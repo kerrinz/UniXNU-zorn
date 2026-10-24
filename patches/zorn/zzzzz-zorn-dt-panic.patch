@@ -1,0 +1,11 @@
+--- a/pexpert/pexpert/arm64/BCM2837.h
++++ b/pexpert/pexpert/arm64/BCM2837.h
+@@ -67,6 +67,8 @@
+ 
+ #define PLATFORM_PANIC_LOG_PADDR        0x3c0fc000
+ #define PLATFORM_PANIC_LOG_SIZE         16384        // 16kb
++/* That address is Pi SRAM. Other SoCs describe the panic log in the device tree. */
++#define XNU_DT_PANIC_REGION             1
+ #endif /* ! ASSEMBLER */
+ 
+ #endif /* ! _PEXPERT_ARM_BCM2837_H */

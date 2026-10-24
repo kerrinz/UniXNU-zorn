@@ -1,0 +1,156 @@
+--- a/osfmk/arm64/arm_vm_init.c
++++ b/osfmk/arm64/arm_vm_init.c
+@@ -369,6 +369,7 @@
+ #define PTOV_TABLE_SIZE 8
+ SECURITY_READ_ONLY_LATE(static ptov_table_entry)        ptov_table[PTOV_TABLE_SIZE];
+ SECURITY_READ_ONLY_LATE(static boolean_t)               kva_active = FALSE;
++
+ 
+ vm_map_address_t
+ phystokv(pmap_paddr_t pa)
+@@ -969,6 +970,7 @@
+ 		*ttep = entry;
+ 	}
+ }
++
+ 
+ /*
+  * arm_vm_page_granular_helper updates protections at the L3 level.  It will (if
+@@ -1589,23 +1591,29 @@
+ 
+ #else
+ 
++static void zorn_vm_band(boot_args *args, uint32_t color);
++
+ static void
+ arm_vm_physmap_init(boot_args *args)
+ {
+ 	ptov_table_entry temp_ptov_table[PTOV_TABLE_SIZE];
+ 
++	zorn_vm_band(args, 0xFF0000FF);
+ 	bzero(temp_ptov_table, sizeof(temp_ptov_table));
+ 
+ 	// Will be handed back to VM layer through ml_static_mfree() in arm_vm_prot_finalize()
+ 	arm_vm_physmap_slide(temp_ptov_table, gVirtBase, segLOWEST - gVirtBase, AP_RWNA,
+ 	    ARM64_GRANULE_ALLOW_BLOCK | ARM64_GRANULE_ALLOW_HINT);
+ 
++	zorn_vm_band(args, 0xFFFFFF00);
+ 	arm_vm_page_granular_RWNX(end_kern, phystokv(args->topOfKernelData) - end_kern,
+ 	    ARM64_GRANULE_ALLOW_BLOCK | ARM64_GRANULE_ALLOW_HINT); /* Device Tree (if not locked down), RAM Disk (if present), bootArgs */
+ 
++	zorn_vm_band(args, 0xFFFF00FF);
+ 	arm_vm_physmap_slide(temp_ptov_table, (args->topOfKernelData - gPhysBase + gVirtBase),
+ 	    real_avail_end - args->topOfKernelData, AP_RWNA, ARM64_GRANULE_ALLOW_BLOCK | ARM64_GRANULE_ALLOW_HINT); // rest of physmem
+ 
++	zorn_vm_band(args, 0xFF0080FF);
+ 	assert((temp_ptov_table[ptov_index - 1].va + temp_ptov_table[ptov_index - 1].len) <= physmap_end);
+ 
+ 	// Sort in descending order of segment length.  LUT traversal is linear, so largest (most likely used)
+@@ -1815,6 +1823,35 @@
+ 
+ #define ARM64_PHYSMAP_SLIDE_RANGE (1ULL << 30) // 1 GB
+ #define ARM64_PHYSMAP_SLIDE_MASK  (ARM64_PHYSMAP_SLIDE_RANGE - 1)
++
++/*
++ * Repaint the top framebuffer band through the bootstrap V=P map.
++ * Blue, yellow, magenta and orange mark the steps inside the physical
++ * aperture setup. White means that returned and the translation-table
++ * switch is next. A store after that switch may no longer reach this panel.
++ */
++static void
++zorn_vm_band(boot_args *args, uint32_t color)
++{
++	uintptr_t base;
++	uint64_t row;
++	uint64_t bytes;
++	uint64_t off;
++
++	if (args->Video.v_baseAddr == 0 || args->Video.v_rowBytes < 8 || args->Video.v_height < 16) {
++		return;
++	}
++	row = args->Video.v_rowBytes;
++	bytes = (args->Video.v_height >> 4) * row;
++	base = (uintptr_t)args->Video.v_baseAddr;
++	for (off = 0; off + 8 <= bytes; off += 8) {
++		*(volatile uint64_t *)(base + off) = ((uint64_t)color << 32) | color;
++	}
++	for (off = 0; off + 64 <= bytes; off += 64) {
++		__asm__ volatile("dc civac, %0" :: "r"(base + off) : "memory");
++	}
++	__asm__ volatile("dsb sy" ::: "memory");
++}
+ 
+ void
+ arm_vm_init(uint64_t memory_size, boot_args * args)
+@@ -1829,6 +1866,8 @@
+ 	vm_offset_t      ptpage_vaddr;
+ 	vm_map_address_t dynamic_memory_begin;
+ 
++	zorn_vm_band(args, 0xFF0000FF);
++
+ 	/*
+ 	 * Get the virtual and physical kernel-managed memory base from boot_args.
+ 	 */
+@@ -1872,7 +1911,9 @@
+ #endif
+ 
+ 	// Slide the physical aperture to a random page-aligned location within the slide range
++	zorn_vm_band(args, 0xFFFFFF00);
+ 	uint64_t physmap_slide = early_random() & ARM64_PHYSMAP_SLIDE_MASK & ~((uint64_t)PAGE_MASK);
++	zorn_vm_band(args, 0xFFFF00FF);
+ 	assert(physmap_slide < ARM64_PHYSMAP_SLIDE_RANGE);
+ 
+ 	physmap_base += physmap_slide;
+@@ -1987,6 +2028,7 @@
+ 	init_ptpages(cpu_tte, physmap_base, ROUND_L1(physmap_end), TRUE, ARM_DYNAMIC_TABLE_XN | ARM_TTE_TABLE_AP(ARM_TTE_TABLE_AP_USER_NA));
+ #endif
+ 
++
+ #if __ARM_KERNEL_PROTECT__
+ 	/* Expand the page tables to prepare for the EL0 mappings. */
+ 	arm_vm_expand_kernel_el0_mappings();
+@@ -2099,6 +2141,7 @@
+ 	vm_prelink_sdata = segPRELINKDATAB;
+ 	vm_prelink_edata = segPRELINKDATAB + segSizePRELINKDATA;
+ 
++	zorn_vm_band(args, 0xFF0080FF);
+ 	arm_vm_prot_init(args);
+ 
+ 	/*
+@@ -2145,6 +2188,9 @@
+ 
+ 	arm_set_user_tbi();
+ 
++	uint64_t zorn_ttbr0;
++	__asm__ volatile("mrs %0, TTBR0_EL1" : "=r"(zorn_ttbr0));
++	zorn_vm_band(args, 0xFF000000);
+ 	arm_vm_physmap_init(args);
+ 	set_mmu_ttb_alternate(cpu_ttep & TTBR_BADDR_MASK);
+ 
+@@ -2154,6 +2200,10 @@
+ 
+ 	set_mmu_ttb(invalid_ttep & TTBR_BADDR_MASK);
+ 
++	/* Keep the bootstrap low map so the panel stays reachable. */
++	set_mmu_ttb(zorn_ttbr0);
++	zorn_vm_band(args, 0xFFFFFFFF);
++
+ 	flush_mmu_tlb();
+ 	kva_active = TRUE;
+ 	// global table pointers may need to be different due to physical aperture remapping
+@@ -2162,6 +2212,7 @@
+ 
+ 	// From here on out, we're off the bootstrap translation tables.
+ 
++
+ 	/* AuxKC initialization has to be deferred until this point, since
+ 	 * the AuxKC may not have been fully mapped in the bootstrap
+ 	 * tables, if it spilled downwards into the prior L2 block.
+@@ -2364,6 +2415,7 @@
+ 		cpu_l1_tte++;
+ 	}
+ 
++
+ 	/*
+ 	 * Adjust avail_start so that the range that the VM owns
+ 	 * starts on a PAGE_SIZE aligned boundary.

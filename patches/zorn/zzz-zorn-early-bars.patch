@@ -1,0 +1,92 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -75,6 +75,41 @@
+ #endif
+ .endmacro
+ 
++
++
++/* Physical framebuffer bands. x20 is boot_args. Video base is +0x28.
++   Band 0 is DarwinEnter's green bar. MMU-off stores reach the panel.
++   The same macro is used once more after the MMU is on; dc civac makes
++   that write visible through the write-back bootstrap map. */
++.macro ZORN_FB_BAND band, lo, hi
++	ldr		x9, [x20, #0x28]
++	cbz		x9, 99f
++	ldr		x10, [x20, #0x38]
++	ldr		x11, [x20, #0x48]
++	lsr		x11, x11, #4
++	mul		x12, x10, x11
++	mov		x13, #\band
++	mul		x13, x13, x12
++	add		x9, x9, x13
++	mov		w13, #\lo
++	movk		w13, #\hi, lsl #16
++	mov		x11, x12
++98:
++	stp		w13, w13, [x9], #8
++	subs		x11, x11, #8
++	b.hi		98b
++	sub		x9, x9, x12
++	bic		x11, x12, #63
++97:
++	cbz		x11, 96f
++	dc		civac, x9
++	add		x9, x9, #64
++	subs		x11, x11, #64
++	b.hi		97b
++96:
++	dsb		sy
++99:
++.endm
+ 
+ .macro MSR_SCTLR_EL1_X0
+ #if defined(KERNEL_INTEGRITY_KTRR)
+@@ -471,6 +506,7 @@
+ 
+ 	mov		x20, x0
+ 	mov		x21, #0
++	ZORN_FB_BAND 1, 0x0000, 0xFFFF
+ 
+ 	// Set low reset vector before attempting any loads
+ 	adrp	x0, EXT(LowExceptionVectorBase)@page
+@@ -624,6 +660,21 @@
+ 	// the early debugger rather than corrupting memory or forging a map.
+ 	b Lbootstrap_tables_exhausted
+ Lbootstrap_tables_ready:
++	/* Ten 2 MiB V=P blocks cover the whole 1440x3200 panel. */
++	ldr		x0, [x20, #0x28]
++	cbz		x0, 1f
++	bic		x0, x0, #0x1fffff
++	mov		x1, x0
++	add		x4, x2, PGBYTES
++	add		x6, x25, #(BOOTSTRAP_TABLE_BYTES >> 12), lsl #12
++	cmp		x4, x6
++	b.hs		1f
++	create_l1_table_entry	x0, x25, x4, x6, x7, x8
++	mov		x5, #10
++	create_l2_block_entries	x0, x1, x4, x5, x6, x7, x8, x9
++	mov		x2, x4
++1:
++	ZORN_FB_BAND 2, 0xFFFF, 0xFF00
+ 	/* Ensure TTEs are visible */
+ 	dsb		ish
+ 
+@@ -762,6 +813,7 @@
+ 	PAC_INIT_KEY_STATE tmp=x0, tmp2=x1
+ #endif /* HAS_APPLE_PAC */
+ 
++	ZORN_FB_BAND 3, 0xFFFF, 0xFFFF
+ 	// Enable caches, MMU, ROP and JOP
+ 	MOV64   x0, SCTLR_EL1_DEFAULT
+ 	MSR_SCTLR_EL1_X0
+@@ -831,6 +883,9 @@
+ 	mov	lr, x21
+ #endif
+ 
++	mov		x19, x0
++	ZORN_FB_BAND 0, 0x00FF, 0xFF00
++	mov		x0, x19
+ 	// Return to arm_init()
+ 	ret
+ 

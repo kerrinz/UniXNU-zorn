@@ -1,0 +1,356 @@
+--- a/osfmk/arm/arm_init.c
++++ b/osfmk/arm/arm_init.c
+@@ -337,7 +337,204 @@
+ #endif /* __arm64 */
+ }
+ 
++
+ /*
++ * Repaint one 1/16 framebuffer band through the bootstrap V=P map.
++ * Band 1 turns green once arm_init runs. Band 3 is black while the
++ * timer event stream is armed, yellow while the CPU topology is parsed,
++ * white while the bootstrap thread is created, and cyan during
++ * cpu_bootstrap. Band 2 turns red when the platform expert returns.
++ * Band 0 then leaves blue: green is the early clock, yellow is startup
++ * hooks, orange is cpu_init, white is arm_vm_init, cyan means that
++ * returned.
++ */
++static void
++zorn_fb_band(boot_args *args, unsigned int band, uint32_t color)
++{
++	uintptr_t base;
++	uint64_t row;
++	uint64_t bytes;
++	uint64_t off;
++
++	if (args->Video.v_baseAddr == 0 || args->Video.v_rowBytes < 8 || args->Video.v_height < 16) {
++		return;
++	}
++	row = args->Video.v_rowBytes;
++	bytes = (args->Video.v_height >> 4) * row;
++	base = (uintptr_t)args->Video.v_baseAddr + band * bytes;
++	for (off = 0; off + 8 <= bytes; off += 8) {
++		*(volatile uint64_t *)(base + off) = ((uint64_t)color << 32) | color;
++	}
++	for (off = 0; off + 64 <= bytes; off += 64) {
++		__asm__ volatile("dc civac, %0" :: "r"(base + off) : "memory");
++	}
++	__asm__ volatile("dsb sy" ::: "memory");
++}
++
++void
++zorn_fb_top(boot_args *args, uint32_t color)
++{
++	zorn_fb_band(args, 0, color);
++}
++
++/* 5x7 glyphs, bit 4 is the left pixel. Words run left to right,
++   separated by " | ", and wrap under the color bands. */
++static const uint8_t zorn_glyph_az[26][7] = {
++	{0x0E, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11}, /* A */
++	{0x1E, 0x11, 0x11, 0x1E, 0x11, 0x11, 0x1E}, /* B */
++	{0x0F, 0x10, 0x10, 0x10, 0x10, 0x10, 0x0F}, /* C */
++	{0x1E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1E}, /* D */
++	{0x1F, 0x10, 0x10, 0x1E, 0x10, 0x10, 0x1F}, /* E */
++	{0x1F, 0x10, 0x10, 0x1E, 0x10, 0x10, 0x10}, /* F */
++	{0x0F, 0x10, 0x10, 0x17, 0x11, 0x11, 0x0F}, /* G */
++	{0x11, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11}, /* H */
++	{0x0E, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0E}, /* I */
++	{0x01, 0x01, 0x01, 0x01, 0x01, 0x11, 0x0E}, /* J */
++	{0x11, 0x12, 0x14, 0x18, 0x14, 0x12, 0x11}, /* K */
++	{0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1F}, /* L */
++	{0x11, 0x1B, 0x15, 0x15, 0x11, 0x11, 0x11}, /* M */
++	{0x11, 0x19, 0x15, 0x13, 0x11, 0x11, 0x11}, /* N */
++	{0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E}, /* O */
++	{0x1E, 0x11, 0x11, 0x1E, 0x10, 0x10, 0x10}, /* P */
++	{0x0E, 0x11, 0x11, 0x11, 0x15, 0x12, 0x0D}, /* Q */
++	{0x1E, 0x11, 0x11, 0x1E, 0x14, 0x12, 0x11}, /* R */
++	{0x0F, 0x10, 0x10, 0x0E, 0x01, 0x01, 0x1E}, /* S */
++	{0x1F, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04}, /* T */
++	{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E}, /* U */
++	{0x11, 0x11, 0x11, 0x11, 0x11, 0x0A, 0x04}, /* V */
++	{0x11, 0x11, 0x11, 0x15, 0x15, 0x1B, 0x11}, /* W */
++	{0x11, 0x11, 0x0A, 0x04, 0x0A, 0x11, 0x11}, /* X */
++	{0x11, 0x11, 0x0A, 0x04, 0x04, 0x04, 0x04}, /* Y */
++	{0x1F, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1F}, /* Z */
++};
++
++static const uint8_t zorn_glyph_09[10][7] = {
++	{0x0E, 0x11, 0x13, 0x15, 0x19, 0x11, 0x0E}, /* 0 */
++	{0x04, 0x0C, 0x04, 0x04, 0x04, 0x04, 0x0E}, /* 1 */
++	{0x0E, 0x11, 0x01, 0x02, 0x04, 0x08, 0x1F}, /* 2 */
++	{0x0E, 0x11, 0x01, 0x06, 0x01, 0x11, 0x0E}, /* 3 */
++	{0x02, 0x06, 0x0A, 0x12, 0x1F, 0x02, 0x02}, /* 4 */
++	{0x1F, 0x10, 0x1E, 0x01, 0x01, 0x11, 0x0E}, /* 5 */
++	{0x0E, 0x10, 0x1E, 0x11, 0x11, 0x11, 0x0E}, /* 6 */
++	{0x1F, 0x01, 0x02, 0x04, 0x08, 0x08, 0x08}, /* 7 */
++	{0x0E, 0x11, 0x11, 0x0E, 0x11, 0x11, 0x0E}, /* 8 */
++	{0x0E, 0x11, 0x11, 0x0F, 0x01, 0x01, 0x0E}, /* 9 */
++};
++
++static const uint8_t zorn_glyph_bar[7] = {
++	0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04
++};
++
++static const uint8_t *
++zorn_glyph_for(char ch)
++{
++	if (ch >= 'a' && ch <= 'z') {
++		ch = (char)(ch - 'a' + 'A');
++	}
++	if (ch >= 'A' && ch <= 'Z') {
++		return zorn_glyph_az[ch - 'A'];
++	}
++	if (ch >= '0' && ch <= '9') {
++		return zorn_glyph_09[ch - '0'];
++	}
++	if (ch == '|') {
++		return zorn_glyph_bar;
++	}
++	return NULL;
++}
++
++static void
++zorn_draw_char(uintptr_t base, int row_bytes, int x, int y, int scale, const uint8_t *glyph)
++{
++	const uint32_t on = 0xFFFFFFFF;
++	const uint32_t off = 0xFF000000;
++	int row;
++	int sy;
++	int col;
++
++	for (row = 0; row < 7; row++) {
++		uint8_t bits = glyph ? glyph[row] : 0;
++
++		for (sy = 0; sy < scale; sy++) {
++			volatile uint32_t *pixel = (volatile uint32_t *)(base +
++			    (uintptr_t)(y + row * scale + sy) * row_bytes + (uintptr_t)x * 4);
++
++			for (col = 0; col < 6 * scale; col++) {
++				int bit = col / scale;
++				uint32_t color = off;
++
++				if (bit < 5 && (bits & (0x10 >> bit))) {
++					color = on;
++				}
++				pixel[col] = color;
++			}
++		}
++	}
++}
++
++static void
++zorn_draw_text(uintptr_t base, int row_bytes, int *x, int y, int scale, const char *text)
++{
++	const char *cursor;
++
++	for (cursor = text; *cursor != '\0'; cursor++) {
++		zorn_draw_char(base, row_bytes, *x, y, scale, zorn_glyph_for(*cursor));
++		*x += 6 * scale;
++	}
++}
++
++static void
++zorn_say_flush(uintptr_t base, int row_bytes, int y, int scale)
++{
++	int row;
++	int byte;
++
++	for (row = 0; row < 7 * scale; row++) {
++		uintptr_t line = base + (uintptr_t)(y + row) * row_bytes;
++
++		for (byte = 0; byte < row_bytes; byte += 64) {
++			__asm__ volatile("dc civac, %0" :: "r"(line + byte) : "memory");
++		}
++	}
++	__asm__ volatile("dsb sy" ::: "memory");
++}
++
++void
++zorn_say(const char *text)
++{
++	static int zorn_say_x = 40;
++	static int zorn_say_y = 820;
++	const int scale = 5;
++	const int cell = 6 * scale;
++	const int x_left = 40;
++	const int x_right = 1400;
++	const char *sep = " | ";
++	uintptr_t base = 0xFC400000;
++	const int row_bytes = 5760;
++	const char *cursor;
++	int width = 0;
++
++	if (text == NULL || *text == '\0' || zorn_say_y > 3000) {
++		return;
++	}
++	for (cursor = text; *cursor != '\0'; cursor++) {
++		width += cell;
++	}
++	if (zorn_say_x != x_left && zorn_say_x + 3 * cell + width > x_right) {
++		zorn_say_x = x_left;
++		zorn_say_y += 7 * scale + 8;
++		if (zorn_say_y > 3000) {
++			return;
++		}
++	}
++	if (zorn_say_x != x_left) {
++		zorn_draw_text(base, row_bytes, &zorn_say_x, zorn_say_y, scale, sep);
++	}
++	zorn_draw_text(base, row_bytes, &zorn_say_x, zorn_say_y, scale, text);
++	zorn_say_flush(base, row_bytes, zorn_say_y, scale);
++}
++
++/*
+  *		Routine:		arm_init
+  *		Function:		Runs on the boot CPU, once, on entry from iBoot.
+  */
+@@ -354,9 +551,12 @@
+ 	DTEntry chosen = NULL;
+ 	unsigned int dt_entry_size = 0;
+ 
++	zorn_fb_band(args, 1, 0xFF00FF00);
+ 	arm_setup_pre_sign();
++	zorn_fb_band(args, 3, 0xFF000000);
+ 
+ 	arm_slide_rebase_and_sign_image();
++	zorn_fb_band(args, 3, 0xFFFFFF00);
+ 
+ 	/* If kernel integrity is supported, use a constant copy of the boot args. */
+ 	const_boot_args = *args;
+@@ -368,11 +568,14 @@
+ 	BootCpuData.rop_key = ml_default_rop_pid();
+ 	BootCpuData.jop_key = ml_default_jop_pid();
+ #endif /* defined(HAS_APPLE_PAC) */
++	zorn_fb_band(args, 3, 0xFFFF00FF);
+ 
+ 	PE_init_platform(FALSE, args); /* Get platform expert set up */
++	zorn_fb_band(args, 2, 0xFFFF0000);
+ 	boot_progress_init();
+ 
+ #if __arm64__
++	zorn_fb_band(args, 3, 0xFF000000);
+ 	configure_timer_apple_regs();
+ 	wfe_timeout_configure();
+ 	wfe_timeout_init();
+@@ -441,6 +644,7 @@
+ 	}
+ #endif
+ 
++	zorn_fb_band(args, 3, 0xFFFFFF00);
+ 	ml_parse_cpu_topology();
+ 
+ 
+@@ -458,6 +662,7 @@
+ 	    + ((uintptr_t)&BootCpuData
+ 	    - (uintptr_t)(args->virtBase)));
+ 
++	zorn_fb_band(args, 3, 0xFFFFFFFF);
+ 	thread = thread_bootstrap();
+ 	thread->machine.CpuDatap = &BootCpuData;
+ 	thread->machine.pcpu_data_base = (vm_offset_t)0;
+@@ -470,10 +675,13 @@
+ 	 * preemption level is not really meaningful for the bootstrap thread.
+ 	 */
+ 	thread->machine.preemption_count = 0;
++	zorn_fb_band(args, 3, 0xFF00FFFF);
+ 	cpu_bootstrap();
+ 
++	zorn_fb_band(args, 0, 0xFF00FF00);
+ 	rtclock_early_init();
+ 
++	zorn_fb_band(args, 0, 0xFFFFFF00);
+ 	kernel_debug_string_early("kernel_startup_bootstrap");
+ 	kernel_startup_bootstrap();
+ 
+@@ -482,6 +690,7 @@
+ 	 */
+ 	timer_call_init();
+ 
++	zorn_fb_band(args, 0, 0xFF0080FF);
+ 	cpu_init();
+ 
+ 	processor_bootstrap();
+@@ -531,13 +740,16 @@
+ 	__builtin_arm_wsr("pan", 1);
+ #endif  /* __ARM_PAN_AVAILABLE__ */
+ 
++	zorn_fb_band(args, 0, 0xFFFFFFFF);
+ 	boot_progress_stage("arm_vm_init enter");
+ 	arm_vm_init(xmaxmem, args);
++	zorn_fb_band(args, 0, 0xFF00FFFF);
+ 	boot_progress_stage("arm_vm_init returned");
+ 
+ 	if (debug_boot_arg) {
+ 		patch_low_glo();
+ 	}
++	zorn_fb_band(args, 0, 0xFF000000);
+ 
+ #if __arm64__ && WITH_CLASSIC_S2R
+ 	sleep_token_buffer_init();
+@@ -546,8 +758,11 @@
+ 	PE_consistent_debug_inherit();
+ 
+ 	/* Setup debugging output. */
++	zorn_fb_band(args, 0, 0xFFFFFF00);
+ 	const unsigned int serial_exists = serial_init();
++	zorn_fb_band(args, 0, 0xFF00FF00);
+ 	kernel_startup_initialize_upto(STARTUP_SUB_KPRINTF);
++	zorn_fb_band(args, 0, 0xFFFFFF00);
+ 	kprintf("kprintf initialized\n");
+ 
+ 	serialmode = 0;
+@@ -588,7 +803,9 @@
+ 		(void)switch_to_serial_console(); /* Switch into serial mode from video console */
+ 		disableConsoleOutput = FALSE;     /* Allow printfs to happen */
+ 	}
++	zorn_fb_band(args, 0, 0xFF000000);
+ 	PE_create_console();
++	zorn_fb_band(args, 0, 0xFFFF00FF);
+ 
+ 	/* setup console output */
+ 	PE_init_printf(FALSE);
+@@ -599,6 +816,7 @@
+ #endif
+ #endif
+ 
++	zorn_fb_band(args, 0, 0xFF0080FF);
+ 	cpu_machine_idle_init(TRUE);
+ 
+ 	PE_init_platform(TRUE, &BootCpuData);
+@@ -609,6 +827,8 @@
+ 		panic("The cpumask=N boot arg cannot be used together with cpus=N, and the boot CPU must be enabled");
+ 	}
+ 
++	zorn_fb_band(args, 0, 0xFFFFFFFF);
++	zorn_say("PIO");
+ 	ml_map_cpu_pio();
+ 
+ #if APPLE_ARM64_ARCH_FAMILY
+@@ -618,6 +838,7 @@
+ #endif
+ 
+ 	cpu_timebase_init(TRUE);
++	zorn_say("TIME");
+ 
+ #if KPERF
+ 	/* kptimer_curcpu_up() must be called after cpu_timebase_init */
+@@ -625,7 +846,9 @@
+ #endif /* KPERF */
+ 
+ 	PE_init_cpu();
++	zorn_say("CPU");
+ 	fiq_context_init(TRUE);
++	zorn_say("FIQ");
+ 
+ 
+ #if HIBERNATION
+@@ -667,6 +890,8 @@
+ 	 * against string vulnerabilities
+ 	 */
+ 	__stack_chk_guard &= ~(0xFFULL << 8);
++	zorn_fb_band(args, 0, 0xFFFFFF00);
++	zorn_say("GO");
+ 	machine_startup(args);
+ }
+ 

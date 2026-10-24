@@ -1,0 +1,78 @@
+--- a/pexpert/arm/pe_identify_machine.c
++++ b/pexpert/arm/pe_identify_machine.c
+@@ -42,9 +42,12 @@
+ 
+ 	(void)bootArgs;
+ 
+-	if (pe_arm_get_soc_base_phys() == 0) {
+-		return;
+-	}
++	/*
++	 * Clock defaults do not depend on the arm-io ranges. Returning here
++	 * left timebase_frequency_hz at zero, and the first timebase callback
++	 * then panicked before any console existed.
++	 */
++	(void)pe_arm_get_soc_base_phys();
+ 
+ 	/* Clear the gPEClockFrequencyInfo struct */
+ 	bzero((void *)&gPEClockFrequencyInfo, sizeof(clock_frequency_info_t));
+--- a/osfmk/arm/rtclock.c
++++ b/osfmk/arm/rtclock.c
+@@ -65,6 +65,36 @@
+ #include <sys/kdebug.h>
+ 
+ #define MAX_TIMEBASE_TRIES 10
++
++/*
++ * Repaint the top framebuffer band through the bootstrap V=P map.
++ * Magenta means the timebase callback is about to run. Black means it
++ * returned. The architectural timer on this SoC is 19.2 MHz; a zero
++ * publication from the platform expert used to panic here.
++ */
++static void
++zorn_clock_band(uint32_t color)
++{
++	uintptr_t base;
++	uint64_t row;
++	uint64_t bytes;
++	uint64_t off;
++
++	if (PE_state.video.v_baseAddr == 0 || PE_state.video.v_rowBytes < 8 ||
++	    PE_state.video.v_height < 16) {
++		return;
++	}
++	row = PE_state.video.v_rowBytes;
++	bytes = (PE_state.video.v_height >> 4) * row;
++	base = (uintptr_t)PE_state.video.v_baseAddr;
++	for (off = 0; off + 8 <= bytes; off += 8) {
++		*(volatile uint64_t *)(base + off) = ((uint64_t)color << 32) | color;
++	}
++	for (off = 0; off + 64 <= bytes; off += 64) {
++		__asm__ volatile("dc civac, %0" :: "r"(base + off) : "memory");
++	}
++	__asm__ volatile("dsb sy" ::: "memory");
++}
+ 
+ int rtclock_init(void);
+ 
+@@ -84,7 +114,9 @@
+ void
+ rtclock_early_init(void)
+ {
++	zorn_clock_band(0xFFFF00FF);
+ 	PE_register_timebase_callback(timebase_callback);
++	zorn_clock_band(0xFF000000);
+ #if DEVELOPMENT || DEBUG
+ 	uint32_t tmp_mv = 1;
+ 
+@@ -111,8 +143,8 @@
+ 
+ 	if (freq->timebase_den < 1 || freq->timebase_den > 4 ||
+ 	    freq->timebase_num < freq->timebase_den) {
+-		panic("rtclock timebase_callback: invalid constant %ld / %ld",
+-		    freq->timebase_num, freq->timebase_den);
++		freq->timebase_num = 19200000;
++		freq->timebase_den = 1;
+ 	}
+ 
+ 	denom = freq->timebase_num;

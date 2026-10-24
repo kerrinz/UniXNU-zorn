@@ -1,0 +1,80 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -1341,6 +1341,8 @@
+ 	 * return an error code to the parent process.
+ 	 */
+ 
++	extern void zorn_say(const char *);
++	zorn_say("EMACH");
+ 	/*
+ 	 * Actually load the image file we previously decided to load.
+ 	 */
+@@ -2247,6 +2249,8 @@
+ 	    UIO_SYSSPACE, CAST_USER_ADDR_T(excpath), imgp->ip_vfs_context);
+ 
+ again:
++	extern void zorn_say(const char *);
++	zorn_say("ENAME");
+ 	error = namei(ndp);
+ 	if (error) {
+ 		if (error == ERESTART) {
+@@ -2256,6 +2260,7 @@
+ 	}
+ 	imgp->ip_ndp = ndp;     /* successful namei(); call nameidone() later */
+ 	imgp->ip_vp = ndp->ni_vp;       /* if set, need to vnode_put() at some point */
++	zorn_say("EOPEN");
+ 
+ 	/*
+ 	 * Before we start the transition from binary A to binary B, make
+@@ -5233,6 +5238,8 @@
+ 		 * the old proc in pid hash and other lists that make
+ 		 * the proc visible to the system.
+ 		 */
++		extern void zorn_say(const char *);
++		zorn_say("ECLONE");
+ 		imgp->ip_new_thread = cloneproc(old_task, NULL, p, CLONEPROC_EXEC);
+ 		/* task and thread ref returned by cloneproc */
+ 		if (imgp->ip_new_thread == NULL) {
+@@ -5260,6 +5267,8 @@
+ 	 * Warning: If activation failed after point of no return, it returns error
+ 	 * as 0 and pretends the call succeeded.
+ 	 */
++	extern void zorn_say(const char *);
++	zorn_say("EACT");
+ 	error = exec_activate_image(imgp);
+ 	/* thread and task ref returned for vfexec case */
+ 
+@@ -7971,6 +7980,15 @@
+ 	 */
+ 	set_security_token(p, proc_ucred_unsafe(p));
+ 
++	extern void zorn_say(const char *);
++	if (path[1] == 's') {
++		zorn_say("LBIN");
++	} else if (path[5] == 'a') {
++		zorn_say("LDEV");
++	} else {
++		zorn_say("LPATH");
++	}
++	zorn_say("LEXEC");
+ 	return execve(p, &init_exec_args, retval);
+ }
+ 
+@@ -8090,6 +8108,8 @@
+ 	}
+ #endif
+ 
++	extern void zorn_say(const char *);
++	zorn_say("LTRY");
+ 	error = ENOENT;
+ 	for (i = 0; i < sizeof(init_programs) / sizeof(init_programs[0]); i++) {
+ 		printf("load_init_program: attempting to load %s\n", init_programs[i]);
+@@ -8101,6 +8121,8 @@
+ 		}
+ 	}
+ 
++	extern void zorn_say(const char *);
++	zorn_say("NOLAUNCH");
+ 	panic("Process 1 exec of %s failed, errno %d", ((i == 0) ? "<null>" : init_programs[i - 1]), error);
+ }
+ 

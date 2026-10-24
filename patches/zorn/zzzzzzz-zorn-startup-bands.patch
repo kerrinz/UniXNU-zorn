@@ -1,0 +1,295 @@
+--- a/osfmk/arm64/machine_routines.c
++++ b/osfmk/arm64/machine_routines.c
+@@ -496,19 +496,55 @@
+ #endif
+ }
+ 
+-void
+-machine_startup(__unused boot_args * args)
++static boot_args *zorn_paint_args = (boot_args *)1;
++
++static void
++zorn_paint(boot_args *args, uint32_t color)
++{
++	uintptr_t base;
++	uint64_t row;
++	uint64_t bytes;
++	uint64_t off;
++
++	if (args == NULL || args->Video.v_baseAddr == 0 || args->Video.v_rowBytes < 8 ||
++	    args->Video.v_height < 16) {
++		return;
++	}
++	row = args->Video.v_rowBytes;
++	bytes = (args->Video.v_height >> 4) * row;
++	base = (uintptr_t)args->Video.v_baseAddr;
++	for (off = 0; off + 8 <= bytes; off += 8) {
++		*(volatile uint64_t *)(base + off) = ((uint64_t)color << 32) | color;
++	}
++	for (off = 0; off + 64 <= bytes; off += 64) {
++		__asm__ volatile("dc civac, %0" :: "r"(base + off) : "memory");
++	}
++	__asm__ volatile("dsb sy" ::: "memory");
++}
++
++void
++zorn_top_band(uint32_t color)
++{
++	zorn_paint(zorn_paint_args, color);
++}
++
++void
++machine_startup(boot_args * args)
+ {
++	extern void zorn_fb_top(boot_args *args, uint32_t color);
++	extern void zorn_say(const char *text);
++
++	zorn_say("MSTART");
++	zorn_fb_top(args, 0xFFFF00FF);
+ #if defined(HAS_IPI) && (DEVELOPMENT || DEBUG)
+ 	if (!PE_parse_boot_argn("fastipi", &gFastIPI, sizeof(gFastIPI))) {
+ 		gFastIPI = 1;
+ 	}
+ #endif /* defined(HAS_IPI) && (DEVELOPMENT || DEBUG)*/
+ 
+-
++	zorn_paint_args = args;
+ 	machine_conf();
+-
+-
++	zorn_fb_top(args, 0xFF000000);
+ 	/*
+ 	 * Kick off the kernel bootstrap.
+ 	 */
+--- a/osfmk/kern/startup.c
++++ b/osfmk/kern/startup.c
+@@ -431,12 +431,20 @@
+ 
+ 	code_signing_config_t cs_config;
+ 
++	extern void zorn_top_band(uint32_t color);
++	extern void zorn_say(const char *text);
++	zorn_say("KBOOT");
++	zorn_top_band(0xFF000000);
+ 	printf("%s\n", version); /* log kernel version */
+ 
+ 	scale_setup();
+ 
++	zorn_say("VM");
++	zorn_top_band(0xFFFFFFFF);
+ 	kernel_bootstrap_log("vm_mem_bootstrap");
+ 	vm_mem_bootstrap();
++	zorn_say("VMDONE");
++	zorn_top_band(0xFF0080FF);
+ 
+ 	machine_info.memory_size = (uint32_t)mem_size;
+ #if XNU_TARGET_OS_OSX
+@@ -446,6 +454,7 @@
+ #endif /* XNU_TARGET_OS_OSX */
+ 	machine_info.major_version = version_major;
+ 	machine_info.minor_version = version_minor;
++	zorn_say("INFO");
+ 
+ #if CONFIG_ATM
+ 	/* Initialize the Activity Trace Resource Manager. */
+@@ -453,6 +462,7 @@
+ 	atm_init();
+ #endif
+ 	kernel_startup_initialize_upto(STARTUP_SUB_OSLOG);
++	zorn_say("OSLOG");
+ 
+ #if CONFIG_UBSAN_MINIMAL
+ 	kernel_bootstrap_log("UBSan minimal runtime init");
+@@ -481,19 +491,23 @@
+ 
+ 	kernel_bootstrap_log("console_init");
+ 	console_init();
++	zorn_say("CON");
+ 
+ 	kernel_bootstrap_log("stackshot_init");
+ 	stackshot_init();
+ 
+ 	kernel_bootstrap_log("sched_init");
+ 	sched_init();
++	zorn_say("SCHED");
+ 
+ #if CONFIG_MACF
+ 	kernel_bootstrap_log("mac_policy_init");
+ 	mac_policy_init();
++	zorn_say("MAC");
+ #endif
+ 
+ 	kernel_startup_initialize_upto(STARTUP_SUB_MACH_IPC);
++	zorn_say("IPC");
+ 
+ 	/*
+ 	 * As soon as the virtual memory system is up, we record
+@@ -501,18 +515,22 @@
+ 	 */
+ 	kernel_bootstrap_log("PMAP_ACTIVATE_KERNEL");
+ 	PMAP_ACTIVATE_KERNEL(master_cpu);
++	zorn_say("PMAP");
+ 
+ 	kernel_bootstrap_log("mapping_free_prime");
+ 	mapping_free_prime();                                           /* Load up with temporary mapping blocks */
++	zorn_say("MAP");
+ 
+ 	kernel_bootstrap_log("machine_init");
+ 	machine_init();
++	zorn_say("MACH");
+ 
+ 	kernel_bootstrap_log("thread_machine_init_template");
+ 	thread_machine_init_template();
+ 
+ 	kernel_bootstrap_log("clock_init");
+ 	clock_init();
++	zorn_say("CLK");
+ 
+ 	/*
+ 	 *	Initialize the IPC, task, and thread subsystems.
+@@ -530,6 +548,7 @@
+ 	kernel_bootstrap_log("code_signing_init");
+ 	code_signing_init();
+ 	code_signing_configuration(NULL, &cs_config);
++	zorn_say("CS");
+ #if XNU_TARGET_OS_OSX && (DEVELOPMENT || DEBUG)
+ 	if (cs_config & CS_CONFIG_GET_OUT_OF_MY_WAY) {
+ 		AMFI_bootarg_disable_mach_hardening = true;
+@@ -538,9 +557,11 @@
+ 
+ 	kernel_bootstrap_log("task_init");
+ 	task_init();
++	zorn_say("TASK");
+ 
+ 	kernel_bootstrap_log("thread_init");
+ 	thread_init();
++	zorn_say("THR");
+ 
+ 	kernel_bootstrap_log("restartable_init");
+ 	restartable_init();
+@@ -560,6 +581,7 @@
+ 	/* initialize exceptions */
+ 	kernel_bootstrap_log("exception_init");
+ 	exception_init();
++	zorn_say("EXC");
+ 
+ #if CONFIG_SCHED_SFI
+ 	kernel_bootstrap_log("sfi_init");
+@@ -576,6 +598,7 @@
+ 	if (result != KERN_SUCCESS) {
+ 		panic("kernel_bootstrap: result = %08X", result);
+ 	}
++	zorn_say("KTHR");
+ 
+ 	/* TODO: do a proper thread_start() (without the thread_setrun()) */
+ 	thread->state = TH_RUN;
+@@ -585,6 +608,7 @@
+ 	thread_deallocate(thread);
+ 
+ 	kernel_bootstrap_log("load_context - done");
++	zorn_say("CTX");
+ 	load_context(thread);
+ 	/*NOTREACHED*/
+ }
+@@ -602,8 +626,11 @@
+ static void
+ kernel_bootstrap_thread(void)
+ {
++	extern void zorn_say(const char *text);
+ 	processor_t processor = current_processor();
+ 
++	zorn_say("BSTHR");
++
+ #if (DEVELOPMENT || DEBUG)
+ 	platform_stall_panic_or_spin(PLATFORM_STALL_XNU_LOCATION_KERNEL_BOOTSTRAP);
+ #endif
+@@ -613,6 +640,7 @@
+ 	 * Create the idle processor thread.
+ 	 */
+ 	idle_thread_create(processor);
++	zorn_say("IDLE");
+ 
+ 	/*
+ 	 * N.B. Do not stick anything else
+@@ -622,6 +650,7 @@
+ 	 */
+ 	kernel_bootstrap_thread_log("sched_startup");
+ 	sched_startup();
++	zorn_say("SCHED2");
+ 
+ 	/*
+ 	 * Thread lifecycle maintenance (teardown, stack allocation)
+@@ -698,6 +727,7 @@
+ #ifdef  IOKIT
+ 	kernel_bootstrap_log("PE_init_iokit");
+ 	PE_init_iokit();
++	zorn_say("IOKIT");
+ #endif
+ 
+ 	assert(ml_get_interrupts_enabled() == FALSE);
+@@ -713,21 +743,25 @@
+ 	ml_spin_debug_clear_self();
+ #endif
+ 	(void) spllo();         /* Allow interruptions */
++	zorn_say("SPL");
+ 
+ 	/*
+ 	 * This will start displaying progress to the user, start as early as possible
+ 	 */
+ 	initialize_screen(NULL, kPEAcquireScreen);
++	zorn_say("SCR");
+ 
+ 	/*
+ 	 *	Initialize the shared region module.
+ 	 */
+ 	vm_commpage_init();
+ 	vm_commpage_text_init();
++	zorn_say("COMM");
+ 
+ #if CONFIG_MACF
+ 	kernel_bootstrap_log("mac_policy_initmach");
+ 	mac_policy_initmach();
++	zorn_say("MAC2");
+ #if CONFIG_VNGUARD
+ 	kernel_bootstrap_log("vnguard_policy_init");
+ 	vnguard_policy_init();
+@@ -775,6 +809,7 @@
+ 	 */
+ 	kernel_bootstrap_log("OSKextRemoveKextBootstrap");
+ 	OSKextRemoveKextBootstrap();
++	zorn_say("KEXT");
+ 
+ #if SOCKETS
+ 	/*
+@@ -786,6 +821,7 @@
+ 	/* No changes to kernel text and rodata beyond this point. */
+ 	kernel_bootstrap_log("machine_lockdown");
+ 	machine_lockdown();
++	zorn_say("LOCK");
+ 
+ #ifdef CONFIG_XNUPOST
+ 	kern_return_t result = kernel_list_tests();
+@@ -799,6 +835,7 @@
+ #ifdef  IOKIT
+ 	kernel_bootstrap_log("PE_lockdown_iokit");
+ 	PE_lockdown_iokit();
++	zorn_say("IOLOCK");
+ #endif
+ 	/*
+ 	 * max_cpus must be nailed down by the time PE_lockdown_iokit() finishes,
+@@ -815,6 +852,7 @@
+ 	 *	Start the user bootstrap.
+ 	 */
+ #ifdef  MACH_BSD
++	zorn_say("BSD");
+ 	bsd_init();
+ #endif
+ 
+@@ -840,6 +878,7 @@
+ 	/*
+ 	 *	Become the pageout daemon.
+ 	 */
++	zorn_say("PAGE");
+ 	vm_pageout();
+ 	/*NOTREACHED*/
+ }

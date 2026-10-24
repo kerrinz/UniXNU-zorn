@@ -1,0 +1,41 @@
+--- a/bsd/kern/mach_loader.c
++++ b/bsd/kern/mach_loader.c
+@@ -484,6 +484,7 @@
+ 	pmap_flags |= result->is_64bit_addr ? PMAP_CREATE_64BIT : 0;
+ 
+ 	task_t ledger_task;
++	extern void zorn_say(const char *);
+ 	if (imgp->ip_new_thread) {
+ 		ledger_task = get_threadtask(imgp->ip_new_thread);
+ 	} else {
+@@ -499,12 +500,14 @@
+ 	}
+ #endif /* XNU_TARGET_OS_OSX && _POSIX_SPAWN_FORCE_4K_PAGES && PMAP_CREATE_FORCE_4K_PAGE */
+ 
++	zorn_say("PMAP");
+ 	pmap = pmap_create_options(get_task_ledger(ledger_task),
+ 	    (vm_map_size_t) 0,
+ 	    pmap_flags);
+ 	if (pmap == NULL) {
+ 		return LOAD_RESOURCE;
+ 	}
++	zorn_say("VMAP");
+ 	map = vm_map_create_options(pmap, 0,
+ 	    vm_compute_max_offset(result->is_64bit_addr),
+ 	    VM_MAP_CREATE_PAGEABLE);
+@@ -550,6 +553,7 @@
+ 	/*
+ 	 * Compute a random offset for ASLR, and an independent random offset for dyld.
+ 	 */
++	zorn_say("ASLR");
+ 	if (!(imgp->ip_flags & IMGPF_DISABLE_ASLR)) {
+ 		vm_map_get_max_aslr_slide_section(map, &aslr_section_offset, &aslr_section_size);
+ 		aslr_section_offset = (random() % aslr_section_offset) * aslr_section_size;
+@@ -581,6 +585,7 @@
+ 	result->is_64bit_addr = ((imgp->ip_flags & IMGPF_IS_64BIT_ADDR) == IMGPF_IS_64BIT_ADDR);
+ 	result->is_64bit_data = ((imgp->ip_flags & IMGPF_IS_64BIT_DATA) == IMGPF_IS_64BIT_DATA);
+ 
++	zorn_say("PARSE");
+ 	lret = parse_machfile(vp, map, thread, header, file_offset, macho_size,
+ 	    0, aslr_page_offset, dyld_aslr_page_offset, result,
+ 	    NULL, imgp);

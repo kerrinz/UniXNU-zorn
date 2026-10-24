@@ -1,0 +1,99 @@
+--- a/iokit/bsddev/IOKitBSDInit.cpp
++++ b/iokit/bsddev/IOKitBSDInit.cpp
+@@ -68,6 +68,7 @@
+ extern void di_root_ramfile(IORegistryEntry * entry);
+ extern int IODTGetDefault(const char *key, void *infoAddr, unsigned int infoSize);
+ extern boolean_t cpuid_vmm_present(void);
++extern void zorn_say(const char *);
+ 
+ #define ROUNDUP(a, b) (((a) + ((b) - 1)) & (~((b) - 1)))
+ 
+@@ -759,11 +760,18 @@
+ 	assert(matching);
+ 	matching->setObject(gIOResourceMatchedKey, gIOBSDKey);
+ 
+-	if ((service = IOService::waitForMatchingService(matching, 30ULL * kSecondScale))) {
++	static int zorn_find_root_gave_up = 0;
++	if (zorn_find_root_gave_up) {
++		matching->release();
++		return kIOReturnError;
++	}
++	zorn_say("IORES");
++	if ((service = IOService::waitForMatchingService(matching, 2ULL * kSecondScale))) {
+ 		OSSafeReleaseNULL(service);
+ 	} else {
+ 		IOLog("!BSD\n");
+ 	}
++	zorn_say("IORES2");
+ 	matching->release();
+ 	matching = NULL;
+ 
+@@ -869,6 +877,7 @@
+ 				rootName[3] = 0;                                                                /* Build root name */
+ 				IOLog("BSD root: %s, major %d, minor %d\n", rootName, major(*root), minor(*root));
+ 				*oflags = 0;                                                                    /* Show that this is not network */
++				zorn_say("MD0");
+ 
+ #if CONFIG_KDP_INTERACTIVE_DEBUGGING
+ 				/* retrieve final ramdisk range and initialize KDP variables */
+@@ -881,6 +890,7 @@
+ 
+ 				goto iofrootx;                                                                  /* Join common exit... */
+ 			}
++			zorn_say("NOMD");
+ 			panic("IOFindBSDRoot: specified root memory device, %s, has not been configured", rdBootVar); /* Not there */
+ 		}
+ 	}
+@@ -950,41 +960,18 @@
+ 	    || PE_parse_boot_argn("-s", namep, sizeof(namep))) {
+ 		IOService::startDeferredMatches();
+ 	}
+-
+-	do {
+-		t.tv_sec = ROOTDEVICETIMEOUT;
+-		t.tv_nsec = 0;
+-		matching->retain();
+-		service = IOService::waitForService( matching, &t );
+-		if ((!service) || (mountAttempts == 10)) {
+-#if !XNU_TARGET_OS_OSX || !defined(__arm64__)
+-			PE_display_icon( 0, "noroot");
+-			IOLog( "Still waiting for root device\n" );
+-#endif
+ 
+-			if (!debugInfoPrintedOnce) {
+-				debugInfoPrintedOnce = true;
+-				if (gIOKitDebug & kIOLogDTree) {
+-					IOLog("\nDT plane:\n");
+-					IOPrintPlane( gIODTPlane );
+-				}
+-				if (gIOKitDebug & kIOLogServiceTree) {
+-					IOLog("\nService plane:\n");
+-					IOPrintPlane( gIOServicePlane );
+-				}
+-				if (gIOKitDebug & kIOLogMemory) {
+-					IOPrintMemory();
+-				}
+-			}
+-
+-#if XNU_TARGET_OS_OSX && defined(__arm64__)
+-			// The disk isn't found - have the user pick from System Recovery.
+-			(void)IOSetRecoveryBoot(BSD_BOOTFAIL_MEDIA_MISSING, NULL, true);
+-#elif XNU_TARGET_OS_IOS
+-			panic("Failed to mount root device");
+-#endif
+-		}
+-	} while (!service);
++	zorn_say("MEDIA");
++	t.tv_sec = 2;
++	t.tv_nsec = 0;
++	matching->retain();
++	service = IOService::waitForService( matching, &t );
++	if (!service) {
++		zorn_say("NODISK");
++		zorn_find_root_gave_up = 1;
++		matching->release();
++		return kIOReturnError;
++	}
+ 
+ 	OSSafeReleaseNULL(matching);
+ 

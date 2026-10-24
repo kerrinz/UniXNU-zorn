@@ -1,0 +1,77 @@
+--- a/bsd/vfs/vfs_subr.c
++++ b/bsd/vfs/vfs_subr.c
+@@ -1218,6 +1218,9 @@
+ 	int     error;
+ 	mount_t mp;
+ 	vnode_t bdevvp_rootvp;
++	static int zorn_mount_once = 0;
++	int zorn_first;
++	extern void zorn_say(const char *);
+ 
+ 	/*
+ 	 * Reset any prior "unmounting everything" state.  This handles the
+@@ -1236,6 +1239,25 @@
+ 
+ 		KDBG_RELEASE(DBG_MOUNTROOT | DBG_FUNC_END, error, 0);
+ 		return error;
++	}
++	zorn_first = (zorn_mount_once++ == 0);
++	if (zorn_first) {
++		zorn_say("MROOT");
++	}
++	/*
++	 * setconf uses major 6 as a placeholder when no root disk exists.
++	 * Opening that device panics or waits forever, so report the miss
++	 * and let the caller print FAIL.
++	 */
++	if (rootdev == makedev(6, 0)) {
++		if (zorn_first) {
++			zorn_say("SKIP");
++		}
++		KDBG_RELEASE(DBG_MOUNTROOT | DBG_FUNC_END, ENODEV, 1);
++		return ENODEV;
++	}
++	if (zorn_first) {
++		zorn_say("BDEV0");
+ 	}
+ 	if ((error = bdevvp(rootdev, &rootvp))) {
+ 		printf("vfs_mountroot: can't setup bdevvp\n");
+@@ -1248,11 +1270,24 @@
+ 	 * so keep a local copy for some house keeping.
+ 	 */
+ 	bdevvp_rootvp = rootvp;
++	if (zorn_first) {
++		zorn_say("BDEV");
++	}
+ 
+ 	for (vfsp = vfsconf; vfsp; vfsp = vfsp->vfc_next) {
+ 		if (vfsp->vfc_mountroot == NULL
+ 		    && !ISSET(vfsp->vfc_vfsflags, VFC_VFSCANMOUNTROOT)) {
+ 			continue;
++		}
++		if (zorn_first && vfsp->vfc_name != NULL && vfsp->vfc_name[0] != '\0') {
++			char tag[5];
++			int name_index;
++
++			for (name_index = 0; name_index < 4 && vfsp->vfc_name[name_index] != '\0'; name_index++) {
++				tag[name_index] = vfsp->vfc_name[name_index];
++			}
++			tag[name_index] = '\0';
++			zorn_say(tag);
+ 		}
+ 
+ 		mp = vfs_rootmountalloc_internal(vfsp, "root_device");
+@@ -2161,6 +2196,13 @@
+ 	 */
+ #endif /* MAC */
+ 
++	{
++		extern void zorn_say(const char *);
++		static int zorn_bdev_open_once = 0;
++		if (zorn_bdev_open_once++ == 0) {
++			zorn_say("OPEN");
++		}
++	}
+ 	if ((error = VNOP_OPEN(nvp, FREAD, &context))) {
+ 		panic("bdevvp failed: open");
+ 		return error;

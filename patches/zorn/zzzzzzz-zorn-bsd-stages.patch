@@ -1,0 +1,176 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -579,6 +579,8 @@
+ #if (DEVELOPMENT || DEBUG)
+ 	platform_stall_panic_or_spin(PLATFORM_STALL_XNU_LOCATION_BSD_INIT);
+ #endif
++	extern void zorn_say(const char *text);
++	zorn_say("BIN");
+ 
+ #define DEBUG_BSDINIT 0
+ 
+@@ -591,6 +593,7 @@
+ 	throttle_init();
+ 
+ 	printf(copyright);
++	zorn_say("PRN");
+ 
+ #if CONFIG_DEV_KMEM
+ 	bsd_init_kprintf("calling dev_kmem_init\n");
+@@ -600,6 +603,7 @@
+ 	/* Initialize kauth subsystem before instancing the first credential */
+ 	bsd_init_kprintf("calling kauth_init\n");
+ 	kauth_init();
++	zorn_say("KAUTH");
+ 
+ 	/* kernel_task->proc = kernproc; */
+ 	set_bsdtask_info(kernel_task, (void *)kernproc);
+@@ -661,6 +665,7 @@
+ 	 * Initialize the MAC Framework
+ 	 */
+ 	mac_policy_initbsd();
++	zorn_say("MACB");
+ 
+ #if defined (__i386__) || defined (__x86_64__)
+ 	/*
+@@ -784,7 +789,9 @@
+ 	 * Initialize the calendar.
+ 	 */
+ 	bsd_init_kprintf("calling IOKitInitializeTime\n");
++	zorn_say("CAL0");
+ 	IOKitInitializeTime();
++	zorn_say("CAL");
+ 
+ 	/* Initialize the file systems. */
+ 	bsd_init_kprintf("calling vfsinit\n");
+@@ -816,6 +823,7 @@
+ 	bsd_init_kprintf("calling proc_uuid_policy_init()\n");
+ 	proc_uuid_policy_init();
+ #endif
++	zorn_say("VFS");
+ 
+ #if SOCKETS
+ #if CONFIG_MBUF_MCACHE
+@@ -923,6 +931,7 @@
+ 
+ 	bsd_init_kprintf("calling bsd_autoconf\n");
+ 	bsd_autoconf();
++	zorn_say("ACD");
+ 
+ #if CONFIG_DTRACE
+ 	dtrace_postinit();
+@@ -1000,15 +1009,23 @@
+ 	net_init_run();
+ #endif /* NETWORKING */
+ 
++	zorn_say("NET");
+ 	bsd_init_kprintf("calling inittodr\n");
+ 	inittodr(0);
++	zorn_say("TOD");
+ 
+ 	/* Mount the root file system. */
++	zorn_say("ROOT");
++	int zorn_root_fail = 0;
++	int zorn_root_try = 0;
+ 	while (TRUE) {
+ 		int err;
+ 
++		if (zorn_root_try == 0) zorn_say("SET");
+ 		bsd_init_kprintf("calling setconf\n");
+ 		setconf();
++		if (zorn_root_try == 0) zorn_say("VMNT");
++		zorn_root_try = 1;
+ #if CONFIG_NETBOOT
+ 		netboot = (mountroot == netboot_mountroot);
+ #endif
+@@ -1034,7 +1051,12 @@
+ 		}
+ #endif
+ 		printf("cannot mount root, errno = %d\n", err);
++		if (!zorn_root_fail) {
++			zorn_say("FAIL");
++			zorn_root_fail = 1;
++		}
+ 	}
++	zorn_say("MNT");
+ 
+ 	IOSecureBSDRoot(rootdevice);
+ 
+@@ -1054,6 +1076,7 @@
+ 	init_rootvnode = NULLVP;  /* use rootvnode after this point */
+ 
+ 
++	zorn_say("AUTH");
+ 	if (!bsd_rooted_ramdisk()) {
+ 		boolean_t require_rootauth = FALSE;
+ 
+@@ -1158,6 +1181,7 @@
+ 
+ 		bsd_init_kprintf("calling devfs_kernel_mount\n");
+ 		devfs_kernel_mount(mounthere);
++		zorn_say("DEV");
+ 	}
+ #endif /* DEVFS */
+ 
+@@ -1201,9 +1225,11 @@
+ 	/* Initialize signal state for process 0. */
+ 	bsd_init_kprintf("calling siginit\n");
+ 	siginit(kernproc);
++	zorn_say("SIG");
+ 
+ 	bsd_init_kprintf("calling bsd_utaskbootstrap\n");
+ 	bsd_utaskbootstrap();
++	zorn_say("UTASK");
+ 
+ 	pal_kernel_announce();
+ 
+@@ -1261,7 +1287,9 @@
+ bsdinit_task(void)
+ {
+ 	proc_t p = current_proc();
++	extern void zorn_say(const char *);
+ 
++	zorn_say("INIT");
+ 	process_name("init", p);
+ 
+ 	/* Set up exception-to-signal reflection */
+@@ -1272,6 +1300,7 @@
+ #endif
+ 
+ 	vm_init_before_launchd();
++	zorn_say("VMLAUNCH");
+ 
+ #if CONFIG_XNUPOST
+ 	int result = bsd_list_tests();
+@@ -1283,6 +1312,7 @@
+ 
+ 	bsd_init_kprintf("bsd_do_post - done");
+ 
++	zorn_say("LAUNCH");
+ 	load_init_program(p);
+ 	lock_trace = 1;
+ }
+@@ -1360,12 +1390,15 @@
+ {
+ 	thread_t thread;
+ 	struct uthread *ut;
++	extern void zorn_say(const char *);
+ 
++	zorn_say("CLONE");
+ 	/*
+ 	 * Clone the bootstrap process from the kernel process, without
+ 	 * inheriting either task characteristics or memory from the kernel;
+ 	 */
+ 	thread = cloneproc(TASK_NULL, NULL, kernproc, CLONEPROC_INITPROC);
++	zorn_say("CLONED");
+ 
+ 	/* Hold the reference as it will be dropped during shutdown */
+ 	initproc = proc_find(1);
+@@ -1389,6 +1422,7 @@
+ 	act_set_astbsd(thread);
+ 
+ 	ipc_task_enable(get_threadtask(thread));
++	zorn_say("IPC");
+ 
+ 	task_clear_return_wait(get_threadtask(thread), TCRW_CLEAR_ALL_WAIT);
+ }
