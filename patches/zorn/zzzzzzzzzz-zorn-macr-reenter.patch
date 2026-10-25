@@ -1,0 +1,95 @@
+--- a/security/mac_vfs.c
++++ b/security/mac_vfs.c
+@@ -69,6 +69,7 @@
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+ #include <sys/proc.h>
++#include <sys/proc_internal.h>
+ #include <sys/kauth.h>
+ 
+ #include <sys/file_internal.h>
+@@ -1670,21 +1671,74 @@
+ {
+ 	kauth_cred_t cred;
+ 	int error;
++	extern thread_t current_thread(void);
++	extern void zorn_say(const char *);
++	static thread_t holder;
++	thread_t self = current_thread();
+ 
+-#if SECURITY_MAC_CHECK_ENFORCE
+-	/* 21167099 - only check if we allow write */
+-	if (!mac_vnode_enforce) {
++	/*
++	 * AMFI's read check can read the file, which calls back into this
++	 * function on the same thread. That re-entry must return before the
++	 * credential check, which takes the same lock the outer check holds.
++	 */
++	if (holder == self) {
++		zorn_say("MREC");
+ 		return 0;
+ 	}
+-#endif
++	zorn_say("MAC1");
++
++	/*
++	 * proc_ucred_unsafe() calls zone_require_ro(). That load of zone
++	 * metadata faults once vm_pageout is running, and the abort path
++	 * does not return, so the status line stays on MAC1. The credential
++	 * compare only needs the two pointers.
++	 */
+ 	cred = vfs_context_ucred(ctx);
+-	if (!mac_cred_check_enforce(cred)) {
+-		return 0;
++	zorn_say("MACP");
++	{
++		proc_ro_t ro = kernproc->p_proc_ro;
++		kauth_cred_t kcred = NULL;
++
++		if (ro != NULL) {
++			kcred = smr_serialized_load(&ro->p_ucred);
++		}
++		zorn_say(kcred != NULL ? "MACQ" : "MAC0");
++		if (cred == kcred) {
++			zorn_say("MKEQ");
++			return 0;
++		}
+ 	}
+-	VFS_KERNEL_DEBUG_START1(53, vp);
+-	MAC_CHECK(vnode_check_read, cred, file_cred, vp,
+-	    mac_vnode_label(vp));
+-	VFS_KERNEL_DEBUG_END1(53, vp);
++	zorn_say("MAC2");
++	{
++		holder = self;
++		error = 0;
++		MAC_POLICY_ITERATE({
++			if (mpc->mpc_ops->mpo_vnode_check_read != NULL) {
++				char tag[5];
++				const char *name = mpc->mpc_name;
++				int k;
++				int step_err;
++
++				for (k = 0; k < 4 && name != NULL && name[k] != '\0'; k++) {
++					char ch = name[k];
++
++					if (ch >= 'a' && ch <= 'z') {
++						ch = (char)(ch - 'a' + 'A');
++					}
++					if (!((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))) {
++						ch = 'X';
++					}
++					tag[k] = ch;
++				}
++				tag[k] = '\0';
++				zorn_say(k > 0 ? tag : "NONM");
++				step_err = mpc->mpc_ops->mpo_vnode_check_read(cred,
++				    file_cred, vp, mac_vnode_label(vp));
++				error = mac_error_select(step_err, error);
++			}
++		});
++		holder = (thread_t)0;
++	}
+ 
+ 	return error;
+ }

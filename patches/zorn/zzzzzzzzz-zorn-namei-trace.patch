@@ -1,0 +1,67 @@
+--- a/bsd/vfs/vfs_lookup.c
++++ b/bsd/vfs/vfs_lookup.c
+@@ -477,6 +477,10 @@
+ 		 * NB: policies receive path information as supplied
+ 		 *     by the caller and thus cannot be trusted.
+ 		 */
++		{
++			extern void zorn_say(const char *);
++			zorn_say("NMAC");
++		}
+ 		error = mac_vnode_check_lookup_preflight(ctx, dp, cnp->cn_nameptr, cnp->cn_namelen);
+ 		if (error) {
+ 			goto error_out;
+@@ -485,6 +489,10 @@
+ 		ndp->ni_startdir = dp;
+ 		dp = NULLVP;
+ 
++		{
++			extern void zorn_say(const char *);
++			zorn_say("NLOOK");
++		}
+ 		if ((error = lookup(ndp))) {
+ 			goto error_out;
+ 		}
+@@ -1131,6 +1139,9 @@
+ 	vnode_t last_dp = NULLVP;
+ 	int keep_going;
+ 	int atroot;
++	int zorn_pass = 0;
++	char zorn_tag[4];
++	extern void zorn_say(const char *);
+ 
+ 	/*
+ 	 * Setup: break out flag bits into variables.
+@@ -1169,10 +1180,20 @@
+ 	atroot = 0;
+ 	ndp->ni_vp = NULLVP;
+ 
++	zorn_tag[0] = 'L';
++	zorn_tag[1] = 'C';
++	zorn_tag[2] = (char)('0' + (zorn_pass < 9 ? zorn_pass : 9));
++	zorn_tag[3] = '\0';
++	if (zorn_pass < 9) {
++		zorn_pass++;
++	}
++	zorn_say(zorn_tag);
+ 	if ((error = cache_lookup_path(ndp, cnp, dp, ctx, &dp_authorized, last_dp))) {
+ 		dp = NULLVP;
+ 		goto bad;
+ 	}
++	zorn_tag[1] = 'D';
++	zorn_say(zorn_tag);
+ 	if ((cnp->cn_flags & ISLASTCN)) {
+ 		if (docache) {
+ 			cnp->cn_flags |= MAKEENTRY;
+@@ -1348,7 +1369,11 @@
+ 	 * not fix whether or not you should or should not get /tmp/a vs. /foo/b.
+ 	 */
+ 
++	zorn_tag[1] = 'V';
++	zorn_say(zorn_tag);
+ 	error = VNOP_LOOKUP(dp, &ndp->ni_vp, cnp, ctx);
++	zorn_tag[1] = 'W';
++	zorn_say(zorn_tag);
+ 
+ 	if (error) {
+ lookup_error:

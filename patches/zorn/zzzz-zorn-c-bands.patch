@@ -1,6 +1,6 @@
 --- a/osfmk/arm/arm_init.c
 +++ b/osfmk/arm/arm_init.c
-@@ -337,7 +337,204 @@
+@@ -337,7 +337,261 @@
  #endif /* __arm64 */
  }
  
@@ -119,14 +119,32 @@
 +	int sy;
 +	int col;
 +
++	/* Rows at and below 900 are outside the early framebuffer map. */
++	if (scale < 1 || x < 0 || y < 0 || x >= 1440 || y >= 900) {
++		return;
++	}
 +	for (row = 0; row < 7; row++) {
 +		uint8_t bits = glyph ? glyph[row] : 0;
 +
 +		for (sy = 0; sy < scale; sy++) {
-+			volatile uint32_t *pixel = (volatile uint32_t *)(base +
-+			    (uintptr_t)(y + row * scale + sy) * row_bytes + (uintptr_t)x * 4);
++			int py = y + row * scale + sy;
++			int width = 6 * scale;
++			volatile uint32_t *pixel;
++			uintptr_t addr;
 +
-+			for (col = 0; col < 6 * scale; col++) {
++			if (py < 0 || py >= 900) {
++				continue;
++			}
++			if (x + width > 1440) {
++				width = 1440 - x;
++			}
++			addr = base + (uintptr_t)py * (uintptr_t)row_bytes + (uintptr_t)x * 4;
++			if (addr < base || addr + (uintptr_t)width * 4 > base + 1440ull * 3200ull * 4) {
++				continue;
++			}
++			pixel = (volatile uint32_t *)addr;
++
++			for (col = 0; col < width; col++) {
 +				int bit = col / scale;
 +				uint32_t color = off;
 +
@@ -144,68 +162,107 @@
 +{
 +	const char *cursor;
 +
-+	for (cursor = text; *cursor != '\0'; cursor++) {
++	for (cursor = text; *cursor != '\0' && *x >= 0 && *x < 1440; cursor++) {
 +		zorn_draw_char(base, row_bytes, *x, y, scale, zorn_glyph_for(*cursor));
++		if (*x > 1440 - 6 * scale) {
++			break;
++		}
 +		*x += 6 * scale;
++	}
++}
++
++static void
++zorn_say_flush_span(uintptr_t base, int row_bytes, int y, int scale, int pixels)
++{
++	int row;
++	int byte;
++	int width;
++
++	if (pixels < 1) {
++		return;
++	}
++	width = pixels * 4;
++	if (width > row_bytes) {
++		width = row_bytes;
++	}
++	for (row = 0; row < 7 * scale; row++) {
++		uintptr_t line = base + (uintptr_t)(y + row) * (uintptr_t)row_bytes;
++
++		for (byte = 0; byte < width; byte += 64) {
++			__asm__ volatile("dc civac, %0" :: "r"(line + byte) : "memory");
++		}
 +	}
 +}
 +
 +static void
 +zorn_say_flush(uintptr_t base, int row_bytes, int y, int scale)
 +{
-+	int row;
-+	int byte;
-+
-+	for (row = 0; row < 7 * scale; row++) {
-+		uintptr_t line = base + (uintptr_t)(y + row) * row_bytes;
-+
-+		for (byte = 0; byte < row_bytes; byte += 64) {
-+			__asm__ volatile("dc civac, %0" :: "r"(line + byte) : "memory");
-+		}
-+	}
-+	__asm__ volatile("dsb sy" ::: "memory");
++	zorn_say_flush_span(base, row_bytes, y, scale, row_bytes / 4);
 +}
++
++volatile int zorn_daif_held;
++volatile uint64_t zorn_saved_daif;
 +
 +void
 +zorn_say(const char *text)
 +{
-+	static int zorn_say_x = 40;
-+	static int zorn_say_y = 820;
-+	const int scale = 5;
-+	const int cell = 6 * scale;
-+	const int x_left = 40;
-+	const int x_right = 1400;
-+	const char *sep = " | ";
++	extern volatile int zorn_read_trace;
++	extern volatile int zorn_read_irqs_on;
 +	uintptr_t base = 0xFC400000;
 +	const int row_bytes = 5760;
-+	const char *cursor;
-+	int width = 0;
++	int row;
++	int col;
++	int status_x;
++	int clear_cols;
++	uint64_t daif;
 +
-+	if (text == NULL || *text == '\0' || zorn_say_y > 3000) {
++	/* PAGE and INIT run on two threads. Mask IRQs so the cursor stays consistent. */
++	__asm__ volatile("mrs %0, daif" : "=r"(daif));
++	if (!zorn_daif_held) {
++		zorn_saved_daif = daif;
++	}
++	__asm__ volatile("msr daifset, #15" ::: "memory");
++	if (text == NULL || *text == '\0') {
++		zorn_daif_held = 0;
++		__asm__ volatile("msr daif, %0" :: "r"(zorn_saved_daif) : "memory");
 +		return;
 +	}
-+	for (cursor = text; *cursor != '\0'; cursor++) {
-+		width += cell;
-+	}
-+	if (zorn_say_x != x_left && zorn_say_x + 3 * cell + width > x_right) {
-+		zorn_say_x = x_left;
-+		zorn_say_y += 7 * scale + 8;
-+		if (zorn_say_y > 3000) {
-+			return;
++	/* One line under the color bars. The lower panel is not in the early
++	 * page tables, so a scrolling log faults on the pixel store.
++	 * After the exclusive lock, cleaning the whole row does not return.
++	 * Clean only the glyphs so the word reaches the panel.
++	 */
++	clear_cols = zorn_read_trace ? 320 : 1440;
++	for (row = 0; row < 7 * 5; row++) {
++		volatile uint32_t *pixel = (volatile uint32_t *)(base +
++		    (uintptr_t)(840 + row) * row_bytes);
++
++		for (col = 0; col < clear_cols; col++) {
++			pixel[col] = 0xFF000000;
 +		}
 +	}
-+	if (zorn_say_x != x_left) {
-+		zorn_draw_text(base, row_bytes, &zorn_say_x, zorn_say_y, scale, sep);
++	status_x = 40;
++	zorn_draw_text(base, row_bytes, &status_x, 840, 5, text);
++	if (zorn_read_trace && !zorn_read_irqs_on) {
++		/* Restoring DAIF here stops the read. Leave it masked until the lock is held. */
++		zorn_daif_held = 1;
++		zorn_say_flush_span(base, row_bytes, 840, 5, 320);
++	} else if (zorn_read_trace) {
++		zorn_say_flush_span(base, row_bytes, 840, 5, 320);
++		zorn_daif_held = 0;
++		__asm__ volatile("msr daif, %0" :: "r"(zorn_saved_daif) : "memory");
++	} else {
++		zorn_say_flush(base, row_bytes, 840, 5);
++		zorn_daif_held = 0;
++		__asm__ volatile("msr daif, %0" :: "r"(zorn_saved_daif) : "memory");
 +	}
-+	zorn_draw_text(base, row_bytes, &zorn_say_x, zorn_say_y, scale, text);
-+	zorn_say_flush(base, row_bytes, zorn_say_y, scale);
 +}
 +
 +/*
   *		Routine:		arm_init
   *		Function:		Runs on the boot CPU, once, on entry from iBoot.
   */
-@@ -354,9 +551,12 @@
+@@ -354,9 +590,12 @@
  	DTEntry chosen = NULL;
  	unsigned int dt_entry_size = 0;
  
@@ -218,7 +275,7 @@
  
  	/* If kernel integrity is supported, use a constant copy of the boot args. */
  	const_boot_args = *args;
-@@ -368,11 +568,14 @@
+@@ -368,11 +607,14 @@
  	BootCpuData.rop_key = ml_default_rop_pid();
  	BootCpuData.jop_key = ml_default_jop_pid();
  #endif /* defined(HAS_APPLE_PAC) */
@@ -233,7 +290,7 @@
  	configure_timer_apple_regs();
  	wfe_timeout_configure();
  	wfe_timeout_init();
-@@ -441,6 +644,7 @@
+@@ -441,6 +683,7 @@
  	}
  #endif
  
@@ -241,7 +298,7 @@
  	ml_parse_cpu_topology();
  
  
-@@ -458,6 +662,7 @@
+@@ -458,6 +701,7 @@
  	    + ((uintptr_t)&BootCpuData
  	    - (uintptr_t)(args->virtBase)));
  
@@ -249,7 +306,7 @@
  	thread = thread_bootstrap();
  	thread->machine.CpuDatap = &BootCpuData;
  	thread->machine.pcpu_data_base = (vm_offset_t)0;
-@@ -470,10 +675,13 @@
+@@ -470,10 +714,13 @@
  	 * preemption level is not really meaningful for the bootstrap thread.
  	 */
  	thread->machine.preemption_count = 0;
@@ -263,7 +320,7 @@
  	kernel_debug_string_early("kernel_startup_bootstrap");
  	kernel_startup_bootstrap();
  
-@@ -482,6 +690,7 @@
+@@ -482,6 +729,7 @@
  	 */
  	timer_call_init();
  
@@ -271,7 +328,7 @@
  	cpu_init();
  
  	processor_bootstrap();
-@@ -531,13 +740,16 @@
+@@ -531,13 +779,16 @@
  	__builtin_arm_wsr("pan", 1);
  #endif  /* __ARM_PAN_AVAILABLE__ */
  
@@ -288,7 +345,7 @@
  
  #if __arm64__ && WITH_CLASSIC_S2R
  	sleep_token_buffer_init();
-@@ -546,8 +758,11 @@
+@@ -546,8 +797,11 @@
  	PE_consistent_debug_inherit();
  
  	/* Setup debugging output. */
@@ -300,7 +357,7 @@
  	kprintf("kprintf initialized\n");
  
  	serialmode = 0;
-@@ -588,7 +803,9 @@
+@@ -588,7 +842,9 @@
  		(void)switch_to_serial_console(); /* Switch into serial mode from video console */
  		disableConsoleOutput = FALSE;     /* Allow printfs to happen */
  	}
@@ -310,7 +367,7 @@
  
  	/* setup console output */
  	PE_init_printf(FALSE);
-@@ -599,6 +816,7 @@
+@@ -599,6 +855,7 @@
  #endif
  #endif
  
@@ -318,7 +375,7 @@
  	cpu_machine_idle_init(TRUE);
  
  	PE_init_platform(TRUE, &BootCpuData);
-@@ -609,6 +827,8 @@
+@@ -609,6 +866,8 @@
  		panic("The cpumask=N boot arg cannot be used together with cpus=N, and the boot CPU must be enabled");
  	}
  
@@ -327,7 +384,7 @@
  	ml_map_cpu_pio();
  
  #if APPLE_ARM64_ARCH_FAMILY
-@@ -618,6 +838,7 @@
+@@ -618,6 +877,7 @@
  #endif
  
  	cpu_timebase_init(TRUE);
@@ -335,7 +392,7 @@
  
  #if KPERF
  	/* kptimer_curcpu_up() must be called after cpu_timebase_init */
-@@ -625,7 +846,9 @@
+@@ -625,7 +885,9 @@
  #endif /* KPERF */
  
  	PE_init_cpu();
@@ -345,7 +402,7 @@
  
  
  #if HIBERNATION
-@@ -667,6 +890,8 @@
+@@ -667,6 +929,8 @@
  	 * against string vulnerabilities
  	 */
  	__stack_chk_guard &= ~(0xFFULL << 8);

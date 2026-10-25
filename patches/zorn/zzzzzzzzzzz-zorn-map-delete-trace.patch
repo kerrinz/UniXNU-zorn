@@ -1,0 +1,73 @@
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -1844,4 +1844,11 @@
+ 	(void)vm_map_delete(map, 0x0, 0xFFFFFFFFFFFFF000ULL, flags,
+ 	    KMEM_GUARD_NONE, &zap);
+ 
++	{
++		extern void zorn_say(const char *);
++		extern volatile int zorn_read_trace;
++		if (zorn_read_trace)
++			zorn_say("MEND");
++	}
++
+ 	vm_map_disable_hole_optimization(map);
+@@ -8215,3 +8215,10 @@
+ 	struct mach_vm_range    slot;
+ 
++	{
++		extern void zorn_say(const char *);
++		extern volatile int zorn_read_trace;
++		if (zorn_read_trace)
++			zorn_say("MDEL");
++	}
++
+ 	if (vm_map_pmap(map) == kernel_pmap) {
+@@ -8606,6 +8606,12 @@
+ 			if (state & VMDS_NEEDS_WAKEUP) {
+ 				vm_map_entry_wakeup(map);
+ 				state &= ~VMDS_NEEDS_WAKEUP;
+ 			}
+ 
++			{
++				extern void zorn_say(const char *);
++				extern volatile int zorn_read_trace;
++				if (zorn_read_trace)
++					zorn_say("MWAT");
++			}
+ 			wait_result = vm_map_entry_wait(map, interruptible);
+@@ -8687,4 +8687,10 @@
+ 
+ 				entry->needs_wakeup = TRUE;
++				{
++					extern void zorn_say(const char *);
++					extern volatile int zorn_read_trace;
++					if (zorn_read_trace)
++						zorn_say("MWIR");
++				}
+ 				wait_result = vm_map_entry_wait(map,
+ 				    interruptible);
+@@ -8776,4 +8776,10 @@
+ 						NULL);
+ 				}
++				{
++					extern void zorn_say(const char *);
++					extern volatile int zorn_read_trace;
++					if (zorn_read_trace)
++						zorn_say("MUNW");
++				}
+ 				vm_fault_unwire(map, &tmp_entry,
+ 				    tmp_entry.vme_kernel_object, map->pmap,
+@@ -8954,6 +8954,12 @@
+ 			 * do not have such VM invisible
+ 			 * translations.
+ 			 */
++			{
++				extern void zorn_say(const char *);
++				extern volatile int zorn_read_trace;
++				if (zorn_read_trace)
++					zorn_say("PREM");
++			}
+ 			pmap_remove_options(map->pmap,
+ 			    (addr64_t)entry->vme_start,
+ 			    (addr64_t)entry->vme_end,

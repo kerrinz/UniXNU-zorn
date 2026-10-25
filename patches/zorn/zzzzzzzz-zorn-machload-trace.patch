@@ -8,7 +8,7 @@
  	if (imgp->ip_new_thread) {
  		ledger_task = get_threadtask(imgp->ip_new_thread);
  	} else {
-@@ -499,12 +500,14 @@
+@@ -499,15 +500,36 @@
  	}
  #endif /* XNU_TARGET_OS_OSX && _POSIX_SPAWN_FORCE_4K_PAGES && PMAP_CREATE_FORCE_4K_PAGE */
  
@@ -18,12 +18,34 @@
  	    pmap_flags);
  	if (pmap == NULL) {
  		return LOAD_RESOURCE;
- 	}
++	}
 +	zorn_say("VMAP");
++	{
++		extern uint32_t thread_get_ctid(thread_t);
++		uint32_t vdata = *(volatile uint32_t *)((uintptr_t)vp + 8);
++		uint32_t owner = vdata & 0x0fffffffu;
++		uint32_t self = thread_get_ctid(current_thread());
++
++		/*
++		 * vm_map_create can wait on a zone lock the pageout thread holds.
++		 * Pageout may itself be waiting for this vnode lock.
++		 */
++		if (self != 0 && owner == self) {
++			zorn_say("VULK");
++			vnode_unlock(vp);
++			zorn_say("VUNL");
++		} else {
++			zorn_say(owner == 0 ? "VFRE" : "VOTH");
++		}
+ 	}
  	map = vm_map_create_options(pmap, 0,
  	    vm_compute_max_offset(result->is_64bit_addr),
  	    VM_MAP_CREATE_PAGEABLE);
-@@ -550,6 +553,7 @@
++	zorn_say("VNEW");
+ 
+ #if defined(__arm64__)
+ 	if (result->is_64bit_addr) {
+@@ -550,6 +572,7 @@
  	/*
  	 * Compute a random offset for ASLR, and an independent random offset for dyld.
  	 */
@@ -31,7 +53,7 @@
  	if (!(imgp->ip_flags & IMGPF_DISABLE_ASLR)) {
  		vm_map_get_max_aslr_slide_section(map, &aslr_section_offset, &aslr_section_size);
  		aslr_section_offset = (random() % aslr_section_offset) * aslr_section_size;
-@@ -581,6 +585,7 @@
+@@ -581,9 +604,11 @@
  	result->is_64bit_addr = ((imgp->ip_flags & IMGPF_IS_64BIT_ADDR) == IMGPF_IS_64BIT_ADDR);
  	result->is_64bit_data = ((imgp->ip_flags & IMGPF_IS_64BIT_DATA) == IMGPF_IS_64BIT_DATA);
  
@@ -39,3 +61,261 @@
  	lret = parse_machfile(vp, map, thread, header, file_offset, macho_size,
  	    0, aslr_page_offset, dyld_aslr_page_offset, result,
  	    NULL, imgp);
++	zorn_say("PDON");
+ 
+ 	if (lret != LOAD_SUCCESS) {
+ 		vm_map_deallocate(map); /* will lose pmap reference too */
+@@ -822,6 +847,10 @@
+ 	effective_page_size = vm_map_page_size(map);
+ #endif /* __arm64__ */
+ 
++	extern void zorn_say(const char *);
++	int zorn_seg_n = 0;
++	zorn_say("PENT");
++
+ 	if (header->magic == MH_MAGIC_64 ||
+ 	    header->magic == MH_CIGAM_64) {
+ 		mach_header_sz = sizeof(struct mach_header_64);
+@@ -905,8 +934,42 @@
+ 	/*
+ 	 *	Get the pager for the file.
+ 	 */
+-	control = ubc_getobject(vp, UBC_FLAGS_NONE);
++	/*
++	 * ubc_getobject is three loads. A bad vnode or ubc_info pointer
++	 * faults here and the serial console never comes back, so the
++	 * last word on screen stays OBJ. Translate first, then load.
++	 */
++	zorn_say("OBJ");
++	control = NULL;
++	if (vp == NULL) {
++		zorn_say("OVNL");
++	} else {
++		extern unsigned long long kvtophys(unsigned long long);
++		struct ubc_info *uip;
+ 
++		zorn_say("OKV");
++		if (kvtophys((unsigned long long)vp) == 0) {
++			zorn_say("OVP0");
++		} else {
++			zorn_say("OTYP");
++			if (vp->v_type != VREG) {
++				zorn_say("ONRG");
++			} else {
++				zorn_say("OUBC");
++				uip = vp->v_ubcinfo;
++				if (uip == NULL) {
++					zorn_say("OUNO");
++				} else if (kvtophys((unsigned long long)uip) == 0) {
++					zorn_say("OUI0");
++				} else {
++					zorn_say("OCTL");
++					control = ubc_getobject(vp, UBC_FLAGS_NONE);
++					zorn_say("OBJD");
++				}
++			}
++		}
++	}
++
+ 	/* ensure header + sizeofcmds falls within the file */
+ 	if (os_add_overflow(mach_header_sz, header->sizeofcmds, &cmds_size) ||
+ 	    (off_t)cmds_size > macho_size ||
+@@ -918,13 +981,20 @@
+ 	/*
+ 	 * Map the load commands into kernel memory.
+ 	 */
++	zorn_say("KALC");
+ 	addr = kalloc_data(alloc_size, Z_WAITOK);
+ 	if (addr == NULL) {
+ 		return LOAD_NOSPACE;
+ 	}
+ 
++	zorn_say("READ");
++	/*
++	 * The header read passes IO_NODELOCKED and returns. This read did not,
++	 * so the filesystem takes the vnode lock itself and does not come back.
++	 */
+ 	error = vn_rdwr(UIO_READ, vp, addr, (int)alloc_size, file_offset,
+-	    UIO_SYSSPACE, 0, vfs_context_ucred(imgp->ip_vfs_context), &resid, p);
++	    UIO_SYSSPACE, IO_NODELOCKED, vfs_context_ucred(imgp->ip_vfs_context), &resid, p);
++	zorn_say("RDON");
+ 	if (error) {
+ 		kfree_data(addr, alloc_size);
+ 		return LOAD_IOERROR;
+@@ -955,6 +1025,7 @@
+ #endif
+ 
+ 	for (pass = 0; pass <= 3; pass++) {
++		zorn_say(pass == 0 ? "PAS0" : pass == 1 ? "PAS1" : pass == 2 ? "PAS2" : "PAS3");
+ 		if (pass == 1) {
+ #if __arm64__
+ 			boolean_t       is_pie;
+@@ -1096,6 +1167,18 @@
+ 			 * that lcp->cmdsize is large enough to fit its specific struct type
+ 			 * before dereferencing fields not covered by struct load_command.
+ 			 */
++			if (pass == 1) {
++				char tag[5];
++				unsigned idx = header->ncmds - ncmds - 1;
++				static const char hexd[] = "0123456789ABCDEF";
++
++				tag[0] = 'C';
++				tag[1] = hexd[(lcp->cmd >> 4) & 0xf];
++				tag[2] = hexd[lcp->cmd & 0xf];
++				tag[3] = hexd[idx & 0xf];
++				tag[4] = '\0';
++				zorn_say(tag);
++			}
+ 			switch (lcp->cmd) {
+ 			case LC_SEGMENT: {
+ 				struct segment_command *scp = (struct segment_command *) lcp;
+@@ -1211,6 +1294,10 @@
+ 					break;
+ 				}
+ 
++				if (zorn_seg_n < 4) {
++					zorn_seg_n++;
++					zorn_say(zorn_seg_n == 1 ? "S1" : zorn_seg_n == 2 ? "S2" : zorn_seg_n == 3 ? "S3" : "S4");
++				}
+ 				ret = load_segment(lcp,
+ 				    header->filetype,
+ 				    control,
+@@ -1248,6 +1335,7 @@
+ 					break;
+ 				}
+ #endif
++				zorn_say("LUNI");
+ 				ret = load_unixthread(
+ 					(struct thread_command *) lcp,
+ 					thread,
+@@ -1263,6 +1351,7 @@
+ 				if (depth != 1) {
+ 					break;
+ 				}
++				zorn_say("LMAN");
+ 				ret = load_main(
+ 					(struct entry_point_command *) lcp,
+ 					thread,
+@@ -1296,6 +1385,7 @@
+ 				 *  load signatures & store in uip
+ 				 *  set VM object "signed_pages"
+ 				 */
++				zorn_say("CSIG");
+ 				ret = load_code_signature(
+ 					(struct linkedit_data_command *) lcp,
+ 					vp,
+@@ -1318,6 +1408,7 @@
+ 				} else {
+ 					got_code_signatures = TRUE;
+ 				}
++				zorn_say("CSOK");
+ 
+ 				if (got_code_signatures) {
+ 					unsigned tainted = CS_VALIDATE_TAINTED;
+@@ -1329,6 +1420,7 @@
+ 						printf("validating initial pages of %s\n", vp->v_name);
+ 					}
+ 
++					zorn_say("CVAL");
+ 					while (off < alloc_size && ret == LOAD_SUCCESS) {
+ 						tainted = CS_VALIDATE_TAINTED;
+ 
+@@ -1351,6 +1443,7 @@
+ 						}
+ 						off += PAGE_SIZE;
+ 					}
++					zorn_say("CVOK");
+ 				}
+ 
+ 				break;
+@@ -1468,6 +1561,7 @@
+ 			break;
+ 		}
+ 	}
++	zorn_say("PLOOP");
+ 
+ 	if (ret == LOAD_SUCCESS) {
+ 		if (!got_code_signatures && cs_process_global_enforcement()) {
+@@ -1484,6 +1578,7 @@
+ 			 * load the dylinker, and slide it by the independent DYLD ASLR
+ 			 * offset regardless of the PIE-ness of the main binary.
+ 			 */
++			zorn_say("DYLD");
+ 			ret = load_dylinker(dlp, header->cputype, map, thread, depth,
+ 			    dyld_aslr_offset, result, imgp);
+ 		}
+@@ -2704,7 +2799,15 @@
+ 	result->needs_dynlinker = TRUE;
+ 	result->using_lcmain = TRUE;
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("PSTT");
++	}
+ 	ret = thread_state_initialize( thread );
++	{
++		extern void zorn_say(const char *);
++		zorn_say("PSTD");
++	}
+ 	if (ret != KERN_SUCCESS) {
+ 		return LOAD_FAILURE;
+ 	}
+@@ -3440,10 +3543,13 @@
+ 
+ 	addr = 0;
+ 	blob = NULL;
++	extern void zorn_say(const char *);
+ 
+ 	cpusubtype &= ~CPU_SUBTYPE_MASK;
+ 
++	zorn_say("CSB");
+ 	blob = ubc_cs_blob_get(vp, cputype, cpusubtype, macho_offset);
++	zorn_say("CSG");
+ 
+ 	if (blob != NULL) {
+ 		/* we already have a blob for this vnode and cpu(sub)type */
+@@ -3514,6 +3620,7 @@
+ 	}
+ 
+ 	blob_size = lcp->datasize;
++	zorn_say("CSAL");
+ 	kr = ubc_cs_blob_allocate(&addr, &blob_size);
+ 	if (kr != KERN_SUCCESS) {
+ 		ret = LOAD_NOSPACE;
+@@ -3521,13 +3628,15 @@
+ 	}
+ 
+ 	resid = 0;
++	zorn_say("CSRD");
++	/* The exec vnode is still locked from namei(LOCKLEAF). */
+ 	error = vn_rdwr(UIO_READ,
+ 	    vp,
+ 	    (caddr_t) addr,
+ 	    lcp->datasize,
+ 	    macho_offset + lcp->dataoff,
+ 	    UIO_SYSSPACE,
+-	    0,
++	    IO_NODELOCKED,
+ 	    kauth_cred_get(),
+ 	    &resid,
+ 	    current_proc());
+@@ -3536,6 +3645,8 @@
+ 		goto out;
+ 	}
+ 
++	zorn_say("CSAD");
++
+ 	if (ubc_cs_blob_add(vp,
+ 	    result->ip_platform,
+ 	    cputype,
+@@ -3789,6 +3900,10 @@
+ 	/* init the namei data to point the file user's program name */
+ 	NDINIT(ndp, LOOKUP, OP_OPEN, FOLLOW | LOCKLEAF, UIO_SYSSPACE, CAST_USER_ADDR_T(path), ctx);
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("GDYL");
++	}
+ 	if ((error = namei(ndp)) != 0) {
+ 		if (error == ENOENT) {
+ 			error = LOAD_ENOENT;

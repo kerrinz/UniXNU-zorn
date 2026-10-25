@@ -1,0 +1,326 @@
+diff --git a/bsd/dev/memdev.c b/bsd/dev/memdev.c
+index 1254061..582b3b4 100644
+--- a/bsd/dev/memdev.c
++++ b/bsd/dev/memdev.c
+@@ -166,15 +166,19 @@ struct mdev {
+ 	int                     mdCDev;         /* Character device number */
+ 	void *          mdbdevb;
+ 	void *          mdcdevb;
++	void *          mdArg;
++	int                     (*mdTransfer)(void *arg, uint64_t offset, void *data, size_t bytes, int iswrite);
+ } mdev[NB_MAX_MDEVICES];
+ 
+ /* mdFlags */
+ #define mdInited        0x01    /* This device defined */
+ #define mdRO            0x02    /* This device is read-only */
+ #define mdPhys          0x04    /* This device is in physical memory */
++#define mdCallback      0x08    /* Bytes come from mdTransfer, not mdBase */
+ 
+ int mdevBMajor = -1;
+ int mdevCMajor = -1;
++static int mdev_pending_secsize;
+ 
+ static int      mdevioctl(dev_t dev, u_long cmd, caddr_t data, int flag, struct proc *p, int is_char);
+ dev_t           mdevadd(int devid, uint64_t base, unsigned int size, int phys);
+@@ -222,6 +226,38 @@ mdevrw(dev_t dev, struct uio *uio, __unused int ioflag)
+ 	if (!(mdev[devid].mdFlags & mdInited)) {
+ 		return ENXIO;                                 /* Have we actually been defined yet? */
+ 	}
++	if (mdev[devid].mdFlags & mdCallback) {
++		uint64_t callback_off, callback_limit;
++		uint8_t callback_chunk[4096];
++
++		if (uio->uio_offset < 0 || uio_resid(uio) < 0) {
++			return EINVAL;
++		}
++		if (uio->uio_rw != UIO_READ) {
++			return EROFS;
++		}
++		callback_off = (uint64_t)uio->uio_offset;
++		callback_limit = (uint64_t)mdev[devid].mdSize << 12;
++		while (uio_resid(uio) > 0) {
++			size_t callback_bytes = (size_t)MIN(uio_resid(uio), (user_ssize_t)sizeof(callback_chunk));
++			int callback_error;
++
++			if (callback_off > callback_limit || callback_bytes > callback_limit - callback_off) {
++				return EINVAL;
++			}
++			callback_error = mdev[devid].mdTransfer(mdev[devid].mdArg, callback_off,
++			    callback_chunk, callback_bytes, 0);
++			if (callback_error) {
++				return callback_error;
++			}
++			callback_error = uiomove((caddr_t)callback_chunk, (int)callback_bytes, uio);
++			if (callback_error) {
++				return callback_error;
++			}
++			callback_off += callback_bytes;
++		}
++		return 0;
++	}
+ 	if (uio->uio_offset < 0) {
+ 		return EINVAL;  /* invalid offset */
+ 	}
+@@ -270,6 +306,45 @@ mdevstrategy(struct buf *bp)
+ 		buf_biodone(bp);
+ 		return;
+ 	}
++	if (mdev[devid].mdFlags & mdCallback) {
++		vm_offset_t callback_vaddr;
++		uint64_t callback_off, callback_limit, callback_bytes;
++		int callback_error = 0;
++
++		buf_setresid(bp, buf_count(bp));
++		if (buf_map(bp, (caddr_t *)&callback_vaddr)) {
++			panic("ramstrategy: buf_map failed");
++		}
++		callback_off = (uint64_t)buf_blkno(bp) * (uint64_t)mdev[devid].mdSecsize;
++		callback_bytes = buf_count(bp);
++		callback_limit = (uint64_t)mdev[devid].mdSize << 12;
++		if (callback_off > callback_limit || callback_bytes > callback_limit - callback_off) {
++			callback_error = EINVAL;
++		} else if ((buf_flags(bp) & B_READ) == 0) {
++			callback_error = EROFS;
++		} else if (mdev[devid].mdTransfer == NULL) {
++			callback_error = ENXIO;
++		} else {
++			callback_error = mdev[devid].mdTransfer(mdev[devid].mdArg, callback_off,
++			    (void *)callback_vaddr, (size_t)callback_bytes, 0);
++			if (callback_error == 0 && callback_bytes != 0 && callback_bytes <= (1024 * 1024)) {
++				uintptr_t line = (uintptr_t)callback_vaddr & ~(uintptr_t)63;
++				uintptr_t end = (uintptr_t)callback_vaddr + (uintptr_t)callback_bytes;
++
++				for (; line < end; line += 64) {
++					__asm__ volatile("dc civac, %0" :: "r"(line) : "memory");
++				}
++			}
++		}
++		buf_unmap(bp);
++		if (callback_error) {
++			buf_seterror(bp, callback_error);
++		} else {
++			buf_setresid(bp, 0);
++		}
++		buf_biodone(bp);
++		return;
++	}
+ 
+ 	buf_setresid(bp, buf_count(bp));                                                /* Set byte count */
+ 
+@@ -387,9 +462,21 @@ mdevioctl(dev_t dev, u_long cmd, caddr_t data, __unused int flag,
+ 	if (devid >= NB_MAX_MDEVICES || devid < 0) {
+ 		return ENXIO;                                                                 /* Not valid */
+ 	}
+-	error = proc_suser(p);                  /* Are we superman? */
+-	if (error) {
+-		return error;                                                         /* Nope... */
++	/*
++	 * Geometry queries have to succeed while the root is being mounted.
++	 * The mount context is not always allowed to pass proc_suser, and a
++	 * refused block-size query makes APFS assume 512 while the block count
++	 * stays in another unit. That mismatch fails the container check with
++	 * EILSEQ.
++	 */
++	error = 0;
++	if (cmd != DKIOCGETBLOCKSIZE && cmd != DKIOCGETBLOCKCOUNT &&
++	    cmd != DKIOCGETMAXBLOCKCOUNTREAD && cmd != DKIOCGETMAXBLOCKCOUNTWRITE &&
++	    cmd != DKIOCGETMAXSEGMENTCOUNTREAD && cmd != DKIOCGETMAXSEGMENTCOUNTWRITE) {
++		error = proc_suser(p);
++		if (error) {
++			return error;
++		}
+ 	}
+ 	f = (u_int32_t*)data;
+ 	o = (u_int64_t *)data;
+@@ -414,6 +501,10 @@ mdevioctl(dev_t dev, u_long cmd, caddr_t data, __unused int flag,
+ 
+ 	case DKIOCGETBLOCKSIZE:
+ 		*f = mdev[devid].mdSecsize;
++		{
++			extern void zorn_os_note_bs(uint32_t);
++			zorn_os_note_bs(*f);
++		}
+ 		break;
+ 
+ 	case DKIOCSETBLOCKSIZE:
+@@ -427,14 +518,23 @@ mdevioctl(dev_t dev, u_long cmd, caddr_t data, __unused int flag,
+ 		break;
+ 
+ 	case DKIOCISWRITABLE:
+-		*f = 1;
++		*f = (mdev[devid].mdFlags & mdCallback) ? 0 : 1;
+ 		break;
+ 
+ 	case DKIOCGETBLOCKCOUNT:
+ 		if (!(mdev[devid].mdFlags & mdInited)) {
+ 			return ENXIO;
+ 		}
+-		*o = ((mdev[devid].mdSize << 12) + mdev[devid].mdSecsize - 1) / mdev[devid].mdSecsize;
++		/*
++		 * mdSize counts 4 KiB pages in a 32-bit field. Widening after the
++		 * shift keeps only the low 4 GiB, so this 6 GiB container is reported
++		 * short and APFS rejects it with EILSEQ.
++		 */
++		*o = (((uint64_t)mdev[devid].mdSize << 12) + mdev[devid].mdSecsize - 1) / mdev[devid].mdSecsize;
++		{
++			extern void zorn_os_note_blocks(uint64_t);
++			zorn_os_note_blocks(*o);
++		}
+ 		break;
+ 
+ 	/*
+@@ -677,6 +777,8 @@ mdevadd(int devid, uint64_t base, unsigned int size, int phys)
+ 		}
+ 	}
+ 
++	mdev[devid].mdSecsize = mdev_pending_secsize ? mdev_pending_secsize : DEV_BSIZE;
++	mdev_pending_secsize = 0;
+ 	mdev[devid].mdBDev = makedev(mdevBMajor, devid);        /* Get the device number */
+ 	mdev[devid].mdbdevb = devfs_make_node(mdev[devid].mdBDev, DEVFS_BLOCK,  /* Make the node */
+ 	    UID_ROOT, GID_OPERATOR,
+@@ -697,7 +799,6 @@ mdevadd(int devid, uint64_t base, unsigned int size, int phys)
+ 
+ 	mdev[devid].mdBase = base;                                                      /* Set the base address of ram disk */
+ 	mdev[devid].mdSize = size;                                                      /* Set the length of the ram disk */
+-	mdev[devid].mdSecsize = DEV_BSIZE;                                      /* Set starting block size */
+ 	if (phys) {
+ 		mdev[devid].mdFlags |= mdPhys;                          /* Show that we are in physical memory */
+ 	}
+@@ -740,7 +841,39 @@ mdevremoveall(void)
+ 		mdev[i].mdCDev = 0;
+ 		mdev[i].mdbdevb = 0;
+ 		mdev[i].mdcdevb = 0;
++		mdev[i].mdArg = NULL;
++		mdev[i].mdTransfer = NULL;
++	}
++}
++
++dev_t
++mdevadd_ops(int devid, uint64_t bytes,
++    int (*transfer)(void *arg, uint64_t offset, void *data, size_t bytes, int iswrite), void *arg)
++{
++	dev_t dev;
++
++	if (transfer == NULL || devid < 0 || devid >= NB_MAX_MDEVICES ||
++	    bytes == 0 || (bytes & 4095) || (bytes >> 12) > UINT_MAX) {
++		return (dev_t)-1;
+ 	}
++	/*
++	 * Publish the sector size before devfs creates the vnode. APFS keeps
++	 * that vnode size, then upgrades its own container size to 4096. The
++	 * strategy offset is blkno times this sector size, so the two have to
++	 * start out the same or every block after the superblock is read from
++	 * the wrong place and the checksum comes back EILSEQ.
++	 */
++	mdev_pending_secsize = 4096;
++	dev = mdevadd(devid, 0, (unsigned int)(bytes >> 12), 0);
++	mdev_pending_secsize = 0;
++	if (dev == (dev_t)-1) {
++		return dev;
++	}
++	mdev[devid].mdArg = arg;
++	mdev[devid].mdTransfer = transfer;
++	mdev[devid].mdSecsize = 4096;
++	mdev[devid].mdFlags |= mdCallback | mdRO;
++	return dev;
+ }
+ 
+ int
+@@ -760,7 +893,7 @@ mdevgetrange(int devid, uint64_t *base, uint64_t *size)
+ 	}
+ 
+ 	*base = mdev[devid].mdBase << 12;
+-	*size = mdev[devid].mdSize << 12;
++	*size = (uint64_t)mdev[devid].mdSize << 12;
+ 
+ 	/* make sure (base, size) is a valid range and will not overflow */
+ 	assert(*size < (UINT64_MAX - *base));
+diff --git a/bsd/kern/bsd_init.c b/bsd/kern/bsd_init.c
+index 8fb4378..d9dbfbe 100644
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -1019,6 +1019,9 @@ bsd_init(void)
+ 	zorn_say("TOD");
+ 
+ 	/* Mount the root file system. */
++	extern int zorn_os_root_pending;
++	extern void zorn_os_hold(const char *);
++	extern void zorn_os_hold_errno(int);
+ 	zorn_say("ROOT");
+ 	int zorn_root_fail = 0;
+ 	int zorn_root_try = 0;
+@@ -1055,12 +1058,24 @@ bsd_init(void)
+ 		}
+ #endif
+ 		printf("cannot mount root, errno = %d\n", err);
++		if (zorn_os_root_pending) {
++			zorn_os_hold_errno(err);
++		}
+ 		if (!zorn_root_fail) {
+ 			zorn_say("FAIL");
+ 			zorn_root_fail = 1;
+ 		}
+ 	}
+ 	zorn_say("MNT");
++	if (zorn_os_root_pending) {
++		const char *fsname = mountlist.tqh_first->mnt_vtable->vfc_name;
++		if (fsname != NULL && fsname[0] == 'a' && fsname[1] == 'p' &&
++		    fsname[2] == 'f' && fsname[3] == 's' && fsname[4] == '\0') {
++			zorn_say("APOK");
++		} else {
++			zorn_os_hold("FSBAD");
++		}
++	}
+ 
+ 	IOSecureBSDRoot(rootdevice);
+ 
+diff --git a/bsd/vfs/vfs_subr.c b/bsd/vfs/vfs_subr.c
+index b1af02b..e496e63 100644
+--- a/bsd/vfs/vfs_subr.c
++++ b/bsd/vfs/vfs_subr.c
+@@ -1221,6 +1221,9 @@ vfs_mountroot(void)
+ 	static int zorn_mount_once = 0;
+ 	int zorn_first;
+ 	extern void zorn_say(const char *);
++	extern int zorn_os_root_pending;
++	extern void zorn_os_hold(const char *);
++	extern void zorn_os_fail(int);
+ 
+ 	/*
+ 	 * Reset any prior "unmounting everything" state.  This handles the
+@@ -1292,11 +1295,14 @@ vfs_mountroot(void)
+ 
+ 		mp = vfs_rootmountalloc_internal(vfsp, "root_device");
+ 		mp->mnt_devvp = rootvp;
++		if (zorn_os_root_pending) {
++			mp->mnt_flag |= MNT_RDONLY;
++		}
+ 
+ 		if (vfsp->vfc_mountroot) {
+ 			error = (*vfsp->vfc_mountroot)(mp, rootvp, ctx);
+ 		} else {
+-			error = VFS_MOUNT(mp, rootvp, 0, ctx);
++			error = VFS_MOUNT(mp, rootvp, zorn_os_root_pending ? MNT_RDONLY : 0, ctx);
+ 		}
+ 
+ 		if (!error) {
+@@ -1425,10 +1431,19 @@ vfs_mountroot(void)
+ #if CONFIG_MACF
+ fail:
+ #endif
++		if (zorn_os_root_pending && vfsp->vfc_name != NULL &&
++		    vfsp->vfc_name[0] == 'a' && vfsp->vfc_name[1] == 'p' &&
++		    vfsp->vfc_name[2] == 'f' && vfsp->vfc_name[3] == 's' &&
++		    vfsp->vfc_name[4] == '\0') {
++			zorn_os_fail(error);
++		}
+ 		if (error != EINVAL) {
+ 			printf("%s_mountroot failed: %d\n", vfsp->vfc_name, error);
+ 		}
+ 	}
++	if (zorn_os_root_pending) {
++		zorn_os_hold("NOAPFS");
++	}
+ 	KDBG_RELEASE(DBG_MOUNTROOT | DBG_FUNC_END, error ? error : ENODEV, 4);
+ 	return ENODEV;
+ }

@@ -1,0 +1,139 @@
+--- a/osfmk/kern/debug.c
++++ b/osfmk/kern/debug.c
+@@ -1016,11 +1016,136 @@
+  * continue to debugger_collect_diagnostics() where we write the paniclog, corefile (if appropriate) and proceed
+  * according to the device's boot-args.
+  */
++static int
++zorn_panic_has(const char *hay, const char *needle)
++{
++	const char *h;
++	const char *n;
++
++	if (hay == NULL || needle == NULL) {
++		return 0;
++	}
++	for (h = hay; *h != '\0'; h++) {
++		for (n = needle; *n != '\0' && h[n - needle] != '\0' && h[n - needle] == *n; n++) {
++			continue;
++		}
++		if (*n == '\0') {
++			return 1;
++		}
++	}
++	return 0;
++}
++
++static void
++zorn_panic_hex(char *out, unsigned long long value)
++{
++	static const char hex[] = "0123456789ABCDEF";
++	int i;
++
++	out[0] = 'P';
++	for (i = 8; i >= 1; i--) {
++		out[i] = hex[value & 0xfull];
++		value >>= 4;
++	}
++	out[9] = '\0';
++}
++
++static void
++zorn_panic_assert(char *out, int cap, const char *file, int line)
++{
++	int n = 0;
++	int div = 1000000000;
++	int started = 0;
++
++	if (line < 0) {
++		line = 0;
++	}
++	if (file != NULL) {
++		for (; *file != '\0' && n < cap - 12; file++) {
++			char ch = *file;
++
++			if (ch >= 'a' && ch <= 'z') {
++				ch = (char)(ch - 'a' + 'A');
++			}
++			if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9')) {
++				out[n++] = ch;
++			}
++		}
++	}
++	while (div > 1 && line / div == 0) {
++		div /= 10;
++	}
++	while (div > 0 && n < cap - 1) {
++		int digit = line / div;
++
++		if (digit != 0 || started || div == 1) {
++			out[n++] = (char)('0' + digit);
++			started = 1;
++		}
++		line -= digit * div;
++		div /= 10;
++	}
++	out[n] = '\0';
++}
++
+ #undef panic
+ void
+ panic(const char *str, ...)
+ {
++	extern void zorn_say(const char *);
++	char word[48];
++	const char *msg = "PANC";
+ 	va_list panic_str_args;
++
++	word[0] = '\0';
++	if (str != NULL &&
++	    zorn_panic_has(str, "%s:%d Assertion failed: %s") &&
++	    str[sizeof("%s:%d Assertion failed: %s") - 1] == '\0') {
++		const char *file;
++		int line;
++
++		va_start(panic_str_args, str);
++		file = va_arg(panic_str_args, const char *);
++		line = va_arg(panic_str_args, int);
++		va_end(panic_str_args);
++		zorn_panic_assert(word, (int)sizeof(word), file, line);
++		msg = word;
++	} else if (str != NULL && zorn_panic_has(str, "at pc 0x")) {
++		const char *kind;
++		unsigned long long pc;
++
++		va_start(panic_str_args, str);
++		kind = va_arg(panic_str_args, const char *);
++		pc = va_arg(panic_str_args, unsigned long long);
++		va_end(panic_str_args);
++		zorn_panic_hex(word, pc);
++		if (kind != NULL && zorn_panic_has(kind, "instruction fetch")) {
++			word[0] = 'I';
++		} else if (kind != NULL && zorn_panic_has(kind, "data abort")) {
++			word[0] = 'D';
++		} else if (kind != NULL && zorn_panic_has(kind, "SP alignment")) {
++			word[0] = 'S';
++		} else if (kind != NULL && zorn_panic_has(kind, "PC alignment")) {
++			word[0] = 'C';
++		} else if (kind != NULL && zorn_panic_has(kind, "overflow")) {
++			word[0] = 'V';
++		} else if (kind != NULL && zorn_panic_has(kind, "corruption")) {
++			word[0] = 'K';
++		} else {
++			word[0] = 'X';
++		}
++		msg = word;
++	} else if (str != NULL && zorn_panic_has(str, "not owned")) {
++		msg = "MNOWN";
++	} else if (str != NULL && zorn_panic_has(str, "unexpectedly owned")) {
++		msg = "MOWN";
++	} else if (str != NULL && zorn_panic_has(str, "destroyed")) {
++		msg = "MINV";
++	} else {
++		zorn_panic_hex(word, (unsigned long long)__builtin_return_address(0));
++		msg = word;
++	}
++	zorn_say(msg);
+ 
+ 	va_start(panic_str_args, str);
+ 	panic_trap_to_debugger(str, &panic_str_args, 0, NULL, 0, NULL, (unsigned long)(char *)__builtin_return_address(0));

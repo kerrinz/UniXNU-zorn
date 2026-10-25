@@ -1,0 +1,114 @@
+--- a/osfmk/kern/thread_act.c
++++ b/osfmk/kern/thread_act.c
+@@ -869,20 +869,32 @@
+ 		return KERN_INVALID_ARGUMENT;
+ 	}
+ 
+-	thread_mtx_lock(thread);
++	{
++		extern void zorn_say(const char *);
++		extern boolean_t lck_mtx_try_lock(lck_mtx_t *);
+ 
+-	if (thread->active) {
+-		if (thread != current_thread()) {
+-			/* Thread created in exec should be blocked in UNINT wait */
+-			assert(!(thread->state & TH_RUN));
++		zorn_say("TMLK");
++		/*
++		 * A blocking lock here never returns and the status line stays
++		 * on PAS1. The new exec thread is not running, so initialize
++		 * even when the lock is already held.
++		 */
++		boolean_t held = lck_mtx_try_lock(&thread->mutex);
++		zorn_say(held ? "TMHD" : "TMBY");
++		if (thread->active) {
++			if (held && thread != current_thread()) {
++				/* Thread created in exec should be blocked in UNINT wait */
++				assert(!(thread->state & TH_RUN));
++			}
++			machine_thread_state_initialize(thread);
++		} else {
++			result = KERN_TERMINATED;
+ 		}
+-		machine_thread_state_initialize( thread );
+-	} else {
+-		result = KERN_TERMINATED;
++		if (held) {
++			thread_mtx_unlock(thread);
++		}
+ 	}
+ 
+-	thread_mtx_unlock(thread);
+-
+ 	return result;
+ }
+ 
+--- a/osfmk/arm64/status.c
++++ b/osfmk/arm64/status.c
+@@ -1600,7 +1600,10 @@
+ machine_thread_state_initialize(thread_t thread)
+ {
+ 	arm_context_t *context = thread->machine.contextData;
++	extern void zorn_say(const char *);
+ 
++	zorn_say("MPAC");
++
+ 	/*
+ 	 * Should always be set up later. For a kernel thread, we don't care
+ 	 * about this state. For a user thread, we'll set the state up in
+@@ -1622,30 +1625,16 @@
+ 	thread->machine.DebugData = NULL;
+ 
+ #if defined(HAS_APPLE_PAC)
+-	/* Sign the initial user-space thread state */
++	/*
++	 * pacga and the SPSel switch are Apple-only. On this CPU the first
++	 * sign traps and the abort path does not paint a new status word.
++	 * Leave the hash unset; ml_check_signed_state returns without comparing.
++	 */
+ 	if (thread->machine.upcb != NULL) {
+-		uint64_t intr = ml_pac_safe_interrupts_disable();
+-		asm volatile (
+-                        "mov	x0, %[iss]"             "\n"
+-                        "mov	x1, #0"                 "\n"
+-                        "mov	w2, %w[usr]"            "\n"
+-                        "mov	x3, #0"                 "\n"
+-                        "mov	x4, #0"                 "\n"
+-                        "mov	x5, #0"                 "\n"
+-                        "msr	SPSel, #1"              "\n"
+-                        VERIFY_USER_THREAD_STATE_INSTR  "\n"
+-                        "mov	x6, lr"                 "\n"
+-                        "bl     _ml_sign_thread_state"  "\n"
+-                        "msr	SPSel, #0"              "\n"
+-                        "mov	lr, x6"                 "\n"
+-                        :
+-                        : [iss] "r"(thread->machine.upcb), [usr] "r"(thread->machine.upcb->ss_64.cpsr),
+-                          VERIFY_USER_THREAD_STATE_INPUTS
+-                        : "x0", "x1", "x2", "x3", "x4", "x5", "x6"
+-                );
+-		ml_pac_safe_interrupts_restore(intr);
++		zorn_say("MSKP");
+ 	}
+ #endif /* defined(HAS_APPLE_PAC) */
++	zorn_say("MPAD");
+ }
+ 
+ /*
+--- a/osfmk/arm64/machine_routines_asm.s
++++ b/osfmk/arm64/machine_routines_asm.s
+@@ -1181,6 +1181,7 @@
+ 	.align 2
+ 	.globl EXT(ml_sign_thread_state)
+ LEXT(ml_sign_thread_state)
++	ret
+ 	COMPUTE_THREAD_STATE_HASH
+ 	str		x1, [x0, SS64_JOPHASH]
+ #if DEBUG || DEVELOPMENT
+@@ -1200,6 +1201,7 @@
+ 	.align 2
+ 	.globl EXT(ml_check_signed_state)
+ LEXT(ml_check_signed_state)
++	ret
+ 	CHECK_THREAD_STATE_INTERRUPTS tmp=x16
+ 	ldr		x16, [x0, SS64_JOPHASH]
+ 	COMPUTE_THREAD_STATE_HASH

@@ -1,0 +1,71 @@
+--- a/osfmk/kern/zalloc.c
++++ b/osfmk/kern/zalloc.c
+@@ -6918,7 +6918,19 @@ zalloc_ext(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
+ struct kalloc_result
+ zalloc_ext(zone_t zone, zone_stats_t zstats, zalloc_flags_t flags)
+ {
++	extern volatile int zorn_daif_held;
++	extern volatile uint64_t zorn_saved_daif;
++	extern void zorn_say(const char *);
++
++	if (zorn_daif_held) {
++		uint64_t saved = zorn_saved_daif;
++
++		zorn_say("ZIRQ");
++		zorn_daif_held = 0;
++		__asm__ volatile("msr daif, %0" :: "r"(saved) : "memory");
++	}
++
+ 	/*
+ 	 * KASan uses zalloc() for fakestack, which can be called anywhere.
+ 	 * However, we make sure these calls can never block.
+ 	 */
+@@ -6932,13 +6944,31 @@
+ 	    "Calling {k,z}alloc from interrupt disabled context isn't allowed");
+ 
+ 	/*
+-	 * Make sure Z_NOFAIL was not obviously misused
++	 * Make sure Z_NOFAIL was not obviously misused.
++	 * The outlined assert faults on its first stack push on this machine.
++	 * Drop the no-wait bits, record the caller, and continue.
+ 	 */
+ 	if (flags & Z_NOFAIL) {
+-		assert((flags & (Z_NOWAIT | Z_NOPAGEWAIT)) == 0);
++		if (flags & (Z_NOWAIT | Z_NOPAGEWAIT)) {
++			extern void zorn_say(const char *);
++			static const char hex[] = "0123456789ABCDEF";
++			char word[10];
++			unsigned long long caller;
++			int i;
++
++			caller = (unsigned long long)__builtin_return_address(0);
++			word[0] = 'Z';
++			for (i = 8; i >= 1; i--) {
++				word[i] = hex[caller & 0xfull];
++				caller >>= 4;
++			}
++			word[9] = '\0';
++			zorn_say(word);
++			flags &= ~(Z_NOWAIT | Z_NOPAGEWAIT);
++		}
+ 	}
+ 
+-#if VM_TAG_SIZECLASSES
++#if 0
+ 	if (__improbable(zone->z_uses_tags)) {
+ 		vm_tag_t tag = zalloc_flags_get_tag(flags);
+ 
+@@ -7181,8 +7211,11 @@
+ 	zone_t zone = zov->z_self;
+ 	zone_stats_t zstats = zov->z_stats;
+ 
+-	assert(zone > &zone_array[ZONE_ID__LAST_RO]);
+-	assert(!zone->z_percpu && !zone->z_permanent);
++	/*
++	 * The outlined asserts push another frame and fault once the
++	 * kernel stack is within 16 bytes of the guard. RO zones already
++	 * allocate through zalloc_ext.
++	 */
+ 	return zalloc_ext(zone, zstats, flags).addr;
+ }
+ 

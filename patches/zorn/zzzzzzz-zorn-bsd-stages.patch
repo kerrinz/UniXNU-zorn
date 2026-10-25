@@ -124,25 +124,34 @@
  
  	pal_kernel_announce();
  
-@@ -1261,7 +1287,9 @@
+@@ -1261,17 +1287,26 @@
  bsdinit_task(void)
  {
  	proc_t p = current_proc();
 +	extern void zorn_say(const char *);
  
 +	zorn_say("INIT");
++	zorn_say("INAM");
  	process_name("init", p);
++	zorn_say("UX");
  
  	/* Set up exception-to-signal reflection */
-@@ -1272,6 +1300,7 @@
+ 	ux_handler_setup();
++	zorn_say("UXD");
+ 
+ #if CONFIG_MACF
++	zorn_say("MACU");
+ 	mac_cred_label_associate_user(proc_ucred_unsafe(p)); /* in init */
++	zorn_say("MACD");
  #endif
  
++	zorn_say("VMB");
  	vm_init_before_launchd();
 +	zorn_say("VMLAUNCH");
  
  #if CONFIG_XNUPOST
  	int result = bsd_list_tests();
-@@ -1283,6 +1312,7 @@
+@@ -1283,6 +1318,7 @@
  
  	bsd_init_kprintf("bsd_do_post - done");
  
@@ -150,7 +159,7 @@
  	load_init_program(p);
  	lock_trace = 1;
  }
-@@ -1360,12 +1390,15 @@
+@@ -1360,12 +1396,15 @@
  {
  	thread_t thread;
  	struct uthread *ut;
@@ -166,7 +175,7 @@
  
  	/* Hold the reference as it will be dropped during shutdown */
  	initproc = proc_find(1);
-@@ -1389,6 +1422,7 @@
+@@ -1389,6 +1428,7 @@
  	act_set_astbsd(thread);
  
  	ipc_task_enable(get_threadtask(thread));

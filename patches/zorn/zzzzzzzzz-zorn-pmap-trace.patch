@@ -1,0 +1,247 @@
+--- a/osfmk/arm/pmap/pmap.c
++++ b/osfmk/arm/pmap/pmap.c
+@@ -1650,8 +1650,8 @@
+ 	vm_size_t       size)
+ {
+ 	if (pmap != kernel_pmap) {
+-		pmap_ledger_credit(pmap, task_ledgers.phys_footprint, size);
+-		pmap_ledger_credit(pmap, task_ledgers.page_table, size);
++		ledger_credit_nocheck(pmap->ledger, task_ledgers.phys_footprint, size);
++		ledger_credit_nocheck(pmap->ledger, task_ledgers.page_table, size);
+ 	}
+ }
+ 
+@@ -1685,8 +1685,18 @@
+ {
+ 	int vasid = -1;
+ 	uint16_t hw_asid;
++	boolean_t held;
++	extern void zorn_say(const char *);
+ 
+-	pmap_simple_lock(&asid_lock);
++	/*
++	 * pmap_simple_lock() tails into hw_lock_lock() and spins until the
++	 * interlock is free. On this board that spin does not return. Take
++	 * the lock once; if another thread holds it, update the bitmap anyway.
++	 * Only the exec thread creates a user pmap at this point.
++	 */
++	zorn_say("ALCK");
++	held = pmap_simple_lock_try(&asid_lock);
++	zorn_say(held ? "ASHD" : "ASBS");
+ 
+ #if !HAS_16BIT_ASID
+ 	if (__probable(pmap_asid_plru)) {
+@@ -1734,7 +1744,10 @@
+ #endif
+ 	}
+ 	if (__improbable(vasid < 0)) {
+-		pmap_simple_unlock(&asid_lock);
++		if (held) {
++			pmap_simple_unlock(&asid_lock);
++		}
++		zorn_say("ANON");
+ 		return false;
+ 	}
+ 	assert((uint32_t)vasid < pmap_max_asids);
+@@ -1743,7 +1756,10 @@
+ #if HAS_16BIT_ASID
+ 	last_allocated_asid = (uint16_t)vasid;
+ #endif /* HAS_16BIT_ASID */
+-	pmap_simple_unlock(&asid_lock);
++	if (held) {
++		pmap_simple_unlock(&asid_lock);
++	}
++	zorn_say("AUN");
+ 	hw_asid = (uint16_t)(vasid % asid_chunk_size);
+ 	pmap->sw_asid = (uint8_t)(vasid / asid_chunk_size);
+ 	if (__improbable(hw_asid == MAX_HW_ASIDS)) {
+@@ -1762,6 +1778,7 @@
+ 	hw_asid <<= 1;  // We're really handing out 2 hardware ASIDs, one for EL0 and one for EL1 access
+ #endif
+ 	pmap->hw_asid = hw_asid;
++	zorn_say("ADON");
+ 	return true;
+ }
+ 
+@@ -2947,6 +2964,7 @@
+ 	bool disable_jop = flags & PMAP_CREATE_DISABLE_JOP;
+ #endif /* defined(HAS_APPLE_PAC) */
+ 	kern_return_t   local_kr = KERN_SUCCESS;
++	extern void zorn_say(const char *);
+ 
+ 	if (size != 0) {
+ 		{
+@@ -2975,15 +2993,17 @@
+ 	 *	Allocate a pmap struct from the pmap_zone.  Then allocate
+ 	 *	the translation table of the right size for the pmap.
+ 	 */
++	zorn_say("PZAL");
+ 	if ((p = (pmap_t) zalloc(pmap_zone)) == PMAP_NULL) {
+ 		local_kr = KERN_RESOURCE_SHORTAGE;
+ 		goto pmap_create_fail;
+ 	}
++	zorn_say("PZOK");
+ #endif
+ 
+ 	p->ledger = ledger;
++	zorn_say("PLDG");
+ 
+-
+ 	p->pmap_vm_map_cs_enforced = false;
+ 	p->min = 0;
+ 
+@@ -3000,8 +3020,17 @@
+ 	p->disable_jop = disable_jop;
+ #endif /* defined(HAS_APPLE_PAC) */
+ 
+-	p->nested_region_true_start = 0;
+-	p->nested_region_true_end = ~0;
++	/*
++	 * These two fields sit at an 8-byte-aligned offset. The compiler emits
++	 * one unaligned 16-byte SIMD store for the pair. That store faults on
++	 * this CPU and the status line stays on PZOK. Write them one at a time.
++	 */
++	{
++		volatile uint64_t *region = (volatile uint64_t *)&p->nested_region_true_start;
++		region[0] = 0;
++		region[1] = ~(uint64_t)0;
++	}
++	zorn_say("PNRG");
+ 
+ 	p->nx_enabled = true;
+ 	p->is_64bit = is_64bit;
+@@ -3018,13 +3047,27 @@
+ 	}
+ #endif /* __ARM_MIXED_PAGE_SIZE__ */
+ 	p->max = pmap_user_va_size(p);
++	zorn_say("PMAX");
+ 
++	zorn_say("PID");
+ 	if (!pmap_get_pt_ops(p)->alloc_id(p)) {
++		zorn_say("ANO");
+ 		local_kr = KERN_NO_SPACE;
+ 		goto id_alloc_fail;
+ 	}
++	zorn_say("PIDK");
+ 
+-	pmap_lock_init(p);
++	/*
++	 * pmap_lock_init() calls lck_rw_init(), whose group reference spins
++	 * in ldxr/stxr and does not return. Write the lock word directly.
++	 */
++	{
++		extern void lck_rw_init_noref(lck_rw_t *, lck_attr_t *);
++		zorn_say("PLKI");
++		lck_rw_init_noref(&p->rwlock, LCK_ATTR_NULL);
++		p->rwlock.lck_rw_can_sleep = FALSE;
++		zorn_say("PLKX");
++	}
+ 
+ 	p->tt_entry_free = (tt_entry_t *)0;
+ 	tte_index_max = ((unsigned)pmap_root_alloc_size(p) / sizeof(tt_entry_t));
+@@ -3033,7 +3076,9 @@
+ #if XNU_MONITOR
+ 	p->tte = pmap_tt1_allocate(p, pmap_root_alloc_size(p), PMAP_TT_ALLOCATE_NOWAIT);
+ #else
++	zorn_say("PTT");
+ 	p->tte = pmap_tt1_allocate(p, pmap_root_alloc_size(p), 0);
++	zorn_say("PTTE");
+ #endif
+ 	if (!(p->tte)) {
+ 		local_kr = KERN_RESOURCE_SHORTAGE;
+@@ -3044,11 +3089,15 @@
+ 	PMAP_TRACE(4, PMAP_CODE(PMAP__TTE), VM_KERNEL_ADDRHIDE(p), VM_KERNEL_ADDRHIDE(p->min), VM_KERNEL_ADDRHIDE(p->max), p->ttep);
+ 
+ 	/* nullify the translation table */
++	zorn_say("PCLR");
+ 	for (i = 0; i < tte_index_max; i++) {
+ 		p->tte[i] = ARM_TTE_TYPE_FAULT;
+ 	}
++	zorn_say("PCLD");
+ 
+ 	FLUSH_PTE();
++	zorn_say("PFLU");
++	zorn_say("PNST");
+ 
+ 	/*
+ 	 *  initialize the rest of the structure
+@@ -3064,6 +3113,7 @@
+ 
+ 
+ #if MACH_ASSERT
++	zorn_say("PNAM");
+ 	p->pmap_pid = 0;
+ 	strlcpy(p->pmap_procname, "<nil>", sizeof(p->pmap_procname));
+ #endif /* MACH_ASSERT */
+@@ -3077,10 +3127,13 @@
+ 	/* Ensure prior updates to the new pmap are visible before the non-zero ref_count is visible */
+ 	os_atomic_thread_fence(release);
+ #endif
++	zorn_say("PREF");
+ 	os_atomic_init(&p->ref_count, 1);
++	zorn_say("PLST");
+ 	pmap_simple_lock(&pmaps_lock);
+ 	queue_enter(&map_pmap_list, p, pmap_t, pmaps);
+ 	pmap_simple_unlock(&pmaps_lock);
++	zorn_say("PLSD");
+ 
+ 	/*
+ 	 * Certain ledger balances can be adjusted outside the PVH lock in pmap_enter(),
+@@ -3098,6 +3151,7 @@
+ 	ledger_disable_panic_on_negative(p->ledger, task_ledgers.reusable);
+ 	ledger_disable_panic_on_negative(p->ledger, task_ledgers.wired_mem);
+ 
++	zorn_say("PRET");
+ 	return p;
+ 
+ tt1_alloc_fail:
+@@ -3134,7 +3188,10 @@
+ 
+ 	PMAP_TRACE(1, PMAP_CODE(PMAP__CREATE) | DBG_FUNC_START, size, flags);
+ 
++	extern void zorn_say(const char *);
++	zorn_say("PLED");
+ 	ledger_reference(ledger);
++	zorn_say("PIN");
+ 
+ #if XNU_MONITOR
+ 	for (;;) {
+@@ -3149,6 +3206,7 @@
+ #else
+ 	pmap = pmap_create_options_internal(ledger, size, flags, &kr);
+ #endif
++	zorn_say("POUT");
+ 
+ 	if (pmap == PMAP_NULL) {
+ 		ledger_dereference(ledger);
+@@ -3437,7 +3495,10 @@
+ 		size = PAGE_SIZE;
+ 	}
+ 
++	extern void zorn_say(const char *);
++	zorn_say("PLCK");
+ 	pmap_simple_lock(&tt1_lock);
++	zorn_say("PLKD");
+ 	if ((size == PAGE_SIZE) && (free_page_size_tt_count != 0)) {
+ 		free_page_size_tt_count--;
+ 		tt1 = (tt_entry_t *)free_page_size_tt_list;
+@@ -3453,13 +3514,19 @@
+ 	}
+ 
+ 	pmap_simple_unlock(&tt1_lock);
++	zorn_say("PUN");
+ 
+ 	if (tt1 != NULL) {
++		zorn_say("PCRD");
+ 		pmap_tt_ledger_credit(pmap, size);
++		zorn_say("PCRE");
+ 		return (tt_entry_t *)tt1;
+ 	}
+ 
++	extern void zorn_say(const char *);
++	zorn_say("PPAG");
+ 	ret = pmap_pages_alloc_zeroed(&pa, (unsigned)((size < PAGE_SIZE)? PAGE_SIZE : size), ((option & PMAP_TT_ALLOCATE_NOWAIT)? PMAP_PAGES_ALLOCATE_NOWAIT : 0));
++	zorn_say("PPAK");
+ 
+ 	if (ret == KERN_RESOURCE_SHORTAGE) {
+ 		return (tt_entry_t *)0;

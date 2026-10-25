@@ -1,0 +1,146 @@
+--- a/osfmk/kern/lock_rw.c
++++ b/osfmk/kern/lock_rw.c
+@@ -188,6 +188,28 @@ lck_rw_init(
+ 	lck_grp_reference(grp, &grp->lck_grp_rwcnt);
+ }
+ 
++/*
++ * Same initial lock word as lck_rw_init(), without the group reference.
++ * That reference is an ldxr/stxr increment, and it does not finish while
++ * the user pmap is being created.
++ */
++void
++lck_rw_init_noref(
++	lck_rw_t        *lck,
++	lck_attr_t      *attr)
++{
++	lck_type_t type = LCK_TYPE_RW;
++
++	if (attr == LCK_ATTR_NULL) {
++		attr = &lck_attr_default;
++	}
++	*lck = (lck_rw_t){
++		.lck_rw_type = type,
++		.lck_rw_can_sleep = true,
++		.lck_rw_priv_excl = !(attr->lck_attr_val & LCK_ATTR_RW_SHARED_PRIORITY),
++	};
++}
++
+ /*!
+  * @function lck_rw_free
+  *
+@@ -746,10 +768,19 @@ lck_rw_interlock_spin(
+ 	lck_rw_t        *lock)
+ {
+ 	uint32_t        data, prev;
++	int             spins = 0;
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
+ 
+ 	for (;;) {
+ 		data = atomic_exchange_begin32(&lock->lck_rw_data, &prev, memory_order_relaxed);
+ 		if (data & LCK_RW_INTERLOCK) {
++			if (zorn_read_trace && ++spins > 8) {
++				atomic_exchange_abort();
++				*(volatile uint32_t *)&lock->lck_rw_data = data & ~LCK_RW_INTERLOCK;
++				zorn_say("LRIN");
++				return;
++			}
+ #if __x86_64__
+ 			cpu_pause();
+ #else
+@@ -1214,7 +1245,32 @@ void
+ lck_rw_lock_exclusive(
+ 	lck_rw_t        *lock)
+ {
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
++
++	if (zorn_read_trace) {
++		zorn_say("LRDE");
++	}
+ 	(void) lck_rw_lock_exclusive_internal_inline(lock, __builtin_return_address(0), NULL);
++	if (zorn_read_trace) {
++		extern volatile int zorn_read_irqs_on;
++		unsigned long long caller;
++		char word[10];
++		static const char hex[] = "0123456789ABCDEF";
++		int i;
++
++		zorn_say("LRDK");
++		zorn_say("LROK");
++		caller = (unsigned long long)__builtin_return_address(0);
++		word[0] = 'C';
++		for (i = 8; i >= 1; i--) {
++			word[i] = hex[caller & 0xfull];
++			caller >>= 4;
++		}
++		word[9] = '\0';
++		zorn_read_irqs_on = 1;
++		zorn_say(word);
++	}
+ }
+ 
+ /*!
+@@ -1489,7 +1545,16 @@ void
+ lck_rw_lock_shared(
+ 	lck_rw_t        *lock)
+ {
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
++
++	if (zorn_read_trace) {
++		zorn_say("LRDS");
++	}
+ 	(void) lck_rw_lock_shared_internal_inline(lock, __builtin_return_address(0), NULL);
++	if (zorn_read_trace) {
++		zorn_say("LRSH");
++	}
+ }
+ 
+ /*!
+@@ -2194,6 +2259,9 @@ lck_rw_done(
+ {
+ 	uint32_t        data, prev;
+ 	boolean_t       once = FALSE;
++	int             spins = 0;
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
+ 
+ #ifdef DEBUG_RW
+ 	/*
+@@ -2256,6 +2324,11 @@ check_waiters:
+ 		if (atomic_exchange_complete32(&lock->lck_rw_data, prev, data, memory_order_release_smp)) {
+ 			break;
+ 		}
++		if (zorn_read_trace && ++spins > 32) {
++			*(volatile uint32_t *)&lock->lck_rw_data = data;
++			zorn_say("LRPL");
++			break;
++		}
+ 		cpu_pause();
+ 	}
+ 	return lck_rw_done_gen(lock, prev);
+@@ -2305,7 +2378,12 @@ lck_rw_unlock_exclusive(
+ 	lck_rw_t        *lck)
+ {
+ 	lck_rw_type_t   ret;
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
+ 
++	if (zorn_read_trace) {
++		zorn_say("LRUE");
++	}
+ 	assertf(lck->lck_rw_owner == current_thread()->ctid,
+ 	    "state=0x%x, owner=%p", lck->lck_rw_data,
+ 	    ctid_get_thread_unsafe(lck->lck_rw_owner));
+@@ -2314,6 +2392,9 @@ lck_rw_unlock_exclusive(
+ 	if (ret != LCK_RW_TYPE_EXCLUSIVE) {
+ 		panic("lck_rw_unlock_exclusive(): lock %p held in mode: %d", lck, ret);
+ 	}
++	if (zorn_read_trace) {
++		zorn_say("LRUY");
++	}
+ }
+ 
+ /*!

@@ -1,0 +1,14 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -931,6 +931,10 @@
+ 
+ 	bsd_init_kprintf("calling bsd_autoconf\n");
+ 	bsd_autoconf();
+ 	zorn_say("ACD");
++	{
++		extern void zorn_ufs_read_gpt(void);
++		zorn_ufs_read_gpt();
++	}
+ 
+ #if CONFIG_DTRACE
+ 	dtrace_postinit();

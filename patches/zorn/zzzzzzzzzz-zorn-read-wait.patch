@@ -1,0 +1,30 @@
+--- a/bsd/kern/decmpfs.c
++++ b/bsd/kern/decmpfs.c
+@@ -1647,6 +1647,12 @@ out:
+ errno_t
+ decmpfs_read_compressed(struct vnop_read_args *ap, int *is_compressed, decmpfs_cnode *cp)
+ {
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
++
++	if (zorn_read_trace) {
++		zorn_say("DCMP");
++	}
+ 	/* handles a read request from vfs for a compressed file */
+ 
+ 	uio_t uio                    = ap->a_uio;
+--- a/bsd/vfs/vfs_cluster.c
++++ b/bsd/vfs/vfs_cluster.c
+@@ -3960,6 +3960,12 @@ check_cluster:
+ int
+ cluster_read(vnode_t vp, struct uio *uio, off_t filesize, int xflags)
+ {
++	extern volatile int zorn_read_trace;
++	extern void zorn_say(const char *);
++
++	if (zorn_read_trace) {
++		zorn_say("CLRD");
++	}
+ 	return cluster_read_ext(vp, uio, filesize, xflags, NULL, NULL);
+ }
+ 

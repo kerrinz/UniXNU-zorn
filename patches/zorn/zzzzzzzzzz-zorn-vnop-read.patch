@@ -1,0 +1,58 @@
+--- a/bsd/vfs/kpi_vfs.c
++++ b/bsd/vfs/kpi_vfs.c
+@@ -3844,16 +3844,23 @@ struct vnop_read_args {
+ 	vfs_context_t a_context;
+ };
+ #endif /* 0*/
++volatile int zorn_read_trace;
++volatile int zorn_read_irqs_on;
++
+ errno_t
+ VNOP_READ(vnode_t vp, struct uio * uio, int ioflag, vfs_context_t ctx)
+ {
+ 	int _err;
+ 	struct vnop_read_args a;
++	int (*fn)(void *);
++	extern void zorn_say(const char *);
+ #if CONFIG_DTRACE
+ 	user_ssize_t resid = uio_resid(uio);
+ #endif
+ 
++	zorn_say("VOP");
+ 	if (ctx == NULL) {
++		zorn_say("VCTX");
+ 		return EINVAL;
+ 	}
+ 
+@@ -3863,7 +3870,30 @@ VNOP_READ(vnode_t vp, struct uio * uio, int ioflag, vfs_context_t ctx)
+ 	a.a_ioflag = ioflag;
+ 	a.a_context = ctx;
+ 
+-	_err = (*vp->v_op[vnop_read_desc.vdesc_offset])(&a);
++	fn = vp->v_op[vnop_read_desc.vdesc_offset];
++	if (fn == NULL) {
++		zorn_say("VNIL");
++		return EIO;
++	}
++	{
++		char hex[9];
++		static const char digits[] = "0123456789ABCDEF";
++		uintptr_t value = (uintptr_t)fn;
++		int i;
++
++		for (i = 7; i >= 0; i--) {
++			hex[i] = digits[value & 0xfu];
++			value >>= 4;
++		}
++		hex[8] = '\0';
++		zorn_say(hex);
++	}
++	zorn_read_irqs_on = 0;
++	zorn_read_trace = 1;
++	_err = fn(&a);
++	zorn_read_trace = 0;
++	zorn_read_irqs_on = 0;
++	zorn_say("VDON");
+ 	DTRACE_FSINFO_IO(read,
+ 	    vnode_t, vp, user_ssize_t, (resid - uio_resid(uio)));
+ 

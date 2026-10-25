@@ -1,0 +1,46 @@
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -1524,7 +1524,15 @@
+ 	}
+ #endif /* DEBUG || DEVELOPMENT */
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("VZ1");
++	}
+ 	result = zalloc_id(ZONE_ID_VM_MAP, Z_WAITOK | Z_NOFAIL | Z_ZERO);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("VZ2");
++	}
+ 
+ 	vm_map_store_init(&result->hdr);
+ 	result->hdr.entries_pageable = (bool)(options & VM_MAP_CREATE_PAGEABLE);
+@@ -1550,8 +1558,11 @@
+ 		result->has_corpse_footprint = true;
+ 	} else if (!(options & VM_MAP_CREATE_DISABLE_HOLELIST)) {
+ 		struct vm_map_links *hole_entry;
++		extern void zorn_say(const char *);
+ 
++		zorn_say("VH1");
+ 		hole_entry = zalloc_id(ZONE_ID_VM_MAP_HOLES, Z_WAITOK | Z_NOFAIL);
++		zorn_say("VH2");
+ 		hole_entry->start = min;
+ #if defined(__arm64__)
+ 		hole_entry->end = result->max_offset;
+@@ -1563,7 +1574,15 @@
+ 		result->holelistenabled = true;
+ 	}
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("VLCK");
++	}
+ 	vm_map_lock_init(result);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("VLOK");
++	}
+ 
+ 	return result;
+ }

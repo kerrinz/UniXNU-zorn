@@ -1,0 +1,22 @@
+--- a/osfmk/mach/arm/vm_param.h
++++ b/osfmk/mach/arm/vm_param.h
+@@ -315,15 +315,16 @@
+  * Increase the stack size to account for less efficient use of stack space when
+- * compiling with -O0.
++ * compiling with -O0. Doubled again: the launchd read faults on a 16-byte
++ * cold frame at the guard.
+  */
+-# define KERNEL_STACK_SIZE      (2*4*4096)
++# define KERNEL_STACK_SIZE      (4*4*4096)
+ #else
+ /*
+  * KERNEL_STACK_MULTIPLIER can be defined externally to get a larger
+  * kernel stack size. For example, adding "-DKERNEL_STACK_MULTIPLIER=2"
+  * helps avoid kernel stack overflows when compiling with "-O0".
+  */
+ #ifndef KERNEL_STACK_MULTIPLIER
+-#define KERNEL_STACK_MULTIPLIER (1)
++#define KERNEL_STACK_MULTIPLIER (2)
+ #endif /* KERNEL_STACK_MULTIPLIER */
+ # define KERNEL_STACK_SIZE      (4*4096*KERNEL_STACK_MULTIPLIER)
+ #endif /* XNU_KERNEL_PRIVATE */

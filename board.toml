@@ -1,7 +1,10 @@
 # Redmi K80 (zorn), 12GB+256GB, SM8650-AB. Read by the unixnu build driver.
-# RAM boot only. There is no [userdata] block: nothing in this file is a
-# partition to flash. The tested volume is packed by uefi-zorn/scripts,
-# because the generic payload step does not use 512-byte FAT clusters.
+# RAM boot only for the kernel image. [userdata] is the iPadOS 17.7.11 volume
+# file built by `unixnu build userdata`. That file was written to userdata on
+# 2026-10-25 and the read-back stopped at SHNGOK. Do not flash it again, and
+# do not boot Android while it is installed. The kernel probe is read-only.
+# The tested boot image is packed by uefi-zorn/scripts, because the generic
+# payload step does not use 512-byte FAT clusters.
 
 [board]
 name = "zorn"
@@ -25,6 +28,21 @@ fetch = ["KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustC
 "044-76040-038.dmg" = "3f99b859c9728379110b66657c7b15285bcb1925ad8b5726542e2cdcf8b1028d"
 "044-76034-038.dmg" = "b4908cde41d23e6bc05e6af51a2c9eeb00cf0f863a6a18b1600c96a3fd70414f"
 
+# first_lba/last_lba only reproduce fastboot partition-size 0x3A1D0FB000
+# (60936443 blocks of 4096). They are not the GPT addresses.
+[userdata]
+first_lba = 0
+last_lba = 60936442
+lba_bytes = 4096
+
+[[userdata.windows]]
+name = "OS"
+component = "OS"
+
+[[userdata.windows]]
+name = "SystemOS"
+component = "Cryptex1,SystemOS"
+
 [kernel]
 defconfig = "zorn_defconfig"
 archives = [
@@ -34,6 +52,7 @@ archives = [
   "build-arm-driver.py ArmCpu",
   "build-libpthread-kernel.py",
   "build-zorn-link-stubs.py",
+  "build-zorn-ufs.py",
 ]
 
 # Same restore image and prelink pins as UniXNU-sheng. The addresses belong
@@ -109,16 +128,18 @@ BUILDID_STRING = "zorn-research"
 # Do not add a splash node here until the stock DTB is in hand: pineapple
 # already has /reserved-memory/splash_region, and fdtput -c fails if it exists.
 
-# Numbers for the generic payload step. The image that reached parse_machfile
-# is the one packed by uefi-zorn/scripts/make-zorn-payload.py: 512-byte
-# clusters, initrd Payloads/root.img, menu file payload/EFI/UniXNU/unixnu.toml.
+# Numbers for the generic payload step. The image that reached MEND is the
+# one packed by uefi-zorn/scripts/make-zorn-payload.py: 512-byte clusters,
+# initrd Payloads/root.img, menu file payload/EFI/UniXNU/unixnu.toml.
+# rd=md0 is the userdata OS container; the kernel registers it before the
+# restore ramdisk.
 [payload]
 volume = "ZORNESP"
 size_mib = 192
 loader = "firmware"
 title = "Boot XNU"
 dram_size = "0x300000000"
-timeout = 10
+timeout = 5
 kernel_args = ["rd=md0", "-v", "serial=3", "debug=0x14e"]
 
 [payload.adt]

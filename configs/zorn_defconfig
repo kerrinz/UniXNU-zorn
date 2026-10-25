@@ -16,6 +16,8 @@ CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"
 # The development kernel references native_legacy_display_probe even when the
 # Legacy framebuffer is not built. This empty definition keeps the link going
 # until a zorn display archive exists. The call only runs with the boot arg.
-CONFIG_XNU_EXTRA_LD_ARCHIVES="-Wl,-force_load,{tree}/build/zorn-stubs/libZornLinkStubs.a"
+# libZornUfs is the read-only UFS probe. It publishes the OS container as md0
+# and does not issue WRITE or SYNCHRONIZE CACHE.
+CONFIG_XNU_EXTRA_LD_ARCHIVES="-Wl,-force_load,{tree}/build/zorn-stubs/libZornLinkStubs.a -Wl,-force_load,{tree}/build/zorn-ufs/libZornUfs.a"
 # CONFIG_XNU_ARMVIRT_PLATFORM is not set
 # CONFIG_XNU_SHENG_PMGR is not set

@@ -1,0 +1,35 @@
+--- a/bsd/kern/ubc_subr.c
++++ b/bsd/kern/ubc_subr.c
+@@ -4701,6 +4701,10 @@
+ 	if (error != 0) {
+ 		printf("unable to create a validated cs_blob object: %d\n", error);
+ 		return error;
++	}
++	{
++		extern void zorn_say(const char *);
++		zorn_say("CSBI");
+ 	}
+ 
+ 	tmp_blob.csb_cpu_type = cputype;
+@@ -4767,6 +4771,10 @@
+ #if CONFIG_MACF
+ 	unsigned int cs_flags = tmp_blob.csb_flags;
+ 	unsigned int signer_type = tmp_blob.csb_signer_type;
++	{
++		extern void zorn_say(const char *);
++		zorn_say("CSMAC");
++	}
+ 
+ 	error = mac_vnode_check_signature(
+ 		vp,
+@@ -4781,6 +4789,10 @@
+ 		printf("validation of code signature failed through MACF policy: %d\n", error);
+ 		goto out;
+ 	}
++	{
++		extern void zorn_say(const char *);
++		zorn_say("CSMAD");
++	}
+ 
+ #if HAS_APPLE_PAC
+ 	signed_entitlements = ptrauth_sign_unauthenticated(

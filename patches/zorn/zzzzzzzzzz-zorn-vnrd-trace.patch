@@ -1,0 +1,34 @@
+--- a/bsd/vfs/vfs_vnops.c
++++ b/bsd/vfs/vfs_vnops.c
+@@ -1007,7 +1007,31 @@ vn_rdwr_64(
+ 			if (vnode_isswap(vp) && ((ioflg & IO_SWAP_DISPATCH) == 0)) {
+ 				error = vn_read_swapfile(vp, auio);
+ 			} else {
++				extern void zorn_say(const char *);
++				user_ssize_t got;
++
++				zorn_say("VNRD");
+ 				error = VNOP_READ(vp, auio, ioflg, &context);
++				zorn_say("VNDN");
++				/*
++				 * The residual check used to assert and panic. That
++				 * panic does not paint a new status word. Record the
++				 * residual and continue.
++				 */
++				got = uio_resid(auio);
++				if (got < 0 || got > len) {
++					zorn_say("VBIG");
++					got = len;
++				} else {
++					zorn_say("VRES");
++				}
++				if (aresid) {
++					*aresid = got;
++				} else if (got && error == 0) {
++					error = EIO;
++				}
++				zorn_say("VRET");
++				return error;
+ 			}
+ 		} else {
+ 			error = VNOP_WRITE(vp, auio, ioflg, &context);

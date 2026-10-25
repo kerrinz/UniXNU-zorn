@@ -9,16 +9,25 @@
  	/*
  	 * Actually load the image file we previously decided to load.
  	 */
-@@ -2247,6 +2249,8 @@
+@@ -2247,6 +2249,17 @@
  	    UIO_SYSSPACE, CAST_USER_ADDR_T(excpath), imgp->ip_vfs_context);
  
  again:
 +	extern void zorn_say(const char *);
++	if (excpath != NULL && excpath[0] == '/' && excpath[1] == 's') {
++		zorn_say("NBIN");
++	} else if (excpath != NULL && excpath[0] == '/' && excpath[5] == 'a') {
++		zorn_say("NDEV");
++	} else if (excpath != NULL && excpath[0] == '/' && excpath[5] == 'l') {
++		zorn_say("NDYL");
++	} else {
++		zorn_say("NPTH");
++	}
 +	zorn_say("ENAME");
  	error = namei(ndp);
  	if (error) {
  		if (error == ERESTART) {
-@@ -2256,6 +2260,7 @@
+@@ -2256,6 +2269,7 @@
  	}
  	imgp->ip_ndp = ndp;     /* successful namei(); call nameidone() later */
  	imgp->ip_vp = ndp->ni_vp;       /* if set, need to vnode_put() at some point */
@@ -26,7 +35,124 @@
  
  	/*
  	 * Before we start the transition from binary A to binary B, make
-@@ -5233,6 +5238,8 @@
+@@ -2264,22 +2278,77 @@
+ 	 * mechanism ensures that the value doesn't change after we release
+ 	 * the lock.
+ 	 */
+-	proc_lock(p);
+-	if (p->p_lflag & P_LEXIT) {
+-		error = EDEADLK;
+-		proc_unlock(p);
+-		goto bad_notrans;
++	zorn_say("ELCK");
++	zorn_say("EUNL");
++	/*
++	 * namei may return only an iocount. Unlocking a mutex this thread
++	 * does not own panics or spins in the lock slow path, and the
++	 * status line stays on ELCK. The mutex word is at vnode+8.
++	 */
++	{
++		extern uint32_t thread_get_ctid(thread_t);
++		uint32_t vdata = *(volatile uint32_t *)((uintptr_t)imgp->ip_vp + 8);
++		uint32_t owner = vdata & 0x0fffffffu;
++		uint32_t self = thread_get_ctid(current_thread());
++
++		if (self == 0) {
++			zorn_say("CTD0");
++		} else if (owner == 0) {
++			zorn_say("VFREE");
++		} else if (owner == self) {
++			zorn_say("VOWN");
++		} else {
++			zorn_say("VOTH");
++		}
++		/* Flag bits mean a waiter, not a different owner. Dropping the
++		 * lock here lets the next lookup finish. The slow path is only
++		 * taken when this thread is the owner.
++		 */
++		if (self != 0 && owner == self) {
++			vnode_unlock(imgp->ip_vp);
++			zorn_say("EUNLD");
++		}
+ 	}
+-	error = proc_transstart(p, 1, 0);
+-	proc_unlock(p);
+-	if (error) {
+-		goto bad_notrans;
++	boolean_t proc_locked = FALSE;
++	for (int spins = 0; spins < 8; spins++) {
++		if (lck_mtx_try_lock(&p->p_mlock)) {
++			proc_locked = TRUE;
++			break;
++		}
++		zorn_say(spins == 0 ? "EBSY" : "EBS2");
++		thread_block(THREAD_CONTINUE_NULL);
+ 	}
++	if (proc_locked) {
++		zorn_say("ELKD");
++		if (p->p_lflag & P_LEXIT) {
++			error = EDEADLK;
++			proc_unlock(p);
++			goto bad_notrans;
++		}
++		zorn_say("ETRN");
++		error = proc_transstart(p, 1, 0);
++		proc_unlock(p);
++		if (error) {
++			zorn_say("ETRB");
++			goto bad_notrans;
++		}
++	} else {
++		/* Single-threaded init can mark the exec transition without the lock.
++		 * proc_transcommit asserts that this thread holds it.
++		 */
++		zorn_say("ESKP");
++		p->p_lflag |= P_LINTRANSIT;
++		p->p_transholder = current_thread();
++		zorn_say("ESET");
++	}
+ 
++	zorn_say("EPERM");
+ 	error = exec_check_permissions(imgp);
+ 	if (error) {
++		zorn_say("EPRB");
+ 		goto bad;
+ 	}
++	zorn_say("ERD");
+ 
+ 	/* Copy; avoid invocation of an interpreter overwriting the original */
+ 	if (once) {
+@@ -2287,13 +2356,29 @@
+ 		*imgp->ip_origvattr = *imgp->ip_vattr;
+ 	}
+ 
++	/* Drop the vnode lock if this thread still holds it. The read path
++	 * takes that lock itself, and a second lock panics as MOWN.
++	 */
++	{
++		extern uint32_t thread_get_ctid(thread_t);
++		uint32_t vdata = *(volatile uint32_t *)((uintptr_t)imgp->ip_vp + 8);
++		uint32_t owner = vdata & 0x0fffffffu;
++		uint32_t self = thread_get_ctid(current_thread());
++
++		if (self != 0 && owner == self) {
++			vnode_unlock(imgp->ip_vp);
++			zorn_say("EUNL");
++		}
++	}
+ 	error = vn_rdwr(UIO_READ, imgp->ip_vp, imgp->ip_vdata, PAGE_SIZE, 0,
+ 	    UIO_SYSSPACE, IO_NODELOCKED,
+ 	    vfs_context_ucred(imgp->ip_vfs_context),
+ 	    &resid, vfs_context_proc(imgp->ip_vfs_context));
+ 	if (error) {
++		zorn_say("ERDB");
+ 		goto bad;
+ 	}
++	zorn_say("EHDR");
+ 
+ 	if (resid) {
+ 		memset(imgp->ip_vdata + (PAGE_SIZE - resid), 0x0, resid);
+@@ -5233,6 +5318,8 @@
  		 * the old proc in pid hash and other lists that make
  		 * the proc visible to the system.
  		 */
@@ -35,7 +161,7 @@
  		imgp->ip_new_thread = cloneproc(old_task, NULL, p, CLONEPROC_EXEC);
  		/* task and thread ref returned by cloneproc */
  		if (imgp->ip_new_thread == NULL) {
-@@ -5260,6 +5267,8 @@
+@@ -5260,6 +5347,8 @@
  	 * Warning: If activation failed after point of no return, it returns error
  	 * as 0 and pretends the call succeeded.
  	 */
@@ -44,7 +170,7 @@
  	error = exec_activate_image(imgp);
  	/* thread and task ref returned for vfexec case */
  
-@@ -7971,6 +7980,15 @@
+@@ -7971,6 +8060,15 @@
  	 */
  	set_security_token(p, proc_ucred_unsafe(p));
  
@@ -60,7 +186,7 @@
  	return execve(p, &init_exec_args, retval);
  }
  
-@@ -8090,6 +8108,8 @@
+@@ -8090,6 +8188,8 @@
  	}
  #endif
  
@@ -69,7 +195,7 @@
  	error = ENOENT;
  	for (i = 0; i < sizeof(init_programs) / sizeof(init_programs[0]); i++) {
  		printf("load_init_program: attempting to load %s\n", init_programs[i]);
-@@ -8101,6 +8121,8 @@
+@@ -8101,6 +8201,8 @@
  		}
  	}
  

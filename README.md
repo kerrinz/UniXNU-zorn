@@ -23,27 +23,27 @@
 
 `./unixnu ipsw info` 核对产品、版本和 build。本地 IPSW 用 `--ipsw` 或 `UNIXNU_IPSW` 指向文件，不写进 `board.toml`。
 
-固件、负载和 `fastboot boot` 用的镜像在 uefi-zorn 里打包。不要对这台机器执行 `fastboot flash`。Android 留在当前槽位，关机后回到原来的系统。
+固件、负载和 `fastboot boot` 用的镜像在 uefi-zorn 里打包。内核镜像只做内存启动。不要写 `boot`、`super`、`vbmeta`，不要改槽位。`userdata` 上已经是核对过的系统卷，不要再刷，也不要启动 Android。
 
 ## 进度
 
-阶段划分跟 [bring-up 顺序](https://unixnu.com/zh/porting/bring-up) 一致。2026-10-25 停在阶段 7，屏幕上最后一个词是 `PARSE`。内核调试先停在这里。
+阶段划分跟 [bring-up 顺序](https://unixnu.com/zh/porting/bring-up) 一致。2026-10-26 停在阶段 7，色条下方最后一个词是 `MEND`。这一阶段先提交仓库，不再编下一颗内核。
 
 | 阶段 | 状态 |
 | --- | --- |
 | 1 UEFI | 工作。`fastboot boot` 进入固件，framebuffer 1440×3200 |
-| 2 UniXNU | 工作。菜单标题是 Redmi K80，读到 `\EFI\UniXNU\unixnu.toml`，倒计时 10 秒 |
-| 3 负载 | 工作。卷标 `ZORNESP`，192 MiB FAT32 |
+| 2 UniXNU | 工作。菜单标题是 Redmi K80，读到 `\EFI\UniXNU\unixnu.toml`，倒计时 5 秒 |
+| 3 负载 | 工作。卷标 `ZORNESP`，192 MiB FAT32，512 字节簇 |
 | 4 DarwinBoot | 工作。已经把内核交出去。这台机器没有串口，依据是屏幕上的阶段词 |
 | 5 内核入口 | 工作。平台专家、时间基、虚拟内存和屏幕初始化都已返回 |
-| 6 存储与根卷 | 部分。没有原生 UFS。iPadOS 17.7.11 的恢复内存盘作为 `md0` 挂上了 APFS |
-| 7 用户态 | 部分。`/sbin/launchd` 已经打开。`load_machfile` 停在调用 `parse_machfile` 之前，屏幕词是 `PARSE` |
+| 6 存储与根卷 | 工作到只读挂载。`CONFIG_XNU_NATIVE_UFS` 仍关着。`native/ufs-read` 只读探针读 `userdata` 上的 `SHNGROOT`，把 OS 窗口里的 APFS 容器注册成 `md0`。只读 apfs 根已经挂上，屏幕词是 `APOK`。内核不发 WRITE，也不发 SYNCHRONIZE CACHE |
+| 7 用户态 | 部分。挂载之后继续读文件。`MEND` 表示 `vm_map_destroy` 里的两次 `vm_map_delete` 都已返回。这张表是 4K 内核给 16K 用户映射做物理拷贝时的临时表。还没有桌面 |
 
-到达这一步的启动镜像 sha256 是 `0c1300e0c0b2e8ebfcebb7978708fa76d5076e448cdad3188c7c31d973f14828`，内核 sha256 是 `c79e9ff9b4acd9b8061cfd0c86850f5b67fe5e8f66067f664569ff5a48132c76`。镜像大约 145 MB，在 fastboot 768 MiB 的下载上限以内。
+到达 `MEND` 的启动镜像 sha256 是 `07f183f9ecba184ef88dea9267d80eebdec6d1f6e7255ec43152ec215c6f8797`，内核 sha256 是 `dd91221f3d671766270874cf225c307ac35ccd90f9c0b2e0339ac886ea30c8bb`。镜像 144732160 字节，在 fastboot 768 MiB 的下载上限以内。
 
-`PARSE` 之前，同一次启动还打印了用户页表、地址空间和 ASLR。恢复盘里的 `/sbin/launchd` 是 ad-hoc 签名。ADT 仍带 `amfi-only-platform-code`。去掉这项并加上 `amfi_get_out_of_my_way=1` 时，内核停在更早的 `mac_policy_initmach`。
+`MEND` 之前，同一次启动已经过了 `APOK`。中间还见过 `P07993938`（中断仍关着就进了 `zalloc`）、`LROK`、`LIRQ` 和 `C07341634`。`C07341634` 是 `vm_map_destroy` 拿到地址空间锁之后的返回地址 `0xfffffff007341634`。恢复盘里的 `/sbin/launchd` 是 ad-hoc 签名。ADT 仍带 `amfi-only-platform-code`。去掉这项并加上 `amfi_get_out_of_my_way=1` 时，内核停在更早的 `mac_policy_initmach`。
 
-这是恢复环境，不是 iPad 主屏幕。恢复盘展开后 176 MiB，里面有 `/sbin/launchd`、`/usr/lib/dyld` 和恢复工具，没有 dyld 共享缓存。
+负载里的 `Payloads/root.img` 仍是恢复内存盘，展开后 176 MiB，里面有 `/sbin/launchd`、`/usr/lib/dyld` 和恢复工具，没有 dyld 共享缓存。根卷不是这张恢复盘。内核在登记恢复盘之前，先把 `userdata` 上的 OS 容器登记成 `md0`，所以 `rd=md0` 指向这只读容器。恢复盘占用后面的空闲单元。
 
 ## 板级
 
@@ -75,7 +75,7 @@ kit = "zorn"
 
 ## 内核
 
-`configs/zorn_defconfig` 打开 Arm 设备树平台、ArmCpu、corecrypto 14、pthread、代码签名哈希缓存，预链接引导。`CONFIG_XNU_NATIVE_UFS` 没有打开。链接还需要 `scripts/build-zorn-link-stubs.py` 提供的空 `native_legacy_display_probe`。
+`configs/zorn_defconfig` 打开 Arm 设备树平台、ArmCpu、corecrypto 14、pthread、代码签名哈希缓存，预链接引导。`CONFIG_XNU_NATIVE_UFS` 没有打开，因为那条路会带上 verified-root、boot progress 和 `IOBlockStorageDevice`，这颗内核还没链它们。只读探针在 `native/ufs-read/`，由 `scripts/build-zorn-ufs.py` 编成 `libZornUfs.a` 再强制链接。链接还需要 `scripts/build-zorn-link-stubs.py` 提供的空 `native_legacy_display_probe`。
 
 预链接针和 `kernelcache_sha256` 与 sheng 的 iPad7,1 kernelcache 相同。slide 是 `-0x1000000`。
 
@@ -91,7 +91,7 @@ kit = "zorn"
 | 大小 | 192 MiB |
 | 加载器 | 固件卷里的 DarwinBoot |
 | 菜单项 | Boot XNU |
-| 倒计时 | 10 秒 |
+| 倒计时 | 5 秒 |
 | DRAM | `0x300000000`（按 12 GiB 售卖规格填写，不是从 SMEM 读到的） |
 | 引导窗口 | `0x18000000`（384 MiB） |
 | CPU | `cpu_regs = 0`，只描述 CPU0 |
@@ -104,23 +104,21 @@ kit = "zorn"
 
 ## userdata
 
-`board.toml` 没有 `[userdata]`。不准备刷写 userdata，也不改分区表。
-
-OS 约 4.80 GiB，SystemOS 约 3.08 GiB，合计约 7.88 GiB。fastboot 的下载上限是 768 MiB，ABL 解压内核的窗口是 256 MiB。主系统镜像走不了现在这条内存启动路径。官方 sheng 把系统写进整个 userdata 分区；这块板子还没有走那一步。
+`board.toml` 的 `[userdata]` 描述 `unixnu build userdata` 写出的文件。`first_lba` / `last_lba` 只复现 fastboot 报出的字节数，不是盘上的 GPT 地址。已生成的文件在 `out/zorn/userdata/userdata-root.img`，9382658048 字节，sha256 `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。开头是 `SHNGROOT`，OS 窗口在 `0x100000`，SystemOS 窗口在 `0x16a600000`。2026-10-25 已用 256 MiB 分段写入 `userdata`，探针读回后停在 `SHNGOK`。不要再刷这卷。不要启动 Android，否则会把它当成加密的 Android 数据。
 
 ## 设备支持
 
 | 功能 | 状态 |
 | --- | --- |
-| UEFI 菜单 | 工作 |
+| UEFI 菜单 | 工作，倒计时 5 秒 |
 | 显示交接 | 工作，1440×3200 |
-| 内核启动 | 工作到 `PARSE` |
-| 内存根卷 | 工作，恢复盘 |
-| UFS | 未做 |
+| 内核启动 | 工作到 `MEND` |
+| 内存根卷 | 恢复盘仍打进负载；当前根是 `userdata` 上的只读 APFS |
+| UFS | 只读探针工作。没有打开 `CONFIG_XNU_NATIVE_UFS`。内核不写盘 |
 | 触控 | 未做 |
 | GPU | 未做 |
 | Wi-Fi、蓝牙、音频、基带、摄像头、传感器 | 未做 |
-| 分区上的 iPadOS | 未做 |
+| 分区上的 iPadOS | 系统卷已在 `userdata`，只读根已挂上，还没有桌面 |
 
 ## 许可
 
