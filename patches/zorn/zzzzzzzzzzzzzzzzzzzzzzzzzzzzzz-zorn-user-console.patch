@@ -1,0 +1,14 @@
+--- a/osfmk/arm64/sleh.c
++++ b/osfmk/arm64/sleh.c
+@@ -1895,6 +1895,11 @@
+ handle_svc(arm_saved_state_t *state)
+ {
+ 	int      trap_no = get_saved_state_svc_number(state);
++	if (trap_no == 4) {
++		extern void zorn_ufs_capture_write(uint64_t, uint64_t, uint64_t);
++		zorn_ufs_capture_write(saved_state64(state)->x[0], saved_state64(state)->x[1],
++		    saved_state64(state)->x[2]);
++	}
+ 	static volatile unsigned zorn_svc_count;
+ 	bool zorn_trace_svc = __sync_fetch_and_add(&zorn_svc_count, 1) < 32;
+ 	if (zorn_trace_svc) {

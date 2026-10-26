@@ -1,125 +1,120 @@
 # UniXNU-zorn
 
-红米 K80 12GB+256GB（代号 zorn，SM8650-AB）的 UniXNU 设备仓库。这里放 `board.toml`、内核 defconfig、ADT 脚本和这次 bring-up 的内核补丁。
+红米 K80 12GB+256GB（zorn，SM8650-AB）的 UniXNU 实验移植。目标系统为 iPad7,1 / j120ap 的 iPadOS 17.7.11（21H461，Darwin 23.6 / xnu-10063.141.1）。固件板级包独立放在 `uefi-zorn`。
 
-固件仓库是 `uefi-zorn`，和本仓库分开发布。构建驱动、UniXNU 菜单和 DarwinBoot 在 [UniXNU](https://github.com/UniXNU/UniXNU)。
+**2026-10-27 暂停状态：UEFI、XNU、UFS 只读根卷和 PID 1 的早期用户代码已运行，尚未进入 launchd 主循环或 iPadOS 桌面。** 已主动验证第 32 次 EL0 SVC；继续执行时停在 `security.mac.img4.ignition_blob` 的原版 AppleImage4 处理函数。无人值守看门狗会自动回 recovery。
 
-- [命令行](https://unixnu.com/zh/reference/cli)
-- [移植总览](https://unixnu.com/zh/porting/)
-- [设备仓库布局](https://unixnu.com/zh/porting/device-repository)
-- [bring-up 顺序](https://unixnu.com/zh/porting/bring-up)
-- 同代参考：[小米平板 6S Pro（sheng）](https://unixnu.com/zh/devices/sheng)、[一加 Ace 5（giulia）](https://unixnu.com/zh/devices/giulia)
+当前进度、测试哈希和下一步见 [进度记录](docs/progress-2026-10-27.md)，可提交的日志摘录在 [docs/evidence](docs/evidence)。日志路径相对于三仓库的共同父目录；原始镜像和完整运行目录不放进 Git。
 
-## 构建
+## 已验证的范围
 
-在 UniXNU 检出目录里执行。设备仓库用 `-D` 指定，驱动会记住它。
+- UEFI 菜单、DarwinBoot 交接和 1440×3200 framebuffer 工作，倒计时 5 秒。
+- zorn 专用 UFS 传输可读 GPT、`userdata` 的 `SHNGROOT` 和 OS 窗口；OS APFS 容器作为 `md0` 只读挂载。
+- 两份原版 trust cache 已加载，签名检查通过（`SIGPASS`），`load_init_program` 返回（`INITOK`）。
+- EL0 执行及系统调用入口/返回已有真机证据：`mprotect`、Mach VM 分配返回 0，`getpid` 返回 1，第 32 次 SVC 检查点自动回收成功。
+- 参照 sheng 的原版 ApplePMGRNub 适配通过对象生命周期、绑定、原版 AON 方法和服务发布检查；完整硬件电源管理尚未实现。
+- 补选官方 ARM64 的 `CONFIG_XNU_NATIVE_PAN` 后，修复了 `_bcopyin` 同址权限故障循环。用户访问窗口内保留标准拷贝序列。
+- UFS 持久日志、完整 panic、用户 write 文本、sysctl MIB/名称/处理边界、独立 Gunyah watchdog 和 recovery 自动回收均已验证。
+
+SystemOS 窗口已随系统镜像写入 userdata，但当前 zorn 传输尚未将它单独发布、挂载和接入启动链。可写 Data、完整显示/GPU、触控、网络、音频、基带及其他外设尚未完成。当前只描述 CPU0；12 GiB 是标称配置，DRAM 实测和扩大 XNU 引导内存范围仍待完成。
+
+## 设备与写入范围
+
+- `92988a43`：红米 K80 / zorn，唯一目标，活动槽保持 `b`。
+- `f85d4270`：小米 CC9 / pyxis，不对它执行操作。
+
+所有定向 adb/fastboot 命令都要带 `-s 92988a43`。`userdata` 已于 2026-10-25 经机主授权改用于系统镜像；当前不具备 Android/iPadOS 双系统共存能力，**不要启动 Android 或重刷这份 userdata**。
+
+内核通过 `fastboot boot` 内存启动。OS 传输回调拒绝写入。已授权的诊断方案只写 userdata 镜像末尾之后的一个 4 KiB 日志块，以及 GPT 选定的 misc recovery BCB 页；BCB 前 864 字节更新为 recovery 命令，其余字节保留，没有 wipe 参数。不要写 boot、super、vbmeta、vendor_boot，不改槽位。
+
+## 文件结构
+
+```text
+board.toml                         schema-1 板级配置与原版 IPSW 针
+configs/zorn_defconfig             内核配置（含 trust cache runtime、PAN）
+native/ufs-read/                   UFS 只读根、受限日志/BCB、watchdog
+native/pmgr/                       精确原版 PMGR ABI 适配
+patches/zorn/                     板级 XNU 补丁
+patches/core/                     本次依赖的主 UniXNU CLI 修改
+scripts/install-zorn-patches.sh    安装补丁，--core 同时安装 CLI overlay
+scripts/build-zorn-ufs.py          UFS archive 构建
+scripts/build-zorn-pmgr.py         私有 ABI 审计与 PMGR archive 构建
+scripts/prepare-zorn-trustcache.py 提取并校验两份原版 trust cache
+scripts/build-zorn-debug.py        遇错即停的构建/打包流程，可选 --boot
+scripts/run-zorn-debug.py          固定设备的内存启动/recovery 回收
+scripts/read-zorn-log.py           读取或离线解码 ZORNLOG1/2
+scripts/make-zorn-adt.py           当前 ADT 生成器
+docs/                             当前状态和可提交的证据
+unixnu.lock                       已解析源码提交
+```
+
+本设备仍使用旧版 schema-1 布局；尚未迁移到官方当前 schema-2 的 DTS、组件列表和 `porting.toml`。`package/` 不建空目录，避免被识别为设备 kit。`patches/zorn` 通过安装脚本追加到基础 XNU 补丁，不能改名为会替换基础模块的 `patches/xnu`。
+
+## 构建状态与依赖
+
+本次主 UniXNU 基线是 `16e592abee8a550dec8154ed1f38b5ebc4f16213`，XNU 针为 `d8b80295118ef25ac3a784134bcf95cd8e88109f`。当前成功结果来自本机已经应用补丁的 XNU 工作树，以及之前的预链接候选。
+
+**干净检出的补丁重放仍未通过。** 已观察到 boot-progress/early-bars 顺序和 vm-bands 空行上下文冲突；PMGR 构建还需要前一份候选与编译记录。因此下面的增量命令不代表全新克隆可以一键复现。早期锁、TLBI 和 MAC/exec 的试验性修改仍保留，稳定性及完整安全语义尚未验证。
+
+主 UniXNU 中的本地修改已保存为 [CLI overlay](patches/core/README.md)，其中包含现有 AMFI 空字段修补和缓存 kernelcache 的使用。准备专用于 zorn 的主仓库后，从主仓库运行：
 
 ```sh
+../UniXNU-zorn/scripts/install-zorn-patches.sh . --core
 ./unixnu defconfig zorn_defconfig -D ../UniXNU-zorn
-./unixnu fetch
-../UniXNU-zorn/scripts/install-zorn-patches.sh .
-./unixnu build kernel
 ```
 
-`./unixnu ipsw info` 核对产品、版本和 build。本地 IPSW 用 `--ipsw` 或 `UNIXNU_IPSW` 指向文件，不写进 `board.toml`。
+组件源码、SDK、编译记录、IPSW、ADT、恢复内存盘及固件 FD 需预先准备；源码按主仓库 feeds 和本仓库 `unixnu.lock` 取用。`board.toml` 使用公共 IPSW URL，机器本地路径通过 `UNIXNU_IPSW` 或调试构建器 `--ipsw` 指定。IPSW、Apple 二进制、keys、镜像和生成的 archive 不提交。
 
-固件、负载和 `fastboot boot` 用的镜像在 uefi-zorn 里打包。内核镜像只做内存启动。不要写 `boot`、`super`、`vbmeta`，不要改槽位。`userdata` 上已经是核对过的系统卷，不要再刷，也不要启动 Android。
+## 本机增量构建与回收
 
-## 进度
+以下在 `UniXNU`、`UniXNU-zorn`、`uefi-zorn` 的共同父目录执行。先准备原版 trust cache：
 
-阶段划分跟 [bring-up 顺序](https://unixnu.com/zh/porting/bring-up) 一致。2026-10-26 停在阶段 7，色条下方最后一个词是 `MEND`。这一阶段先提交仓库，不再编下一颗内核。
-
-| 阶段 | 状态 |
-| --- | --- |
-| 1 UEFI | 工作。`fastboot boot` 进入固件，framebuffer 1440×3200 |
-| 2 UniXNU | 工作。菜单标题是 Redmi K80，读到 `\EFI\UniXNU\unixnu.toml`，倒计时 5 秒 |
-| 3 负载 | 工作。卷标 `ZORNESP`，192 MiB FAT32，512 字节簇 |
-| 4 DarwinBoot | 工作。已经把内核交出去。这台机器没有串口，依据是屏幕上的阶段词 |
-| 5 内核入口 | 工作。平台专家、时间基、虚拟内存和屏幕初始化都已返回 |
-| 6 存储与根卷 | 工作到只读挂载。`CONFIG_XNU_NATIVE_UFS` 仍关着。`native/ufs-read` 只读探针读 `userdata` 上的 `SHNGROOT`，把 OS 窗口里的 APFS 容器注册成 `md0`。只读 apfs 根已经挂上，屏幕词是 `APOK`。内核不发 WRITE，也不发 SYNCHRONIZE CACHE |
-| 7 用户态 | 部分。挂载之后继续读文件。`MEND` 表示 `vm_map_destroy` 里的两次 `vm_map_delete` 都已返回。这张表是 4K 内核给 16K 用户映射做物理拷贝时的临时表。还没有桌面 |
-
-到达 `MEND` 的启动镜像 sha256 是 `07f183f9ecba184ef88dea9267d80eebdec6d1f6e7255ec43152ec215c6f8797`，内核 sha256 是 `dd91221f3d671766270874cf225c307ac35ccd90f9c0b2e0339ac886ea30c8bb`。镜像 144732160 字节，在 fastboot 768 MiB 的下载上限以内。
-
-`MEND` 之前，同一次启动已经过了 `APOK`。中间还见过 `P07993938`（中断仍关着就进了 `zalloc`）、`LROK`、`LIRQ` 和 `C07341634`。`C07341634` 是 `vm_map_destroy` 拿到地址空间锁之后的返回地址 `0xfffffff007341634`。恢复盘里的 `/sbin/launchd` 是 ad-hoc 签名。ADT 仍带 `amfi-only-platform-code`。去掉这项并加上 `amfi_get_out_of_my_way=1` 时，内核停在更早的 `mac_policy_initmach`。
-
-负载里的 `Payloads/root.img` 仍是恢复内存盘，展开后 176 MiB，里面有 `/sbin/launchd`、`/usr/lib/dyld` 和恢复工具，没有 dyld 共享缓存。根卷不是这张恢复盘。内核在登记恢复盘之前，先把 `userdata` 上的 OS 容器登记成 `md0`，所以 `rd=md0` 指向这只读容器。恢复盘占用后面的空闲单元。
-
-## 板级
-
-```toml
-[board]
-name = "zorn"
-soc = "SM8650"
-description = "Redmi K80 12GB+256GB"
-kit = "zorn"
+```sh
+python3 UniXNU-zorn/scripts/prepare-zorn-trustcache.py \
+  --ipsw iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw
 ```
 
-输出目录是 `out/zorn/`。还没有设备 kit、驱动或 `package/`。空的 `package/` 会变成一块设备 kit，所以先不建这个目录。
+只生成镜像：
 
-## IPSW
+```sh
+python3 UniXNU-zorn/scripts/build-zorn-debug.py \
+  --incremental-patched-tree \
+  --ipsw iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw \
+  --fd ../Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd
+```
 
-和 sheng 使用同一份未修改的 iPad7,1 恢复镜像。
+恢复无人值守试验时，在上述命令加 `--boot`。当前按机主要求暂停，不自动启动新的轮次。脚本默认也会寻找共同父目录中的同名本地 IPSW。
 
-| 项 | 值 |
-| --- | --- |
-| 产品 | iPad7,1（12.9 英寸 iPad Pro 第二代） |
-| 版本 | iPadOS 17.7.11，build 21H461 |
-| device class | j120ap |
-| ApChipID / ApBoardID | 0x8011 / 12 |
-| 内核 | Darwin 23.6，xnu-10063.141.1 |
+每一步失败都会停止流程，`out/zorn/boot.inputs.json` 保存构建状态与输入哈希。回收脚本在 USB 操作之前核对 `ready` 状态和 `boot.img` SHA256；失败构建使用旧镜像的反向控制已验证为零 USB 命令。已有匹配清单的镜像可单独回收：
 
-`[ipsw.sha256]` 固定 `044-76040-038.dmg`（OS）和 `044-76034-038.dmg`（Cryptex1,SystemOS），哈希与 sheng 的板级文件相同。`fetch` 列表是 KernelCache、DeviceTree、StaticTrustCache 和 Cryptex1,SystemTrustCache。
+```sh
+python3 UniXNU-zorn/scripts/run-zorn-debug.py
+```
 
-本地的 iPhone X 16.7.16 镜像是 Darwin 22，不能用来预链接这颗内核。
+脚本核对 zorn 和槽位 b，从 recovery 定向重启 bootloader，再临时启动。180 秒未发现 recovery 就停止。成功后保存 `run.json`、构建输入清单、启动输出和 4 KiB 原始日志到 `out/zorn/debug/<时间>-<哈希前缀>/`，手机留在 recovery。
 
-## 内核
+## 负载与系统卷
 
-`configs/zorn_defconfig` 打开 Arm 设备树平台、ArmCpu、corecrypto 14、pthread、代码签名哈希缓存，预链接引导。`CONFIG_XNU_NATIVE_UFS` 没有打开，因为那条路会带上 verified-root、boot progress 和 `IOBlockStorageDevice`，这颗内核还没链它们。只读探针在 `native/ufs-read/`，由 `scripts/build-zorn-ufs.py` 编成 `libZornUfs.a` 再强制链接。链接还需要 `scripts/build-zorn-link-stubs.py` 提供的空 `native_legacy_display_probe`。
+UEFI 打包见 `uefi-zorn/README.md`。当前负载是 192 MiB FAT32、512 字节簇，包含内核、ADT、原版 trust cache sidecar 和恢复内存盘。两块原版模块的 bundle SHA256 为 `7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7`；`TC00000003` 证明均被内核接受。
 
-预链接针和 `kernelcache_sha256` 与 sheng 的 iPad7,1 kernelcache 相同。slide 是 `-0x1000000`。
+恢复盘 `root.img` 展开后为 176 MiB，仍随负载保留；真正的根是 userdata OS 容器 `md0`。当前没有可写 Data 种子。XNU 的 `owned_memory_size` 仍为 384 MiB，和 UEFI 256 MiB 的镜像解压窗口是不同参数。
 
-`patches/zorn/` 里的补丁在复制进 UniXNU 的 `patches/xnu/` 之后才会参与构建。说明见该目录的 README。
+已写入的 SHNGROOT 镜像为 9382658048 字节，SHA256 `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。OS 窗口偏移 `0x100000`，SystemOS 偏移 `0x16a600000`。板级 userdata 的 first/last LBA 仅复现容量，不是实际 GPT 起始地址；运行时由 GPT 按名称定位。
 
-## 负载
+## 日志
 
-`[payload]` 记录通用驱动能读的数值：
+日志块是 userdata 分区内第 `2291712` 个 4096 字节块，位于系统镜像结束后 4 MiB。`ZORNLOG2` 是 340 个 12 字节循环槽，另存格式化 panic、用户输出和 sysctl 名称；读取器兼容旧 `ZORNLOG1`。
 
-| 键 | 值 |
-| --- | --- |
-| 卷标 | `ZORNESP` |
-| 大小 | 192 MiB |
-| 加载器 | 固件卷里的 DarwinBoot |
-| 菜单项 | Boot XNU |
-| 倒计时 | 5 秒 |
-| DRAM | `0x300000000`（按 12 GiB 售卖规格填写，不是从 SMEM 读到的） |
-| 引导窗口 | `0x18000000`（384 MiB） |
-| CPU | `cpu_regs = 0`，只描述 CPU0 |
-| 身份 | iPad |
-| 参数 | `rd=md0 -v serial=3 debug=0x14e` |
+```sh
+python3 UniXNU-zorn/scripts/read-zorn-log.py --save out/zorn/last-log.bin --tail 100
+python3 UniXNU-zorn/scripts/read-zorn-log.py --block out/zorn/last-log.bin --tail 100
+```
 
-真机上跑过的那份卷由 uefi-zorn 的 `scripts/make-zorn-payload.py` 打包。它把簇大小固定成 512 字节。EDK2 的 EnhancedFatDxe 拒绝簇数小于 65525 的 FAT32；192 MiB 只有在 512 字节簇时才够簇数。通用的 `unixnu build payload` 不传这个簇大小，所以那一步还不是这台机器的打包路径。
+第一条固定从 K80 recovery 只读提取；第二条只读本地文件。`zorn_log_only=1` 在 UFS 就绪后停止刷新屏幕词，因此屏幕旧词不能代表最新执行位置。检查点复位也不能解释成自然故障。详细协议、watchdog ABI 和写入限制见 [UFS 诊断说明](native/ufs-read/README.md)。
 
-恢复内存盘放在 `Payloads/root.img`，菜单里的 `initrd` 指向它。ADT 里是 `RAMDisk` 占位，DarwinBoot 把 `DBRDISK1` 展开进这块窗口。没有安装 trust cache，也没有 Data 种子。
+## 参考与许可
 
-## userdata
+- [官方 CLI](https://unixnu.com/zh/reference/cli)、[移植总览](https://unixnu.com/zh/porting/)、[bring-up 顺序](https://unixnu.com/zh/porting/bring-up)
+- [UniXNU-sheng](https://github.com/UniXNU/UniXNU-sheng)、[同 SoC 的 UniXNU-houji](https://github.com/lonzzi/UniXNU-houji)
 
-`board.toml` 的 `[userdata]` 描述 `unixnu build userdata` 写出的文件。`first_lba` / `last_lba` 只复现 fastboot 报出的字节数，不是盘上的 GPT 地址。已生成的文件在 `out/zorn/userdata/userdata-root.img`，9382658048 字节，sha256 `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。开头是 `SHNGROOT`，OS 窗口在 `0x100000`，SystemOS 窗口在 `0x16a600000`。2026-10-25 已用 256 MiB 分段写入 `userdata`，探针读回后停在 `SHNGOK`。不要再刷这卷。不要启动 Android，否则会把它当成加密的 Android 数据。
-
-## 设备支持
-
-| 功能 | 状态 |
-| --- | --- |
-| UEFI 菜单 | 工作，倒计时 5 秒 |
-| 显示交接 | 工作，1440×3200 |
-| 内核启动 | 工作到 `MEND` |
-| 内存根卷 | 恢复盘仍打进负载；当前根是 `userdata` 上的只读 APFS |
-| UFS | 只读探针工作。没有打开 `CONFIG_XNU_NATIVE_UFS`。内核不写盘 |
-| 触控 | 未做 |
-| GPU | 未做 |
-| Wi-Fi、蓝牙、音频、基带、摄像头、传感器 | 未做 |
-| 分区上的 iPadOS | 系统卷已在 `userdata`，只读根已挂上，还没有桌面 |
-
-## 许可
-
-BSD-2-Clause-Patent。见 [LICENSE](LICENSE)。
+本仓库主要使用 [BSD-2-Clause-Patent](LICENSE)。`native/pmgr/ZornPlatformPower.cpp` 改编自 sheng 的 MIT 源码，保留 [MIT 许可](native/pmgr/LICENSE.MIT)；原有上游文件继续使用各自版权头。

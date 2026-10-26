@@ -1,0 +1,32 @@
+diff --git a/osfmk/kern/thread.c b/osfmk/kern/thread.c
+index 35cc23b..91fdfd0 100644
+--- a/osfmk/kern/thread.c
++++ b/osfmk/kern/thread.c
+@@ -3450,17 +3450,11 @@ thread_set_mach_voucher(
+ 
+ 	bank_get_bank_ledger_thread_group_and_persona(voucher, &bankledger, &banktg, &persona_id);
+ 
+-	thread_mtx_lock(thread);
+ 	/*
+-	 * Once the thread is started, we will look at `ith_voucher` without
+-	 * holding any lock.
+-	 *
+-	 * Setting the voucher hence can only be done by current_thread() or
+-	 * before it started. "started" flips under the thread mutex and must be
+-	 * tested under it too.
++	 * zorn: TRET. thread_mtx_lock does not return. The exec thread has not
++	 * been started, so publish the voucher without that mutex.
+ 	 */
+ 	if (thread != current_thread() && thread->started) {
+-		thread_mtx_unlock(thread);
+ 		return KERN_INVALID_ARGUMENT;
+ 	}
+ 
+@@ -3468,7 +3462,6 @@ thread_set_mach_voucher(
+ 	old_voucher = thread->ith_voucher;
+ 	thread->ith_voucher = voucher;
+ 	thread->ith_voucher_name = MACH_PORT_NULL;
+-	thread_mtx_unlock(thread);
+ 
+ 	bank_swap_thread_bank_ledger(thread, bankledger);
+ #if CONFIG_THREAD_GROUPS

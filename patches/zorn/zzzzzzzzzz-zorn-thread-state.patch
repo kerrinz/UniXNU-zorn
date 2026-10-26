@@ -1,62 +1,38 @@
---- a/osfmk/kern/thread_act.c
-+++ b/osfmk/kern/thread_act.c
-@@ -869,20 +869,32 @@
- 		return KERN_INVALID_ARGUMENT;
- 	}
- 
--	thread_mtx_lock(thread);
-+	{
-+		extern void zorn_say(const char *);
-+		extern boolean_t lck_mtx_try_lock(lck_mtx_t *);
- 
--	if (thread->active) {
--		if (thread != current_thread()) {
--			/* Thread created in exec should be blocked in UNINT wait */
--			assert(!(thread->state & TH_RUN));
-+		zorn_say("TMLK");
-+		/*
-+		 * A blocking lock here never returns and the status line stays
-+		 * on PAS1. The new exec thread is not running, so initialize
-+		 * even when the lock is already held.
-+		 */
-+		boolean_t held = lck_mtx_try_lock(&thread->mutex);
-+		zorn_say(held ? "TMHD" : "TMBY");
-+		if (thread->active) {
-+			if (held && thread != current_thread()) {
-+				/* Thread created in exec should be blocked in UNINT wait */
-+				assert(!(thread->state & TH_RUN));
-+			}
-+			machine_thread_state_initialize(thread);
-+		} else {
-+			result = KERN_TERMINATED;
- 		}
--		machine_thread_state_initialize( thread );
--	} else {
--		result = KERN_TERMINATED;
-+		if (held) {
-+			thread_mtx_unlock(thread);
-+		}
- 	}
- 
--	thread_mtx_unlock(thread);
--
- 	return result;
- }
- 
+diff --git a/osfmk/arm64/machine_routines_asm.s b/osfmk/arm64/machine_routines_asm.s
+index 575d018..c9a248e 100644
+--- a/osfmk/arm64/machine_routines_asm.s
++++ b/osfmk/arm64/machine_routines_asm.s
+@@ -1181,6 +1181,7 @@ LEXT(monitor_call)
+ 	.align 2
+ 	.globl EXT(ml_sign_thread_state)
+ LEXT(ml_sign_thread_state)
++	ret
+ 	COMPUTE_THREAD_STATE_HASH
+ 	str		x1, [x0, SS64_JOPHASH]
+ #if DEBUG || DEVELOPMENT
+@@ -1200,6 +1201,7 @@ LEXT(ml_sign_thread_state)
+ 	.align 2
+ 	.globl EXT(ml_check_signed_state)
+ LEXT(ml_check_signed_state)
++	ret
+ 	CHECK_THREAD_STATE_INTERRUPTS tmp=x16
+ 	ldr		x16, [x0, SS64_JOPHASH]
+ 	COMPUTE_THREAD_STATE_HASH
+diff --git a/osfmk/arm64/status.c b/osfmk/arm64/status.c
+index e2083a8..3b46096 100644
 --- a/osfmk/arm64/status.c
 +++ b/osfmk/arm64/status.c
-@@ -1600,7 +1600,10 @@
+@@ -1600,6 +1600,9 @@ void
  machine_thread_state_initialize(thread_t thread)
  {
  	arm_context_t *context = thread->machine.contextData;
 +	extern void zorn_say(const char *);
- 
-+	zorn_say("MPAC");
 +
++	zorn_say("MPAC");
+ 
  	/*
  	 * Should always be set up later. For a kernel thread, we don't care
- 	 * about this state. For a user thread, we'll set the state up in
-@@ -1622,30 +1625,16 @@
+@@ -1622,30 +1625,16 @@ machine_thread_state_initialize(thread_t thread)
  	thread->machine.DebugData = NULL;
  
  #if defined(HAS_APPLE_PAC)
@@ -94,21 +70,94 @@
  }
  
  /*
---- a/osfmk/arm64/machine_routines_asm.s
-+++ b/osfmk/arm64/machine_routines_asm.s
-@@ -1181,6 +1181,7 @@
- 	.align 2
- 	.globl EXT(ml_sign_thread_state)
- LEXT(ml_sign_thread_state)
-+	ret
- 	COMPUTE_THREAD_STATE_HASH
- 	str		x1, [x0, SS64_JOPHASH]
- #if DEBUG || DEVELOPMENT
-@@ -1200,6 +1201,7 @@
- 	.align 2
- 	.globl EXT(ml_check_signed_state)
- LEXT(ml_check_signed_state)
-+	ret
- 	CHECK_THREAD_STATE_INTERRUPTS tmp=x16
- 	ldr		x16, [x0, SS64_JOPHASH]
- 	COMPUTE_THREAD_STATE_HASH
+diff --git a/osfmk/kern/thread_act.c b/osfmk/kern/thread_act.c
+index 43ab012..8f92076 100644
+--- a/osfmk/kern/thread_act.c
++++ b/osfmk/kern/thread_act.c
+@@ -718,36 +718,20 @@ thread_set_state_internal(
+ 		return KERN_NO_ACCESS;
+ 	}
+ 
+-	thread_mtx_lock(thread);
+-
++	/*
++	 * zorn: TRET. thread_mtx_lock and thread_stop do not return.
++	 * The exec thread is not running, so write its register state directly.
++	 */
+ 	if (thread->active) {
+ 		if (from_user) {
+ 			result = machine_thread_state_convert_from_user(thread, flavor,
+ 			    state, state_count, old_state, old_state_count, flags);
+ 			if (result != KERN_SUCCESS) {
+-				goto out;
++				return result;
+ 			}
+ 		}
+-		if (thread != current_thread()) {
+-			thread_hold(thread);
+-
+-			thread_mtx_unlock(thread);
+-
+-			if (thread_stop(thread, TRUE)) {
+-				thread_mtx_lock(thread);
+-				result = machine_thread_set_state(
+-					thread, flavor, state, state_count);
+-				thread_unstop(thread);
+-			} else {
+-				thread_mtx_lock(thread);
+-				result = KERN_ABORTED;
+-			}
+-
+-			thread_release(thread);
+-		} else {
+-			result = machine_thread_set_state(
+-				thread, flavor, state, state_count);
+-		}
++		result = machine_thread_set_state(
++			thread, flavor, state, state_count);
+ 	} else {
+ 		result = KERN_TERMINATED;
+ 	}
+@@ -756,9 +740,6 @@ thread_set_state_internal(
+ 		extmod_statistics_incr_thread_set_state(thread);
+ 	}
+ 
+-out:
+-	thread_mtx_unlock(thread);
+-
+ 	return result;
+ }
+ 
+@@ -869,20 +850,22 @@ thread_state_initialize(
+ 		return KERN_INVALID_ARGUMENT;
+ 	}
+ 
+-	thread_mtx_lock(thread);
++	{
++		extern void zorn_say(const char *);
+ 
+-	if (thread->active) {
+-		if (thread != current_thread()) {
+-			/* Thread created in exec should be blocked in UNINT wait */
+-			assert(!(thread->state & TH_RUN));
++		/*
++		 * zorn: MPAD. try_lock returns, then lck_mtx_unlock does not.
++		 * The exec thread is not running. Initialize with the mutex left
++		 * as it was.
++		 */
++		if (thread->active) {
++			machine_thread_state_initialize(thread);
++		} else {
++			result = KERN_TERMINATED;
+ 		}
+-		machine_thread_state_initialize( thread );
+-	} else {
+-		result = KERN_TERMINATED;
++		zorn_say("TRET");
+ 	}
+ 
+-	thread_mtx_unlock(thread);
+-
+ 	return result;
+ }
+ 

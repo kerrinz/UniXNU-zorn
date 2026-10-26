@@ -53,7 +53,7 @@
  	if (!(imgp->ip_flags & IMGPF_DISABLE_ASLR)) {
  		vm_map_get_max_aslr_slide_section(map, &aslr_section_offset, &aslr_section_size);
  		aslr_section_offset = (random() % aslr_section_offset) * aslr_section_size;
-@@ -581,9 +604,11 @@
+@@ -581,9 +604,15 @@
  	result->is_64bit_addr = ((imgp->ip_flags & IMGPF_IS_64BIT_ADDR) == IMGPF_IS_64BIT_ADDR);
  	result->is_64bit_data = ((imgp->ip_flags & IMGPF_IS_64BIT_DATA) == IMGPF_IS_64BIT_DATA);
  
@@ -62,6 +62,10 @@
  	    0, aslr_page_offset, dyld_aslr_page_offset, result,
  	    NULL, imgp);
 +	zorn_say("PDON");
++	{
++		extern void zorn_arm_return_after_tent(void);
++		zorn_arm_return_after_tent();
++	}
  
  	if (lret != LOAD_SUCCESS) {
  		vm_map_deallocate(map); /* will lose pmap reference too */

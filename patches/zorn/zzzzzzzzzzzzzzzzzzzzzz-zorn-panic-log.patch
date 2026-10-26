@@ -1,0 +1,18 @@
+--- a/osfmk/kern/debug.c
++++ b/osfmk/kern/debug.c
+@@ -1172,6 +1172,15 @@
+ 	}
+ 	zorn_say(msg);
+ 
++	if (str != NULL) {
++		extern void zorn_ufs_log_text(const char *);
++		char zorn_reason[256];
++		va_start(panic_str_args, str);
++		vsnprintf(zorn_reason, sizeof(zorn_reason), str, panic_str_args);
++		va_end(panic_str_args);
++		zorn_ufs_log_text(zorn_reason);
++	}
++
+ 	va_start(panic_str_args, str);
+ 	panic_trap_to_debugger(str, &panic_str_args, 0, NULL, 0, NULL, (unsigned long)(char *)__builtin_return_address(0));
+ 	va_end(panic_str_args);

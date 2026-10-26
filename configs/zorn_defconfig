@@ -8,16 +8,17 @@ CONFIG_XNU_SOURCE_CORECRYPTO14=y
 CONFIG_XNU_SOURCE_PTHREAD=y
 CONFIG_XNU_ARM_DT_PLATFORM=y
 CONFIG_XNU_ARMCPU=y
+CONFIG_XNU_NATIVE_PAN=y
 CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
+CONFIG_XNU_TRUST_CACHE_RUNTIME=y
 # NativeUfs pulls in verified-root, boot progress and IOBlockStorageDevice.
-# Those are not linked yet. The first kernel has no UFS root driver.
+# The board uses its own bounded UFS transport instead of this full driver.
 # CONFIG_XNU_NATIVE_UFS is not set
 CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"
 # The development kernel references native_legacy_display_probe even when the
 # Legacy framebuffer is not built. This empty definition keeps the link going
 # until a zorn display archive exists. The call only runs with the boot arg.
-# libZornUfs is the read-only UFS probe. It publishes the OS container as md0
-# and does not issue WRITE or SYNCHRONIZE CACHE.
-CONFIG_XNU_EXTRA_LD_ARCHIVES="-Wl,-force_load,{tree}/build/zorn-stubs/libZornLinkStubs.a -Wl,-force_load,{tree}/build/zorn-ufs/libZornUfs.a"
+# libZornUfs exposes a read-only OS container and bounded log/recovery writes.
+CONFIG_XNU_EXTRA_LD_ARCHIVES="-Wl,-force_load,{tree}/build/zorn-stubs/libZornLinkStubs.a -Wl,-force_load,{tree}/build/zorn-ufs/libZornUfs.a -Wl,-force_load,{tree}/build/zorn-pmgr/libZornPlatformPower.a"
 # CONFIG_XNU_ARMVIRT_PLATFORM is not set
 # CONFIG_XNU_SHENG_PMGR is not set

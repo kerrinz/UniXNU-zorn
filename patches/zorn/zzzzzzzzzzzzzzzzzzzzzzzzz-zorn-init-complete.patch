@@ -1,0 +1,10 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -1341,6 +1341,7 @@
+ 
+ 	zorn_say("LAUNCH");
+ 	load_init_program(p);
++	zorn_say("INITOK");
+ 	lock_trace = 1;
+ }
+ 

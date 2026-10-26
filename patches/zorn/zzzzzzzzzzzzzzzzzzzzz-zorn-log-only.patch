@@ -1,0 +1,16 @@
+--- a/osfmk/arm/arm_init.c
++++ b/osfmk/arm/arm_init.c
+@@ -592,6 +592,13 @@
+ 	int clear_cols;
+ 	uint64_t daif;
+ 
++	{
++		extern int zorn_ufs_trace_only(const char *);
++		if (zorn_ufs_trace_only(text)) {
++			return;
++		}
++	}
++
+ 	/* PAGE and INIT run on two threads. Mask IRQs so the cursor stays consistent. */
+ 	__asm__ volatile("mrs %0, daif" : "=r"(daif));
+ 	if (!zorn_daif_held) {

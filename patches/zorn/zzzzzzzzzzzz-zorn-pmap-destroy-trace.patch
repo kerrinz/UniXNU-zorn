@@ -1,0 +1,110 @@
+--- a/osfmk/arm/pmap/pmap.c	2026-10-26 00:55:44
++++ b/osfmk/arm/pmap/pmap.c	2026-10-26 00:53:50
+@@ -3319,11 +3319,20 @@
+  *	Should only be called if the map contains
+  *	no valid mappings.
+  */
++#define zorn_pmap_say(word)                                             \
++	do {                                                            \
++		extern void zorn_say(const char *);                     \
++		extern volatile int zorn_read_trace;                    \
++		if (zorn_read_trace) {                                  \
++			zorn_say(word);                                 \
++		}                                                       \
++	} while (0)
+ 
+ MARK_AS_PMAP_TEXT void
+ pmap_destroy_internal(
+ 	pmap_t pmap)
+ {
++	zorn_pmap_say("PDIN");
+ 	if (pmap == PMAP_NULL) {
+ 		return;
+ 	}
+@@ -3342,6 +3351,7 @@
+ 	} else if (__improbable(pmap->type == PMAP_TYPE_COMMPAGE)) {
+ 		panic("pmap %p: attempt to destroy commpage pmap", pmap);
+ 	}
++	zorn_pmap_say("PDEC");
+ 
+ #if XNU_MONITOR
+ 	/*
+@@ -3368,23 +3378,28 @@
+ 		}
+ 	}
+ #endif
++	zorn_pmap_say("PCOM");
+ 	pmap_unmap_commpage(pmap);
+ 
++	zorn_pmap_say("PLST");
+ 	pmap_simple_lock(&pmaps_lock);
+ 	queue_remove(&map_pmap_list, pmap, pmap_t, pmaps);
+ 	pmap_simple_unlock(&pmaps_lock);
+ 
++	zorn_pmap_say("PTRM");
+ 	pmap_trim_self(pmap);
+ 
+ 	/*
+ 	 *	Free the memory maps, then the
+ 	 *	pmap structure.
+ 	 */
++	zorn_pmap_say("PLEA");
+ 	pmap_deallocate_all_leaf_tts(pmap, pmap->tte, pt_attr_root_level(pt_attr));
+ 
+ 
+ 
+ 	if (pmap->tte) {
++		zorn_pmap_say("PTT1");
+ 		pmap_tt1_deallocate(pmap, pmap->tte, pmap_root_alloc_size(pmap), 0);
+ 		pmap->tte = (tt_entry_t *) NULL;
+ 		pmap->ttep = 0;
+@@ -3393,12 +3408,15 @@
+ 	assert((tt_free_entry_t*)pmap->tt_entry_free == NULL);
+ 
+ 	if (__improbable(pmap->type == PMAP_TYPE_NESTED)) {
++		zorn_pmap_say("PTLB");
+-		pmap_get_pt_ops(pmap)->flush_tlb_region_async(pmap->nested_region_addr, pmap->nested_region_size, pmap, false, false);
+-		sync_tlb_flush();
++		/* tlbi aside1 never completes: the following dsb stayed on LTLB. */
++		zorn_pmap_say("PLOC");
+ 	} else {
++		zorn_pmap_say("PTLB");
+-		pmap_get_pt_ops(pmap)->flush_tlb_async(pmap);
+-		sync_tlb_flush();
++		/* tlbi aside1 never completes: the following dsb stayed on LTLB. */
++		zorn_pmap_say("PLOC");
+ 		/* return its asid to the pool */
++		zorn_pmap_say("PASD");
+ 		pmap_get_pt_ops(pmap)->free_id(pmap);
+ 		if (pmap->nested_pmap != NULL) {
+ #if XNU_MONITOR
+@@ -3409,6 +3427,7 @@
+ 		}
+ 	}
+ 
++	zorn_pmap_say("PCHK");
+ 	pmap_check_ledgers(pmap);
+ 
+ 	if (pmap->nested_region_unnested_table_bitmap) {
+@@ -3428,6 +3447,7 @@
+ 	pmap_lock_destroy(pmap);
+ 	pmap_free_pmap(pmap);
+ #else
++	zorn_pmap_say("PZFR");
+ 	pmap_lock_destroy(pmap);
+ 	zfree(pmap_zone, pmap);
+ #endif
+@@ -3449,11 +3469,13 @@
+ 	pmap_destroy_internal(pmap);
+ #endif
+ 
++	zorn_pmap_say("PLED");
+ 	ledger_dereference(ledger);
+ 
+ 	PMAP_TRACE(1, PMAP_CODE(PMAP__DESTROY) | DBG_FUNC_END);
+ }
+ 
++#undef zorn_pmap_say
+ 
+ 
+ /*

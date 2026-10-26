@@ -1,0 +1,62 @@
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -1680,6 +1680,51 @@
+ #define vm_map_entry_create(map)    _vm_map_entry_create(&(map)->hdr)
+ 
+ #define vm_map_copy_entry_create(copy) _vm_map_entry_create(&(copy)->cpy_hdr)
++
++/*
++ * zorn: TZOK. The next store into the new entry does not return.
++ * If that address is not writable from EL1, use one static entry.
++ */
++__attribute__((noinline))
++static vm_map_entry_t
++zorn_map_entry_backed(vm_map_entry_t entry)
++{
++	extern void zorn_say(const char *);
++	unsigned long par;
++	static struct vm_map_entry fallback;
++	static int fallback_used;
++	unsigned char *bytes;
++	unsigned i;
++
++	zorn_say("EAT1");
++	__asm__ volatile(
++	    "at s1e1w, %1\n"
++	    "isb\n"
++	    "mrs %0, par_el1\n"
++	    : "=r"(par)
++	    : "r"(entry)
++	    : "memory");
++	if (par & 1UL) {
++		zorn_say("EUNM");
++		if (fallback_used) {
++			zorn_say("EFUL");
++			for (;;) {
++				__asm__ volatile("wfe");
++			}
++		}
++		fallback_used = 1;
++		bytes = (unsigned char *)&fallback;
++		for (i = 0; i < sizeof(fallback); i++) {
++			bytes[i] = 0;
++		}
++		return &fallback;
++	}
++	zorn_say("EMAP");
++	bytes = (unsigned char *)entry;
++	bytes[0] = 0;
++	zorn_say("EMOK");
++	return entry;
++}
+ 
+ static vm_map_entry_t
+ _vm_map_entry_create(
+@@ -1703,6 +1748,7 @@
+ 	 *
+ 	 * See rdar://87041299
+ 	 */
++	entry = zorn_map_entry_backed(entry);
+ 	__builtin_assume(entry->vme_object_value == 0);
+ 	__builtin_assume(*(uint64_t *)(&entry->vme_object_value + 1) == 0);
+ 	__builtin_assume(*(uint64_t *)(&entry->vme_object_value + 2) == 0);

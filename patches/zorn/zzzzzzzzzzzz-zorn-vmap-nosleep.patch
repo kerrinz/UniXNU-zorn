@@ -1,0 +1,21 @@
+diff --git a/osfmk/vm/vm_map.h b/osfmk/vm/vm_map.h
+index c9c2f00..99f299f 100644
+--- a/osfmk/vm/vm_map.h
++++ b/osfmk/vm/vm_map.h
+@@ -748,9 +748,15 @@ vm_map_copy_adjust_to_target(
+  *	(See vm_map.c::vm_remap())
+  */
+ 
++/*
++ * zorn: VLOK. This lock is created sleepable, and the next exclusive
++ * acquire does not return. Leave it non-sleepable so the spin path is used.
++ */
+ #define vm_map_lock_init(map)                                           \
+ 	((map)->timestamp = 0 ,                                         \
+-	lck_rw_init(&(map)->lock, &vm_map_lck_grp, &vm_map_lck_rw_attr))
++	lck_rw_init(&(map)->lock, &vm_map_lck_grp, &vm_map_lck_rw_attr), \
++	(*(volatile uint32_t *)&(map)->lock.lck_rw_data &=              \
++	    ~(1U << LCK_RW_CAN_SLEEP_BIT)))
+ 
+ #define vm_map_lock(map)                     \
+ 	MACRO_BEGIN                          \

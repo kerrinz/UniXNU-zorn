@@ -1,0 +1,100 @@
+--- a/osfmk/kern/thread.c
++++ b/osfmk/kern/thread.c
+@@ -1301,6 +1301,7 @@
+ 	thread_create_internal_options_t        options,
+ 	thread_t                                *out_thread)
+ {
++	extern void zorn_ufs_thread_stage(const char *, uint64_t);
+ 	thread_t                  new_thread;
+ 	ipc_thread_init_options_t init_options = IPC_THREAD_INIT_NONE;
+ 	struct thread_ro          tro_tpl = { };
+@@ -1353,12 +1354,15 @@
+ 
+ 	os_ref_init_count_raw(&new_thread->ref_count, &thread_refgrp, 2);
+ 	machine_thread_create(new_thread, parent_task, first_thread);
++	zorn_ufs_thread_stage("TCMACH", (uintptr_t)__builtin_return_address(0));
+ 
+ 	machine_thread_process_signature(new_thread, parent_task);
++	zorn_ufs_thread_stage("TCSIG", (uintptr_t)__builtin_return_address(0));
+ 
+ #ifdef MACH_BSD
+ 	uthread_init(parent_task, get_bsdthread_info(new_thread),
+ 	    &tro_tpl, (options & TH_OPTION_WORKQ) != 0);
++	zorn_ufs_thread_stage("TCUTH", (uintptr_t)__builtin_return_address(0));
+ 	if (!task_is_a_corpse(parent_task)) {
+ 		/*
+ 		 * uthread_init will set tro_cred (with a +1)
+@@ -1374,8 +1378,10 @@
+ 	lck_mtx_init(&new_thread->mutex, &thread_lck_grp, LCK_ATTR_NULL);
+ 
+ 	ipc_thread_init(parent_task, new_thread, &tro_tpl, init_options);
++	zorn_ufs_thread_stage("TCIPC", (uintptr_t)__builtin_return_address(0));
+ 
+ 	thread_ro_create(parent_task, new_thread, &tro_tpl);
++	zorn_ufs_thread_stage("TCRO", (uintptr_t)__builtin_return_address(0));
+ 
+ 	new_thread->continuation = continuation;
+ 	new_thread->parameter = parameter;
+@@ -1402,6 +1408,7 @@
+ 	/* Allocate I/O Statistics structure */
+ 	new_thread->thread_io_stats = kalloc_data(sizeof(struct io_stat_info),
+ 	    Z_WAITOK | Z_ZERO | Z_NOFAIL);
++	zorn_ufs_thread_stage("TCIO", (uintptr_t)__builtin_return_address(0));
+ 
+ #if KASAN_CLASSIC
+ 	kasan_init_thread(&new_thread->kasan_data);
+@@ -1436,6 +1443,7 @@
+ #endif
+ 
+ 	lck_mtx_lock(&tasks_threads_lock);
++	zorn_ufs_thread_stage("TCGLK", (uintptr_t)__builtin_return_address(0));
+ 	task_lock(parent_task);
+ 
+ 	/*
+@@ -1566,6 +1574,7 @@
+ 	new_thread->corpse_dup = FALSE;
+ 	new_thread->turnstile = turnstile_alloc();
+ 	new_thread->ctsid = turnstile_compact_id_get();
++	zorn_ufs_thread_stage("TCTRN", (uintptr_t)__builtin_return_address(0));
+ 
+ 
+ 	*out_thread = new_thread;
+@@ -1620,6 +1629,7 @@
+ 	zfree(thread_zone, new_thread);
+ 
+ done:
++	zorn_ufs_thread_stage("TCRET", (uintptr_t)__builtin_return_address(0));
+ 	return kr;
+ }
+ 
+--- a/osfmk/ipc/mach_kernelrpc.c
++++ b/osfmk/ipc/mach_kernelrpc.c
+@@ -59,22 +59,28 @@
+ int
+ _kernelrpc_mach_vm_allocate_trap(struct _kernelrpc_mach_vm_allocate_trap_args *args)
+ {
++	extern void zorn_ufs_thread_stage(const char *, uint64_t);
++	zorn_ufs_thread_stage("MALC", (uintptr_t)__builtin_return_address(0));
+ 	mach_vm_offset_t addr;
+ 	task_t task = port_name_to_current_task_noref(args->target);
+ 	int rv = MACH_SEND_INVALID_DEST;
++	zorn_ufs_thread_stage("MATSK", (uintptr_t)__builtin_return_address(0));
+ 
+ 	if (task) {
+ 		if ((rv = mach_copyin(args->addr, (char *)&addr, sizeof(addr)))) {
+ 			goto done;
+ 		}
+ 
++		zorn_ufs_thread_stage("MACIN", (uintptr_t)__builtin_return_address(0));
+ 		rv = mach_vm_allocate_external(task->map, &addr, args->size, args->flags);
++		zorn_ufs_thread_stage("MAENT", (uintptr_t)__builtin_return_address(0));
+ 		if (rv == KERN_SUCCESS) {
+ 			rv = mach_copyout(&addr, args->addr, sizeof(addr));
+ 		}
+ 	}
+ 
+ done:
++	zorn_ufs_thread_stage("MARET", (uintptr_t)__builtin_return_address(0));
+ 	return rv;
+ }
+ 

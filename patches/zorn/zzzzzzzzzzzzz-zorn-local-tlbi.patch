@@ -1,0 +1,220 @@
+diff --git a/osfmk/arm64/tlb.h b/osfmk/arm64/tlb.h
+index c0154ab..22c8111 100644
+--- a/osfmk/arm64/tlb.h
++++ b/osfmk/arm64/tlb.h
+@@ -88,11 +88,14 @@ arm64_sync_tlb(bool strong __unused)
+ 	sync_tlb_flush();
+ }
+ 
+-// flush_mmu_tlb: full TLB flush on all cores
++/* zorn describes only CPU0. A broadcast tlbi aside1is never completed,
++ * so the following dsb stays in pmap_destroy. Runtime flushes are local.
++ */
++// flush_mmu_tlb: full TLB flush on the current core
+ static inline void
+ flush_mmu_tlb_async(void)
+ {
+-	asm volatile ("tlbi vmalle1is");
++	asm volatile ("tlbi vmalle1");
+ }
+ 
+ static inline void
+@@ -157,22 +160,22 @@ flush_mmu_tlb_allentries_async(uint64_t start, uint64_t end, uint64_t pmap_page_
+ 		for (; start < end; start += (pmap_page_size / 4096)) {
+ #if HAS_FEAT_XS
+ 			if (__probable(!strong)) {
+-				asm volatile ("tlbi vaale1isnxs, %0" : : "r"(start));
++				asm volatile ("tlbi vaale1nxs, %0" : : "r"(start));
+ 			} else
+ #endif /* HAS_FEAT_XS */
+ 			{
+-				asm volatile ("tlbi vaale1is, %0" : : "r"(start));
++				asm volatile ("tlbi vaale1, %0" : : "r"(start));
+ 			}
+ 		}
+ 	} else {
+ 		for (; start < end; start += (pmap_page_size / 4096)) {
+ #if HAS_FEAT_XS
+ 			if (__probable(!strong)) {
+-				asm volatile ("tlbi vaae1isnxs, %0" : : "r"(start));
++				asm volatile ("tlbi vaae1nxs, %0" : : "r"(start));
+ 			} else
+ #endif /* HAS_FEAT_XS */
+ 			{
+-				asm volatile ("tlbi vaae1is, %0" : : "r"(start));
++				asm volatile ("tlbi vaae1, %0" : : "r"(start));
+ 			}
+ 		}
+ 	}
+@@ -223,11 +226,11 @@ flush_mmu_tlb_entries_async(uint64_t start, uint64_t end, uint64_t pmap_page_siz
+ 	if (asid == 0) {
+ 		if (last_level_only) {
+ 			for (; start < end; start += (pmap_page_size / 4096)) {
+-				asm volatile ("tlbi vaale1is, %0" : : "r"(start));
++				asm volatile ("tlbi vaale1, %0" : : "r"(start));
+ 			}
+ 		} else {
+ 			for (; start < end; start += (pmap_page_size / 4096)) {
+-				asm volatile ("tlbi vaae1is, %0" : : "r"(start));
++				asm volatile ("tlbi vaae1, %0" : : "r"(start));
+ 			}
+ 		}
+ 		return;
+@@ -237,16 +240,16 @@ flush_mmu_tlb_entries_async(uint64_t start, uint64_t end, uint64_t pmap_page_siz
+ 	if (last_level_only) {
+ 		for (; start < end; start += (pmap_page_size / 4096)) {
+ 			start = start & ~(1ULL << TLBI_ASID_SHIFT);
+-			asm volatile ("tlbi vale1is, %0" : : "r"(start));
++			asm volatile ("tlbi vale1, %0" : : "r"(start));
+ 			start = start | (1ULL << TLBI_ASID_SHIFT);
+-			asm volatile ("tlbi vale1is, %0" : : "r"(start));
++			asm volatile ("tlbi vale1, %0" : : "r"(start));
+ 		}
+ 	} else {
+ 		for (; start < end; start += (pmap_page_size / 4096)) {
+ 			start = start & ~(1ULL << TLBI_ASID_SHIFT);
+-			asm volatile ("tlbi vae1is, %0" : : "r"(start));
++			asm volatile ("tlbi vae1, %0" : : "r"(start));
+ 			start = start | (1ULL << TLBI_ASID_SHIFT);
+-			asm volatile ("tlbi vae1is, %0" : : "r"(start));
++			asm volatile ("tlbi vae1, %0" : : "r"(start));
+ 		}
+ 	}
+ #else
+@@ -254,22 +257,22 @@ flush_mmu_tlb_entries_async(uint64_t start, uint64_t end, uint64_t pmap_page_siz
+ 		for (; start < end; start += (pmap_page_size / 4096)) {
+ #if HAS_FEAT_XS
+ 			if (__probable(!strong)) {
+-				asm volatile ("tlbi vale1isnxs, %0" : : "r"(start));
++				asm volatile ("tlbi vale1nxs, %0" : : "r"(start));
+ 			} else
+ #endif /* HAS_FEAT_XS */
+ 			{
+-				asm volatile ("tlbi vale1is, %0" : : "r"(start));
++				asm volatile ("tlbi vale1, %0" : : "r"(start));
+ 			}
+ 		}
+ 	} else {
+ 		for (; start < end; start += (pmap_page_size / 4096)) {
+ #if HAS_FEAT_XS
+ 			if (__probable(!strong)) {
+-				asm volatile ("tlbi vae1isnxs, %0" : : "r"(start));
++				asm volatile ("tlbi vae1nxs, %0" : : "r"(start));
+ 			} else
+ #endif /* HAS_FEAT_XS */
+ 			{
+-				asm volatile ("tlbi vae1is, %0" : : "r"(start));
++				asm volatile ("tlbi vae1, %0" : : "r"(start));
+ 			}
+ 		}
+ 	}
+@@ -289,28 +292,11 @@ flush_mmu_tlb_entries(uint64_t start, uint64_t end, uint64_t pmap_page_size, boo
+ static inline void
+ flush_mmu_tlb_asid_async(uint64_t val, bool strong __unused)
+ {
+-#if __ARM_KERNEL_PROTECT__
+ 	/*
+-	 * If we are flushing ASID 0, this is a kernel operation.  With this
+-	 * ASID scheme, this means we should flush all ASIDs.
++	 * zorn: tlbi aside1 and aside1is never complete. A later dsb stays
++	 * forever, so a full-ASID invalidate is skipped on this one CPU.
+ 	 */
+-	uint64_t asid = val >> TLBI_ASID_SHIFT;
+-	if (asid == 0) {
+-		asm volatile ("tlbi vmalle1is");
+-		return;
+-	}
+-	val = val & ~(1ULL << TLBI_ASID_SHIFT);
+-	asm volatile ("tlbi aside1is, %0" : : "r"(val));
+-	val = val | (1ULL << TLBI_ASID_SHIFT);
+-#endif /* __ARM_KERNEL_PROTECT__ */
+-#if HAS_FEAT_XS
+-	if (__probable(!strong)) {
+-		asm volatile ("tlbi aside1isnxs, %0" : : "r"(val));
+-	} else
+-#endif /* HAS_FEAT_XS */
+-	{
+-		asm volatile ("tlbi aside1is, %0" : : "r"(val));
+-	}
++	(void)val;
+ }
+ 
+ static inline void
+@@ -326,25 +312,8 @@ flush_mmu_tlb_asid(uint64_t val, bool strong)
+ static inline void
+ flush_core_tlb_asid_async(uint64_t val)
+ {
+-#if __ARM_KERNEL_PROTECT__
+-	/*
+-	 * If we are flushing ASID 0, this is a kernel operation.  With this
+-	 * ASID scheme, this means we should flush all ASIDs.
+-	 */
+-	uint64_t asid = val >> TLBI_ASID_SHIFT;
+-	if (asid == 0) {
+-		asm volatile ("tlbi vmalle1");
+-		return;
+-	}
+-	val = val & ~(1ULL << TLBI_ASID_SHIFT);
+-	asm volatile ("tlbi aside1, %0" : : "r"(val));
+-	val = val | (1ULL << TLBI_ASID_SHIFT);
+-#endif /* __ARM_KERNEL_PROTECT__ */
+-#if HAS_FEAT_XS
+-	asm volatile ("tlbi aside1nxs, %0" : : "r"(val));
+-#else
+-	asm volatile ("tlbi aside1, %0" : : "r"(val));
+-#endif /* HAS_FEAT_XS */
++	/* zorn: same skipped full-ASID invalidate as flush_mmu_tlb_asid_async. */
++	(void)val;
+ }
+ 
+ static inline void
+@@ -393,20 +362,20 @@ flush_mmu_tlb_range_async(uint64_t val, bool last_level_only, bool strong __unus
+ 	if (last_level_only) {
+ #if HAS_FEAT_XS
+ 		if (__probable(!strong)) {
+-			asm volatile ("tlbi rvale1isnxs, %0" : : "r"(val));
++			asm volatile ("tlbi rvale1nxs, %0" : : "r"(val));
+ 		} else
+ #endif /* HAS_FEAT_XS */
+ 		{
+-			asm volatile ("tlbi rvale1is, %0" : : "r"(val));
++			asm volatile ("tlbi rvale1, %0" : : "r"(val));
+ 		}
+ 	} else {
+ #if HAS_FEAT_XS
+ 		if (__probable(!strong)) {
+-			asm volatile ("tlbi rvae1isnxs, %0" : : "r"(val));
++			asm volatile ("tlbi rvae1nxs, %0" : : "r"(val));
+ 		} else
+ #endif /* HAS_FEAT_XS */
+ 		{
+-			asm volatile ("tlbi rvae1is, %0" : : "r"(val));
++			asm volatile ("tlbi rvae1, %0" : : "r"(val));
+ 		}
+ 	}
+ }
+@@ -427,20 +396,20 @@ flush_mmu_tlb_allrange_async(uint64_t val, bool last_level_only, bool strong __u
+ 	if (last_level_only) {
+ #if HAS_FEAT_XS
+ 		if (__probable(!strong)) {
+-			asm volatile ("tlbi rvaale1isnxs, %0" : : "r"(val));
++			asm volatile ("tlbi rvaale1nxs, %0" : : "r"(val));
+ 		} else
+ #endif /* HAS_FEAT_XS */
+ 		{
+-			asm volatile ("tlbi rvaale1is, %0" : : "r"(val));
++			asm volatile ("tlbi rvaale1, %0" : : "r"(val));
+ 		}
+ 	} else {
+ #if HAS_FEAT_XS
+ 		if (__probable(!strong)) {
+-			asm volatile ("tlbi rvaae1isnxs, %0" : : "r"(val));
++			asm volatile ("tlbi rvaae1nxs, %0" : : "r"(val));
+ 		} else
+ #endif /* HAS_FEAT_XS */
+ 		{
+-			asm volatile ("tlbi rvaae1is, %0" : : "r"(val));
++			asm volatile ("tlbi rvaae1, %0" : : "r"(val));
+ 		}
+ 	}
+ }

@@ -2,10 +2,18 @@
 """Build the read-only zorn UFS probe and leave libZornUfs.a in the tree."""
 import subprocess
 import sys
+import json
+import os
 from pathlib import Path
 
 TREE = Path.cwd()
-SOURCE = Path("/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/ufs-read")
+STATE = TREE.parents[1] / "state.json"
+try:
+    DEVICE = Path(os.environ["UNIXNU_DEVICE"] if "UNIXNU_DEVICE" in os.environ
+                  else json.loads(STATE.read_text())["device"]).expanduser().resolve()
+except (OSError, KeyError, ValueError) as error:
+    sys.exit(f"cannot locate UniXNU device repository: {error}")
+SOURCE = DEVICE / "native/ufs-read"
 HEADERS = TREE / "build/xnu/ios-obj/EXPORT_HDRS"
 OBJDIR = TREE / "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT"
 if not (SOURCE / "ZornUfsRead.cpp").is_file():

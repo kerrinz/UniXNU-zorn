@@ -1,0 +1,145 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -1721,6 +1721,10 @@
+ 
+ 		goto badtoolate;
+ 	}
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TNXS");
++	}
+ 
+ 	if (load_result.hardened_runtime_binary) {
+ 		if (cs_debug) {
+@@ -7052,7 +7056,15 @@
+ 		}
+ 		kr = mach_vm_allocate_kernel(map, &addr, size,
+ 		    VM_FLAGS_FIXED, VM_MEMORY_STACK);
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TAOK");
++		}
+ 		if (kr != KERN_SUCCESS) {
++			{
++				extern void zorn_say(const char *);
++				zorn_say("TANY");
++			}
+ 			// Can't allocate at default location, try anywhere
+ 			addr = 0;
+ 			kr = mach_vm_allocate_kernel(map, &addr, size,
+@@ -7083,6 +7095,10 @@
+ 		}
+ 
+ 		prot_addr = addr;
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TPRT");
++		}
+ 		kr = mach_vm_protect(map,
+ 		    prot_addr,
+ 		    prot_size,
+@@ -7092,6 +7108,10 @@
+ 			(void)mach_vm_deallocate(map, addr, size);
+ 			return kr;
+ 		}
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TSOK");
++		}
+ 	}
+ 
+ 	return KERN_SUCCESS;
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -1687,7 +1687,15 @@
+ {
+ 	vm_map_entry_t entry = NULL;
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TZAL");
++	}
+ 	entry = zalloc_id(ZONE_ID_VM_MAP_ENTRY, Z_WAITOK | Z_ZERO);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TZOK");
++	}
+ 
+ 	/*
+ 	 * Help the compiler with what we know to be true,
+@@ -2792,6 +2800,10 @@
+ 
+ #define RETURN(value)   { result = value; goto BailOut; }
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TCHK");
++	}
+ 	assertf(VM_MAP_PAGE_ALIGNED(*address, FOURK_PAGE_MASK), "0x%llx", (uint64_t)*address);
+ 	assertf(VM_MAP_PAGE_ALIGNED(size, FOURK_PAGE_MASK), "0x%llx", (uint64_t)size);
+ 	if (VM_MAP_PAGE_MASK(map) >= PAGE_MASK) {
+@@ -2844,8 +2856,16 @@
+ 	start = *address;
+ 
+ 	if (anywhere) {
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TALK");
++		}
+ 		vm_map_lock(map);
+ 		map_locked = TRUE;
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TALC");
++		}
+ 
+ 		result = vm_map_locate_space(map, size, mask, vmk_flags,
+ 		    &start, &entry);
+@@ -2894,8 +2914,16 @@
+ 		 *		the mask requirement.
+ 		 */
+ 
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TLCK");
++		}
+ 		vm_map_lock(map);
+ 		map_locked = TRUE;
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TLOC");
++		}
+ 		if ((start & mask) != 0) {
+ 			RETURN(KERN_NO_SPACE);
+ 		}
+@@ -3049,6 +3077,10 @@
+ 		if ((entry->vme_next != vm_map_to_entry(map)) &&
+ 		    (entry->vme_next->vme_start < end)) {
+ 			RETURN(KERN_NO_SPACE);
++		}
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TLOK");
+ 		}
+ 	}
+ 
+@@ -17403,7 +17435,19 @@
+ 	 *	Insert the new entry into the list.
+ 	 */
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TLNK");
++	}
+ 	vm_map_store_entry_link(map, insp_entry, new_entry, vmk_flags);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TENT");
++	}
+ 	map->size += end - start;
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TSIZ");
++	}
+ 
+ 	/*

@@ -1,0 +1,64 @@
+--- a/osfmk/kern/thread_call.c
++++ b/osfmk/kern/thread_call.c
+@@ -1690,7 +1690,20 @@
+ 	    (unsigned) (tc_ttd & 0xFFFFFFFF), is_delayed, call);
+ #endif
+ 
++	uintptr_t zorn_callback = (uintptr_t)func;
++	static volatile unsigned zorn_amfi_calls;
++	bool zorn_trace_amfi = zorn_callback >= 0xfffffff004aaa000ULL &&
++	    zorn_callback < 0xfffffff004aca5e8ULL &&
++	    __sync_fetch_and_add(&zorn_amfi_calls, 1) < 16;
++	if (zorn_trace_amfi) {
++		extern void zorn_ufs_note_amfi_call(uint64_t, int);
++		zorn_ufs_note_amfi_call(zorn_callback, 0);
++	}
+ 	(*func)(param0, param1);
++	if (zorn_trace_amfi) {
++		extern void zorn_ufs_note_amfi_call(uint64_t, int);
++		zorn_ufs_note_amfi_call(zorn_callback, 1);
++	}
+ 
+ #if CONFIG_DTRACE
+ 	DTRACE_TMR6(thread_callout__end, thread_call_func_t, func, int, 0, int, (tc_ttd >> 32),
+--- a/iokit/Kernel/IOService.cpp
++++ b/iokit/Kernel/IOService.cpp
+@@ -6609,11 +6609,19 @@
+ 	return result;
+ }
+ 
++extern "C" void zorn_ufs_note_pmgr_lookup(uint64_t, unsigned);
++extern "C" void zorn_say(const char *);
++
+ IOService *
+ IOService::waitForMatchingService( OSDictionary * matching,
+     uint64_t timeout)
+ {
+-	return IOService::waitForMatchingServiceWithToken(matching, timeout, NULL);
++	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
++	bool trace = caller >= 0xfffffff004aaa000ULL && caller < 0xfffffff004aca5e8ULL;
++	if (trace) zorn_ufs_note_pmgr_lookup(caller, 0);
++	IOService *result = IOService::waitForMatchingServiceWithToken(matching, timeout, NULL);
++	if (trace) zorn_ufs_note_pmgr_lookup(caller, result ? 1 : 2);
++	return result;
+ }
+ 
+ IOService *
+@@ -6741,6 +6749,9 @@
+     OSDictionary * table )
+ {
+ 	const OSString *    str;
++	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
++	bool trace = caller >= 0xfffffff004aaa000ULL && caller < 0xfffffff004aca5e8ULL;
++	if (trace) zorn_say("PMDICT");
+ 
+ 	str = OSSymbol::withCString( name );
+ 	if (!str) {
+@@ -6749,6 +6760,7 @@
+ 
+ 	table = serviceMatching( str, table );
+ 	str->release();
++	if (trace) zorn_say(table ? "PMDOK" : "PMDFAIL");
+ 	return table;
+ }
+ 

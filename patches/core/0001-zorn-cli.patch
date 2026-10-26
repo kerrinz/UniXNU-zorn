@@ -1,0 +1,174 @@
+diff --git a/scripts/unixnu/bootimg.py b/scripts/unixnu/bootimg.py
+index 259fb29..2ae604c 100644
+--- a/scripts/unixnu/bootimg.py
++++ b/scripts/unixnu/bootimg.py
+@@ -17,7 +17,7 @@ from .config import load_toml
+ from .util import Error, log, run, sha256_file, tool
+ 
+ DEFAULTS = {'header_version': 0, 'base': 0, 'kernel_offset': 0x8000, 'tags_offset': 0x1e00000, 'pagesize': 4096}
+-MKBOOTIMG_FLAGS = ('base', 'kernel_offset', 'tags_offset', 'pagesize', 'header_version', 'ramdisk_offset', 'second_offset', 'cmdline')
++MKBOOTIMG_FLAGS = ('base', 'kernel_offset', 'tags_offset', 'pagesize', 'header_version', 'ramdisk_offset', 'second_offset', 'cmdline', 'os_version', 'os_patch_level')
+ 
+ 
+ def compile_shim(uefi, base, size, requires_header, scratch):
+@@ -119,11 +119,27 @@ def build(ctx, uefi, fd, dtb, ramdisk=None, output=None):
+ def verify(path, combined, tree, ramdisk_path, image):
+     """Unpack the image and compare every part with its input."""
+     data = Path(path).read_bytes()
+-    kernel_size, kernel_address, ramdisk_size, _, second_size, _, tags, page, version, _ = struct.unpack_from('<10I', data, 8)
+-    if data[:8] != b'ANDROID!' or second_size or version != image['header_version'] or page != image['pagesize']:
+-        raise Error('boot image header does not match the requested parameters')
+-    if kernel_address != image['base'] + image['kernel_offset'] or tags != image['base'] + image['tags_offset']:
+-        raise Error('boot image load addresses do not match the requested offsets')
++    version = int(image['header_version'])
++    if data[:8] != b'ANDROID!':
++        raise Error('boot image is missing the ANDROID! magic')
++    if version >= 3:
++        # Header v3/v4 stores sizes and the version, not the kernel load address.
++        # That address stays in the on-device vendor_boot image. Page size is 4096.
++        kernel_size, ramdisk_size, _, header_size, reserved0, reserved1, reserved2, reserved3, got_version = struct.unpack_from('<9I', data, 8)
++        page = 4096
++        expect_header = 1584 if version >= 4 else 1580
++        if got_version != version or header_size != expect_header or image.get('pagesize', page) != page:
++            raise Error('boot image header does not match the requested parameters')
++        if reserved0 or reserved1 or reserved2 or reserved3:
++            raise Error('boot image v3/v4 reserved header words are not zero')
++        kernel_address = None
++        tags = None
++    else:
++        kernel_size, kernel_address, ramdisk_size, _, second_size, _, tags, page, got_version, _ = struct.unpack_from('<10I', data, 8)
++        if second_size or got_version != version or page != image['pagesize']:
++            raise Error('boot image header does not match the requested parameters')
++        if kernel_address != image['base'] + image['kernel_offset'] or tags != image['base'] + image['tags_offset']:
++            raise Error('boot image load addresses do not match the requested offsets')
+     kernel = data[page:page + kernel_size]
+     unpacker = zlib.decompressobj(16 + zlib.MAX_WBITS)
+     if unpacker.decompress(kernel) != combined or not unpacker.eof or unpacker.unused_data != tree:
+@@ -131,5 +147,9 @@ def verify(path, combined, tree, ramdisk_path, image):
+     start = page * (1 + -(-kernel_size // page))
+     if data[start:start + ramdisk_size] != Path(ramdisk_path).read_bytes():
+         raise Error('ramdisk bytes differ')
+-    return {'kernel_sha256': hashlib.sha256(kernel).hexdigest(), 'ramdisk_bytes': ramdisk_size,
+-            'header_version': version, 'kernel_address': hex(kernel_address), 'tags_address': hex(tags)}
++    report = {'kernel_sha256': hashlib.sha256(kernel).hexdigest(), 'ramdisk_bytes': ramdisk_size,
++              'header_version': got_version}
++    if kernel_address is not None:
++        report['kernel_address'] = hex(kernel_address)
++        report['tags_address'] = hex(tags)
++    return report
+diff --git a/scripts/unixnu/kernel.py b/scripts/unixnu/kernel.py
+index 19558bd..b73afa0 100644
+--- a/scripts/unixnu/kernel.py
++++ b/scripts/unixnu/kernel.py
+@@ -2,6 +2,7 @@
+ import os
+ import platform
+ import shlex
++import struct
+ from pathlib import Path
+ 
+ from . import components, ipsw, patches
+@@ -189,6 +190,77 @@ def build(ctx, modules):
+     run(['bash', script], cwd=ctx.tree, env=env, log_file=ctx.logs / 'kernel.log')
+ 
+ 
++def macho_segments_and_symtab(data):
++    if data[:4] != b'\xcf\xfa\xed\xfe':
++        raise Error('prelinked kernel is not a thin Mach-O')
++    ncmds, sizeofcmds = struct.unpack_from('<II', data, 16)
++    cmd = 32
++    end = 32 + sizeofcmds
++    segments = []
++    symtab = None
++    while cmd < end:
++        cid, size = struct.unpack_from('<II', data, cmd)
++        if cid == 0x19:
++            vmaddr, vmsize, fileoff, filesize = struct.unpack_from('<QQQQ', data, cmd + 24)
++            segments.append((vmaddr, vmsize, fileoff, filesize))
++        elif cid == 0x2:
++            symtab = struct.unpack_from('<IIII', data, cmd + 8)
++        cmd += size
++    return segments, symtab
++
++
++def macho_symbol(data, name):
++    _, symtab = macho_segments_and_symtab(data)
++    if symtab is None:
++        raise Error('prelinked kernel has no symbol table')
++    symoff, nsyms, stroff, strsize = symtab
++    wanted = name.encode()
++    for index in range(nsyms):
++        n_strx, _, _, _, n_value = struct.unpack_from('<IBBHQ', data, symoff + index * 16)
++        if not n_strx or n_strx >= strsize or not n_value:
++            continue
++        end = data.find(b'\x00', stroff + n_strx, stroff + strsize)
++        if data[stroff + n_strx:end] == wanted:
++            return n_value
++    raise Error(f'{name} missing from prelinked kernel')
++
++
++def macho_va(data, file_offset):
++    segments, _ = macho_segments_and_symtab(data)
++    for vmaddr, _, fileoff, filesize in segments:
++        if fileoff <= file_offset < fileoff + filesize:
++            return vmaddr + (file_offset - fileoff)
++    raise Error(f'file offset {file_offset:#x} is not in a Mach-O segment')
++
++
++def patch_amfi_null_deref(output):
++    """D04ABBE54: AMFI loads a null field. Branch to zorn_amfi_deref instead."""
++    data = bytearray(output.read_bytes())
++    target = macho_symbol(data, '_zorn_amfi_deref')
++    pattern = bytes.fromhex('a81240f9000140f908000014')
++    sites = []
++    start = 0
++    while True:
++        at = data.find(pattern, start)
++        if at < 0:
++            break
++        sites.append(at)
++        start = at + 1
++    if len(sites) != 1:
++        raise Error(f'AMFI null-deref site matched {len(sites)} times')
++    site = sites[0] + 4
++    va = macho_va(data, site)
++    displacement = target - va
++    if displacement % 4:
++        raise Error(f'AMFI deref branch is not instruction-aligned ({displacement:#x})')
++    immediate = displacement // 4
++    if immediate < -(1 << 25) or immediate >= (1 << 25):
++        raise Error(f'AMFI deref is out of bl range ({displacement:#x})')
++    struct.pack_into('<I', data, site, 0x94000000 | (immediate & 0x03ffffff))
++    output.write_bytes(data)
++    log(f'kernel: AMFI null deref at {va:#x} -> _zorn_amfi_deref {target:#x}')
++
++
+ def prelink(ctx):
+     """Produce out/<device>/kernel/kernel.macho from the XNU build and the original kernelcache."""
+     log('kernel: prelink')
+@@ -197,8 +269,16 @@ def prelink(ctx):
+         raise Error('board.toml has no [kernel.prelink]')
+     cache = ctx.option('kernelcache', 'UNIXNU_KERNELCACHE') or (expand(ctx.tree / spec['kernelcache']) if spec.get('kernelcache') else None)
+     if not cache:
+-        # Not given: take it from the IPSW (--ipsw PATH_OR_URL, or the url of board.toml [ipsw]).
+-        cache = ipsw.kernelcache(ctx, ipsw.Ipsw(ctx))
++        # The decompressed kernelcache is already pinned under out/ipsw/<build>/.
++        # Use it without opening the IPSW. A remote url would otherwise issue
++        # range requests even when nothing new is needed.
++        cached = ctx.out_root / 'ipsw' / ctx.board['ipsw']['build'] / 'kernelcache.decompressed'
++        pin = spec.get('kernelcache_sha256')
++        if cached.is_file() and (not pin or sha256_file(cached) == pin):
++            log(f'ipsw: cached kernelcache {cached}')
++            cache = cached
++        else:
++            cache = ipsw.kernelcache(ctx, ipsw.Ipsw(ctx))
+     if not cache.is_file():
+         raise Error(f'kernelcache not found: {cache}')
+     wanted = spec.get('kernelcache_sha256')
+@@ -220,5 +300,6 @@ def prelink(ctx):
+         command += ['--early-security-init', spec['early_security_init']]
+     command += spec.get('extra_args', [])
+     run(command, cwd=ctx.tree, log_file=ctx.logs / 'prelink.log')
++    patch_amfi_null_deref(output)
+     log(f'kernel: {output} sha256 {sha256_file(output)}')
+     return output

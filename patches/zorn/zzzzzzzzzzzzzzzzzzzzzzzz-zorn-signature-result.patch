@@ -1,0 +1,13 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8273,6 +8273,10 @@
+ 
+ 	/* If we hit this, we likely would have leaked an exit reason */
+ 	assert(signature_failure_reason == OS_REASON_NULL);
++	{
++		extern void zorn_ufs_log_word(const char *);
++		zorn_ufs_log_word(error == 0 ? "SIGPASS" : "SIGFAIL");
++	}
+ 	return error;
+ }
+ 

@@ -1,0 +1,10 @@
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -17537,3 +17537,7 @@
+ 	SAVE_HINT_MAP_WRITE(map, new_entry);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("SAVR");
++	}
+ 	return new_entry;
+ }

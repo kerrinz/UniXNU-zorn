@@ -1,17 +1,65 @@
 --- a/osfmk/vm/vm_map.c
 +++ b/osfmk/vm/vm_map.c
-@@ -1844,4 +1844,11 @@
+@@ -1844,25 +1844,53 @@
  	(void)vm_map_delete(map, 0x0, 0xFFFFFFFFFFFFF000ULL, flags,
  	    KMEM_GUARD_NONE, &zap);
  
+-	vm_map_disable_hole_optimization(map);
+-	vm_map_corpse_footprint_destroy(map);
+-
+-	vm_map_unlock(map);
+-
+-	vm_map_zap_dispose(&zap);
 +	{
 +		extern void zorn_say(const char *);
 +		extern volatile int zorn_read_trace;
 +		if (zorn_read_trace)
 +			zorn_say("MEND");
++		if (zorn_read_trace)
++			zorn_say("MHOL");
++		vm_map_disable_hole_optimization(map);
++		if (zorn_read_trace)
++			zorn_say("MCRP");
++		vm_map_corpse_footprint_destroy(map);
++		if (zorn_read_trace)
++			zorn_say("MUNL");
++		vm_map_unlock(map);
++		if (zorn_read_trace)
++			zorn_say("MZAP");
++		vm_map_zap_dispose(&zap);
 +	}
-+
- 	vm_map_disable_hole_optimization(map);
+ 
+ 	assert(map->hdr.nentries == 0);
+ 
+ 	if (map->pmap) {
++		extern void zorn_say(const char *);
++		extern volatile int zorn_read_trace;
++		if (zorn_read_trace)
++			zorn_say("MPMD");
+ 		pmap_destroy(map->pmap);
+ 	}
+ 
++	{
++		extern void zorn_say(const char *);
++		extern volatile int zorn_read_trace;
++		if (zorn_read_trace)
++			zorn_say("MLCK");
++	}
+ 	lck_rw_destroy(&map->lock, &vm_map_lck_grp);
++	{
++		extern void zorn_say(const char *);
++		extern volatile int zorn_read_trace;
++		if (zorn_read_trace)
++			zorn_say("MFIN");
++	}
+ 
+ #if CONFIG_MAP_RANGES
+ 	kfree_data(map->extra_ranges,
+ 	    map->extra_ranges_count * sizeof(struct vm_map_user_range));
+ #endif
+ 
+ 	zfree_id(ZONE_ID_VM_MAP, map);
+ }
 @@ -8215,3 +8215,10 @@
  	struct mach_vm_range    slot;
  

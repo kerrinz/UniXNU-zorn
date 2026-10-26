@@ -28,7 +28,7 @@
  		hole_entry->start = min;
  #if defined(__arm64__)
  		hole_entry->end = result->max_offset;
-@@ -1563,7 +1574,15 @@
+@@ -1563,7 +1574,16 @@
  		result->holelistenabled = true;
  	}
  
@@ -40,6 +40,7 @@
 +	{
 +		extern void zorn_say(const char *);
 +		zorn_say("VLOK");
++		zorn_say("VRET");
 +	}
  
  	return result;

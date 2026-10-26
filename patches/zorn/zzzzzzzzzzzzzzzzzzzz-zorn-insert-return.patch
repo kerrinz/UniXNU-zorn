@@ -1,0 +1,48 @@
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -3330,6 +3330,11 @@
+ 			    VM_INHERIT_NONE : inheritance),
+ 			    clear_map_aligned);
+ 
++			{
++				extern void zorn_ufs_log_word(const char *);
++				zorn_ufs_log_word("INMR");
++				zorn_ufs_log_word("IRET");
++			}
+ 			assert(!is_kernel_object(object) || (VM_KERN_MEMORY_NONE != alias));
+ 
+ 			if (resilient_codesign) {
+@@ -3749,6 +3754,10 @@
+ 		}
+ 	}
+ 
++	{
++		extern void zorn_ufs_log_word(const char *);
++		zorn_ufs_log_word("VMRT");
++	}
+ 	return result;
+ 
+ #undef  RETURN
+@@ -4033,6 +4042,11 @@
+ 	    (entry_for_jit && !VM_MAP_POLICY_ALLOW_JIT_INHERIT(map) ?
+ 	    VM_INHERIT_NONE : inheritance),
+ 	    clear_map_aligned);
++	{
++		extern void zorn_ufs_log_word(const char *);
++		zorn_ufs_log_word("I4KR");
++		zorn_ufs_log_word("IRET");
++	}
+ 	entry = new_entry;
+ 
+ #if VM_MAP_DEBUG_FOURK
+@@ -4267,6 +4281,10 @@
+ 
+ 	vm_map_zap_dispose(&zap_list);
+ 
++	{
++		extern void zorn_ufs_log_word(const char *);
++		zorn_ufs_log_word("VMRT");
++	}
+ 	return result;
+ 
+ #undef  RETURN

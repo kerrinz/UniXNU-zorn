@@ -2,7 +2,8 @@
 # RAM boot only for the kernel image. [userdata] is the iPadOS 17.7.11 volume
 # file built by `unixnu build userdata`. That file was written to userdata on
 # 2026-10-25 and the read-back stopped at SHNGOK. Do not flash it again, and
-# do not boot Android while it is installed. The kernel probe is read-only.
+# do not boot Android while it is installed. OS reads remain read-only; the
+# diagnostic transport writes only its log block and the recovery BCB.
 # The tested boot image is packed by uefi-zorn/scripts, because the generic
 # payload step does not use 512-byte FAT clusters.
 
@@ -13,7 +14,7 @@ description = "Redmi K80 12GB+256GB"
 kit = "zorn"
 
 # Darwin 23.6 kernel. Same unpatched iPad7,1 / 17.7.11 image as UniXNU-sheng.
-# A local file overrides this URL: unixnu --ipsw PATH, or UNIXNU_IPSW.
+# Use UNIXNU_IPSW or the debug builder --ipsw option for a local IPSW.
 [ipsw]
 url = "https://updates.cdn-apple.com/2025SpringFCS/fullrestores/122-77166/DCA6CFE8-90E9-4B92-880D-3DE171798E40/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw"
 product = "iPad7,1"
@@ -53,6 +54,7 @@ archives = [
   "build-libpthread-kernel.py",
   "build-zorn-link-stubs.py",
   "build-zorn-ufs.py",
+  "build-zorn-pmgr.py",
 ]
 
 # Same restore image and prelink pins as UniXNU-sheng. The addresses belong
@@ -140,7 +142,8 @@ loader = "firmware"
 title = "Boot XNU"
 dram_size = "0x300000000"
 timeout = 5
-kernel_args = ["rd=md0", "-v", "serial=3", "debug=0x14e"]
+trust_cache_sha256 = ["7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"]
+kernel_args = ["rd=md0", "-v", "serial=3", "debug=0x14e", "zorn_pmgr=2", "zorn_checkpoint=USVC", "zorn_checkpoint_skip=63", "zorn_checkpoint_early=1", "zorn_log_only=1", "zorn_trace_compact=1", "zorn_wdt=1"]
 
 [payload.adt]
 tool = "scripts/make-zorn-adt.py"

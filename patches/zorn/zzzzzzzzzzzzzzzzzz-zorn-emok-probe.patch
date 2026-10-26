@@ -1,0 +1,57 @@
+--- a/osfmk/vm/vm_map.c
++++ b/osfmk/vm/vm_map.c
+@@ -1754,3 +1754,7 @@
+ 	__builtin_assume(*(uint64_t *)(&entry->vme_object_value + 2) == 0);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("ESET");
++	}
+ 
+ 	static_assert(VM_MAX_TAG_VALUE <= VME_ALIAS_MASK,
+@@ -1761,3 +1765,10 @@
+ 	entry->inheritance = VM_INHERIT_DEFAULT;
++	{
++		extern void zorn_say(const char *);
++		extern void zorn_ufs_log_word(const char *);
++		zorn_ufs_log_word("EIBG");
++		zorn_say("EINH");
++		zorn_ufs_log_word("EIRT");
++	}
+ 
+ #if MAP_ENTRY_CREATION_DEBUG
+@@ -17439,6 +17447,25 @@
+ 	new_entry = vm_map_entry_create(map);
+ 
+-	new_entry->vme_start = start;
+-	new_entry->vme_end = end;
++	{
++		extern void zorn_say(const char *);
++		uint32_t lo;
++		uint32_t hi;
++
++		/* EINH returned. The next instruction was a 64-bit str of start
++		 * at entry+0x10. The 32-bit inheritance store at +0x48 already
++		 * returned, so write this field as two 32-bit stores.
++		 */
++		zorn_say("ESTR");
++		lo = (uint32_t)start;
++		hi = (uint32_t)((uint64_t)start >> 32);
++		__asm__ volatile("str %w1, [%0]\n\tstr %w2, [%0, #4]"
++		    :: "r"(&new_entry->vme_start), "r"(lo), "r"(hi) : "memory");
++		zorn_say("ESTS");
++		lo = (uint32_t)end;
++		hi = (uint32_t)((uint64_t)end >> 32);
++		__asm__ volatile("str %w1, [%0]\n\tstr %w2, [%0, #4]"
++		    :: "r"(&new_entry->vme_end), "r"(lo), "r"(hi) : "memory");
++		zorn_say("ESTE");
++	}
+ 
+ 	if (vmk_flags.vmkf_submap) {
+@@ -17448,3 +17475,7 @@
+ 		VME_OBJECT_SET(new_entry, object, false, 0);
+ 	}
++	{
++		extern void zorn_say(const char *);
++		zorn_say("EOBJ");
++	}
+ 	VME_OFFSET_SET(new_entry, offset);

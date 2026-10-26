@@ -1,6 +1,8 @@
+diff --git a/osfmk/kern/debug.c b/osfmk/kern/debug.c
+index e9daeed..fbc28c7 100644
 --- a/osfmk/kern/debug.c
 +++ b/osfmk/kern/debug.c
-@@ -1016,11 +1016,136 @@
+@@ -1016,12 +1016,162 @@ register_additional_panic_data_buffer(const char *producer_name, void *buf, int
   * continue to debugger_collect_diagnostics() where we write the paniclog, corefile (if appropriate) and proceed
   * according to the device's boot-args.
   */
@@ -76,6 +78,29 @@
 +	out[n] = '\0';
 +}
 +
++/*
++ * zorn: D04ABBE54. Prelinked AMFI does `ldr x8, [x21, #0x20]; ldr x0, [x8]`.
++ * x8 is null or not a kernel pointer, so the second load data-aborts.
++ * The call is patched in after prelink. On the bad path LR points at the
++ * next instruction and +60 lands on that function's existing error return.
++ */
++void (*volatile zorn_amfi_deref_anchor)(void);
++
++__attribute__((naked, used, noinline))
++void
++zorn_amfi_deref(void)
++{
++	__asm__ volatile(
++		"cbz x8, 1f\n"
++		"tbz x8, #63, 1f\n"
++		"ldr x0, [x8]\n"
++		"ret\n"
++		"1:\n"
++		"add x30, x30, #60\n"
++		"ret\n"
++	);
++}
++
  #undef panic
  void
  panic(const char *str, ...)
@@ -84,6 +109,8 @@
 +	char word[48];
 +	const char *msg = "PANC";
  	va_list panic_str_args;
+ 
++	zorn_amfi_deref_anchor = zorn_amfi_deref;
 +
 +	word[0] = '\0';
 +	if (str != NULL &&
@@ -134,6 +161,7 @@
 +		msg = word;
 +	}
 +	zorn_say(msg);
- 
++
  	va_start(panic_str_args, str);
  	panic_trap_to_debugger(str, &panic_str_args, 0, NULL, 0, NULL, (unsigned long)(char *)__builtin_return_address(0));
+ 	va_end(panic_str_args);

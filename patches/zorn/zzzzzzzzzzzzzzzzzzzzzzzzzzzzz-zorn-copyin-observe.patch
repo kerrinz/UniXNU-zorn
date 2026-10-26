@@ -1,0 +1,91 @@
+--- a/osfmk/ipc/mach_kernelrpc.c
++++ b/osfmk/ipc/mach_kernelrpc.c
+@@ -60,6 +60,7 @@
+ _kernelrpc_mach_vm_allocate_trap(struct _kernelrpc_mach_vm_allocate_trap_args *args)
+ {
+ 	extern void zorn_ufs_thread_stage(const char *, uint64_t);
++	extern void zorn_ufs_copy_scope(uint64_t, uint64_t, int);
+ 	zorn_ufs_thread_stage("MALC", (uintptr_t)__builtin_return_address(0));
+ 	mach_vm_offset_t addr;
+ 	task_t task = port_name_to_current_task_noref(args->target);
+@@ -67,7 +68,10 @@
+ 	zorn_ufs_thread_stage("MATSK", (uintptr_t)__builtin_return_address(0));
+ 
+ 	if (task) {
+-		if ((rv = mach_copyin(args->addr, (char *)&addr, sizeof(addr)))) {
++		zorn_ufs_copy_scope((uintptr_t)current_thread(), args->addr, 1);
++		rv = mach_copyin(args->addr, (char *)&addr, sizeof(addr));
++		zorn_ufs_copy_scope((uintptr_t)current_thread(), args->addr, 0);
++		if (rv) {
+ 			goto done;
+ 		}
+ 
+--- a/osfmk/arm64/copyio.c
++++ b/osfmk/arm64/copyio.c
+@@ -128,6 +128,8 @@
+  * Returns EXDEV when the current thread pmap is the kernel's
+  * which is non fatal for certain routines.
+  */
++extern void zorn_ufs_copy_stage(const char *, uint64_t);
++
+ static int
+ copy_validate(const user_addr_t user_addr, uintptr_t kernel_addr,
+     vm_size_t nbytes, copyio_flags_t flags)
+@@ -185,7 +187,9 @@
+ 	}
+ 
+ 	if ((flags & COPYIO_VALIDATE_USER_ONLY) == 0) {
++		zorn_ufs_copy_stage("CVZONE", (uintptr_t)self);
+ 		zone_element_bounds_check(kernel_addr, nbytes);
++		zorn_ufs_copy_stage("CVZRET", (uintptr_t)self);
+ #if KASAN
+ 		/* For user copies, asan-check the kernel-side buffer */
+ 		if (flags & COPYIO_IN) {
+@@ -218,6 +222,7 @@
+ copyin(const user_addr_t user_addr, void *kernel_addr, vm_size_t nbytes)
+ {
+ 	int result;
++	zorn_ufs_copy_stage("CIENTER", (uintptr_t)current_thread());
+ 
+ 	if (__improbable(nbytes == 0)) {
+ 		return 0;
+@@ -225,6 +230,7 @@
+ 
+ 	result = copy_validate(user_addr, (uintptr_t)kernel_addr, nbytes,
+ 	    COPYIO_IN | COPYIO_ALLOW_KERNEL_TO_KERNEL);
++	zorn_ufs_copy_stage("CIVAL", (uintptr_t)current_thread());
+ 	if (result == EXDEV) {
+ 		return copyin_kern(user_addr, kernel_addr, nbytes);
+ 	}
+@@ -235,6 +241,7 @@
+ 	user_access_enable(USER_ACCESS_READ);
+ 	result = _bcopyin((const char *)user_addr, kernel_addr, nbytes);
+ 	user_access_disable(USER_ACCESS_READ);
++	zorn_ufs_copy_stage("CIOFF", (uintptr_t)current_thread());
+ 	return result;
+ }
+ 
+--- a/osfmk/arm64/sleh.c
++++ b/osfmk/arm64/sleh.c
+@@ -1746,6 +1746,9 @@
+ {
+ 	thread_t thread = current_thread();
+ 	struct copyio_recovery_entry *recover = find_copyio_recovery_entry(state);
++	extern void zorn_ufs_copy_abort(uint64_t, uint64_t, uint64_t, uint32_t, int);
++	extern void zorn_ufs_copy_stage(const char *, uint64_t);
++	zorn_ufs_copy_abort((uintptr_t)thread, get_saved_state_pc(state), fault_addr, esr, recover != NULL);
+ 
+ #ifndef CONFIG_XNUPOST
+ 	(void)expected_fault_handler;
+@@ -1845,9 +1848,11 @@
+ 			/*
+ 			 *  We have to "fault" the page in.
+ 			 */
++			zorn_ufs_copy_stage("KVMF", (uintptr_t)thread);
+ 			result = vm_fault(map, fault_addr, fault_type,
+ 			    /* change_wiring */ FALSE, VM_KERN_MEMORY_NONE, interruptible,
+ 			    /* caller_pmap */ NULL, /* caller_pmap_addr */ 0);
++			zorn_ufs_copy_stage("KVMRET", (uintptr_t)thread);
+ 		}
+ 
+ 		if (result == KERN_SUCCESS) {

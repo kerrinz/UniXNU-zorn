@@ -262,3 +262,50 @@ static IOReturn hostRead4k (uint8_t lun, uint64_t lba, uint32_t blocks, void *ds
   return status;
 }
 
+// WRITE(10) + FUA of one 4096-byte block to the armed log LBA. Try-lock so a status
+// word can record itself while DAIF is masked. No SYNCHRONIZE CACHE.
+static IOReturn hostWriteLog4k (const void *src)
+{
+  if (!gHost.ready || !gHost.lock || !src || !gLogArmed || !gLogBlocks) return kIOReturnNotReady;
+  if (!IOLockTryLock (gHost.lock)) return kIOReturnBusy;
+  memcpy (gHost.virt + kDataOffset, src, 4096U);
+  uint8_t cdb[10] = { 0x2a, 0x08, uint8_t (gLogLba >> 24), uint8_t (gLogLba >> 16), uint8_t (gLogLba >> 8),
+                      uint8_t (gLogLba), 0, 0, 1, 0 };
+  uint32_t scsi = 0;
+  IOReturn status = hostScsiDir (0, cdb, 10, 1, 4096U, 2000000, &scsi);
+  IOLockUnlock (gHost.lock);
+  return status;
+}
+
+// One FUA WRITE(10) of the misc BCB page. Try-lock: the checkpoint runs with DAIF masked.
+static IOReturn hostWriteMisc4k (const void *src)
+{
+  if (!gHost.ready || !gHost.lock || !src || !gRecoveryArmed || gMiscLba == 0) return kIOReturnNotReady;
+  if (!IOLockTryLock (gHost.lock)) return kIOReturnBusy;
+  memcpy (gHost.virt + kDataOffset, src, 4096U);
+  uint8_t cdb[10] = { 0x2a, 0x08, uint8_t (gMiscLba >> 24), uint8_t (gMiscLba >> 16), uint8_t (gMiscLba >> 8),
+                      uint8_t (gMiscLba), 0, 0, 1, 0 };
+  uint32_t scsi = 0;
+  IOReturn status = hostScsiDir (0, cdb, 10, 1, 4096U, 2000000, &scsi);
+  IOLockUnlock (gHost.lock);
+  return status;
+}
+
+static IOReturn hostTryRead4k (uint8_t lun, uint64_t lba, uint32_t blocks, void *dst)
+{
+  if (!gHost.ready || !gHost.lock || !dst || !blocks || blocks > kDataMax / 4096 || lba > 0xffffffffULL - (blocks - 1)) {
+    return kIOReturnBadArgument;
+  }
+  if (!IOLockTryLock (gHost.lock)) return kIOReturnBusy;
+  gRootDiagnostic.lba = lba;
+  uint8_t cdb[10] = { 0x28, 0, uint8_t (lba >> 24), uint8_t (lba >> 16), uint8_t (lba >> 8), uint8_t (lba),
+                      0, uint8_t (blocks >> 8), uint8_t (blocks), 0 };
+  uint32_t scsi = 0;
+  IOReturn status = hostScsi (lun, cdb, 10, true, blocks * 4096U, 1000000, &scsi);
+  if (status == kIOReturnSuccess) {
+    memcpy (dst, gHost.virt + kDataOffset, blocks * 4096U);
+  }
+  IOLockUnlock (gHost.lock);
+  return status;
+}
+

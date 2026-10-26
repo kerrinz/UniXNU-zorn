@@ -1,0 +1,45 @@
+--- a/bsd/kern/kern_exec.c	2026-10-26 19:05:40
++++ b/bsd/kern/kern_exec.c	2026-10-26 19:05:23
+@@ -885,6 +885,10 @@
+ 	task_set_mach_header_address(task, result->mach_header);
+ 
+ 	ret = thread_state_initialize(thread);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TDON");
++	}
+ 	if (ret != KERN_SUCCESS) {
+ 		return ret;
+ 	}
+@@ -907,6 +911,10 @@
+ 	}
+ 
+ 	thread_setentrypoint(thread, result->entry_point);
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TEND");
++	}
+ 
+ 	return KERN_SUCCESS;
+ }
+@@ -7011,6 +7019,10 @@
+ 
+ 	mach_vm_address_t       user_stack = load_result->user_stack;
+ 
++	{
++		extern void zorn_say(const char *);
++		zorn_say("TSTK");
++	}
+ 	proc_lock(p);
+ 	p->user_stack = (uintptr_t)user_stack;
+ 	if (load_result->custom_stack) {
+@@ -7034,5 +7046,9 @@
+ 		}
+ 		addr = vm_map_trunc_page(load_result->user_stack - size,
+ 		    vm_map_page_mask(map));
++		{
++			extern void zorn_say(const char *);
++			zorn_say("TALL");
++		}
+ 		kr = mach_vm_allocate_kernel(map, &addr, size,
+ 		    VM_FLAGS_FIXED, VM_MEMORY_STACK);

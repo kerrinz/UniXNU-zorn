@@ -1,0 +1,34 @@
+--- a/bsd/kern/kern_newsysctl.c
++++ b/bsd/kern/kern_newsysctl.c
+@@ -1768,6 +1768,8 @@
+ 	}
+ 
+ 	lck_rw_done(&sysctl_geometry_lock);
++	extern void zorn_ufs_sysctl_point(const char *, uint64_t, unsigned);
++	if (!from_kernel) zorn_ufs_sysctl_point(namestring, (uintptr_t)oid_handler, 0);
+ 
+ #if CONFIG_MACF
+ 	if (!from_kernel) {
+@@ -1789,6 +1791,7 @@
+ 	 * ...however, we still have to grab the mutex for those calls which
+ 	 * may be into code whose reentrancy is protected by it.
+ 	 */
++	if (!from_kernel) zorn_ufs_sysctl_point(namestring, (uintptr_t)oid_handler, 1);
+ 	if (unlocked_node_found) {
+ 		lck_mtx_lock(&sysctl_unlocked_node_lock);
+ 	}
+@@ -1805,12 +1808,14 @@
+ 	    ptrauth_function_pointer_type_discriminator(typeof(oid_handler)));
+ #endif /* defined(HAS_APPLE_PAC) */
+ 
++	if (!from_kernel) zorn_ufs_sysctl_point(namestring, (uintptr_t)oid_handler, 2);
+ 	if ((oid->oid_kind & CTLTYPE) == CTLTYPE_NODE) {
+ 		i = oid_handler(oid, name + indx, (int)(namelen - indx), req);
+ 	} else {
+ 		i = oid_handler(oid, oid->oid_arg1, oid->oid_arg2, req);
+ 	}
+ 	error = i;
++	if (!from_kernel) zorn_ufs_sysctl_point(namestring, (uintptr_t)oid_handler, 3);
+ 
+ 	if (unlocked_node_found) {
+ 		lck_mtx_unlock(&sysctl_unlocked_node_lock);

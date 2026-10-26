@@ -1,0 +1,36 @@
+--- a/security/mac_vfs.c
++++ b/security/mac_vfs.c
+@@ -846,9 +846,13 @@
+ 			size_t spawnattrlen = 0;
+ 			void *spawnattr = exec_spawnattr_getmacpolicyinfo(macextensions, mpc->mpc_name, &spawnattrlen);
+ 
+-			error = mac_error_select(hook(cred, new, vfs_context_proc(ctx), vp, offset, scriptvp,
+-			    mac_vnode_label(vp), scriptvnodelabel, execl, csflags, spawnattr, spawnattrlen, disjoint),
+-			    error);
++			int step_error = hook(cred, new, vfs_context_proc(ctx), vp, offset, scriptvp,
++			    mac_vnode_label(vp), scriptvnodelabel, execl, csflags, spawnattr, spawnattrlen, disjoint);
++			if (step_error != 0) {
++				extern void zorn_ufs_note_mac_failure(const char *, int);
++				zorn_ufs_note_mac_failure(mpc->mpc_name, step_error);
++			}
++			error = mac_error_select(step_error, error);
+ 		}
+ 		if (mac_policy_list_conditional_busy() != 0) {
+ 			for (; i <= mac_policy_list.maxindex; i++) {
+@@ -865,9 +869,13 @@
+ 				size_t spawnattrlen = 0;
+ 				void *spawnattr = exec_spawnattr_getmacpolicyinfo(macextensions, mpc->mpc_name, &spawnattrlen);
+ 
+-				error = mac_error_select(hook(cred, new, vfs_context_proc(ctx), vp, offset, scriptvp,
+-				    mac_vnode_label(vp), scriptvnodelabel, execl, csflags, spawnattr, spawnattrlen, disjoint),
+-				    error);
++				int step_error = hook(cred, new, vfs_context_proc(ctx), vp, offset, scriptvp,
++				    mac_vnode_label(vp), scriptvnodelabel, execl, csflags, spawnattr, spawnattrlen, disjoint);
++				if (step_error != 0) {
++					extern void zorn_ufs_note_mac_failure(const char *, int);
++					zorn_ufs_note_mac_failure(mpc->mpc_name, step_error);
++				}
++				error = mac_error_select(step_error, error);
+ 			}
+ 			mac_policy_list_unbusy();
+ 		}

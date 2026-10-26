@@ -1,0 +1,55 @@
+{
+  "scope": "static audit of the runtime-observed original Image4 handler; no additional device boot",
+  "kernel_sha256": "b56df19dea10509f7565e9965a20ef5fbb05bede8c38fc852bf897f1e7f6fd1f",
+  "module": "com.apple.security.AppleImage4",
+  "handler": "0xfffffff004a948ec",
+  "module_text_unchanged_from_original": true,
+  "module_text_sha256": "94eee9bff8da89bb6cd12c5c8ba0c3e2ec186783f26a2e14a8c8dba0046c1290",
+  "kernel_calls_in_first_192_bytes": [
+    {
+      "site": "0xfffffff004a94944",
+      "target": "0xfffffff0076eae4c",
+      "symbols": [
+        "_proc_task"
+      ]
+    },
+    {
+      "site": "0xfffffff004a94950",
+      "target": "0xfffffff007924264",
+      "symbols": [
+        "_IOTaskHasEntitlement"
+      ]
+    },
+    {
+      "site": "0xfffffff004a9495c",
+      "target": "0xfffffff0076eb048",
+      "symbols": [
+        "_proc_isinitproc"
+      ]
+    },
+    {
+      "site": "0xfffffff004a9496c",
+      "target": "0xfffffff007287e30",
+      "symbols": [
+        "_IOLockLock",
+        "_lck_mtx_lock"
+      ]
+    },
+    {
+      "site": "0xfffffff004a94978",
+      "target": "0xfffffff007290d08",
+      "symbols": [
+        "_lck_mtx_gate_try_close"
+      ]
+    },
+    {
+      "site": "0xfffffff004a94994",
+      "target": "0xfffffff007290dd8",
+      "symbols": [
+        "_lck_mtx_gate_wait"
+      ]
+    }
+  ],
+  "gate_wait_call_present": true,
+  "handler_internal_runtime_stack_observed": false
+}

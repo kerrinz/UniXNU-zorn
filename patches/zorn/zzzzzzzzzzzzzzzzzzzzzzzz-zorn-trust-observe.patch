@@ -1,0 +1,13 @@
+--- a/bsd/kern/kern_trustcache.c
++++ b/bsd/kern/kern_trustcache.c
+@@ -1111,6 +1111,10 @@
+ 			continue;
+ 		}
+ 		printf("loaded external trust cache module: %u\n", i);
++		{
++			extern void zorn_ufs_note_trust_cache(unsigned);
++			zorn_ufs_note_trust_cache(i);
++		}
+ 
+ 		/*
+ 		 * The first module is always loaded as a static trust cache. If loading it failed,

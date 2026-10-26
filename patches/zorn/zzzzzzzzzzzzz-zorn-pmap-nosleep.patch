@@ -1,0 +1,24 @@
+diff --git a/osfmk/arm/pmap/pmap_internal.h b/osfmk/arm/pmap/pmap_internal.h
+index 019203e..78bc0ed 100644
+--- a/osfmk/arm/pmap/pmap_internal.h
++++ b/osfmk/arm/pmap/pmap_internal.h
+@@ -260,6 +260,11 @@ pmap_assert_locked_any(__unused pmap_t pmap)
+ static inline void
+ pmap_lock(pmap_t pmap, pmap_lock_mode_t mode)
+ {
++	/*
++	 * User pmaps are created with can_sleep cleared, but shared_b still
++	 * panics when the bit is set. These locks must not sleep on CPU0.
++	 */
++	pmap->rwlock.lck_rw_can_sleep = FALSE;
+ #if !XNU_MONITOR
+ 	mp_disable_preemption();
+ #endif
+@@ -300,6 +305,7 @@ pmap_lock_preempt(pmap_t pmap, pmap_lock_mode_t mode)
+ 	 * pmap_verify_preemptible() is used in pmap.
+ 	 */
+ 	do {
++		pmap->rwlock.lck_rw_can_sleep = FALSE;
+ #if !XNU_MONITOR
+ 		mp_disable_preemption();
+ #endif

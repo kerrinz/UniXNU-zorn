@@ -1,3 +1,5 @@
+diff --git a/osfmk/kern/lock_rw.c b/osfmk/kern/lock_rw.c
+index d101e71..306b372 100644
 --- a/osfmk/kern/lock_rw.c
 +++ b/osfmk/kern/lock_rw.c
 @@ -188,6 +188,28 @@ lck_rw_init(
@@ -49,7 +51,51 @@
  #if __x86_64__
  			cpu_pause();
  #else
-@@ -1214,7 +1245,32 @@ void
+@@ -1123,9 +1154,11 @@ lck_rw_lock_exclusive_check_contended(
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	} else if (get_preemption_level() == 0) {
+-		panic("Taking non-sleepable RW lock with preemption enabled");
+ 	}
++	/*
++	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
++	 * get_preemption_level() is still 0 here. Take the lock anyway.
++	 */
+ 
+ 	if (LCK_RW_LOCK_EXCLUSIVE_TAS(lock)) {
+ #if     CONFIG_DTRACE
+@@ -1157,22 +1190,21 @@ lck_rw_lock_exclusive_internal_inline(
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	} else if (get_preemption_level() == 0) {
+-		panic("Taking non-sleepable RW lock with preemption enabled");
+ 	}
++	/*
++	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
++	 * get_preemption_level() is still 0 here. Take the lock anyway.
++	 */
+ 
+ 	if (LCK_RW_LOCK_EXCLUSIVE_TAS(lock)) {
+ #if     CONFIG_DTRACE
+ 		LOCKSTAT_RECORD(LS_LCK_RW_LOCK_EXCL_ACQUIRE, lock, DTRACE_RW_EXCL);
+ #endif  /* CONFIG_DTRACE */
+-	} else if (!lck_rw_lock_exclusive_gen(lock, lock_pause)) {
++	} else if (!lck_rw_lock_exclusive_gen(lock, NULL)) {
+ 		/*
+-		 * lck_rw_lock_exclusive_gen() should only return
+-		 * early if lock_pause has been passed and
+-		 * returns FALSE. lock_pause is exclusive with
+-		 * lck_rw_can_sleep().
++		 * zorn: do not bail out on AST_URGENT. shared_b panics at
++		 * P0798420C when the pause returns and can_sleep is still set.
+ 		 */
+-		assert(!lock->lck_rw_can_sleep);
+ 		return FALSE;
+ 	}
+ 
+@@ -1214,7 +1246,32 @@ void
  lck_rw_lock_exclusive(
  	lck_rw_t        *lock)
  {
@@ -82,7 +128,50 @@
  }
  
  /*!
-@@ -1489,7 +1545,16 @@ void
+@@ -1243,7 +1300,11 @@ lck_rw_lock_exclusive_b(
+ 	lck_rw_t        *lock,
+ 	bool            (^lock_pause)(void))
+ {
+-	assert(!lock->lck_rw_can_sleep);
++	/*
++	 * A bitfield store here compiled to a halfword write that put the
++	 * original can_sleep bit back. One volatile word store only.
++	 */
++	*(volatile uint32_t *)&lock->lck_rw_data &= ~(1U << LCK_RW_CAN_SLEEP_BIT);
+ 
+ 	return lck_rw_lock_exclusive_internal_inline(lock, __builtin_return_address(0), lock_pause);
+ }
+@@ -1396,22 +1457,21 @@ lck_rw_lock_shared_internal_inline(
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	} else if (get_preemption_level() == 0) {
+-		panic("Taking non-sleepable RW lock with preemption enabled");
+ 	}
++	/*
++	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
++	 * get_preemption_level() is still 0 here. Take the lock anyway.
++	 */
+ 
+ 	for (;;) {
+ 		data = atomic_exchange_begin32(&lock->lck_rw_data, &prev, memory_order_acquire_smp);
+ 		if (data & (LCK_RW_WANT_EXCL | LCK_RW_WANT_UPGRADE | LCK_RW_INTERLOCK)) {
+ 			atomic_exchange_abort();
+-			if (!lck_rw_lock_shared_gen(lock, lock_pause)) {
++			if (!lck_rw_lock_shared_gen(lock, NULL)) {
+ 				/*
+-				 * lck_rw_lock_shared_gen() should only return
+-				 * early if lock_pause has been passed and
+-				 * returns FALSE. lock_pause is exclusive with
+-				 * lck_rw_can_sleep().
++				 * zorn: P0798420C is this assert. The pause bails
++				 * out while can_sleep is set. Spin instead.
+ 				 */
+-				assert(!lock->lck_rw_can_sleep);
+ 				return FALSE;
+ 			}
+ 
+@@ -1489,7 +1549,16 @@ void
  lck_rw_lock_shared(
  	lck_rw_t        *lock)
  {
@@ -99,7 +188,48 @@
  }
  
  /*!
-@@ -2194,6 +2259,9 @@ lck_rw_done(
+@@ -1518,7 +1587,11 @@ lck_rw_lock_shared_b(
+ 	lck_rw_t        *lock,
+ 	bool            (^lock_pause)(void))
+ {
+-	assert(!lock->lck_rw_can_sleep);
++	/*
++	 * A bitfield store here compiled to a halfword write that put the
++	 * original can_sleep bit back. One volatile word store only.
++	 */
++	*(volatile uint32_t *)&lock->lck_rw_data &= ~(1U << LCK_RW_CAN_SLEEP_BIT);
+ 
+ 	return lck_rw_lock_shared_internal_inline(lock, __builtin_return_address(0), lock_pause);
+ }
+@@ -1943,9 +2016,11 @@ lck_rw_try_lock_shared_internal_inline(
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	} else if (get_preemption_level() == 0) {
+-		panic("Taking non-sleepable RW lock with preemption enabled");
+ 	}
++	/*
++	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
++	 * get_preemption_level() is still 0 here. Take the lock anyway.
++	 */
+ 
+ #if     CONFIG_DTRACE
+ 	LOCKSTAT_RECORD(LS_LCK_RW_TRY_LOCK_SHARED_ACQUIRE, lock, DTRACE_RW_SHARED);
+@@ -2017,9 +2092,11 @@ lck_rw_try_lock_exclusive_internal_inline(
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	} else if (get_preemption_level() == 0) {
+-		panic("Taking non-sleepable RW lock with preemption enabled");
+ 	}
++	/*
++	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
++	 * get_preemption_level() is still 0 here. Take the lock anyway.
++	 */
+ 
+ 	assertf(lock->lck_rw_owner == 0, "state=0x%x, owner=%p",
+ 	    ordered_load_rw(lock), ctid_get_thread_unsafe(lock->lck_rw_owner));
+@@ -2194,6 +2271,9 @@ lck_rw_done(
  {
  	uint32_t        data, prev;
  	boolean_t       once = FALSE;
@@ -109,7 +239,7 @@
  
  #ifdef DEBUG_RW
  	/*
-@@ -2256,6 +2324,11 @@ check_waiters:
+@@ -2256,6 +2336,11 @@ check_waiters:
  		if (atomic_exchange_complete32(&lock->lck_rw_data, prev, data, memory_order_release_smp)) {
  			break;
  		}
@@ -121,7 +251,7 @@
  		cpu_pause();
  	}
  	return lck_rw_done_gen(lock, prev);
-@@ -2305,7 +2378,12 @@ lck_rw_unlock_exclusive(
+@@ -2305,7 +2390,12 @@ lck_rw_unlock_exclusive(
  	lck_rw_t        *lck)
  {
  	lck_rw_type_t   ret;
@@ -134,7 +264,7 @@
  	assertf(lck->lck_rw_owner == current_thread()->ctid,
  	    "state=0x%x, owner=%p", lck->lck_rw_data,
  	    ctid_get_thread_unsafe(lck->lck_rw_owner));
-@@ -2314,6 +2392,9 @@ lck_rw_unlock_exclusive(
+@@ -2314,6 +2404,9 @@ lck_rw_unlock_exclusive(
  	if (ret != LCK_RW_TYPE_EXCLUSIVE) {
  		panic("lck_rw_unlock_exclusive(): lock %p held in mode: %d", lck, ret);
  	}
