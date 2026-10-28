@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":9,"stage":11,"pid":0,"sequence":189,"ms":148064,"pages":{"free":1765311,"active":23044,"inactive":31908,"wired":92618},"ram_data":{"reads":71,"writes":107,"errors":0},"display":[10,0,6304,6464,1,1,1,0,1,0,64,0,18446744042174051712,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":9,"slide":446283776,"main_header":4313489408,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8154950324,"lr":7146384576,"sp":6153934736,"fp":6153934752,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":1,"pc":8154911016,"lr":7146278112,"sp":6155034512,"fp":6155034528,"wait":0,"continuation":18446744005188259836,"state":4,"frames":[]},{"index":2,"pc":8154892520,"lr":8455447936,"sp":6155582256,"fp":6155582288,"wait":18446744038310360568,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":3,"pc":8154892520,"lr":8455447936,"sp":6156130880,"fp":6156130912,"wait":0,"continuation":0,"state":4,"frames":[]}]},{"name":"SpringBoard","pid":5,"tick":9,"slide":446283776,"main_header":4302172160,"thread_count":4,"truncated":false,"threads":[{"index":0,"pc":8154892480,"lr":7146305064,"sp":6164709072,"fp":6164709168,"wait":18446744042189953664,"continuation":18446744005188073828,"state":1,"frames":[]},{"index":1,"pc":8154892520,"lr":8455447936,"sp":6165252912,"fp":6165252944,"wait":18446744038315560176,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":8154893144,"lr":8154907172,"sp":6165783024,"fp":6165783104,"wait":0,"continuation":18446744005183365804,"state":65,"frames":[]},{"index":3,"pc":8154892520,"lr":8455447936,"sp":6166899504,"fp":6166899536,"wait":18446744038315338288,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"backboardd","pid":37,"tick":9,"slide":446283776,"main_header":4311629824,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8154893012,"lr":7146188776,"sp":6155253040,"fp":6155253056,"wait":18446744005107540492,"continuation":18446744005183776880,"state":1,"frames":[]},{"index":1,"pc":8154893144,"lr":8154907172,"sp":6155776496,"fp":6155776576,"wait":0,"continuation":18446744005183365804,"state":65,"frames":[]},{"index":2,"pc":8154893144,"lr":8154907172,"sp":6156322480,"fp":6156322560,"wait":0,"continuation":18446744005183365804,"state":65,"frames":[]},{"index":3,"pc":8154892520,"lr":8455447936,"sp":6156892976,"fp":6156893008,"wait":0,"continuation":0,"state":4,"frames":[]}]}],"exits":[{"sequence":1,"pid":2,"status":1,"namespace":0,"code":0,"name":"launchd","detail":{"pc":0,"lr":0,"far":0,"slide":446283776,"main_header":0,"esr":0,"cpsr":0,"fixups":0,"reason":"","frames":[]}}]}
+180 checkpoints; showing last 100
+080 UFD00000000
+081 USRBEGIN
+082 GUI EXIT #1
+083  launchd[2]
+084  status=1 n
+085 amespace=0 
+086 code=0 
+087 USREND
+088 UCON
+089 LC2
+090 LD2
+091 LV2
+092 LW2
+093 LC2
+094 LD2
+095 LV2
+096 LW2
+097 TIM0001F5F6
+098 UFD00000000
+099 USRBEGIN
+100 EXEC BEGIN 
+101 pid=107 err
+102 or=0 path=/
+103 usr/libexec
+104 /xpcproxy 
+105 USREND
+106 UCON
+107 NDYL
+108 ENAME
+109 EPERM
+110 TIM0001F5F9
+111 UFD00000000
+112 USRBEGIN
+113 MEM ms=1285
+114 05 free=176
+115 5351 active
+116 =23042 inac
+117 tive=31899 
+118 wired=92579
+119  pages fixu
+120 ps=0 
+121 USREND
+122 UCON
+123 TIM0001F5F9
+124 UFD00000000
+125 USRBEGIN
+126 RAMDATA rea
+127 ds=71 write
+128 s=107 error
+129 s=0 
+130 USREND
+131 UCON
+132 TIM0001F5FA
+133 UFD00000000
+134 USRBEGIN
+135 DISPLAY sta
+136 ge=10 error
+137 =00000000 r
+138 egistered=1
+139  clients=1 
+140 accepted=0 
+141 rejected=0 
+142 transfers=0
+143  status=000
+144 00000 bytes
+145 =0 pixels=0
+146  
+147 USREND
+148 UCON
+149 TIM0001F5FB
+150 UFD00000000
+151 USRBEGIN
+152 GUI EXIT #1
+153  launchd[2]
+154  status=1 n
+155 amespace=0 
+156 code=0 
+157 USREND
+158 UCON
+159 EPET
+160 TIM0001F5FC
+161 UFD00000000
+162 USRBEGIN
+163 EXEC ACTIVA
+164 TE_RETURN p
+165 id=107 erro
+166 r=0 path=/u
+167 sr/libexec/
+168 xpcproxy 
+169 USREND
+170 UCON
+171 LC2
+172 LD2
+173 LV2
+174 LW2
+175 LC2
+176 LD2
+177 LV2
+178 LW2
+179 TIM00024260
+user output: GUI SAMPLE 8/12 GUI backboardd[37] slide=1a99c000 mh=100fe4000 threads=4 truncated=1 GUI SpringBoard[5] slide=1a99c000 mh=1006df000 threads=4 truncated=0 GUI launchd[1] slide=1a99c000 mh=1011aa000 threads=4 truncated=1 MEM ms=120171 free=1765942 active=23029 inactive=31796 wired=92515 pages fixups=0 RAMDATA reads=71 writes=87 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=1 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 EXEC BEGIN pid=107 error=0 path=/usr/libexec/xpcproxy MEM ms=128505 free=1765351 active=23042 inactive=31899 wired=92579 pages fixups=0 RAMDATA reads=71 writes=107 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=1 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 EXEC ACTIVATE_RETURN pid=107 error=0 path=/usr/libexec/xpcproxy 

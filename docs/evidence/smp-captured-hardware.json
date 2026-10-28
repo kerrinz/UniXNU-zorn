@@ -1,0 +1,72 @@
+{
+  "captured_fdt": "out/zorn/physical-memory/live.dtb",
+  "sha256": "8a8e5a0b8954bb71d1451e71b388e96a7d1d985828b6dd3ff789fcd504ae6ac7",
+  "cpus": [
+    {
+      "path": "/cpus/cpu@0",
+      "affinity": "0x0",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1024
+    },
+    {
+      "path": "/cpus/cpu@100",
+      "affinity": "0x100",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1024
+    },
+    {
+      "path": "/cpus/cpu@200",
+      "affinity": "0x200",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1792
+    },
+    {
+      "path": "/cpus/cpu@300",
+      "affinity": "0x300",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1792
+    },
+    {
+      "path": "/cpus/cpu@400",
+      "affinity": "0x400",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1792
+    },
+    {
+      "path": "/cpus/cpu@500",
+      "affinity": "0x500",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1792
+    },
+    {
+      "path": "/cpus/cpu@600",
+      "affinity": "0x600",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1792
+    },
+    {
+      "path": "/cpus/cpu@700",
+      "affinity": "0x700",
+      "compatible": "qcom,kryo",
+      "enable_method": "psci",
+      "capacity_dmips_mhz": 1894
+    }
+  ],
+  "psci": [
+    {
+      "path": "/soc/psci",
+      "method": "smc",
+      "compatible": [
+        "arm,psci-1.0"
+      ]
+    }
+  ],
+  "hardware_smp_qualified": false
+}

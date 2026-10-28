@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":11,"stage":11,"pid":0,"sequence":204,"ms":173358,"pages":{"free":1668544,"active":40383,"inactive":44139,"wired":108871},"ram_data":{"reads":74,"writes":582,"errors":0},"display":[10,0,6304,6464,1,1,1,0,4,0,81,0,18446744044447741184,4,0,1,0,0,0,0,0,0,0,6,0,0,41011,4278190080,40989,5,0,18432000],"processes":[{"name":"launchd","pid":1,"tick":11,"slide":6438912,"main_header":4304547840,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8015592644,"lr":0,"sp":6162878464,"fp":0,"wait":0,"continuation":18446744005183446236,"state":4,"frames":[]},{"index":1,"pc":7715066152,"lr":6706433248,"sp":6163976080,"fp":6163976096,"wait":0,"continuation":18446744005188259708,"state":4,"frames":[]},{"index":2,"pc":7715047656,"lr":8015603072,"sp":6164523648,"fp":6164523680,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":3,"pc":7715047656,"lr":8015603072,"sp":6165072592,"fp":6165072624,"wait":0,"continuation":0,"state":4,"frames":[]}]},{"name":"SpringBoard","pid":5,"tick":6,"slide":6438912,"main_header":4310310912,"thread_count":3,"truncated":false,"threads":[{"index":0,"pc":7715048280,"lr":7715062308,"sp":6156551728,"fp":6156551808,"wait":0,"continuation":18446744005183365804,"state":1,"frames":[]},{"index":1,"pc":7715047656,"lr":8015603072,"sp":6157663024,"fp":6157663056,"wait":18446744036726551176,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":7715047656,"lr":8015603072,"sp":6157114160,"fp":6157114192,"wait":18446744036726679208,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"backboardd","pid":37,"tick":11,"slide":6438912,"main_header":4311719936,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":7715072816,"lr":8015597644,"sp":6155156208,"fp":6155156208,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":1,"pc":7715048280,"lr":7715062308,"sp":6158408128,"fp":6158408208,"wait":0,"continuation":18446744005183365804,"state":1,"frames":[]},{"index":2,"pc":7715048280,"lr":7715062308,"sp":6160561184,"fp":6160561264,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":3,"pc":7715047656,"lr":8015603072,"sp":6159522624,"fp":6159522656,"wait":18446744036731315352,"continuation":18446744005187930812,"state":1,"frames":[]}]}],"exits":[{"sequence":13,"pid":171,"status":6,"namespace":8,"code":1,"name":"SpringBoard"},{"sequence":14,"pid":176,"status":11,"namespace":2,"code":11,"name":"SpringBoard"},{"sequence":11,"pid":158,"status":11,"namespace":2,"code":11,"name":"SpringBoard"},{"sequence":12,"pid":163,"status":6,"namespace":8,"code":1,"name":"SpringBoard"}]}
+180 checkpoints; showing last 100
+080  failed: 21
+081 H461: logd 
+082 + 92748 [F6
+083 5F3793-7045
+084 -37BC-ACAC-
+085 47B49048879
+086 9]: 0x2 
+087 USREND
+088 UCON
+089 LC2
+090 LD2
+091 TIM0002A346
+092 UFD00000002
+093 USRBEGIN
+094 objc[172]: 
+095 couldn't dl
+096 open libobj
+097 c-trampolin
+098 es.dylib: d
+099 lopen(/usr/
+100 lib/libobjc
+101 -trampoline
+102 s.dylib, 0x
+103 0106): trie
+104 d: '/usr/li
+105 b/libobjc-t
+106 rampolines.
+107 dylib' (no 
+108 such file, 
+109 not in dyld
+110  cache) 
+111 USREND
+112 UCON
+113 DFR00000005
+114 DFE00000000
+115 DFB01194000
+116 DFDONE
+117 TIM0002A3A3
+118 UFD00000000
+119 USRBEGIN
+120 EXEC ACTIVA
+121 TE_RETURN p
+122 id=185 erro
+123 r=0 path=/u
+124 sr/libexec/
+125 nfcd 
+126 USREND
+127 UCON
+128 TIM0002A3B9
+129 UFD00000004
+130 USRBEGIN
+131 1970-01-01 
+132 00:03:31+00
+133 00 logd[66]
+134 : assertion
+135  failed: 21
+136 H461: logd 
+137 + 92748 [F6
+138 5F3793-7045
+139 -37BC-ACAC-
+140 47B49048879
+141 9]: 0x2 
+142 USREND
+143 UCON
+144 DSA00000001
+145 DSR00000000
+146 TIM0002A462
+147 UFD00000002
+148 USRBEGIN
+149 com.apple.x
+150 pc.launchd|
+151 1970-01-01 
+152 00:03:30.80
+153 1579 (user/
+154 501/com.app
+155 le.mobilere
+156 paird [181]
+157 ) <Notice>:
+158  service st
+159 ate: runnin
+160 g 
+161 USREND
+162 UCON
+163 TIM0002A463
+164 UFD00000002
+165 USRBEGIN
+166 com.apple.x
+167 pc.launchd|
+168 1970-01-01 
+169 00:03:31.18
+170 8162 (user/
+171 501/com.app
+172 le.nfcd [18
+173 5]) <Notice
+174 >: service 
+175 state: runn
+176 ing 
+177 USREND
+178 UCON
+179 LC2
+user output: EXEC BEGIN pid=181 error=0 path=/usr/libexec/mobilerepaird 1970-01-01 00:03:30+0000 logd[66]: assertion failed: 21H461: logd + 92748 [F65F3793-7045-37BC-ACAC-47B490488799]: 0x2 EXEC ACTIVATE_RETURN pid=181 error=0 path=/usr/libexec/mobilerepaird EXEC BEGIN pid=185 error=0 path=/usr/libexec/nfcd 1970-01-01 00:03:30+0000 logd[66]: assertion failed: 21H461: logd + 92748 [F65F3793-7045-37BC-ACAC-47B490488799]: 0x2 objc[172]: couldn't dlopen libobjc-trampolines.dylib: dlopen(/usr/lib/libobjc-trampolines.dylib, 0x0106): tried: '/usr/lib/libobjc-trampolines.dylib' (no such file, not in dyld cache) EXEC ACTIVATE_RETURN pid=185 error=0 path=/usr/libexec/nfcd 1970-01-01 00:03:31+0000 logd[66]: assertion failed: 21H461: logd + 92748 [F65F3793-7045-37BC-ACAC-47B490488799]: 0x2 com.apple.xpc.launchd|1970-01-01 00:03:30.801579 (user/501/com.apple.mobilerepaird [181]) <Notice>: service state: running com.apple.xpc.launchd|1970-01-01 00:03:31.188162 (user/501/com.apple.nfcd [185]) <Notice>: service state: running 

@@ -1,0 +1,17 @@
+{
+  "real_c_parser": true,
+  "real_openssl_signature_verification": true,
+  "native_arm64_ios17_cross_compile": true,
+  "checks": [
+    "real RSA3072-SHA256 verification and signed metadata",
+    "all original blocks including the exact final 512-byte tail",
+    "one-byte mutation refused in every actual block",
+    "block substitution, outside index and partial-block reads refused",
+    "signed UUID/header, RSA signature and hash-table mutation refused",
+    "wrong trusted anchor, rollback generation, truncation and trailing bytes refused",
+    "matching attacker-selected key identifier cannot replace the actual RSA signature"
+  ],
+  "qemu_tested": false,
+  "boot_root_authenticated": false,
+  "hardware_tested": false
+}

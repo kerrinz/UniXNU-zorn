@@ -1,0 +1,12 @@
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -240,6 +240,9 @@
+     if (!strcmp(name, "lsd")) {
+         PE_parse_boot_argn("zorn_gui_service_thread", &first_thread, sizeof(first_thread));
+         if (first_thread > 63) first_thread = 0;
++    } else if (!strcmp(name, "backboardd")) {
++        PE_parse_boot_argn("zorn_gui_backboard_thread", &first_thread, sizeof(first_thread));
++        if (first_thread > 63) first_thread = 0;
+     }
+     strlcpy(process.name, name, sizeof(process.name));
+     process.pid = (uint32_t)pid;

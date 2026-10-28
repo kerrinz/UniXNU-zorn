@@ -1,0 +1,53 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7167,12 +7167,25 @@
+ volatile dev_t native_owner_cache_selected_device = NODEV;
+ volatile dev_t native_owner_cache_mounted_device = NODEV;
+ char native_owner_cache_device_path[64];
++volatile unsigned native_owner_path_errors[5];
++volatile unsigned native_owner_path_types[5];
++volatile dev_t native_owner_path_device = NODEV;
+ void native_owner_cache_checkpoint(int, int);
+ __attribute__((noinline)) void
+ native_owner_cache_checkpoint(int status, int authorized)
+ {
+ 	extern void zorn_say(const char *);
+ 	char word[12];
++	/* Preserve observations across lookups; the best-effort transport logger
++	 * may already be busy on another thread while filesystem I/O runs. */
++	for (unsigned index = 0; index < 5; ++index) {
++		snprintf(word, sizeof(word), "ZP%u%08X", index, native_owner_path_errors[index]);
++		zorn_say(word);
++		snprintf(word, sizeof(word), "ZT%u%08X", index, native_owner_path_types[index]);
++		zorn_say(word);
++	}
++	snprintf(word, sizeof(word), "ZDV%08X", (unsigned)native_owner_path_device);
++	zorn_say(word);
+ 	snprintf(word, sizeof(word), "ZCS%08X", (unsigned)native_owner_cache_stage);
+ 	zorn_say(word);
+ 	snprintf(word, sizeof(word), "ZCE%08X", (unsigned)status);
+@@ -7252,20 +7265,16 @@
+ 	    (error = copyout(mount_data, request.data, sizeof(mount_data))) != 0) goto done;
+ 	native_owner_cache_stage = 3;
+ 	{
+-		extern void zorn_say(const char *);
+ 		const char *probes[] = { "/dev", device_path, "/private", "/private/preboot", "/private/var" };
+ 		for (unsigned index = 0; index < sizeof(probes) / sizeof(probes[0]); index++) {
+ 			vnode_t observed = NULLVP;
+ 			int probe_error = vnode_lookup(probes[index], 0, &observed, vfs_context_current());
+-			char word[12];
+-			snprintf(word, sizeof(word), "ZP%u%08X", index, (unsigned)probe_error);
+-			zorn_say(word);
++			native_owner_path_errors[index] = (unsigned)probe_error;
++			native_owner_path_types[index] = 0;
+ 			if (probe_error == 0) {
+-				snprintf(word, sizeof(word), "ZT%u%08X", index, (unsigned)vnode_vtype(observed));
+-				zorn_say(word);
++				native_owner_path_types[index] = (unsigned)vnode_vtype(observed);
+ 				if (vnode_vtype(observed) == VBLK) {
+-					snprintf(word, sizeof(word), "ZDV%08X", (unsigned)vnode_specrdev(observed));
+-					zorn_say(word);
++					native_owner_path_device = vnode_specrdev(observed);
+ 				}
+ 				vnode_put(observed);
+ 			}

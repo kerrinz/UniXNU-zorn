@@ -1,0 +1,78 @@
+{
+  "/usr/lib/system/libsystem_c.dylib": {
+    "base": "0x18f5d7000",
+    "text_sha256": "f23cf9a370fe13aae1368a37a8b8a85c7ec00a633161e4662dcb177ca5f53eb9",
+    "exports_sha256": "959c9c28acbe6b124b6a1742bf65722577db5b5f5ebbe3828c13aa0b033a9eca",
+    "resolved": [
+      {
+        "address": "0x18f5ecb94",
+        "nearest_export": "_nanosleep",
+        "offset": 216,
+        "export_address": "0x18f5ecabc"
+      }
+    ]
+  },
+  "/usr/lib/system/libsystem_kernel.dylib": {
+    "base": "0x1cb77f000",
+    "text_sha256": "b880d525cf51d2e0a1148e01e236a0fdb6e54147cf0161b5a98abe2bad9f46b3",
+    "exports_sha256": "1add311ecb93d1b725a9eae926d50458a39167c1c4a5dd4a7dff1fd3ee58ada7",
+    "resolved": [
+      {
+        "address": "0x1cb780b58",
+        "nearest_export": "_mach_msg2_trap",
+        "offset": 8,
+        "export_address": "0x1cb780b50"
+      },
+      {
+        "address": "0x1cb786394",
+        "nearest_export": "___semwait_signal",
+        "offset": 8,
+        "export_address": "0x1cb78638c"
+      },
+      {
+        "address": "0x1cb784224",
+        "nearest_export": "_mach_msg2_internal",
+        "offset": 76,
+        "export_address": "0x1cb7841d8"
+      }
+    ]
+  },
+  "/usr/lib/system/libsystem_pthread.dylib": {
+    "base": "0x1dd61f000",
+    "text_sha256": "60b16516556abf11346538b94ee313f48c6ee7abe4dcf2ddd3f28980e1f88f93",
+    "exports_sha256": "9b32e094c7dca78addc6aa885333f66976443b6d36e49528869cc39739952d50",
+    "resolved": [
+      {
+        "address": "0x1dd622580",
+        "nearest_export": "__pthread_wqthread",
+        "offset": 360,
+        "export_address": "0x1dd622418"
+      },
+      {
+        "address": "0x1dd61fcc4",
+        "nearest_export": "_start_wqthread",
+        "offset": 0,
+        "export_address": "0x1dd61fcc4"
+      }
+    ]
+  },
+  "/usr/lib/system/libsystem_malloc.dylib": {
+    "base": "0x197134000",
+    "text_sha256": "51dd6b715757f12d4e2ae74dddb1115603e880e4fee42e9c47dc45c765b00a8d",
+    "exports_sha256": "9486c0110760947065d9463baca9895c336f2e8492b8c015825af453d5a88990",
+    "resolved": [
+      {
+        "address": "0x197143a04",
+        "nearest_export": "_malloc_set_zone_name",
+        "offset": 240,
+        "export_address": "0x197143914"
+      },
+      {
+        "address": "0x19713e84c",
+        "nearest_export": "_malloc_zone_batch_malloc",
+        "offset": 6840,
+        "export_address": "0x19713cd94"
+      }
+    ]
+  }
+}

@@ -1,0 +1,562 @@
+{
+  "run": "20261027-204242-6b816f14",
+  "boot_sha256": "6b816f14f7a6210de5e073e08b455d38305b6927a3f2ec4061c67d46bc0ed721",
+  "kernel_sha256": "2c034f58aafb4137df98da6951624e28adcacb8fc5297c4b15338ce2ec4fd8c2",
+  "samples": {
+    "launchd": {
+      "name": "launchd",
+      "pid": 1,
+      "tick": 12,
+      "slide": 242253824,
+      "main_header": 4304461824,
+      "thread_count": 4,
+      "truncated": true,
+      "threads": [
+        {
+          "index": 0,
+          "pc": 7950862568,
+          "lr": 8251417984,
+          "sp": 6162963264,
+          "fp": 6162963296,
+          "wait": 18446744027867980776,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e888e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1ebd2a580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "pc": 7950862568,
+          "lr": 8251417984,
+          "sp": 6163512128,
+          "fp": 6163512160,
+          "wait": 18446744027867982912,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e888e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1ebd2a580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "pc": 7950881064,
+          "lr": 6942248160,
+          "sp": 6164062096,
+          "fp": 6164062112,
+          "wait": 18446744027867430080,
+          "continuation": 18446744005188260168,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e8d128",
+              "unslid": "0x1cb785128",
+              "image": "/usr/lib/system/libsystem_kernel.dylib",
+              "nearest_local_symbol": "_mach_msg_destroy_port",
+              "offset": 988
+            },
+            {
+              "address": "0x19dca4ce0",
+              "unslid": "0x18f59cce0",
+              "image": "/usr/lib/system/libdispatch.dylib",
+              "nearest_local_symbol": "__dispatch_sigsuspend",
+              "offset": 44
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "pc": 7950920372,
+          "lr": 6942354624,
+          "sp": 6164608912,
+          "fp": 6164608928,
+          "wait": 0,
+          "continuation": 18446744005183446236,
+          "state": 4,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e96ab4",
+              "unslid": "0x1cb78eab4",
+              "image": "/usr/lib/system/libsystem_kernel.dylib",
+              "nearest_local_symbol": "_os_channel_init_ring",
+              "offset": 2908
+            },
+            {
+              "address": "0x19dcbecc0",
+              "unslid": "0x18f5b6cc0",
+              "image": "/usr/lib/system/libdispatch.dylib",
+              "nearest_local_symbol": "__dispatch_client_callout",
+              "offset": 16
+            }
+          ]
+        }
+      ]
+    },
+    "SpringBoard": {
+      "name": "SpringBoard",
+      "pid": 5,
+      "tick": 12,
+      "slide": 242253824,
+      "main_header": 4309733376,
+      "thread_count": 3,
+      "truncated": false,
+      "threads": [
+        {
+          "index": 0,
+          "pc": 7950863192,
+          "lr": 7950877220,
+          "sp": 6157129264,
+          "fp": 6157129344,
+          "wait": 0,
+          "continuation": 18446744005183365804,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e88b58",
+              "unslid": "0x1cb780b58",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1d9e8c224",
+              "unslid": "0x1cb784224",
+              "image": "/usr/lib/system/libsystem_kernel.dylib",
+              "nearest_local_symbol": "___commpage_gettimeofday_internal",
+              "offset": 13144
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "pc": 7950862568,
+          "lr": 8251417984,
+          "sp": 6157691696,
+          "fp": 6157691728,
+          "wait": 18446744027870699088,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e888e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1ebd2a580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "pc": 7950862568,
+          "lr": 8251417984,
+          "sp": 6158241728,
+          "fp": 6158241760,
+          "wait": 18446744027870751632,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1d9e888e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1ebd2a580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "exits": [
+    {
+      "sequence": 1,
+      "pid": 2,
+      "status": 1,
+      "namespace": 0,
+      "code": 0,
+      "name": "launchd",
+      "detail": {
+        "pc": 0,
+        "lr": 0,
+        "far": 0,
+        "slide": 242253824,
+        "main_header": 0,
+        "esr": 0,
+        "cpsr": 0,
+        "fixups": 0,
+        "reason": "",
+        "frames": [],
+        "resolved": []
+      }
+    }
+  ],
+  "snapshot": {
+    "tick": 12,
+    "stage": 10,
+    "pid": 0,
+    "sequence": 229,
+    "ms": 183444,
+    "pages": {
+      "free": 1810029,
+      "active": 12131,
+      "inactive": 29826,
+      "wired": 89803
+    },
+    "ram_data": {
+      "reads": 69,
+      "writes": 29,
+      "errors": 0
+    },
+    "display": [
+      10,
+      0,
+      6304,
+      6464,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "processes": [
+      {
+        "name": "launchd",
+        "pid": 1,
+        "tick": 12,
+        "slide": 242253824,
+        "main_header": 4304461824,
+        "thread_count": 4,
+        "truncated": true,
+        "threads": [
+          {
+            "index": 0,
+            "pc": 7950862568,
+            "lr": 8251417984,
+            "sp": 6162963264,
+            "fp": 6162963296,
+            "wait": 18446744027867980776,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e888e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1ebd2a580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "pc": 7950862568,
+            "lr": 8251417984,
+            "sp": 6163512128,
+            "fp": 6163512160,
+            "wait": 18446744027867982912,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e888e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1ebd2a580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "pc": 7950881064,
+            "lr": 6942248160,
+            "sp": 6164062096,
+            "fp": 6164062112,
+            "wait": 18446744027867430080,
+            "continuation": 18446744005188260168,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e8d128",
+                "unslid": "0x1cb785128",
+                "image": "/usr/lib/system/libsystem_kernel.dylib",
+                "nearest_local_symbol": "_mach_msg_destroy_port",
+                "offset": 988
+              },
+              {
+                "address": "0x19dca4ce0",
+                "unslid": "0x18f59cce0",
+                "image": "/usr/lib/system/libdispatch.dylib",
+                "nearest_local_symbol": "__dispatch_sigsuspend",
+                "offset": 44
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "pc": 7950920372,
+            "lr": 6942354624,
+            "sp": 6164608912,
+            "fp": 6164608928,
+            "wait": 0,
+            "continuation": 18446744005183446236,
+            "state": 4,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e96ab4",
+                "unslid": "0x1cb78eab4",
+                "image": "/usr/lib/system/libsystem_kernel.dylib",
+                "nearest_local_symbol": "_os_channel_init_ring",
+                "offset": 2908
+              },
+              {
+                "address": "0x19dcbecc0",
+                "unslid": "0x18f5b6cc0",
+                "image": "/usr/lib/system/libdispatch.dylib",
+                "nearest_local_symbol": "__dispatch_client_callout",
+                "offset": 16
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SpringBoard",
+        "pid": 5,
+        "tick": 12,
+        "slide": 242253824,
+        "main_header": 4309733376,
+        "thread_count": 3,
+        "truncated": false,
+        "threads": [
+          {
+            "index": 0,
+            "pc": 7950863192,
+            "lr": 7950877220,
+            "sp": 6157129264,
+            "fp": 6157129344,
+            "wait": 0,
+            "continuation": 18446744005183365804,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e88b58",
+                "unslid": "0x1cb780b58",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1d9e8c224",
+                "unslid": "0x1cb784224",
+                "image": "/usr/lib/system/libsystem_kernel.dylib",
+                "nearest_local_symbol": "___commpage_gettimeofday_internal",
+                "offset": 13144
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "pc": 7950862568,
+            "lr": 8251417984,
+            "sp": 6157691696,
+            "fp": 6157691728,
+            "wait": 18446744027870699088,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e888e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1ebd2a580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "pc": 7950862568,
+            "lr": 8251417984,
+            "sp": 6158241728,
+            "fp": 6158241760,
+            "wait": 18446744027870751632,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1d9e888e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1ebd2a580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "sequence": 1,
+        "pid": 2,
+        "status": 1,
+        "namespace": 0,
+        "code": 0,
+        "name": "launchd",
+        "detail": {
+          "pc": 0,
+          "lr": 0,
+          "far": 0,
+          "slide": 242253824,
+          "main_header": 0,
+          "esr": 0,
+          "cpsr": 0,
+          "fixups": 0,
+          "reason": "",
+          "frames": [],
+          "resolved": []
+        }
+      }
+    ],
+    "configuration": {
+      "dyld_flags": 524297,
+      "owner_dyld_flags": 524296,
+      "fixups_parsed": 3,
+      "fixups_applied": 0,
+      "hold_seconds": 180,
+      "watchdog_mode": 1,
+      "owner_stage": 6,
+      "owner_mount_flags": 343969825
+    },
+    "paths": [
+      {
+        "path": "/usr/lib/libobjc-trampolines.dylib",
+        "errno": 0,
+        "vnode_type": 1
+      },
+      {
+        "path": "/private/preboot/usr/lib/libobjc-trampolines.dylib",
+        "errno": 2,
+        "vnode_type": 0
+      },
+      {
+        "path": "/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
+        "errno": 0,
+        "vnode_type": 1
+      },
+      {
+        "path": "/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
+        "errno": 2,
+        "vnode_type": 0
+      }
+    ]
+  },
+  "kernel_continuations": {
+    "0xfffffff00b8562ac": {
+      "nearest_symbol": "_ipc_mqueue_receive_continue",
+      "offset": 0
+    },
+    "0xfffffff00bcb0abc": {
+      "nearest_symbol": "_workq_unpark_continue",
+      "offset": 0
+    },
+    "0xfffffff00b869cdc": {
+      "nearest_symbol": "_thread_preempted",
+      "offset": 0
+    },
+    "0xfffffff00bd01148": {
+      "nearest_symbol": "__sleep_continue",
+      "offset": 0
+    }
+  },
+  "symbols_uuid_matches": true,
+  "original_inputs_modified": false,
+  "desktop_qualified": false
+}

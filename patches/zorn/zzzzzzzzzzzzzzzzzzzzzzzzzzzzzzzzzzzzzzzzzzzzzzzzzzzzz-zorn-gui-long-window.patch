@@ -1,0 +1,15 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -632,8 +632,11 @@
+ zorn_gui_sample_thread(__unused void *arg, __unused wait_result_t wr)
+ {
+ 	static int channel;
++	unsigned hold = 0, seconds = 15;
++	PE_parse_boot_argn("zorn_gui_hold", &hold, sizeof(hold));
++	if (hold > 180 && hold <= 300) seconds = (hold + 11) / 12;
+ 	for (unsigned sample = 1; sample <= 12; ++sample) {
+-		(void)tsleep(&channel, PZERO, "zorngui", 15 * hz);
++		(void)tsleep(&channel, PZERO, "zorngui", seconds * hz);
+ 		char text[64];
+ 		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/12 ", sample);
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);

@@ -1,0 +1,21 @@
+{
+  "source": "https://github.com/tycykp/UniXNU-OnePlus-Ace5/blob/aaa100d19f6fb14e5897a7e496edf7838d4d4e9f/hardware/ios16-service-repair.json",
+  "sha256": "da5a2e53734ba3464af40b8cd03852901e3d97e5c216f9057852124893604687",
+  "reference_os_build": "20H392",
+  "recorded_wait": {
+    "service": "lsd",
+    "operation": "LaunchServices database seeding / GenerateBuiltInAppInstallSessionID",
+    "waiting_library": "libMobileGestalt",
+    "waiting_provider": "IONetworkController",
+    "missing_fast_path": "IODeviceTree:/chosen mac-address-wifi0",
+    "evidence": "out/ios16/launchservices-trace/usb-sample-1.symbols.txt"
+  },
+  "recorded_first_sample": {
+    "lsd_network_provider_wait_seen": false,
+    "lsd_work": "MIFilesystemScanner scans app directories; LSDeviceIdentifierCache save/fsync",
+    "installcoordinationd": "Waiting for LaunchServices database seeding"
+  },
+  "reference_gui_completed": false,
+  "zorn_same_wait_confirmed": false,
+  "notes": "Reference only; do not copy userdata, migration overrides, partition writes or addresses."
+}

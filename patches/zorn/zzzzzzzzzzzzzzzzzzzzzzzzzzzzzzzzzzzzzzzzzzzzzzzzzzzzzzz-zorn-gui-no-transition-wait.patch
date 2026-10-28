@@ -1,0 +1,21 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -592,6 +592,9 @@
+ 		if (n > 0) zorn_gui_inventory_used += (size_t)n;
+ 	}
+ 	if (!zorn_gui_sample_wanted(p, NULL)) return PROC_RETURNED;
++	/* Diagnostic snapshots do not wait for an exec/exit transition. The
++	 * proc_iterate reference keeps this coallocated proc/task storage alive. */
++	if (p->p_lflag & P_LINTRANSIT) return PROC_RETURNED;
+ 	zorn_ufs_gui_stage(0, 2, proc_getpid(p));
+ 	char name[MAXCOMLEN + 1] = {0};
+ 	proc_name(proc_getpid(p), name, sizeof(name));
+@@ -641,7 +644,7 @@
+ 		if (sample == 1) zorn_gui_library_paths();
+ 		zorn_gui_inventory_used = 0;
+ 		zorn_gui_inventory_count = 0;
+-		proc_iterate(PROC_ALLPROCLIST, zorn_gui_sample_proc, NULL,
++		proc_iterate(PROC_ALLPROCLIST | PROC_NOWAITTRANS, zorn_gui_sample_proc, NULL,
+ 		    NULL, NULL);
+ 		zorn_ufs_gui_stage(sample, 10, 0);
+ 		for (size_t pos = 0; pos < zorn_gui_inventory_used; pos += 220) {

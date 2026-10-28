@@ -1,0 +1,37 @@
+{
+  "negative_profile_guards": [
+    {
+      "command": [
+        "python3",
+        "UniXNU-zorn/scripts/build-zorn-debug.py",
+        "--gui-watch"
+      ],
+      "returncode": 2,
+      "rejected_before_build": true
+    },
+    {
+      "command": [
+        "python3",
+        "uefi-zorn/scripts/make-zorn-payload.py",
+        "--gui-watch"
+      ],
+      "returncode": 2,
+      "rejected_before_build": true
+    }
+  ],
+  "observer_period_seconds": 15,
+  "observer_max_ticks": 12,
+  "user_threads_per_task_cap": 4,
+  "user_frames_per_thread_cap": 2,
+  "timer_pets_watchdog": false,
+  "captures": [
+    "launchd",
+    "SpringBoard",
+    "backboardd"
+  ],
+  "source": {
+    "bsd/kern/bsd_init.c": "4395238e37f9fc767f37024f411a27825cb9a18fc42ee9bc58b9fc6f658f5b2a",
+    "bsd/kern/kern_exit.c": "21aa2cde375ecf08b4507a6a98cff8b243a7656dd3067fd2167e643ff4008b54",
+    "osfmk/kern/exception.c": "cc08dbb661c1bc0730d4746010eb529d6716e3e9e01418550cad8fac99fb2778"
+  }
+}

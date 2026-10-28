@@ -1,0 +1,29 @@
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -110,7 +110,8 @@
+ #include <arm/machine_routines.h>
+ 
+ /* No task/thread lock is held. On the sole initialized CPU, disabling
+- * preemption keeps a referenced, non-running target's wired stack stable.
++ * preemption keeps a referenced, non-current target's wired stack stable.
++ * Runnable targets require a separate explicit diagnostic boot argument.
+  * No waits, suspension, filesystem I/O or persistent logging occur here. */
+ #include <sys/zorn_gui_log.h>
+ static __attribute__((noinline)) int
+@@ -119,11 +120,15 @@
+     struct ZornGuiUserStack stack = {.pid = (uint32_t)pid};
+     kern_return_t error = KERN_FAILURE;
+     bool user_preferred = false;
++    unsigned runnable = 0;
++    PE_parse_boot_argn("zorn_gui_krun", &runnable, sizeof(runnable));
+     disable_preemption();
+     if (processor_count != 1) {
+         error = KERN_NOT_SUPPORTED;
+     } else if (target != THREAD_NULL && target != current_thread() &&
+-        (target->state & TH_WAIT) && !(target->state & (TH_RUN | TH_TERMINATE))) {
++        !(target->state & TH_TERMINATE) &&
++        (((target->state & TH_WAIT) && !(target->state & TH_RUN)) ||
++         (runnable == 1 && (target->state & TH_RUN)))) {
+         if (target->continuation != NULL) {
+             /* The continuation is already in the process record. Preserve
+              * the deeper user call chain instead of duplicating one PC. */

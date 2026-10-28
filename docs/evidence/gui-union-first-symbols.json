@@ -1,0 +1,548 @@
+{
+  "run": "20261027-193226-98b33744",
+  "boot_sha256": "98b33744e2d5cdad961731cadc23b16f36b1a12893629dc848bc4caa1e7ddd6e",
+  "kernel_sha256": "fdd0f2d8537e48e60bb5145b54d47f4c8d442f4ab7abc7c66b1d08447c55e1e8",
+  "samples": {
+    "launchd": {
+      "name": "launchd",
+      "pid": 1,
+      "tick": 8,
+      "slide": 380190720,
+      "main_header": 4312428544,
+      "thread_count": 4,
+      "truncated": true,
+      "threads": [
+        {
+          "index": 0,
+          "pc": 8088799464,
+          "lr": 8389354880,
+          "sp": 6155545392,
+          "fp": 6155545424,
+          "wait": 18446744028747486008,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1e22148e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1f40b6580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "pc": 8088817960,
+          "lr": 7080185056,
+          "sp": 6156095376,
+          "fp": 6156095392,
+          "wait": 0,
+          "continuation": 18446744005188259564,
+          "state": 4,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1e2219128",
+              "unslid": "0x1cb785128",
+              "image": "/usr/lib/system/libsystem_kernel.dylib",
+              "nearest_local_symbol": "_mach_msg_destroy_port",
+              "offset": 988
+            },
+            {
+              "address": "0x1a6030ce0",
+              "unslid": "0x18f59cce0",
+              "image": "/usr/lib/system/libdispatch.dylib",
+              "nearest_local_symbol": "__dispatch_sigsuspend",
+              "offset": 44
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "pc": 8088799464,
+          "lr": 8389354880,
+          "sp": 6154996416,
+          "fp": 6154996448,
+          "wait": 18446744028747496688,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1e22148e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1f40b6580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "pc": 8088817568,
+          "lr": 4312485004,
+          "sp": 6156638704,
+          "fp": 6156638736,
+          "wait": 0,
+          "continuation": 0,
+          "state": 4,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1e2218fa0",
+              "unslid": "0x1cb784fa0",
+              "image": "/usr/lib/system/libsystem_kernel.dylib",
+              "nearest_local_symbol": "_mach_msg_destroy_port",
+              "offset": 596
+            }
+          ]
+        }
+      ]
+    },
+    "SpringBoard": {
+      "name": "SpringBoard",
+      "pid": 72,
+      "tick": 8,
+      "slide": 380190720,
+      "main_header": 4299427840,
+      "thread_count": 2,
+      "truncated": false,
+      "threads": [
+        {
+          "index": 0,
+          "pc": 8088800088,
+          "lr": 8088814116,
+          "sp": 6167434800,
+          "fp": 6167434880,
+          "wait": 0,
+          "continuation": 18446744005183365804,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1e2214b58",
+              "unslid": "0x1cb780b58",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1e2218224",
+              "unslid": "0x1cb784224",
+              "image": "/usr/lib/system/libsystem_kernel.dylib",
+              "nearest_local_symbol": "___commpage_gettimeofday_internal",
+              "offset": 13144
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "pc": 8088799464,
+          "lr": 8389354880,
+          "sp": 6168546096,
+          "fp": 6168546128,
+          "wait": 18446744028751588240,
+          "continuation": 18446744005187930812,
+          "state": 1,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1e22148e8",
+              "unslid": "0x1cb7808e8",
+              "image": "/usr/lib/system/libsystem_kernel.dylib"
+            },
+            {
+              "address": "0x1f40b6580",
+              "unslid": "0x1dd622580",
+              "image": "/usr/lib/system/libsystem_pthread.dylib",
+              "nearest_local_symbol": "___pthread_once_handler",
+              "offset": 1560
+            }
+          ]
+        }
+      ]
+    },
+    "backboardd": {
+      "name": "backboardd",
+      "pid": 37,
+      "tick": 8,
+      "slide": 380190720,
+      "main_header": 4298199040,
+      "thread_count": 1,
+      "truncated": false,
+      "threads": [
+        {
+          "index": 0,
+          "pc": 8388450016,
+          "lr": 7514952216,
+          "sp": 6168670496,
+          "fp": 6168670656,
+          "wait": 0,
+          "continuation": 18446744005183446236,
+          "state": 4,
+          "frames": [],
+          "resolved": [
+            {
+              "address": "0x1f3fd96e0",
+              "unslid": "0x1dd5456e0",
+              "image": "/usr/lib/libc++abi.dylib",
+              "nearest_local_symbol": "__GLOBAL__sub_I_stdlib_typed_new.cpp",
+              "offset": 164
+            },
+            {
+              "address": "0x1bfed1218",
+              "unslid": "0x1a943d218",
+              "image": "/usr/lib/dyld",
+              "nearest_local_symbol": "____ZZNK5dyld46Loader25findAndRunAllInitializersERNS_12RuntimeStateEENK3$_0clEv_block_invoke",
+              "offset": 152
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "exits": [
+    {
+      "sequence": 1,
+      "pid": 2,
+      "status": 1,
+      "namespace": 0,
+      "code": 0,
+      "name": "launchd"
+    },
+    {
+      "sequence": 2,
+      "pid": 5,
+      "status": 11,
+      "namespace": 2,
+      "code": 11,
+      "name": "SpringBoard"
+    },
+    {
+      "sequence": 3,
+      "pid": 37,
+      "status": 5,
+      "namespace": 2,
+      "code": 5,
+      "name": "backboardd"
+    }
+  ],
+  "snapshot": {
+    "tick": 8,
+    "stage": 11,
+    "pid": 0,
+    "sequence": 141,
+    "ms": 129295,
+    "pages": {
+      "free": 1753764,
+      "active": 22667,
+      "inactive": 37535,
+      "wired": 91816
+    },
+    "ram_data": {
+      "reads": 71,
+      "writes": 125,
+      "errors": 0
+    },
+    "display": [
+      10,
+      0,
+      6304,
+      6464,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "processes": [
+      {
+        "name": "launchd",
+        "pid": 1,
+        "tick": 8,
+        "slide": 380190720,
+        "main_header": 4312428544,
+        "thread_count": 4,
+        "truncated": true,
+        "threads": [
+          {
+            "index": 0,
+            "pc": 8088799464,
+            "lr": 8389354880,
+            "sp": 6155545392,
+            "fp": 6155545424,
+            "wait": 18446744028747486008,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1e22148e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1f40b6580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "pc": 8088817960,
+            "lr": 7080185056,
+            "sp": 6156095376,
+            "fp": 6156095392,
+            "wait": 0,
+            "continuation": 18446744005188259564,
+            "state": 4,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1e2219128",
+                "unslid": "0x1cb785128",
+                "image": "/usr/lib/system/libsystem_kernel.dylib",
+                "nearest_local_symbol": "_mach_msg_destroy_port",
+                "offset": 988
+              },
+              {
+                "address": "0x1a6030ce0",
+                "unslid": "0x18f59cce0",
+                "image": "/usr/lib/system/libdispatch.dylib",
+                "nearest_local_symbol": "__dispatch_sigsuspend",
+                "offset": 44
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "pc": 8088799464,
+            "lr": 8389354880,
+            "sp": 6154996416,
+            "fp": 6154996448,
+            "wait": 18446744028747496688,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1e22148e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1f40b6580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "pc": 8088817568,
+            "lr": 4312485004,
+            "sp": 6156638704,
+            "fp": 6156638736,
+            "wait": 0,
+            "continuation": 0,
+            "state": 4,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1e2218fa0",
+                "unslid": "0x1cb784fa0",
+                "image": "/usr/lib/system/libsystem_kernel.dylib",
+                "nearest_local_symbol": "_mach_msg_destroy_port",
+                "offset": 596
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SpringBoard",
+        "pid": 72,
+        "tick": 8,
+        "slide": 380190720,
+        "main_header": 4299427840,
+        "thread_count": 2,
+        "truncated": false,
+        "threads": [
+          {
+            "index": 0,
+            "pc": 8088800088,
+            "lr": 8088814116,
+            "sp": 6167434800,
+            "fp": 6167434880,
+            "wait": 0,
+            "continuation": 18446744005183365804,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1e2214b58",
+                "unslid": "0x1cb780b58",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1e2218224",
+                "unslid": "0x1cb784224",
+                "image": "/usr/lib/system/libsystem_kernel.dylib",
+                "nearest_local_symbol": "___commpage_gettimeofday_internal",
+                "offset": 13144
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "pc": 8088799464,
+            "lr": 8389354880,
+            "sp": 6168546096,
+            "fp": 6168546128,
+            "wait": 18446744028751588240,
+            "continuation": 18446744005187930812,
+            "state": 1,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1e22148e8",
+                "unslid": "0x1cb7808e8",
+                "image": "/usr/lib/system/libsystem_kernel.dylib"
+              },
+              {
+                "address": "0x1f40b6580",
+                "unslid": "0x1dd622580",
+                "image": "/usr/lib/system/libsystem_pthread.dylib",
+                "nearest_local_symbol": "___pthread_once_handler",
+                "offset": 1560
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "backboardd",
+        "pid": 37,
+        "tick": 8,
+        "slide": 380190720,
+        "main_header": 4298199040,
+        "thread_count": 1,
+        "truncated": false,
+        "threads": [
+          {
+            "index": 0,
+            "pc": 8388450016,
+            "lr": 7514952216,
+            "sp": 6168670496,
+            "fp": 6168670656,
+            "wait": 0,
+            "continuation": 18446744005183446236,
+            "state": 4,
+            "frames": [],
+            "resolved": [
+              {
+                "address": "0x1f3fd96e0",
+                "unslid": "0x1dd5456e0",
+                "image": "/usr/lib/libc++abi.dylib",
+                "nearest_local_symbol": "__GLOBAL__sub_I_stdlib_typed_new.cpp",
+                "offset": 164
+              },
+              {
+                "address": "0x1bfed1218",
+                "unslid": "0x1a943d218",
+                "image": "/usr/lib/dyld",
+                "nearest_local_symbol": "____ZZNK5dyld46Loader25findAndRunAllInitializersERNS_12RuntimeStateEENK3$_0clEv_block_invoke",
+                "offset": 152
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "sequence": 1,
+        "pid": 2,
+        "status": 1,
+        "namespace": 0,
+        "code": 0,
+        "name": "launchd"
+      },
+      {
+        "sequence": 2,
+        "pid": 5,
+        "status": 11,
+        "namespace": 2,
+        "code": 11,
+        "name": "SpringBoard"
+      },
+      {
+        "sequence": 3,
+        "pid": 37,
+        "status": 5,
+        "namespace": 2,
+        "code": 5,
+        "name": "backboardd"
+      }
+    ]
+  },
+  "kernel_continuations": {
+    "0xfffffff00b869cdc": {
+      "nearest_symbol": "_thread_preempted",
+      "offset": 0
+    },
+    "0xfffffff00bcb0abc": {
+      "nearest_symbol": "_workq_unpark_continue",
+      "offset": 0
+    },
+    "0xfffffff00b8562ac": {
+      "nearest_symbol": "_ipc_mqueue_receive_continue",
+      "offset": 0
+    },
+    "0xfffffff00bd00eec": {
+      "nearest_symbol": "__sleep_continue",
+      "offset": 0
+    }
+  },
+  "symbols_uuid_matches": true,
+  "original_inputs_modified": false,
+  "desktop_qualified": false
+}

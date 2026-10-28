@@ -1,0 +1,20 @@
+--- a/scripts/build-xnu-4k-baseline.sh
++++ b/scripts/build-xnu-4k-baseline.sh
+@@ -285,7 +285,16 @@
+   echo 'XNU_OWNER_ROOT_TRUST must be 0 or 1' >&2
+   exit 1
+ fi
+-if [ "$OWNER_ROOT_TRUST" = 1 ] && { [ "$OWNER_ROOT_AUDIT" != 1 ] || [ "${XNU_NATIVE_VIRTIO_BLOCK:-0}" != 1 ]; }; then
++ZORN_VERIFIED_ROOT=${XNU_ZORN_VERIFIED_ROOT:-0}
++if [ "$ZORN_VERIFIED_ROOT" != 0 ] && [ "$ZORN_VERIFIED_ROOT" != 1 ]; then
++  echo 'XNU_ZORN_VERIFIED_ROOT must be 0 or 1' >&2
++  exit 1
++fi
++# zorn supplies the same typed owner queries using its real readonly mdev/UFS
++# provider, signed block policies and APFS-reported mounted UUIDs. It does not
++# publish a fictitious Virtio device merely to satisfy this build dependency.
++if [ "$OWNER_ROOT_TRUST" = 1 ] && { [ "$OWNER_ROOT_AUDIT" != 1 ] || \
++  { [ "${XNU_NATIVE_VIRTIO_BLOCK:-0}" != 1 ] && [ "$ZORN_VERIFIED_ROOT" != 1 ]; }; }; then
+   echo 'Owner root acceptance requires actual mounted-media binding and verified block storage' >&2
+   exit 1
+ fi

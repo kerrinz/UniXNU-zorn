@@ -1,0 +1,87 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -566,8 +566,8 @@
+ 
+ #if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
+ #include <sys/zorn_gui_log.h>
+-/* zorn: passive, bounded GUI task observations, following houji's sampler.
+- * No observer tick pets the watchdog or changes a process's execution. */
++/* zorn: bounded GUI observations. Only an explicitly selected absolute
++ * observation window permits scheduled observer watchdog pets. */
+ extern void zorn_gui_sample_task(const char *, int, task_t);
+ extern void zorn_ufs_runtime_snapshot(void);
+ extern void zorn_ufs_user_output(unsigned, const char *, size_t);
+@@ -597,6 +597,28 @@
+ }
+ 
+ static void
++zorn_gui_library_paths(void)
++{
++	static const char *paths[] = {
++		"/usr/lib/libobjc-trampolines.dylib",
++		"/private/preboot/usr/lib/libobjc-trampolines.dylib",
++		"/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
++		"/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
++	};
++	uint32_t results[8];
++	for (unsigned i = 0; i < 8; ++i) results[i] = UINT32_MAX;
++	zorn_ufs_gui_paths(results);
++	for (unsigned i = 0; i < 4; ++i) {
++		vnode_t vp = NULLVP;
++		int error = vnode_lookup(paths[i], 0, &vp, vfs_context_current());
++		results[2 * i] = (uint32_t)error;
++		results[2 * i + 1] = error ? 0 : (uint32_t)vnode_vtype(vp);
++		if (!error) vnode_put(vp);
++		zorn_ufs_gui_paths(results);
++	}
++}
++
++static void
+ zorn_gui_sample_thread(__unused void *arg, __unused wait_result_t wr)
+ {
+ 	static int channel;
+@@ -606,6 +628,7 @@
+ 		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/12 ", sample);
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);
+ 		zorn_ufs_gui_stage(sample, 1, 0);
++		if (sample == 1) zorn_gui_library_paths();
+ 		proc_iterate(PROC_ALLPROCLIST, zorn_gui_sample_proc, NULL,
+ 		    zorn_gui_sample_wanted, NULL);
+ 		zorn_ufs_gui_stage(sample, 10, 0);
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -4,7 +4,7 @@
+ #define ZORN_GUI_LOG_H
+ #include <sys/types.h>
+ 
+-#define ZORN_GUI_LOG_SLOTS 180
++#define ZORN_GUI_LOG_SLOTS 172
+ #define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
+ 
+ struct ZornGuiThread {
+@@ -39,18 +39,23 @@
+     struct ZornGuiProcess processes[3];
+     struct ZornGuiExitRecord exits[4];
+     struct ZornGuiExitDetail exitDetails[4];
++    // Actual kernel values, independent of potentially wrapped console text.
++    uint64_t configuration[8];
++    // Four fixed library/cache paths: errno and vnode type for each.
++    uint32_t paths[8];
+ };
+ 
+ #ifdef __cplusplus
+ static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
+-static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiFooter) == 1920, "GUI footer ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiFooter) == 2016, "GUI footer ABI");
+ extern "C" {
+ #else
+ _Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
+-_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiFooter) == 1920, "GUI footer ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiFooter) == 2016, "GUI footer ABI");
+ #endif
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
++void zorn_ufs_gui_paths(const uint32_t paths[8]);
+ struct task;
+ void zorn_gui_exit_regs(struct task *task, struct ZornGuiExitDetail *detail);
+ int zorn_ufs_gui_enabled(void);

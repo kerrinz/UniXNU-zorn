@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":20,"stage":10,"pid":0,"sequence":541,"ms":308799,"pages":{"free":1698814,"active":36750,"inactive":38279,"wired":95149},"ram_data":{"reads":73,"writes":359,"errors":0},"display":[10,0,6304,6464,1,1,1,0,3,0,76,0,18446744029085592576,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":20,"slide":433373184,"main_header":4310269952,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8141981928,"lr":8442537344,"sp":6157155136,"fp":6157155168,"wait":18446744025225947872,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":1,"pc":8141981928,"lr":8442537344,"sp":6157703696,"fp":6157703728,"wait":0,"continuation":18446744005187930812,"state":4,"frames":[]},{"index":2,"pc":8142000424,"lr":7133367520,"sp":6158253968,"fp":6158253984,"wait":0,"continuation":18446744005188260432,"state":4,"frames":[]},{"index":3,"pc":8141981928,"lr":8442537344,"sp":6158801712,"fp":6158801744,"wait":18446744025225971368,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"SpringBoard","pid":5,"tick":20,"slide":433373184,"main_header":4304928768,"thread_count":3,"truncated":false,"threads":[{"index":0,"pc":8141982552,"lr":8141996580,"sp":6161951648,"fp":6161951728,"wait":0,"continuation":18446744005183365976,"state":1,"frames":[]},{"index":1,"pc":8141981928,"lr":8442537344,"sp":6163045168,"fp":6163045200,"wait":18446744025226584712,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":8141981928,"lr":8442537344,"sp":6164142896,"fp":6164142928,"wait":18446744025245645712,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"backboardd","pid":37,"tick":20,"slide":433373184,"main_header":4299071488,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8142005140,"lr":7133694868,"sp":6167810992,"fp":6167811040,"wait":0,"continuation":18446744005183777052,"state":4,"frames":[]},{"index":1,"pc":8141981928,"lr":8442537344,"sp":6168353072,"fp":6168353104,"wait":18446744025245652120,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":7277997428,"lr":7133469852,"sp":6168901792,"fp":6168901808,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":3,"pc":8141981928,"lr":8442537344,"sp":6169451328,"fp":6169451360,"wait":0,"continuation":18446744005187930812,"state":4,"frames":[]}]}],"exits":[{"sequence":1,"pid":2,"status":1,"namespace":0,"code":0,"name":"launchd","detail":{"pc":0,"lr":0,"far":0,"slide":433373184,"main_header":0,"esr":0,"cpsr":0,"fixups":0,"reason":"","frames":[]}}],"configuration":{"dyld_flags":9,"owner_dyld_flags":8,"fixups_parsed":3,"fixups_applied":0,"hold_seconds":300,"watchdog_mode":1,"owner_stage":6,"owner_mount_flags":343969825},"paths":[{"path":"/usr/lib/libobjc-trampolines.dylib","errno":0,"vnode_type":1},{"path":"/private/preboot/usr/lib/libobjc-trampolines.dylib","errno":2,"vnode_type":0},{"path":"/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":0,"vnode_type":1},{"path":"/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":2,"vnode_type":0}],"ipc_attempts":[{"sequence":1793,"name":"launchd","pid":1,"message":536870912,"receiver_pid":72,"bits":2147483666,"receiver_name":"siriactionsd"},{"sequence":1791,"name":"launchd","pid":1,"message":536870912,"receiver_pid":37,"bits":18,"receiver_name":"backboardd"},{"sequence":1641,"name":"SpringBoard","pid":5,"message":536870912,"receiver_pid":101,"bits":18,"receiver_name":"bluetoothd"},{"sequence":1642,"name":"SpringBoard","pid":5,"message":69,"receiver_pid":101,"bits":2147483666,"receiver_name":""},{"sequence":1796,"name":"backboardd","pid":37,"message":2881,"receiver_pid":-1,"bits":4625,"receiver_name":""},{"sequence":1795,"name":"backboardd","pid":37,"message":1073742628,"receiver_pid":1,"bits":1118737,"receiver_name":"launchd"}],"iokit_queries":[{"sequence":61,"name":"backboardd","pid":37,"status":0,"iterator_present":false,"provider_class":"IOAcceleratorES"}],"keystore":{"stage":3,"status":0,"opens":15,"calls":43,"refused":0,"last_selector":7,"last_result":0}}
+136 checkpoints; showing last 100
+036 accepted=0 
+037 rejected=0 
+038 transfers=0
+039  status=000
+040 00000 bytes
+041 =0 pixels=0
+042  
+043 USREND
+044 UCON
+045 TIM0004B557
+046 UFD00000000
+047 USRBEGIN
+048 GUI EXIT #1
+049  launchd[2]
+050  status=1 n
+051 amespace=0 
+052 code=0 
+053 USREND
+054 UCON
+055 TIM0004B576
+056 UFD00000000
+057 USRBEGIN
+058 IPC_ATTEMPT
+059  #1793 laun
+060 chd[1] msg=
+061 536870912 r
+062 eceiver=72 
+063 bits=800000
+064 12 
+065 USREND
+066 UCON
+067 TIM0004B594
+068 UFD00000000
+069 USRBEGIN
+070 IPC_ATTEMPT
+071  #1791 laun
+072 chd[1] msg=
+073 536870912 r
+074 eceiver=37 
+075 bits=12 
+076 USREND
+077 UCON
+078 TIM0004B5B2
+079 UFD00000000
+080 USRBEGIN
+081 IPC_ATTEMPT
+082  #1641 Spri
+083 ngBoard[5] 
+084 msg=5368709
+085 12 receiver
+086 =101 bits=1
+087 2 
+088 USREND
+089 UCON
+090 TIM0004B5D0
+091 UFD00000000
+092 USRBEGIN
+093 IPC_ATTEMPT
+094  #1642 Spri
+095 ngBoard[5] 
+096 msg=69 rece
+097 iver=101 bi
+098 ts=80000012
+099  
+100 USREND
+101 UCON
+102 TIM0004B5EE
+103 UFD00000000
+104 USRBEGIN
+105 IPC_ATTEMPT
+106  #1796 back
+107 boardd[37] 
+108 msg=2881 re
+109 ceiver=-1 b
+110 its=1211 
+111 USREND
+112 UCON
+113 TIM0004B60D
+114 UFD00000000
+115 USRBEGIN
+116 IPC_ATTEMPT
+117  #1795 back
+118 boardd[37] 
+119 msg=1073742
+120 628 receive
+121 r=1 bits=11
+122 1211 
+123 USREND
+124 UCON
+125 TIM0004B62B
+126 UFD00000000
+127 USRBEGIN
+128 AKS stage=3
+129  status=0 o
+130 pens=15 cal
+131 ls=43 refus
+132 ed=0 last=7
+133  result=0 
+134 USREND
+135 UCON
+user output: MEM ms=308477 free=1698814 active=36750 inactive=38279 wired=95149 pages fixups=0 parsed=3 hold=300 RAMDATA reads=73 writes=359 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=3 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 IPC_ATTEMPT #1793 launchd[1] msg=536870912 receiver=72 bits=80000012 IPC_ATTEMPT #1791 launchd[1] msg=536870912 receiver=37 bits=12 IPC_ATTEMPT #1641 SpringBoard[5] msg=536870912 receiver=101 bits=12 IPC_ATTEMPT #1642 SpringBoard[5] msg=69 receiver=101 bits=80000012 IPC_ATTEMPT #1796 backboardd[37] msg=2881 receiver=-1 bits=1211 IPC_ATTEMPT #1795 backboardd[37] msg=1073742628 receiver=1 bits=111211 AKS stage=3 status=0 opens=15 calls=43 refused=0 last=7 result=0 

@@ -1,0 +1,20 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -611,6 +611,7 @@
+ 		zorn_ufs_gui_stage(sample, 10, 0);
+ 		zorn_ufs_runtime_snapshot();
+ 		zorn_ufs_gui_stage(sample, 11, 0);
++		zorn_ufs_gui_hold_tick();
+ 	}
+ 	zorn_ufs_gui_stage(12, 12, 0);
+ 	thread_terminate(current_thread());
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -54,6 +54,7 @@
+ struct task;
+ void zorn_gui_exit_regs(struct task *task, struct ZornGuiExitDetail *detail);
+ int zorn_ufs_gui_enabled(void);
++void zorn_ufs_gui_hold_tick(void);
+ void zorn_ufs_exit_report(int pid, const char *name, int status, uint32_t reasonNamespace,
+                         uint64_t reasonCode, const struct ZornGuiExitDetail *detail);
+ #ifdef __cplusplus

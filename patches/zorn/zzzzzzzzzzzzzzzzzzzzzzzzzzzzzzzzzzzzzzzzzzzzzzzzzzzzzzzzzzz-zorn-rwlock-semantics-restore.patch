@@ -1,0 +1,302 @@
+--- a/osfmk/kern/lock_rw.c
++++ b/osfmk/kern/lock_rw.c
+@@ -186,28 +186,6 @@
+ 		.lck_rw_priv_excl = !(attr->lck_attr_val & LCK_ATTR_RW_SHARED_PRIORITY),
+ 	};
+ 	lck_grp_reference(grp, &grp->lck_grp_rwcnt);
+-}
+-
+-/*
+- * Same initial lock word as lck_rw_init(), without the group reference.
+- * That reference is an ldxr/stxr increment, and it does not finish while
+- * the user pmap is being created.
+- */
+-void
+-lck_rw_init_noref(
+-	lck_rw_t        *lck,
+-	lck_attr_t      *attr)
+-{
+-	lck_type_t type = LCK_TYPE_RW;
+-
+-	if (attr == LCK_ATTR_NULL) {
+-		attr = &lck_attr_default;
+-	}
+-	*lck = (lck_rw_t){
+-		.lck_rw_type = type,
+-		.lck_rw_can_sleep = true,
+-		.lck_rw_priv_excl = !(attr->lck_attr_val & LCK_ATTR_RW_SHARED_PRIORITY),
+-	};
+ }
+ 
+ /*!
+@@ -768,19 +746,10 @@
+ 	lck_rw_t        *lock)
+ {
+ 	uint32_t        data, prev;
+-	int             spins = 0;
+-	extern volatile int zorn_read_trace;
+-	extern void zorn_say(const char *);
+ 
+ 	for (;;) {
+ 		data = atomic_exchange_begin32(&lock->lck_rw_data, &prev, memory_order_relaxed);
+ 		if (data & LCK_RW_INTERLOCK) {
+-			if (zorn_read_trace && ++spins > 8) {
+-				atomic_exchange_abort();
+-				*(volatile uint32_t *)&lock->lck_rw_data = data & ~LCK_RW_INTERLOCK;
+-				zorn_say("LRIN");
+-				return;
+-			}
+ #if __x86_64__
+ 			cpu_pause();
+ #else
+@@ -1154,11 +1123,9 @@
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	}
+-	/*
+-	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
+-	 * get_preemption_level() is still 0 here. Take the lock anyway.
+-	 */
++	} else if (get_preemption_level() == 0) {
++		panic("Taking non-sleepable RW lock with preemption enabled");
++	}
+ 
+ 	if (LCK_RW_LOCK_EXCLUSIVE_TAS(lock)) {
+ #if     CONFIG_DTRACE
+@@ -1190,21 +1157,22 @@
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	}
+-	/*
+-	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
+-	 * get_preemption_level() is still 0 here. Take the lock anyway.
+-	 */
++	} else if (get_preemption_level() == 0) {
++		panic("Taking non-sleepable RW lock with preemption enabled");
++	}
+ 
+ 	if (LCK_RW_LOCK_EXCLUSIVE_TAS(lock)) {
+ #if     CONFIG_DTRACE
+ 		LOCKSTAT_RECORD(LS_LCK_RW_LOCK_EXCL_ACQUIRE, lock, DTRACE_RW_EXCL);
+ #endif  /* CONFIG_DTRACE */
+-	} else if (!lck_rw_lock_exclusive_gen(lock, NULL)) {
++	} else if (!lck_rw_lock_exclusive_gen(lock, lock_pause)) {
+ 		/*
+-		 * zorn: do not bail out on AST_URGENT. shared_b panics at
+-		 * P0798420C when the pause returns and can_sleep is still set.
++		 * lck_rw_lock_exclusive_gen() should only return
++		 * early if lock_pause has been passed and
++		 * returns FALSE. lock_pause is exclusive with
++		 * lck_rw_can_sleep().
+ 		 */
++		assert(!lock->lck_rw_can_sleep);
+ 		return FALSE;
+ 	}
+ 
+@@ -1246,32 +1214,7 @@
+ lck_rw_lock_exclusive(
+ 	lck_rw_t        *lock)
+ {
+-	extern volatile int zorn_read_trace;
+-	extern void zorn_say(const char *);
+-
+-	if (zorn_read_trace) {
+-		zorn_say("LRDE");
+-	}
+ 	(void) lck_rw_lock_exclusive_internal_inline(lock, __builtin_return_address(0), NULL);
+-	if (zorn_read_trace) {
+-		extern volatile int zorn_read_irqs_on;
+-		unsigned long long caller;
+-		char word[10];
+-		static const char hex[] = "0123456789ABCDEF";
+-		int i;
+-
+-		zorn_say("LRDK");
+-		zorn_say("LROK");
+-		caller = (unsigned long long)__builtin_return_address(0);
+-		word[0] = 'C';
+-		for (i = 8; i >= 1; i--) {
+-			word[i] = hex[caller & 0xfull];
+-			caller >>= 4;
+-		}
+-		word[9] = '\0';
+-		zorn_read_irqs_on = 1;
+-		zorn_say(word);
+-	}
+ }
+ 
+ /*!
+@@ -1300,11 +1243,7 @@
+ 	lck_rw_t        *lock,
+ 	bool            (^lock_pause)(void))
+ {
+-	/*
+-	 * A bitfield store here compiled to a halfword write that put the
+-	 * original can_sleep bit back. One volatile word store only.
+-	 */
+-	*(volatile uint32_t *)&lock->lck_rw_data &= ~(1U << LCK_RW_CAN_SLEEP_BIT);
++	assert(!lock->lck_rw_can_sleep);
+ 
+ 	return lck_rw_lock_exclusive_internal_inline(lock, __builtin_return_address(0), lock_pause);
+ }
+@@ -1457,21 +1396,22 @@
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	}
+-	/*
+-	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
+-	 * get_preemption_level() is still 0 here. Take the lock anyway.
+-	 */
++	} else if (get_preemption_level() == 0) {
++		panic("Taking non-sleepable RW lock with preemption enabled");
++	}
+ 
+ 	for (;;) {
+ 		data = atomic_exchange_begin32(&lock->lck_rw_data, &prev, memory_order_acquire_smp);
+ 		if (data & (LCK_RW_WANT_EXCL | LCK_RW_WANT_UPGRADE | LCK_RW_INTERLOCK)) {
+ 			atomic_exchange_abort();
+-			if (!lck_rw_lock_shared_gen(lock, NULL)) {
++			if (!lck_rw_lock_shared_gen(lock, lock_pause)) {
+ 				/*
+-				 * zorn: P0798420C is this assert. The pause bails
+-				 * out while can_sleep is set. Spin instead.
++				 * lck_rw_lock_shared_gen() should only return
++				 * early if lock_pause has been passed and
++				 * returns FALSE. lock_pause is exclusive with
++				 * lck_rw_can_sleep().
+ 				 */
++				assert(!lock->lck_rw_can_sleep);
+ 				return FALSE;
+ 			}
+ 
+@@ -1549,16 +1489,7 @@
+ lck_rw_lock_shared(
+ 	lck_rw_t        *lock)
+ {
+-	extern volatile int zorn_read_trace;
+-	extern void zorn_say(const char *);
+-
+-	if (zorn_read_trace) {
+-		zorn_say("LRDS");
+-	}
+ 	(void) lck_rw_lock_shared_internal_inline(lock, __builtin_return_address(0), NULL);
+-	if (zorn_read_trace) {
+-		zorn_say("LRSH");
+-	}
+ }
+ 
+ /*!
+@@ -1587,11 +1518,7 @@
+ 	lck_rw_t        *lock,
+ 	bool            (^lock_pause)(void))
+ {
+-	/*
+-	 * A bitfield store here compiled to a halfword write that put the
+-	 * original can_sleep bit back. One volatile word store only.
+-	 */
+-	*(volatile uint32_t *)&lock->lck_rw_data &= ~(1U << LCK_RW_CAN_SLEEP_BIT);
++	assert(!lock->lck_rw_can_sleep);
+ 
+ 	return lck_rw_lock_shared_internal_inline(lock, __builtin_return_address(0), lock_pause);
+ }
+@@ -2016,11 +1943,9 @@
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	}
+-	/*
+-	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
+-	 * get_preemption_level() is still 0 here. Take the lock anyway.
+-	 */
++	} else if (get_preemption_level() == 0) {
++		panic("Taking non-sleepable RW lock with preemption enabled");
++	}
+ 
+ #if     CONFIG_DTRACE
+ 	LOCKSTAT_RECORD(LS_LCK_RW_TRY_LOCK_SHARED_ACQUIRE, lock, DTRACE_RW_SHARED);
+@@ -2092,11 +2017,9 @@
+ 
+ 	if (lock->lck_rw_can_sleep) {
+ 		lck_rw_lock_count_inc(thread, lock);
+-	}
+-	/*
+-	 * zorn: P079841CC. pmap shared locks are non-sleepable, and
+-	 * get_preemption_level() is still 0 here. Take the lock anyway.
+-	 */
++	} else if (get_preemption_level() == 0) {
++		panic("Taking non-sleepable RW lock with preemption enabled");
++	}
+ 
+ 	assertf(lock->lck_rw_owner == 0, "state=0x%x, owner=%p",
+ 	    ordered_load_rw(lock), ctid_get_thread_unsafe(lock->lck_rw_owner));
+@@ -2271,9 +2194,6 @@
+ {
+ 	uint32_t        data, prev;
+ 	boolean_t       once = FALSE;
+-	int             spins = 0;
+-	extern volatile int zorn_read_trace;
+-	extern void zorn_say(const char *);
+ 
+ #ifdef DEBUG_RW
+ 	/*
+@@ -2336,11 +2256,6 @@
+ 		if (atomic_exchange_complete32(&lock->lck_rw_data, prev, data, memory_order_release_smp)) {
+ 			break;
+ 		}
+-		if (zorn_read_trace && ++spins > 32) {
+-			*(volatile uint32_t *)&lock->lck_rw_data = data;
+-			zorn_say("LRPL");
+-			break;
+-		}
+ 		cpu_pause();
+ 	}
+ 	return lck_rw_done_gen(lock, prev);
+@@ -2390,12 +2305,7 @@
+ 	lck_rw_t        *lck)
+ {
+ 	lck_rw_type_t   ret;
+-	extern volatile int zorn_read_trace;
+-	extern void zorn_say(const char *);
+-
+-	if (zorn_read_trace) {
+-		zorn_say("LRUE");
+-	}
++
+ 	assertf(lck->lck_rw_owner == current_thread()->ctid,
+ 	    "state=0x%x, owner=%p", lck->lck_rw_data,
+ 	    ctid_get_thread_unsafe(lck->lck_rw_owner));
+@@ -2403,9 +2313,6 @@
+ 
+ 	if (ret != LCK_RW_TYPE_EXCLUSIVE) {
+ 		panic("lck_rw_unlock_exclusive(): lock %p held in mode: %d", lck, ret);
+-	}
+-	if (zorn_read_trace) {
+-		zorn_say("LRUY");
+ 	}
+ }
+ 
+--- a/osfmk/arm/pmap/pmap_internal.h
++++ b/osfmk/arm/pmap/pmap_internal.h
+@@ -260,11 +260,6 @@
+ static inline void
+ pmap_lock(pmap_t pmap, pmap_lock_mode_t mode)
+ {
+-	/*
+-	 * User pmaps are created with can_sleep cleared, but shared_b still
+-	 * panics when the bit is set. These locks must not sleep on CPU0.
+-	 */
+-	pmap->rwlock.lck_rw_can_sleep = FALSE;
+ #if !XNU_MONITOR
+ 	mp_disable_preemption();
+ #endif
+@@ -305,7 +300,6 @@
+ 	 * pmap_verify_preemptible() is used in pmap.
+ 	 */
+ 	do {
+-		pmap->rwlock.lck_rw_can_sleep = FALSE;
+ #if !XNU_MONITOR
+ 		mp_disable_preemption();
+ #endif

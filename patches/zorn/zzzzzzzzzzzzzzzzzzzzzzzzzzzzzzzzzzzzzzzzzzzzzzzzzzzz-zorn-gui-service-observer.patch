@@ -1,0 +1,124 @@
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -4,7 +4,7 @@
+ #define ZORN_GUI_LOG_H
+ #include <sys/types.h>
+ 
+-#define ZORN_GUI_LOG_SLOTS 162
++#define ZORN_GUI_LOG_SLOTS 140
+ #define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
+ 
+ struct ZornGuiThread {
+@@ -35,6 +35,12 @@
+     int32_t pid, message, receiver;
+     uint32_t bits;
+ };
++struct ZornGuiQueryRecord {
++    uint32_t sequence;
++    int32_t pid, status;
++    uint32_t outputPresent;
++    char provider[40];
++};
+ struct ZornGuiFooter {
+     char magic[8];
+     uint32_t version, bytes, tick, stage, pid, sequence;
+@@ -49,20 +55,23 @@
+     // Four fixed library/cache paths: errno and vnode type for each.
+     uint32_t paths[8];
+     struct ZornGuiIpcRecord ipc[3][2];
++    char receiverNames[3][2][16];
++    struct ZornGuiQueryRecord queries[3];
+ };
+ 
+ #ifdef __cplusplus
+ static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
+-static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiFooter) == 2136, "GUI footer ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiFooter) == 2400, "GUI footer ABI");
+ extern "C" {
+ #else
+ _Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
+-_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiFooter) == 2136, "GUI footer ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiFooter) == 2400, "GUI footer ABI");
+ #endif
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
+ void zorn_ufs_gui_paths(const uint32_t paths[8]);
+-void zorn_ufs_gui_ipc(int pid, const char *name, int32_t message, int receiver, uint32_t bits);
++void zorn_ufs_gui_ipc(int pid, const char *name, int32_t message, int receiver, uint32_t bits, const char *receiverName);
++void zorn_ufs_gui_iokit(int pid, const char *name, const char *provider, int status, unsigned outputPresent);
+ struct task;
+ void zorn_gui_exit_regs(struct task *task, struct ZornGuiExitDetail *detail);
+ int zorn_ufs_gui_enabled(void);
+--- a/osfmk/ipc/ipc_kmsg.c
++++ b/osfmk/ipc/ipc_kmsg.c
+@@ -138,8 +138,9 @@
+  * BSD/libsa typedefs into this osfmk translation unit. */
+ extern int proc_selfpid(void);
+ extern void proc_selfname(char *, int);
++extern void proc_name(int, char *, int);
+ extern int zorn_ufs_gui_enabled(void);
+-extern void zorn_ufs_gui_ipc(int, const char *, int32_t, int, uint32_t);
++extern void zorn_ufs_gui_ipc(int, const char *, int32_t, int, uint32_t, const char *);
+ #endif
+ 
+ #include <ptrauth.h>
+@@ -5278,7 +5279,9 @@
+ 		proc_selfname(name, sizeof(name));
+ 		if (!strcmp(name, "launchd") || !strcmp(name, "SpringBoard") || !strcmp(name, "backboardd")) {
+ 			int receiver = ipc_port_get_receiver_task(port, NULL);
+-			zorn_ufs_gui_ipc(proc_selfpid(), name, hdr->msgh_id, receiver, hdr->msgh_bits);
++			char receiver_name[16] = {0};
++			if (receiver > 0) proc_name(receiver, receiver_name, sizeof(receiver_name));
++			zorn_ufs_gui_ipc(proc_selfpid(), name, hdr->msgh_id, receiver, hdr->msgh_bits, receiver_name);
+ 		}
+ 	}
+ #endif
+--- a/iokit/Kernel/IOUserClient.cpp
++++ b/iokit/Kernel/IOUserClient.cpp
+@@ -2694,6 +2694,24 @@
+ 	return internal_io_service_match_property_table(service, matching, matchingCnt, matches);
+ }
+ 
++#if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++extern "C" int zorn_ufs_gui_enabled(void);
++extern "C" int proc_selfpid(void);
++extern "C" void proc_selfname(char *, int);
++extern "C" void zorn_ufs_gui_iokit(int, const char *, const char *, int, unsigned);
++static __attribute__((noinline)) void
++zorn_gui_iokit_match(OSDictionary *dict, kern_return_t status, bool output_present)
++{
++	if (!zorn_ufs_gui_enabled()) return;
++	char name[17] = {0};
++	proc_selfname(name, sizeof(name));
++	if (strcmp(name, "launchd") && strcmp(name, "SpringBoard") && strcmp(name, "backboardd")) return;
++	OSString *provider = dict ? OSDynamicCast(OSString, dict->getObject(gIOProviderClassKey)) : nullptr;
++	zorn_ufs_gui_iokit(proc_selfpid(), name, provider ? provider->getCStringNoCopy() : "",
++	    status, output_present ? 1 : 0);
++}
++__attribute__((noinline))
++#endif
+ static kern_return_t
+ internal_io_service_get_matching_services(
+ 	mach_port_t main_port,
+@@ -2706,6 +2724,9 @@
+ 	OSDictionary *      dict;
+ 
+ 	if (main_port != main_device_port) {
++#if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++		zorn_gui_iokit_match(nullptr, kIOReturnNotPrivileged, false);
++#endif
+ 		return kIOReturnNotPrivileged;
+ 	}
+ 
+@@ -2719,6 +2740,11 @@
+ 	} else {
+ 		kr = kIOReturnBadArgument;
+ 	}
++
++#if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++	/* The original iterator is never inspected or consumed by diagnostics. */
++	zorn_gui_iokit_match(dict, kr, kr == kIOReturnSuccess && *existing != nullptr);
++#endif
+ 
+ 	if (obj) {
+ 		obj->release();

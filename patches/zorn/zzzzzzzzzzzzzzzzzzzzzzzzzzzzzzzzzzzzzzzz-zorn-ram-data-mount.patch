@@ -1,0 +1,138 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7354,6 +7354,8 @@
+ #error Supply the observed scratch volume UUID for the IOKit backend
+ #endif
+ extern int native_ram_block_volume_seed(const char *, dev_t *, char *, size_t, uint64_t *, uint64_t *, uint8_t *);
++extern const uint8_t zorn_data_expected_seed[32], zorn_data_expected_uuid[16];
++extern const uint64_t zorn_data_expected_bytes;
+ #endif
+ extern dev_t mdevlookup(int);
+ extern int mdevgetrange(int, uint64_t *, uint64_t *);
+@@ -7364,6 +7366,83 @@
+ uint64_t native_owner_data_seed_base, native_owner_data_seed_size;
+ uint8_t native_owner_data_seed_sha256[32];
+ char native_owner_data_device_path[64];
++volatile int native_owner_data_probe_stage, native_owner_data_probe_status = -1;
++
++#if defined(XNU_NATIVE_RAM_BLOCK) && XNU_NATIVE_RAM_BLOCK
++/* Exercise only the independently identified, volatile Data mount. Normal
++ * vnode authorization and APFS code perform every operation; no raw media
++ * writes or authorization overrides are used. */
++static int
++native_owner_data_probe(proc_t p, user_addr_t scratch, mount_t data_mount)
++{
++	char path[96];
++	uint64_t probe_nonce = mach_absolute_time();
++	vfs_context_t ctx = vfs_context_current();
++	vnode_t vp = NULLVP;
++	uint8_t expected[64], observed[64] = {0};
++	int error, close_error, residue = 0, created = 0;
++	int flags = FREAD | FWRITE;
++	int32_t result = 0;
++	struct unlink_args remove = {.path = scratch + 0x100};
++	for (unsigned i = 0; i < sizeof(expected); ++i)
++		expected[i] = (uint8_t)(0xa5 ^ i ^ zorn_data_expected_seed[i % 32]);
++	if ((error = vnode_lookup("/private/var/tmp", 0, &vp, ctx))) goto done;
++	if (vnode_mount(vp) != data_mount || !vnode_isdir(vp)) error = EXDEV;
++	vnode_put(vp); vp = NULLVP;
++	if (error) goto done;
++	native_owner_data_probe_stage = 1;
++	for (unsigned attempt = 0; attempt < 8; ++attempt) {
++		snprintf(path, sizeof(path), "/private/var/tmp/.zorn-data-probe-%llx-%u", probe_nonce, attempt);
++		if ((error = copyout(path, remove.path, strlen(path) + 1))) goto done;
++		error = vnode_open(path, flags | O_CREAT | O_EXCL | O_NOFOLLOW, 0600, 0, &vp, ctx);
++		if (error != EEXIST) break;
++	}
++	if (error) goto done;
++	created = 1;
++	if (vnode_mount(vp) != data_mount || !vnode_isreg(vp)) { error = EXDEV; goto close_file; }
++	native_owner_data_probe_stage = 2;
++	error = vn_rdwr(UIO_WRITE, vp, (caddr_t)expected, sizeof(expected), 0,
++	    UIO_SYSSPACE, IO_SYNC | IO_NOCACHE | IO_UNIT, vfs_context_ucred(ctx), &residue, p);
++	if (!error && residue) error = EIO;
++	if (!error) {
++		native_owner_data_probe_stage = 3;
++		error = VNOP_FSYNC(vp, MNT_WAIT, ctx);
++	}
++close_file:
++	close_error = vnode_close(vp, flags, ctx); vp = NULLVP;
++	if (!error) error = close_error;
++	if (error) goto done;
++	native_owner_data_probe_stage = 4;
++	flags = FREAD;
++	if ((error = vnode_open(path, flags | O_NOFOLLOW, 0, 0, &vp, ctx))) goto done;
++	if (vnode_mount(vp) != data_mount || !vnode_isreg(vp)) error = EXDEV;
++	if (!error) {
++		native_owner_data_probe_stage = 5;
++		residue = 0;
++		error = vn_rdwr(UIO_READ, vp, (caddr_t)observed, sizeof(observed), 0,
++		    UIO_SYSSPACE, IO_NOCACHE, vfs_context_ucred(ctx), &residue, p);
++		if (!error && (residue || memcmp(expected, observed, sizeof(expected)))) error = EIO;
++	}
++	close_error = vnode_close(vp, flags, ctx); vp = NULLVP;
++	if (!error) error = close_error;
++done:
++	if (created) {
++		int remove_error = unlink(p, &remove, &result);
++		if (!error) {
++			native_owner_data_probe_stage = 6;
++			error = remove_error;
++			if (!error) {
++				int lookup_error = vnode_lookup(path, VNODE_LOOKUP_NOFOLLOW, &vp, ctx);
++				if (!lookup_error) { vnode_put(vp); vp = NULLVP; }
++				error = lookup_error == ENOENT ? 0 : (lookup_error ? lookup_error : EEXIST);
++				if (!error) native_owner_data_probe_stage = 7;
++			}
++		}
++	}
++	native_owner_data_probe_status = error;
++	return error;
++}
++#endif
+ 
+ static int
+ native_owner_data_prepare(proc_t p, user_addr_t scratch)
+@@ -7378,6 +7457,8 @@
+ 	 * sparse media. A sparse disk has no contiguous logical-byte address. */
+ 	if (!native_ram_block_volume_seed(XNU_OWNER_DATA_VOLUME_UUID, &device, device_path,
+ 	    sizeof(device_path), &base, &size, native_owner_data_seed_sha256)) { error = ENOENT; goto done; }
++	if (size != zorn_data_expected_bytes ||
++	    memcmp(native_owner_data_seed_sha256, zorn_data_expected_seed, 32)) { error = EAUTH; goto done; }
+ 	/* The typed provider's disk may be far larger than 2 GiB (a persistent Data disk keeps only its seed's nonzero pages). */
+ 	if (!size || size > UINT64_C(0x10000000000) || (size & 4095)) goto done;
+ #else
+@@ -7409,7 +7490,10 @@
+ 	    (error = copyout(device_path, spec, strlen(device_path) + 1)) ||
+ 	    (error = copyout(payload, request.data, sizeof(payload)))) goto done;
+ 	native_owner_data_stage = 2;
++	extern void zorn_ufs_mount_capture(int);
++	zorn_ufs_mount_capture(1);
+ 	error = mount(p, &request, &result);
++	zorn_ufs_mount_capture(0);
+ 	if (error) goto done;
+ 	native_owner_data_stage = 3;
+ 	error = vnode_lookup("/private/var", 0, &data_root, vfs_context_current());
+@@ -7422,10 +7506,22 @@
+ 	native_owner_data_readonly = (vfs_flags(data_mount) & MNT_RDONLY) != 0;
+ 	if (actual != device || (vfs_flags(data_mount) & MNT_RDONLY) ||
+ 	    strcmp(vfs_statfs(data_mount)->f_fstypename, "apfs")) error = EINVAL;
++#if defined(XNU_NATIVE_RAM_BLOCK) && XNU_NATIVE_RAM_BLOCK
++	if (!error) {
++		struct vfs_attr attr;
++		VFSATTR_INIT(&attr);
++		VFSATTR_WANTED(&attr, f_uuid);
++		if (vfs_getattr(data_mount, &attr, vfs_context_current()) ||
++		    !VFSATTR_IS_SUPPORTED(&attr, f_uuid) || memcmp(attr.f_uuid, zorn_data_expected_uuid, 16)) error = EAUTH;
++	}
++	if (!error) error = native_owner_data_probe(p, scratch, data_mount);
++#endif
+ 	if (!error) native_owner_data_stage = 4;
+ done:
+ 	if (data_root) vnode_put(data_root);
+ 	native_owner_data_status = error;
++	extern void zorn_ufs_data_result(int, int, int, dev_t);
++	zorn_ufs_data_result(native_owner_data_stage, error, native_owner_data_readonly, native_owner_data_device);
+ 	return error;
+ }
+ #endif

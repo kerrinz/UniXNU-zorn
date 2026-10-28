@@ -1,0 +1,19 @@
+--- a/osfmk/arm/pmap/pmap.h
++++ b/osfmk/arm/pmap/pmap.h
+@@ -116,10 +116,12 @@
+  */
+ #define BOOTSTRAP_TABLE_SIZE (ARM_PGBYTES * 34)
+ #elif !defined(APPLE_ARM64_ARCH_FAMILY) && !__ARM_16K_PG__
+-/* Native 4 KiB: two roots plus up to seven L2 pages per 6 GiB mapping.
+- * The physical and virtual bases may each straddle an extra 1 GiB region.
+- */
+-#define BOOTSTRAP_TABLE_SIZE (ARM_PGBYTES * 16)
++/* Native 4 KiB: the loader permits an 8 GiB contiguous window.  Each
++ * mapping can span nine L1 entries when its base is not 1 GiB aligned:
++ * two roots + 2*9 L2 pages + one framebuffer L2 page = 21 pages.
++ * Keep spare pages and the assembly allocator's existing bounds check.
++ */
++#define BOOTSTRAP_TABLE_SIZE (ARM_PGBYTES * 32)
+ #else /* defined(ARM_LARGE_MEMORY) */
+ #define BOOTSTRAP_TABLE_SIZE (ARM_PGBYTES * 8)
+ #endif /* defined(ARM_LARGE_MEMORY) */

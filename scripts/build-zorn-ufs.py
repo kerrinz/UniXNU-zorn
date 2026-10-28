@@ -57,11 +57,64 @@ command = [
     "-Wno-unused-function", "-Wno-unused-variable", "-Wno-unused-parameter",
     "-Wno-c++98-compat", "-Wno-c++17-extensions", "-Wno-c99-extensions",
 ]
+config = (TREE.parent / ".config").read_text().splitlines()
+verified = "CONFIG_XNU_ZORN_VERIFIED_ROOT=y" in config
+if verified:
+    command += ["-DZORN_VERIFIED_ROOT=1"]
+if "CONFIG_XNU_NATIVE_RAM_BLOCK=y" in config:
+    command += ["-DZORN_RAM_DATA=1"]
+if "CONFIG_XNU_NATIVE_LEGACY_DISPLAY=y" in config:
+    command += ["-DZORN_DISPLAY=1"]
 for path in includes:
     command += ["-I", str(path)]
 print(" ".join(command), flush=True)
 subprocess.run(command, check=True)
+if verified:
+    subprocess.run([sys.executable, TREE / "scripts/build-zorn-storage.py"], check=True)
 archive = out / "libZornUfs.a"
 archive.unlink(missing_ok=True)
-subprocess.run(["xcrun", "ar", "rcs", str(archive), str(obj)], check=True)
+storage = TREE / "build/zorn-storage"
+objects = [obj]
+if verified:
+    # Keep the syscall ABI of the actual BSD compile record. Policy runs only
+    # after the independent writable RAM Data mount, before original launchd.
+    record_path = TREE / "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/bsd/DEVELOPMENT/kern_exec.o.json"
+    record = json.loads(record_path.read_text().strip().rstrip(","))
+    policy_source = DEVICE / "native/startup-policy/BootWatchdogPolicy.c"
+    policy_object = out / "BootWatchdogPolicy.o"
+    policy_command = []
+    arguments = record["arguments"]
+    index = 0
+    while index < len(arguments):
+        value = arguments[index]
+        if value == record["file"]:
+            policy_command.append(str(policy_source))
+        elif value == "-o":
+            policy_command += ["-o", str(policy_object)]
+            index += 1
+        elif value in ("-MF", "-MJ", "-MT"):
+            index += 1
+        elif value not in ("-MD", "-MP"):
+            policy_command.append(value)
+        index += 1
+    policy_command.append("-mgeneral-regs-only")
+    subprocess.run(policy_command, cwd=record["directory"], check=True)
+    objects.append(policy_object)
+    permissions_source = DEVICE / "native/startup-policy/DataPermissions.c"
+    permissions_object = out / "DataPermissions.o"
+    permissions_command = [str(permissions_source) if value == str(policy_source) else
+                           str(permissions_object) if value == str(policy_object) else value
+                           for value in policy_command]
+    subprocess.run(permissions_command, cwd=record["directory"], check=True)
+    objects.append(permissions_object)
+    marker_source = DEVICE / "native/startup-policy/DataMarker.c"
+    marker_object = out / "DataMarker.o"
+    marker_command = [str(marker_source) if value == str(policy_source) else
+                      str(marker_object) if value == str(policy_object) else value
+                      for value in policy_command]
+    subprocess.run(marker_command, cwd=record["directory"], check=True)
+    objects.append(marker_object)
+if verified:
+    objects += [storage / "ZornUfsBlock.late.o", storage / "original-bindings.o"]
+subprocess.run(["xcrun", "ar", "rcs", str(archive), *objects], check=True)
 print(archive)

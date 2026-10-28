@@ -1,0 +1,36 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1504,11 +1504,9 @@
+ 	struct uthread *ut;
+ 	int error = 0;
+ 	bool proc_exiting = false;
+-    /* Observe only selected GUI exits, before exit takes its own locks.
++    /* Observe selected GUI and startup-service exits before exit takes its locks.
+      * Copy the bounded kernel reason, not a userspace payload pointer. */
+-    if (zorn_ufs_gui_enabled() && (proc_getpid(p) == 1 ||
+-        !strcmp(p->p_comm, "SpringBoard") || !strcmp(p->p_comm, "backboardd") ||
+-        !strcmp(p->p_comm, "launchd"))) {
++    if (zorn_ufs_gui_exit_wanted(proc_getpid(p), p->p_comm)) {
+         struct ZornGuiExitDetail detail = {0};
+ #if defined(__arm64__) && !defined(APPLE_ARM64_ARCH_FAMILY)
+         zorn_gui_exit_regs(task, &detail);
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -76,6 +76,7 @@
+ struct task;
+ void zorn_gui_exit_regs(struct task *task, struct ZornGuiExitDetail *detail);
+ int zorn_ufs_gui_enabled(void);
++int zorn_ufs_gui_exit_wanted(int pid, const char *name);
+ void zorn_ufs_gui_hold_tick(void);
+ void zorn_ufs_exit_report(int pid, const char *name, int status, uint32_t reasonNamespace,
+                         uint64_t reasonCode, const struct ZornGuiExitDetail *detail);
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -113,6 +113,7 @@
+ void
+ zorn_gui_exit_regs(task_t task, struct ZornGuiExitDetail *detail)
+ {
++    if (task == TASK_NULL) return;
+     if (current_task() == task) {
+         arm_saved_state_t *ss = find_user_regs(current_thread());
+         if (ss != NULL && is_saved_state64(ss)) {

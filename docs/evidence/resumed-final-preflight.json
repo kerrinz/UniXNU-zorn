@@ -1,0 +1,31 @@
+{
+  "image": "out/zorn/boot.img",
+  "boot_sha256": "28793d4656c2a0126c1f6fe98f391dd09b2622f8e6d59797eaf41bdb938bc059",
+  "image_bytes": 80453632,
+  "kernel_sha256": "a136627c83eaf1f6bf5f33de10339d6ff0da343368256b1e7914ad5efd588ab3",
+  "all_current_inputs_match": true,
+  "actual_fat_files": {
+    "kernel.macho": {
+      "bytes": 125247488,
+      "sha256": "a136627c83eaf1f6bf5f33de10339d6ff0da343368256b1e7914ad5efd588ab3",
+      "matches_reference": true
+    },
+    "kernel.macho.adt": {
+      "bytes": 11164,
+      "sha256": "5c23739ee035d7abd8e952b6720f8826aa48dc1db633baa8e8bfd1a4af36faa8",
+      "matches_reference": true
+    },
+    "kernel.macho.trustcache": {
+      "bytes": 61356,
+      "sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+      "matches_reference": true
+    }
+  },
+  "early_watchdog_mode": 1,
+  "fat_backup_marker_matches": true,
+  "kernel_virtual_span": "0x8706000",
+  "owned_memory_bytes": 402653184,
+  "no_initrd_ephemeral_flag_absent": true,
+  "recovery_timeout_seconds": 300,
+  "scope": "current package identity; runtime outcome is separate"
+}

@@ -1,0 +1,117 @@
+340 checkpoints; showing last 100
+240 75: md1 ini
+241 tializing c
+242 ache w/hash
+243 _size 1024 
+244 and cache s
+245 ize 2500 
+246 APEND
+247 APBEGIN
+248 nx_mount:16
+249 17: md1 che
+250 ckpoint sea
+251 rch: larges
+252 t xid 14, b
+253 est xid 14 
+254 @ 9 
+255 APEND
+256 APBEGIN
+257 nx_mount:16
+258 44: md1 sta
+259 ble checkpo
+260 int indices
+261 : desc 8 da
+262 ta 16 
+263 APEND
+264 APBEGIN
+265 apfs_log_op
+266 _with_proc:
+267 3091: md1s1
+268  mounting v
+269 olume DawnU
+270 pdate21H461
+271 .J120J121J2
+272 07J208Syste
+273 mCryptex, r
+274 equested by
+275 : init (pid
+276  1); parent
+277 : kernel_ta
+278 sk (pid 0) 
+279 APEND
+280 APBEGIN
+281 apfs_vfsop_
+282 mount:2833:
+283  md1s1 fs i
+284 okit node w
+285 as not foun
+286 d 
+287 APEND
+288 APBEGIN
+289 apfs_vfsop_
+290 mount:2842:
+291  md1s1 apfs
+292 _iokit_moun
+293 t_eligibili
+294 ty not elig
+295 ible, err: 
+296 1 
+297 APEND
+298 APBEGIN
+299 apfs_vfsop_
+300 mount:2897:
+301  apfs_vfsop
+302 _mount fail
+303 ed, err: 1 
+304 APEND
+305 APBEGIN
+306 container_u
+307 nload:2029:
+308  vnode_clos
+309 e() invoked
+310  in the con
+311 tainer unlo
+312 ad path 
+313 APEND
+314 VRQUERY
+315 VRQOK
+316 ZP000000000
+317 ZT000000002
+318 ZP100000000
+319 ZT100000003
+320 ZP200000000
+321 ZT200000002
+322 ZP300000000
+323 ZT300000002
+324 ZP400000000
+325 ZT400000002
+326 ZDV03000001
+327 ZCS00000003
+328 ZCE00000001
+329 ZCA00000000
+330 OWNFAIL
+331 P0BCC2CF0
+332 PANICBEGIN
+333 offline own
+334 er SystemOS
+335  mount fail
+336 ed: 1 @kern
+337 _exec.c:758
+338 3
+339 PANICEND
+panic: offline owner SystemOS mount failed: 1 @kern_exec.c:7583
+mount printf: nx_mount:1275: md1 initializing cache w/hash_size 1024 and cache size 2500 
+mount printf: nx_mount:1617: md1 checkpoint search: largest xid 14, best xid 14 @ 9 
+mount printf: nx_mount:1644: md1 stable checkpoint indices: desc 8 data 16 
+mount printf: apfs_log_op_with_proc:3091: md1s1 mounting volume DawnUpdate21H461.J120J121J207J208SystemCryptex, requested by: init (pid 1); parent: kernel_task (pid 0) 
+mount printf: apfs_vfsop_mount:2833: md1s1 fs iokit node was not found 
+mount printf: apfs_vfsop_mount:2842: md1s1 apfs_iokit_mount_eligibility not eligible, err: 1 
+mount printf: apfs_vfsop_mount:2897: apfs_vfsop_mount failed, err: 1 
+mount printf: container_unload:2029: vnode_close() invoked in the container unload path 
+Image4 before UFS: service wait; pc_low=0x04a98224; value=0xffffffffffffffff
+Image4 before UFS: SoftwareAES start enter; pc_low=0x00000000; value=0x0; NativeAES
+Image4 before UFS: SoftwareAES start true; pc_low=0x00000000; value=0x0; NativeAES
+Image4 before UFS: service found; pc_low=0x04a98224; value=0xfffffff807024e40
+Image4 before UFS: gate open; pc_low=0x04a98324; value=0xfffffff806ea2ac0
+Image4 before UFS: service matching; pc_low=0x04a93018; value=0x0; IODTNVRAM
+Image4 before UFS: start true; pc_low=0x00000000; value=0x0; IOPlatformDevice

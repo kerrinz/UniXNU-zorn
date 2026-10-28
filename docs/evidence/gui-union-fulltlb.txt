@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":12,"stage":10,"pid":0,"sequence":229,"ms":183444,"pages":{"free":1810029,"active":12131,"inactive":29826,"wired":89803},"ram_data":{"reads":69,"writes":29,"errors":0},"display":[10,0,6304,6464,1,1,1,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":12,"slide":242253824,"main_header":4304461824,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":7950862568,"lr":8251417984,"sp":6162963264,"fp":6162963296,"wait":18446744027867980776,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":1,"pc":7950862568,"lr":8251417984,"sp":6163512128,"fp":6163512160,"wait":18446744027867982912,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":7950881064,"lr":6942248160,"sp":6164062096,"fp":6164062112,"wait":18446744027867430080,"continuation":18446744005188260168,"state":1,"frames":[]},{"index":3,"pc":7950920372,"lr":6942354624,"sp":6164608912,"fp":6164608928,"wait":0,"continuation":18446744005183446236,"state":4,"frames":[]}]},{"name":"SpringBoard","pid":5,"tick":12,"slide":242253824,"main_header":4309733376,"thread_count":3,"truncated":false,"threads":[{"index":0,"pc":7950863192,"lr":7950877220,"sp":6157129264,"fp":6157129344,"wait":0,"continuation":18446744005183365804,"state":1,"frames":[]},{"index":1,"pc":7950862568,"lr":8251417984,"sp":6157691696,"fp":6157691728,"wait":18446744027870699088,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":7950862568,"lr":8251417984,"sp":6158241728,"fp":6158241760,"wait":18446744027870751632,"continuation":18446744005187930812,"state":1,"frames":[]}]}],"exits":[{"sequence":1,"pid":2,"status":1,"namespace":0,"code":0,"name":"launchd","detail":{"pc":0,"lr":0,"far":0,"slide":242253824,"main_header":0,"esr":0,"cpsr":0,"fixups":0,"reason":"","frames":[]}}],"configuration":{"dyld_flags":524297,"owner_dyld_flags":524296,"fixups_parsed":3,"fixups_applied":0,"hold_seconds":180,"watchdog_mode":1,"owner_stage":6,"owner_mount_flags":343969825},"paths":[{"path":"/usr/lib/libobjc-trampolines.dylib","errno":0,"vnode_type":1},{"path":"/private/preboot/usr/lib/libobjc-trampolines.dylib","errno":2,"vnode_type":0},{"path":"/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":0,"vnode_type":1},{"path":"/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":2,"vnode_type":0}]}
+172 checkpoints; showing last 100
+072 rejected=0 
+073 transfers=0
+074  status=000
+075 00000 bytes
+076 =0 pixels=0
+077  
+078 USREND
+079 UCON
+080 TIM00029071
+081 UFD00000000
+082 USRBEGIN
+083 GUI EXIT #1
+084  launchd[2]
+085  status=1 n
+086 amespace=0 
+087 code=0 
+088 USREND
+089 UCON
+090 GHOLDOK
+091 TIM0002CB50
+092 UFD00000000
+093 USRBEGIN
+094 GUI SAMPLE 
+095 12/12 
+096 USREND
+097 UCON
+098 TIM0002CB83
+099 UFD00000000
+100 USRBEGIN
+101 GUI SpringB
+102 oard[5] sli
+103 de=e708000 
+104 mh=100e1500
+105 0 threads=3
+106  truncated=
+107 0 
+108 USREND
+109 UCON
+110 TIM0002CBB6
+111 UFD00000000
+112 USRBEGIN
+113 GUI launchd
+114 [1] slide=e
+115 708000 mh=1
+116 0090e000 th
+117 reads=4 tru
+118 ncated=1 
+119 USREND
+120 UCON
+121 TIM0002CBE9
+122 UFD00000000
+123 USRBEGIN
+124 MEM ms=1832
+125 73 free=181
+126 0029 active
+127 =12131 inac
+128 tive=29826 
+129 wired=89803
+130  pages fixu
+131 ps=0 parsed
+132 =3 hold=180
+133  
+134 USREND
+135 UCON
+136 TIM0002CC15
+137 UFD00000000
+138 USRBEGIN
+139 RAMDATA rea
+140 ds=69 write
+141 s=29 errors
+142 =0 
+143 USREND
+144 UCON
+145 TIM0002CC3E
+146 UFD00000000
+147 USRBEGIN
+148 DISPLAY sta
+149 ge=10 error
+150 =00000000 r
+151 egistered=1
+152  clients=0 
+153 accepted=0 
+154 rejected=0 
+155 transfers=0
+156  status=000
+157 00000 bytes
+158 =0 pixels=0
+159  
+160 USREND
+161 UCON
+162 TIM0002CC71
+163 UFD00000000
+164 USRBEGIN
+165 GUI EXIT #1
+166  launchd[2]
+167  status=1 n
+168 amespace=0 
+169 code=0 
+170 USREND
+171 UCON
+user output: GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 GUI SAMPLE 11/12 GUI SpringBoard[5] slide=e708000 mh=100e15000 threads=3 truncated=0 GUI launchd[1] slide=e708000 mh=10090e000 threads=4 truncated=1 MEM ms=167930 free=1810029 active=12131 inactive=29826 wired=89803 pages fixups=0 parsed=3 hold=180 RAMDATA reads=69 writes=29 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=0 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 GUI SAMPLE 12/12 GUI SpringBoard[5] slide=e708000 mh=100e15000 threads=3 truncated=0 GUI launchd[1] slide=e708000 mh=10090e000 threads=4 truncated=1 MEM ms=183273 free=1810029 active=12131 inactive=29826 wired=89803 pages fixups=0 parsed=3 hold=180 RAMDATA reads=69 writes=29 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=0 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 

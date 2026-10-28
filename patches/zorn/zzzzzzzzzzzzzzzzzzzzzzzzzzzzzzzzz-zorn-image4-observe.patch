@@ -1,0 +1,116 @@
+--- a/osfmk/kern/thread_call.c
++++ b/osfmk/kern/thread_call.c
+@@ -1691,6 +1691,8 @@
+ #endif
+ 
+ 	uintptr_t zorn_callback = (uintptr_t)func;
++	bool zorn_trace_image4 = zorn_callback >= 0xfffffff004a8c000ULL &&
++	    zorn_callback < 0xfffffff004aa9fb4ULL;
+ 	static volatile unsigned zorn_amfi_calls;
+ 	bool zorn_trace_amfi = zorn_callback >= 0xfffffff004aaa000ULL &&
+ 	    zorn_callback < 0xfffffff004aca5e8ULL &&
+@@ -1699,7 +1701,15 @@
+ 		extern void zorn_ufs_note_amfi_call(uint64_t, int);
+ 		zorn_ufs_note_amfi_call(zorn_callback, 0);
+ 	}
++	if (zorn_trace_image4) {
++		extern void zorn_ufs_image4_event(unsigned, uint64_t, uint64_t, const char *);
++		zorn_ufs_image4_event(1, zorn_callback, (uintptr_t)param0, NULL);
++	}
+ 	(*func)(param0, param1);
++	if (zorn_trace_image4) {
++		extern void zorn_ufs_image4_event(unsigned, uint64_t, uint64_t, const char *);
++		zorn_ufs_image4_event(2, zorn_callback, 0, NULL);
++	}
+ 	if (zorn_trace_amfi) {
+ 		extern void zorn_ufs_note_amfi_call(uint64_t, int);
+ 		zorn_ufs_note_amfi_call(zorn_callback, 1);
+--- a/iokit/Kernel/IOService.cpp
++++ b/iokit/Kernel/IOService.cpp
+@@ -4756,9 +4756,15 @@
+  * called on exporting object instance
+  */
+ 
++extern "C" void zorn_ufs_image4_event(unsigned, uint64_t, uint64_t, const char *);
++
+ bool
+ IOService::startCandidate( IOService * service )
+ {
++	bool zorn_image4 = !strcmp(service->getMetaClass()->getClassName(), "AppleImage4");
++	if (zorn_image4) zorn_ufs_image4_event(6, 0, 0, getMetaClass()->getClassName());
++	bool zorn_aes = !strcmp(service->getMetaClass()->getClassName(), "NativeAES");
++	if (zorn_aes) zorn_ufs_image4_event(13, 0, 0, "NativeAES");
+ 	bool                ok;
+ 	OSObject          * obj;
+ 	OSObject          * prop;
+@@ -4928,6 +4934,8 @@
+ 	}
+ 
+ 	ok = service->start(this);
++	if (zorn_image4) zorn_ufs_image4_event(ok ? 7 : 8, 0, 0, getMetaClass()->getClassName());
++	if (zorn_aes) zorn_ufs_image4_event(ok ? 14 : 15, 0, 0, "NativeAES");
+ 
+ 	if (recordTime) {
+ 		clock_get_uptime(&endTime);
+@@ -6618,8 +6626,11 @@
+ {
+ 	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
+ 	bool trace = caller >= 0xfffffff004aaa000ULL && caller < 0xfffffff004aca5e8ULL;
++	bool image4 = caller >= 0xfffffff004a8c000ULL && caller < 0xfffffff004aa9fb4ULL;
++	if (image4) zorn_ufs_image4_event(3, caller, timeout, NULL);
+ 	if (trace) zorn_ufs_note_pmgr_lookup(caller, 0);
+ 	IOService *result = IOService::waitForMatchingServiceWithToken(matching, timeout, NULL);
++	if (image4) zorn_ufs_image4_event(result ? 4 : 5, caller, (uintptr_t)result, NULL);
+ 	if (trace) zorn_ufs_note_pmgr_lookup(caller, result ? 1 : 2);
+ 	return result;
+ }
+@@ -6751,6 +6762,8 @@
+ 	const OSString *    str;
+ 	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
+ 	bool trace = caller >= 0xfffffff004aaa000ULL && caller < 0xfffffff004aca5e8ULL;
++	if (caller >= 0xfffffff004a8c000ULL && caller < 0xfffffff004aa9fb4ULL)
++		zorn_ufs_image4_event(12, caller, 0, name);
+ 	if (trace) zorn_say("PMDICT");
+ 
+ 	str = OSSymbol::withCString( name );
+--- a/osfmk/kern/locks.c
++++ b/osfmk/kern/locks.c
+@@ -3103,7 +3103,13 @@
+ {
+ 	LCK_MTX_ASSERT(lock, LCK_MTX_ASSERT_OWNED);
+ 
+-	return gate_try_close(gate);
++	int result = gate_try_close(gate);
++	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
++	if (caller >= 0xfffffff004a8c000ULL && caller < 0xfffffff004aa9fb4ULL) {
++		extern void zorn_ufs_image4_event(unsigned, uint64_t, uint64_t, const char *);
++		zorn_ufs_image4_event(9, caller, result, NULL);
++	}
++	return result;
+ }
+ 
+ /*
+@@ -3148,6 +3154,11 @@
+ {
+ 	LCK_MTX_ASSERT(lock, LCK_MTX_ASSERT_OWNED);
+ 
++	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
++	if (caller >= 0xfffffff004a8c000ULL && caller < 0xfffffff004aa9fb4ULL) {
++		extern void zorn_ufs_image4_event(unsigned, uint64_t, uint64_t, const char *);
++		zorn_ufs_image4_event(11, caller, (uintptr_t)gate, NULL);
++	}
+ 	gate_open(gate);
+ }
+ 
+@@ -3242,6 +3253,11 @@
+ {
+ 	LCK_MTX_ASSERT(lock, LCK_MTX_ASSERT_OWNED);
+ 
++	uintptr_t caller = (uintptr_t)__builtin_return_address(0);
++	if (caller >= 0xfffffff004a8c000ULL && caller < 0xfffffff004aa9fb4ULL) {
++		extern void zorn_ufs_image4_event(unsigned, uint64_t, uint64_t, const char *);
++		zorn_ufs_image4_event(10, caller, deadline, NULL);
++	}
+ 	if (lck_sleep_action & LCK_SLEEP_UNLOCK) {
+ 		return gate_wait(gate,
+ 		           interruptible,

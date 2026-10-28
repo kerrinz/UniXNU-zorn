@@ -1,0 +1,94 @@
+--- a/osfmk/ipc/ipc_kmsg.c
++++ b/osfmk/ipc/ipc_kmsg.c
+@@ -132,6 +132,15 @@
+ 
+ #include <sys/kdebug.h>
+ #include <libkern/OSAtomic.h>
++
++#if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++/* Match bsd/sys/proc.h and the XNU-only diagnostic header without importing
++ * BSD/libsa typedefs into this osfmk translation unit. */
++extern int proc_selfpid(void);
++extern void proc_selfname(char *, int);
++extern int zorn_ufs_gui_enabled(void);
++extern void zorn_ufs_gui_ipc(int, const char *, int32_t, int, uint32_t);
++#endif
+ 
+ #include <ptrauth.h>
+ #if __has_feature(ptrauth_calls)
+@@ -5261,6 +5270,18 @@
+ 
+ 	port = hdr->msgh_remote_port;
+ 	assert(IP_VALID(port));
++#if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++	/* Observe an already copied-in header before taking the destination lock.
++	 * Retain only scalars in RAM; never write UFS while observing IPC. */
++	if (zorn_ufs_gui_enabled() && !(options & MACH64_SEND_KERNEL)) {
++		char name[17] = {0};
++		proc_selfname(name, sizeof(name));
++		if (!strcmp(name, "launchd") || !strcmp(name, "SpringBoard") || !strcmp(name, "backboardd")) {
++			int receiver = ipc_port_get_receiver_task(port, NULL);
++			zorn_ufs_gui_ipc(proc_selfpid(), name, hdr->msgh_id, receiver, hdr->msgh_bits);
++		}
++	}
++#endif
+ 	ip_mq_lock(port);
+ 
+ 	/*
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -571,6 +571,9 @@
+ extern void zorn_gui_sample_task(const char *, int, task_t);
+ extern void zorn_ufs_runtime_snapshot(void);
+ extern void zorn_ufs_user_output(unsigned, const char *, size_t);
++static char zorn_gui_inventory[512];
++static size_t zorn_gui_inventory_used;
++static unsigned zorn_gui_inventory_count;
+ 
+ static int
+ zorn_gui_sample_wanted(proc_t p, __unused void *arg)
+@@ -582,6 +585,13 @@
+ static int
+ zorn_gui_sample_proc(proc_t p, __unused void *arg)
+ {
++	++zorn_gui_inventory_count;
++	if (zorn_gui_inventory_used + MAXCOMLEN + 24 < sizeof(zorn_gui_inventory)) {
++		int n = snprintf(zorn_gui_inventory + zorn_gui_inventory_used,
++		    sizeof(zorn_gui_inventory) - zorn_gui_inventory_used, "%s[%d] ", p->p_comm, proc_getpid(p));
++		if (n > 0) zorn_gui_inventory_used += (size_t)n;
++	}
++	if (!zorn_gui_sample_wanted(p, NULL)) return PROC_RETURNED;
+ 	zorn_ufs_gui_stage(0, 2, proc_getpid(p));
+ 	char name[MAXCOMLEN + 1] = {0};
+ 	proc_name(proc_getpid(p), name, sizeof(name));
+@@ -629,9 +639,19 @@
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);
+ 		zorn_ufs_gui_stage(sample, 1, 0);
+ 		if (sample == 1) zorn_gui_library_paths();
++		zorn_gui_inventory_used = 0;
++		zorn_gui_inventory_count = 0;
+ 		proc_iterate(PROC_ALLPROCLIST, zorn_gui_sample_proc, NULL,
+-		    zorn_gui_sample_wanted, NULL);
++		    NULL, NULL);
+ 		zorn_ufs_gui_stage(sample, 10, 0);
++		for (size_t pos = 0; pos < zorn_gui_inventory_used; pos += 220) {
++			size_t bytes = zorn_gui_inventory_used - pos;
++			if (bytes > 220) bytes = 220;
++			char inventory[256];
++			int length = snprintf(inventory, sizeof(inventory), "PROCS total=%u offset=%lu %.*s ",
++			    zorn_gui_inventory_count, (unsigned long)pos, (int)bytes, zorn_gui_inventory + pos);
++			if (length > 0) zorn_ufs_user_output(0, inventory, (size_t)length < sizeof(inventory) ? (size_t)length : sizeof(inventory) - 1);
++		}
+ 		zorn_ufs_runtime_snapshot();
+ 		zorn_ufs_gui_stage(sample, 11, 0);
+ 		zorn_ufs_gui_hold_tick();
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -56,6 +56,7 @@
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
+ void zorn_ufs_gui_paths(const uint32_t paths[8]);
++void zorn_ufs_gui_ipc(int pid, const char *name, int32_t message, int receiver, uint32_t bits);
+ struct task;
+ void zorn_gui_exit_regs(struct task *task, struct ZornGuiExitDetail *detail);
+ int zorn_ufs_gui_enabled(void);

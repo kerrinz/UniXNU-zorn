@@ -1,0 +1,15 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -940,6 +940,12 @@
+ 		/* UFS logging and the independent recovery watchdog are ready. */
+ 		extern void zorn_pmgr_run(void);
+ 		zorn_pmgr_run();
++#if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++		/* zorn logging/watchdog start after bsd_autoconf. Defer the optional
++		 * display probe until both are ready; the generic early call is gated. */
++		extern void native_legacy_display_late_probe(void);
++		native_legacy_display_late_probe();
++#endif
+ 	}
+ 
+ #if CONFIG_DTRACE

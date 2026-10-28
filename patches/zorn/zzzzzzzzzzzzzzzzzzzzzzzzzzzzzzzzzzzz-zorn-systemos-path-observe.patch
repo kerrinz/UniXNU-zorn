@@ -1,0 +1,29 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7251,6 +7251,26 @@
+ 	    (error = copyout(device_path, spec, strlen(device_path) + 1)) != 0 ||
+ 	    (error = copyout(mount_data, request.data, sizeof(mount_data))) != 0) goto done;
+ 	native_owner_cache_stage = 3;
++	{
++		extern void zorn_say(const char *);
++		const char *probes[] = { "/dev", device_path, "/private", "/private/preboot", "/private/var" };
++		for (unsigned index = 0; index < sizeof(probes) / sizeof(probes[0]); index++) {
++			vnode_t observed = NULLVP;
++			int probe_error = vnode_lookup(probes[index], 0, &observed, vfs_context_current());
++			char word[12];
++			snprintf(word, sizeof(word), "ZP%u%08X", index, (unsigned)probe_error);
++			zorn_say(word);
++			if (probe_error == 0) {
++				snprintf(word, sizeof(word), "ZT%u%08X", index, (unsigned)vnode_vtype(observed));
++				zorn_say(word);
++				if (vnode_vtype(observed) == VBLK) {
++					snprintf(word, sizeof(word), "ZDV%08X", (unsigned)vnode_specrdev(observed));
++					zorn_say(word);
++				}
++				vnode_put(observed);
++			}
++		}
++	}
+ 	error = mount(p, &request, &result);
+ 	native_owner_cache_mount_status = error;
+ 	if (error) goto done;

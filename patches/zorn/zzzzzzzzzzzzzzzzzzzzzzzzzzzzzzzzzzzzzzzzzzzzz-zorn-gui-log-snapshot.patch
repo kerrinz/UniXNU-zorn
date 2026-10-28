@@ -1,0 +1,211 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -565,6 +565,7 @@
+ #endif
+ 
+ #if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
++#include <sys/zorn_gui_log.h>
+ /* zorn: passive, bounded GUI task observations, following houji's sampler.
+  * No observer tick pets the watchdog or changes a process's execution. */
+ extern void zorn_gui_sample_task(const char *, int, task_t);
+@@ -581,14 +582,17 @@
+ static int
+ zorn_gui_sample_proc(proc_t p, __unused void *arg)
+ {
++	zorn_ufs_gui_stage(0, 2, proc_getpid(p));
+ 	char name[MAXCOMLEN + 1] = {0};
+ 	proc_name(proc_getpid(p), name, sizeof(name));
+ 	task_t task = proc_task(p);
+ 	if (task != TASK_NULL) {
+ 		task_reference(task);
++		zorn_ufs_gui_stage(0, 3, proc_getpid(p));
+ 		zorn_gui_sample_task(name, proc_getpid(p), task);
+ 		task_deallocate(task);
+ 	}
++	zorn_ufs_gui_stage(0, 9, proc_getpid(p));
+ 	return PROC_RETURNED;
+ }
+ 
+@@ -601,10 +605,14 @@
+ 		char text[64];
+ 		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/12 ", sample);
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);
++		zorn_ufs_gui_stage(sample, 1, 0);
+ 		proc_iterate(PROC_ALLPROCLIST, zorn_gui_sample_proc, NULL,
+ 		    zorn_gui_sample_wanted, NULL);
++		zorn_ufs_gui_stage(sample, 10, 0);
+ 		zorn_ufs_runtime_snapshot();
+-	}
++		zorn_ufs_gui_stage(sample, 11, 0);
++	}
++	zorn_ufs_gui_stage(12, 12, 0);
+ 	thread_terminate(current_thread());
+ }
+ 
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -107,62 +107,47 @@
+ 
+ extern void zorn_ufs_user_output(unsigned, const char *, size_t);
+ 
+-/* zorn GUI observer. Snapshot at most four threads under task_lock; read
+- * user frames only after unlocking, using an independently referenced map.
+- * Register/stack values are observational and may race a running process. */
++/* zorn: no user VM reads. The fixed diagnostic footer retains these
++ * registers independently of the rotating text log. */
++#include <sys/zorn_gui_log.h>
+ void
+ zorn_gui_sample_task(const char *name, int pid, task_t task)
+ {
+-	struct zorn_gui_regs {
+-		uint64_t pc, lr, sp, fp, wait, continuation;
+-		uint32_t state;
+-	} regs[4] = {0};
+-	unsigned count = 0;
+-	bool truncated = false;
+-	vm_map_t map = get_task_map_reference(task);
+-	if (map == VM_MAP_NULL) return;
+-	uint64_t slide = 0, header = 0;
+-	vm_shared_region_t sr = vm_shared_region_get(task);
+-	if (sr != NULL) {
+-		slide = sr->sr_slide;
+-		vm_shared_region_deallocate(sr);
+-	}
+-	task_lock(task);
+-	header = task->mach_header_vm_address;
+-	thread_t thread;
+-	queue_iterate(&task->threads, thread, thread_t, task_threads) {
+-		arm_saved_state_t *ss = find_user_regs(thread);
+-		if (ss == NULL || !is_saved_state64(ss)) continue;
+-		if (count == 4) { truncated = true; break; }
+-		regs[count++] = (struct zorn_gui_regs){
+-			.pc = get_saved_state_pc(ss), .lr = get_saved_state_lr(ss),
+-			.sp = get_saved_state_sp(ss), .fp = get_saved_state_fp(ss),
+-			.wait = thread->wait_event, .continuation = (uintptr_t)thread->continuation,
+-			.state = thread->state,
+-		};
+-	}
+-	task_unlock(task);
+-	char text[256];
+-	int n = snprintf(text, sizeof(text), "GUI %s[%d] slide=%llx mh=%llx threads=%u truncated=%u ",
+-	    name, pid, slide, header, count, truncated);
+-	if (n > 0) zorn_ufs_user_output(0, text, (size_t)n < sizeof(text) ? (size_t)n : sizeof(text) - 1);
+-	for (unsigned i = 0; i < count; ++i) {
+-		uint64_t fp = regs[i].fp, backtrace[2] = {0};
+-		for (unsigned depth = 0; depth < 2 && fp && !(fp & 15); ++depth) {
+-			uint64_t frame[2];
+-			if (fp >= vm_map_max(map) || vm_map_max(map) - fp < sizeof(frame) ||
+-			    vm_map_read_user(map, fp, frame, sizeof(frame)) != KERN_SUCCESS) break;
+-			backtrace[depth] = frame[1];
+-			if (frame[0] <= fp) break;
+-			fp = frame[0];
+-		}
+-		n = snprintf(text, sizeof(text), "GUI %s t%u pc=%llx lr=%llx sp=%llx state=%x wait=%llx cont=%llx bt=%llx,%llx ",
+-		    name, i, regs[i].pc, regs[i].lr, regs[i].sp, regs[i].state,
+-		    regs[i].wait, regs[i].continuation, backtrace[0], backtrace[1]);
+-		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n < sizeof(text) ? (size_t)n : sizeof(text) - 1);
+-	}
+-	vm_map_deallocate(map);
+-}
++    struct ZornGuiProcess process = {0};
++    strlcpy(process.name, name, sizeof(process.name));
++    process.pid = (uint32_t)pid;
++    zorn_ufs_gui_stage(0, 4, pid);
++    vm_shared_region_t sr = vm_shared_region_get(task);
++    if (sr != NULL) {
++        process.slide = sr->sr_slide;
++        vm_shared_region_deallocate(sr);
++    }
++    zorn_ufs_gui_stage(0, 5, pid);
++    task_lock(task);
++    zorn_ufs_gui_stage(0, 6, pid);
++    process.header = task->mach_header_vm_address;
++    thread_t thread;
++    queue_iterate(&task->threads, thread, thread_t, task_threads) {
++        arm_saved_state_t *ss = find_user_regs(thread);
++        if (ss == NULL || !is_saved_state64(ss)) continue;
++        if (process.count == 4) { process.truncated = 1; break; }
++        process.threads[process.count++] = (struct ZornGuiThread){
++            .pc = get_saved_state_pc(ss), .lr = get_saved_state_lr(ss),
++            .sp = get_saved_state_sp(ss), .fp = get_saved_state_fp(ss),
++            .wait = thread->wait_event, .continuation = (uintptr_t)thread->continuation,
++            .state = thread->state,
++        };
++    }
++    task_unlock(task);
++    zorn_ufs_gui_stage(0, 7, pid);
++    zorn_ufs_gui_process(&process);
++    zorn_ufs_gui_stage(0, 8, pid);
++    char text[160];
++    int n = snprintf(text, sizeof(text), "GUI %s[%d] slide=%llx mh=%llx threads=%u truncated=%u ",
++        name, pid, process.slide, process.header, process.count, process.truncated);
++    if (n > 0) zorn_ufs_user_output(0, text, (size_t)n < sizeof(text) ? (size_t)n : sizeof(text) - 1);
++}
++
+ #endif
+ 
+ bool panic_on_exception_triage = false;
+--- a/bsd/sys/Makefile
++++ b/bsd/sys/Makefile
+@@ -229,6 +229,7 @@
+ 	lockdown_mode.h \
+ 
+ XNU_ONLY_EXPORTS = \
++	zorn_gui_log.h \
+ 	bsdtask_info.h \
+ 	file_internal.h \
+ 	filedesc.h \
+--- /dev/null
++++ b/bsd/sys/zorn_gui_log.h
+@@ -0,0 +1,51 @@
++// zorn diagnostic ABI. All fields are little-endian; no user memory pointers
++// are dereferenced by the persistence layer. Keep the XNU sys header identical.
++#ifndef ZORN_GUI_LOG_H
++#define ZORN_GUI_LOG_H
++#include <sys/types.h>
++
++#define ZORN_GUI_LOG_SLOTS 180
++#define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
++
++struct ZornGuiThread {
++    uint64_t pc, lr, sp, fp, wait, continuation;
++    uint32_t state, reserved;
++};
++struct ZornGuiProcess {
++    char name[16];
++    uint32_t pid, tick;
++    uint64_t slide, header;
++    uint32_t count, truncated;
++    struct ZornGuiThread threads[4];
++};
++struct ZornGuiExitRecord {
++    uint32_t sequence;
++    int32_t pid, status;
++    uint32_t reasonNamespace;
++    uint64_t reasonCode;
++    char name[24];
++};
++struct ZornGuiFooter {
++    char magic[8];
++    uint32_t version, bytes, tick, stage, pid, sequence;
++    uint64_t ms;
++    uint32_t freePages, activePages, inactivePages, wiredPages;
++    uint64_t ram[3], display[32];
++    struct ZornGuiProcess processes[3];
++    struct ZornGuiExitRecord exits[4];
++};
++
++#ifdef __cplusplus
++static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiFooter) == 1344, "GUI footer ABI");
++extern "C" {
++#else
++_Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiFooter) == 1344, "GUI footer ABI");
++#endif
++void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
++void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
++#ifdef __cplusplus
++}
++#endif
++#endif

@@ -1,0 +1,46 @@
+{
+  "device": "zorn",
+  "serial": "92988a43",
+  "fdt_sha256": "8c3712d8850a3eba0c53d266ea96268f3b908975cabe9e866bcf991dbcc8382a",
+  "touch_node": "/soc/qcom,qupv3_1_geni_se@ac0000/spi@a90000/xiaomi_touch@0",
+  "controller": "FocalTech FT3683",
+  "live_chip_id_hex": "3683",
+  "live_firmware_version_text": "35",
+  "live_driver": "Focaltech V3.4 20241129",
+  "bus": {
+    "spi": 2,
+    "cs": 0,
+    "physical_base_hex": "a90000",
+    "span": 16384,
+    "mode": 0,
+    "max_hz": 15000000,
+    "miso": 48,
+    "mosi": 49,
+    "clock": 50,
+    "cs_pin": 51
+  },
+  "reset_gpio": 161,
+  "irq_gpio": 162,
+  "supplies": {
+    "avdd": {
+      "resource": "ldob14",
+      "microvolts": 3200000
+    },
+    "iovdd": {
+      "resource": "ldob12",
+      "microvolts": 1800000
+    }
+  },
+  "input": {
+    "event": "event7",
+    "contacts": 10,
+    "linux_max_x": 143999,
+    "linux_max_y": 319999,
+    "super_resolution_factor": 100,
+    "panel_width": 1440,
+    "panel_height": 3200
+  },
+  "source_scope": "live recovery and fixed MiCode SM8650 clock/pinctrl; GPIO global numbers462/463 are Linux offsets, use DT161/162",
+  "xnu_probe_qualified": false,
+  "xnu_touch_qualified": false
+}

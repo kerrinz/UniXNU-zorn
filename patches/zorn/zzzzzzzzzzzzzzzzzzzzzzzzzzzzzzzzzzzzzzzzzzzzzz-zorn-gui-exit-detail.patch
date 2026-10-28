@@ -1,0 +1,110 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -96,6 +96,7 @@
+ #include <sys/ptrace.h>
+ #include <sys/proc_info.h>
+ #include <sys/reason.h>
++#include <sys/zorn_gui_log.h>
+ #include <sys/_types/_timeval64.h>
+ #include <sys/user.h>
+ #include <sys/aio_kern.h>
+@@ -1503,11 +1504,29 @@
+ 	struct uthread *ut;
+ 	int error = 0;
+ 	bool proc_exiting = false;
+-	/* zorn: observe the original exit status/reason before exit takes locks. */
+-	extern void zorn_ufs_exit_report(int, const char *, int, uint32_t, uint64_t);
+-	zorn_ufs_exit_report(proc_getpid(p), p->p_comm, rv,
+-	    exit_reason ? exit_reason->osr_namespace : 0,
+-	    exit_reason ? exit_reason->osr_code : 0);
++    /* Observe only selected GUI exits, before exit takes its own locks.
++     * Copy the bounded kernel reason, not a userspace payload pointer. */
++    if (zorn_ufs_gui_enabled() && (proc_getpid(p) == 1 ||
++        !strcmp(p->p_comm, "SpringBoard") || !strcmp(p->p_comm, "backboardd") ||
++        !strcmp(p->p_comm, "launchd"))) {
++        struct ZornGuiExitDetail detail = {0};
++#if defined(__arm64__) && !defined(APPLE_ARM64_ARCH_FAMILY)
++        zorn_gui_exit_regs(task, &detail);
++#endif
++        const char *description = exit_reason_get_string_desc(exit_reason);
++        if (description && exit_reason && exit_reason->osr_kcd_buf) {
++            uintptr_t base = (uintptr_t)exit_reason->osr_kcd_buf;
++            uintptr_t pos = (uintptr_t)description;
++            if (pos >= base && pos - base < exit_reason->osr_bufsize) {
++                size_t bound = exit_reason->osr_bufsize - (pos - base);
++                if (bound > sizeof(detail.reason) - 1) bound = sizeof(detail.reason) - 1;
++                memcpy(detail.reason, description, strnlen(description, bound));
++            }
++        }
++        zorn_ufs_exit_report(proc_getpid(p), p->p_comm, rv,
++            exit_reason ? exit_reason->osr_namespace : 0,
++            exit_reason ? exit_reason->osr_code : 0, &detail);
++    }
+ 
+ #if DEVELOPMENT || DEBUG
+ 	/*
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -110,6 +110,21 @@
+ /* zorn: no user VM reads. The fixed diagnostic footer retains these
+  * registers independently of the rotating text log. */
+ #include <sys/zorn_gui_log.h>
++void
++zorn_gui_exit_regs(task_t task, struct ZornGuiExitDetail *detail)
++{
++    if (current_task() == task) {
++        arm_saved_state_t *ss = find_user_regs(current_thread());
++        if (ss != NULL && is_saved_state64(ss)) {
++            detail->pc = get_saved_state_pc(ss); detail->lr = get_saved_state_lr(ss);
++            detail->far = get_saved_state_far(ss); detail->esr = get_saved_state_esr(ss);
++            detail->cpsr = get_saved_state_cpsr(ss);
++        }
++    }
++    vm_shared_region_t sr = vm_shared_region_get(task);
++    if (sr != NULL) { detail->slide = sr->sr_slide; vm_shared_region_deallocate(sr); }
++    task_lock(task); detail->header = task->mach_header_vm_address; task_unlock(task);
++}
+ void
+ zorn_gui_sample_task(const char *name, int pid, task_t task)
+ {
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -25,6 +25,11 @@
+     uint64_t reasonCode;
+     char name[24];
+ };
++struct ZornGuiExitDetail {
++    uint64_t pc, lr, far, slide, header;
++    uint32_t esr, cpsr, fixups;
++    char reason[92];
++};
+ struct ZornGuiFooter {
+     char magic[8];
+     uint32_t version, bytes, tick, stage, pid, sequence;
+@@ -33,18 +38,24 @@
+     uint64_t ram[3], display[32];
+     struct ZornGuiProcess processes[3];
+     struct ZornGuiExitRecord exits[4];
++    struct ZornGuiExitDetail exitDetails[4];
+ };
+ 
+ #ifdef __cplusplus
+ static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
+-static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiFooter) == 1344, "GUI footer ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiFooter) == 1920, "GUI footer ABI");
+ extern "C" {
+ #else
+ _Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
+-_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiFooter) == 1344, "GUI footer ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiFooter) == 1920, "GUI footer ABI");
+ #endif
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
++struct task;
++void zorn_gui_exit_regs(struct task *task, struct ZornGuiExitDetail *detail);
++int zorn_ufs_gui_enabled(void);
++void zorn_ufs_exit_report(int pid, const char *name, int status, uint32_t reasonNamespace,
++                        uint64_t reasonCode, const struct ZornGuiExitDetail *detail);
+ #ifdef __cplusplus
+ }
+ #endif

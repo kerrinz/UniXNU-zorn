@@ -1,0 +1,231 @@
+{
+  "OS": {
+    "source_readonly": true,
+    "volume_uuid": "04769D26-2CA0-4825-B443-E2E5F88300F2",
+    "directories": {
+      "System/Library/LaunchDaemons": {
+        "exists": true,
+        "plist_count": 523,
+        "selected": [
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.SpringBoard.plist",
+            "Label": "com.apple.SpringBoard",
+            "Program": null,
+            "ProgramArguments": [
+              "/System/Library/CoreServices/SpringBoard.app/SpringBoard"
+            ],
+            "RunAtLoad": true,
+            "MachServices": {
+              "com.apple.springboard.carditemscontroller": true,
+              "com.apple.notificationcenter.widgetcontrollerconnection": true,
+              "com.apple.usernotifications.usernotificationsettingsservice": true,
+              "com.apple.UIKit.KeyboardManagement.hosted": true,
+              "com.apple.UIKit.statusbarserver": true,
+              "com.apple.springboard.statusbarservices": {},
+              "com.apple.controlcenter.remoteservice": true,
+              "com.apple.proactive.UserEducationSuggestion.client-listener.xpc": true,
+              "com.apple.springboard.blockableservices": {
+                "ResetAtClose": true
+              },
+              "com.apple.frontboard.systemappservices": true,
+              "com.apple.systemstatus.publisher": {
+                "#Then": true,
+                "#IfFeatureFlagDisabled": "SystemStatus/EmbeddedDaemon"
+              },
+              "com.apple.usernotifications.usernotificationservice": true,
+              "com.apple.bulletinboard.dataproviderconnection": true,
+              "com.apple.pegasus": true,
+              "com.apple.bulletinboard.settingsconnection": true,
+              "com.apple.springboard.backgroundappservices": {
+                "HideUntilCheckIn": true,
+                "ResetAtClose": true
+              },
+              "com.apple.SBUserNotification": true,
+              "PurpleSystemAppPort": {
+                "ResetAtClose": true
+              },
+              "com.apple.usernotifications.remotenotificationservice": true,
+              "com.apple.DragUI.druid.system": true,
+              "com.apple.siri.activation": true,
+              "com.apple.springboard.services": {
+                "HideUntilCheckIn": true,
+                "ResetAtClose": true
+              },
+              "com.apple.aps.usernotifications": true,
+              "com.apple.siri.activation.service": true,
+              "com.apple.springboard.oswatchdog": true,
+              "com.apple.bulletinboard.serverconduitconnection": true,
+              "com.apple.systemstatus": {
+                "#Then": true,
+                "#IfFeatureFlagDisabled": "SystemStatus/EmbeddedDaemon"
+              },
+              "com.apple.posterboardui.services": true,
+              "com.apple.systemstatus.activityattribution": {
+                "#Then": true,
+                "#IfFeatureFlagDisabled": "SystemStatus/EmbeddedDaemon"
+              },
+              "com.apple.usernotifications.delegate.com.apple.donotdisturb": true,
+              "com.apple.aps.usernotifications.dev": true,
+              "com.apple.siri.assessment-mode-restriction": true,
+              "com.apple.bulletinboard.observerconnection": true,
+              "com.apple.pencilkit.pktouchdetection": true,
+              "com.apple.hangtracermonitor": true,
+              "com.apple.proactive.HomeScreenSuggestion.xpc": true
+            },
+            "LimitLoadToSessionType": null
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.backboardd.plist",
+            "Label": "com.apple.backboardd",
+            "Program": null,
+            "ProgramArguments": [
+              "/usr/libexec/backboardd"
+            ],
+            "RunAtLoad": true,
+            "MachServices": {
+              "com.apple.accessibility.gax.backboard": true,
+              "com.apple.backboard.watchdog": true,
+              "com.apple.AttentionAwareness": true,
+              "com.apple.iohideventsystem": {
+                "ResetAtClose": true
+              },
+              "com.apple.backboard.oswatchdog": true,
+              "com.apple.libEDR.Notification": true,
+              "com.apple.backboard.altsysapp": true,
+              "com.apple.backboard.hid.services": {
+                "ResetAtClose": true
+              },
+              "com.apple.hid.PencilHaptics": true,
+              "com.apple.backboardd.virtualframebuffer": true,
+              "com.apple.backboard.hid-services.xpc": true,
+              "PurpleWorkspacePort": {
+                "ResetAtClose": true
+              },
+              "PurpleSystemEventPort": {
+                "ResetAtClose": true
+              },
+              "com.apple.backboard.display.services": {
+                "ResetAtClose": true
+              },
+              "com.apple.backboard.system-app-server": true,
+              "com.apple.accessibility.AXBackBoardServer": true,
+              "com.apple.backboard.TouchDeliveryPolicyServer": true,
+              "com.apple.iphone.axserver-systemwide": true,
+              "com.apple.backlightd": true,
+              "com.apple.CARenderServer": {
+                "ResetAtClose": true
+              }
+            },
+            "LimitLoadToSessionType": null
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.logd.plist",
+            "Label": "com.apple.logd",
+            "Program": "/usr/libexec/logd",
+            "ProgramArguments": null,
+            "RunAtLoad": true,
+            "MachServices": {
+              "com.apple.logd.watchdog": true,
+              "com.apple.logd": true,
+              "com.apple.logd.admin": true,
+              "com.apple.logd.cachedelete": true,
+              "com.apple.logd.events": true
+            },
+            "LimitLoadToSessionType": "System"
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.logd_helper.plist",
+            "Label": "com.apple.logd_helper",
+            "Program": "/usr/libexec/logd_helper",
+            "ProgramArguments": null,
+            "RunAtLoad": null,
+            "MachServices": {
+              "com.apple.logd_helper": true
+            },
+            "LimitLoadToSessionType": "System"
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.logd_reporter.plist",
+            "Label": "com.apple.logd_reporter",
+            "Program": "/usr/libexec/logd_reporter",
+            "ProgramArguments": null,
+            "RunAtLoad": null,
+            "MachServices": null,
+            "LimitLoadToSessionType": "System"
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.notifyd.plist",
+            "Label": "com.apple.notifyd",
+            "Program": null,
+            "ProgramArguments": [
+              "/usr/sbin/notifyd"
+            ],
+            "RunAtLoad": null,
+            "MachServices": {
+              "com.apple.system.notification_center": true
+            },
+            "LimitLoadToSessionType": "System"
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.runningboardd.plist",
+            "Label": "com.apple.runningboardd",
+            "Program": "/usr/libexec/runningboardd",
+            "ProgramArguments": null,
+            "RunAtLoad": true,
+            "MachServices": {
+              "com.apple.runningboard.watchdog": true,
+              "com.apple.runningboard.resource_notify": true,
+              "com.apple.runningboard": true
+            },
+            "LimitLoadToSessionType": null
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.syslogd.plist",
+            "Label": "com.apple.syslogd",
+            "Program": null,
+            "ProgramArguments": [
+              "/usr/sbin/syslogd"
+            ],
+            "RunAtLoad": null,
+            "MachServices": {
+              "com.apple.system.logger": true
+            },
+            "LimitLoadToSessionType": null
+          },
+          {
+            "file": "System/Library/LaunchDaemons/com.apple.watchdogd.plist",
+            "Label": "com.apple.watchdogd",
+            "Program": null,
+            "ProgramArguments": [
+              "/usr/libexec/watchdogd"
+            ],
+            "RunAtLoad": null,
+            "MachServices": null,
+            "LimitLoadToSessionType": null
+          }
+        ]
+      },
+      "System/Library/LaunchAgents": {
+        "exists": true,
+        "plist_count": 16,
+        "selected": []
+      }
+    }
+  },
+  "SystemOS": {
+    "source_readonly": true,
+    "volume_uuid": "8846FE78-2910-4297-AF97-D59BB6F8FC16",
+    "directories": {
+      "System/Library/LaunchDaemons": {
+        "exists": false,
+        "plist_count": 0,
+        "selected": []
+      },
+      "System/Library/LaunchAgents": {
+        "exists": false,
+        "plist_count": 0,
+        "selected": []
+      }
+    }
+  }
+}

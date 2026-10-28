@@ -1,0 +1,130 @@
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -7,6 +7,15 @@
+ #define ZORN_GUI_LOG_SLOTS 92
+ #define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
+ #define ZORN_GUI_STACK_FRAMES 16
++#define ZORN_GUI_STACK_KERNEL 0x80000000U
++
++/* A retained kernel stack is wired. Limit reads to its exact allocation. */
++static inline int zorn_gui_kernel_frame_valid(uint64_t base, uint64_t size,
++    uint64_t fp)
++{
++    return size >= 16 && size - 1 <= ~((uint64_t)0) - base &&
++        fp >= base && fp - base <= size - 16 && !(fp & 15);
++}
+ 
+ /* Only sample aligned frame records in the captured thread's user stack.
+  * Subtraction keeps untrusted pointer arithmetic from wrapping. */
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -107,16 +107,82 @@
+ 
+ extern void zorn_ufs_user_output(unsigned, const char *, size_t);
+ 
++#include <arm/machine_routines.h>
++
++/* No task/thread lock is held. On the sole initialized CPU, disabling
++ * preemption keeps a referenced, non-running target's wired stack stable.
++ * No waits, suspension, filesystem I/O or persistent logging occur here. */
++#include <sys/zorn_gui_log.h>
++static __attribute__((noinline)) int
++zorn_gui_sample_kernel_stack(const char *name, int pid, thread_t target)
++{
++    struct ZornGuiUserStack stack = {.pid = (uint32_t)pid};
++    kern_return_t error = KERN_FAILURE;
++    bool user_preferred = false;
++    disable_preemption();
++    if (processor_count != 1) {
++        error = KERN_NOT_SUPPORTED;
++    } else if (target != THREAD_NULL && target != current_thread() &&
++        (target->state & TH_WAIT) && !(target->state & (TH_RUN | TH_TERMINATE))) {
++        if (target->continuation != NULL) {
++            /* The continuation is already in the process record. Preserve
++             * the deeper user call chain instead of duplicating one PC. */
++            user_preferred = true;
++        } else {
++            uint64_t base = target->kernel_stack, size = kernel_stack_size;
++            uint64_t saved = (uintptr_t)target->machine.kstackptr;
++            arm_kernel_saved_state_t state;
++            error = KERN_INVALID_ADDRESS;
++            if (base && size >= sizeof(state) && size <= 1024 * 1024 &&
++                saved >= base && saved - base <= size - sizeof(state) &&
++                ml_nofault_copy(saved, (vm_offset_t)&state, sizeof(state)) == sizeof(state) &&
++                !state.pc_was_in_userspace) {
++                error = KERN_SUCCESS;
++                if (state.lr >= VM_MIN_KERNEL_ADDRESS && state.lr <= VM_MAX_KERNEL_ADDRESS)
++                    stack.frames[stack.count++] = state.lr;
++                uint64_t fp = state.fp;
++                while (fp && stack.count < ZORN_GUI_STACK_FRAMES) {
++                    uint64_t pair[2] = {0};
++                    if (!zorn_gui_kernel_frame_valid(base, size, fp) ||
++                        ml_nofault_copy(fp, (vm_offset_t)pair, sizeof(pair)) != sizeof(pair)) {
++                        error = KERN_INVALID_ADDRESS;
++                        break;
++                    }
++                    if (pair[1] < VM_MIN_KERNEL_ADDRESS || pair[1] > VM_MAX_KERNEL_ADDRESS) {
++                        error = KERN_INVALID_ADDRESS;
++                        break;
++                    }
++                    stack.frames[stack.count++] = pair[1];
++                    if (!pair[0]) break;
++                    if (pair[0] <= fp) { error = KERN_INVALID_ADDRESS; break; }
++                    fp = pair[0];
++                }
++            }
++        }
++    } else if (target != THREAD_NULL && target != current_thread() &&
++        !(target->state & TH_TERMINATE)) {
++        user_preferred = true;
++    }
++    enable_preemption();
++    if (user_preferred) return 0;
++    stack.error = ZORN_GUI_STACK_KERNEL | (uint32_t)error;
++    zorn_ufs_gui_stack(name, &stack);
++    return 1;
++}
++
+ /* Opt-in user stack sampling runs only in the scheduled GUI observer,
+  * after task_unlock, through the original VM read API. */
+ #include <sys/zorn_gui_log.h>
+ static void
+ zorn_gui_sample_stack(const char *name, int pid, task_t task,
+-    const struct ZornGuiProcess *process)
++    const struct ZornGuiProcess *process, thread_t selected)
+ {
+     unsigned enabled = 0;
+     if (!process->count || !PE_parse_boot_argn("zorn_gui_stack", &enabled, sizeof(enabled)) || enabled != 1)
+         return;
++    unsigned kernel = 0;
++    if (PE_parse_boot_argn("zorn_gui_kstack", &kernel, sizeof(kernel)) && kernel == 1 &&
++        zorn_gui_sample_kernel_stack(name, pid, selected)) return;
+     struct ZornGuiUserStack stack = {.pid = (uint32_t)pid};
+     zorn_ufs_gui_stage(0, 13, pid);
+     vm_map_t map = get_task_map_reference(task);
+@@ -169,6 +235,7 @@
+ zorn_gui_sample_task(const char *name, int pid, task_t task)
+ {
+     struct ZornGuiProcess process = {0};
++    thread_t selected = THREAD_NULL;
+     unsigned first_thread = 0, ordinal = 0;
+     if (!strcmp(name, "lsd")) {
+         PE_parse_boot_argn("zorn_gui_service_thread", &first_thread, sizeof(first_thread));
+@@ -193,6 +260,7 @@
+         unsigned thread_ordinal = ordinal++;
+         if (thread_ordinal < first_thread) continue;
+         if (process.count == 4) { process.truncated = 1; break; }
++        if (!process.count) { selected = thread; thread_reference(selected); }
+         process.threads[process.count++] = (struct ZornGuiThread){
+             .pc = get_saved_state_pc(ss), .lr = get_saved_state_lr(ss),
+             .sp = get_saved_state_sp(ss), .fp = get_saved_state_fp(ss),
+@@ -206,7 +274,8 @@
+     zorn_ufs_gui_process(&process);
+     /* No task/thread lock is held while a read may fault. This is a bounded,
+      * best-effort sample of the first eligible thread, not an atomic unwind. */
+-    zorn_gui_sample_stack(name, pid, task, &process);
++    zorn_gui_sample_stack(name, pid, task, &process, selected);
++    if (selected != THREAD_NULL) thread_deallocate(selected);
+     zorn_ufs_gui_stage(0, 8, pid);
+     char text[160];
+     int n = snprintf(text, sizeof(text), "GUI %s[%d] slide=%llx mh=%llx threads=%u truncated=%u ",

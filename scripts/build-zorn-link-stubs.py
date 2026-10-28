@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Define symbols the development kernel references before zorn has those drivers.
 
-native_legacy_display_probe is called from bsd_init only when the boot argument
-offline-legacy-register is set. The real archive is qualified against another
-board's kernelcache, so this empty definition is enough to finish the link.
+Without the display profile, native_legacy_display_probe has an empty
+development-only definition. With GopFramebuffer selected, this archive has
+no display symbol: the qualified real archive supplies both lifecycle hooks.
 """
 import subprocess
 from pathlib import Path
@@ -12,7 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "build/zorn-stubs"
 OUT.mkdir(parents=True, exist_ok=True)
 source = OUT / "link-stubs.c"
-source.write_text("void native_legacy_display_probe(void) {}\n")
+display_enabled = "CONFIG_XNU_NATIVE_LEGACY_DISPLAY=y" in (ROOT.parent / ".config").read_text().splitlines()
+source.write_text("/* Real display archive supplies its initialization hooks. */\n" if display_enabled
+                  else "void native_legacy_display_probe(void) {}\n")
 obj = OUT / "link-stubs.o"
 sdk = subprocess.check_output(["xcrun", "--sdk", "iphoneos", "--show-sdk-path"], text=True).strip()
 subprocess.run(

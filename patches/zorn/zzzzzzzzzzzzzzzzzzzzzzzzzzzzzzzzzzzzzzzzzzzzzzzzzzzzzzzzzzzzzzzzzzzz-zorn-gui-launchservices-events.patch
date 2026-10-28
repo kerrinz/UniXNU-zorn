@@ -1,0 +1,22 @@
+--- a/osfmk/ipc/ipc_kmsg.c
++++ b/osfmk/ipc/ipc_kmsg.c
+@@ -5277,7 +5277,7 @@
+ 	if (zorn_ufs_gui_enabled() && !(options & MACH64_SEND_KERNEL)) {
+ 		char name[17] = {0};
+ 		proc_selfname(name, sizeof(name));
+-		if (!strcmp(name, "launchd") || !strcmp(name, "SpringBoard") || !strcmp(name, "backboardd")) {
++		if (!strcmp(name, "launchd") || !strcmp(name, "lsd") || !strcmp(name, "SpringBoard") || !strcmp(name, "backboardd")) {
+ 			int receiver = ipc_port_get_receiver_task(port, NULL);
+ 			char receiver_name[16] = {0};
+ 			if (receiver > 0) proc_name(receiver, receiver_name, sizeof(receiver_name));
+--- a/iokit/Kernel/IOUserClient.cpp
++++ b/iokit/Kernel/IOUserClient.cpp
+@@ -2705,7 +2705,7 @@
+ 	if (!zorn_ufs_gui_enabled()) return;
+ 	char name[17] = {0};
+ 	proc_selfname(name, sizeof(name));
+-	if (strcmp(name, "launchd") && strcmp(name, "SpringBoard") && strcmp(name, "backboardd")) return;
++	if (strcmp(name, "launchd") && strcmp(name, "lsd") && strcmp(name, "SpringBoard") && strcmp(name, "backboardd")) return;
+ 	OSString *provider = dict ? OSDynamicCast(OSString, dict->getObject(gIOProviderClassKey)) : nullptr;
+ 	zorn_ufs_gui_iokit(proc_selfpid(), name, provider ? provider->getCStringNoCopy() : "",
+ 	    status, output_present ? 1 : 0);

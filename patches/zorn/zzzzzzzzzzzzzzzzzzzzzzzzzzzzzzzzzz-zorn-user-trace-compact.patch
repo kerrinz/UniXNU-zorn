@@ -1,0 +1,13 @@
+--- a/osfmk/arm64/sleh.c
++++ b/osfmk/arm64/sleh.c
+@@ -1906,7 +1906,9 @@
+ 		    saved_state64(state)->x[2]);
+ 	}
+ 	static volatile unsigned zorn_svc_count;
+-	bool zorn_trace_svc = __sync_fetch_and_add(&zorn_svc_count, 1) < 128;
++	// write() already has a bounded payload observer; preserve ring space for
++	// other syscalls instead of duplicating every console fragment's entry/ret.
++	bool zorn_trace_svc = trap_no != 4 && __sync_fetch_and_add(&zorn_svc_count, 1) < 512;
+ 	if (zorn_trace_svc) {
+ 		extern void zorn_ufs_note_user_svc(uint64_t, uint32_t);
+ 		zorn_ufs_note_user_svc(get_saved_state_pc(state), (uint32_t)trap_no);

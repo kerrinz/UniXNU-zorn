@@ -1,0 +1,25 @@
+{
+  "upstream_repository": "https://github.com/UniXNU/UniXNU-sheng",
+  "revision": "0e1f6e52638137db15905db8d775ad73757f39fa",
+  "source": "package/BootWatchdogPolicy.c",
+  "upstream_source_sha256": "45eaa2b2e86cf5bf8dad75fa1a4457fa1ffd53183f8e9627d0aac159cfcf55e3",
+  "adapted_source_sha256": "c4b3f51b6ee7ea6421464e0ea6ddcf21f1f6cfab0877a5ba36404ffcb8d33056",
+  "source_spdx": "MIT",
+  "adaptation": [
+    "zorn symbol names and volatile Data/watchdog guard",
+    "removed Setup flag reset feature",
+    "normal syscall readback after fsync",
+    "fixed diagnostic metadata callback"
+  ],
+  "disabled_jobs": [
+    "com.apple.identityservicesd",
+    "com.apple.locationd",
+    "com.apple.CommCenter",
+    "com.apple.bluetoothd",
+    "com.apple.watchdogd"
+  ],
+  "original_os_images_modified": false,
+  "kernel_recovery_watchdog_retained": true,
+  "host_abi_compile_qualified": false,
+  "hardware_qualified": false
+}

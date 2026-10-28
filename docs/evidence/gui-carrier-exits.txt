@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":8,"stage":11,"pid":0,"sequence":141,"ms":133281,"pages":{"free":1754758,"active":23486,"inactive":34386,"wired":92537},"ram_data":{"reads":71,"writes":85,"errors":0},"display":[10,0,6304,6464,1,1,1,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":8,"slide":195592192,"main_header":4302401536,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":7904200936,"lr":8204756352,"sp":6165023424,"fp":6165023456,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":1,"pc":7904223612,"lr":6895926532,"sp":6165566576,"fp":6165566800,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":2,"pc":7904219432,"lr":6895586528,"sp":6166122384,"fp":6166122400,"wait":0,"continuation":18446744005188259984,"state":4,"frames":[]},{"index":3,"pc":7904200936,"lr":8204756352,"sp":6166670144,"fp":6166670176,"wait":0,"continuation":0,"state":4,"frames":[]}]},{"name":"SpringBoard","pid":71,"tick":8,"slide":195592192,"main_header":4304293888,"thread_count":3,"truncated":false,"threads":[{"index":0,"pc":7904201560,"lr":7904215588,"sp":6162568752,"fp":6162568832,"wait":0,"continuation":18446744005183365804,"state":1,"frames":[]},{"index":1,"pc":7904200936,"lr":8204756352,"sp":6163680048,"fp":6163680080,"wait":18446744035927248464,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":7904200936,"lr":8204756352,"sp":6163131184,"fp":6163131216,"wait":18446744035927172424,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"backboardd","pid":87,"tick":8,"slide":195592192,"main_header":4313432064,"thread_count":1,"truncated":false,"threads":[{"index":0,"pc":7904201560,"lr":7904215588,"sp":6153439776,"fp":6153439856,"wait":0,"continuation":0,"state":4,"frames":[]}]}],"exits":[{"sequence":1,"pid":2,"status":1,"namespace":0,"code":0,"name":"launchd","detail":{"pc":0,"lr":0,"far":0,"slide":195592192,"main_header":0,"esr":0,"cpsr":0,"fixups":0,"reason":"","frames":[]}},{"sequence":2,"pid":5,"status":11,"namespace":2,"code":11,"name":"SpringBoard","detail":{"pc":0,"lr":7025244692,"far":0,"slide":195592192,"main_header":4307607552,"esr":2181038085,"cpsr":2147485696,"fixups":0,"reason":"","frames":[]}},{"sequence":3,"pid":37,"status":11,"namespace":2,"code":11,"name":"backboardd","detail":{"pc":7330381308,"lr":7330380820,"far":160,"slide":195592192,"main_header":4300726272,"esr":2449473541,"cpsr":2147483648,"fixups":0,"reason":"","frames":[]}},{"sequence":4,"pid":71,"status":6,"namespace":8,"code":1,"name":"SpringBoard","detail":{"pc":7904273344,"lr":7904398256,"far":0,"slide":195592192,"main_header":4304293888,"esr":1442840704,"cpsr":1073741824,"fixups":0,"reason":"couldn't dlopen libobjc-trampolines.dylib: dlopen(/usr/lib/libobjc-trampolines.dylib, 0x010","frames":[]}}]}
+180 checkpoints; showing last 100
+080 TIM00020521
+081 UFD00000002
+082 USRBEGIN
+083 com.apple.x
+084 pc.launchd|
+085 1970-01-01 
+086 00:02:48.82
+087 6584 (user/
+088 501/com.app
+089 le.Wireless
+090 RadioManage
+091 r [19]) <No
+092 tice>: serv
+093 ice state: 
+094 running 
+095 USREND
+096 UCON
+097 TIM0002063E
+098 UFD00000002
+099 USRBEGIN
+100 com.apple.x
+101 pc.launchd|
+102 1970-01-01 
+103 00:02:49.09
+104 6140 (pid/8
+105 7 [backboar
+106 dd]) <Notic
+107 e>: Service
+108  stub creat
+109 ed for com.
+110 apple.Sessi
+111 onFilterRec
+112 ordingUpdat
+113 er 
+114 USREND
+115 UCON
+116 TIM000206C7
+117 UFD00000002
+118 USRBEGIN
+119 com.apple.x
+120 pc.launchd|
+121 1970-01-01 
+122 00:02:49.09
+123 6177 (pid/8
+124 7 [backboar
+125 dd]) <Notic
+126 e>: Service
+127  stub creat
+128 ed for com.
+129 apple.Sessi
+130 onFilterPre
+131 ferenceProv
+132 ider 
+133 USREND
+134 UCON
+135 TIM00020801
+136 UFD00000000
+137 USRBEGIN
+138 EXEC BEGIN 
+139 pid=100 err
+140 or=0 path=/
+141 usr/libexec
+142 /usermanage
+143 rd 
+144 USREND
+145 UCON
+146 NDYL
+147 ENAME
+148 EPERM
+149 TIM00020832
+150 UFD00000000
+151 USRBEGIN
+152 EXEC ACTIVA
+153 TE_RETURN p
+154 id=100 erro
+155 r=0 path=/u
+156 sr/libexec/
+157 usermanager
+158 d 
+159 USREND
+160 UCON
+161 TIM00020862
+162 UFD00000002
+163 USRBEGIN
+164 com.apple.x
+165 pc.launchd|
+166 1970-01-01 
+167 00:02:51.20
+168 0324 (user/
+169 501/com.app
+170 le.watchdog
+171 d [93]) <Wa
+172 rning>: Ena
+173 bling panic
+174 -on-crash d
+175 ue to conse
+176 cutive cras
+177 hes 
+178 USREND
+179 UCON
+user output: EXEC ACTIVATE_RETURN pid=97 error=0 path=/System/Library/PrivateFrameworks/DataMigration.framework/XPCServices/com.apple.datamigrator.xpc/com.apple.datam EXEC BEGIN pid=99 error=0 path=/usr/libexec/xpcproxy EXEC ACTIVATE_RETURN pid=99 error=0 path=/usr/libexec/xpcproxy EXEC BEGIN pid=19 error=0 path=/usr/sbin/WirelessRadioManagerd EXEC ACTIVATE_RETURN pid=19 error=0 path=/usr/sbin/WirelessRadioManagerd com.apple.xpc.launchd|1970-01-01 00:02:48.826584 (user/501/com.apple.WirelessRadioManager [19]) <Notice>: service state: running com.apple.xpc.launchd|1970-01-01 00:02:49.096140 (pid/87 [backboardd]) <Notice>: Service stub created for com.apple.SessionFilterRecordingUpdater com.apple.xpc.launchd|1970-01-01 00:02:49.096177 (pid/87 [backboardd]) <Notice>: Service stub created for com.apple.SessionFilterPreferenceProvider EXEC BEGIN pid=100 error=0 path=/usr/libexec/usermanagerd EXEC ACTIVATE_RETURN pid=100 error=0 path=/usr/libexec/usermanagerd com.apple.xpc.launchd|1970-01-01 00:02:51.200324 (user/501/com.apple.watchdogd [93]) <Warning>: Enabling panic-on-crash due to consecutive crashes 

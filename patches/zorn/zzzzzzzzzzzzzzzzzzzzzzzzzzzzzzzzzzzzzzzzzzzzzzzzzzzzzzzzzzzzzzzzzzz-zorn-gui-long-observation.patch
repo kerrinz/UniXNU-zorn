@@ -1,0 +1,27 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -637,10 +637,13 @@
+ zorn_gui_sample_thread(__unused void *arg, __unused wait_result_t wr)
+ {
+ 	static int channel;
+-	for (unsigned sample = 1; sample <= 20; ++sample) {
++	unsigned hold = 0;
++	PE_parse_boot_argn("zorn_gui_hold", &hold, sizeof(hold));
++	unsigned sample_limit = hold > 300 && hold <= 900 ? (hold + 14) / 15 : 20;
++	for (unsigned sample = 1; sample <= sample_limit; ++sample) {
+ 		(void)tsleep(&channel, PZERO, "zorngui", 15 * hz);
+ 		char text[64];
+-		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/20 ", sample);
++		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/%u ", sample, sample_limit);
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);
+ 		zorn_ufs_gui_stage(sample, 1, 0);
+ 		if (sample == 1) zorn_gui_library_paths();
+@@ -661,7 +664,7 @@
+ 		zorn_ufs_gui_stage(sample, 11, 0);
+ 		zorn_ufs_gui_hold_tick();
+ 	}
+-	zorn_ufs_gui_stage(20, 12, 0);
++	zorn_ufs_gui_stage(sample_limit, 12, 0);
+ 	thread_terminate(current_thread());
+ }
+ 

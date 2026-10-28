@@ -1,0 +1,120 @@
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -107,9 +107,48 @@
+ 
+ extern void zorn_ufs_user_output(unsigned, const char *, size_t);
+ 
+-/* zorn: no user VM reads. The fixed diagnostic footer retains these
+- * registers independently of the rotating text log. */
++/* Opt-in user stack sampling runs only in the scheduled GUI observer,
++ * after task_unlock, through the original VM read API. */
+ #include <sys/zorn_gui_log.h>
++static void
++zorn_gui_sample_stack(const char *name, int pid, task_t task,
++    const struct ZornGuiProcess *process)
++{
++    unsigned enabled = 0;
++    if (!process->count || !PE_parse_boot_argn("zorn_gui_stack", &enabled, sizeof(enabled)) || enabled != 1)
++        return;
++    struct ZornGuiUserStack stack = {.pid = (uint32_t)pid};
++    zorn_ufs_gui_stage(0, 13, pid);
++    vm_map_t map = get_task_map_reference(task);
++    if (map == VM_MAP_NULL) {
++        stack.error = KERN_FAILURE;
++        zorn_ufs_gui_stack(name, &stack);
++        return;
++    }
++    uint64_t sp = process->threads[0].sp, fp = process->threads[0].fp;
++    for (unsigned i = 0; i < ZORN_GUI_STACK_FRAMES; ++i) {
++        if (!zorn_gui_stack_frame_valid(sp, fp, vm_map_min(map), vm_map_max(map))) {
++            stack.error = KERN_INVALID_ADDRESS;
++            break;
++        }
++        uint64_t pair[2] = {0};
++        zorn_ufs_gui_stage(0, 14, pid);
++        stack.error = vm_map_read_user(map, fp, pair, sizeof(pair));
++        if (stack.error) break;
++        if (pair[1] < vm_map_min(map) || pair[1] >= vm_map_max(map)) {
++            stack.error = KERN_INVALID_ADDRESS;
++            break;
++        }
++        stack.frames[stack.count++] = pair[1];
++        zorn_ufs_gui_stack(name, &stack);
++        if (!pair[0]) break;
++        if (pair[0] <= fp) { stack.error = KERN_INVALID_ADDRESS; break; }
++        fp = pair[0];
++    }
++    vm_map_deallocate(map);
++    zorn_ufs_gui_stack(name, &stack);
++    zorn_ufs_gui_stage(0, 7, pid);
++}
+ void
+ zorn_gui_exit_regs(task_t task, struct ZornGuiExitDetail *detail)
+ {
+@@ -157,6 +196,9 @@
+     task_unlock(task);
+     zorn_ufs_gui_stage(0, 7, pid);
+     zorn_ufs_gui_process(&process);
++    /* No task/thread lock is held while a read may fault. This is a bounded,
++     * best-effort sample of the first eligible thread, not an atomic unwind. */
++    zorn_gui_sample_stack(name, pid, task, &process);
+     zorn_ufs_gui_stage(0, 8, pid);
+     char text[160];
+     int n = snprintf(text, sizeof(text), "GUI %s[%d] slide=%llx mh=%llx threads=%u truncated=%u ",
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -4,8 +4,19 @@
+ #define ZORN_GUI_LOG_H
+ #include <sys/types.h>
+ 
+-#define ZORN_GUI_LOG_SLOTS 134
++#define ZORN_GUI_LOG_SLOTS 98
+ #define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
++#define ZORN_GUI_STACK_FRAMES 16
++
++/* Only sample aligned frame records in the captured thread's user stack.
++ * Subtraction keeps untrusted pointer arithmetic from wrapping. */
++static inline int zorn_gui_stack_frame_valid(uint64_t sp, uint64_t fp,
++    uint64_t minimum, uint64_t maximum)
++{
++    return maximum >= 16 && sp >= minimum && sp < maximum &&
++        fp >= sp && fp - sp < 1024 * 1024 && !(fp & 15) &&
++        fp >= minimum && fp <= maximum - 16;
++}
+ 
+ struct ZornGuiThread {
+     uint64_t pc, lr, sp, fp, wait, continuation;
+@@ -41,6 +52,10 @@
+     uint32_t outputPresent;
+     char provider[40];
+ };
++struct ZornGuiUserStack {
++    uint32_t pid, tick, count, error;
++    uint64_t frames[ZORN_GUI_STACK_FRAMES];
++};
+ struct ZornGuiFooter {
+     char magic[8];
+     uint32_t version, bytes, tick, stage, pid, sequence;
+@@ -59,18 +74,20 @@
+     struct ZornGuiQueryRecord queries[3];
+     uint64_t keystore[6];
+     uint64_t startupPolicy[3];
++    struct ZornGuiUserStack stacks[3];
+ };
+ 
+ #ifdef __cplusplus
+ static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
+-static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiFooter) == 2472, "GUI footer ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiUserStack) == 144 && sizeof(ZornGuiFooter) == 2904, "GUI footer ABI");
+ extern "C" {
+ #else
+ _Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
+-_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiFooter) == 2472, "GUI footer ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiUserStack) == 144 && sizeof(struct ZornGuiFooter) == 2904, "GUI footer ABI");
+ #endif
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
++void zorn_ufs_gui_stack(const char *name, const struct ZornGuiUserStack *stack);
+ void zorn_ufs_gui_paths(const uint32_t paths[8]);
+ void zorn_ufs_gui_ipc(int pid, const char *name, int32_t message, int receiver, uint32_t bits, const char *receiverName);
+ void zorn_ufs_gui_iokit(int pid, const char *name, const char *provider, int status, unsigned outputPresent);

@@ -1,0 +1,29 @@
+{
+  "patch_count": 76,
+  "core_patch_mirrors_match": true,
+  "gui_headers_match": true,
+  "new_cli_negative_checks": [
+    {
+      "script": "UniXNU-zorn/scripts/build-zorn-debug.py",
+      "option": "--quiet-gui",
+      "invalid_configuration_refused": true
+    },
+    {
+      "script": "UniXNU-zorn/scripts/build-zorn-debug.py",
+      "option": "--hid-family",
+      "invalid_configuration_refused": true
+    },
+    {
+      "script": "uefi-zorn/scripts/make-zorn-payload.py",
+      "option": "--quiet-gui",
+      "invalid_configuration_refused": true
+    },
+    {
+      "script": "uefi-zorn/scripts/make-zorn-payload.py",
+      "option": "--hid-family",
+      "invalid_configuration_refused": true
+    }
+  ],
+  "clean_patch_replay_qualified": false,
+  "desktop_qualified": false
+}

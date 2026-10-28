@@ -1,0 +1,43 @@
+--- a/osfmk/arm64/tlb.h
++++ b/osfmk/arm64/tlb.h
+@@ -286,17 +286,18 @@
+ 	arm64_sync_tlb(strong);
+ }
+ 
+-// flush_mmu_tlb_asid: flush all entries that match an ASID, on all cores
+-// ASID must be in high 16 bits of argument
+-// Will not flush global entries
++// zorn CPU0: conservatively invalidate all EL1 entries for an ASID request.
++// This includes global entries; the caller still provides completion barriers.
+ static inline void
+ flush_mmu_tlb_asid_async(uint64_t val, bool strong __unused)
+ {
+ 	/*
+-	 * zorn: tlbi aside1 and aside1is never complete. A later dsb stays
+-	 * forever, so a full-ASID invalidate is skipped on this one CPU.
++	 * ASID-selective TLBI stalled during early bring-up. Skipping it leaves
++	 * stale translations on ASID reuse. The full local operation already
++	 * used by flush_mmu_tlb_async covers the requested ASID on CPU0.
+ 	 */
+ 	(void)val;
++	asm volatile ("tlbi vmalle1" : : : "memory");
+ }
+ 
+ static inline void
+@@ -306,14 +307,12 @@
+ 	arm64_sync_tlb(strong);
+ }
+ 
+-// flush_core_tlb_asid: flush all entries that match an ASID, local core only
+-// ASID must be in high 16 bits of argument
+-// Will not flush global entries
++// CPU0 local request uses the same conservative full invalidate.
+ static inline void
+ flush_core_tlb_asid_async(uint64_t val)
+ {
+-	/* zorn: same skipped full-ASID invalidate as flush_mmu_tlb_asid_async. */
+ 	(void)val;
++	asm volatile ("tlbi vmalle1" : : : "memory");
+ }
+ 
+ static inline void

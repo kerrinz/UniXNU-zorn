@@ -1,0 +1,24 @@
+--- a/osfmk/arm/pmap/pmap.c
++++ b/osfmk/arm/pmap/pmap.c
+@@ -3057,17 +3057,10 @@
+ 	}
+ 	zorn_say("PIDK");
+ 
+-	/*
+-	 * pmap_lock_init() calls lck_rw_init(), whose group reference spins
+-	 * in ldxr/stxr and does not return. Write the lock word directly.
+-	 */
+-	{
+-		extern void lck_rw_init_noref(lck_rw_t *, lck_attr_t *);
+-		zorn_say("PLKI");
+-		lck_rw_init_noref(&p->rwlock, LCK_ATTR_NULL);
+-		p->rwlock.lck_rw_can_sleep = FALSE;
+-		zorn_say("PLKX");
+-	}
++	/* Pair the original lock/group initialization with pmap_lock_destroy(). */
++	zorn_say("PLKI");
++	pmap_lock_init(p);
++	zorn_say("PLKX");
+ 
+ 	p->tt_entry_free = (tt_entry_t *)0;
+ 	tte_index_max = ((unsigned)pmap_root_alloc_size(p) / sizeof(tt_entry_t));

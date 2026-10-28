@@ -1,0 +1,117 @@
+340 checkpoints; showing last 100
+240 best xid 4 
+241 @ 7 
+242 APEND
+243 APBEGIN
+244 nx_mount:16
+245 44: disk1 s
+246 table check
+247 point indic
+248 es: desc 6 
+249 data 10 
+250 APEND
+251 APBEGIN
+252 spaceman_me
+253 tazone_init
+254 :111: disk1
+255  no metazon
+256 e for devic
+257 e 0, of siz
+258 e 536870912
+259  bytes, blo
+260 ck_size 409
+261 6 
+262 APEND
+263 APBEGIN
+264 apfs_log_op
+265 _with_proc:
+266 3091: disk1
+267 s1 mounting
+268  volume Zor
+269 nData, requ
+270 ested by: i
+271 nit (pid 1)
+272 ; parent: k
+273 ernel_task 
+274 (pid 0) 
+275 APEND
+276 APBEGIN
+277 handle_moun
+278 t:817: disk
+279 1s1 vol-uui
+280 d: C7D77FF3
+281 -6437-4C4A-
+282 8E05-E8E239
+283 AC1641 bloc
+284 k size: 409
+285 6 block cou
+286 nt: 131072 
+287 (unencrypte
+288 d; flags: 0
+289 x1; feature
+290 s: 1.0.2) 
+291 APEND
+292 APBEGIN
+293 handle_moun
+294 t:830: disk
+295 1s1 setting
+296  dev block 
+297 size to 409
+298 6 from 512 
+299 APEND
+300 APBEGIN
+301 apfs_log_op
+302 _with_proc:
+303 3091: disk1
+304 s1 mount-co
+305 mplete volu
+306 me ZornData
+307 , requested
+308  by: init (
+309 pid 1); par
+310 ent: kernel
+311 _task (pid 
+312 0) 
+313 APEND
+314 MAC1
+315 MACP
+316 MACQ
+317 MKEQ
+318 VNRD
+319 VOP
+320 05690C84
+321 CLRD
+322 VDON
+323 VNDN
+324 VRES
+325 DST00000004
+326 DRE00000000
+327 DRO00000000
+328 DDV01000002
+329 DPT00000007
+330 DPE00000000
+331 DRD0000003F
+332 DWR00000001
+333 DER00000000
+334 DATAOK
+335 WSTOP
+336 RSET
+337 TC00000003
+338 HIT00000001
+339 BCBK
+mount printf: dev_init:306: disk3 device_handle block size 4096 block count 806400 features 0 internal  
+mount printf: nx_mount:1275: disk3 initializing cache w/hash_size 1024 and cache size 2500 
+mount printf: nx_mount:1617: disk3 checkpoint search: largest xid 14, best xid 14 @ 9 
+mount printf: nx_mount:1644: disk3 stable checkpoint indices: desc 8 data 16 
+mount printf: apfs_log_op_with_proc:3091: disk3s1 mounting volume DawnUpdate21H461.J120J121J207J208SystemCryptex, requested by: init (pid 1); parent: kernel_task (pid 0) 
+mount printf: handle_mount:817: disk3s1 vol-uuid: 8846FE78-2910-4297-AF97-D59BB6F8FC16 block size: 4096 block count: 806400 (unencrypted; flags: 0x1; features: 28.0.2) 
+mount printf: handle_mount:830: disk3s1 setting dev block size to 4096 from 512 
+mount printf: apfs_log_op_with_proc:3091: disk3s1 mount-complete volume DawnUpdate21H461.J120J121J207J208SystemCryptex, requested by: init (pid 1); parent: kernel_task (pid 0) 
+mount printf: nx_mount:1275: disk1 initializing cache w/hash_size 1024 and cache size 2500 
+mount printf: nx_mount:1617: disk1 checkpoint search: largest xid 4, best xid 4 @ 7 
+mount printf: nx_mount:1644: disk1 stable checkpoint indices: desc 6 data 10 
+mount printf: spaceman_metazone_init:111: disk1 no metazone for device 0, of size 536870912 bytes, block_size 4096 
+mount printf: apfs_log_op_with_proc:3091: disk1s1 mounting volume ZornData, requested by: init (pid 1); parent: kernel_task (pid 0) 
+mount printf: handle_mount:817: disk1s1 vol-uuid: C7D77FF3-6437-4C4A-8E05-E8E239AC1641 block size: 4096 block count: 131072 (unencrypted; flags: 0x1; features: 1.0.2) 
+mount printf: handle_mount:830: disk1s1 setting dev block size to 4096 from 512 
+mount printf: apfs_log_op_with_proc:3091: disk1s1 mount-complete volume ZornData, requested by: init (pid 1); parent: kernel_task (pid 0) 

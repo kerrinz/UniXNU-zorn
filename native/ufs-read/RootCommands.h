@@ -37,7 +37,8 @@ static IOReturn hostSubmit (uint32_t direction, uint32_t dataBytes, uint32_t tim
 {
   *ocs = 15;
   if (!houjiUfsReadCommandAllowed(gHost.virt+kUcdOffset,32,direction,dataBytes) &&
-      !houjiUfsLogCommandAllowed(gHost.virt+kUcdOffset,32,direction,dataBytes,gLogEnabled,gLogArmed))
+      !houjiUfsLogCommandAllowed(gHost.virt+kUcdOffset,32,direction,dataBytes,gLogEnabled,gLogArmed) &&
+      !zornDataCommandAllowed(gHost.virt+kUcdOffset,32,direction,dataBytes,gZornDataMode,gZornDataOpened))
     return kIOReturnNotPermitted;
   if (!timeoutUs || dataBytes > kDataMax || (dataBytes & 3) ||
       (dataBytes ? (direction != 1 && direction != 2) : direction != 0)) return kIOReturnBadArgument;

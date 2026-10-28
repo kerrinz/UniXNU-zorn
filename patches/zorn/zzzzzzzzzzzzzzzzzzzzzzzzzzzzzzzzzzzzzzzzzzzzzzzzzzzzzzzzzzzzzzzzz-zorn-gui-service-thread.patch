@@ -1,0 +1,30 @@
+--- a/osfmk/kern/exception.c
++++ b/osfmk/kern/exception.c
+@@ -169,6 +169,11 @@
+ zorn_gui_sample_task(const char *name, int pid, task_t task)
+ {
+     struct ZornGuiProcess process = {0};
++    unsigned first_thread = 0, ordinal = 0;
++    if (!strcmp(name, "lsd")) {
++        PE_parse_boot_argn("zorn_gui_service_thread", &first_thread, sizeof(first_thread));
++        if (first_thread > 63) first_thread = 0;
++    }
+     strlcpy(process.name, name, sizeof(process.name));
+     process.pid = (uint32_t)pid;
+     zorn_ufs_gui_stage(0, 4, pid);
+@@ -185,12 +190,15 @@
+     queue_iterate(&task->threads, thread, thread_t, task_threads) {
+         arm_saved_state_t *ss = find_user_regs(thread);
+         if (ss == NULL || !is_saved_state64(ss)) continue;
++        unsigned thread_ordinal = ordinal++;
++        if (thread_ordinal < first_thread) continue;
+         if (process.count == 4) { process.truncated = 1; break; }
+         process.threads[process.count++] = (struct ZornGuiThread){
+             .pc = get_saved_state_pc(ss), .lr = get_saved_state_lr(ss),
+             .sp = get_saved_state_sp(ss), .fp = get_saved_state_fp(ss),
+             .wait = thread->wait_event, .continuation = (uintptr_t)thread->continuation,
+             .state = thread->state,
++            .reserved = first_thread ? thread_ordinal + 1 : 0,
+         };
+     }
+     task_unlock(task);

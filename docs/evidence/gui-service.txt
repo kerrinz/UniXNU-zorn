@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":6,"stage":11,"pid":0,"sequence":131,"ms":96253,"pages":{"free":1618520,"active":55482,"inactive":47039,"wired":100714},"ram_data":{"reads":74,"writes":800,"errors":0},"display":[10,0,6304,6464,1,1,1,0,4,0,78,0,18446744037894658048,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":6,"slide":453607424,"main_header":4303499264,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8162238844,"lr":7153941764,"sp":6163919984,"fp":6163920208,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":1,"pc":8162216168,"lr":8462771584,"sp":6164475840,"fp":6164475872,"wait":18446744045623550776,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":8162234664,"lr":7153601760,"sp":6165024656,"fp":6165024672,"wait":0,"continuation":18446744005188260424,"state":4,"frames":[]},{"index":3,"pc":8162216168,"lr":8462771584,"sp":6165572416,"fp":6165572448,"wait":18446744045623570000,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"SpringBoard","pid":5,"tick":6,"slide":453607424,"main_header":4299554816,"thread_count":4,"truncated":false,"threads":[{"index":0,"pc":8162216792,"lr":8162230820,"sp":6167325600,"fp":6167325680,"wait":0,"continuation":18446744005183365976,"state":1,"frames":[]},{"index":1,"pc":8162216168,"lr":8462771584,"sp":6167870256,"fp":6167870288,"wait":18446744045617070728,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":8162216168,"lr":8462771584,"sp":6168420288,"fp":6168420320,"wait":18446744045617050776,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":3,"pc":8162216168,"lr":8462771584,"sp":6168967984,"fp":6168968016,"wait":18446744045616948552,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"backboardd","pid":37,"tick":6,"slide":453607424,"main_header":4299042816,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8162239380,"lr":7153929108,"sp":6167839664,"fp":6167839712,"wait":18446744005107540492,"continuation":18446744005183777052,"state":1,"frames":[]},{"index":1,"pc":8462761156,"lr":0,"sp":6168383488,"fp":0,"wait":0,"continuation":18446744005183446408,"state":4,"frames":[]},{"index":2,"pc":8162216168,"lr":8462771584,"sp":6168931120,"fp":6168931152,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":3,"pc":8162216168,"lr":8462771584,"sp":6170028864,"fp":6170028896,"wait":18446744045615205088,"continuation":18446744005187930812,"state":1,"frames":[]}]}],"exits":[{"sequence":1,"pid":2,"status":1,"namespace":0,"code":0,"name":"launchd","detail":{"pc":0,"lr":0,"far":0,"slide":453607424,"main_header":0,"esr":0,"cpsr":0,"fixups":0,"reason":"","frames":[]}}],"configuration":{"dyld_flags":9,"owner_dyld_flags":8,"fixups_parsed":3,"fixups_applied":0,"hold_seconds":180,"watchdog_mode":1,"owner_stage":6,"owner_mount_flags":343969825},"paths":[{"path":"/usr/lib/libobjc-trampolines.dylib","errno":0,"vnode_type":1},{"path":"/private/preboot/usr/lib/libobjc-trampolines.dylib","errno":2,"vnode_type":0},{"path":"/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":0,"vnode_type":1},{"path":"/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":2,"vnode_type":0}],"ipc_attempts":[{"sequence":3377,"name":"launchd","pid":1,"message":536870912,"receiver_pid":41,"bits":18,"receiver_name":"locationd"},{"sequence":3378,"name":"launchd","pid":1,"message":536870912,"receiver_pid":41,"bits":18,"receiver_name":"locationd"},{"sequence":2983,"name":"SpringBoard","pid":5,"message":1017,"receiver_pid":69,"bits":1118737,"receiver_name":"notifyd"},{"sequence":2975,"name":"SpringBoard","pid":5,"message":1018,"receiver_pid":69,"bits":1118737,"receiver_name":"notifyd"},{"sequence":3373,"name":"backboardd","pid":37,"message":2881,"receiver_pid":-1,"bits":4625,"receiver_name":""},{"sequence":3364,"name":"backboardd","pid":37,"message":2881,"receiver_pid":-1,"bits":4625,"receiver_name":""}],"iokit_queries":[{"sequence":233,"name":"backboardd","pid":37,"status":0,"iterator_present":false,"provider_class":"IOAcceleratorES"}]}
+140 checkpoints; showing last 100
+040 USRBEGIN
+041 IPC_ATTEMPT
+042  #3359 laun
+043 chd[1] msg=
+044 536870912 r
+045 eceiver=62 
+046 bits=12 
+047 USREND
+048 UCON
+049 TIM00017704
+050 UFD00000000
+051 USRBEGIN
+052 IPC_ATTEMPT
+053  #3360 laun
+054 chd[1] msg=
+055 536870912 r
+056 eceiver=44 
+057 bits=800000
+058 12 
+059 USREND
+060 UCON
+061 TIM00017705
+062 UFD00000000
+063 USRBEGIN
+064 IPC_ATTEMPT
+065  #2983 Spri
+066 ngBoard[5] 
+067 msg=1017 re
+068 ceiver=69 b
+069 its=111211 
+070 USREND
+071 UCON
+072 TIM00017705
+073 UFD00000000
+074 USRBEGIN
+075 IPC_ATTEMPT
+076  #2975 Spri
+077 ngBoard[5] 
+078 msg=1018 re
+079 ceiver=69 b
+080 its=111211 
+081 USREND
+082 UCON
+083 TIM00017706
+084 UFD00000000
+085 USRBEGIN
+086 IPC_ATTEMPT
+087  #3357 back
+088 boardd[37] 
+089 msg=2881 re
+090 ceiver=-1 b
+091 its=1211 
+092 USREND
+093 UCON
+094 TIM00017706
+095 UFD00000000
+096 USRBEGIN
+097 IPC_ATTEMPT
+098  #3332 back
+099 boardd[37] 
+100 msg=2881 re
+101 ceiver=-1 b
+102 its=1211 
+103 USREND
+104 UCON
+105 EPET
+106 TIM00017707
+107 UFD00000000
+108 USRBEGIN
+109 EXEC ACTIVA
+110 TE_RETURN p
+111 id=136 erro
+112 r=0 path=/u
+113 sr/libexec/
+114 transparenc
+115 yd 
+116 USREND
+117 UCON
+118 LC2
+119 LD2
+120 LV2
+121 LW2
+122 LC2
+123 LD2
+124 LV2
+125 LW2
+126 LC2
+127 LD2
+128 LV2
+129 LW2
+130 LC2
+131 LD2
+132 LV2
+133 LW2
+134 TIM000177D5
+135 UFD00000004
+136 USRBEGIN
+137 24 
+138 USREND
+139 UCON
+user output: RAMDATA reads=74 writes=782 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=4 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 IPC_ATTEMPT #3359 launchd[1] msg=536870912 receiver=62 bits=12 IPC_ATTEMPT #3360 launchd[1] msg=536870912 receiver=44 bits=80000012 IPC_ATTEMPT #2983 SpringBoard[5] msg=1017 receiver=69 bits=111211 IPC_ATTEMPT #2975 SpringBoard[5] msg=1018 receiver=69 bits=111211 IPC_ATTEMPT #3357 backboardd[37] msg=2881 receiver=-1 bits=1211 IPC_ATTEMPT #3332 backboardd[37] msg=2881 receiver=-1 bits=1211 EXEC ACTIVATE_RETURN pid=136 error=0 path=/usr/libexec/transparencyd 24 

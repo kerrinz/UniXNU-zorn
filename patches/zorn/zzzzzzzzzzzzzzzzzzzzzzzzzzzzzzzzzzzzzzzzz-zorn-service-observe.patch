@@ -1,0 +1,28 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -2226,7 +2226,8 @@
+ exec_activate_image(struct image_params *imgp)
+ {
+ 	struct nameidata *ndp = NULL;
+-	const char *excpath;
++	const char *excpath = NULL;
++	extern void zorn_ufs_exec_report(int, const char *, int, int);
+ 	int error;
+ 	int resid;
+ 	int once = 1;   /* save SGUID-ness for interpreted files */
+@@ -2253,6 +2254,7 @@
+ 	}
+ 
+ 	/* Use excpath, which contains the copyin-ed exec path */
++	zorn_ufs_exec_report(proc_getpid(p), excpath, 0, 0);
+ 	DTRACE_PROC1(exec, uintptr_t, excpath);
+ 
+ 	ndp = kalloc_type(struct nameidata, Z_WAITOK | Z_ZERO | Z_NOFAIL);
+@@ -2481,6 +2483,7 @@
+ 	proc_transend(p, 0);
+ 
+ bad_notrans:
++	zorn_ufs_exec_report(proc_getpid(p), excpath, error, 1);
+ 	if (imgp->ip_strings) {
+ 		execargs_free(imgp);
+ 	}

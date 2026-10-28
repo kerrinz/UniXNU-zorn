@@ -1,0 +1,117 @@
+340 checkpoints; showing last 100
+240 SRL00001000
+241 SRE00000000
+242 APC00000008
+243 APBEGIN
+244 spec_open :
+245  si_devbsdu
+246 nit initial
+247 ized to (0)
+248 , throttle_
+249 mask is (0x
+250 0), isssd i
+251 s (0) 
+252 APEND
+253 APBEGIN
+254 dev_init:30
+255 3: md1 devi
+256 ce accelera
+257 ted crypto:
+258  0 (compile
+259 d @ Jul 11 
+260 2025 17:34:
+261 16) 
+262 APEND
+263 APBEGIN
+264 dev_init:30
+265 6: md1 devi
+266 ce_handle b
+267 lock size 4
+268 096 block c
+269 ount 806400
+270  features 0
+271  internal  
+272 APEND
+273 APBEGIN
+274 nx_mount:12
+275 75: md1 ini
+276 tializing c
+277 ache w/hash
+278 _size 1024 
+279 and cache s
+280 ize 2500 
+281 APEND
+282 APBEGIN
+283 nx_mount:16
+284 17: md1 che
+285 ckpoint sea
+286 rch: larges
+287 t xid 14, b
+288 est xid 14 
+289 @ 9 
+290 APEND
+291 APBEGIN
+292 nx_mount:16
+293 44: md1 sta
+294 ble checkpo
+295 int indices
+296 : desc 8 da
+297 ta 16 
+298 APEND
+299 APBEGIN
+300 nx_is_mount
+301 _valid:2306
+302 : md1 inval
+303 id fsindex:
+304  -1 
+305 APEND
+306 APBEGIN
+307 apfs_vfsop_
+308 mount:2550:
+309  unable to 
+310 mount from 
+311 /dev/md1: 2
+312  
+313 APEND
+314 VRQUERY
+315 VRQOK
+316 ZP000000000
+317 ZT000000002
+318 ZP100000000
+319 ZT100000003
+320 ZP200000000
+321 ZT200000002
+322 ZP300000000
+323 ZT300000002
+324 ZP400000000
+325 ZT400000002
+326 ZDV03000001
+327 ZCS00000003
+328 ZCE00000002
+329 ZCA00000000
+330 OWNFAIL
+331 P0BCC2C60
+332 PANICBEGIN
+333 offline own
+334 er SystemOS
+335  mount fail
+336 ed: 2 @kern
+337 _exec.c:758
+338 3
+339 PANICEND
+panic: offline owner SystemOS mount failed: 2 @kern_exec.c:7583
+mount printf: spec_open : si_devbsdunit initialized to (0), throttle_mask is (0x0), isssd is (0) 
+mount printf: dev_init:303: md1 device accelerated crypto: 0 (compiled @ Jul 11 2025 17:34:16) 
+mount printf: dev_init:306: md1 device_handle block size 4096 block count 806400 features 0 internal  
+mount printf: nx_mount:1275: md1 initializing cache w/hash_size 1024 and cache size 2500 
+mount printf: nx_mount:1617: md1 checkpoint search: largest xid 14, best xid 14 @ 9 
+mount printf: nx_mount:1644: md1 stable checkpoint indices: desc 8 data 16 
+mount printf: nx_is_mount_valid:2306: md1 invalid fsindex: -1 
+mount printf: apfs_vfsop_mount:2550: unable to mount from /dev/md1: 2 
+Image4 before UFS: service wait; pc_low=0x04a98224; value=0xffffffffffffffff
+Image4 before UFS: SoftwareAES start enter; pc_low=0x00000000; value=0x0; NativeAES
+Image4 before UFS: SoftwareAES start true; pc_low=0x00000000; value=0x0; NativeAES
+Image4 before UFS: service found; pc_low=0x04a98224; value=0xfffffff73023a980
+Image4 before UFS: gate open; pc_low=0x04a98324; value=0xfffffff8fcd2f1c0
+Image4 before UFS: service matching; pc_low=0x04a93018; value=0x0; IODTNVRAM
+Image4 before UFS: start true; pc_low=0x00000000; value=0x0; IOPlatformDevice

@@ -1,0 +1,45 @@
+# Readonly native union of authenticated SystemOS over OS; isolated GUI trial.
+# Kernel configuration for the first zorn link.
+# CONFIG_XNU_* becomes XNU_* for scripts/build-xnu-4k-baseline.sh.
+# This tree builds Darwin 23.6 (xnu-10063). The local iPhone X 16.7.16 IPSW
+# is Darwin 22 and is not the prelink target.
+
+CONFIG_XNU_BUILD_ARCHIVES=y
+CONFIG_XNU_SOURCE_CORECRYPTO14=y
+CONFIG_XNU_SOURCE_PTHREAD=y
+CONFIG_XNU_ARM_DT_PLATFORM=y
+CONFIG_XNU_ARMCPU=y
+CONFIG_XNU_NATIVE_PAN=y
+CONFIG_XNU_NATIVE_AES=y
+CONFIG_XNU_NATIVE_AES_ARCHIVE="{tree}/build/native-aes/libSoftwareAES.a"
+CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
+CONFIG_XNU_TRUST_CACHE_RUNTIME=y
+CONFIG_XNU_ZORN_VERIFIED_ROOT=y
+CONFIG_XNU_VERIFIED_ROOT_PROBE=y
+CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/zorn-verified-root/libZornVerifiedRoot.a"
+CONFIG_XNU_OWNER_ROOT_AUDIT=y
+CONFIG_XNU_OWNER_ROOT_TRUST=y
+CONFIG_XNU_OWNER_CACHE_MOUNT=y
+CONFIG_XNU_OWNER_CACHE_STARTUP=y
+CONFIG_XNU_OWNER_BOOT_MANIFEST=y
+# CONFIG_XNU_OWNER_CACHE_CARRIER is not set
+CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
+# NativeUfs pulls in verified-root, boot progress and IOBlockStorageDevice.
+# The board uses its own bounded UFS transport instead of this full driver.
+# CONFIG_XNU_NATIVE_UFS is not set
+CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"
+# The development kernel references native_legacy_display_probe even when the
+# Legacy framebuffer is not built. The archive is empty when the real
+# GopFramebuffer integration is selected instead.
+# libZornUfs exposes a read-only OS container and bounded log/recovery writes.
+CONFIG_XNU_EXTRA_LD_ARCHIVES="-Wl,-force_load,{tree}/build/zorn-stubs/libZornLinkStubs.a -Wl,-force_load,{tree}/build/zorn-ufs/libZornUfs.a -Wl,-force_load,{tree}/build/zorn-pmgr/libZornPlatformPower.a"
+# CONFIG_XNU_ARMVIRT_PLATFORM is not set
+# CONFIG_XNU_SHENG_PMGR is not set
+
+# Isolated writable RAM Data; UUID is filled from the validated seed by build-zorn-debug.py.
+CONFIG_XNU_NATIVE_RAM_BLOCK=y
+CONFIG_XNU_OWNER_DATA_MOUNT=y
+CONFIG_XNU_OWNER_DATA_VOLUME_UUID="00000000-0000-0000-0000-000000000000"
+
+# Isolated display lifecycle and CPU presentation experiment.
+CONFIG_XNU_NATIVE_LEGACY_DISPLAY=y

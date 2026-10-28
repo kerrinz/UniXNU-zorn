@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":5,"stage":11,"pid":0,"sequence":74,"ms":78693,"pages":{"free":1791368,"active":14836,"inactive":34082,"wired":93521},"ram_data":{"reads":72,"writes":306,"errors":0},"display":[10,0,6304,6464,1,1,1,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":5,"slide":232947712,"main_header":4309213184,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":7941556456,"lr":8242111872,"sp":6158211776,"fp":6158211808,"wait":18446744027039282680,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":1,"pc":7941556456,"lr":8242111872,"sp":6158760768,"fp":6158760800,"wait":18446744027039286952,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":2,"pc":7941574952,"lr":6932942048,"sp":6159310736,"fp":6159310752,"wait":18446744038626073792,"continuation":18446744005188260168,"state":1,"frames":[]},{"index":3,"pc":7941556456,"lr":8242111872,"sp":6159858480,"fp":6159858512,"wait":18446744027039274136,"continuation":18446744005187930812,"state":1,"frames":[]}]},{"name":"SpringBoard","pid":73,"tick":5,"slide":232947712,"main_header":4298371072,"thread_count":2,"truncated":false,"threads":[{"index":0,"pc":7941557080,"lr":7941571108,"sp":6168491568,"fp":6168491648,"wait":0,"continuation":18446744005183365804,"state":1,"frames":[]},{"index":1,"pc":7941556456,"lr":8242111872,"sp":6169604032,"fp":6169604064,"wait":18446744027043904928,"continuation":18446744005187930812,"state":1,"frames":[]}]}],"exits":[{"sequence":1,"pid":2,"status":1,"namespace":0,"code":0,"name":"launchd","detail":{"pc":0,"lr":0,"far":0,"slide":232947712,"main_header":0,"esr":0,"cpsr":0,"fixups":0,"reason":"","frames":[]}},{"sequence":2,"pid":5,"status":11,"namespace":2,"code":11,"name":"SpringBoard","detail":{"pc":7062600196,"lr":7062600168,"far":16,"slide":232947712,"main_header":4300816384,"esr":2449473541,"cpsr":2147483648,"fixups":0,"reason":"","frames":[]}}],"configuration":{"dyld_flags":524297,"owner_dyld_flags":524296,"fixups_parsed":3,"fixups_applied":0,"hold_seconds":180,"watchdog_mode":1,"owner_stage":6,"owner_mount_flags":343969825},"paths":[{"path":"/usr/lib/libobjc-trampolines.dylib","errno":0,"vnode_type":1},{"path":"/private/preboot/usr/lib/libobjc-trampolines.dylib","errno":2,"vnode_type":0},{"path":"/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":0,"vnode_type":1},{"path":"/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64","errno":2,"vnode_type":0}]}
+172 checkpoints; showing last 100
+072 =0 path=/us
+073 r/libexec/r
+074 unningboard
+075 d 
+076 USREND
+077 UCON
+078 NDYL
+079 ENAME
+080 EPERM
+081 TIM000131B0
+082 UFD00000000
+083 USRBEGIN
+084 EXEC ACTIVA
+085 TE_RETURN p
+086 id=6 error=
+087 0 path=/usr
+088 /libexec/ru
+089 nningboardd
+090  
+091 USREND
+092 UCON
+093 TIM000131E6
+094 UFD00000002
+095 USRBEGIN
+096 com.apple.x
+097 pc.launchd|
+098 1970-01-01 
+099 00:01:56.39
+100 0115 (user/
+101 501/com.app
+102 le.watchdog
+103 d [86]) <Wa
+104 rning>: Ena
+105 bling panic
+106 -on-crash d
+107 ue to conse
+108 cutive cras
+109 hes 
+110 USREND
+111 UCON
+112 TIM000131E7
+113 UFD00000002
+114 USRBEGIN
+115 com.apple.x
+116 pc.launchd|
+117 1970-01-01 
+118 00:01:56.40
+119 4080 (user/
+120 501/com.app
+121 le.watchdog
+122 d [86]) <No
+123 tice>: serv
+124 ice state: 
+125 running 
+126 USREND
+127 UCON
+128 TIM000131E9
+129 UFD00000002
+130 USRBEGIN
+131 com.apple.x
+132 pc.launchd|
+133 1970-01-01 
+134 00:01:56.41
+135 8054 (user/
+136 501/com.app
+137 le.runningb
+138 oardd [6]) 
+139 <Notice>: s
+140 ervice stat
+141 e: running 
+142 USREND
+143 UCON
+144 TIM00013351
+145 UFD00000002
+146 USRBEGIN
+147 objc[85]: C
+148 lass MBAcco
+149 untChange i
+150 s implement
+151 ed in both 
+152 /System/Lib
+153 rary/Privat
+154 eFrameworks
+155 /MobileBack
+156 up.framewor
+157 k/MobileBac
+158 kup (0x202a
+159 6d8f0) and 
+160 /System/Lib
+161 rary/UserEv
+162 entPlugins/
+163 MobileBacku
+164 pUEA.plugin
+165 /MobileBack
+166 upUEA (0x10
+167 0ca19f8). O
+168 ne of the t
+169 wo will be 
+170 use
+171 USREND
+user output: RAMDATA reads=71 writes=243 errors=0 DISPLAY stage=10 error=00000000 registered=1 clients=0 accepted=0 rejected=0 transfers=0 status=00000000 bytes=0 pixels=0 GUI EXIT #1 launchd[2] status=1 namespace=0 code=0 GUI EXIT #2 SpringBoard[5] status=b namespace=2 code=b EXEC ACTIVATE_RETURN pid=86 error=0 path=/usr/libexec/xpcproxy EXEC BEGIN pid=6 error=0 path=/usr/libexec/runningboardd EXEC ACTIVATE_RETURN pid=6 error=0 path=/usr/libexec/runningboardd com.apple.xpc.launchd|1970-01-01 00:01:56.390115 (user/501/com.apple.watchdogd [86]) <Warning>: Enabling panic-on-crash due to consecutive crashes com.apple.xpc.launchd|1970-01-01 00:01:56.404080 (user/501/com.apple.watchdogd [86]) <Notice>: service state: running com.apple.xpc.launchd|1970-01-01 00:01:56.418054 (user/501/com.apple.runningboardd [6]) <Notice>: service state: running objc[85]: Class MBAccountChange is implemented in both /System/Library/PrivateFrameworks/MobileBackup.framework/MobileBackup (0x202a6d8f0) and /System/Library/UserEventPlugins/MobileBackupUEA.plugin/MobileBackupUEA (0x100ca19f8). One of the two will be use

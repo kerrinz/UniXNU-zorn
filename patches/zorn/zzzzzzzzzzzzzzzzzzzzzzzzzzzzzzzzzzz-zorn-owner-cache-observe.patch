@@ -1,0 +1,18 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7171,6 +7171,15 @@
+ __attribute__((noinline)) void
+ native_owner_cache_checkpoint(int status, int authorized)
+ {
++	extern void zorn_say(const char *);
++	char word[12];
++	snprintf(word, sizeof(word), "ZCS%08X", (unsigned)native_owner_cache_stage);
++	zorn_say(word);
++	snprintf(word, sizeof(word), "ZCE%08X", (unsigned)status);
++	zorn_say(word);
++	snprintf(word, sizeof(word), "ZCA%08X", (unsigned)authorized);
++	zorn_say(word);
++	zorn_say(status == 0 && authorized ? "OWNOK" : "OWNFAIL");
+ 	__asm__ volatile("" : : "r"(status), "r"(authorized) : "memory");
+ }
+ 

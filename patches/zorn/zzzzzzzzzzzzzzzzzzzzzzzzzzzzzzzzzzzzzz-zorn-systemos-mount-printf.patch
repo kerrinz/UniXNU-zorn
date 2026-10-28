@@ -1,0 +1,28 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7280,7 +7280,10 @@
+ 			}
+ 		}
+ 	}
++	extern void zorn_ufs_mount_capture(int);
++	zorn_ufs_mount_capture(1);
+ 	error = mount(p, &request, &result);
++	zorn_ufs_mount_capture(0);
+ 	native_owner_cache_mount_status = error;
+ 	if (error) goto done;
+ 	native_owner_cache_stage = 4;
+--- a/osfmk/kern/printf.c
++++ b/osfmk/kern/printf.c
+@@ -873,6 +873,12 @@
+ vprintf_internal(const char *fmt, va_list ap_in, void *caller)
+ {
+ 	if (fmt) {
++		/* Bounded passive BSS capture; no transport I/O or policy changes. */
++		extern void zorn_ufs_mount_printf(const char *, va_list);
++		va_list observed;
++		va_copy(observed, ap_in);
++		zorn_ufs_mount_printf(fmt, observed);
++		va_end(observed);
+ 		struct console_printbuf_state info_data;
+ 
+ 		va_list ap;

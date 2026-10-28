@@ -1,0 +1,20 @@
+
+out/zorn/builds/2ddf7cb4/kernel.macho:	file format mach-o arm64
+
+Disassembly of section __TEXT_EXEC,__text:
+
+fffffff00b93a8ac <_vm_fault_internal>:
+fffffff00b93ad70: f85103a8     	ldur	x8, [x29, #-0xf0]
+fffffff00b93ad74: b5014e28     	cbnz	x8, 0xfffffff00b93d738 <_vm_fault_internal+0x2e8c>
+fffffff00b93ad78: 52800088     	mov	w8, #0x4        ; =4
+fffffff00b93ad7c: b81603a8     	stur	w8, [x29, #-0xa0]
+fffffff00b93ad80: f9001b56     	str	x22, [x26, #0x30]
+fffffff00b93ad84: d503201f     	nop
+fffffff00b93ad88: f9401b40     	ldr	x0, [x26, #0x30]
+fffffff00b93ad8c: 97fd6034     	bl	0xfffffff00b892e5c <_lck_rw_lock_shared>
+fffffff00b93ad90: 36000154     	tbz	w20, #0x0, 0xfffffff00b93adb8 <_vm_fault_internal+0x50c>
+fffffff00b93ad94: 90003c49     	adrp	x9, 0xfffffff00c0c2000 <_sample_period_ghost_counts+0xffc>
+fffffff00b93ad98: f9446d28     	ldr	x8, [x9, #0x8d8]
+fffffff00b93ad9c: 91000508     	add	x8, x8, #0x1
+fffffff00b93ada0: f9046d28     	str	x8, [x9, #0x8d8]
+fffffff00b93ada4: 52800208     	mov	w8, #0x10       ; =16

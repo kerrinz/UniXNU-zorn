@@ -189,7 +189,10 @@ def main():
                              ('artwork-device-idiom', b'pad\0'),
                              ('artwork-device-subtype', struct.pack('<I', 2732)),
                              ('artwork-scale-factor', struct.pack('<I', 2)),
-                             ('artwork-display-gamut', b'P3\0'),
+                             # The CPU presentation path scans out 8-bit BGRX.
+                             # Use the sheng CPU-rendering profile: wide-color
+                             # surfaces require GPU drawing in parts of CoreGraphics.
+                             ('artwork-display-gamut', b'sRGB\0'),
                              ('compatible-device-fallback', b'iPad6,7\0'),
                              ('thin-bezel', struct.pack('<I', 1))] if args.ipad_identity else [] )]),
         node('arm-io', [('device_type', b'arm-io\0'),

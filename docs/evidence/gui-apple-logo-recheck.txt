@@ -1,0 +1,103 @@
+GUI snapshot: {"tick":8,"stage":11,"pid":0,"sequence":141,"ms":124463,"pages":{"free":1788837,"active":17197,"inactive":30934,"wired":90979},"ram_data":{"reads":71,"writes":92,"errors":0},"display":[10,0,6304,6464,1,1,1,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"processes":[{"name":"launchd","pid":1,"tick":8,"slide":514949120,"main_header":4300218368,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8223557864,"lr":8524113280,"sp":6167206448,"fp":6167206480,"wait":18446744045790509968,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":1,"pc":8223576360,"lr":7214943456,"sp":6168305552,"fp":6168305568,"wait":0,"continuation":18446744005188259708,"state":4,"frames":[]},{"index":2,"pc":8223557864,"lr":8524113280,"sp":6168853296,"fp":6168853328,"wait":18446744045790527056,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":3,"pc":8524102852,"lr":0,"sp":6169402224,"fp":0,"wait":0,"continuation":18446744005183446236,"state":4,"frames":[]}]},{"name":"SpringBoard","pid":5,"tick":7,"slide":514949120,"main_header":4302749696,"thread_count":4,"truncated":true,"threads":[{"index":0,"pc":8223557824,"lr":7214970408,"sp":6164131536,"fp":6164131632,"wait":18446744038059771392,"continuation":18446744005188073828,"state":1,"frames":[]},{"index":1,"pc":8523363908,"lr":7072954212,"sp":6164672928,"fp":6164672944,"wait":0,"continuation":0,"state":4,"frames":[]},{"index":2,"pc":8223557864,"lr":8524113280,"sp":6165224240,"fp":6165224272,"wait":18446744045787625128,"continuation":18446744005187930812,"state":1,"frames":[]},{"index":3,"pc":8223558488,"lr":8223572516,"sp":6165754352,"fp":6165754432,"wait":0,"continuation":18446744005183365804,"state":65,"frames":[]}]},{"name":"backboardd","pid":77,"tick":6,"slide":514949120,"main_header":4310319104,"thread_count":1,"truncated":false,"threads":[{"index":0,"pc":7649845964,"lr":7649845960,"sp":6156565072,"fp":6156565088,"wait":0,"continuation":0,"state":4,"frames":[]}]}],"exits":[{"sequence":5,"pid":101,"status":11,"namespace":2,"code":11,"name":"backboardd"},{"sequence":2,"pid":77,"status":11,"namespace":2,"code":11,"name":"backboardd"},{"sequence":3,"pid":5,"status":6,"namespace":8,"code":1,"name":"SpringBoard"},{"sequence":4,"pid":109,"status":6,"namespace":8,"code":1,"name":"SpringBoard"}]}
+180 checkpoints; showing last 100
+080 pc.launchd|
+081 1970-01-01 
+082 00:02:38.60
+083 2852 (user/
+084 501/com.app
+085 le.watchdog
+086 d [98]) <Wa
+087 rning>: Ena
+088 bling panic
+089 -on-crash d
+090 ue to conse
+091 cutive cras
+092 hes 
+093 USREND
+094 UCON
+095 TIM0001E3E2
+096 UFD00000002
+097 USRBEGIN
+098 com.apple.x
+099 pc.launchd|
+100 1970-01-01 
+101 00:02:38.67
+102 8015 (user/
+103 501/com.app
+104 le.powerd [
+105 107]) <Noti
+106 ce>: servic
+107 e state: ru
+108 nning 
+109 USREND
+110 UCON
+111 TIM0001E4E8
+112 UFD00000002
+113 USRBEGIN
+114 com.apple.x
+115 pc.launchd|
+116 1970-01-01 
+117 00:02:38.82
+118 5637 (user/
+119 501/com.app
+120 le.lsd [106
+121 ]) <Notice>
+122 : service s
+123 tate: runni
+124 ng 
+125 USREND
+126 UCON
+127 TIM0001E530
+128 UFD00000000
+129 USRBEGIN
+130 EXEC BEGIN 
+131 pid=110 err
+132 or=0 path=/
+133 usr/libexec
+134 /xpcproxy 
+135 USREND
+136 UCON
+137 NDYL
+138 ENAME
+139 EPERM
+140 TIM0001E55A
+141 UFD00000000
+142 USRBEGIN
+143 EXEC ACTIVA
+144 TE_RETURN p
+145 id=110 erro
+146 r=0 path=/u
+147 sr/libexec/
+148 xpcproxy 
+149 USREND
+150 UCON
+151 TIM0001E576
+152 UFD00000002
+153 USRBEGIN
+154 com.apple.x
+155 pc.launchd|
+156 1970-01-01 
+157 00:02:39.12
+158 7757 (pid/1
+159 09 [SpringB
+160 oard]) <Not
+161 ice>: uncor
+162 king exec s
+163 ource upfro
+164 nt 
+165 USREND
+166 UCON
+167 EPERM
+168 TIM0001E5F3
+169 UFD00000000
+170 USRBEGIN
+171 EXEC ACTIVA
+172 TE_RETURN p
+173 id=73 error
+174 =0 path=/us
+175 r/libexec/U
+176 serEventAge
+177 nt 
+178 USREND
+179 UCON
+user output: com.apple.xpc.launchd|1970-01-01 00:02:38.534857 (user/501/com.apple.SpringBoard [109]) <Notice>: internal event: INIT, code = 0 com.apple.xpc.launchd|1970-01-01 00:02:38.534866 (user/501/com.apple.SpringBoard [109]) <Notice>: job state = running com.apple.xpc.launchd|1970-01-01 00:02:38.534885 (user/501/com.apple.SpringBoard [109]) <Notice>: Successfully spawned SpringBoard[109] because inefficient com.apple.xpc.launchd|1970-01-01 00:02:38.534898 (user/501/com.apple.SpringBoard [109]) <Notice>: internal event: SOURCE_ATTACH, code = 0 com.apple.xpc.launchd|1970-01-01 00:02:38.602852 (user/501/com.apple.watchdogd [98]) <Warning>: Enabling panic-on-crash due to consecutive crashes com.apple.xpc.launchd|1970-01-01 00:02:38.678015 (user/501/com.apple.powerd [107]) <Notice>: service state: running com.apple.xpc.launchd|1970-01-01 00:02:38.825637 (user/501/com.apple.lsd [106]) <Notice>: service state: running EXEC BEGIN pid=110 error=0 path=/usr/libexec/xpcproxy EXEC ACTIVATE_RETURN pid=110 error=0 path=/usr/libexec/xpcproxy com.apple.xpc.launchd|1970-01-01 00:02:39.127757 (pid/109 [SpringBoard]) <Notice>: uncorking exec source upfront EXEC ACTIVATE_RETURN pid=73 error=0 path=/usr/libexec/UserEventAgent 

@@ -1,0 +1,19 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -680,9 +680,14 @@
+ 	static int channel;
+ 	unsigned hold = 0;
+ 	PE_parse_boot_argn("zorn_gui_hold", &hold, sizeof(hold));
+-	unsigned sample_limit = hold > 300 && hold <= 900 ? (hold + 14) / 15 : 20;
++	/* A 30-second period keeps the existing 60-sample wire bound and stays
++	 * below the independent 55-second watchdog bite. The absolute epoch
++	 * deadline in the native hold helper is never extended by this loop. */
++	unsigned period = hold > 900 && hold <= 1800 ? 30 : 15;
++	unsigned sample_limit = hold > 300 && hold <= 1800 ? (hold + period - 1) / period : 20;
++	if (period == 30) zorn_ufs_gui_hold_tick();
+ 	for (unsigned sample = 1; sample <= sample_limit; ++sample) {
+-		(void)tsleep(&channel, PZERO, "zorngui", 15 * hz);
++		(void)tsleep(&channel, PZERO, "zorngui", period * hz);
+ 		char text[64];
+ 		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/%u ", sample, sample_limit);
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);

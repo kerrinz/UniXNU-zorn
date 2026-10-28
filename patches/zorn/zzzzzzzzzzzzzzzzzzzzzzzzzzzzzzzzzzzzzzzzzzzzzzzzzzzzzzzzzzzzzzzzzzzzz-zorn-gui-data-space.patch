@@ -1,0 +1,103 @@
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -4,7 +4,7 @@
+ #define ZORN_GUI_LOG_H
+ #include <sys/types.h>
+ 
+-#define ZORN_GUI_LOG_SLOTS 96
++#define ZORN_GUI_LOG_SLOTS 92
+ #define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
+ #define ZORN_GUI_STACK_FRAMES 16
+ 
+@@ -76,20 +76,24 @@
+     uint64_t startupPolicy[3];
+     struct ZornGuiUserStack stacks[3];
+     uint64_t dataPermissions[3];
++    // errno/support bits, block bytes, total/available blocks, actual UUID.
++    uint64_t dataSpace[6];
+ };
+ 
+ #ifdef __cplusplus
+ static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
+-static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiUserStack) == 144 && sizeof(ZornGuiFooter) == 2928, "GUI footer ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiUserStack) == 144 && sizeof(ZornGuiFooter) == 2976, "GUI footer ABI");
+ extern "C" {
+ #else
+ _Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
+-_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiUserStack) == 144 && sizeof(struct ZornGuiFooter) == 2928, "GUI footer ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiUserStack) == 144 && sizeof(struct ZornGuiFooter) == 2976, "GUI footer ABI");
+ #endif
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);
+ void zorn_ufs_gui_stack(const char *name, const struct ZornGuiUserStack *stack);
+ void zorn_ufs_gui_paths(const uint32_t paths[8]);
++void zorn_ufs_gui_data_space(const uint64_t values[6]);
++int zorn_ufs_boot_policy_allowed(void);
+ void zorn_ufs_gui_ipc(int pid, const char *name, int32_t message, int receiver, uint32_t bits, const char *receiverName);
+ void zorn_ufs_gui_iokit(int pid, const char *name, const char *provider, int status, unsigned outputPresent);
+ struct task;
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -566,6 +566,7 @@
+ 
+ #if defined(XNU_NATIVE_LEGACY_DISPLAY) && XNU_NATIVE_LEGACY_DISPLAY
+ #include <sys/zorn_gui_log.h>
++#include <sys/mount.h>
+ /* zorn: bounded GUI observations. Only an explicitly selected absolute
+  * observation window permits scheduled observer watchdog pets. */
+ extern void zorn_gui_sample_task(const char *, int, task_t);
+@@ -631,6 +632,46 @@
+ 		if (!error) vnode_put(vp);
+ 		zorn_ufs_gui_paths(results);
+ 	}
++}
++
++static __attribute__((noinline)) void
++zorn_gui_data_space(void)
++{
++	uint64_t values[6] = { ENXIO, 0, 0, 0, 0, 0 };
++	if (!zorn_ufs_boot_policy_allowed()) {
++		zorn_ufs_gui_data_space(values);
++		return;
++	}
++	values[0] = 0;
++	vnode_t vp = NULLVP;
++	vfs_context_t ctx = vfs_context_kernel();
++	int error = vnode_lookup("/private/var", 0, &vp, ctx);
++	if (!error) {
++		mount_t mp = vnode_mount(vp);
++		if (!mp || !rootvnode || mp == vnode_mount(rootvnode)) {
++			error = EXDEV;
++		} else {
++			struct vfs_attr attr;
++			bzero(&attr, sizeof(attr));
++			VFSATTR_INIT(&attr);
++			VFSATTR_WANTED(&attr, f_bsize);
++			VFSATTR_WANTED(&attr, f_blocks);
++			VFSATTR_WANTED(&attr, f_bavail);
++			VFSATTR_WANTED(&attr, f_uuid);
++			error = vfs_getattr(mp, &attr, ctx);
++			if (!error) {
++				unsigned supported = 0;
++				if (VFSATTR_IS_SUPPORTED(&attr, f_bsize)) { supported |= 1; values[1] = attr.f_bsize; }
++				if (VFSATTR_IS_SUPPORTED(&attr, f_blocks)) { supported |= 2; values[2] = attr.f_blocks; }
++				if (VFSATTR_IS_SUPPORTED(&attr, f_bavail)) { supported |= 4; values[3] = attr.f_bavail; }
++				if (VFSATTR_IS_SUPPORTED(&attr, f_uuid)) { supported |= 8; memcpy(&values[4], attr.f_uuid, 16); }
++				values[0] = (uint64_t)supported << 32;
++			}
++		}
++		vnode_put(vp);
++	}
++	values[0] |= (uint32_t)error;
++	zorn_ufs_gui_data_space(values);
+ }
+ 
+ static void
+@@ -660,6 +701,7 @@
+ 			    zorn_gui_inventory_count, (unsigned long)pos, (int)bytes, zorn_gui_inventory + pos);
+ 			if (length > 0) zorn_ufs_user_output(0, inventory, (size_t)length < sizeof(inventory) ? (size_t)length : sizeof(inventory) - 1);
+ 		}
++		zorn_gui_data_space();
+ 		zorn_ufs_runtime_snapshot();
+ 		zorn_ufs_gui_stage(sample, 11, 0);
+ 		zorn_ufs_gui_hold_tick();

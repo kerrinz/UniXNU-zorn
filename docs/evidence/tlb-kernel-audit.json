@@ -1,0 +1,56 @@
+{
+  "c6fddc85": {
+    "kernel_sha256": "ed01439a06ab6e0c1a97c3b262a145efa39cf36c3aab00f14b66c65a8b188605",
+    "functions": {
+      "_flush_mmu_tlb_full_asid_async": {
+        "vmalle1_count": 0,
+        "tlbi": []
+      },
+      "_flush_mmu_tlb_region_asid_async": {
+        "vmalle1_count": 1,
+        "tlbi": [
+          "fffffff00b9cda18: d508871f     \ttlbi\tvmalle1",
+          "fffffff00b9cda48: d50887e8     \ttlbi\tvaale1, x8",
+          "fffffff00b9cda68: d50887a8     \ttlbi\tvale1, x8",
+          "fffffff00b9cda80: d5088768     \ttlbi\tvaae1, x8",
+          "fffffff00b9cda98: d5088728     \ttlbi\tvae1, x8"
+        ]
+      },
+      "_pmap_switch_internal": {
+        "vmalle1_count": 1,
+        "tlbi": [
+          "fffffff00b9d213c: d508871f     \ttlbi\tvmalle1"
+        ]
+      }
+    }
+  },
+  "6b816f14": {
+    "kernel_sha256": "2c034f58aafb4137df98da6951624e28adcacb8fc5297c4b15338ce2ec4fd8c2",
+    "functions": {
+      "_flush_mmu_tlb_full_asid_async": {
+        "vmalle1_count": 1,
+        "tlbi": [
+          "fffffff00b9cdab4: d508871f     \ttlbi\tvmalle1"
+        ]
+      },
+      "_flush_mmu_tlb_region_asid_async": {
+        "vmalle1_count": 2,
+        "tlbi": [
+          "fffffff00b9cda18: d508871f     \ttlbi\tvmalle1",
+          "fffffff00b9cda48: d50887e8     \ttlbi\tvaale1, x8",
+          "fffffff00b9cda68: d50887a8     \ttlbi\tvale1, x8",
+          "fffffff00b9cda7c: d508871f     \ttlbi\tvmalle1",
+          "fffffff00b9cda88: d5088768     \ttlbi\tvaae1, x8",
+          "fffffff00b9cdaa0: d5088728     \ttlbi\tvae1, x8"
+        ]
+      },
+      "_pmap_switch_internal": {
+        "vmalle1_count": 2,
+        "tlbi": [
+          "fffffff00b9d2144: d508871f     \ttlbi\tvmalle1",
+          "fffffff00b9d2174: d508871f     \ttlbi\tvmalle1"
+        ]
+      }
+    }
+  }
+}

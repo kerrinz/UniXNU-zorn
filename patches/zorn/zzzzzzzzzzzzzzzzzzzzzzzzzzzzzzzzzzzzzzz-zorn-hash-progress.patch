@@ -1,0 +1,35 @@
+--- a/bsd/kern/ubc_subr.c
++++ b/bsd/kern/ubc_subr.c
+@@ -5813,6 +5813,12 @@
+ 		return ENOTSUP;
+ 	}
+ 	count = (limit + PAGE_MASK) >> PAGE_SHIFT;
++	{
++		extern void zorn_ufs_hash_file(const char *, uint64_t);
++		const char *name = vnode_getname(vp);
++		zorn_ufs_hash_file(name, limit);
++		if (name) vnode_putname(name);
++	}
+ 	if (os_mul_overflow(count, (vm_size_t)md->cs_size, &allocation) ||
+ 	    round_page_overflow(allocation, &allocation)) {
+ 		return EOVERFLOW;
+@@ -5881,6 +5887,10 @@
+ 			}
+ 		}
+ 		os_atomic_add(&cs_native4k_hash_ticks, mach_absolute_time() - hash_start, relaxed);
++		/* Only a fully authenticated original chunk may pet the bounded
++		 * diagnostic watchdog. Never publish or change a hash decision here. */
++		extern void zorn_ufs_hash_progress(uint64_t, uint64_t);
++		zorn_ufs_hash_progress(chunk + chunk_length, limit);
+ 	}
+ 	kr = vm_map_protect(kernel_map, storage, storage + allocation, VM_PROT_READ, TRUE);
+ 	if (kr != KERN_SUCCESS) {
+@@ -5898,6 +5908,8 @@
+ 	if (storage) {
+ 		kmem_free(kernel_map, storage, allocation);
+ 	}
++	extern void zorn_ufs_hash_result(int);
++	zorn_ufs_hash_result(error);
+ 	return error;
+ }
+ #endif

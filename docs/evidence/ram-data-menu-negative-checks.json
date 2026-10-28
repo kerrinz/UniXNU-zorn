@@ -1,0 +1,30 @@
+[
+  {
+    "args": [
+      "--display-mode",
+      "1"
+    ],
+    "rejected_before_packaging": true,
+    "returncode": 2,
+    "message": "make-zorn-payload.py: error: display experiment requires the independent RAM Data seed"
+  },
+  {
+    "args": [
+      "--checkpoint",
+      "a/b"
+    ],
+    "rejected_before_packaging": true,
+    "returncode": 2,
+    "message": "make-zorn-payload.py: error: checkpoint must contain 1..7 uppercase letters/digits"
+  },
+  {
+    "args": [
+      "--data-seed",
+      "out/zorn/ram-data/zorn-data-512.dbr",
+      "--no-initrd"
+    ],
+    "rejected_before_packaging": true,
+    "returncode": 2,
+    "message": "make-zorn-payload.py: error: --data-seed cannot be combined with --no-initrd"
+  }
+]

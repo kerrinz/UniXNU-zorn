@@ -1,0 +1,13 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -578,7 +578,9 @@
+ static int
+ zorn_gui_sample_wanted(proc_t p, __unused void *arg)
+ {
+-	return proc_getpid(p) == 1 || !strcmp(p->p_comm, "SpringBoard") ||
++	unsigned service = 0;
++	PE_parse_boot_argn("zorn_gui_service", &service, sizeof(service));
++	return (service == 1 ? !strcmp(p->p_comm, "lsd") : proc_getpid(p) == 1) || !strcmp(p->p_comm, "SpringBoard") ||
+ 	       !strcmp(p->p_comm, "backboardd");
+ }
+ 
