@@ -21,6 +21,7 @@ parser.add_argument('--build-test',action='store_true',help='Build but do not en
 args=parser.parse_args()
 if not (args.audit_only or args.build_test or 'CONFIG_XNU_NATIVE_LEGACY_DISPLAY=y' in (ROOT.parent/'.config').read_text().splitlines()):
     print('GopFramebuffer Legacy disabled for this profile');raise SystemExit(0)
+touch_runtime=os.environ.get('UNIXNU_ZORN_TOUCH_RUNTIME','0')=='1'
 OUT=ROOT/'build/native-legacy-display';OUT.mkdir(parents=True,exist_ok=True)
 sys.path.insert(0,str(ROOT/'kits/XnuPrelink'))
 from native_prelink import macho,backed_offset,exports
@@ -155,7 +156,7 @@ def compile_source(source,output):
         elif v=='-Xclang' and a[index+1].startswith('-W'):index+=1
         elif not v.startswith('-W') and v not in ('-MD','-MP'):cmd.append(v)
         index+=1
-    cmd+=['-I',str(OUT),'-I',str(ROOT/'.cache/xnu-work/osfmk'),'-Wall','-Wextra','-Werror','-Wno-unused-parameter','-Wno-unnecessary-virtual-specifier','-Wno-deprecated-enum-enum-conversion','-Wno-c99-designator','-Wno-reorder-init-list','-Wno-deprecated-declarations','-mgeneral-regs-only']
+    cmd+=['-DZORN_TOUCH_RUNTIME_ENABLED='+str(int(touch_runtime)),'-I',str(OUT),'-I',str(ROOT/'.cache/xnu-work/osfmk'),'-Wall','-Wextra','-Werror','-Wno-unused-parameter','-Wno-unnecessary-virtual-specifier','-Wno-deprecated-enum-enum-conversion','-Wno-c99-designator','-Wno-reorder-init-list','-Wno-deprecated-declarations','-mgeneral-regs-only']
     result=subprocess.run(cmd,cwd=r['directory'],capture_output=True,text=True)
     output.with_suffix('.compile.log').write_text(result.stdout+result.stderr)
     require(result.returncode==0,(result.stdout+result.stderr)[-5000:])
@@ -261,6 +262,8 @@ def code(data,info):
 require(code(raw,image)==code(late.read_bytes(),macho(late.read_bytes())),'Only owned initializer section registration changes')
 probe=DEVICE/'native/display/ZornDisplayProbe.cpp'
 compile_source(probe,OUT/'ZornDisplayProbe.o')
+probe_image=macho((OUT/'ZornDisplayProbe.o').read_bytes())
+require(not any(sec['name']=='__mod_init_func' and sec['size'] for seg in probe_image['segments'] for sec in seg['sections']),'Board probe has no unqualified early global constructors')
 keystore=ROOT/'drivers/AppleKeyStoreState/NativeKeyStoreEvents.cpp'
 compile_source(keystore,OUT/'NativeKeyStoreEvents.o')
 keylate=OUT/'NativeKeyStoreEvents.late.o'
@@ -273,8 +276,14 @@ keyprobe=DEVICE/'native/display/ZornKeyStoreProbe.cpp'
 compile_source(keyprobe,OUT/'ZornKeyStoreProbe.o')
 hidprobe=DEVICE/'native/display/ZornHidServices.cpp'
 compile_source(hidprobe,OUT/'ZornHidServices.o')
+import importlib.util
+hid_builder=DEVICE/'scripts/zorn_touch_hid_build.py'
+hid_spec=importlib.util.spec_from_file_location('zorn_touch_hid_build',hid_builder)
+hid_module=importlib.util.module_from_spec(hid_spec);hid_spec.loader.exec_module(hid_module)
+hid_objects=hid_module.build(ROOT,DEVICE,OUT,plan,read,names,compile_source,run,require,macho,code,llvm,sdk) if touch_runtime else []
 archive=OUT/'libNativeLegacyDisplay.late.a';archive.unlink(missing_ok=True)
-run(['xcrun','ar','rcs',archive,late,OUT/'original-bindings.o',OUT/'ZornDisplayProbe.o',keylate,OUT/'ZornKeyStoreProbe.o',OUT/'ZornHidServices.o'])
-sources=[ROOT/'drivers/GopFramebuffer/NativeLegacyDisplay.cpp',ROOT/'drivers/GopFramebuffer/NativeLegacyRequest.h',probe,DEVICE/'native/display/ZornPanelBrightness.h',DEVICE/'native/display/ZornDsiBrightness.h',DEVICE/'native/display/ZornTouchProbe.h',DEVICE/'native/display/ZornTouchHandoff.h',DEVICE/'native/display/ZornTouchIdentify.h',DEVICE/'native/display/ZornFt3683Wire.h',keystore,keyprobe,hidprobe,Path(__file__).resolve()]
-(OUT/'build-report.json').write_text(json.dumps(dict(source_sha256={str(p):sha(p) for p in sources},archive_sha256=sha(archive),generated_abi_sha256=sha(OUT/'OriginalLegacyFramebufferABI.h'),original_candidate_sha256=sha(path),virtual_entries=358,owned_entries=owned,guarded_backend_leaves=[i for i in pure if i not in (213,337)],driver_initialized=False,display_presented=False,desktop=False),indent=2)+'\n')
+run(['xcrun','ar','rcs',archive,late,OUT/'original-bindings.o',OUT/'ZornDisplayProbe.o',keylate,OUT/'ZornKeyStoreProbe.o',OUT/'ZornHidServices.o',*hid_objects])
+sources=[ROOT/'drivers/GopFramebuffer/NativeLegacyDisplay.cpp',ROOT/'drivers/GopFramebuffer/NativeLegacyRequest.h',probe,DEVICE/'native/display/ZornPanelBrightness.h',DEVICE/'native/display/ZornDsiBrightness.h',DEVICE/'native/display/ZornTouchProbe.h',DEVICE/'native/display/ZornTouchHandoff.h',DEVICE/'native/display/ZornTouchIdentify.h',DEVICE/'native/display/ZornFt3683Wire.h',DEVICE/'native/display/ZornTouchFrames.h',DEVICE/'native/display/ZornTouchPrompt.h',DEVICE/'native/display/ZornTouchMatrix.h',keystore,keyprobe,hidprobe,DEVICE/'native/display/ZornTouchHid.cpp',DEVICE/'native/display/ZornTouchContacts.h',DEVICE/'native/display/ZornTouchRuntime.h',hid_builder,Path(__file__).resolve()]
+sources += [DEVICE/'native/display/ZornTouchPacing.h',DEVICE/'native/display/ZornTouchTrace.h',DEVICE/'native/display/ZornTouchEdges.h',DEVICE/'native/display/ZornTouchEdgeDispatch.h']
+(OUT/'build-report.json').write_text(json.dumps(dict(touch_runtime_compiled=touch_runtime,source_sha256={str(p):sha(p) for p in sources},archive_sha256=sha(archive),generated_abi_sha256=sha(OUT/'OriginalLegacyFramebufferABI.h'),original_candidate_sha256=sha(path),virtual_entries=358,owned_entries=owned,guarded_backend_leaves=[i for i in pure if i not in (213,337)],driver_initialized=False,display_presented=False,desktop=False),indent=2)+'\n')
 print('PASS: built canonical GopFramebuffer Legacy with verified original ABI; runtime lifecycle remains unqualified')

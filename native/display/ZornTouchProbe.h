@@ -5,6 +5,7 @@
 #include "ZornTouchIdentify.h"
 #include "ZornTouchFrames.h"
 extern "C" int zorn_ufs_touch_probe_finish(const char *);
+extern "C" int zorn_ufs_touch_raw_finish(const char *,const uint8_t *,unsigned);
 struct ZornTouchReadBus {
     bool read(uint32_t physical,uint32_t &value) {
         if(!ZornTouch::allowed(physical))return false;
@@ -22,14 +23,19 @@ struct ZornTouchReadBus {
 static void zornTouchProbe(void) {
     unsigned mode=0,watchdog=0;
     if(!PE_parse_boot_argn("zorn_touch",&mode,sizeof(mode)) || !mode)return;
-    if((mode!=1 && mode!=2 && mode!=3) || !PE_parse_boot_argn("zorn_wdt",&watchdog,sizeof(watchdog)) || watchdog!=1)
+    if(mode==6)return; // long-lived driver is started after the display publishes
+    if((mode<1 || mode>5) || !PE_parse_boot_argn("zorn_wdt",&watchdog,sizeof(watchdog)) || watchdog!=1)
         panic("zorn touch probe requires exact mode/watchdog");
     PE_Video v={};if(!videoValid(v))panic("zorn touch probe display identity differs");
     ZornTouchReadBus bus;ZornTouch::Snapshot s;ZornTouch::capture(bus,s);
     char report[512];
-    if(mode==2 || mode==3) {
-        if(mode==3)zornTouchFrames(s,report,sizeof(report));
+    if(mode>=2) {
+        if(mode>=3)zornTouchFrames(s,report,sizeof(report),mode>=4,mode==5);
         else zornTouchIdentify(s,report,sizeof(report));
+        if(mode>=4) {
+            if(!zorn_ufs_touch_raw_finish(report,zornTouchCapturedRaw,zornTouchCapturedBytes))panic("zorn full touch log unavailable");
+            panic("zorn full touch recovery returned");
+        }
         if(!zorn_ufs_touch_probe_finish(report))panic("zorn touch ID log unavailable");
         panic("zorn touch ID recovery returned");
     }

@@ -26,6 +26,7 @@ int zorn_ufs_log_ready(void);
 int zorn_ufs_display_summary(unsigned, unsigned, unsigned, int);
 void zorn_ufs_user_output(unsigned, const char *, size_t);
 volatile uint64_t zorn_display_stats[32];
+volatile uint64_t zorn_touch_runtime_stats[12];
 }
 static bool requested, initialized, scanoutClaimed;
 static unsigned mode;
@@ -40,6 +41,7 @@ static void number(const char *tag,uint64_t value) {
 }
 #include "ZornPanelBrightness.h"
 #include "ZornTouchProbe.h"
+#include "ZornTouchRuntime.h"
 static void checkpoint(bool mayWait=true) {
     (void)zorn_ufs_display_summary((unsigned)zorn_display_stats[0],(unsigned)zorn_display_stats[1],
                                  (unsigned)zorn_display_stats[2],mayWait);
@@ -197,6 +199,7 @@ extern "C" void native_legacy_display_late_probe(void) {
         zorn_display_stats[6]=1;
         activeDisplay=display;zorn_display_stats[0]=10;zorn_display_stats[1]=0;
         OSSafeReleaseNULL(memory);OSSafeReleaseNULL(ranges);OSSafeReleaseNULL(dt);
+        ZornTouchRuntime::start();
         checkpoint();zorn_say("DSPOK");return;
     }
     if(started)display->stop(nub);

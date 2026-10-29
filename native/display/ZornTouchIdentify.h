@@ -6,6 +6,10 @@ struct ZornTouchIdBus {
     IODeviceMemory *memory[6]={};IOMemoryMap *maps[6]={};
     uintptr_t pins[6]={};uint32_t cfg[6]={},io[6]={};bool changed=false;
     uint32_t gpi[8]={};unsigned failure=0;
+    unsigned cooperateEvery=0;
+    __attribute__((noinline)) void afterByte(unsigned bytes) {
+        if(cooperateEvery && bytes%cooperateEvery==0)IOSleep(1);
+    }
     uint32_t read(unsigned i,unsigned offset) {
         uint32_t value=*reinterpret_cast<volatile uint32_t *>(pins[i]+offset);
         __asm__ volatile("dmb oshld" ::: "memory");return value;
@@ -20,7 +24,16 @@ struct ZornTouchIdBus {
         write(i,4,(read(i,4)&~2u)|(value?2u:0));
     }
     unsigned sample(){return read(0,4)&1;}
-    void delay(unsigned us){IODelay(us);}
+    void delay(unsigned us){
+        // Sub-millisecond bit timing must not block the CPU0 thread for every
+        // GPIO edge. Long reset/sample waits retain the scheduler's delay.
+        if(us>1000){IODelay(us);return;}
+        uint64_t start=0,now=0,hz=0;
+        __asm__ volatile("mrs %0,cntfrq_el0\n\tisb\n\tmrs %1,cntpct_el0":"=r"(hz),"=r"(start));
+        if(!hz || hz>1000000000)panic("zorn touch counter frequency");
+        uint64_t ticks=(hz*us+999999)/1000000;
+        do {__asm__ volatile("isb\n\tmrs %0,cntpct_el0":"=r"(now));}while(now-start<ticks);
+    }
     bool transfer(const uint8_t *tx,uint8_t *rx,unsigned n){return ZornFt::transfer(*this,tx,rx,n);}
     // Only AP dynamic GPI instances2/3 from the live FDT are inspected. Never
     // reset an engine or steal an active DMA channel. No GPI writes exist.

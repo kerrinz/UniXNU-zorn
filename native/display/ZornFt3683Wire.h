@@ -26,6 +26,36 @@ static inline uint16_t crc(const uint8_t *data,unsigned bytes) {
 }
 struct ReadResult {unsigned error,attempts;uint8_t raw[10];};
 struct FrameResult {unsigned error,attempts;uint8_t raw[93];};
+struct FullFrameResult {unsigned error,attempts;uint8_t raw[3129];};
+// Only the 64-byte header and 720 raw mutual-capacitance cells are consumed by
+// the experimental tracker. Keep the longer capture command for diagnostics.
+struct MatrixFrameResult {unsigned error,attempts;uint8_t raw[1513];};
+template<class Bus> static unsigned readMatrixFrame(Bus &bus,MatrixFrameResult &result) {
+    result={};static const uint8_t tx[1513]={0x01,0xa0,0x05,0xe0};
+    for(unsigned retry=0;retry<3;++retry) {
+        ++result.attempts;
+        for(auto &v:result.raw)v=0xff;
+        if(!bus.transfer(tx,result.raw,1513))result.error=2;
+        else if(result.raw[3]&0xa0)result.error=3;
+        else if(crc(result.raw+7,1504)!=(result.raw[1511]|uint16_t(result.raw[1512])<<8))result.error=4;
+        else result.error=0;
+        bus.delay(150);if(!result.error)return 0;
+    }
+    return result.error;
+}
+template<class Bus> static unsigned readFullFrame(Bus &bus,FullFrameResult &result) {
+    result={};static const uint8_t tx[3129]={0x01,0xa0,0x0c,0x30};
+    for(unsigned retry=0;retry<3;++retry) {
+        ++result.attempts;
+        for(auto &v:result.raw)v=0xff;
+        if(!bus.transfer(tx,result.raw,3129))result.error=2;
+        else if(result.raw[3]&0xa0)result.error=3;
+        else if(crc(result.raw+7,3120)!=(result.raw[3127]|uint16_t(result.raw[3128])<<8))result.error=4;
+        else result.error=0;
+        bus.delay(150);if(!result.error)return 0;
+    }
+    return result.error;
+}
 // FT read-touch command only. Keep raw payload: the K80 layout is not yet qualified.
 template<class Bus> static unsigned readFrame(Bus &bus,FrameResult &result) {
     result={};const uint8_t tx[93]={0x01,0xa0,0,84};
@@ -59,7 +89,7 @@ template<class Bus> static unsigned readIdentity(Bus &bus,uint8_t reg,uint8_t &v
 // Mode0/MSB-first/active-low CS. Only MOSI, clock, CS can be changed by wire I/O.
 // Derived from BSD-2-Clause-Patent UniXNU-houji HoujiTouchGpio.h.
 template<class Pins> static bool transfer(Pins &pins,const uint8_t *tx,uint8_t *rx,unsigned count) {
-    if(!tx || !rx || (count!=10 && count!=93))return false;
+    if(!tx || !rx || (count!=10 && count!=93 && count!=1513 && count!=3129))return false;
     pins.set(2,0);pins.set(3,0);pins.delay(1);
     for(unsigned i=0;i<count;++i) {
         uint8_t receive=0;
@@ -69,6 +99,9 @@ template<class Pins> static bool transfer(Pins &pins,const uint8_t *tx,uint8_t *
             receive=(receive<<1)|(pins.sample()&1);pins.set(2,0);
         }
         rx[i]=receive;
+        // Only runtime sessions opt into bounded scheduler yields. CS remains
+        // asserted and clock is low; short probes keep their original timing.
+        pins.afterByte(i+1);
     }
     pins.delay(1);pins.set(3,1);pins.delay(1);return true;
 }

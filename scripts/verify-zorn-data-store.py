@@ -14,9 +14,10 @@ from pathlib import Path
 import re
 import subprocess
 import threading
+from zorn_data_profile import DIRECTORY,NAME
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "out/zorn/data-store"
+OUT = DIRECTORY
 
 
 def load(name, file):
@@ -30,6 +31,9 @@ symbols = load("store_messages", Path(__file__).with_name("symbolicate-zorn-gui.
 
 
 def window_hash(replacement=None, backup=False):
+    if NAME=='8g' and not backup:
+        if replacement is not None:raise ValueError('replacement only applies to local backup')
+        return prepare.device_window_hash()[0]
     h = hashlib.sha256(); total = 0
     process = timer = None
     if backup:
@@ -73,12 +77,16 @@ def main():
     if not plan.get("backup_roundtrip_verified") or prepare.window(plan["userdata_first"], plan["userdata_last"]) != \
             (plan["absolute_first_lba"], plan["blocks"]):
         raise ValueError("Reservation plan mismatch")
+    if plan.get('data_profile','512m')!=NAME or plan['logical_data_bytes']!=prepare.PAGES*4096:
+        raise ValueError('selected Data profile differs from reservation')
     run = json.loads((args.run / "run.json").read_text()); build = json.loads((args.run / "build-inputs.json").read_text())
     archive = ROOT / "out/zorn/builds" / run["sha256"][:8]
     if run.get("status") != "recovered" or run.get("kernel_log_changed") is not True or \
             run.get("serial") != prepare.SERIAL or run.get("product") != "zorn" or run.get("slot") != "b" or \
-            build.get("status") != "ready" or build.get("data_store_mode") != 1 or build != json.loads((archive / "inputs.json").read_text()):
+            build.get("status") != "ready" or build.get("data_store_mode") != 1 or build.get('data_profile','512m')!=NAME or build != json.loads((archive / "inputs.json").read_text()):
         raise ValueError("Require exact recovered mode1 probe with changed log")
+    if build['inputs'].get(str(plan_path))!=hashlib.sha256(plan_path.read_bytes()).hexdigest():
+        raise ValueError('probe did not use this exact prepared plan')
     if hashlib.file_digest((archive / "boot.img").open("rb"), "sha256").hexdigest() != run["sha256"] or \
             hashlib.file_digest((archive / "kernel.macho").open("rb"), "sha256").hexdigest() != build["inputs"][str(ROOT / "UniXNU/out/zorn/kernel/kernel.macho")]:
         raise ValueError("Probe boot/kernel archive mismatch")
@@ -120,26 +128,30 @@ def main():
     if not args.initialize:
         print(json.dumps(proof, indent=2)); return
     metadata = (OUT / "empty-overlay-metadata.bin").read_bytes()
-    if len(metadata) != 5 * 4096 or hashlib.sha256(metadata).hexdigest() != plan["empty_metadata_sha256"]:
+    metadata_blocks=1+prepare.BITMAP_BLOCKS
+    if len(metadata) != metadata_blocks * 4096 or hashlib.sha256(metadata).hexdigest() != plan["empty_metadata_sha256"]:
         raise ValueError("Prepared five-block metadata changed")
     expected = window_hash(replacement=metadata, backup=True)
     attempt = {"status": "prepared", "serial": prepare.SERIAL, "relative_first_lba": prepare.RELATIVE_FIRST,
-               "blocks_to_write": 5, "expected_full_window_sha256": expected, "preimage_sha256": plan["preimage_sha256"]}
+               "data_profile":NAME,"blocks_to_write": metadata_blocks,
+               "installer_sha256":hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+               "probe_boot_sha256":run['sha256'],"expected_full_window_sha256": expected, "preimage_sha256": plan["preimage_sha256"]}
     (OUT / "install-attempt.json").write_text(json.dumps(attempt, indent=2) + "\n")
     remote = "/tmp/unixnu-zorn-data-overlay-header.bin"
     prepare.adb("push", OUT / "empty-overlay-metadata.bin", remote)
     if prepare.adb("exec-out", "cat", remote, binary=True) != metadata:
         raise ValueError("Recovery tmpfs metadata copy mismatch; no store write attempted")
     # Exact bounded metadata write; old page contents remain outside the five blocks.
-    prepare.adb("shell", f"dd if={remote} of=/dev/block/by-name/userdata bs=4096 seek={prepare.RELATIVE_FIRST} count=5 conv=notrunc")
+    prepare.adb("shell", f"dd if={remote} of=/dev/block/by-name/userdata bs=4096 seek={prepare.RELATIVE_FIRST} count={metadata_blocks} conv=notrunc")
     prepare.adb("shell", "sync")
-    if prepare.read_blocks("/dev/block/by-name/userdata", prepare.RELATIVE_FIRST, 5) != metadata or window_hash() != expected:
+    readback=b''.join(prepare.read_blocks('/dev/block/by-name/userdata',prepare.RELATIVE_FIRST+i,min(32,metadata_blocks-i)) for i in range(0,metadata_blocks,32))
+    if readback != metadata or window_hash() != expected:
         raise ValueError("Metadata/full-window readback differs; stay in recovery and preserve preimage")
     boundaries()
     attempt.update(status="installed-readback-verified", gpt_root_fences_unchanged=True)
     (OUT / "install-attempt.json").write_text(json.dumps(attempt, indent=2) + "\n")
     plan.update(status="installed-metadata-readback-verified", phone_writes=True,
-                installed=True, installed_metadata_blocks=5, readonly_probe_verified=True,
+                installed=True, installed_metadata_blocks=metadata_blocks, readonly_probe_verified=True,
                 initialized_full_window_sha256=expected, initialized_at=datetime.datetime.now().astimezone().isoformat())
     plan_path.write_text(json.dumps(plan, indent=2) + "\n")
     print(json.dumps(attempt, indent=2))

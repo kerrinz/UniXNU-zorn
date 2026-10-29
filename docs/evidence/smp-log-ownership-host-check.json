@@ -1,0 +1,21 @@
+{
+  "source_sha256": "b43a635c47d43c2dc1d7aacddeea29f4ae866d8aa96327c60ff6d8d467387958",
+  "watchdog_sha256": "40372a1d38800204e295c9efd6bc73e198aec88afffac1e8c9fd0ee25f0e3fc4",
+  "actual_functions": [
+    "static void zorn_log_put",
+    "extern \"C\" void zorn_ufs_log_word",
+    "extern \"C\" void zorn_ufs_user_output",
+    "extern \"C\" void zorn_ufs_note_mac_failure",
+    "static void zorn_checkpoint_reset"
+  ],
+  "host_producers": 8,
+  "iterations_each": 2500,
+  "asan_ubsan": true,
+  "no_simultaneous_block_writers": true,
+  "footer_preserved": true,
+  "mac_reservations": 512,
+  "mac_slots_bounded": 8,
+  "reset_never_steals_ownership": true,
+  "old_plain_store_baseline_rejected": true,
+  "hardware_qualified": false
+}

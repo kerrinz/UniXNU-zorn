@@ -1,0 +1,43 @@
+{
+  "baseline_boot_sha256": "af82587ba252210bcf8533066a4a6c02df3aa047ed6de21dbe5c8bd03c992495",
+  "captured_fdt_sha256": "8a8e5a0b8954bb71d1451e71b388e96a7d1d985828b6dd3ff789fcd504ae6ac7",
+  "candidate_adt_sha256": "9548ae65117891df0479b7cb34dd1d692b4b3c0f87a6780a6695b981c2118f72",
+  "candidate_source_sha256": "0c3643427672848b87cee1a86d9b4109863b3dc63ca00462913211316536337a",
+  "cpu_affinities": [
+    0,
+    256,
+    512,
+    768,
+    1024,
+    1280,
+    1536,
+    1792
+  ],
+  "psci_method": "smc",
+  "unrelated_adt_bytes_preserved": true,
+  "default_profile_changed": false,
+  "object_compiled": true,
+  "hardware_smp_qualified": false,
+  "remaining_gates": [
+    "cross-core TLB invalidation",
+    "atomic diagnostic log ownership",
+    "PSCI/per-core timer/IPI preflight",
+    "legacy synchronization review"
+  ],
+  "observed_recovery_midrs": [
+    "0x410fd801",
+    "0x410fd801",
+    "0x410fd811",
+    "0x410fd811",
+    "0x410fd811",
+    "0x410fd811",
+    "0x410fd811",
+    "0x410fd821"
+  ],
+  "midr_proof_sha256": "edf3d732b5d7c9d6eb3b6812eb201b80a3fdd551113efeaf5a6c9bdd4173392d",
+  "midr_values_not_yet_observed_in_xnu": true,
+  "object_sha256": "a2427e61f86444f3b0d19abf26dcd91b506fdf8df549952937a0882c9cde8b4e",
+  "ordered_sgi_in_actual_object": true,
+  "old_linked_kernel_missing_sgi_confirmed": true,
+  "actual_psci_smc_present": true
+}

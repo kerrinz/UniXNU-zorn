@@ -1,10 +1,16 @@
 # zorn UFS transport and unattended diagnostics
 
-Current GUI profile (2026-10-28): `ZORNLOGB`, footer v14 (optional kernel
-stack profile v15), 92 text slots,
-2976-byte footer at offset 1120. The complete record remains one 4096-byte
+Current GUI profile (2026-10-29): `ZORNLOGD`, footer v17, 84 text slots,
+3072-byte footer at offset 1024. Twelve aligned words retain touch initialization,
+frame/contact and original HID publication/report counters even after text wraps.
+V17 uses the high halves of touch[1..6] for UInt32 edge dispatch counters
+(installed, dispatches, digitizer events, marks, skipped, install error);
+the low halves retain the original sensor counters/contact position. The
+reader splits these before validating coordinates and still accepts v16.
+Individual words may span adjacent frames; they are not an atomic frame snapshot.
+The complete record remains one 4096-byte
 block at the existing log LBA. Earlier formats below describe their historical
-wire layouts; the reader retains them, including v11/v12/v13.
+wire layouts; the reader retains them, including LOGB/v14-v15 and raw-touch LOGC.
 
 The footer retains bounded process registers, real user frame reads and errors,
 display counters, temporary startup policy and numeric RAM Data permissions.

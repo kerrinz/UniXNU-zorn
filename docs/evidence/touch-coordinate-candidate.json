@@ -1,0 +1,45 @@
+{
+  "status": "ready-offline-not-booted",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/builds/349a9231",
+  "boot_sha256": "349a923188caaf7b90f835e52442926b1124b7705899bf195dae69c812170a3e",
+  "boot_bytes": 81125376,
+  "kernel_sha256": "93e8600dd2730793a1c0ad38be2460ad3b36028e1a198d238d6e78bf2dd2e858",
+  "input_hashes_verified": 123,
+  "baseline": "cd6fd19f",
+  "profile_changes": [
+    "touch_trace enabled; v18 evidence replaces unused stack region"
+  ],
+  "all_other_profile_fields_identical": true,
+  "mapping_source_unchanged": true,
+  "host_checks": {
+    "passed": true,
+    "header_sha256": "8bfa2d01bca4f9e6f8cd3b6a2444d40a7d9cebdd1ce0cee2af5a1237de34e2fa",
+    "reader_sha256": "8451c0270a80d7926f8d3c54223b8c6150fed8f83af8157d6146b24ad7374a9a",
+    "cpp_asan_ubsan": true,
+    "concurrent_atomic_publication": true,
+    "bounded_busy_snapshot": true,
+    "invalid_frames_release_and_ring_wrap": true,
+    "cpp_to_python_v18_roundtrip": true,
+    "corruption_controls": 13,
+    "cli_rejection_controls": 2,
+    "same_4096_byte_log": true,
+    "replaces_only_unused_stack_slots": true,
+    "hardware_qualified": false
+  },
+  "device_operations": false,
+  "hardware_qualified": false,
+  "hold_seconds": 300,
+  "recovery_timeout_seconds": 600,
+  "pause_after_build": true,
+  "copy_repositories_unchanged": true,
+  "linked_trace_audit": {
+    "kernel_sha256": "93e8600dd2730793a1c0ad38be2460ad3b36028e1a198d238d6e78bf2dd2e858",
+    "actual_worker_contains_inlined_trace_publication": true,
+    "actual_worker_publish_and_footer_reference_shared_trace_address": "0xfffffff00c12a560",
+    "actual_publication_acquire_release_exclusives": true,
+    "actual_footer_orders_payload_reads_with_dmb_ish": true,
+    "actual_footer_contains_version18_selection": true,
+    "read_write_scope": "CPU BSS plus existing GUI footer; no new block IO command",
+    "hardware_qualified": false
+  }
+}

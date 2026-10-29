@@ -25,11 +25,17 @@
 #include "ZornSha256.h"
 #include "ZornVerifiedRoot.h"
 #include "ZornGuiLog.h"
+#include "../display/ZornTouchTrace.h"
 #include "ZornTraceStages.h"
 
 // Exact native XNU globals from the pinned osfmk/vm/vm_page.h. Diagnostic
 // snapshots only; these counters never select memory allocation or policy.
 extern "C" {
+#if defined(ZORN_SMP_PREFLIGHT) && ZORN_SMP_PREFLIGHT
+int zorn_armcpu_preflight(void);
+int zorn_armcpu_runtime(char *,unsigned);
+extern volatile unsigned zorn_smp_preflight_active;
+#endif
 extern unsigned int vm_page_free_count, vm_page_active_count;
 extern unsigned int vm_page_inactive_count, vm_page_wire_count;
 extern uint32_t cs_text_fixup_applied;
@@ -48,6 +54,11 @@ extern volatile uint64_t zorn_data_marker_cookie;
 #endif
 #if defined(ZORN_DISPLAY) && ZORN_DISPLAY
 extern volatile uint64_t zorn_display_stats[32];
+extern volatile uint64_t zorn_touch_runtime_stats[12];
+#if defined(ZORN_TOUCH_RUNTIME_ENABLED) && ZORN_TOUCH_RUNTIME_ENABLED
+extern volatile uint32_t zorn_touch_edge_stats[8];
+uint32_t zorn_touch_trace_words[108];
+#endif
 void zorn_brightness_checkpoint(void);
 extern volatile uint32_t zorn_aks_stage, zorn_aks_opens, zorn_aks_calls, zorn_aks_refused, zorn_aks_last_selector;
 extern volatile int32_t zorn_aks_status, zorn_aks_last_result;
@@ -242,6 +253,8 @@ static uint32_t gLogLba = 0;
 static uint32_t gMiscLba = 0;
 static uint32_t gLogBlocks = 0;
 static int gLogBusy = 0;
+static bool gTouchRawLog;
+#include "ZornTouchRawLog.h"
 static int gReturnAfterTent = 0;
 static char gRecoveryCheckpoint[9] = "IRET";
 static unsigned gCheckpointSkip;
@@ -276,6 +289,7 @@ static unsigned gExecBudgetSeconds;
 static uint64_t gExecLastObservationMs;
 static void zorn_service_progress(void);
 static void zorn_checkpoint_reset(void);
+static void zorn_checkpoint_reset_owned(void);
 static void zorn_watchdog_start(void);
 struct ZornLogBlock {
 	char magic[8];
@@ -290,6 +304,7 @@ struct ZornMacFailure {
 	uint32_t error;
 };
 static ZornMacFailure gMacFailures[8];
+static unsigned gMacFailureReady[8];
 static unsigned gMacFailureCount;
 static uint32_t gTrustCacheMask;
 static IOReturn (*gZornWriteLog)(const void *) = nullptr;
@@ -298,7 +313,7 @@ extern "C" void zorn_show_words(const char *text);
 
 static void zorn_log_put(const char *text)
 {
-	unsigned capacity = gGuiWatch ? ZORN_GUI_LOG_SLOTS : 340;
+	unsigned capacity = gTouchRawLog ? ZornTouchLog::Slots : gGuiWatch ? ZORN_GUI_LOG_SLOTS : 340;
 	char *slot = gLogBlock.word[gLogBlock.next];
 	gLogBlock.next = (gLogBlock.next + 1) % capacity;
 	if (gLogBlock.count < capacity) {
@@ -411,12 +426,14 @@ extern "C" void zorn_ufs_gui_data_space(const uint64_t values[6])
 
 static void zorn_gui_fill_footer(void)
 {
+	if (gTouchRawLog) return;
 	if (!gGuiWatch || !__sync_bool_compare_and_swap(&gGuiDiagnosticsBusy, 0, 1)) return;
 	ZornGuiFooter snapshot = gGuiDiagnostics;
 	__sync_lock_release(&gGuiDiagnosticsBusy);
 	memcpy(snapshot.magic, "ZORNGUI1", 8);
-	// v14 adds readonly Data filesystem space/UUID; still exactly one 4 KiB block.
-	snapshot.version = gGuiKernelStacks ? 15 : 14; snapshot.bytes = sizeof(snapshot);
+	// v17 uses the unused high halves of six UInt32 sensor words for event
+	// dispatch counters. Same 3072-byte footer and single 4KiB log block as v16.
+	snapshot.version = 17; snapshot.bytes = sizeof(snapshot);
 #if defined(ZORN_VERIFIED_ROOT) && ZORN_VERIFIED_ROOT
 	snapshot.dataPermissions[0] = static_cast<uint32_t>(zorn_data_permissions_status) | (static_cast<uint64_t>(zorn_data_permissions_stage) << 32);
 	snapshot.dataPermissions[1] = zorn_data_permissions_checked | (static_cast<uint64_t>(zorn_data_permissions_total) << 32);
@@ -442,6 +459,24 @@ static void zorn_gui_fill_footer(void)
 #endif
 #if defined(ZORN_DISPLAY) && ZORN_DISPLAY
 	for (unsigned i = 0; i < 32; ++i) snapshot.display[i] = zorn_display_stats[i];
+	for (unsigned i = 0; i < 12; ++i) snapshot.touch[i] = zorn_touch_runtime_stats[i];
+#if defined(ZORN_TOUCH_RUNTIME_ENABLED) && ZORN_TOUCH_RUNTIME_ENABLED
+	unsigned trace = 0, userStacks = 0;
+	PE_parse_boot_argn("zorn_touch_trace", &trace, sizeof(trace));
+	PE_parse_boot_argn("zorn_gui_stack", &userStacks, sizeof(userStacks));
+	if (trace == 1 && userStacks == 0 && !gGuiKernelStacks) {
+		// v18 explicitly replaces unused stack records. It cannot coexist
+		// with stack samplers, and never changes the authorized 4KiB extent.
+		uint32_t words[ZornTouchTrace::Words];
+		ZornTouchTrace::snapshot(zorn_touch_trace_words, words);
+		static_assert(sizeof(words) == sizeof(snapshot.stacks), "trace/stack union ABI");
+		memcpy(snapshot.stacks, words, sizeof(words));
+		snapshot.version = 18;
+	}
+	for (unsigned i = 0; i < 6; ++i)
+		snapshot.touch[i + 1] = (snapshot.touch[i + 1] & 0xffffffffULL) |
+		    (static_cast<uint64_t>(__atomic_load_n(&zorn_touch_edge_stats[i], __ATOMIC_RELAXED)) << 32);
+#endif
 	snapshot.keystore[0] = zorn_aks_stage;
 	snapshot.keystore[1] = static_cast<uint32_t>(zorn_aks_status);
 	snapshot.keystore[2] = zorn_aks_opens;
@@ -486,10 +521,14 @@ static volatile unsigned gImage4EventCount;
 static unsigned gImage4Flushed;
 static bool gImage4Replayed;
 
-static void zorn_image4_flush(void)
+static void zorn_image4_flush(bool replay = false)
 {
-	if (!gLogArmed || gLogBusy || !gZornWriteLog) return;
-	gLogBusy = 1;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gZornWriteLog) return;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
+	if (replay && !gImage4Replayed) {
+		gImage4Replayed = true;
+		gImage4Flushed = 0;
+	}
 	while (gImage4Flushed < 64 &&
 	    __atomic_load_n(&gImage4Events[gImage4Flushed].ready, __ATOMIC_ACQUIRE)) {
 		const ZornImage4Event &event = gImage4Events[gImage4Flushed++];
@@ -515,7 +554,7 @@ static void zorn_image4_flush(void)
 		}
 		(void)gZornWriteLog(&gLogBlock);
 	}
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 }
 
 extern "C" void zorn_ufs_image4_event(unsigned kind, uint64_t pc, uint64_t value, const char *name)
@@ -536,20 +575,18 @@ extern "C" void zorn_ufs_image4_event(unsigned kind, uint64_t pc, uint64_t value
 	__atomic_store_n(&event.ready, 1, __ATOMIC_RELEASE);
 	// Replay the early service history at the first ignition gate observation;
 	// normal syscall tracing may have wrapped the 4 KiB ring since UFS startup.
-	if (kind == 9 && !gImage4Replayed && !gLogBusy) {
-		gImage4Replayed = true;
-		gImage4Flushed = 0;
-	}
-	zorn_image4_flush();
+	zorn_image4_flush(kind == 9);
 }
 
 extern "C" void zorn_ufs_log_text(const char *text)
 {
-	if (!gLogArmed || gLogBusy || !gZornWriteLog || !text) {
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gZornWriteLog || !text) {
 		return;
 	}
-	gLogBusy = 1;
-	for (unsigned f = 0; f < gMacFailureCount; f++) {
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
+	unsigned macCount = __atomic_load_n(&gMacFailureCount, __ATOMIC_ACQUIRE);
+	for (unsigned f = 0; f < macCount && f < 8; f++) {
+		if (!__atomic_load_n(&gMacFailureReady[f], __ATOMIC_ACQUIRE)) continue;
 		static const char hex[] = "0123456789ABCDEF";
 		char number[10] = {};
 		number[0] = 'E';
@@ -571,33 +608,43 @@ extern "C" void zorn_ufs_log_text(const char *text)
 	}
 	zorn_log_put("PANICEND");
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 }
 
 // Retain the last eight original printf messages during one owner mount.
 // Capturing under filesystem/console locks only touches this fixed BSS array;
 // persistent transport writes happen after mount() has returned.
 static unsigned gMountCaptureActive, gMountCaptureCount;
+static int gMountCaptureBusy;
 static char gMountMessages[8][256];
 
 extern "C" void zorn_ufs_mount_printf(const char *format, va_list arguments)
 {
 	if (!format || !__atomic_load_n(&gMountCaptureActive, __ATOMIC_ACQUIRE)) return;
+	if (!__sync_bool_compare_and_swap(&gMountCaptureBusy, 0, 1)) return;
+	if (!__atomic_load_n(&gMountCaptureActive, __ATOMIC_ACQUIRE)) {
+		__sync_lock_release(&gMountCaptureBusy); return;
+	}
 	unsigned sequence = __atomic_fetch_add(&gMountCaptureCount, 1, __ATOMIC_RELAXED);
 	vsnprintf(gMountMessages[sequence % 8], sizeof(gMountMessages[0]), format, arguments);
+	__sync_lock_release(&gMountCaptureBusy);
 }
 
 extern "C" void zorn_ufs_mount_capture(int start)
 {
 	if (start) {
+		if (!__sync_bool_compare_and_swap(&gMountCaptureBusy, 0, 1)) return;
 		gMountCaptureCount = 0;
 		bzero(gMountMessages, sizeof(gMountMessages));
 		__atomic_store_n(&gMountCaptureActive, 1, __ATOMIC_RELEASE);
+		__sync_lock_release(&gMountCaptureBusy);
 		return;
 	}
 	__atomic_store_n(&gMountCaptureActive, 0, __ATOMIC_RELEASE);
-	if (!gLogArmed || gLogBusy || !gZornWriteLog) return;
-	gLogBusy = 1;
+	if (!gLogArmed || !gZornWriteLog || !__sync_bool_compare_and_swap(&gMountCaptureBusy, 0, 1)) return;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) {
+		__sync_lock_release(&gMountCaptureBusy); return;
+	}
 	unsigned count = gMountCaptureCount;
 	char number[12];
 	snprintf(number, sizeof(number), "APC%08X", count);
@@ -616,21 +663,23 @@ extern "C" void zorn_ufs_mount_capture(int start)
 		zorn_log_put("APEND");
 	}
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
+	__sync_lock_release(&gMountCaptureBusy);
 }
 
 extern "C" void zorn_ufs_note_mac_failure(const char *policy, int error)
 {
-	if (error == 0 || gMacFailureCount >= 8) {
-		return;
-	}
-	ZornMacFailure &failure = gMacFailures[gMacFailureCount++];
+	if (error == 0) return;
+	unsigned index = __atomic_fetch_add(&gMacFailureCount, 1, __ATOMIC_RELAXED);
+	if (index >= 8) return;
+	ZornMacFailure &failure = gMacFailures[index];
 	const char *name = policy ? policy : "UNKNOWN";
 	for (unsigned i = 0; i < 11 && name[i] != '\0'; i++) {
 		unsigned char c = name[i];
 		failure.policy[i] = (c >= 32 && c <= 126) ? static_cast<char>(c) : '?';
 	}
 	failure.error = static_cast<uint32_t>(error);
+	__atomic_store_n(&gMacFailureReady[index], 1, __ATOMIC_RELEASE);
 }
 
 extern "C" void zorn_arm_return_after_tent(void)
@@ -642,33 +691,37 @@ extern "C" void zorn_arm_return_after_tent(void)
 extern "C" void zorn_ufs_note_trust_cache(unsigned index)
 {
 	if (index < 32) {
-		gTrustCacheMask |= 1U << index;
+		__atomic_fetch_or(&gTrustCacheMask, 1U << index, __ATOMIC_RELAXED);
 	}
 }
 
 extern "C" void zorn_ufs_log_word(const char *text)
 {
-	if (!gLogArmed || gLogBusy || !gZornWriteLog || !text || text[0] == '\0') {
+#if defined(ZORN_SMP_PREFLIGHT) && ZORN_SMP_PREFLIGHT
+	// Pre-root eight-core diagnostics use the bounded SMP recorder only.
+	// Do not issue persistence I/O from legacy tracing inside VM locks.
+	if(__atomic_load_n(&zorn_smp_preflight_active,__ATOMIC_ACQUIRE))return;
+#endif
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gZornWriteLog || !text || text[0] == '\0') {
 		return;
 	}
 	if (gCompactTrace && strcmp(text, gRecoveryCheckpoint) != 0) {
 		static bool ioSeen[ZORN_TRACE_STAGE_COUNT];
 		int stage = zorn_trace_stage_index(text);
 		if (stage >= 0) {
-			if (ioSeen[stage]) {
+			if (__atomic_exchange_n(&ioSeen[stage], true, __ATOMIC_RELAXED)) {
 				__atomic_fetch_add(&gTraceSuppressed, 1, __ATOMIC_RELAXED);
 				if (text[0] == 'L' && text[2] == '2' && !text[3] &&
 				    (text[1] == 'C' || text[1] == 'D' || text[1] == 'V' || text[1] == 'W'))
 					__atomic_fetch_add(&gStage2Suppressed, 1, __ATOMIC_RELAXED);
 				return;
 			}
-			ioSeen[stage] = true;
 		}
 		bool bareAddress = strlen(text) == 8;
 		for (unsigned i = 0; bareAddress && i < 8; ++i)
 			bareAddress = (text[i] >= '0' && text[i] <= '9') || (text[i] >= 'A' && text[i] <= 'F');
 		static unsigned bareAddresses;
-		if (bareAddress && bareAddresses++ >= 8) return;
+		if (bareAddress && __atomic_fetch_add(&bareAddresses, 1, __ATOMIC_RELAXED) >= 8) return;
 		static const char *const noise[] = {
 			"TZAL", "TZOK", "EAT1", "EMAP", "EMOK", "ESET", "EIBG", "EINH", "EIRT",
 			"ESTR", "ESTS", "ESTE", "EOBJ", "TLNK", "TENT", "TSIZ", "SAVR",
@@ -684,18 +737,20 @@ extern "C" void zorn_ufs_log_word(const char *text)
 			return;
 		}
 	}
-	gLogBusy = 1;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	zorn_log_append(text);
-	gLogBusy = 0;
+	bool reset = false;
 	if (gReturnAfterTent && strcmp(text, gRecoveryCheckpoint) == 0) {
 		gCheckpointSeen++;
 		if (gCheckpointSkip != 0) {
 			gCheckpointSkip--;
-			return;
+		} else {
+			gReturnAfterTent = 0;
+			reset = true;
 		}
-		gReturnAfterTent = 0;
-		zorn_checkpoint_reset();
 	}
+	if (reset) zorn_checkpoint_reset_owned();
+	__sync_lock_release(&gLogBusy);
 }
 
 extern "C" int zorn_ufs_trace_only(const char *text)
@@ -735,9 +790,9 @@ extern "C" int zorn_ufs_display_summary(unsigned stage, unsigned error, unsigned
 	if (gReturnAfterTent && !strcmp(gRecoveryCheckpoint, "DSPDONE")) {
 		gCheckpointSeen++;
 		if (gCheckpointSkip) --gCheckpointSkip;
-		else { gReturnAfterTent = 0; zorn_checkpoint_reset(); }
+		else { gReturnAfterTent = 0; zorn_checkpoint_reset_owned(); }
 	}
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 	return 1;
 }
 
@@ -766,12 +821,12 @@ extern "C" int zorn_ufs_brightness_finish(const char *text, unsigned mode, int o
 	(void)gZornWriteLog(&gLogBlock);
 	if (mode!=3 || !ok) {
 		gReturnAfterTent=0;
-		zorn_checkpoint_reset();
+		zorn_checkpoint_reset_owned();
 		// PSCI is expected not to return. A failed recovery is not permission
 		// to continue startup with an unqualified panel transaction.
 		panic("zorn brightness recovery returned unexpectedly");
 	}
-	gLogBusy=0;
+	__sync_lock_release(&gLogBusy);
 	return 1;
 }
 
@@ -794,13 +849,35 @@ extern "C" int zorn_ufs_touch_probe_finish(const char *text)
 		zorn_log_put(chunk);
 	}
 	zorn_log_put("USREND");zorn_log_put("TOUCHRO");
-	(void)gZornWriteLog(&gLogBlock);gReturnAfterTent=0;zorn_checkpoint_reset();
+	(void)gZornWriteLog(&gLogBlock);gReturnAfterTent=0;zorn_checkpoint_reset_owned();
 	panic("zorn touch handoff recovery returned unexpectedly");
+}
+
+// Replace only the diagnostic block's in-memory layout, after acquisition and
+// GPIO restoration. GUI startup never runs in this explicit short probe mode.
+extern "C" int zorn_ufs_touch_raw_finish(const char *text,const uint8_t *raw,unsigned bytes)
+{
+	unsigned mode=0;
+	if(!PE_parse_boot_argn("zorn_touch",&mode,sizeof(mode)) || (mode!=4 && mode!=5) || !gGuiWatch ||
+	    !gLogArmed || !gZornWriteLog || !gWatchdogArmed || !text || strnlen(text,512)>=512)return 0;
+	if(bytes!=ZornTouchLog::Bytes)return zorn_ufs_touch_probe_finish(text);
+	if(!__sync_bool_compare_and_swap(&gLogBusy,0,1))return 0;
+	if(!ZornTouchLog::install(&gLogBlock,sizeof(gLogBlock),raw,bytes,mode==5?1:0)){__sync_lock_release(&gLogBusy);return 0;}
+	gTouchRawLog=true;
+	zorn_log_put("USRBEGIN");
+	for(size_t pos=0;text[pos];) {
+		char chunk[12]={};
+		for(unsigned i=0;i<11 && text[pos];++i,++pos)chunk[i]=(text[pos]>=32 && text[pos]<=126)?text[pos]:' ';
+		zorn_log_put(chunk);
+	}
+	zorn_log_put("USREND");zorn_log_put("TOUCHRAW");
+	(void)gZornWriteLog(&gLogBlock);gReturnAfterTent=0;zorn_checkpoint_reset_owned();
+	panic("zorn touch raw recovery returned unexpectedly");
 }
 
 static void zorn_trace_time(void)
 {
-	if (!gLogArmed || gLogBusy) {
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED)) {
 		return;
 	}
 	uint64_t ns = 0;
@@ -831,7 +908,7 @@ extern "C" void zorn_ufs_copy_scope(uint64_t owner, uint64_t address, int enable
 extern "C" void zorn_ufs_copy_stage(const char *stage, uint64_t owner)
 {
 	if (gCompactTrace) return;
-	if (!gLogArmed || gLogBusy || owner != gCopyTraceOwner || gCopyTraceCount++ >= 48) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || owner != gCopyTraceOwner || gCopyTraceCount++ >= 48) return;
 	zorn_trace_time();
 	zorn_ufs_log_word(stage);
 }
@@ -839,7 +916,7 @@ extern "C" void zorn_ufs_copy_stage(const char *stage, uint64_t owner)
 extern "C" void zorn_ufs_copy_abort(uint64_t owner, uint64_t pc, uint64_t far,
     uint32_t esr, int recovery)
 {
-	if (!gLogArmed || gLogBusy || owner != gCopyTraceOwner || gCopyTraceCount++ >= 48) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || owner != gCopyTraceOwner || gCopyTraceCount++ >= 48) return;
 	zorn_trace_time();
 	char word[12];
 	snprintf(word, sizeof(word), "KPC%08X", static_cast<uint32_t>(pc));
@@ -858,7 +935,7 @@ extern "C" void zorn_ufs_thread_stage(const char *stage, uint64_t caller)
 	static unsigned count;
 	unsigned limit = gCompactTrace ? 24 : 256;
 	bool selected = stage && !strcmp(stage, gRecoveryCheckpoint);
-	if (!gLogArmed || gLogBusy || (!selected && count++ >= limit)) {
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || (!selected && count++ >= limit)) {
 		return;
 	}
 	zorn_trace_time();
@@ -916,9 +993,9 @@ extern "C" void zorn_ufs_note_user_return(uint32_t trap, uint64_t result, uint32
 
 extern "C" void zorn_ufs_user_output(unsigned fd, const char *text, size_t length)
 {
-	if (!gLogArmed || gLogBusy || !gZornWriteLog || !text || !length) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gZornWriteLog || !text || !length) return;
 	zorn_trace_time();
-	gLogBusy = 1;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	char word[12];
 	snprintf(word, sizeof(word), "UFD%08X", fd);
 	zorn_log_put(word);
@@ -934,7 +1011,7 @@ extern "C" void zorn_ufs_user_output(unsigned fd, const char *text, size_t lengt
 	}
 	zorn_log_put("USREND");
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 	zorn_ufs_log_word("UCON");
 }
 
@@ -949,7 +1026,7 @@ extern "C" void zorn_ufs_capture_write(uint64_t fd, uint64_t address, uint64_t l
 {
 	static unsigned count;
 	if (gQuietGui) return;
-	if (!gLogArmed || gLogBusy || !length || (!gServiceTrace && count++ >= 4096)) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !length || (!gServiceTrace && count++ >= 4096)) return;
 	char text[257] = {};
 	size_t bytes = length < sizeof(text) - 1 ? static_cast<size_t>(length) : sizeof(text) - 1;
 	if (copyin(address, text, bytes) == 0) {
@@ -1021,12 +1098,12 @@ extern "C" void zorn_ufs_exit_report(int pid, const char *name, int status, uint
 extern "C" void zorn_ufs_capture_sysctl(uint64_t address, uint64_t length, uint64_t newLength)
 {
 	static unsigned count;
-	if (!gLogArmed || gLogBusy || count++ >= 128) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || count++ >= 128) return;
 	uint32_t name[12] = {};
 	unsigned entries = length < 12 ? static_cast<unsigned>(length) : 12;
 	bool valid = entries && copyin(address, name, entries * sizeof(name[0])) == 0;
 	zorn_trace_time();
-	gLogBusy = 1;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	zorn_log_put("SCBEGIN");
 	char word[12];
 	snprintf(word, sizeof(word), "SCN%08X", static_cast<uint32_t>(length));
@@ -1043,15 +1120,15 @@ extern "C" void zorn_ufs_capture_sysctl(uint64_t address, uint64_t length, uint6
 	}
 	zorn_log_put("SCEND");
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 }
 
 extern "C" void zorn_ufs_sysctl_point(const char *name, uint64_t handler, unsigned phase)
 {
 	static unsigned count;
-	if (!gLogArmed || gLogBusy || !name || count++ >= 512) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !name || count++ >= 512) return;
 	zorn_trace_time();
-	gLogBusy = 1;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	zorn_log_put("SCTBEGIN");
 	for (unsigned pos = 0; pos < 95 && name[pos];) {
 		char chunk[12] = {};
@@ -1068,7 +1145,7 @@ extern "C" void zorn_ufs_sysctl_point(const char *name, uint64_t handler, unsign
 	snprintf(word, sizeof(word), "SCP%08X", phase);
 	zorn_log_put(word);
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 	const char *stages[] = { "SCMAC", "SCMACD", "SCCALL", "SCRET" };
 	if (phase < 4) zorn_ufs_log_word(stages[phase]);
 }
@@ -1694,14 +1771,16 @@ static void zorn_ufs_arm_log(uint64_t start, uint64_t end)
 	for (unsigned i = 0; i < 8; i++) {
 		gLogBlock.magic[i] = magic[i];
 	}
-	if (gGuiWatch) gLogBlock.magic[7] = 'B';
+	if (gGuiWatch) gLogBlock.magic[7] = 'D';
 	zorn_say("WRGO");
 	gLogEnabled = true;
 	gTraceEpoch = mach_absolute_time();
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	gLogArmed = true;
 	if (zorn_write_log4k(&gLogBlock) != kIOReturnSuccess) {
 		gLogArmed = false;
 		gLogEnabled = false;
+		__sync_lock_release(&gLogBusy);
 		zorn_say("WRNO");
 		return;
 	}
@@ -1710,9 +1789,11 @@ static void zorn_ufs_arm_log(uint64_t start, uint64_t end)
 	    memcmp(check, &gLogBlock, sizeof(gLogBlock)) != 0) {
 		gLogArmed = false;
 		gLogEnabled = false;
+		__sync_lock_release(&gLogBusy);
 		zorn_say("WRNO");
 		return;
 	}
+	__sync_lock_release(&gLogBusy);
 	zorn_say("WROK");
 	char trustStatus[12];
 	snprintf(trustStatus, sizeof(trustStatus), "TC%08X", gTrustCacheMask);
@@ -1821,7 +1902,7 @@ extern "C" void zorn_ufs_gui_flush(void)
 
 extern "C" void zorn_ufs_runtime_snapshot(void)
 {
-	if (!gLogArmed || gLogBusy) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED)) return;
 	uint64_t ns = 0;
 	absolutetime_to_nanoseconds(mach_absolute_time() - gTraceEpoch, &ns);
 	uint64_t ms = ns / 1000000;
@@ -1901,11 +1982,15 @@ extern "C" void zorn_ufs_runtime_snapshot(void)
 #if defined(ZORN_DISPLAY) && ZORN_DISPLAY
 	zorn_brightness_checkpoint();
 #endif
+#if defined(ZORN_SMP_PREFLIGHT) && ZORN_SMP_PREFLIGHT
+	count=zorn_armcpu_runtime(text,sizeof(text));
+	if(count>0 && unsigned(count)<sizeof(text))zorn_ufs_user_output(0,text,unsigned(count));
+#endif
 }
 
 static void zorn_service_progress(void)
 {
-	if (!gLogArmed || gLogBusy || !gExecBudgetSeconds) return;
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gExecBudgetSeconds) return;
 	uint64_t ns = 0;
 	absolutetime_to_nanoseconds(mach_absolute_time() - gTraceEpoch, &ns);
 	uint64_t ms = ns / 1000000;
@@ -1937,16 +2022,16 @@ static void zorn_hash_name(void)
 
 extern "C" void zorn_ufs_hash_file(const char *name, uint64_t limit)
 {
+	if (!gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gZornWriteLog) return;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	strlcpy(gHashFile, name ? name : "unknown", sizeof(gHashFile));
 	gHashLastLogBytes = 0;
-	if (!gLogArmed || gLogBusy || !gZornWriteLog) return;
-	gLogBusy = 1;
 	zorn_hash_name();
 	char word[12];
 	snprintf(word, sizeof(word), "HL%08X", static_cast<uint32_t>(limit));
 	zorn_log_put(word);
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 }
 
 extern "C" void zorn_ufs_hash_progress(uint64_t completed, uint64_t limit)
@@ -1962,9 +2047,9 @@ extern "C" void zorn_ufs_hash_progress(uint64_t completed, uint64_t limit)
 		if (!petStatus) gHashLastPetMs = elapsedMs;
 	}
 	if ((!pet && completed != limit && completed - gHashLastLogBytes < 32 * 1024 * 1024) ||
-	    !gLogArmed || gLogBusy || !gZornWriteLog) return;
+	    !gLogArmed || __atomic_load_n(&gLogBusy, __ATOMIC_RELAXED) || !gZornWriteLog) return;
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	gHashLastLogBytes = completed;
-	gLogBusy = 1;
 	zorn_hash_name();
 	char word[12];
 	snprintf(word, sizeof(word), "TIM%08X", static_cast<uint32_t>(elapsedMs)); zorn_log_put(word);
@@ -1972,7 +2057,7 @@ extern "C" void zorn_ufs_hash_progress(uint64_t completed, uint64_t limit)
 	snprintf(word, sizeof(word), "HL%08X", static_cast<uint32_t>(limit)); zorn_log_put(word);
 	if (pet) zorn_log_put(petStatus ? "HPETERR" : "HPET");
 	(void)gZornWriteLog(&gLogBlock);
-	gLogBusy = 0;
+	__sync_lock_release(&gLogBusy);
 }
 
 extern "C" void zorn_ufs_hash_result(int error)
@@ -1995,18 +2080,20 @@ extern "C" void zorn_ufs_data_result(int stage, int error, int readonly, dev_t d
 	snprintf(word, sizeof(word), "DRD%08X", static_cast<unsigned>(native_ram_block_reads)); zorn_say(word);
 	snprintf(word, sizeof(word), "DWR%08X", static_cast<unsigned>(native_ram_block_writes)); zorn_say(word);
 	snprintf(word, sizeof(word), "DER%08X", static_cast<unsigned>(native_ram_block_failures)); zorn_say(word);
+	if(gZornDataMode) {
+		char text[224];
+		int count=snprintf(text,sizeof(text),"DSTORE mode=%u open=%u state=%u header=%u gpt=%u/%u present=%llu writes=%llu loaded=%llu errors=%llu ",
+		    gZornDataMode,gZornDataOpened?1U:0U,native_data_persist_state,native_data_persist_header,
+		    native_data_persist_gpt,native_data_persist_gpt_after,native_data_persist_present,
+		    native_data_persist_writes,native_data_persist_loaded,native_data_persist_errors);
+		if(count>0 && unsigned(count)<sizeof(text))zorn_ufs_user_output(0,text,unsigned(count));
+	}
 #endif
 	zorn_say(!error && stage == 4 && !readonly ? "DATAOK" : "DATAFAIL");
 }
 
-static void zorn_checkpoint_reset(void)
+static void zorn_checkpoint_reset_owned(void)
 {
-	gLogBusy = 1;
-	if (gWatchdogArmed) {
-		ZornSmcResult stopped = zorn_wdt_call(0x86000005U, 2, 0);
-		zorn_log_append(stopped.status == 0 ? "WSTOP" : "WSTERR");
-		gWatchdogArmed = false;
-	}
 	zorn_log_append("RSET");
 	char trustStatus[12];
 	snprintf(trustStatus, sizeof(trustStatus), "TC%08X", gTrustCacheMask);
@@ -2016,10 +2103,55 @@ static void zorn_checkpoint_reset(void)
 	bool wrote = zorn_set_recovery_bcb();
 	zorn_log_append(wrote ? "BCBK" : "BCBN");
 	if (wrote) {
+		bool stoppedWatchdog=false;
+		if (gWatchdogArmed) {
+			ZornSmcResult stopped=zorn_wdt_call(0x86000005U,2,0);
+			stoppedWatchdog=stopped.status==0;
+			zorn_log_append(stoppedWatchdog?"WSTOP":"WSTERR");
+		}
 		zorn_psci_reset();
+		if(stoppedWatchdog) {
+			(void)zorn_wdt_call(0x86000007U,0,0);
+			ZornSmcResult enabled=zorn_wdt_call(0x86000005U,3,0);
+			zorn_log_append(enabled.status==0?"WREARM":"WREFAIL");
+		}
 		zorn_log_append("PSRT");
 	}
-	gLogBusy = 0;
+}
+
+static void zorn_checkpoint_reset(void)
+{
+	// Never steal an in-flight block or release another CPU's ownership.
+	// The independent watchdog remains the fallback if the writer is busy.
+	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
+	zorn_checkpoint_reset_owned();
+	__sync_lock_release(&gLogBusy);
+}
+
+extern "C" void zorn_ufs_smp_record(const char *text,unsigned length,int final)
+{
+	unsigned mode=0;
+	if(!PE_parse_boot_argn("zorn_smp_preflight",&mode,sizeof(mode)) || mode!=8 ||
+	   !gLogArmed || !gWatchdogArmed || !gZornWriteLog || !text || !length || length>3000)
+		panic("zorn SMP log bounds/readiness");
+	bool acquired=false;
+	for(unsigned attempt=0;attempt<(final?40U:1U);++attempt) {
+		if(__sync_bool_compare_and_swap(&gLogBusy,0,1)){acquired=true;break;}
+		if(final)IOSleep(5);
+	}
+	if(!acquired){if(final)panic("zorn SMP final log busy");return;}
+	// One complete, bounded snapshot; never combine halves from two samples.
+	gLogBlock.count=0;gLogBlock.next=0;
+	zorn_log_put("UFD00000000");zorn_log_put("USRBEGIN");
+	for(unsigned pos=0;pos<length;) {
+		char word[12]={};
+		for(unsigned n=0;n<11 && pos<length;++n,++pos)word[n]=(text[pos]>=32 && text[pos]<=126)?text[pos]:' ';
+		zorn_log_put(word);
+	}
+	zorn_log_put("USREND");zorn_log_put(final?"SMPFINAL":"SMPSAMPLE");
+	(void)gZornWriteLog(&gLogBlock);
+	if(final){zorn_checkpoint_reset_owned();panic("zorn SMP reset returned");}
+	__sync_lock_release(&gLogBusy);
 }
 
 extern "C" void zorn_ufs_read_gpt(void)
@@ -2120,6 +2252,12 @@ extern "C" void zorn_ufs_read_gpt(void)
 	}
 	if (root) {
 		zorn_ufs_arm_log(start, end);
+#if defined(ZORN_SMP_PREFLIGHT) && ZORN_SMP_PREFLIGHT
+		unsigned continueSmp=0;PE_parse_boot_argn("zorn_smp_continue",&continueSmp,sizeof(continueSmp));
+		int smpOk=zorn_armcpu_preflight();
+		if(!smpOk || continueSmp!=1)panic("zorn SMP preflight returned before root publication");
+		zorn_ufs_log_word("SMP8GO");
+#endif
 #if defined(ZORN_RAM_DATA) && ZORN_RAM_DATA
 		unsigned storeMode = 0, reset = 0;
 		PE_parse_boot_argn("zorn_data_store", &storeMode, sizeof(storeMode));

@@ -5,9 +5,15 @@
 #include <stdint.h>
 static constexpr uint64_t kZornDataPartitionFirst = 3112704;
 static constexpr uint64_t kZornDataPartitionLast = 64049146;
+#if defined(ZORN_DATA_8G) && ZORN_DATA_8G
+static constexpr uint64_t kZornDataRelativeFirst = 50331648; //192GiB, separate from old512MiB
+static constexpr uint64_t kZornDataPages = 2097152;
+static constexpr uint64_t kZornDataWindowBlocks = 2097217; // header +64bitmap +8GiB
+#else
 static constexpr uint64_t kZornDataRelativeFirst = 2621440; // 10 GiB
 static constexpr uint64_t kZornDataPages = 131072;
 static constexpr uint64_t kZornDataWindowBlocks = 131077; // header + 4 bitmap + 512 MiB
+#endif
 static constexpr uint64_t kZornDataFirst = kZornDataPartitionFirst + kZornDataRelativeFirst;
 static inline bool zornDataGeometry(uint64_t first, uint64_t last, uint64_t imageBytes, uint64_t logLba)
 {
