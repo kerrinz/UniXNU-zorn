@@ -13,16 +13,15 @@ import struct
 import subprocess
 import threading
 import zlib
+import os
+import argparse
+from zorn_data_profile import DIRECTORY,SEED_REPORT,RELATIVE_FIRST,PAGES,BITMAP_BLOCKS,WINDOW_BLOCKS,NAME
 
 ROOT = Path(__file__).resolve().parents[2]
 ADB = "/Users/kerrinz/env/android_sdk/platform-tools/adb"
 SERIAL = "92988a43"
-OUT = ROOT / "out/zorn/data-store"
+OUT = DIRECTORY
 BLOCK = 4096
-RELATIVE_FIRST = 10 * 1024**3 // BLOCK
-PAGES = 512 * 1024**2 // BLOCK
-BITMAP_BLOCKS = (PAGES + 32767) // 32768
-WINDOW_BLOCKS = 1 + BITMAP_BLOCKS + PAGES
 PARTITION_BYTES = 249595670528
 ROOT_BYTES = 9382658048
 LOG_RELATIVE = 2291712
@@ -41,6 +40,15 @@ def read_blocks(device, first, blocks):
     if len(b) != blocks * BLOCK:
         raise ValueError("Short device read")
     return b
+
+
+def device_window_hash():
+    result=subprocess.run([ADB,'-s',SERIAL,'exec-out','sh','-c',
+        f'set -o pipefail\ndd if=/dev/block/by-name/userdata bs=4096 skip={RELATIVE_FIRST} count={WINDOW_BLOCKS} 2>/tmp/unixnu-zorn-blank-read-status | sha256sum\nzorn_blank_rc=$?\ncat /tmp/unixnu-zorn-blank-read-status\nexit "$zorn_blank_rc"'],capture_output=True,check=True,timeout=900)
+    text=result.stdout.decode();actual=text.split()[0];records=text.split('\n',1)[1]
+    if not re.fullmatch('[0-9a-f]{64}',actual) or not re.search(rf'\b{WINDOW_BLOCKS}\+0 records out\b',records):
+        raise ValueError('whole window hash/read count failed: '+text)
+    return actual,records
 
 
 def gpt(header, entries, current):
@@ -83,10 +91,15 @@ def window(first, last):
         raise ValueError("Store overlaps root/log guard")
     if end > last + 1 or end - 1 > 0xffffffff:
         raise ValueError("Store exceeds partition or WRITE(10)")
+    if NAME=='8g' and RELATIVE_FIRST <= 2621440+131077:
+        raise ValueError('New store overlaps legacy Data')
     return absolute, WINDOW_BLOCKS
 
 
 def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--blank-only',action='store_true',help='on-device zero hash; no content export; require a completely zero window')
+    args=parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     plan_path = OUT / "plan.json"
     if plan_path.exists():
@@ -123,7 +136,7 @@ def main():
         expected_root = f.read(BLOCK)
     if root != expected_root or root[:8] != b"SHNGROOT" or struct.unpack_from("<Q", root, 16)[0] != ROOT_BYTES:
         raise ValueError("Installed system manifest differs")
-    seed = json.loads((ROOT / "out/zorn/ram-data/desktop/seed.json").read_text())
+    seed = json.loads(SEED_REPORT.read_text())
     if seed["bytes"] != PAGES * BLOCK or seed["volume_uuid"] != "C7D77FF3-6437-4C4A-8E05-E8E239AC1641":
         raise ValueError("Data seed size/UUID differs")
     artifacts = {"primary-header.bin": header, "primary-entries.bin": entries,
@@ -141,25 +154,37 @@ def main():
     if backup.exists() or temporary.exists():
         raise ValueError("Existing preimage must be inspected, not overwritten")
     command = f"dd if=/dev/block/by-name/userdata bs=4096 skip={RELATIVE_FIRST} count={blocks} 2>/dev/null"
-    process = subprocess.Popen([ADB, "-s", SERIAL, "exec-out", "sh", "-c", command],
-                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    timer = threading.Timer(180, process.kill); timer.start()
+    process=timer=None
     digest = hashlib.sha256(); total = 0
+    zero=bytes(1024*1024)
+    if args.blank_only:
+        expected=hashlib.sha256()
+        for at in range(0,blocks*BLOCK,len(zero)):expected.update(zero[:min(len(zero),blocks*BLOCK-at)])
+        actual,records=device_window_hash()
+        proof=dict(phone_writes=False,contents_exported=False,bytes=blocks*BLOCK,sha256=actual,
+                   zero_sha256=expected.hexdigest(),all_zero=actual==expected.hexdigest(),dd_records=records)
+        (OUT/'blank-check.json').write_text(json.dumps(proof,indent=2)+'\n')
+        if not proof['all_zero']:raise ValueError('Window is not all-zero; no backup export or device write attempted')
+    else:
+        process = subprocess.Popen([ADB, "-s", SERIAL, "exec-out", "sh", "-c", command],
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        timer = threading.Timer(900 if NAME=='8g' else 180, process.kill); timer.start()
     try:
         with gzip.open(temporary, "wb", compresslevel=1) as out:
             while True:
-                data = process.stdout.read(128 * 1024)
+                data = (zero[:min(len(zero),blocks*BLOCK-total)] if total<blocks*BLOCK else b'') if args.blank_only else process.stdout.read(128*1024)
                 if not data:
                     break
                 total += len(data)
                 if total > blocks * BLOCK:
                     raise ValueError("Preimage exceeds reservation")
                 digest.update(data); out.write(data)
-        if process.wait(timeout=5) or total != blocks * BLOCK:
+                if total%(128*1024**2)==0:print(f'preimage {total}/{blocks*BLOCK} bytes',flush=True)
+        if (process and process.wait(timeout=5)) or total != blocks * BLOCK:
             raise ValueError("Incomplete preimage backup")
     finally:
-        timer.cancel()
-        if process.poll() is None:
+        if timer:timer.cancel()
+        if process and process.poll() is None:
             process.kill(); process.wait(timeout=5)
     check = hashlib.sha256(); check_bytes = 0
     with gzip.open(temporary, "rb") as f:
@@ -176,6 +201,8 @@ def main():
     struct.pack_into("<I", metadata, 60, zlib.crc32(metadata[:60]))
     (OUT / "empty-overlay-metadata.bin").write_bytes(metadata)
     plan = {"status": "prepared-readonly-no-phone-writes", "serial": SERIAL, "product": "zorn", "slot": "b",
+            "data_profile":NAME,
+            "preimage_blank_proven":args.blank_only,
             **geometry, "relative_first_lba": RELATIVE_FIRST, "absolute_first_lba": absolute,
             "blocks": blocks, "bytes": total, "logical_data_bytes": PAGES * BLOCK,
             "pages": PAGES, "bitmap_blocks": BITMAP_BLOCKS,

@@ -19,9 +19,13 @@ seed = ROOT / report["seed"]
 sys.path.insert(0, str(TREE / "drivers/DarwinBoot/Test"))
 import packed_ramdisk
 actual, header = packed_ramdisk.inspect(seed)
+large=os.environ.get('UNIXNU_ZORN_DATA_PROFILE','512m')=='8g'
+expected_bytes=8*1024**3 if large else 512*1024**2
 if any(actual[k] != report[k] for k in ("bytes", "sha256", "encoded_sha256", "encoded_bytes")) or \
-        actual["bytes"] != 512 * 1024**2 or header[32:36] != b"NXSB" or not report["guest_volatile"]:
-    raise SystemExit("Require the exact prepared volatile 512 MiB Data seed")
+        actual["bytes"] != expected_bytes or header[32:36] != b"NXSB" or \
+        (not large and not report["guest_volatile"]) or \
+        (large and (report["guest_volatile"] or report.get('storage_mode')!='ufs-direct' or not report.get('grown_seed_readonly_verified'))):
+    raise SystemExit("Require the exact prepared selected Data seed/profile")
 subprocess.run([sys.executable, TREE / "scripts/build-zorn-storage.py", "--component", "RamBlock"], check=True)
 out = TREE / "build/ram-block"
 assembly = ".section __DATA_CONST,__const\n.balign 8\n"

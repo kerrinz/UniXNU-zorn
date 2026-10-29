@@ -1,0 +1,15 @@
+{
+  "run": "out/zorn/debug/20261028-233217-5d8b2662",
+  "boot_sha256": "5d8b2662f3bde9c6ab370e73d0b2ff0c5f4c464331f1d239ce1a966022d109fe",
+  "kernel_sha256": "ffe57b6cd5629b329a1b46ffdb75b57932c6f10d1820a5d7dc707fc03ed074e4",
+  "log_sha256": "2342ef3e9329c1aa9f87655b41f8f02320616de40e8d0f7a303ce8cf38b83143",
+  "recovered": true,
+  "fresh_log": true,
+  "phase": 76,
+  "all_eight_remap_epochs": 9,
+  "all_eight_remap_errors": 0,
+  "cleanup_passed": false,
+  "panic": "vm_fault.c:2011 Assertion failed: !must_be_resident",
+  "diagnosis": "KMA_VAONLY made VM entry wired although no resident pages in its object; kmem_free unwire asserts. Reserve with KMA_VAONLY|KMA_PAGEABLE; retain assertion",
+  "data_mounted": false
+}

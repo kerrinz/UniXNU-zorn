@@ -32,6 +32,7 @@ struct Pins {
  }
  unsigned sample(){assert(!cs&&clk&&samples<80);return (0xa5>>(7-(samples++)%8))&1;}
  void delay(unsigned us){assert(us==1);++pauses;}
+ void afterByte(unsigned n){assert(!cs&&!clk&&n*8==bits&&samples==bits);}
 };
 int main(){
  const uint8_t check[]="123456789";assert(ZornFt::crc(check,9)==0x6f91);

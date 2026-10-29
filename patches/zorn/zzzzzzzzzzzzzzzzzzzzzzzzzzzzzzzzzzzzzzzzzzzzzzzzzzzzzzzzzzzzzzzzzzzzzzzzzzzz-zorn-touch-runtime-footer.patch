@@ -1,0 +1,32 @@
+--- a/bsd/sys/zorn_gui_log.h
++++ b/bsd/sys/zorn_gui_log.h
+@@ -4,7 +4,7 @@
+ #define ZORN_GUI_LOG_H
+ #include <sys/types.h>
+ 
+-#define ZORN_GUI_LOG_SLOTS 92
++#define ZORN_GUI_LOG_SLOTS 84
+ #define ZORN_GUI_LOG_OFFSET (16 + 12 * ZORN_GUI_LOG_SLOTS)
+ #define ZORN_GUI_STACK_FRAMES 16
+ #define ZORN_GUI_STACK_KERNEL 0x80000000U
+@@ -87,15 +87,18 @@
+     uint64_t dataPermissions[3];
+     // errno/support bits, block bytes, total/available blocks, actual UUID.
+     uint64_t dataSpace[6];
++    // Independent of the wrapping text ring: progress/error, frame counters,
++    // position/noise, last sample time and original HID publication/report state.
++    uint64_t touch[12];
+ };
+ 
+ #ifdef __cplusplus
+ static_assert(sizeof(ZornGuiThread) == 56 && sizeof(ZornGuiProcess) == 272, "GUI process ABI");
+-static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiUserStack) == 144 && sizeof(ZornGuiFooter) == 2976, "GUI footer ABI");
++static_assert(sizeof(ZornGuiExitRecord) == 48 && sizeof(ZornGuiExitDetail) == 144 && sizeof(ZornGuiIpcRecord) == 20 && sizeof(ZornGuiQueryRecord) == 56 && sizeof(ZornGuiUserStack) == 144 && sizeof(ZornGuiFooter) == 3072, "GUI footer ABI");
+ extern "C" {
+ #else
+ _Static_assert(sizeof(struct ZornGuiThread) == 56 && sizeof(struct ZornGuiProcess) == 272, "GUI process ABI");
+-_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiUserStack) == 144 && sizeof(struct ZornGuiFooter) == 2976, "GUI footer ABI");
++_Static_assert(sizeof(struct ZornGuiExitRecord) == 48 && sizeof(struct ZornGuiExitDetail) == 144 && sizeof(struct ZornGuiIpcRecord) == 20 && sizeof(struct ZornGuiQueryRecord) == 56 && sizeof(struct ZornGuiUserStack) == 144 && sizeof(struct ZornGuiFooter) == 3072, "GUI footer ABI");
+ #endif
+ void zorn_ufs_gui_stage(unsigned tick, unsigned stage, int pid);
+ void zorn_ufs_gui_process(const struct ZornGuiProcess *process);

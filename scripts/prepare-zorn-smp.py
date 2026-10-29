@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare an isolated ArmCpu assembly fix and two-core ADT; never boot/link it."""
+"""Prepare isolated ArmCpu and explicit two/eight-core ADTs; never boot/link."""
 import argparse
 import copy
 import hashlib
@@ -72,6 +72,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline", type=Path, default=ROOT / "out/zorn/builds/af82587b")
     parser.add_argument("--compile", action="store_true", help="compile isolated object with the real XNU C++ recipe")
+    parser.add_argument("--cores", type=int, choices=(2, 8), default=2, help="explicit isolated CPU count; active profile remains CPU0")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     origin = json.loads((NATIVE / "origin.json").read_text())
@@ -98,20 +99,36 @@ def main():
     cpus = child(tree, b"cpus")
     if len(cpus[1]) != 1 or dict(cpus[1][0][0]).get(b"reg") != struct.pack("<I", 0):
         raise ValueError("baseline is not CPU0 only")
-    cpu1 = copy.deepcopy(cpus[1][0])
-    replacements = {b"name": b"cpu1\0", b"reg": struct.pack("<I", 0x100), b"state": b"waiting\0"}
-    cpu1[0] = [(key, replacements.get(key, value)) for key, value in cpu1[0]]
-    cpus[1].append(cpu1)
+    midrs = []
+    if args.cores == 8:
+        proof_path=OUT/'midr-recovery-20261028.json'
+        proof=json.loads(proof_path.read_text())
+        if not (proof['serial']=='92988a43' and proof['product']=='zorn' and proof['slot']=='b' and proof['source_state']=='recovery' and proof['readonly']):
+            raise ValueError('eight-core MIDR proof identity differs')
+        rows=re.findall(r'cpu([0-7])\s+(0x[0-9a-f]+)',proof['output'])
+        if [int(i) for i,_ in rows]!=list(range(8)):
+            raise ValueError('missing or reordered real per-CPU MIDRs')
+        midrs=[int(v,16) for _,v in rows]
+        if [v & 0xff0ffff0 for v in midrs] != [0x410fd800]*2+[0x410fd810]*5+[0x410fd820]:
+            raise ValueError('K80 MIDR parts differ; do not guess CPU identities')
+    for i in range(1,args.cores):
+        cpu=copy.deepcopy(cpus[1][0])
+        replacements={b"name":f"cpu{i}\0".encode(),b"reg":struct.pack("<I",i*0x100),b"state":b"waiting\0"}
+        cpu[0]=[(key,replacements.get(key,value)) for key,value in cpu[0]]
+        if midrs:
+            cpu[0]+=[(b'zorn,expected-midr',struct.pack('<I',midrs[i])),
+                     (b'capacity-dmips-mhz',struct.pack('<I',captured['cpus'][i]['capacity_dmips_mhz']))]
+        cpus[1].append(cpu)
     if any(dict(c[0]).get(b"name") == b"psci\0" for c in tree[1]):
         raise ValueError("baseline unexpectedly includes PSCI")
     tree[1].append([[(b"name", b"psci\0"), (b"compatible", b"arm,psci-1.0\0"), (b"method", b"smc\0")], []])
-    candidate_adt = OUT / "two-core.adt"
+    candidate_adt = OUT / ("eight-core.adt" if args.cores==8 else "two-core.adt")
     candidate_adt.write_bytes(emit(tree))
     parse_adt(candidate_adt.read_bytes())
     # Removing just the new CPU and PSCI must reproduce every baseline byte,
     # including random seed, identity, memory window and trust placeholders.
     restored = copy.deepcopy(tree)
-    child(restored, b"cpus")[1].pop()
+    del child(restored, b"cpus")[1][1:]
     restored[1].pop()
     assert emit(restored) == emit(previous)
     with tempfile.TemporaryDirectory(dir=OUT) as directory:
@@ -125,10 +142,12 @@ def main():
         raise ValueError("patched ArmCpu identity differs")
     result = {"baseline_boot_sha256": build["sha256"], "captured_fdt_sha256": captured["sha256"],
               "candidate_adt_sha256": sha(candidate_adt), "candidate_source_sha256": sha(candidate),
-              "two_cpu_affinities": [0, 256], "psci_method": "smc", "unrelated_adt_bytes_preserved": True,
+              "cpu_affinities": [i*256 for i in range(args.cores)], "psci_method": "smc", "unrelated_adt_bytes_preserved": True,
               "default_profile_changed": False, "object_compiled": False, "hardware_smp_qualified": False,
               "remaining_gates": ["cross-core TLB invalidation", "atomic diagnostic log ownership",
                   "PSCI/per-core timer/IPI preflight", "legacy synchronization review"]}
+    if args.cores==2:result['two_cpu_affinities']=[0,256]
+    if midrs:result.update(observed_recovery_midrs=[hex(v) for v in midrs],midr_proof_sha256=sha(proof_path),midr_values_not_yet_observed_in_xnu=True)
     if args.compile:
         recipe = TREE / "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json"
         record = json.loads(recipe.read_text().strip().rstrip(","))
@@ -158,7 +177,7 @@ def main():
         assert re.search(r"\bsmc\s+#0", disassemble(obj, "__ZN6ArmCpu8startCPUEmm"))
         result.update(object_compiled=True, object_sha256=sha(obj), ordered_sgi_in_actual_object=True,
                       old_linked_kernel_missing_sgi_confirmed=True, actual_psci_smc_present=True)
-    (OUT / "candidate.json").write_text(json.dumps(result, indent=2) + "\n")
+    (OUT / ("eight-core-candidate.json" if args.cores==8 else "candidate.json")).write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
 
 

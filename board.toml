@@ -10,6 +10,8 @@
 [board]
 name = "zorn"
 soc = "SM8650"
+# Record identity only: the existing build remains schema 1 (no profile merge).
+os_profile = "ipados-17.7.11-21H461"
 description = "Redmi K80 12GB+256GB"
 kit = "zorn"
 
@@ -50,7 +52,7 @@ archives = [
   "build-corecrypto-14.py",
   "build-corecrypto-14.py --namespace",
   "build-arm-driver.py ArmDTPlatform",
-  "build-arm-driver.py ArmCpu",
+  "build-zorn-cpu.py",
   "build-zorn-aes.py",
   "build-zorn-verified-root.py",
   "build-libpthread-kernel.py",

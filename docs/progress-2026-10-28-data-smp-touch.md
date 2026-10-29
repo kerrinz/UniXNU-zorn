@@ -146,3 +146,92 @@ ADT列出8个节点不算全部核心在线。
 常规启动同时记录BL mode3/ok1/error0/old307/target64/readback64，单次写、第一个读回样本成功，ACK/TIMEOUT0；与机主锁屏反馈对应。末快照tick15/stage11/225346ms，不推断首次锁屏所用时间。触摸无作用按未适配记录；全核CPU仍未启用。
 
 12:54：不修改内核/ADT/种子，以同一eb55ebe5镜像启动第二次已有Data复测（轮次20261028-125358-eb55ebe5）。再次核对64项输入与准确镜像，日志解析器SHA记入新run.json；900/1200秒及600秒单帧保持，等待有界自动回收。尚未进入多核启动，不把读出的8个ADT节点当作8核在线。
+
+
+## 21:53 新增第二次独立绑定的 Data 恢复证据
+
+触控短测 `20261028-214203-ece3d0e8` 自动回收，匹配的新4KiB日志再次读取原初始化标志 `DKEEP state=2 error=0 cookie=2c59d71a`；与首次创建和eb55ebe5的cookie一致。overlay loaded4669、errors0；APFS UUID正确，保留模式只验证已有权限标记，不重放模板。结合此前eb55ebe5，这是至少两次独立绑定的跨启动恢复通过；不等于完整文件系统或长期耐久性验证。见[重复恢复证据](evidence/data-retained-repeat-result.json)。
+
+
+## 22:31 机主要求直接八核目标
+
+手机已自动回recovery；不启动Android。只读采集确认recovery当前0-7在线，CPU0/1 MIDR410fd801，CPU2-6为410fd811，CPU7为410fd821，与实际FDT八个affinity/capacity交叉核对。它证明Linux recovery硬件身份，不等于XNU八核上线。
+
+prepare-zorn-smp.py新增显式--cores8，生成八个不同reg的隔离ADT，保留通用qcom,kryo类型和共用timebase，副核加入实际MIDR/容量元数据；移除新增七个节点与PSCI后逐字节还原原ADT。隔离ArmCpu对象编译通过，实际DSB/SGI/ISB和PSCI SMC存在，旧内核缺SGI负例成立。见[离线候选](evidence/smp-eight-offline-candidate.json)、[实际核型](evidence/smp-eight-midr-recovery.json)。
+
+当前boot.img仍是CPU0触控诊断，未打包/启动八核。直接八核预检前仍须完成跨核TLB、日志原子互斥、旧锁绕过复核及每核实际任务/定时器/IPI证据；通过后再放行用户态。机主明确八核优先、触控候选保留、硬件GPU后置。
+
+
+## 23:17 八核预检进入实际链接阶段（尚未真机启动）
+
+新增显式 `--smp-preflight 8`，仅适用于 `zorn_defconfig` / watchdog1 / 当前增量源码树，禁止混入 GUI、触控或 Data 保留参数。默认仍 CPU0。板级 ArmCpu 包装层修复 boot CPU 的 IOCPUInterruptController 等待全部 CPU 使能、却尚未调度副核启动的注册顺序问题：boot controller 仅负责本核；副核使用现有本地 interrupt handler，在 UFS 日志和独立 watchdog 就绪后依次注册/CPU_ON。
+
+本配置将 RW 锁实现和 pmap 锁恢复为固定原版，恢复原版 ASID 分配器及 pmap 销毁流程；不再允许 try-lock 失败后继续改 ASID 位图。CPU0 首先在可回收的日志检查点执行全 ASID、inner-shareable VMALLE1IS；只有指令返回后才切换六个全局 TLB 入口，并启动副核。实际链接的 SGI/PSCI/TLBI、processor_start、绑定任务和日志调用已核对；完成预检仍需真机每核 MIDR/MPIDR、timer/IPI、10 次绑定任务和 TLB 返回证据。该探测暂不等于已完成跨核重映射一致性或八核 GUI 验收。
+
+日志块所有权改为原子获取/释放，包含 watchdog 头文件；8 个宿主生产者压力检查、越界和旧源码反例在 ASan/UBSan 下通过。此为宿主检查，不能替代 UFS 真机并发验证。最终复位先验证 BCB，再停止 watchdog；若 PSCI 意外返回则尝试重新开启 watchdog。Data 驱动在预检关闭，标志接口明确返回 ENOTSUP，不使用虚假种子或挂载旧 Data。
+
+首次完整链接因非 Data 配置仍拉入 DataMarker 的 Data/种子符号而失败，已单独提供拒绝访问的非 Data 接口修复。第二次链接成功，审计器对函数与同名数据及内联调用路径的识别被纠正后，正在重新完成整个打包流程；失败日志保留在 ignored out。当前手机已核对 recovery/zorn/_b；尚未启动八核，不宣称八核在线。已有 d2c17be2 CPU0/低亮度/保留 Data 基线和触控候选保持归档。
+
+
+23:18：`402f7682`（完整 boot SHA `402f76822c3919be1f0bea547cb6664b1d8ddb08d1a1d8a7d0dcb2f98e5ee2d5`，kernel SHA `05a1f62b1abeba93af8208a19a1adb351fe65286bfb5f8a2b8da3bbdfbb38463`）完成37项输入、实际调用/负载审计和独立完整归档核对。只对92988a43/zorn/b临时启动，run `20261028-231842-402f7682`，主机回收上限360秒；独立watchdog和BCB已验证，尚待新的回收结果。此镜像为预根卷硬件测试，不应拿它等系统锁屏。
+
+
+## 23:19 八核 XNU 预检真机通过
+
+`402f7682` 于23:19:36自动回recovery，run.status=recovered、kernel_log_changed=true，完整boot/kernel/reader及归档SHA匹配。实际 `SMP PASS target=8 phase=80 seen=ff bound=ff failure=0 tlb=1`。CPU0/1为A520、CPU2-6为A720、CPU7为X4；MPIDR实际为81000000至81000700。副核全部step7/PSCI返回0，每核timer>0、IPI>0、10次绑定任务、VMALLE1IS返回，详见[eight-core evidence](evidence/smp-eight-preflight-result.json)。这证明八个实际XNU核心已运行，未挂载Data、未启动八核用户态或验证性能。
+
+下一独立候选增加真实映射可见性测试：CPU0使用标准pmap接口，将保留的同一内核VA在两张自有物理页间切换，八个绑定worker逐次核对9个epoch的标志值并记录错误；停止worker确认后才撤销映射和释放内存。所有操作仅在RAM，仍在根卷发布前自动回收。此候选正在构建，不能将第一轮仅TLBI返回当成映射一致性已通过。
+
+
+## 23:38 完整八核与映射清理通过，准备八核用户态
+
+`37100a75`（boot `37100a7596d683ce84e3ba8d34537e38cd8e7d8f7c80e8a4f150b6508a36e511`，kernel `13495dbd92cbe2c5e6f003d5c291833c5af8fea60506c94847020952d1edbf21`）已自动回recovery，新日志/完整归档SHA匹配。`SMP PASS phase80 seenff boundff failure0`，每核remap9/error0，原先phase76清理断言消失。旧 `5655bfe2`、`5d8b2662` 的失败证据保留；后者证实9轮读值全部正确、断言仅在kmem_free的VM entry unwire。修正为KMA_VAONLY|KMA_PAGEABLE，独立wired backing保持，未删除断言、未手工改PTE或丢弃错误。详见[完整预检](evidence/smp-eight-remap-result.json)。
+
+接入显式 `--smp-preflight 8 --smp-continue`：每次启动仍先执行同一八核/9轮映射预检，通过后才允许根卷/Data/用户态继续；失败仍自动回收。构建前要求真实recovered proof、原始块/boot/kernel哈希，以及与已通过归档完全相同的worker/映射/协调函数与ArmCpu补丁。八核GUI排除旧CPU0用户/内核栈采样和触控实验；保留Data/低亮度/原服务裁剪。Data标志验证不再依赖LaunchServices采样选项，运行时写入资格守卫仍保留。正在构建，尚未把八核系统界面计为通过。
+
+
+23:42：`1a62f9de`（boot `1a62f9deafbd6503ec8eb163c9893f6a6b024a9cc5e242b0078020e6ffc71294`，kernel `47a2abb81089b21e454827929c81ff2a832bc8a61b318d2be1b836a251fe1b25`）通过83项输入/归档、真实CPU调用和保留Data负载审计后，固定设备临时启动；run `20261028-234251-1a62f9de`，300秒观察/600秒回收。23:45机主现场回复“系统锁屏”。这是八核候选的实际画面确认，尚待本轮新日志核对SMP8、Data和亮度；触控实验在此轮关闭，不能据此判定八核解决触摸问题。
+
+
+## 23:49 八核锁屏、保留 Data 和低亮度联合通过
+
+`1a62f9de` 自动回recovery，status/recovered、changed log、精确boot/kernel/reader哈希匹配。机主确认系统锁屏，与末快照tick20/stage12/ms313807及10次CPU传帧一致。原始文本保留 `SMP8 phase80 seenff boundff remapff timersff ipisff failure0 tlb1`；DKEEP state2/error0/cookie2c59d71a，Data模式2/原卷UUID/overlay错误0、权限stage4保留模板，亮度307→64/readback64。见[八核系统证据](evidence/smp-eight-gui-result.json)。八核用户态本轮通过，尚未做长期稳定性/性能测量。
+
+另发现Data可用仅11079680B（512MiB总容量），本轮已有初始化和服务写入显著增多。待测 `2c64d623` 八核+原触控驱动已完整构建并核对104项输入，尚未启动；先调查容量占用。完整Data导出被自动审批因可能包含私人内容、缺少明确导出授权而拒绝，未执行该导出；只读头/位图替代调查和授权确认分开记录。不重置已有Data，不关闭文件系统错误检查，不扩大持久写入窗口，不据单次锁屏声称触摸已修复。
+
+
+## 2026-10-29 00:05 Data容量复核
+
+用户明确授权完整512MiBData本机诊断。已在recovery仅读取既有窗口，核对SHNGDATA头CRC/种子和二次读回，在本机按126678个已变页重建原APFS；仅只读挂载分析。完整副本留在ignored out、未上传；原卷11MiB可用得到宿主复核。db/uuidtext约157MiB、diagnostics约79MiB、analyticsd约32MiB，三项约268MiB，说明512MiB不宜作为后续系统调试容量。未清理文件或重置Data。
+
+建议迁移到8GiB的UFS持久Data，不需要等量RAM。按上游seed-data-grow.py --gib8仅在本机生成新的最小种子，逻辑8GiB、编码1175696B，原种子哈希不变。初始化后的Data尚未迁入；直接换种子会改变store身份并重置，禁止使用此捷径。提案是在userdata相对20GiB的独立窗口保留8GiB Data，旧10GiB/512MiB窗口保留；只完成静态范围核对，仍需实机GPT/新窗口前像/边界与种子绑定/原标志迁移验证及新增写入范围确认。没有安装新窗口、没有扩分区或flash。见evidence/data-8g-offline-proposal.json。
+
+
+## 2026-10-29 全新8GiBData，机主取消数据迁移
+
+机主明确无重要Data、要求直接扩大，改为全新8GiB初始化，省去原初始化数据迁移。旧512MiB窗口和本机副本仍保留作独立回退。8GiB种子已核对逻辑容量、原卷UUID和232项模板路径，编码仍约1.12MiB；默认构建保持512m，显式--data-profile8g选择新策略，--fresh-data限定首次mode2初始化。
+
+20GiB候选非空。完整前像导出被自动审批因未知旧Android私人内容而拒绝，未执行；改用允许的手机端空白校验。新的userdata相对192GiB候选完整8590200832B/2097217块哈希与全零一致，未导出其内容；在本机构造对应零前像并完整解压SHA核对，压缩约36MiB。实际新窗口relative50331648、absolute53444352、pages2097152、64块bitmap+1块header；双GPT、manifest、真实容量和边界均核对，避开OS/SystemOS/日志/旧Data。当前installed=false，没有写新窗口或改GPT。
+
+实际8GiB策略/原版provider/overlay的宿主边界、坏GPT/坏seed/越界/只读写拒绝/写失败测试通过；512MiB旧策略回归也通过。1eb799ec仅mode1只读探针已完整50项输入与boot/kernel归档核对，开始定向临时启动；仍需新回收日志及全窗不变证明才初始化65块元数据。下一阶段为八核新Data首次启动，再验证跨重启保留及触控。
+
+
+00:32：严格匹配新mode1轮次7a57b0cb（recovered、changed log、boot/kernel归档一致）后，全新8GiB窗口初始化完成。实际日志为DSTORE mode1/open0/state4/header9/GPT0/255、present/write/loaded/error全0，保留了只读写探针EBUSY16，不当作可写挂载成功。初始化前整窗仍与零前像SHA相同；仅写65块header/bitmap，之后整窗SHA为ac676e6512e4bad824ec9a2e395133c881e156995c6ac0157f42cfa9c2442975，GPT/manifest/前后边界不变。一次人工轮次路径拼错在任何USB写入前失败，随后按唯一真实目录自动定位；失败日志保留。见evidence/data8-metadata-install.json。
+
+00:35：82e697c5全新8GiBData八核候选完成84项输入/归档/真实调用/种子大小及UUID审计后，仅92988a43/zorn/b临时启动；--fresh-data、不携带retained标志，300秒观察/600秒回收。它会先重跑八核和9轮共享映射检查，再创建全新Data初始化标志。系统初始化/新可用容量仍待回收。后续保留Data触控候选正在本地构建，不并发手机测试；最终日常测试镜像将使用--retained-data，避免再次重放首次权限模板。
+
+
+00:38：机主确认82e697c5（全新8GiBData/8核）已进入系统锁屏，先保持现场自动回收；尚待真实容量、Data标志和错误计数。后续bb4bd81b已完成109项输入及完整归档/真实调用核对，使用8GiB/retainedData/8核/低亮度/原触控报告格式，未启动，等待首启新日志后才测试。
+
+
+## 00:43 全新8GiBData首次启动通过
+
+82e697c5已自动回recovery，精确boot/kernel/reader/归档及changed log核对。实际APFS总容量8589934592B、可用8155586560B（约7.60GiB）、UUID仍C7D77FF3-6437-4C4A-8E05-E8E239AC1641。权限stage3/error0/232项全部校验；DKEEP首次创建state1/error0/cookie2dde8229，overlay mode2/open1/state2/header0/GPT0/0/errors0，SMP8全maskff/failure0、11次CPU传帧和亮度读回64。机主确认锁屏。见evidence/data8-firstboot-result.json。此时跨重启保留尚待下一轮，不把首次创建当成恢复证据。
+
+随后bb4bd81b（boot bb4bd81bfae49051e22fffc59017e6bd92639abd7ac8ce12d0813551eee19353，kernel054c37045862a55ff2daaebfc9ee8348f3788452406afaca69f0e9b80e0064c0）重新核对109项输入后定向临时启动，8GiB/retainedData/8核/低亮度/原触控报告格式。它只验证已初始化标志，不重放模板；若标志缺失或新seed不符即拒绝。用于同时验证新Data的跨重启保留与8核下的触摸反应，300/600秒，等待回收。out/zorn/boot.img现为此保留模式候选，首启fresh镜像只保留在归档，避免日后手动测试再次套用首次权限模板。
+
+## 2026-10-29 00:51 8 GiB Data 跨启动保留通过
+
+`bb4bd81b` / `20261029-004452-bb4bd81b` 已自动回 recovery，新增日志、boot/kernel 和完整归档哈希匹配。Data 总量 8589934592 B、可用 7967285248 B（约 7.42 GiB）；DKEEP state2/error0，cookie 与首启相同为 `2dde8229`，权限 stage4，未重放首次 232 项模板。UFS Data 错误为 0，SMP8 各核掩码 ff、failure0，硬件亮度读回 64。机主确认锁屏；见 [本轮证据](evidence/data8-retained-touch-result.json)。这证明一次初始化后的跨启动保留，不代表长期稳定性验收。
+
+本轮触控读取 834 次、解码 833 帧、bad0；HID 提交 187 次，末次返回 0，机主仍无 UI 响应。机主补充早期自由触摸、后期完成 2–3 次中央按住与底部上滑，因此不将本轮当作干净的无触摸基线对照。00:59 已重新只读下载同一日志到本机，按机主要求暂停；随后机主明确恢复触控适配。后续事件派发计数及边缘手势候选详见 [触控事件记录](progress-2026-10-29-touch-events.md)。

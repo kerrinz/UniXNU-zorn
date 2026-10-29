@@ -6,10 +6,11 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+from zorn_data_profile import DIRECTORY,LARGE
 
 ROOT = Path(__file__).resolve().parents[2]
 NATIVE = ROOT / "UniXNU-zorn/native/ufs-read"
-DATA = ROOT / "out/zorn/data-store"
+DATA = DIRECTORY
 plan = json.loads((DATA / "plan.json").read_text())
 spec = importlib.util.spec_from_file_location("data_prepare", Path(__file__).with_name("prepare-zorn-data-store.py"))
 prepare = importlib.util.module_from_spec(spec); spec.loader.exec_module(prepare)
@@ -124,10 +125,10 @@ int main() {
     opened(2);struct Ops {bool read(uint64_t b,uint32_t n,void*p){return zorn_data_store_read(b,n,p);}
         bool write(uint64_t b,uint32_t n,const void*p){return zorn_data_store_write(b,n,p);}
         bool sync(){return zorn_data_store_sync();}} ops;
-    std::array<uint8_t,16384> bits{};persist::Overlay overlay;
+    std::array<uint8_t,(kZornDataPages+7)/8> bits{};persist::Overlay overlay;
     assert(overlay.open(ops,kZornDataPages,zorn_data_expected_seed,false,bits.data())==persist::Open::Resumed);
     assert(overlay.present==0 && overlay.writePage(ops,17,data.data()) && overlay.has(17));
-    persist::Overlay resumed;std::array<uint8_t,16384> bits2{};
+    persist::Overlay resumed;std::array<uint8_t,(kZornDataPages+7)/8> bits2{};
     assert(resumed.open(ops,kZornDataPages,zorn_data_expected_seed,false,bits2.data())==persist::Open::Resumed && resumed.has(17));
     assert(ops.read(persist::pageBlock(kZornDataPages,17),1,got.data()) && !memcmp(got.data(),data.data(),4096));
     puts("actual policy/provider/upstream-overlay controls passed; no USB");
@@ -148,7 +149,7 @@ fixtures += array("zorn_data_expected_seed", bytes.fromhex(plan["seed_sha256"]),
 with tempfile.TemporaryDirectory(prefix="zorn-data-store-") as directory:
     p = Path(directory); source = p / "check.cpp"; exe = p / "check"
     source.write_text(program.replace("@@FIXTURES@@", fixtures))
-    subprocess.run(["xcrun", "clang++", "-std=c++17", "-Wall", "-Wextra", "-Werror", "-I", str(NATIVE),
+    subprocess.run(["xcrun", "clang++", "-std=c++17", "-Wall", "-Wextra", "-Werror", *(['-DZORN_DATA_8G=1'] if LARGE else []), "-I", str(NATIVE),
                     "-I", str(ROOT / "UniXNU/drivers/RamBlock"), str(source), "-o", str(exe)], check=True)
     subprocess.run([str(exe)], check=True)
 report = {"python_geometry_crc_refusals": rejected, "actual_provider_and_policy_executed": True,

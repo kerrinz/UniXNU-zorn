@@ -35,19 +35,19 @@ static void zorn_wdt_number(char tag, uint64_t value)
 
 static void zorn_watchdog_start(void)
 {
-    gLogBusy = 1;
+    if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
     zorn_log_append("WPROBE");
     ZornSmcResult status = zorn_wdt_call(0x86000006U, 0, 0);
     zorn_wdt_number('S', status.status);
     if (status.status != 0) {
         zorn_log_append("WUNSUP");
-        zorn_checkpoint_reset();
-        gLogBusy = 0;
+        zorn_checkpoint_reset_owned();
+        __sync_lock_release(&gLogBusy);
         return;
     }
     zorn_log_append(status.flags & 1 ? "WON" : "WOFF");
     if (!zorn_set_recovery_bcb()) {
-        gLogBusy = 0;
+        __sync_lock_release(&gLogBusy);
         zorn_ufs_stop("WBCN");
     }
     zorn_log_append("WBCB");
@@ -56,8 +56,8 @@ static void zorn_watchdog_start(void)
         zorn_wdt_number('D', status.status);
         if (status.status != 0) {
             zorn_log_append("WDISERR");
-            zorn_checkpoint_reset();
-            gLogBusy = 0;
+            zorn_checkpoint_reset_owned();
+            __sync_lock_release(&gLogBusy);
             return;
         }
     }
@@ -68,32 +68,32 @@ static void zorn_watchdog_start(void)
     zorn_wdt_number('T', status.status);
     if (status.status != 0) {
         zorn_log_append("WTIMERR");
-        zorn_checkpoint_reset();
-        gLogBusy = 0;
+        zorn_checkpoint_reset_owned();
+        __sync_lock_release(&gLogBusy);
         return;
     }
     status = zorn_wdt_call(0x86000007U, 0, 0);
     zorn_wdt_number('P', status.status);
     if (status.status != 0) {
         zorn_log_append("WPETERR");
-        zorn_checkpoint_reset();
-        gLogBusy = 0;
+        zorn_checkpoint_reset_owned();
+        __sync_lock_release(&gLogBusy);
         return;
     }
     status = zorn_wdt_call(0x86000005U, 3, 0);
     zorn_wdt_number('E', status.status);
     if (status.status != 0) {
         zorn_log_append("WENERR");
-        zorn_checkpoint_reset();
-        gLogBusy = 0;
+        zorn_checkpoint_reset_owned();
+        __sync_lock_release(&gLogBusy);
         return;
     }
     gWatchdogArmed = true;
     status = zorn_wdt_call(0x86000006U, 0, 0);
     if (status.status != 0 || !(status.flags & 1)) {
         zorn_log_append("WNOTON");
-        zorn_checkpoint_reset();
-        gLogBusy = 0;
+        zorn_checkpoint_reset_owned();
+        __sync_lock_release(&gLogBusy);
         return;
     }
     zorn_log_append("WARM");
@@ -106,5 +106,5 @@ static void zorn_watchdog_start(void)
             __asm__ volatile("wfe" ::: "memory");
         }
     }
-    gLogBusy = 0;
+    __sync_lock_release(&gLogBusy);
 }

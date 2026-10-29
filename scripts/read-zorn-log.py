@@ -6,6 +6,7 @@ The 4 KiB block is 4 MiB beyond the end of the flashed SHNGROOT image.
 """
 
 import argparse
+import hashlib
 import json
 import struct
 import subprocess
@@ -18,7 +19,31 @@ SERIAL = "92988a43"
 BLOCK_SIZE = 4096
 LOG_BLOCK = 9382658048 // BLOCK_SIZE + 1024
 FORMATS = {b"ZORNLOG1": (510, 8), b"ZORNLOG2": (340, 12), b"ZORNLOG3": (180, 12),
-           b"ZORNLOG4": (172, 12), b"ZORNLOG5": (162, 12), b"ZORNLOG6": (140, 12), b"ZORNLOG7": (136, 12), b"ZORNLOG8": (134, 12), b"ZORNLOG9": (98, 12), b"ZORNLOGA": (96, 12), b"ZORNLOGB": (92, 12)}
+           b"ZORNLOG4": (172, 12), b"ZORNLOG5": (162, 12), b"ZORNLOG6": (140, 12), b"ZORNLOG7": (136, 12), b"ZORNLOG8": (134, 12), b"ZORNLOG9": (98, 12), b"ZORNLOGA": (96, 12), b"ZORNLOGB": (92, 12), b"ZORNLOGC": (64, 12), b"ZORNLOGD": (84, 12)}
+
+
+def touch_raw(block):
+    if len(block) != BLOCK_SIZE or block[:8] != b"ZORNLOGC":
+        return None
+    if block[784:792] not in (b"ZORNTCH1", b"ZORNTCH2"):
+        raise ValueError("invalid touch raw metadata")
+    kind = struct.unpack_from("<I", block, 800)[0]
+    if kind != (1 if block[784:792] == b"ZORNTCH2" else 0):
+        raise ValueError("invalid touch payload kind")
+    size, expected = struct.unpack_from("<II", block, 792)
+    if size != 3120 or expected > 65535:
+        raise ValueError("invalid touch raw length/checksum")
+    raw = block[960:960 + size]
+    value = 0xffff
+    for byte in raw:
+        value ^= byte
+        for _ in range(8):
+            value = (value >> 1) ^ (0x8408 if value & 1 else 0)
+    if value != expected:
+        raise ValueError("touch raw checksum mismatch")
+    if kind == 1 and raw[2944:2952] != b"ZORNCAL1":
+        raise ValueError("invalid touch calibration pair")
+    return raw
 
 
 def from_recovery():
@@ -60,13 +85,47 @@ def decode(block):
     return words
 
 
+def touch_trace(raw):
+    """Decode only the coherent v18 trace union, never as a saved thread stack."""
+    words = struct.unpack("<108I", raw)
+    sequence, magic, total, count, frames, bad, last_ms, gap, zero0, zero1, flags, zero2 = words[:12]
+    if magic != 0x3152545a or flags not in (1, 2):
+        raise ValueError("invalid touch trace header")
+    if flags == 2:
+        if any(value for index, value in enumerate(words) if index not in (1, 10)):
+            raise ValueError("unavailable touch trace contains data")
+        return {"status": "snapshot-unavailable", "records": []}
+    if not sequence or sequence & 1 or count != min(total, 32) or bad > frames or gap > last_ms or zero0 or zero1 or zero2:
+        raise ValueError("invalid touch trace counters")
+    start = total % 32 if total >= 32 else 0
+    points = []
+    for index in range(count):
+        slot = (start + index) % 32
+        ms, xy, meta = words[12 + slot * 3:15 + slot * 3]
+        x, y = xy & 0xffff, xy >> 16
+        identity, phase, contacts, reason = meta & 255, (meta >> 8) & 255, (meta >> 16) & 255, meta >> 24
+        if (x > 32767 or y > 32767 or identity >= 20 or phase not in (1, 2, 3) or contacts > 10 or
+                reason > 2 or (phase != 3 and (reason or not contacts)) or ms > last_ms or
+                (points and ms < points[-1]["ms"])):
+            raise ValueError("invalid touch trace point")
+        points.append({"sequence": total - count + index + 1, "ms": ms, "id": identity,
+                       "phase": ("down", "move", "up")[phase - 1], "contacts": contacts,
+                       "x": x, "y": y, "release_reason": ("normal", "invalid-frames", "worker-stop")[reason]})
+    if total < 32 and any(words[12 + count * 3:]):
+        raise ValueError("unused touch trace slots contain data")
+    return {"status": "coherent", "total_records": total, "overwritten_records": total - count,
+            "matrix_samples": frames, "bad_samples": bad, "last_ms": last_ms, "max_sample_gap_ms": gap,
+            "coordinate_max": 32767, "records": points,
+            "scope": "decoded sensor contacts before HID delivery; GUI receipt not implied"}
+
+
 def gui_state(block):
-    if len(block) != BLOCK_SIZE or block[:8] not in (b"ZORNLOG3", b"ZORNLOG4", b"ZORNLOG5", b"ZORNLOG6", b"ZORNLOG7", b"ZORNLOG8", b"ZORNLOG9", b"ZORNLOGA", b"ZORNLOGB"):
+    if len(block) != BLOCK_SIZE or block[:8] not in (b"ZORNLOG3", b"ZORNLOG4", b"ZORNLOG5", b"ZORNLOG6", b"ZORNLOG7", b"ZORNLOG8", b"ZORNLOG9", b"ZORNLOGA", b"ZORNLOGB", b"ZORNLOGD"):
         return None
-    offset = {b"ZORNLOG3": 2176, b"ZORNLOG4": 2080, b"ZORNLOG5": 1960, b"ZORNLOG6": 1696, b"ZORNLOG7": 1648, b"ZORNLOG8": 1624, b"ZORNLOG9": 1192, b"ZORNLOGA": 1168, b"ZORNLOGB": 1120}[block[:8]]
+    offset = {b"ZORNLOG3": 2176, b"ZORNLOG4": 2080, b"ZORNLOG5": 1960, b"ZORNLOG6": 1696, b"ZORNLOG7": 1648, b"ZORNLOG8": 1624, b"ZORNLOG9": 1192, b"ZORNLOGA": 1168, b"ZORNLOGB": 1120, b"ZORNLOGD": 1024}[block[:8]]
     magic, version, size, tick, stage, pid, sequence, ms = struct.unpack_from("<8s6IQ", block, offset)
     allowed = {b"ZORNLOG3": ((1, 1344), (2, 1920)), b"ZORNLOG4": ((3, 2016),),
-               b"ZORNLOG5": ((4, 2136),), b"ZORNLOG6": ((5, 2400),), b"ZORNLOG7": ((6, 2448),), b"ZORNLOG8": ((7, 2472),), b"ZORNLOG9": ((8, 2904), (9, 2904), (10, 2904)), b"ZORNLOGA": ((11, 2928), (12, 2928), (13, 2928)), b"ZORNLOGB": ((14, 2976), (15, 2976))}[block[:8]]
+               b"ZORNLOG5": ((4, 2136),), b"ZORNLOG6": ((5, 2400),), b"ZORNLOG7": ((6, 2448),), b"ZORNLOG8": ((7, 2472),), b"ZORNLOG9": ((8, 2904), (9, 2904), (10, 2904)), b"ZORNLOGA": ((11, 2928), (12, 2928), (13, 2928)), b"ZORNLOGB": ((14, 2976), (15, 2976)), b"ZORNLOGD": ((16, 3072), (17, 3072), (18, 3072))}[block[:8]]
     maximum_tick = 60 if version >= 12 else 20 if version >= 6 else 12
     if magic != b"ZORNGUI1" or (version, size) not in allowed or tick > maximum_tick or stage > (14 if version >= 8 else 12):
         raise ValueError("invalid GUI snapshot header")
@@ -144,30 +203,33 @@ def gui_state(block):
     if version >= 8:
         result["user_stacks"] = []
         result["kernel_stacks"] = []
-        for index in range(3):
-            stack_pid, stack_tick, count, error, *frames = struct.unpack_from("<4I16Q", block, offset + 2472 + index * 144)
-            if count > 16 or stack_tick > maximum_tick:
-                raise ValueError("invalid GUI user stack")
-            if not stack_pid:
-                if stack_tick or count or error or any(frames):
-                    raise ValueError("unrecorded GUI stack contains data")
-                continue
-            name = ("lsd" if version >= 9 else "launchd", "SpringBoard", "backboardd")[index]
-            if version >= 11 and index == 0:
-                name = block[offset + 336:offset + 352].split(b"\0", 1)[0].decode("ascii")
-                if name not in ("lsd", "launchd"):
-                    raise ValueError("user stack lacks its process identity")
-            kernel_stack = bool(error & 0x80000000)
-            if kernel_stack and version < 15:
-                raise ValueError("kernel stack flag in a legacy user-stack record")
-            error &= 0x7fffffff
-            result["kernel_stacks" if kernel_stack else "user_stacks"].append({
-                "name": name, "pid": stack_pid, "tick": stack_tick,
-                "count": count, "error": error, "frames": frames[:count]})
-            for process in result["processes"]:
-                if process["pid"] == stack_pid and process["name"] == name and process["tick"] == stack_tick and process["threads"]:
-                    process["threads"][0]["kernel_frames" if kernel_stack else "frames"] = frames[:count]
-                    process["threads"][0]["kernel_stack_read_error" if kernel_stack else "stack_read_error"] = error
+        if version == 18:
+            result["touch_trace"] = touch_trace(block[offset + 2472:offset + 2904])
+        else:
+            for index in range(3):
+                stack_pid, stack_tick, count, error, *frames = struct.unpack_from("<4I16Q", block, offset + 2472 + index * 144)
+                if count > 16 or stack_tick > maximum_tick:
+                    raise ValueError("invalid GUI user stack")
+                if not stack_pid:
+                    if stack_tick or count or error or any(frames):
+                        raise ValueError("unrecorded GUI stack contains data")
+                    continue
+                name = ("lsd" if version >= 9 else "launchd", "SpringBoard", "backboardd")[index]
+                if version >= 11 and index == 0:
+                    name = block[offset + 336:offset + 352].split(b"\0", 1)[0].decode("ascii")
+                    if name not in ("lsd", "launchd"):
+                        raise ValueError("user stack lacks its process identity")
+                kernel_stack = bool(error & 0x80000000)
+                if kernel_stack and version < 15:
+                    raise ValueError("kernel stack flag in a legacy user-stack record")
+                error &= 0x7fffffff
+                result["kernel_stacks" if kernel_stack else "user_stacks"].append({
+                    "name": name, "pid": stack_pid, "tick": stack_tick,
+                    "count": count, "error": error, "frames": frames[:count]})
+                for process in result["processes"]:
+                    if process["pid"] == stack_pid and process["name"] == name and process["tick"] == stack_tick and process["threads"]:
+                        process["threads"][0]["kernel_frames" if kernel_stack else "frames"] = frames[:count]
+                        process["threads"][0]["kernel_stack_read_error" if kernel_stack else "stack_read_error"] = error
     if version >= 11:
         outcome, counts, owner = struct.unpack_from("<3Q", block, offset + 2904)
         stage, error = outcome >> 32, outcome & 0xffffffff
@@ -195,6 +257,26 @@ def gui_state(block):
             "uuid": str(uuid.UUID(bytes=struct.pack("<2Q", uuid0, uuid1))).upper() if supported & 8 else None}
         if error == 0 and supported & 7 == 7:
             result["data_space"].update(total_bytes=blocks * block_bytes, available_bytes=available * block_bytes)
+    if version >= 16:
+        values = list(struct.unpack_from("<12Q", block, offset + 2976))
+        if version >= 17:
+            edges = [value >> 32 for value in values[1:7]]
+            if edges[0] > 1 or edges[5] > 3:
+                raise ValueError("invalid touch event dispatch metadata")
+            result["touch_edges"] = dict(zip(("installed", "dispatches", "digitizer_events",
+                "edge_marks", "skipped_events", "install_error"), edges))
+            for index in range(1, 7):
+                values[index] &= 0xffffffff
+        stage, error = values[0] & 0xffffffff, values[0] >> 32
+        if stage not in (0, 1, 3, 4, 5, 6, 7, 21, 22, 23, 24) or values[4] > 10 or values[5] > 32767 or values[6] > 32767 or values[10] >> 32 > 1:
+            raise ValueError("invalid touch runtime metadata")
+        result["touch"] = dict(zip(("reads", "bad", "decoded", "contacts", "x", "y"), values[1:7]))
+        result["touch"].update(stage=stage, error=error, peak=values[7] & 0xffffffff,
+            noise=values[7] >> 32, irq=values[8], counter_ms=values[9],
+            hid_stage=values[10] & 0xffffffff, event_driver=bool(values[10] >> 32),
+            reports=values[11] >> 32, last_result=values[11] & 0xffffffff)
+        # Aligned individual counters; this is not an atomic frame snapshot.
+        result["touch"]["snapshot_policy"] = "independent aligned words; may span adjacent frames"
     for index in range(4):
         seq, pid, status, namespace, code, name = struct.unpack_from("<IiiIQ24s", block, offset + 1152 + index * 48)
         if seq:
@@ -247,9 +329,16 @@ def main():
     if args.block and args.save:
         parser.error("--save is only for adb reads")
     block = args.block.read_bytes() if args.block else from_recovery()
-    words = decode(block)
     if args.save:
         args.save.write_bytes(block)
+    words = decode(block)
+    raw_touch = touch_raw(block)
+    if raw_touch is not None:
+        print(f"Touch raw: {len(raw_touch)} bytes; SHA256 {hashlib.sha256(raw_touch).hexdigest()}")
+        if args.save:
+            raw_path = args.save.with_suffix(".touch.bin")
+            raw_path.write_bytes(raw_touch)
+            print(f"Saved complete touch frame: {raw_path}")
     gui = gui_state(block)
     if gui is not None:
         print("GUI snapshot: " + json.dumps(gui, separators=(",", ":")))

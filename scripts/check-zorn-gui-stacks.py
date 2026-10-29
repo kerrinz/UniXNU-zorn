@@ -21,9 +21,10 @@ program = r'''
 #include <string.h>
 #include "ZornGuiLog.h"
 int main(void) {
-    assert(ZORN_GUI_LOG_OFFSET == 1120);
+    assert(ZORN_GUI_LOG_OFFSET == 1024 && ZORN_GUI_LOG_SLOTS == 84);
     assert(ZORN_GUI_LOG_OFFSET + sizeof(struct ZornGuiFooter) == 4096);
     assert(offsetof(struct ZornGuiFooter, stacks) == 2472);
+    assert(offsetof(struct ZornGuiFooter, touch) == 2976);
     assert(zorn_gui_kernel_frame_valid(0x1000, 0x4000, 0x1000));
     assert(zorn_gui_kernel_frame_valid(0x1000, 0x4000, 0x4ff0));
     assert(!zorn_gui_kernel_frame_valid(0x1000, 0x4000, 0xff0));
@@ -41,10 +42,14 @@ int main(void) {
     assert(!zorn_gui_stack_frame_valid(0xfffffffffffffff0ULL, 0, 0, -1ULL));
     assert(!zorn_gui_stack_frame_valid(0, 0, 0, 15));
     unsigned char block[4096] = {0};
-    memcpy(block, "ZORNLOGB", 8);
+    memcpy(block, "ZORNLOGD", 8);
     struct ZornGuiFooter *p = (void *)(block + ZORN_GUI_LOG_OFFSET);
     memcpy(p->magic, "ZORNGUI1", 8);
-    p->version = 14; p->bytes = sizeof(*p); p->tick = 20; p->stage = 14;
+    p->version = 16; p->bytes = sizeof(*p); p->tick = 20; p->stage = 14;
+    p->touch[0] = 4; p->touch[1] = 800; p->touch[2] = 2; p->touch[3] = 797;
+    p->touch[4] = 1; p->touch[5] = 8784; p->touch[6] = 15444;
+    p->touch[7] = (13ULL << 32) | 950; p->touch[8] = 790; p->touch[9] = 123456;
+    p->touch[10] = (1ULL << 32) | 5; p->touch[11] = (600ULL << 32) | 0xe00002d8;
     p->dataPermissions[0] = 3ULL << 32;
     p->dataPermissions[1] = (232ULL << 32) | 232;
     p->dataSpace[0] = 15ULL << 32; p->dataSpace[1] = 4096;
@@ -58,6 +63,12 @@ int main(void) {
     p->stacks[1].frames[0] = 0x180001234ULL; p->stacks[1].frames[1] = 0x180005678ULL;
     p->stacks[1].error = 1;
     assert(fwrite(block, 1, sizeof(block), stdout) == sizeof(block));
+    // v17 keeps the same sensor values while carrying event dispatch counters.
+    const uint32_t edges[6] = {1, 0xffffffffU, 420, 37, 2, 0};
+    p->version = 17;
+    for (unsigned i = 0; i < 6; ++i)
+        p->touch[i + 1] |= (uint64_t)edges[i] << 32;
+    assert(fwrite(block, 1, sizeof(block), stdout) == sizeof(block));
 }
 '''
 with tempfile.TemporaryDirectory() as directory:
@@ -65,7 +76,47 @@ with tempfile.TemporaryDirectory() as directory:
     (temp / "check.c").write_text(program)
     subprocess.run(["cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I", str(HEADER.parent),
                     str(temp / "check.c"), "-o", str(temp / "check")], check=True)
-    block = subprocess.check_output([str(temp / "check")])
+    blocks = subprocess.check_output([str(temp / "check")])
+assert len(blocks) == 8192
+block, event_block = blocks[:4096], blocks[4096:]
+current = reader.gui_state(block)
+assert current["touch"]["decoded"] == 797 and current["touch"]["contacts"] == 1
+assert current["touch"]["x"] == 8784 and current["touch"]["y"] == 15444
+assert current["touch"]["noise"] == 13 and current["touch"]["peak"] == 950
+assert current["touch"]["reports"] == 600 and current["touch"]["last_result"] == 0xe00002d8
+assert current["touch"]["event_driver"] and reader.decode(block) == []
+events = reader.gui_state(event_block)
+assert events["touch"] == current["touch"]
+assert events["touch_edges"] == dict(installed=1, dispatches=0xffffffff,
+    digitizer_events=420, edge_marks=37, skipped_events=2, install_error=0)
+assert "touch_edges" not in current
+edge_rejected = 0
+for relative, value in ((2984, 2), (3024, 4)):
+    bad = bytearray(event_block)
+    sensor = struct.unpack_from("<Q", bad, 1024 + relative)[0] & 0xffffffff
+    struct.pack_into("<Q", bad, 1024 + relative, sensor | value << 32)
+    try:
+        reader.gui_state(bytes(bad))
+    except ValueError:
+        edge_rejected += 1
+    else:
+        raise AssertionError("invalid event dispatch state accepted")
+touch_rejected = 0
+for relative, value in ((2976, 25), (3008, 11), (3016, 32768), (3024, 32768), (3056, 2 << 32)):
+    bad = bytearray(block)
+    struct.pack_into("<Q", bad, 1024 + relative, value)
+    try:
+        reader.gui_state(bytes(bad))
+    except ValueError:
+        touch_rejected += 1
+    else:
+        raise AssertionError("invalid touch metadata accepted")
+# Preserve the actual old LOGB/v14-v15 decoder controls.
+previous_b = bytearray(4096)
+previous_b[:8] = b"ZORNLOGB"
+previous_b[1120:] = block[1024:1024 + 2976]
+struct.pack_into("<2I", previous_b, 1120 + 8, 14, 2976)
+block = bytes(previous_b)
 data_state = reader.gui_state(block)["data_space"]
 kernel_sample = bytearray(block)
 struct.pack_into("<I", kernel_sample, 1120 + 8, 15)
@@ -205,6 +256,8 @@ result = {"c_layout_and_pointer_bounds": "pass", "c_to_python_roundtrip": "pass"
           "data_filesystem_space_uuid_roundtrip": True,
           "kernel_stack_kind_stale_and_bounds_controls": True,
           "invalid_data_space_rejected": space_rejected,
+          "touch_footer_cpp_roundtrip": True, "invalid_touch_metadata_rejected": touch_rejected,
+          "touch_event_v17_cpp_roundtrip": True, "invalid_event_metadata_rejected": edge_rejected,
           "historical_logs_decoded": historical, "header_sha256": hashlib.sha256(HEADER.read_bytes()).hexdigest(),
           "hardware_stack_reads_qualified": False}
 out = ROOT / "out/zorn/gui-stack-checks.json"

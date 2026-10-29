@@ -65,6 +65,12 @@ if "CONFIG_XNU_NATIVE_RAM_BLOCK=y" in config:
     command += ["-DZORN_RAM_DATA=1"]
 if "CONFIG_XNU_NATIVE_LEGACY_DISPLAY=y" in config:
     command += ["-DZORN_DISPLAY=1"]
+if os.environ.get('UNIXNU_ZORN_SMP','0')=='8':
+    command += ["-DZORN_SMP_PREFLIGHT=1"]
+if os.environ.get('UNIXNU_ZORN_DATA_PROFILE','512m')=='8g':
+    command += ["-DZORN_DATA_8G=1"]
+if os.environ.get('UNIXNU_ZORN_TOUCH_RUNTIME','0')=='1':
+    command += ["-DZORN_TOUCH_RUNTIME_ENABLED=1"]
 for path in includes:
     command += ["-I", str(path)]
 print(" ".join(command), flush=True)
@@ -107,7 +113,8 @@ if verified:
                            for value in policy_command]
     subprocess.run(permissions_command, cwd=record["directory"], check=True)
     objects.append(permissions_object)
-    marker_source = DEVICE / "native/startup-policy/DataMarker.c"
+    marker_source = DEVICE / ("native/startup-policy/DataMarker.c" if
+        "CONFIG_XNU_NATIVE_RAM_BLOCK=y" in config else "native/startup-policy/DataUnavailable.c")
     marker_object = out / "DataMarker.o"
     marker_command = [str(marker_source) if value == str(policy_source) else
                       str(marker_object) if value == str(policy_object) else value
