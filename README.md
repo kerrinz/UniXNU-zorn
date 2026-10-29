@@ -1,18 +1,20 @@
 # UniXNU-zorn
 
+红米 K80 12GB+256GB（zorn，SM8650-AB）的 UniXNU 实验移植。目标系统为 iPad7,1 / j120ap 的 iPadOS 17.7.11（21H461，Darwin 23.6 / xnu-10063.141.1）。固件板级包独立放在 `uefi-zorn`。
+
 **当前进度（2026-10-28）：已进入 iPadOS 系统锁屏，机主在现场确认；当前优先适配触控。** CPU0 保持，多核及硬件 GPU 后置。尚未验证触摸解锁或桌面操作。
+
+最新显示与崩溃调查见 [GUI 续调记录](docs/progress-2026-10-27-gui.md)。恢复后的进度和测试身份见 [续调记录](docs/progress-2026-10-27-resumed.md)；先前的 [暂停记录](docs/progress-2026-10-27.md) 保留为历史快照。可提交的日志摘录在 [docs/evidence](docs/evidence)。日志路径相对于三仓库的共同父目录；原始镜像和完整运行目录不放进 Git。
+
+## 进度
 
 [硬件低亮度](docs/progress-2026-10-28-brightness.md)已通过一次完整锁屏启动，DCS307→64并读回64；[Data](docs/progress-2026-10-28-data-smp-touch.md)首次跨重启读回同一初始化标志。第二次复测被亮度交接保护提前拒绝并自动回 recovery，未到 Data；因此尚不宣称重复启动稳定。现有 overlay 保留。
 
-[触控记录](docs/progress-2026-10-28-touch.md)：真实芯片为 FT3683；首轮只读 XNU 探针证明触控 SE 时钟关闭、GPIO未启用。K80 专属 L14/3.2V 与 L12/1.8V 原生交接已在短测走通，时钟开启、控制器空闲。`bce3bdbe` 已实测读到芯片 ID `3683`、固件 `35`，三条读取均首次 CRC 通过并恢复 GPIO；下一步采集真实触点帧。按[启动与抓日志说明](docs/touch-test-instructions.md)回传结果（提供 Windows PowerShell 命令行包，仅需现有 adb/fastboot，无 Python 依赖）。尚无 HID 或物理触摸成功证据。
+[触控记录](docs/progress-2026-10-28-touch.md)：真实芯片为 FT3683；首轮只读 XNU 探针证明触控 SE 时钟关闭、GPIO 未启用。K80 专属 L14 / 3.2 V 与 L12 / 1.8 V 原生交接已在短测走通，时钟开启、控制器空闲。`bce3bdbe` 已实测读到芯片 ID `3683`、固件 `35`，三条读取均首次 CRC 通过并恢复 GPIO；下一步采集真实触点帧。按[启动与抓日志说明](docs/touch-test-instructions.md)回传结果（提供 Windows PowerShell 命令行包，仅需现有 adb/fastboot，无 Python 依赖）。尚无 HID 或物理触摸成功证据。
 
-红米 K80 12GB+256GB（zorn，SM8650-AB）的 UniXNU 实验移植。目标系统为 iPad7,1 / j120ap 的 iPadOS 17.7.11（21H461，Darwin 23.6 / xnu-10063.141.1）。固件板级包独立放在 `uefi-zorn`。
+2026-10-27 的阶段记录：UEFI、XNU、UFS 只读 OS 根卷及早期用户态已通过；SystemOS 现已由真实 IOBlockStorageDevice → 原版 IOMedia/APFS 挂载为 `/dev/disk1s1`，owner 授权到达 `OWNOK`。原版 launchd 已进入主循环并启动子服务；尚无 iPadOS 图形桌面。已解除原版 Image4 的 AES 等待、raw mdev 的 fsindex/IOKit 资格阻塞，原版 dyld/共享缓存已支持 launchd 执行并生成 ptpd、rapportd 服务日志。UEFI 提前回收和主机 BCB 写入读回已完成真机测试，多轮自动取得新日志。
 
-**2026-10-27：UEFI、XNU、UFS 只读 OS 根卷及早期用户态已通过；SystemOS 现已由真实 IOBlockStorageDevice → 原版 IOMedia/APFS 挂载为 `/dev/disk1s1`，owner 授权到达 `OWNOK`。原版 launchd 已进入主循环并启动子服务；尚无 iPadOS 图形桌面。** 已解除原版 Image4 的 AES 等待、raw mdev 的 fsindex/IOKit 资格阻塞，原版 dyld/共享缓存已支持 launchd 执行并生成 ptpd、rapportd 服务日志。UEFI 提前回收和主机 BCB 写入读回已完成真机测试，多轮自动取得新日志。
-
-**本轮新增：512 MiB 逻辑容量的独立 RAM Data 已在真机以 APFS 可写挂载。临时文件的创建、同步写入、关闭后读回、删除和删除后查询均通过（`DPT=7 / DPE=0`）；实际 RamBlock 写请求为 1、错误为 0。这是当时的易失配置；10月28日已接入受限持久 overlay，最新资格见上文。** 见 [RAM Data 记录](docs/progress-2026-10-27-ram-data.md)。
-
-最新显示与崩溃调查见 [GUI 续调记录](docs/progress-2026-10-27-gui.md)。恢复后的进度和测试身份见 [续调记录](docs/progress-2026-10-27-resumed.md)；先前的 [暂停记录](docs/progress-2026-10-27.md) 保留为历史快照。可提交的日志摘录在 [docs/evidence](docs/evidence)。日志路径相对于三仓库的共同父目录；原始镜像和完整运行目录不放进 Git。
+早期 RAM Data 验证：512 MiB 逻辑容量的独立 RAM Data 已在真机以 APFS 可写挂载。临时文件的创建、同步写入、关闭后读回、删除和删除后查询均通过（`DPT=7 / DPE=0`）；实际 RamBlock 写请求为 1、错误为 0。这是当时的易失配置；10月28日已接入受限持久 overlay，最新资格见上文。见 [RAM Data 记录](docs/progress-2026-10-27-ram-data.md)。
 
 ## 已验证的范围
 
@@ -34,33 +36,33 @@ SystemOS 的 raw `md1` 仍用于只读诊断；正常挂载使用原版存储栈
 
 所有定向 adb/fastboot 命令都要带 `-s 92988a43`。`userdata` 已于 2026-10-25 经机主授权改用于系统镜像；当前不具备 Android/iPadOS 双系统共存能力，**不要启动 Android 或重刷这份 userdata**。
 
-内核通过 `fastboot boot` 内存启动。OS 传输回调拒绝写入。已授权持久写入包括 userdata 的独立 Data overlay 窗口（10GiB偏移、131077个4KiB块，前像已备份验证），既有单4KiB日志块，以及 GPT 选定的 misc recovery BCB 页；BCB 前 864 字节更新为 recovery 命令，其余字节保留，没有 wipe 参数。不要写 boot、super、vbmeta、vendor_boot，不改槽位。
+内核通过 `fastboot boot` 内存启动。OS 传输回调拒绝写入。已授权持久写入包括 userdata 的独立 Data overlay 窗口（10 GiB 偏移、131077 个 4 KiB 块，前像已备份验证），既有单 4 KiB 日志块，以及 GPT 选定的 misc recovery BCB 页；BCB 前 864 字节更新为 recovery 命令，其余字节保留，没有 wipe 参数。不要写 boot、super、vbmeta、vendor_boot，不改槽位。
 
 ## 文件结构
 
 ```text
-board.toml                         schema-1 板级配置与原版 IPSW 针
-configs/zorn_defconfig             内核配置（含 trust cache runtime、PAN）
-native/ufs-read/                   UFS 只读根、受限日志/BCB、watchdog
-native/pmgr/                       精确原版 PMGR ABI 适配
-patches/zorn/                     板级 XNU 补丁
-patches/core/                     本次依赖的主 UniXNU CLI 修改
-scripts/install-zorn-patches.sh    安装补丁，--core 同时安装 CLI overlay
-scripts/build-zorn-ufs.py          UFS archive 构建
-scripts/build-zorn-pmgr.py         私有 ABI 审计与 PMGR archive 构建
-scripts/build-zorn-aes.py          上游 SoftwareAES 构建与前后 ABI 校验
-scripts/prepare-zorn-verified-root.py 原始窗口签名及全量 C 验证（主机）
-scripts/build-zorn-verified-root.py VerifiedRoot / mdev 卷身份绑定构建
-scripts/prepare-zorn-trustcache.py 提取并校验两份原版 trust cache
-scripts/build-zorn-debug.py        遇错即停的构建/打包流程，可选 --boot
-scripts/run-zorn-debug.py          固定设备的内存启动/recovery 回收
-scripts/read-zorn-log.py           读取或离线解码 ZORNLOG1 至 B
-scripts/capture-zorn-screen.py     绑定最新 K80 轮次的 USB 单帧采集（无音频）
-scripts/check-zorn-runner-observation.py  宿主单帧时序/回收期限控制（无 USB）
-scripts/compact-zorn-archives.py   逐份解压核对 SHA 后压缩较旧的生成内核
-scripts/make-zorn-adt.py           当前 ADT 生成器
-docs/                             当前状态和可提交的证据
-unixnu.lock                       已解析源码提交
+board.toml                               schema-1 板级配置与原版 IPSW 针
+configs/zorn_defconfig                   内核配置（含 trust cache runtime、PAN）
+native/ufs-read/                         UFS 只读根、受限日志/BCB、watchdog
+native/pmgr/                             精确原版 PMGR ABI 适配
+patches/zorn/                            板级 XNU 补丁
+patches/core/                            本次依赖的主 UniXNU CLI 修改
+scripts/install-zorn-patches.sh          安装补丁，--core 同时安装 CLI overlay
+scripts/build-zorn-ufs.py                UFS archive 构建
+scripts/build-zorn-pmgr.py               私有 ABI 审计与 PMGR archive 构建
+scripts/build-zorn-aes.py                上游 SoftwareAES 构建与前后 ABI 校验
+scripts/prepare-zorn-verified-root.py    原始窗口签名及全量 C 验证（主机）
+scripts/build-zorn-verified-root.py      VerifiedRoot / mdev 卷身份绑定构建
+scripts/prepare-zorn-trustcache.py       提取并校验两份原版 trust cache
+scripts/build-zorn-debug.py              遇错即停的构建/打包流程，可选 --boot
+scripts/run-zorn-debug.py                固定设备的内存启动/recovery 回收
+scripts/read-zorn-log.py                 读取或离线解码 ZORNLOG1 至 B
+scripts/capture-zorn-screen.py           绑定最新 K80 轮次的 USB 单帧采集（无音频）
+scripts/check-zorn-runner-observation.py 宿主单帧时序/回收期限控制（无 USB）
+scripts/compact-zorn-archives.py         逐份解压核对 SHA 后压缩较旧的生成内核
+scripts/make-zorn-adt.py                 当前 ADT 生成器
+docs/                                    当前状态和可提交的证据
+unixnu.lock                              已解析源码提交
 ```
 
 本设备仍使用旧版 schema-1 布局；尚未迁移到官方当前 schema-2 的 DTS、组件列表和 `porting.toml`。`package/` 不建空目录，避免被识别为设备 kit。`patches/zorn` 通过安装脚本追加到基础 XNU 补丁，不能改名为会替换基础模块的 `patches/xnu`。
@@ -156,6 +158,30 @@ UEFI 打包见 `uefi-zorn/README.md`。当前候选负载是 192 MiB FAT32、512
 
 已写入的 SHNGROOT 镜像为 9382658048 字节，SHA256 `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。OS 窗口偏移 `0x100000`，SystemOS 偏移 `0x16a600000`。板级 userdata 的 first/last LBA 仅复现容量，不是实际 GPT 起始地址；运行时由 GPT 按名称定位。
 
+## LaunchServices 定向取证与设备树对照
+
+`--gui-user-stacks --gui-launchservices` 在原有 GUI/recovery profile 中，
+将进程/栈槽 0 换为 lsd，并读取最多 16 层首线程 frame chain；SpringBoard/backboardd 继续保留。
+这些是可缺页、尽力读取的样本，真实错误保留，不是在 task 锁内执行的原子 stackshot。
+旧 profile 默认关闭这两项。ZORNLOG9 仍只占既定 4 KiB 日志块。
+
+`--development-wifi-identity` 只增加开发用 MAC 身份属性，未实现网络驱动。
+`--reuse-kernel-control out/zorn/builds/0959f393` 仅用于这项单变量对照，
+要求归档内核、审计描述及其他 profile 选项一致；RAM Data、参数和最终 ADT 还需按打包证明核对。
+旧 0959 归档的审计布局是重新计算并逐 extent 复核的记录，完整来源写在续调文档；
+新归档会保存原始 kernel-plan.json。它不代表干净检出构建已通过。
+
+对已授权 USB 摄像头的 GUI watchdog 轮次，可单独使用
+`python3 UniXNU-zorn/scripts/run-zorn-debug.py --timeout 1200 --capture-after 900`。
+默认关闭定时采集；此选项在 fastboot boot 返回 900 秒后仅调用一次既有无音频单帧脚本，
+子进程最多 25 秒，剩余回收期限不足 26 秒则跳过。摄像头错误不改变 recovery 截止时刻，
+生成的图像仍须人工解析；运行 `scripts/check-zorn-runner-observation.py` 可在不访问 USB 时校验时序边界。
+
+`--gui-runnable-kernel-stacks` 是默认关闭的额外诊断，依赖 `--gui-kernel-stacks`
+及其 GUI watchdog/用户栈前置选项。它仅在 CPU0 读取非当前、已引用且非终止线程的
+有界已保存内核上下文，最多 16 帧；有 continuation 时仍优先用户链。它不启用多核，
+也不改变目标线程/调度/锁。20 项宿主控制通过，真机资格须以对应回收日志为准。
+
 ## 日志
 
 日志块是 userdata 分区内第 `2291712` 个 4096 字节块，位于系统镜像结束后 4 MiB。`ZORNLOG2` 是 340 个 12 字节循环槽，另存格式化 panic、用户输出和 sysctl 名称；读取器兼容旧 `ZORNLOG1`。
@@ -173,28 +199,3 @@ python3 UniXNU-zorn/scripts/read-zorn-log.py --block out/zorn/last-log.bin --tai
 - [UniXNU-sheng](https://github.com/UniXNU/UniXNU-sheng)、[同 SoC 的 UniXNU-houji](https://github.com/lonzzi/UniXNU-houji)
 
 本仓库主要使用 [BSD-2-Clause-Patent](LICENSE)。`native/pmgr/ZornPlatformPower.cpp` 改编自 sheng 的 MIT 源码，保留 [MIT 许可](native/pmgr/LICENSE.MIT)；原有上游文件继续使用各自版权头。
-
-
-## LaunchServices 定向取证与设备树对照
-
-`--gui-user-stacks --gui-launchservices` 在原有 GUI/recovery profile 中，
-将进程/栈槽0换为lsd，并读取最多16层首线程frame chain；SpringBoard/backboardd继续保留。
-这些是可缺页、尽力读取的样本，真实错误保留，不是在task锁内执行的原子stackshot。
-旧profile默认关闭这两项。ZORNLOG9仍只占既定4KiB日志块。
-
-`--development-wifi-identity` 只增加开发用MAC身份属性，未实现网络驱动。
-`--reuse-kernel-control out/zorn/builds/0959f393` 仅用于这项单变量对照，
-要求归档内核、审计描述及其他profile选项一致；RAM Data、参数和最终ADT还需按打包证明核对。
-旧0959归档的审计布局是重新计算并逐extent复核的记录，完整来源写在续调文档；
-新归档会保存原始kernel-plan.json。它不代表干净检出构建已通过。
-
-对已授权 USB 摄像头的 GUI watchdog 轮次，可单独使用
-`python3 UniXNU-zorn/scripts/run-zorn-debug.py --timeout 1200 --capture-after 900`。
-默认关闭定时采集；此选项在 fastboot boot 返回900秒后仅调用一次既有无音频单帧脚本，
-子进程最多25秒，剩余回收期限不足26秒则跳过。摄像头错误不改变 recovery 截止时刻，
-生成的图像仍须人工解析；运行 `scripts/check-zorn-runner-observation.py` 可在不访问 USB 时校验时序边界。
-
-`--gui-runnable-kernel-stacks` 是默认关闭的额外诊断，依赖 `--gui-kernel-stacks`
-及其 GUI watchdog/用户栈前置选项。它仅在 CPU0 读取非当前、已引用且非终止线程的
-有界已保存内核上下文，最多16帧；有 continuation 时仍优先用户链。它不启用多核，
-也不改变目标线程/调度/锁。20项宿主控制通过，真机资格须以对应回收日志为准。
