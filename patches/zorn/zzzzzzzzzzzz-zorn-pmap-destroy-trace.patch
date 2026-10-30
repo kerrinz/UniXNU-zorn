@@ -1,6 +1,6 @@
---- a/osfmk/arm/pmap/pmap.c	2026-10-26 00:55:44
-+++ b/osfmk/arm/pmap/pmap.c	2026-10-26 00:53:50
-@@ -3319,11 +3319,20 @@
+--- a/osfmk/arm/pmap/pmap.c
++++ b/osfmk/arm/pmap/pmap.c
+@@ -3319,10 +3319,20 @@
   *	Should only be called if the map contains
   *	no valid mappings.
   */
@@ -12,7 +12,7 @@
 +			zorn_say(word);                                 \
 +		}                                                       \
 +	} while (0)
- 
++
  MARK_AS_PMAP_TEXT void
  pmap_destroy_internal(
  	pmap_t pmap)
@@ -21,7 +21,7 @@
  	if (pmap == PMAP_NULL) {
  		return;
  	}
-@@ -3342,6 +3351,7 @@
+@@ -3341,6 +3351,7 @@
  	} else if (__improbable(pmap->type == PMAP_TYPE_COMMPAGE)) {
  		panic("pmap %p: attempt to destroy commpage pmap", pmap);
  	}
@@ -29,7 +29,7 @@
  
  #if XNU_MONITOR
  	/*
-@@ -3368,23 +3378,28 @@
+@@ -3367,23 +3378,28 @@
  		}
  	}
  #endif
@@ -58,19 +58,19 @@
  		pmap_tt1_deallocate(pmap, pmap->tte, pmap_root_alloc_size(pmap), 0);
  		pmap->tte = (tt_entry_t *) NULL;
  		pmap->ttep = 0;
-@@ -3393,12 +3408,15 @@
+@@ -3392,12 +3408,15 @@
  	assert((tt_free_entry_t*)pmap->tt_entry_free == NULL);
  
  	if (__improbable(pmap->type == PMAP_TYPE_NESTED)) {
-+		zorn_pmap_say("PTLB");
 -		pmap_get_pt_ops(pmap)->flush_tlb_region_async(pmap->nested_region_addr, pmap->nested_region_size, pmap, false, false);
 -		sync_tlb_flush();
++		zorn_pmap_say("PTLB");
 +		/* tlbi aside1 never completes: the following dsb stayed on LTLB. */
 +		zorn_pmap_say("PLOC");
  	} else {
-+		zorn_pmap_say("PTLB");
 -		pmap_get_pt_ops(pmap)->flush_tlb_async(pmap);
 -		sync_tlb_flush();
++		zorn_pmap_say("PTLB");
 +		/* tlbi aside1 never completes: the following dsb stayed on LTLB. */
 +		zorn_pmap_say("PLOC");
  		/* return its asid to the pool */
@@ -78,7 +78,7 @@
  		pmap_get_pt_ops(pmap)->free_id(pmap);
  		if (pmap->nested_pmap != NULL) {
  #if XNU_MONITOR
-@@ -3409,6 +3427,7 @@
+@@ -3408,6 +3427,7 @@
  		}
  	}
  
@@ -86,7 +86,7 @@
  	pmap_check_ledgers(pmap);
  
  	if (pmap->nested_region_unnested_table_bitmap) {
-@@ -3428,6 +3447,7 @@
+@@ -3427,6 +3447,7 @@
  	pmap_lock_destroy(pmap);
  	pmap_free_pmap(pmap);
  #else
@@ -94,7 +94,7 @@
  	pmap_lock_destroy(pmap);
  	zfree(pmap_zone, pmap);
  #endif
-@@ -3449,11 +3469,13 @@
+@@ -3448,10 +3469,13 @@
  	pmap_destroy_internal(pmap);
  #endif
  
@@ -103,7 +103,7 @@
  
  	PMAP_TRACE(1, PMAP_CODE(PMAP__DESTROY) | DBG_FUNC_END);
  }
- 
++
 +#undef zorn_pmap_say
  
  

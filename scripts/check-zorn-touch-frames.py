@@ -3,6 +3,7 @@
 from pathlib import Path
 import subprocess,json,hashlib
 root=Path(__file__).resolve().parents[2];out=root/'out/zorn/touch'
+out.mkdir(parents=True,exist_ok=True)
 header=root/'UniXNU-zorn/native/display/ZornFt3683Wire.h'
 source=r'''
 #include <cassert>

@@ -1,6 +1,6 @@
 # K80 构建、测试与日志
 
-本文对应 2026-10-29 的现有格式 1 构建入口。它记录已准备工作区的使用方式，不是全新克隆的一键安装说明。这里只说明命令，本次文档整理没有构建或启动手机。
+本文对应 2026-10-29 的现有格式 1 构建入口。它记录已准备工作区的使用方式，不是全新克隆的一键安装说明。后续上游构建验证见 [构建回归记录](progress-2026-10-29-repro-build.md)，与已验收桌面基线分开记录。
 
 ## 基线与前置输入
 
@@ -11,7 +11,7 @@
 - IPSW 为 `iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw`（iPad7,1 / j120ap）。公开来源与成员哈希见 `board.toml`；本地文件可用 `--ipsw` 或 `UNIXNU_IPSW` 指定。
 - Mu-Silicium 中的厂商 DXE、Apple 二进制和私钥不随两仓库分发；私钥仅保存在忽略的本机 `out/` 内。
 
-当前成功结果依赖本机已打补丁的 XNU 工作树和此前预链接候选。**干净重放仍有 boot-progress / early-bars 顺序及 vm-bands 上下文冲突；PMGR 还依赖此前候选和编译记录。** 旧锁、pmap、MAC / exec 的部分实验修改仍须复核，不因本轮桌面成功而视为全部合格。
+当前成功结果依赖本机已打补丁的 XNU 工作树和此前预链接候选。**后续已修正陈旧上下文，157 个补丁的干净重放及独立新对象编译通过，但新候选未验收桌面；另已固化实际工作树的 97 文件过渡源码快照，提供隔离工作区入口。PMGR 等配方仍显式使用此前 ABI 候选。** 旧锁、pmap、MAC / exec 的部分实验修改仍须复核，不因本轮桌面成功而视为全部合格。
 
 ## 已准备工作区的入口
 
@@ -42,6 +42,7 @@ owner 验证输入的准备依赖既有只读镜像及 OpenSSL，使用 `prepare
 ```sh
 python3 UniXNU-zorn/scripts/build-zorn-debug.py \
   --incremental-patched-tree --defconfig zorn_union_defconfig --data-profile 8g \
+  --source-pins UniXNU-zorn/source-pins.json \
   --smp-preflight 8 --smp-continue --display-mode 3 --brightness-mode 3 \
   --touch-handoff --touch-runtime --touch-edges --touch-kernel-parser --touch-trace \
   --gui-watch --development-wifi-identity --data-permissions --keystore-state \

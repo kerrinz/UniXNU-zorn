@@ -1,0 +1,58 @@
+diff --git a/scripts/unixnu/feeds.py b/scripts/unixnu/feeds.py
+index 76e6716..34f3185 100644
+--- a/scripts/unixnu/feeds.py
++++ b/scripts/unixnu/feeds.py
+@@ -15,6 +15,8 @@ Module submodules are checked out by `git submodule update --init --recursive`.
+ separate checkouts. Nothing fetched or linked is copied into either repository.
+ """
+ import hashlib
++import configparser
++import json
+ import os
+ from pathlib import Path
+ 
+@@ -207,6 +209,10 @@ def resolve(ctx):
+ 
+ def update_submodules(ctx):
+     """Check out module submodules recorded by this repository and the device repository."""
++    pins = os.environ.get('UNIXNU_SUBMODULE_PINS')
++    if pins:
++        verify_frozen_submodules(ctx, Path(pins))
++        return
+     bases = [ctx.root, ctx.device]
+     if getattr(ctx, 'soc', None):
+         bases.append(ctx.soc.path)
+@@ -217,6 +223,33 @@ def update_submodules(ctx):
+         git(base, 'submodule', 'update', '--init', '--recursive')
+ 
+ 
++def verify_frozen_submodules(ctx, path):
++    """Use explicitly pinned local component bytes without moving any checkout."""
++    record = json.loads(path.read_text())
++    if record.get('schema_version') != 1:
++        raise Error('unsupported frozen submodule record')
++    for label, base in (('core', ctx.root), ('device', ctx.device)):
++        config = configparser.ConfigParser()
++        config.read(base / '.gitmodules')
++        selected = {config[s]['path'] for s in config.sections()}
++        expected = record.get(label, {})
++        if selected != set(expected):
++            raise Error(f'frozen {label} module set differs')
++        for relative, pin in expected.items():
++            if Path(relative).is_absolute() or '..' in Path(relative).parts:
++                raise Error('invalid frozen module path')
++            module = base / relative
++            if git(module, 'rev-parse', 'HEAD').strip() != pin['commit']:
++                raise Error(f'frozen component revision differs: {relative}')
++            for name, digest in pin['files'].items():
++                if Path(name).is_absolute() or '..' in Path(name).parts:
++                    raise Error('invalid frozen component file')
++                source = module / name
++                if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != digest:
++                    raise Error(f'frozen component source differs: {relative}/{name}')
++    log(f'submodules: verified frozen revisions and source bytes from {path}; no update')
++
++
+ def _clone_dir(ctx, entry, revision=None):
+     # Commit-specific directories allow targets to resolve different source pins.
+     revision = (revision or entry.get('commit') or entry.get('ref', '')) if ctx.schema_version == 2 else entry.get('ref', '')

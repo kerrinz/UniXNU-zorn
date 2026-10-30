@@ -25,6 +25,39 @@ def digest(path):
     return result.hexdigest()
 
 
+def verify_source_replay():
+    """Bind a staged source replay to the actual source being compiled."""
+    marker = CORE / 'out/zorn/source-replay.json'
+    if not marker.is_file():
+        return None
+    replay = json.loads(marker.read_text())
+    if replay.get('status') != 'source-replay-passed' or not replay.get('source_sha256'):
+        raise RuntimeError('source replay is not qualified')
+    work = CORE / 'out/zorn/tree/.cache/xnu-work'
+    commit = subprocess.check_output(['git', '-C', str(work), 'rev-parse', 'HEAD'], text=True).strip()
+    if commit != replay['source_commit']:
+        raise RuntimeError('replayed XNU revision differs')
+    profile_path = OUT / 'smp/runtime/profile.json'
+    profile = json.loads(profile_path.read_text()) if profile_path.is_file() else {}
+    for name, expected in replay['source_sha256'].items():
+        if Path(name).is_absolute() or '..' in Path(name).parts:
+            raise RuntimeError('invalid source replay path')
+        source = work / name
+        actual = digest(source) if source.is_file() else None
+        if actual == expected:
+            continue
+        variant = profile.get('files', {}).get(name, {})
+        baseline = OUT / 'smp/runtime/baseline' / name
+        if (expected and variant.get('before') == expected and variant.get('after') == actual
+                and baseline.is_file() and digest(baseline) == expected):
+            continue  # the separately pinned SMP transform; audited again by its builder
+        raise RuntimeError('replayed source changed: ' + name)
+    changed = subprocess.check_output(['git', '-C', str(work), 'diff', '--name-only', 'HEAD'], text=True).splitlines()
+    if any(name not in replay['source_sha256'] and Path(name).name != '.DS_Store' for name in changed):
+        raise RuntimeError('unrecorded tracked XNU source change')
+    return replay
+
+
 def main():
     from zorn_session_guard import check_deadline, minimum_gui_recovery_timeout
     check_deadline()
@@ -84,9 +117,16 @@ def main():
     parser.add_argument("--ipsw", type=Path, help="local iPad7,1 / 21H461 IPSW; also accepts UNIXNU_IPSW")
     parser.add_argument("--incremental-patched-tree", action="store_true",
                         help="reuse the existing patched XNU tree; clean patch replay is not yet qualified")
+    parser.add_argument("--source-pins", type=Path,
+                        help="verify frozen component revisions/bytes instead of updating submodules")
     parser.add_argument("--fd", type=Path, default=ROOT.parent /
                         "Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd")
     args = parser.parse_args()
+    if args.source_pins:
+        args.source_pins = args.source_pins.resolve()
+        if not args.source_pins.is_file():
+            parser.error("--source-pins file is missing")
+        os.environ['UNIXNU_SUBMODULE_PINS'] = str(args.source_pins)
     os.environ['UNIXNU_ZORN_DATA_PROFILE']=args.data_profile
     data_directory=OUT/('data-store8-192' if args.data_profile=='8g' else 'data-store')
     if args.data_profile=='8g' and (not args.skip_setup or not args.data_store_mode):
@@ -214,6 +254,7 @@ def main():
     disabled_jobs += extra_jobs
     record = {"status": "building", "started": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
               "serial": "92988a43", "incremental_patched_tree": args.incremental_patched_tree,
+              "source_pins_sha256": digest(args.source_pins) if args.source_pins else None,
               "defconfig": args.defconfig,
               "data_profile":args.data_profile,"fresh_data":args.fresh_data,
               "smp_preflight": args.smp_preflight,
@@ -255,7 +296,8 @@ def main():
               "checkpoint_override": args.checkpoint,
               "memory_mib": args.memory_mib or 384,
               "early_watchdog_mode": args.early_watchdog,
-              "recovery_timeout_seconds": args.recovery_timeout}
+              "recovery_timeout_seconds": args.recovery_timeout,
+              "xnu_extra_cflags": os.environ.get("XNU_EXTRA_CFLAGS")}
 
     def save():
         pending = MANIFEST.with_suffix(".json.tmp")
@@ -270,6 +312,13 @@ def main():
 
     save()
     try:
+        replay = verify_source_replay()
+        if replay:
+            record['source_replay_sha256'] = digest(CORE / 'out/zorn/source-replay.json')
+            record['source_patch_base'] = (replay.get('base_patch_commit') or replay['core_commit']) if not replay.get('source_snapshot_profile') else None
+            record['source_snapshot_profile'] = replay.get('source_snapshot_profile')
+            record['source_snapshot_sha256'] = replay.get('source_snapshot_sha256')
+            record['source_patch_count'] = replay['applied']
         if args.brightness_mode:
             run("brightness-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-brightness.py"])
         if args.touch_probe:
@@ -399,6 +448,10 @@ def main():
             run("kernel", [CORE / "unixnu", "build", "kernel"], CORE, env)
         if args.smp_preflight:
             run("smp-linked-call-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-smp.py"]+(["--continue-gui"] if args.smp_continue else []))
+        if replay:
+            verify_source_replay()
+            if digest(CORE / 'out/zorn/source-replay.json') != record['source_replay_sha256']:
+                raise RuntimeError('source replay record changed during build')
         if display_config and json.loads((CORE / "out/zorn/tree/build/native-legacy-display/build-report.json").read_text()).get("touch_runtime_compiled") is not args.touch_runtime:
             raise RuntimeError("touch runtime compile gate does not match requested profile")
         if args.touch_runtime:
@@ -530,6 +583,11 @@ def main():
         if args.smp_preflight:
             run("smp-payload-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-smp.py", "--payload"]+(["--continue-gui"] if args.smp_continue else [])+(['--fresh-data'] if args.fresh_data else []))
         image = OUT / "boot.img"
+        if args.source_pins:
+            if digest(args.source_pins) != record["source_pins_sha256"]:
+                raise RuntimeError("component pins changed during build")
+            run("frozen-sources-final", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-source-pins.py",
+                                        "--core", CORE, "--pins", args.source_pins])
         run("boot-image", [sys.executable, ROOT / "uefi-zorn/scripts/package-zorn-boot.py",
                            "--fd", args.fd, "--ramdisk", OUT / "payload.img", "-o", image])
         inputs = [CORE / "out/zorn/kernel/kernel.macho", CORE / "out/zorn/kernel/kernel.json", CORE / "out/zorn/.config",
@@ -537,6 +595,13 @@ def main():
                   ROOT / "uefi-zorn/payload/EFI/UniXNU/unixnu.toml", OUT / "kernel.macho.adt",
                   OUT / "payload-with-trustcache.adt",
                   trust, args.fd]
+        if replay:
+            inputs += [CORE / 'out/zorn/source-replay.json']
+            inputs += [CORE / 'out/zorn/tree/.cache/xnu-work' / name
+                       for name, value in replay['source_sha256'].items() if value is not None]
+        if args.source_pins:
+            inputs += [args.source_pins, CORE / "scripts/unixnu/feeds.py",
+                       ROOT / "UniXNU-zorn/scripts/check-zorn-source-pins.py"]
         if args.smp_preflight:
             inputs += [OUT / "smp/runtime/profile.json", OUT / "smp/runtime/ArmCpu.cpp",
                        OUT / "smp/runtime/ZornSmpPolicy.h", OUT / "smp/runtime/ZornSmpRuntime.inc",

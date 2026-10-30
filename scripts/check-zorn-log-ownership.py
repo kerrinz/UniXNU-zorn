@@ -24,12 +24,15 @@ def audit_ownership(source):
 audit_ownership(text)
 watchdog=SOURCE.with_name("ZornWatchdog.h")
 audit_ownership(watchdog.read_text())
-try:
-    audit_ownership((OUT/'ZornUfsRead.pre-atomic.cpp').read_text())
-except ValueError:
-    pass
-else:
-    raise AssertionError('old plain-store source was not rejected')
+# The historical file contained these plain acquire/release stores. Keep the
+# rejected forms here rather than depending on an untracked host backup.
+for unsafe in ('\tgLogBusy = 1;\n', '\tgLogBusy = 0;\n'):
+    try:
+        audit_ownership(unsafe)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('plain-store control was not rejected')
 source=r'''
 #include <cassert>
 #include <atomic>
@@ -99,5 +102,5 @@ int main(){
 command=['xcrun','clang++','-std=c++17','-Wall','-Wextra','-Werror','-O1','-fsanitize=address,undefined','-I',str(SOURCE.parent),str(OUT/'log-ownership-check.cpp'),'-o',str(OUT/'log-ownership-check')]
 subprocess.run(command,check=True)
 subprocess.run([str(OUT/'log-ownership-check')],check=True)
-result=dict(source_sha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),watchdog_sha256=hashlib.sha256(watchdog.read_bytes()).hexdigest(),actual_functions=[n.split('(')[0] for n in names],host_producers=8,iterations_each=2500,asan_ubsan=True,no_simultaneous_block_writers=True,footer_preserved=True,mac_reservations=512,mac_slots_bounded=8,reset_never_steals_ownership=True,old_plain_store_baseline_rejected=True,hardware_qualified=False)
+result=dict(source_sha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),watchdog_sha256=hashlib.sha256(watchdog.read_bytes()).hexdigest(),actual_functions=[n.split('(')[0] for n in names],host_producers=8,iterations_each=2500,asan_ubsan=True,no_simultaneous_block_writers=True,footer_preserved=True,mac_reservations=512,mac_slots_bounded=8,reset_never_steals_ownership=True,plain_store_controls_rejected=2,hardware_qualified=False)
 (OUT/'log-ownership-host-check.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))

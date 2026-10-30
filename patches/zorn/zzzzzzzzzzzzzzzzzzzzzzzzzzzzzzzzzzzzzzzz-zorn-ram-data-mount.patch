@@ -91,8 +91,8 @@
 +}
 +#endif
  
- static int
- native_owner_data_prepare(proc_t p, user_addr_t scratch)
+ /* Boot-time read-only union views of owner-provided GPU addon content over sealed system directories, mounted after the Data mount and
+  * before launchd starts: the Adreno Metal plugin bundle over /System/Library/Extensions (the original Metal discovery loads
 @@ -7378,6 +7457,8 @@
  	 * sparse media. A sparse disk has no contiguous logical-byte address. */
  	if (!native_ram_block_volume_seed(XNU_OWNER_DATA_VOLUME_UUID, &device, device_path,
@@ -113,7 +113,7 @@
  	if (error) goto done;
  	native_owner_data_stage = 3;
  	error = vnode_lookup("/private/var", 0, &data_root, vfs_context_current());
-@@ -7422,10 +7506,22 @@
+@@ -7422,12 +7506,24 @@
  	native_owner_data_readonly = (vfs_flags(data_mount) & MNT_RDONLY) != 0;
  	if (actual != device || (vfs_flags(data_mount) & MNT_RDONLY) ||
  	    strcmp(vfs_statfs(data_mount)->f_fstypename, "apfs")) error = EINVAL;
@@ -128,6 +128,8 @@
 +	if (!error) error = native_owner_data_probe(p, scratch, data_mount);
 +#endif
  	if (!error) native_owner_data_stage = 4;
+ 	if (!error) native_gpu_addon_prepare(p, scratch);
+ 	if (!error) native_staged_apps_prepare(p, scratch, data_mount);
  done:
  	if (data_root) vnode_put(data_root);
  	native_owner_data_status = error;

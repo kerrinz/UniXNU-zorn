@@ -1,22 +1,6 @@
 --- a/osfmk/arm64/arm_vm_init.c
 +++ b/osfmk/arm64/arm_vm_init.c
-@@ -369,6 +369,7 @@
- #define PTOV_TABLE_SIZE 8
- SECURITY_READ_ONLY_LATE(static ptov_table_entry)        ptov_table[PTOV_TABLE_SIZE];
- SECURITY_READ_ONLY_LATE(static boolean_t)               kva_active = FALSE;
-+
- 
- vm_map_address_t
- phystokv(pmap_paddr_t pa)
-@@ -969,6 +970,7 @@
- 		*ttep = entry;
- 	}
- }
-+
- 
- /*
-  * arm_vm_page_granular_helper updates protections at the L3 level.  It will (if
-@@ -1589,23 +1591,29 @@
+@@ -1591,22 +1591,29 @@
  
  #else
  
@@ -26,7 +10,7 @@
  arm_vm_physmap_init(boot_args *args)
  {
  	ptov_table_entry temp_ptov_table[PTOV_TABLE_SIZE];
- 
++
 +	zorn_vm_band(args, 0xFF0000FF);
  	bzero(temp_ptov_table, sizeof(temp_ptov_table));
  
@@ -46,7 +30,7 @@
  	assert((temp_ptov_table[ptov_index - 1].va + temp_ptov_table[ptov_index - 1].len) <= physmap_end);
  
  	// Sort in descending order of segment length.  LUT traversal is linear, so largest (most likely used)
-@@ -1815,6 +1823,35 @@
+@@ -1816,6 +1823,35 @@
  
  #define ARM64_PHYSMAP_SLIDE_RANGE (1ULL << 30) // 1 GB
  #define ARM64_PHYSMAP_SLIDE_MASK  (ARM64_PHYSMAP_SLIDE_RANGE - 1)
@@ -82,7 +66,7 @@
  
  void
  arm_vm_init(uint64_t memory_size, boot_args * args)
-@@ -1829,6 +1866,8 @@
+@@ -1830,6 +1866,8 @@
  	vm_offset_t      ptpage_vaddr;
  	vm_map_address_t dynamic_memory_begin;
  
@@ -91,7 +75,7 @@
  	/*
  	 * Get the virtual and physical kernel-managed memory base from boot_args.
  	 */
-@@ -1872,7 +1911,9 @@
+@@ -1873,7 +1911,9 @@
  #endif
  
  	// Slide the physical aperture to a random page-aligned location within the slide range
@@ -101,15 +85,7 @@
  	assert(physmap_slide < ARM64_PHYSMAP_SLIDE_RANGE);
  
  	physmap_base += physmap_slide;
-@@ -1987,6 +2028,7 @@
- 	init_ptpages(cpu_tte, physmap_base, ROUND_L1(physmap_end), TRUE, ARM_DYNAMIC_TABLE_XN | ARM_TTE_TABLE_AP(ARM_TTE_TABLE_AP_USER_NA));
- #endif
- 
-+
- #if __ARM_KERNEL_PROTECT__
- 	/* Expand the page tables to prepare for the EL0 mappings. */
- 	arm_vm_expand_kernel_el0_mappings();
-@@ -2099,6 +2141,7 @@
+@@ -2101,6 +2141,7 @@
  	vm_prelink_sdata = segPRELINKDATAB;
  	vm_prelink_edata = segPRELINKDATAB + segSizePRELINKDATA;
  
@@ -117,7 +93,7 @@
  	arm_vm_prot_init(args);
  
  	/*
-@@ -2145,6 +2188,9 @@
+@@ -2147,6 +2188,9 @@
  
  	arm_set_user_tbi();
  
@@ -127,30 +103,14 @@
  	arm_vm_physmap_init(args);
  	set_mmu_ttb_alternate(cpu_ttep & TTBR_BADDR_MASK);
  
-@@ -2154,6 +2200,10 @@
+@@ -2155,6 +2199,10 @@
+ #endif
  
  	set_mmu_ttb(invalid_ttep & TTBR_BADDR_MASK);
- 
++
 +	/* Keep the bootstrap low map so the panel stays reachable. */
 +	set_mmu_ttb(zorn_ttbr0);
 +	zorn_vm_band(args, 0xFFFFFFFF);
-+
+ 
  	flush_mmu_tlb();
  	kva_active = TRUE;
- 	// global table pointers may need to be different due to physical aperture remapping
-@@ -2162,6 +2212,7 @@
- 
- 	// From here on out, we're off the bootstrap translation tables.
- 
-+
- 	/* AuxKC initialization has to be deferred until this point, since
- 	 * the AuxKC may not have been fully mapped in the bootstrap
- 	 * tables, if it spilled downwards into the prior L2 block.
-@@ -2364,6 +2415,7 @@
- 		cpu_l1_tte++;
- 	}
- 
-+
- 	/*
- 	 * Adjust avail_start so that the range that the VM owns
- 	 * starts on a PAGE_SIZE aligned boundary.

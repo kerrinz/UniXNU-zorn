@@ -3,6 +3,7 @@
 from pathlib import Path
 import subprocess,json,hashlib
 root=Path(__file__).resolve().parents[2];out=root/'out/zorn/touch';header=root/'UniXNU-zorn/native/display/ZornTouchContacts.h'
+out.mkdir(parents=True,exist_ok=True)
 source=r'''
 #include <cassert>
 #include <cstdio>

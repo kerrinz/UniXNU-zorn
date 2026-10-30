@@ -37,7 +37,12 @@ The installer detects an already applied overlay, otherwise requires a clean
 `git apply --check` before applying it. A conflict stops installation.
 Without `--core`, it retains the earlier behavior of copying only XNU patches.
 
-This overlay does not resolve the old XNU patch-order/context conflicts or
-migrate this schema-1 board to the current schema-2 device format. The current
-successful builds reuse the existing patched XNU tree and previous prelink
-candidate. See the main README and the progress record for those limits.
+The original overlay retained the historical XNU context conflicts. Later source-replay fixes and remaining build limits are recorded below; schema-2 migration remains separate.
+
+## Frozen component inputs
+
+`0004-zorn-frozen-sources.patch` adds explicit `UNIXNU_SUBMODULE_PINS` verification. The device builder's `--source-pins` passes the selected JSON to the CLI, which checks the module set, actual commits and source hashes instead of updating submodules. The default upstream behavior is unchanged when no pins are selected. The device builder repeats verification before packaging and archives the selected record and checker. The 2026-10-29 record pins the actual qualified component versions, independently of the newer main repository's gitlinks.
+
+The four stale XNU patch contexts have since been repaired: 157 patches replay cleanly twice, and an isolated object build/prelink and complete candidate archive pass. The new candidate's first hardware boot stopped at CPU1 preflight261. This does not resolve the historical ABI-candidate bootstrap dependency or migrate the board to schema2; see the device's reproduction progress record.
+
+实际成功工作树的合并诊断快照独立位于 [`../compat`](../compat/README.md)，只用于显式选择的源码回归，不由 CLI overlay 自动叠加。构建器记录额外 `XNU_EXTRA_CFLAGS`，包括布局对照所用的编译路径映射；它不是 CPU 修复开关。

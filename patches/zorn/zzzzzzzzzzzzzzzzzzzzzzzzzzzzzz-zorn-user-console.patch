@@ -10,5 +10,5 @@
 +		    saved_state64(state)->x[2]);
 +	}
  	static volatile unsigned zorn_svc_count;
- 	bool zorn_trace_svc = __sync_fetch_and_add(&zorn_svc_count, 1) < 32;
+ 	bool zorn_trace_svc = __sync_fetch_and_add(&zorn_svc_count, 1) < 128;
  	if (zorn_trace_svc) {

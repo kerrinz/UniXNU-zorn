@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-29",
+  "core_commit": "066c8d8315f83749d28bcae2faf3595718646be5",
+  "xnu_commit": "d8b80295118ef25ac3a784134bcf95cd8e88109f",
+  "patches": 157,
+  "smp_baseline_pins_match": true,
+  "status": "built-first-hardware-failed-SMP261",
+  "independent_repeat_passed": true,
+  "fixed_patches": [
+    {
+      "patch": "zzzzzz-zorn-vm-bands.patch",
+      "added_and_removed_nonblank_lines_unchanged": true,
+      "sha256": "7f6ed35c0001c9f90e6c172c3c00380f2cf42209ccccbac5b5337532da0e538c"
+    },
+    {
+      "patch": "zzzzzzzzzzzz-zorn-pmap-destroy-trace.patch",
+      "added_and_removed_nonblank_lines_unchanged": true,
+      "sha256": "6fa6dd786b742a76651203c69bd4963eb3c330a1fef0b6b953ad14df51471d96"
+    },
+    {
+      "patch": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-zorn-ram-data-mount.patch",
+      "added_and_removed_nonblank_lines_unchanged": true,
+      "sha256": "b2f2b364dda61d9ad6f0ad8ebc282d9e6e22af4010584ee80d716c48961849d5"
+    },
+    {
+      "patch": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-zorn-user-console.patch",
+      "added_and_removed_nonblank_lines_unchanged": true,
+      "sha256": "4b1bd4bed92e79802b6b2ffd40bea5a8a206aa1031ce94239ac597c3f1a97151"
+    }
+  ],
+  "compiled": true,
+  "hardware_tested": true,
+  "previous_abi_candidate_required": true,
+  "abi_fixture_boot": "42f3d518",
+  "note": "Source replay only. Independent compilation is in progress with no reused XNU objects, cached SDK inputs and an explicitly retained ABI candidate.",
+  "xnu_objects": 1011,
+  "old_xnu_objects_reused": false,
+  "unified_build_ready": true,
+  "boot_sha256": "0b4eda46dee0e7e28b6ca82f7eefe6e87c2fbca4a3770816c4fbf94ae03cf150",
+  "kernel_sha256": "7b2891d5c02ef5448b51a1d2b617943f3c75dcfe7ae496c66fd1b4f8e5acf1ac",
+  "input_hashes_verified": 127,
+  "source_pins_sha256": "ab55549585e094ef2d44c5456cf303b4dbea9f5608bcd5bcdff4ae782007738d",
+  "hardware_gui_qualified": false,
+  "first_hardware_result": "docs/evidence/upstream-regression-0b4eda46-first.json"
+}
