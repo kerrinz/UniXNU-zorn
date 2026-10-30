@@ -1,0 +1,20 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -943,7 +943,7 @@
+ 	str x18, [x17, #16]
+ 	mrs x18, PAR_EL1
+ 	str x18, [x17, #48]
+-	at s1e1r, x0
++	nop // ZORN_TRANSLATION_NOP_CONTROL
+ 	isb
+ 	mrs x18, PAR_EL1
+ 	str x18, [x17, #24]
+@@ -951,7 +951,7 @@
+ 	msr PAR_EL1, x18
+ 	mrs x18, SCTLR_EL1
+ 	str x18, [x17, #32]
+-	mov x18, #0xa1
++	mov x18, #0xa2
+ 	str x18, [x17, #40]
+ 	dc cvac, x17
+ 	dsb sy

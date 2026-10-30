@@ -1,0 +1,9 @@
+# K80 device work
+
+Read [README.md](README.md), the [official record guide](https://unixnu.com/zh/porting/records), [device repository guide](https://unixnu.com/zh/porting/device-repository), [component catalog](https://unixnu.com/zh/reference/components), and the authoritative UniXNU-zorn/porting.toml before implementation. For firmware read [UEFI integration](https://unixnu.com/zh/porting/uefi-firmware); for kernel/config changes read [migration](https://unixnu.com/zh/porting/migration), the selected OS profile and component source/README/recipe.
+
+Only UniXNU-zorn and uefi-zorn are maintained here. Do not modify either `_副本` repository. Preserve unrelated working-tree changes, old manifests and all baselines. Do not commit/push Git unless expressly instructed. Root device metadata is format2; the existing debug entry uses the exact compatibility board. Never mechanically change its pinned SHA or bypass an input/object/link/ready check. Update affected record areas with concrete findings and evidence; do not give historical runs the current HEAD or invent verification levels.
+
+Current autonomous work is paused by the owner; a documentation/configuration request does not resume it. No device build/boot, USB interaction or physical-operation request is implied. Keep the existing touch/CPU display,8GiB RAM, eight-core/nine-map gates and dim64. Only92988a43/zorn/slot b is authorized; f85d4270 is a CC9 and forbidden. No Android/flash/erase/slot/GPT operations. OS/SystemOS stay read-only. Do not reset/enlarge Data or its existing write window. Preserve the independent watchdog/bounded recovery and the single log block/BCB limits. No shutdown is scheduled.
+
+Run record, link and relevant host checks for documentation changes. Source/metadata migration is not a new native-build or hardware qualification. Keep GPU development outside a non-GPU synchronization request.

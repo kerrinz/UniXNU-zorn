@@ -4,6 +4,7 @@ import subprocess
 import sys
 import json
 import os
+import hashlib
 from pathlib import Path
 
 TREE = Path.cwd()
@@ -123,5 +124,24 @@ if verified:
     objects.append(marker_object)
 if verified:
     objects += [storage / "ZornUfsBlock.late.o", storage / "original-bindings.o"]
+# Exact kernel-C ABI; the IOKit translation unit only calls opaque interfaces.
+native = DEVICE / 'native/cpu-active'
+cpu_names = ['two-sweep','active-log-v2-codec','try-active-accounting','active-kernel-bridge','ZornCpuActive'] if os.environ.get('UNIXNU_ZORN_SMP','0')=='8' else ['ZornCpuActiveStub']
+cpu_recipe = TREE / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/osfmk/DEVELOPMENT/processor.o.json'
+cpu_record = json.JSONDecoder().raw_decode(cpu_recipe.read_text())[0]
+cpu_objects=[];cpu_commands=[]
+for name in cpu_names:
+    target=out/(name+'.o');command=list(cpu_record['arguments'])
+    command[command.index(cpu_record['file'])]=str(native/(name+'.c'))
+    command[command.index('-o')+1]=str(target);command.append('-mgeneral-regs-only')
+    subprocess.run(command,cwd=cpu_record['directory'],check=True)
+    cpu_objects.append(target);cpu_commands.append(command)
+objects += cpu_objects
+cpu_sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
+(out/'cpu-active-build.json').write_text(json.dumps(dict(
+    source_sha256={str(p):cpu_sha(p) for p in native.iterdir() if p.is_file()},
+    object_sha256={str(p):cpu_sha(p) for p in cpu_objects},
+    recipe_sha256=cpu_sha(cpu_recipe),commands=cpu_commands,
+    fixed_eight_core=os.environ.get('UNIXNU_ZORN_SMP','0')=='8',hardware_qualified=False),indent=2)+'\n')
 subprocess.run(["xcrun", "ar", "rcs", str(archive), *objects], check=True)
 print(archive)

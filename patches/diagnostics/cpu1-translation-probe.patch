@@ -1,0 +1,37 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -928,6 +928,34 @@
+ 	sub		x0, x0, x23
+ 
+ 	ZORN_SECONDARY_STAGE 8
++	// Observe the actual secondary's target translation; no page-table writes.
++	.globl EXT(zorn_secondary_translation_probe)
++LEXT(zorn_secondary_translation_probe)
++	mrs x16, MPIDR_EL1
++	ubfx x16, x16, #8, #8
++	cmp x16, #8
++	b.hs 96f
++	adrp x17, EXT(zorn_cpu1_trace)@page
++	add x17, x17, EXT(zorn_cpu1_trace)@pageoff
++	add x17, x17, x16, lsl #6
++	str x0, [x17, #8]
++	mrs x18, TTBR1_EL1
++	str x18, [x17, #16]
++	mrs x18, PAR_EL1
++	str x18, [x17, #48]
++	at s1e1r, x0
++	isb
++	mrs x18, PAR_EL1
++	str x18, [x17, #24]
++	ldr x18, [x17, #48]
++	msr PAR_EL1, x18
++	mrs x18, SCTLR_EL1
++	str x18, [x17, #32]
++	mov x18, #0xa1
++	str x18, [x17, #40]
++	dc cvac, x17
++	dsb sy
++96:
+ 	// Branch to the trampoline
+ 	br		x0
+ 

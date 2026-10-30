@@ -10,6 +10,7 @@
 #include <libkern/c++/OSSymbol.h>
 #include <libkern/c++/OSData.h>
 #include <kern/task.h>
+#include <kern/clock.h>
 #include <sys/proc.h>
 #include <mach/kmod.h>
 #include <pexpert/pexpert.h>
@@ -31,6 +32,22 @@ volatile uint64_t zorn_touch_runtime_stats[12];
 static bool requested, initialized, scanoutClaimed;
 static unsigned mode;
 static IOService *activeDisplay;
+#include "ZornDisplayProgress.h"
+static ZornDisplayProgress::State displayProgress;
+static unsigned displayProgressEnabled;
+static uint64_t displayProgressUptimeMs() {
+    uint64_t ns=0;absolutetime_to_nanoseconds(mach_absolute_time(),&ns);return ns/1000000;
+}
+extern "C" void zorn_display_progress_configure(unsigned enabled) {
+    // Called during UFS setup. Repeated configuration never clears counters.
+    __atomic_store_n(&displayProgressEnabled,enabled==1,__ATOMIC_RELAXED);
+}
+extern "C" int zorn_display_progress_overlay(uint64_t display[32]) {
+    if(!__atomic_load_n(&displayProgressEnabled,__ATOMIC_RELAXED))return 0;
+    uint64_t values[ZornDisplayProgress::Words];
+    ZornDisplayProgress::snapshot(displayProgress,displayProgressUptimeMs(),values);
+    return ZornDisplayProgress::encode(display,values);
+}
 static bool videoValid(PE_Video &v) {
     return !PE_current_console(&v) && v.v_baseAddr==0xfc400000 &&
         v.v_width==1440 && v.v_height==3200 && v.v_rowBytes==5760 &&
@@ -111,9 +128,13 @@ extern "C" bool native_legacy_gpu_offer(void *,IOMemoryDescriptor *,uint64_t,uin
 }
 extern "C" void native_legacy_gpu_fallback_observed(int status) {number("DGF",static_cast<uint32_t>(status));}
 extern "C" void native_legacy_retirement_observed(IOService *) {
+    if(__atomic_load_n(&displayProgressEnabled,__ATOMIC_RELAXED))
+        ZornDisplayProgress::observe(displayProgress,ZornDisplayProgress::Retired,displayProgressUptimeMs());
     static unsigned count;if(count++<8)zorn_say("DFDONE");
 }
 extern "C" void native_legacy_vsync_observed(unsigned event,unsigned hz) {
+    if(__atomic_load_n(&displayProgressEnabled,__ATOMIC_RELAXED))
+        ZornDisplayProgress::vsync(displayProgress,event,displayProgressUptimeMs());
     static unsigned count;if(count++<8) {number("DVE",event);number("DVH",hz);}
 }
 static const OSMetaClass *lookup(const char *text) {

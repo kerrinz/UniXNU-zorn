@@ -1,0 +1,91 @@
+{
+  "static_and_host_only": true,
+  "phone_operations": false,
+  "native_source_changed": false,
+  "final_kernel_built": false,
+  "fixed_kernel_sha256": "c333be205c64b187aaca848db5033f5a79b8dcc9c4aa9468c91a8d686d26a1e8",
+  "actual_interface": {
+    "actual_recipe_sha256": "9faa21bbec9ebc1c9935999f4113af9db2ea612d3bf5c74d7e5b8a3f6e6f7f21",
+    "source_object_sha256": "f97e8cb6dca244a297ae251be719c107495103586c4a265ad75ca7a4b8b0c39d",
+    "probe_target": "actual pinned ARM64 kernel C recipe; original source operand replaced explicitly",
+    "probe_abi_pass": true,
+    "probe_object_sha256": "99768953b00a0b7a8c3c5cd3101d75a2395ca396f929118324f4b9b652dd7853",
+    "macros": {
+      "CONFIG_PERVASIVE_CPI": null,
+      "RECOUNT_PRECISE_TIME": null,
+      "RECOUNT_ENERGY": null,
+      "__AMP__": "__ARM_AMP__",
+      "__ARM_AMP__": null,
+      "MACH_ASSERT": "1",
+      "MAX_CPUS": "8",
+      "SCHED_CLUTCH": null,
+      "PRECISE_USER_KERNEL_TIME": "1"
+    },
+    "undefined_macros_are_zero_for_if": true,
+    "original_object_written": false,
+    "first_probe_refusal": "Host command replaced -c successor instead of original source operand; compiler refused multiple outputs. Preserved stderr; fixed operand, no original object write."
+  },
+  "synchronization": {
+    "source_sha256": "861403807ea990ac09cf298828b039f09e1242f6601754cc125365a49e4a7982",
+    "actual_rollup_disassembly_sha256": "1be04cb95510cc2ba3fbd732e6affd2cde9607239bfb0da52e9a94b08408795e",
+    "source_reader_retry_is_unbounded": true,
+    "odd_generation_wait_is_unbounded": true,
+    "actual_linked_retry_backedge": "0xfffffff00b8a8d28 -> 0xfffffff00b8a8d10",
+    "adopt_direct_public_api_in_watchdog_or_log_critical_path": false,
+    "read_side_does_not_imply_deadlock": true,
+    "idle_state_counter_pair_is_separate_relaxed_observation": true,
+    "next_requirement": "A bounded try-observation helper in exact XNU types; return BUSY/unavailable after a finite attempt count. Prove writer/idle-state memory ordering first; never spin on stalled writer or hold log/UFS/watchdog locks."
+  },
+  "naive_text_capacity": {
+    "max_chars_per_user_output_call": 256,
+    "usable_chars_per_slot": 11,
+    "logical_slots": 84,
+    "explicit_example_chars": 663,
+    "split_calls": 3,
+    "new_record_slots": 77,
+    "cannot_guarantee_all_old84_slots_preserved": true,
+    "single_call_would_truncate": true
+  },
+  "alternative_capacity_only": {
+    "host_only": true,
+    "production_integrated": false,
+    "wire_format_experiment": "E/20 not accepted by production reader",
+    "original_bytes": 4096,
+    "footer_bytes": 3072,
+    "logical_text_slots": 84,
+    "packed_text_bytes": 809,
+    "recovered_bytes": 199,
+    "cpu_payload_bytes": 182,
+    "spare_bytes": 17,
+    "counter_width_bits": 24,
+    "requires_all_raw_ticks_fit_without_truncation": true,
+    "epoch_begin_end_ms_bits": 32,
+    "tick_interval_bits": 64,
+    "crc32_not_authentication": true,
+    "roundtrips": 194,
+    "counter_overflow_refusals": 48,
+    "text_refusals": 252,
+    "representative_corruption_refusals": 12,
+    "original_footer_fields_restored_exactly": true,
+    "original_text_raw_slots_restored_exactly": true,
+    "limits": [
+      "No native encoder/reader or runtime collector exists.",
+      "This Python model does not prove ARM64 concurrency, performance or legal recount sampling.",
+      "Do not use24bit modular arithmetic: source tick counters are32bit;24bit wire rejects overflow.",
+      "Unsupported input must keep original v19 bytes and explicitly mark new observation unavailable."
+    ]
+  },
+  "remaining": [
+    "Python7bit+UInt24/CRC transport is a capacity experiment, not an accepted production version20 or reader. All original84 slots and3072footer reconstruct exactly in the model.",
+    "Need native bounded collector/memory ordering/ARM64 object and raw counter/wallclock validation, target overhead and preserved errors before integration.",
+    "PRECISE_USER_KERNEL_TIME=1 in actual processor compilation; source units are mach time, not nanoseconds. CPI macro absent in actual recipe; do not claim hardware performance counters.",
+    "Transport24bit values are guarded representations of32bit source counters; never truncate or apply24bit modular arithmetic.",
+    "A count snapshot is not per-process attribution, clock frequency or display-copy latency measurement."
+  ],
+  "next_action": "Implement and exercise a host-only finite-retry reader model against exact writer protocol and idle-transition scenarios; compile a prospective exact-XNU try helper in isolation only after ordering reviewed. Do not call unbounded API from log/watchdog and do not restart6aea.",
+  "recorded_at": "2026-10-30T16:34:37.031005+08:00",
+  "local_full_report": "out/zorn/cpu-load-design/design-result.json",
+  "local_full_report_sha256": "af449e32b79be267e447b3619502c2e7ad401f603d48e988a56232928b389acf",
+  "local_prototype": "out/zorn/cpu-load-design/transport-prototype.py",
+  "local_prototype_sha256": "ab3f455e97997ed624410576fb68e28328957e241d66d88215299fba25a7b694"
+}

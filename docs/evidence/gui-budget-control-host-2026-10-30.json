@@ -1,0 +1,68 @@
+{
+  "verified_at": "2026-10-30T12:15:12.184255+08:00",
+  "allow_boot": true,
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/builds/25a4e9c0",
+  "boot_sha256": "25a4e9c0301594192e5fe1842d54d66ccdd412b97a20bea509fcd123cfed4ddc",
+  "kernel_sha256": "e0714460722601b7f0a4665c0ef10a6e27bf0a18423e3c3d253806d12a2f074a",
+  "inputs_verified": 231,
+  "asm_trace": false,
+  "root_publication": 1,
+  "smp_stop_after_pass": false,
+  "gui_hold_seconds": 900,
+  "recovery_timeout_seconds": 1200,
+  "same_complete_kernel_as": "e700d2bb1dac9f8acad33219867c94624414b92d0b0f6035bf3456f7339d5f06",
+  "kernel_adt_and_plan_identical": true,
+  "menu_only_gui_hold_differs": true,
+  "profile_differences": {
+    "gui_hold_seconds": [
+      300,
+      900
+    ],
+    "recovery_timeout_seconds": [
+      600,
+      1200
+    ]
+  },
+  "host_controls_rejected": 25,
+  "gui_qualified": false,
+  "host_checks": {
+    "actual_readonly_control": "e700d2bb1dac9f8acad33219867c94624414b92d0b0f6035bf3456f7339d5f06",
+    "actual_kernel": "e0714460722601b7f0a4665c0ef10a6e27bf0a18423e3c3d253806d12a2f074a",
+    "source_inputs_verified": 227,
+    "actual_guard_sha256": "21a0dfec27ba208cf26e39e22ee024834183e8e6cfe59dd0104e581e77e5a957",
+    "explicit_budget_only_positive_passed": true,
+    "rejected": [
+      "profile:smp_root_publication",
+      "profile:smp_stop_after_pass",
+      "profile:fresh_data",
+      "profile:retained_data",
+      "profile:data_profile",
+      "profile:memory_mib",
+      "profile:gui_user_stacks",
+      "profile:touch_runtime",
+      "profile:brightness_mode",
+      "profile:source_replay_sha256",
+      "profile:source_pins_sha256",
+      "profile:gui_hold_seconds",
+      "profile:recovery_timeout_seconds",
+      "profile:disabled_jobs",
+      "archive-kernel",
+      "archive-boot",
+      "archive-plan",
+      "native-source",
+      "display-source",
+      "other-host-source",
+      "Data-geometry",
+      "CPU-object-bytes",
+      "display-ABI-bytes",
+      "actual-CPU-object",
+      "actual-display-ABI"
+    ],
+    "phone_access": false,
+    "original_inputs_modified": false
+  },
+  "hardware_qualified": false,
+  "run": "out/zorn/debug/20261030-121534-25a4e9c0",
+  "source_exception": "Only host build-zorn-debug.py interface revision explicitly records old/current SHA; all native/other host sources exact. Immutable generated kernel-bound outputs resolve by fixed archive aliases.",
+  "qualification_scope": "Initial e700short\u2192900 same-kernel build/boot only; opposite-direction generation/runtime not tested. Retained Data and time order remain uncontrolled."
+}

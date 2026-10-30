@@ -1,150 +1,196 @@
-# Official record schema 1; build remains schema 1. Worktree evidence is hash-bound.
+# Device record schema1 for the format2 root board. Tested worktree bytes are not assigned an invented Git revision.
 schema_version = 1
 
 [device]
 name = "zorn"
 soc = "SM8650"
 os_profile = "ipados-17.7.11-21H461"
-summary = "红米 K80 12 GB + 256 GB；已确认 iPadOS 桌面、基本单指触控、八核、8 GiB Data 跨启动保留及低亮度。仍为有界自动回收调试配置；完整格式 2 构建迁移、多指、GPU 与长期稳定性尚未完成。"
+summary = "Redmi K80: owner-confirmed desktop/basic touch, eight-core checks, retained8GiB Data and dim64. CPU1 narrow root publication has bounded controls; intermittent GUI stalls and long-term stability remain unresolved. Format2 host migration is separate from historical device qualification."
 
 [[area]]
 id = "configuration"
 status = "implemented"
 components = []
-paths = ["board.toml", "unixnu.lock", "configs/**", "patches/core/**", ".github/**", ".gitignore", "scripts/install-zorn-patches.sh", "source-pins.json", "scripts/check-zorn-patch-series.py", "scripts/check-zorn-source-pins.py", "scripts/stage-zorn-build-workspace.py", "patches/compat/**"]
-inputs = ["K80 zorn / SM8650-AB，iPad7,1 / j120ap，iPadOS 17.7.11 / 21H461；主 UniXNU 16e592abee8a550dec8154ed1f38b5ebc4f16213，XNU d8b80295118ef25ac3a784134bcf95cd8e88109f。", "后续主仓库066c8d8与sheng08cde20；当前组件用source-pins.json固定19个实际检出及363个源码指纹。"]
-configuration = ["现有 board.toml 保持格式 1；board.os_profile 仅用于记录身份核对；桌面配置为 zorn_union_defconfig。"]
-procedure = ["按 docs/build-and-debug.md 准备已有增量工作区；在主仓库运行 python3 scripts/porting-record.py check --device ../UniXNU-zorn。"]
-findings = ["保留两个设备仓库与格式1入口；上游独立工作区已两次重放157个补丁，并完成1011个新XNU对象、预链接及统一打包。", "显式--source-pins在构建前和打包前验证组件，不执行子模块更新；错误版本、改动文件和缺少组件均拒绝。"]
-completion = ["设备、系统身份和输入版本一致；后续完整格式 2 迁移另行验证配置层、DTS、源码与补丁顺序。"]
-limits = ["完整格式2构建未迁移；干净源码重放和独立对象编译通过，但历史ABI候选仍是显式输入，新候选首次真机在CPU1预检261退出。"]
-next_action = ["保留42f3d518，按同一recovery起点做对照，定位启动差异后继续重复回归；再消除ABI fixture依赖。"]
+paths = ["board.toml", "unixnu.lock", "configs/**", "patches/core/**", "patches/xnu/series", ".github/**", ".gitignore", "scripts/install-zorn-patches.sh", "source-pins.json", "scripts/check-zorn-patch-series.py", "scripts/check-zorn-source-pins.py", "scripts/stage-zorn-build-workspace.py", "patches/compat/**", "feeds.toml", "soc/**", "dts/**", "package/**", "compat/legacy/**", "proprietary-files.txt", "local.toml.example", "scripts/zorn_legacy_device.py", "scripts/prepare-zorn-legacy-view.py"]
+inputs = ["K80 / SM8650-AB; iPad7,1 / j120ap, iPadOS17.7.11 /21H461, XNU d8b80295118ef25ac3a784134bcf95cd8e88109f; source-pins.json and unixnu.lock bind the prepared dependencies."]
+configuration = ["Root board schema2; record schema1. ARM64, tracked board-local SoC slice, OS and device layers; zorn_union_defconfig and explicit complete patch/archive arrays."]
+procedure = ["Resolve with unixnu status --json in a separate output root; validate this record and compile dts/zorn.dts before building a new format2 image."]
+findings = ["README was not the catalog ingestion source: the scanner selects format2 from root board.toml, then validates porting.toml. The old root was format1 even though the record checker passed."]
+completion = ["Identity, selected components, source pins, configuration fragments, patch order and board package match the intended build route."]
+limits = ["This migration checks configuration/DTS/tree on the host; full native kernel/payload equivalence through the new output layout is not qualified. Historical device runs remain attached to their original manifests."]
+next_action = ["Audit native recipes for format2 output paths before a complete format2 build; retain the fixed legacy diagnostic entry and all old archives."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/repository-format.md"
-result = "说明本次文档范围、记录版本与构建格式的区别；未宣称新布局通过。"
+result = "Root board now uses schema2 with four profiles,9 components and explicit157-patch order. The retained diagnostic board is SHA-pinned; host migration checks do not qualify a new native kernel or device run."
+
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/format2-documentation-sync-2026-10-30.json"
+result = "Format2 four-layer/9-component/157-patch resolution, DTS/ADT/tree, official catalog metadata simulation and fixed legacy-selection host checks passed. Source/record files remain uncommitted; this is not a new native kernel or phone result."
 
 [[area]]
 id = "firmware"
 status = "implemented"
 components = ["DarwinBoot"]
 paths = ["docs/progress-2026-10-27*.md", "docs/progress-2026-10-28-touch.md", "docs/evidence/touch-power-handoff-result.json"]
-inputs = ["相邻 uefi-zorn 板级包、Mu-Silicium 共享依赖、giulia SM8650 DXE 输入、GOP、PSCI SMC 与实机保留区。"]
-configuration = ["zorn.dsc / zorn.fdf；3 MiB FD 位于 0xA7100000，BootShim 解压窗口为 0xA8000000–0xB8000000，邮箱 0xA7601000。"]
-procedure = ["按 uefi-zorn 的 build-and-handoff.md 链接板级包、构建 FD、核对模块及固件哈希，再使用统一构建器打包。"]
-findings = ["UEFI 菜单、5 秒倒计时和 DarwinBoot 交接已实测；触控供电交接为内核 FT3683 通信提供前提。"]
-completion = ["固件输入、菜单、内存与 sidecar 一致，交接后进入已绑定内核；每轮 watchdog 与自动 recovery 结果可追溯。"]
-limits = ["固件源码与厂商 DXE 不混为完整开源实现；本仓库不是完整 Mu-Silicium；精确复位源尚未独立测定。"]
-next_action = ["继续保留固件和模块身份，避免更新 FD 时丢失触控供电或提前 watchdog 前提。"]
+inputs = ["uefi-zorn board package; existing Mu-Silicium/EDKII and giulia SM8650 DXE inputs; GOP and PSCI SMC handoff."]
+configuration = ["FD base0xA7100000/size0x300000; shim window0xA8000000..0xB8000000; mailbox0xA7601000; menu countdown5s."]
+procedure = ["Stage the board package, verify FD/module input manifests and use the guarded device packer; each device observation requires independent watchdog and bounded recovery."]
+findings = ["UEFI menu and DarwinBoot handoff reach the recorded kernel. Existing touch power/clock handoff supports the FT3683 kernel path. Latest CPU/display trials reused the bound FD."]
+completion = ["Firmware, menu, sidecars, memory window and actual kernel agree, and fresh recovery evidence is bound to the run."]
+limits = ["The board repository is not the full Mu-Silicium tree. Vendor DXE inputs remain proprietary; the exact hardware reset source was not separately established."]
+next_action = ["Preserve the known FD and touch handoff while validating any future firmware change separately."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/evidence/touch-power-handoff-result.json"
-result = "已有供电交接结果摘要；固件实现保留在现有 uefi-zorn 仓库。"
+result = "Archived UEFI touch power/clock handoff supports the FT3683 kernel communication path; this update reused the recorded FD and made no firmware build."
 
 [[area]]
 id = "cpu"
 status = "implemented"
 components = ["ArmCpu", "ArmDTPlatform"]
-paths = ["native/smp/**", "scripts/*smp*", "scripts/*cpu*", "patches/zorn/*smp*", "docs/evidence/smp-*"]
-inputs = ["SM8650 的真实 MIDR / MPIDR、PSCI CPU_ON、GIC、定时器、IPI 与原版 XNU CPU 启动和调度接口。"]
-configuration = ["--smp-preflight 8 --smp-continue；每轮通过全部核心预检后才继续用户态；不以 ADT 八节点代替真实在线证据。"]
-procedure = ["逐核核对身份、定时器、IPI 与绑定任务，执行九轮共享 VA 映射及清理，再检查系统桌面和对应回收日志。"]
-findings = ["37100a75 已通过八核和九轮 remap / cleanup；42f3d518 中各核检查掩码均为 ff，并进入桌面。", "前序 CPU1 SMP261 表示启动返回后未在有界窗口内同时观察到 Running / IPI；后续成功不能证明其原因已修复。", "0b4eda46首次新日志记录START1 step4 / PSCI rc0 / fail0，CPU1未在原2秒门槛到达身份与Running/IPI，自动回recovery；不把CPU_ON返回0等同核心已在线。", "资格检查现支持档案搬迁，以唯一相对后缀定位原输入，不重写旧manifest或放宽哈希、代码和设备检查。"]
-completion = ["八核身份、定时器、IPI、跨核映射及用户态均有匹配证据，失败诊断保留，启动和长期压力稳定性通过。"]
-limits = ["当前通过基本八核系统启动；偶发 CPU1 预检早退原因未定，无 AMP、DVFS 或性能成绩验收。"]
-next_action = ["遇到再次早退时保留 START 状态、PSCI 返回与时间关系；做长时间调度与共享映射压力测试。"]
+paths = ["native/smp/**", "scripts/*smp*", "scripts/*cpu*", "patches/zorn/*smp*", "docs/evidence/smp-*", "patches/diagnostics/**", "scripts/check-zorn-smp-startup-report.py", "scripts/check-zorn-start-object.py", "scripts/zorn_gui_budget_control.py", "scripts/check-zorn-gui-budget-control.py", "docs/progress-2026-10-30-cpu1-layout.md", "docs/evidence/cpu1-layout-2026-10-30.json"]
+inputs = ["Actual per-core MIDR/MPIDR, PSCI CPU_ON, GIC,19.2MHz timer, IPIs and original XNU startup interfaces; all8 core gates and9 mapping rounds."]
+configuration = ["Eight-core debug builds default to publication1, other profiles0; explicit0 remains a diagnostic control. Original2s gate and all preflight checks remain."]
+procedure = ["Independently assemble current start.s, compare the complete object SHA, audit final code, and bind boot/kernel/inputs/fresh log before interpreting a run."]
+findings = ["Identical75b9ca39 kernel:0-fail/1-pass/0-fail/1-pass. With0 the late MRS TTBR1 was0; with1 it equaled CPU0 pre-start/final root and all8 cores/9 mapping rounds passed. The change cleans the single cache line containing cpu_ttep,8bytes, without writing root/page tables.", "Two uninstrumented layouts16KiB apart passed preflight; e700 had2 lock-screen runs and936 had1. Early source-slot word4 was0 even on success and is not the actual MMU-off load value. The old5b uninstrumented claim was withdrawn because start.o was stale.", "c50 final capture had status0 on all8 cores in both epochs and USER/SYSTEM cumulative accounting increased on every core."]
+completion = ["Per-core identity/timer/IPI/bound work and mapping cleanup pass; startup failures remain preserved and stress/long-term stability are tested separately."]
+limits = ["The narrow publication evidence does not explain every historical GUI stall. a889 passed CPU/Data/dim64 but remained on the Apple logo. Accounting is cumulative and serial, not simultaneous utilization, idle%, MHz or FPS."]
+next_action = ["Preserve the bounded fix and original gates; do not repeat completed controls or add CPU/GUI probes without new direction."]
 
 [[area.evidence]]
 kind = "source"
-reference = "docs/evidence/smp-eight-remap-result.json"
-result = "保存八核 remap / cleanup 的镜像、内核与日志身份，属于已有结果摘要。"
+reference = "docs/evidence/cpu1-root-publication-controlled-2026-10-30.json"
+result = "Archived identical75b9ca39-kernel controls:0-fail/1-pass/0-fail/1-pass, with late TTBR1=0 versus the CPU0 root; original gates unchanged."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/cpu1-root-publication-gui-2026-10-30.json"
+result = "Archived normal GUI observations:2 e700 runs and1 alternate936 layout, with all8 core gates, retained Data, dim64, fresh logs and camera lock-screen frames."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/cpu1-root-publication-stability-2026-10-30.json"
+result = "Archived a889900-second failure: CPU/Data/dim64 passed, but120/720-second camera frames remained on the Apple logo. GUI qualification failed and is preserved."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/gui-budget-same-kernel-2026-10-30.json"
+result = "Archived25a same-full-kernel900-second lock-screen observation passed; this excludes the budget as a sufficient cause, not metadata/Data/timing causation."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/cpu-active-trial-2026-10-30.json"
+result = "Archived single c50 trial recovered in395s;255 inputs/77 archive files and distinct log matched. Lock screen/all8/Data/dim64 passed and every core had USER/SYSTEM accounting progress; no performance/root-cause qualification."
 
 [[area]]
 id = "memory"
 status = "implemented"
 components = []
 paths = ["patches/zorn/**", "scripts/check-zorn-gui-window.py", "docs/evidence/high-memory-*", "docs/evidence/vm-map-*", "docs/evidence/pmap-*", "docs/evidence/tlb-*"]
-inputs = ["标称 12 GiB RAM，实机 live FDT、UEFI ConventionalMemory、4 KiB 页表、PAN 及 UFS DMA 约束。"]
-configuration = ["当前桌面候选 --memory-mib 8192；XNU 窗口独立于 256 MiB BootShim 解压窗口。"]
-procedure = ["核对真实内存范围、UEFI 分配、页表和 UFS 控制路径；以实际内核和日志验证跨核 TLB / remap。"]
-findings = ["8 GiB 窗口已进入锁屏及桌面；恢复原版 VM map 初始化是解除先前用户态等待的关键结果，但其他实验修改仍需逐项复核。"]
-completion = ["真实可用内存、保留区与 DMA 范围无重叠；全窗压力、跨核页表、释放和错误路径长期通过。"]
-limits = ["不能按标称 12 GiB 声称全部内存已验证；旧锁、pmap 和 MAC / exec 绕过并未全部完成语义与稳定性审查。"]
-next_action = ["保留准确基线，分离内存压力、跨核一致性和历史绕过审查，避免盲目增大窗口或强清锁。"]
+inputs = ["Nominal12GiB SKU; actual UEFI memory ownership,4KiB page tables, PAN, DMA constraints and reserved regions."]
+configuration = ["Qualified debug profile uses8192MiB. The256MiB decompression window is separate from XNU-owned RAM. The new DTS nominal map is not qualification of all12GiB."]
+procedure = ["Check reserved regions, owned allocation, page tables and UFS DMA separately; use bound mapping/cleanup results."]
+findings = ["An8GiB window reached lock screen/desktop. Original VM-map initialization and audited cross-core mapping paths are retained."]
+completion = ["No region overlap or DMA escape, with repeated allocation/free, mapping and stress/error-path evidence."]
+limits = ["Full12GiB, long-term pressure and every historical lock/pmap/exec compatibility change remain unqualified."]
+next_action = ["Audit the migrated hardware description and reserved regions before any new memory-window qualification; do not enlarge the tested window or clear locks."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/review-2026-10-28-official-houji.md"
-result = "保留官方 / houji 对照与 VM 锁调查范围；最新桌面窗口结果另见触控验收摘要。"
+result = "Board memory/VM-map investigation and compatibility limits are retained; the8GiB desktop result does not qualify the full nominal12GiB map."
 
 [[area]]
 id = "storage"
 status = "implemented"
 components = ["VerifiedRoot", "RamBlock", "AppleKeyStoreState", "SoftwareAES"]
 paths = ["native/ufs-read/**", "scripts/*data*", "scripts/*storage*", "scripts/*ufs*", "scripts/*aes*", "scripts/*keystore*", "scripts/*verified*", "docs/evidence/data*", "docs/evidence/ram-data*"]
-inputs = ["实机 UFS / GPT / userdata 容量、SHNGROOT 系统 manifest、owner 区块策略、原版 APFS / IOStorageFamily 与独立 Data 种子。"]
-configuration = ["OS / SystemOS 只读；当前 8 GiB APFS Data 使用 UFS 持久后端（RamBlock DirectDisk），未写页从不可变种子读取，不需要等量 RAM。窗口位于 userdata 相对 192 GiB，2097217 个 4 KiB 块。"]
-procedure = ["核对双 GPT、真实容量、前像与种子哈希，限制读写窗口；验证 APFS UUID、文件读写及至少两次跨启动保留。"]
-findings = ["真实 UFS 块设备发布原版 IOMedia / APFS；原版 owner 验证与 SoftwareAES 适配已越过此前启动阻塞。", "现用 Data UUID C7D77FF3-6437-4C4A-8E05-E8E239AC1641；42f3d518 保留 cookie 2dde8229。512 MiB 历史窗口不再充当当前 Data。"]
-completion = ["OS / SystemOS 只读身份和区块策略匹配，Data 挂载、读写、跨启动保留及越界 / 错种子 / 错误恢复可验证。"]
-limits = ["Data 初始窗口已获机主授权；当前不能启动 Android，不支持双系统。断电一致性、寿命与长期压力尚未验收。"]
-next_action = ["继续验证保留 Data 的长期一致性，不因元数据或种子错误自动清空；保持 OS 拒写及原窗口边界。"]
+inputs = ["Actual UFS capacity/GPT evidence, SHNGROOT manifest and owner policy, original APFS/IOStorageFamily, immutable seed and retained Data marker."]
+configuration = ["OS/SystemOS read-only. Existing Data window:userdata-relative192GiB,2097217 blocks of4096B; original UUID C7D77FF3-6437-4C4A-8E05-E8E239AC1641/cookie2dde8229."]
+procedure = ["Verify window/seed/marker and reject out-of-range access; preserve existing initialization and observe APFS mount and cross-boot retention."]
+findings = ["The8GiB UFS-backed Data volume persisted across the recorded desktop and later lock-screen boots; it does not require8GiB of dense RAM. c50 retained the same UUID/cookie with zero RAM/Data errors."]
+completion = ["Read-only system identity, bounded Data reads/writes, retained metadata and refusal/recovery errors remain traceable."]
+limits = ["No Android dual boot, automatic reset or window enlargement. Power-loss integrity, endurance and sustained storage stress are not qualified. board.toml userdata coordinates describe capacity-relative legacy input, not absolute GPT LBAs."]
+next_action = ["Preserve the existing window and seed; require separate evidence for long-term consistency rather than reinitializing Data."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/evidence/data8-retained-touch-result.json"
-result = "独立 8 GiB APFS、同一 UUID / cookie、跨启动保留及零 Data 错误的已有结果；该旧轮触控未响应不被本记录隐去。"
+result = "Archived8GiB UFS-backed Data mount/retention preserved the original UUID/cookie without RAM/Data errors. The older unresponsive touch result is retained."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/cpu-active-trial-2026-10-30.json"
+result = "Archived single c50 trial recovered in395s;255 inputs/77 archive files and distinct log matched. Lock screen/all8/Data/dim64 passed and every core had USER/SYSTEM accounting progress; no performance/root-cause qualification."
 
 [[area]]
 id = "display"
 status = "implemented"
 components = ["GopFramebuffer"]
 paths = ["native/display/**", "scripts/*display*", "scripts/*brightness*", "docs/evidence/brightness-*"]
-inputs = ["真实 GOP / framebuffer 0xFC400000，1440×3200 / row 5760 / 32 bpp，O11 面板 DSI0 及 DCS 0x51 / 0x52。"]
-configuration = ["--display-mode 3 --brightness-mode 3；CPU 显示，XNU 阶段固定低亮度 64，匹配实机型号与 FIFO / DSI 状态。"]
-procedure = ["先只读核对寄存器与 DCS 返回，再单次降低亮度、清除旧回复并读回；核对 CPU 传帧与机主看到的系统画面。"]
-findings = ["DCS 实测 307→64 并新鲜读回 64；42f3d518 机主已看到桌面，不再把只有传帧计数或苹果标志视为桌面验收。"]
-completion = ["framebuffer / stride / 像素格式正确，系统画面与传帧一致；亮度写入与读回有界并保留错误。"]
-limits = ["64 不是校准 nits 或百分比；UEFI 菜单和系统亮度滑块未接入，无硬件 GPU。长时间显示、旋转与休眠恢复待测。"]
-next_action = ["保留低亮度和 CPU 显示基线，后续分别验证旋转、显示恢复及系统亮度控制。"]
+inputs = ["GOP framebuffer0xFC400000,1440x3200,5760row bytes,32bpp; O11 DSI panel and DCS0x51/0x52."]
+configuration = ["CPU presentation/display-mode3; brightness-mode3 fixes XNU panel value64 and reads it back. Optional v19 retirement/vsync observation retains old log fields."]
+procedure = ["Bind actual linked display objects, menu and fresh log; qualify screen appearance independently of transfer counters."]
+findings = ["Brightness307->64 was read back. Two6aea lock-screen captures had accepted/transfer/retired9/9/9 and8/8/8; c50 had8/8/8, reject0/status0. Independent camera frames showed lock screen.", "Type5 registration/send queue offsets agree. At60Hz, properties0 does not mean no query; healthy lock screens also had started1 and zero observed sender callbacks."]
+completion = ["Correct stride/pixels, observed system output and bounded brightness readback; continuous presentation and recovery require separate tests."]
+limits = ["Single camera frames do not qualify the full observation window. Equal counters do not prove per-request pairing; independent relaxed timestamps are not consistent event pairs. Value64 is not calibrated nits/percent."]
+next_action = ["Keep CPU presentation and brightness baseline; preserve unresolved Apple-logo evidence without changing queues or forcing notifications."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/evidence/brightness-dim-result.json"
-result = "DCS 降亮与读回的已有真机摘要；常规 GUI 的低亮度结果见阶段文档和最新桌面摘要。"
+result = "Archived DCS307-to64 transition and fresh64 readback; this is a register value rather than calibrated luminance or a system brightness-slider implementation."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/display-progress-repeat-2026-10-30.json"
+result = "Archived second6aea bounded run recovered with a camera lock screen and v19 accepted/transfer/retired8/8/8; first run9/9/9 remains separate."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/display-notification-contract-2026-10-30.json"
+result = "Source/final-link audit found matching type5 queue offset5592;60Hz property counters do not prove client registration, receipt or GUI-stall causation."
 
 [[area]]
 id = "input"
 status = "implemented"
 components = []
 paths = ["native/display/ZornTouch*", "scripts/*touch*", "scripts/zorn_touch*", "docs/evidence/touch-*", "docs/progress-2026-10-29-touch-events.md"]
-inputs = ["实机 FT3683 / 固件 35，40 TX × 18 RX 互容矩阵，板级供电 / GPIO SPI、原版 IOHIDFamily / HID 解析 ABI。"]
-configuration = ["--touch-handoff --touch-runtime --touch-edges --touch-kernel-parser --touch-trace --touch-fast-poll；竖屏前摄在上，Y 采用正 TX 方向。"]
-procedure = ["核对芯片、CRC、真实矩阵、基线与释放；用机主六点顺序核对方向，再记录底部上滑及图标点按的连续轨迹。"]
-findings = ["42f3d518 机主确认进入桌面且图标点击正常；2248 次有效解码、34 次 HID dispatch、35 个 digitizer 事件、31 条完整轨迹、错误 0。", "保留同 ID 的上滑与正常释放；实测移动样本约 140 ms，最大间隔 148 ms；此前慢采样上滑被识别为长按编辑锁屏。", "3a8ac966第二轮：两个分离触点ID0/1同时存在5188ms且正常释放，2219帧无坏帧，55次HID提交无错误；此轨迹在HID递送前，不证明系统捏合缩放。", "首次独立工作区的contacts/frames宿主检查创建所需输出目录；运行态检测、坐标和采样算法未在本轮修改。"]
-completion = ["单指位置与释放、边缘手势、图标命中和错误释放正确；多指稳定 ID、抖动、复杂手势和长期响应分别验收。"]
-limits = ["基本单指交互已确认，另有双指分离触点ID跟踪记录；使用GPIO轮询，不声称60/120Hz；像素级校准、连续多指手势和按键未验收。"]
-next_action = ["保留方向与快采样基线，按独立测试扩展像素校准、复杂手势及多指，再评估原生 SPI / IRQ。"]
+inputs = ["FT3683/firmware35,40TXx18RX matrix; existing power/GPIO SPI path and original IOHIDFamily parsing ABI."]
+configuration = ["Retain touch-handoff/runtime/edges/kernel-parser/trace/fast-poll and the qualified portrait Y direction."]
+procedure = ["Verify frame CRC, matrix/baseline, IDs and releases; qualify owner-visible taps/swipes separately from pre-HID traces."]
+findings = ["42f3 owner confirmed desktop, unlock and icon taps. The second3a run recorded independent IDs0/1 for5188ms with normal release,2219 good frames and55 HID submissions without errors."]
+completion = ["Single-touch hit/release and gestures pass; system multi-touch, calibration and long-run responsiveness are distinct qualifications."]
+limits = ["GPIO polling is not proof of60/120Hz input. Two sensor IDs do not prove system pinch/zoom; physical keys, pixel calibration and complex gestures are unqualified."]
+next_action = ["Preserve usable touch; optimization and additional gesture qualification remain deferred."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/evidence/touch-desktop-fast-qualified.json"
-result = "镜像 / 内核 / 新回收日志与 124 项输入绑定，保存机主桌面与命中确认；未提交工作树结果不套用旧 Git revision。"
+result = "Archived42f3 desktop/unlock/icon-tap owner confirmation is bound to boot/kernel/fresh log and124 inputs; no new device test is asserted here."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/qualified-source-repeat-two-contacts.json"
+result = "Archived second3a desktop run recorded2219 good frames,55 HID submissions without errors, and independent IDs0/1 for5188ms with release; system multi-touch remains unqualified."
 
 [[area]]
 id = "gpu"
 status = "planned"
 components = []
 paths = ["docs/repository-format.md"]
-inputs = ["SM8650 集成 GPU；当前有 CPU 显示基线，但尚无本机合格的 GPU 固件、SMMU 与 Metal 路径。"]
-configuration = ["按机主要求暂缓硬件 GPU，不选用 sheng 的 Adreno740 结果代替 K80 支持。"]
-procedure = ["未来单独核对 GPU 型号、固件、MMIO、SMMU、命令提交与 IOGPU / Metal ABI，再设计有界测试。"]
-findings = ["进入桌面使用 CPU 显示，不能据此认定 GPU 工作。"]
-completion = ["固件加载、隔离地址映射、队列、错误回收及 Metal 实际渲染具备对应设备证据。"]
-limits = ["硬件 GPU 尚未适配，不宣称完整图形性能或 Metal 功能。"]
-next_action = ["保持后置，先完成当前输入与系统稳定性验证。"]
+inputs = ["Board-specific firmware, memory/security ownership and frontend ABI require separate qualification."]
+configuration = ["This publication synchronization excludes GPU development progress and retains CPU presentation."]
+procedure = ["Keep GPU work and its hardware qualification in a separate update."]
+findings = ["A CPU-rendered desktop does not establish hardware graphics acceleration."]
+completion = ["Firmware, isolated mappings, submission, fences, recovery and actual rendering have matching device evidence."]
+limits = ["No hardware graphics or Metal qualification is claimed by this non-GPU update. Existing GPU investigation files remain preserved separately."]
+next_action = ["Update this area only in a separately scoped GPU synchronization; autonomous work remains paused."]
 evidence = []
 
 [[area]]
@@ -152,13 +198,13 @@ id = "network"
 status = "planned"
 components = []
 paths = ["native/startup-policy/**", "scripts/*gui*", "docs/evidence/gui-service*", "docs/evidence/gui-os-services*"]
-inputs = ["实机 WLAN / 蓝牙硬件、固件及总线 / 电源信息需要独立整理；不能继承其他机型的网络结论。"]
-configuration = ["--development-wifi-identity 仅补充系统身份，服务裁剪用于当前桌面启动，不注册真实网络设备。"]
-procedure = ["后续核对硬件与固件，分别验证网络接口、收发和错误恢复；保留未实现服务的启动策略。"]
-findings = ["当前可进入系统不依赖可用 Wi-Fi 或蓝牙；MAC 身份属性并非无线驱动。"]
-completion = ["真实接口与硬件收发、关联、掉线恢复及系统接口通过；蓝牙单独记录。"]
-limits = ["Wi-Fi、蓝牙和蜂窝通信尚未实现或验收；部分 Apple 服务被显式裁剪。"]
-next_action = ["按系统稳定性后的优先级整理实际硬件依赖，避免盲目禁用更多服务掩盖错误。"]
+inputs = ["Board WLAN/Bluetooth hardware, firmware, power/bus/IRQ/DMA and OS interface inputs still need independent qualification."]
+configuration = ["Development Wi-Fi identity only supplies system metadata; existing explicit service policy is retained."]
+procedure = ["Identify actual hardware and firmware before adding interfaces; qualify packet traffic and recovery independently."]
+findings = ["Desktop boot does not depend on a working radio. A MAC identity property is not a network driver."]
+completion = ["Real interface publication, association, transmit/receive and recovery have matching device evidence."]
+limits = ["Wi-Fi, Bluetooth and cellular networking are unimplemented or unqualified; Apple service exclusions are explicit."]
+next_action = ["Keep this area planned until hardware-specific inputs and an appropriate driver are established."]
 evidence = []
 
 [[area]]
@@ -166,13 +212,13 @@ id = "audio"
 status = "planned"
 components = []
 paths = ["docs/review-2026-10-27-official-porting.md"]
-inputs = ["K80 的音频 DSP、codec、功放、路由和固件；当前原版 Apple 音频 bundle 的存在不等于对应硬件工作。"]
-configuration = ["当前仅保留启动所需的原版依赖和已记录的服务裁剪，无真实 K80 音频输出实现。"]
-procedure = ["未来从真实硬件与 DSP 固件开始，分别验证时钟、总线、扬声器与麦克风路由。"]
-findings = ["本阶段没有音频播放或录制验收，不能复制 sheng 的完成等级。"]
-completion = ["系统音频端点、播放、录制、音量和错误恢复有真实设备结果。"]
-limits = ["音频及相关 DSP 电源管理尚未适配。"]
-next_action = ["先稳定现有系统，再按实际硬件建立音频输入和有界测试。"]
+inputs = ["Actual DSP, codec, amplifier, clocks, firmware and board routes remain required."]
+configuration = ["Original Apple audio bundles may be retained for boot dependencies; no K80 audio endpoint is claimed."]
+procedure = ["Qualify hardware/firmware, clocks and output/input routing before playback/record tests."]
+findings = ["No playback or capture acceptance result exists for this port."]
+completion = ["Device-backed endpoints, playback, recording, volume and error recovery pass separately."]
+limits = ["Audio and related DSP power management remain unimplemented."]
+next_action = ["Keep planned; identify board inputs before selecting a driver."]
 evidence = []
 
 [[area]]
@@ -180,71 +226,72 @@ id = "power"
 status = "implemented"
 components = []
 paths = ["native/pmgr/**", "scripts/*pmgr*", "native/display/ZornPanel*", "docs/progress-2026-10-28-brightness.md"]
-inputs = ["原版 ApplePMGRNub ABI、K80 面板 DSI、电源域与独立 Gunyah watchdog；完整 PMIC / 电池接口尚待整理。"]
-configuration = ["PMGR 板级适配用于对象生命周期、AON 方法及服务发布；低亮度通过固定面板 DCS 路径实现。"]
-procedure = ["核对原版 ABI 和实际链接调用，先只读寄存器，再做受限操作并读回，保留独立 watchdog。"]
-findings = ["已通过 PMGR 绑定 / 服务发布与面板硬件降亮；这不等于完整 Qualcomm 电源管理、DVFS、充电或休眠支持。"]
-completion = ["局部适配边界准确；后续按真实 PMIC 分别验收电池、充电、热管理、时钟及睡眠唤醒。"]
-limits = ["电池 / 充电策略、温控、完整休眠唤醒和 DVFS 未验收；降亮不承诺消除 OLED 老化风险。"]
-next_action = ["维持调试低亮度，分离 watchdog、显示与完整电源管理测试。"]
+inputs = ["Original ApplePMGRNub ABI, board panel DSI and independent Gunyah watchdog; full PMIC/battery data is missing."]
+configuration = ["PMGR compatibility covers object lifetime/AON methods/service publication; panel dimming uses the existing DCS path."]
+procedure = ["Audit the actual ABI and final calls, use bounded operations/readback and preserve independent recovery."]
+findings = ["PMGR service publication and hardware dimming have results; these do not implement complete Qualcomm power/charging/DVFS."]
+completion = ["Local ABI/panel scope is accurate; battery, charging, thermal and sleep/wake each need real hardware qualification."]
+limits = ["Battery/charging policy, thermal management, DVFS and full sleep/wake are unqualified."]
+next_action = ["Preserve dimming/watchdog behavior and keep complete power management separate."]
 
 [[area.evidence]]
 kind = "source"
 reference = "native/pmgr/README.md"
-result = "现有 PMGR 适配范围与 ABI 说明；不将启动用兼容层描述为完整硬件电源驱动。"
+result = "Implemented PMGR compatibility covers service publication and original ABI/object lifetime. It does not claim charging, DVFS or sleep/wake support."
 
 [[area]]
 id = "packaging"
 status = "implemented"
 components = ["XnuPrelink"]
-paths = ["scripts/build-zorn-debug.py", "scripts/build-zorn-link-stubs.py", "scripts/prepare-zorn-trustcache.py", "scripts/prepare-zorn-adt.py", "scripts/make-zorn-adt.py", "docs/build-and-debug.md", "docs/evidence/ram-data-menu-negative-checks.json"]
-inputs = ["匹配的 kernelcache、原版 trust cache、owner 策略、ADT、Data seed、FD、已通过审计的板级静态库。"]
-configuration = ["192 MiB FAT32 / 512 字节簇，header v4 / gzip；由 uefi-zorn 打包，不附加 DTB，不带 Android ramdisk。"]
-procedure = ["按 build-and-debug.md 的完整桌面参数构建，核对 ready 状态、全部输入与 boot / kernel 哈希，保存独立归档后再定向启动。"]
-findings = ["42f3d518 完成 124 项输入核对并与新日志绑定；Data 配置需要合法 PackedRAMDisk，不能套用旧只读基线的 --no-initrd。", "157补丁两次干净重放、四个八核基线源指纹一致；1011个新对象与预链接、统一归档0b4eda46通过，127项输入核对；不复用旧XNU对象。", "新上游首次启动CPU1预检退出，第二次八核通过但苹果标志；精确97文件快照2b4b143c两次SMP261；仅规范化路径的3a8ac966两轮通过八核和桌面，首轮点击正常，221项输入和各自新日志已绑定；CPU1布局敏感性仍待定位。"]
-completion = ["新克隆可复现且每个引用都固定来源；构建失败、旧源或归档不符均拒绝启动。"]
-limits = ["历史ABI候选42f3d518与现有SDK仍为显式构建输入；并非只有源码和IPSW即可bootstrap。完整格式2布局、发行镜像和新上游硬件回归尚未通过。"]
-next_action = ["保留旧默认镜像；后续独立定位CPU1布局 / 启动原因及验证系统双指手势，不因两轮通过而宣称稳定性完成。"]
-
-[[area.evidence]]
-kind = "source"
-reference = "docs/build-and-debug.md"
-result = "保存实际配置、独立构建入口、归档身份和历史ABI输入边界；各新候选硬件结果另行绑定。"
+paths = ["scripts/build-zorn-debug.py", "scripts/build-zorn-link-stubs.py", "scripts/prepare-zorn-trustcache.py", "scripts/prepare-zorn-adt.py", "scripts/make-zorn-adt.py", "docs/build-and-debug.md", "docs/evidence/ram-data-menu-negative-checks.json", "scripts/zorn_legacy_device.py", "compat/legacy/**"]
+inputs = ["Pinned donor kernelcache/trust cache, owner policy, seed, ADT, FD, SDK and audited board archives."]
+configuration = ["192MiB FAT32 with512B clusters; Android header4/gzip; no Android ramdisk or appended DTB. Canonical debug builder retains flat output via fixed compatibility board."]
+procedure = ["Require source/object/final-link/FAT/ready audits and complete immutable input archives before a new temporary boot."]
+findings = ["157 patches replayed twice and1011 fresh XNU objects linked;3a entered desktop twice. Controlled tool dates yielded identical full kernels across2 actual incremental links in one prepared workspace.", "c50 complete kernel5310b1dd and bootc50ca7ea passed independent start.o,7-object correspondence,26 pre-pack functions/14 call edges/46 GOT/4 callbacks; the full preflight publisher was separately audited as a27th function.255 input hashes and77 immutable archive files matched at run completion."]
+completion = ["Every build uses known inputs and refuses stale objects, mismatched archives or failed audits."]
+limits = ["Historical ABI audit inputs and prepared SDK/cache are still required. Repeated incremental links are not clean-bootstrap/cross-machine reproducibility. The new format2 native output route has no fresh kernel/device qualification."]
+next_action = ["Finish recipe/output-path equivalence checks before a format2 kernel build; do not relabel old manifests or overwrite42f3/3a baselines."]
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/evidence/clean-source-replay-2026-10-29.json"
-result = "两次独立源码重放、新对象编译及ready归档摘要；新候选真机结果单独记录。"
-
-[[area.evidence]]
-kind = "source"
-reference = "docs/evidence/upstream-regression-0b4eda46-first.json"
-result = "匹配新日志、实际boot/kernel身份的CPU1预检261失败；没有声称进入系统。"
+result = "Archived2 independent157-patch replays and1011 fresh XNU objects reached prelink/packaging; subsequent device failures are separate evidence."
 
 [[area.evidence]]
 kind = "source"
 reference = "docs/evidence/qualified-source-desktop-3a8ac966.json"
-result = "精确源码快照路径对照首轮：全新XNU对象，匹配221项输入与新日志，机主确认桌面和基本点击；不证明CPU1根因或长期稳定性。"
+result = "Archived path-normalized source-control image3a reached owner-confirmed desktop/taps with221 inputs and fresh log; no general layout/root-cause claim."
 
 [[area.evidence]]
 kind = "source"
-reference = "docs/evidence/qualified-source-repeat-two-contacts.json"
-result = "第二次同镜像桌面 / 八核 / Data / 亮度通过；两个分离触点ID同时存在5188ms并正常释放，尚未验证系统捏合缩放。"
+reference = "docs/evidence/tool-date-reproducibility-2026-10-30.json"
+result = "Archived controlled ar/ld probes and2 actual incremental native links produced identical complete kernel bytes in one prepared workspace; clean-bootstrap/cross-machine claims are excluded."
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/cpu-active-linked-2026-10-30.json"
+result = "Archived c50 build passed independent start/object/FAT and26 pre-pack functions/14 call edges/46 GOT/4 callbacks; preflight publisher supplement was separately bound as a27th function."
+
+
+[[area.evidence]]
+kind = "source"
+reference = "docs/evidence/format2-documentation-sync-2026-10-30.json"
+result = "Format2 four-layer/9-component/157-patch resolution, DTS/ADT/tree, official catalog metadata simulation and fixed legacy-selection host checks passed. Source/record files remain uncommitted; this is not a new native kernel or phone result."
 
 [[area]]
 id = "diagnostics"
 status = "implemented"
 components = []
-paths = ["scripts/run-zorn-debug.py", "scripts/read-zorn-log.py", "scripts/capture-zorn-screen.py", "scripts/check-zorn-runner*", "scripts/zorn_session_guard.py", "scripts/*log*", "docs/evidence/**", "docs/*.json"]
-inputs = ["固定设备 92988a43 / zorn / b，既有 userdata 单 4 KiB 日志块、misc recovery BCB、独立 watchdog 和已授权单帧 USB Camera。"]
-configuration = ["默认不启用周期续调；镜像 / 内核 / ready 清单匹配才启动，目标 CC9 f85d4270 永不操作。"]
-procedure = ["使用有界 run-zorn-debug.py，回收 run.json、原始日志和输入身份；只有 recovered 且 kernel_log_changed=true 才分析该轮。"]
-findings = ["42f3d518 自动回 recovery，取得新日志并通过归档核对；已由机主实际确认桌面和单指交互。", "新上游回归新日志已回收并绑定0b4eda46实际归档，首次捕获CPU1故障时的PSCI成功返回；旧42f3同起点对照由机主再次确认桌面和点击正常；97文件精确源码和1024对象对比另见构建回归记录。", "日志所有权测试去掉本机临时备份依赖，保留八线程真实函数压力与两个非原子写入拒绝控制。"]
-completion = ["错误、旧日志、读取失败与真实用户 / 内核等待栈分开记录；日志页无越界，自动回收失效时停止设备操作。"]
-limits = ["摄像头或单次栈不能替代全部功能和稳定性验收；读取计时包含锁等待 / 抢占，不能相加成墙钟占比。"]
-next_action = ["延续每轮身份绑定与有界回收；文档或构建整理不自动重启手机、恢复 heartbeat 或修改已取消的关机安排。"]
+paths = ["scripts/run-zorn-debug.py", "scripts/read-zorn-log.py", "scripts/capture-zorn-screen.py", "scripts/check-zorn-runner*", "scripts/zorn_session_guard.py", "scripts/*log*", "docs/evidence/**", "docs/*.json", "native/cpu-active/**", "scripts/zorn_cpu_active.py", "scripts/zorn_display_progress.py"]
+inputs = ["Fixed92988a43/zorn/b; existing single4KiB log block and recovery BCB; independent watchdog and bounded automatic recovery."]
+configuration = ["Autonomous work is paused by owner. Runtime logs remain hash-bound; v19 and experimental E/20-ZCLA/2 preserve old fields. No cross-core running-thread stack reads."]
+procedure = ["Only interpret a recovered run with a changed raw log and exact boot/kernel/input/archive identity. Camera lock screen vs Apple logo is a separate result."]
+findings = ["The c50 run17:53:39..18:00:14 recovered in395s;120s frame was lock screen4:02. Two epochs63744/243896ms had error0,maskff/status0 and raw tick192000, converted to10ms.", "All8 USER/SYSTEM cumulative counters grew;8 accepted/transferred/retired with no rejection. No historical Apple-logo failure was reproduced or explained. The one planned observation is consumed."]
+completion = ["A fresh traceable log and bounded recovery exist, with unknown/error readings preserved and qualification limits explicit."]
+limits = ["No FPS/MHz/idle%/copy-vs-wait attribution or continuous-window/long-term qualification. Log I/O duration includes encoding, lock waits and preemption. No further CPU/GUI repeat is scheduled."]
+next_action = ["Keep automation paused until owner direction. Documentation checks must not build/boot or restart the completed diagnostic."]
 
 [[area.evidence]]
 kind = "source"
-reference = "docs/evidence/touch-desktop-fast-qualified.json"
-result = "保存本轮新日志 SHA256、ready 输入数量、回收身份及机主确认的范围。"
+reference = "docs/evidence/cpu-active-trial-2026-10-30.json"
+result = "Archived single c50 trial recovered in395s;255 inputs/77 archive files and distinct log matched. Lock screen/all8/Data/dim64 passed and every core had USER/SYSTEM accounting progress; no performance/root-cause qualification."

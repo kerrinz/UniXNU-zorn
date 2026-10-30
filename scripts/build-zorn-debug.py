@@ -37,6 +37,11 @@ def verify_source_replay():
     commit = subprocess.check_output(['git', '-C', str(work), 'rev-parse', 'HEAD'], text=True).strip()
     if commit != replay['source_commit']:
         raise RuntimeError('replayed XNU revision differs')
+    device = ROOT / 'UniXNU-zorn'
+    for layer in replay.get('additional_patches', []):
+        path = (device / layer['path']).resolve()
+        if not path.is_relative_to(device.resolve()) or digest(path) != layer['sha256']:
+            raise RuntimeError('diagnostic source layer differs')
     profile_path = OUT / 'smp/runtime/profile.json'
     profile = json.loads(profile_path.read_text()) if profile_path.is_file() else {}
     for name, expected in replay['source_sha256'].items():
@@ -68,12 +73,19 @@ def main():
     parser.add_argument("--smp-preflight", type=int, choices=(0, 8), default=0,
                         help="bounded eight-core hardware qualification before root/Data publication")
     parser.add_argument("--smp-continue",action="store_true",help="continue into retained dim CPU GUI only after all eight-core checks pass")
+    parser.add_argument("--smp-stop-after-pass", action="store_true", help="same GUI kernel/profile, but recover immediately after a verified eight-core preflight")
+    parser.add_argument("--smp-root-publication",type=int,choices=(0,1),default=None,help="single-root cache publication; default1 for eight-core preflight, otherwise0; explicit0 diagnostic control")
+    parser.add_argument("--reuse-smp-publication-control",type=Path,help="same-kernel preflight-only0/1 payload control; identical source/profile required")
+    parser.add_argument("--reuse-gui-budget-control",type=Path,help="same-kernel GUI300/600 versus900/1200 budget control; fixed retained8core profile only")
+    parser.add_argument('--reproducible-tool-dates',action='store_true',help='macOS host-only full-kernel experiment: child ZERO_AR_DATE=1; excludes boot and kernel reuse')
     parser.add_argument("--defconfig", choices=("zorn_defconfig", "zorn_ramdata_defconfig", "zorn_display_defconfig", "zorn_union_defconfig", "zorn_library_defconfig"),
                         default="zorn_defconfig", help="select the qualified UFS baseline or volatile Data experiment")
     parser.add_argument("--display-mode", type=int, choices=(1, 2, 3), default=1,
                         help="display profile: initialize/release (1), publish (2), CPU presentation (3)")
     parser.add_argument("--memory-mib", type=int, help="request a derived UEFI-owned memory window (256..8192 MiB)")
     parser.add_argument("--gui-watch", action="store_true", help="bounded passive launchd/SpringBoard/backboardd thread observations")
+    parser.add_argument("--cpu-active-observation", action="store_true", help="new pinned300/600 eight-core active accounting diagnostic; no automatic boot/reuse")
+    parser.add_argument("--display-progress", action="store_true", help="opt-in v19 retirement/vsync counters; newly built eight-core retained GUI only")
     parser.add_argument("--gui-user-stacks", action="store_true", help="bounded original-VM reads of the first GUI thread's frame chain; requires GUI watch/watchdog")
     parser.add_argument("--gui-kernel-stacks", action="store_true", help="prefer bounded CPU0 retained kernel stacks; otherwise keep original user frame reads")
     parser.add_argument("--gui-runnable-kernel-stacks", action="store_true", help="also inspect referenced, non-current runnable kernel contexts; explicit CPU0 diagnostic")
@@ -122,6 +134,39 @@ def main():
     parser.add_argument("--fd", type=Path, default=ROOT.parent /
                         "Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd")
     args = parser.parse_args()
+    if args.smp_root_publication is None:
+        args.smp_root_publication = 1 if args.smp_preflight == 8 else 0
+    if args.display_progress and (not (args.smp_preflight == 8 and args.smp_continue and
+        args.smp_root_publication == 1 and not args.smp_stop_after_pass and args.gui_watch and
+        args.touch_trace and args.touch_runtime and args.retained_data and not args.fresh_data and
+        args.data_profile == '8g' and args.memory_mib == 8192 and args.early_watchdog == 1 and
+        args.source_pins and args.incremental_patched_tree) or
+        args.boot or args.gui_user_stacks or args.gui_kernel_stacks or args.gui_runnable_kernel_stacks or
+        any(p is not None for p in (args.reuse_kernel_control,args.reuse_smp_publication_control,args.reuse_gui_budget_control))):
+        parser.error('display progress requires a new eight-core retained8GiB GUI/trace/watchdog1 build; no automatic boot, stack samplers or kernel reuse')
+    if args.cpu_active_observation and (not (args.display_progress and args.smp_preflight==8 and args.smp_continue and
+        args.smp_root_publication==1 and not args.smp_stop_after_pass and args.gui_watch and
+        args.touch_trace and args.touch_runtime and args.retained_data and not args.fresh_data and
+        args.data_profile=='8g' and args.memory_mib==8192 and args.early_watchdog==1 and
+        args.source_pins and args.incremental_patched_tree and args.gui_hold_seconds==300 and
+        args.recovery_timeout==600 and args.display_mode==3 and args.brightness_mode==3 and args.data_store_mode==2) or
+        args.boot or args.gui_user_stacks or args.gui_kernel_stacks or args.gui_runnable_kernel_stacks or
+        any(p is not None for p in (args.reuse_kernel_control,args.reuse_smp_publication_control,args.reuse_gui_budget_control))):
+        parser.error('CPU active observation requires new pinned retained8GiB eight-core300/600 dim64/trace/progress/watchdog1; no boot, reuse, stop or stacks')
+    if args.reproducible_tool_dates and (sys.platform != 'darwin' or args.boot or
+        any(p is not None for p in (args.reuse_kernel_control,args.reuse_smp_publication_control,args.reuse_gui_budget_control)) or
+        not (args.source_pins and args.incremental_patched_tree and args.smp_preflight==8 and args.smp_continue and not args.smp_stop_after_pass and args.smp_root_publication==1)):
+        parser.error('reproducible tool dates require a macOS pinned full eight-core GUI build; no boot, stop or kernel reuse')
+    if sum(p is not None for p in (args.reuse_kernel_control, args.reuse_smp_publication_control, args.reuse_gui_budget_control)) > 1:
+        parser.error('kernel reuse controls are mutually exclusive')
+    if args.reuse_gui_budget_control and not (args.smp_preflight==8 and args.smp_continue and not args.smp_stop_after_pass and args.smp_root_publication==1 and (args.gui_hold_seconds,args.recovery_timeout) in ((300,600),(900,1200))):
+        parser.error('GUI budget reuse requires the fixed explicit1 eight-core GUI and300/600 or900/1200 budget')
+    if args.smp_root_publication and args.smp_preflight!=8:
+        parser.error("root publication requires eight-core preflight")
+    if args.reuse_smp_publication_control and (args.reuse_kernel_control or not (args.smp_preflight==8 and args.smp_continue and args.smp_stop_after_pass)):
+        parser.error("publication kernel reuse requires exclusive preflight-stop profile")
+    if args.smp_stop_after_pass and not args.smp_continue:
+        parser.error('--smp-stop-after-pass requires the explicit eight-core continuation profile')
     if args.source_pins:
         args.source_pins = args.source_pins.resolve()
         if not args.source_pins.is_file():
@@ -259,6 +304,8 @@ def main():
               "data_profile":args.data_profile,"fresh_data":args.fresh_data,
               "smp_preflight": args.smp_preflight,
               "smp_continue": args.smp_continue,
+              "smp_stop_after_pass": args.smp_stop_after_pass,
+              "smp_root_publication": args.smp_root_publication,
               "display_mode": args.display_mode if display_config else 0,
               "brightness_mode": args.brightness_mode,
               "touch_probe": args.touch_probe,
@@ -297,7 +344,13 @@ def main():
               "memory_mib": args.memory_mib or 384,
               "early_watchdog_mode": args.early_watchdog,
               "recovery_timeout_seconds": args.recovery_timeout,
+              "tool_zero_ar_date": '1' if args.reproducible_tool_dates else os.environ.get('ZERO_AR_DATE'),
               "xnu_extra_cflags": os.environ.get("XNU_EXTRA_CFLAGS")}
+
+    if args.display_progress:
+        record['display_progress'] = True
+    if args.cpu_active_observation:
+        record['cpu_active_observation'] = True
 
     def save():
         pending = MANIFEST.with_suffix(".json.tmp")
@@ -319,6 +372,8 @@ def main():
             record['source_snapshot_profile'] = replay.get('source_snapshot_profile')
             record['source_snapshot_sha256'] = replay.get('source_snapshot_sha256')
             record['source_patch_count'] = replay['applied']
+        if args.cpu_active_observation:
+            run("cpu-active-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-cpu-active.py"])
         if args.brightness_mode:
             run("brightness-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-brightness.py"])
         if args.touch_probe:
@@ -362,6 +417,8 @@ def main():
         env = dict(os.environ)
         env["UNIXNU_ZORN_SMP"] = str(args.smp_preflight)
         env["UNIXNU_ZORN_TOUCH_RUNTIME"]="1" if args.touch_runtime else "0"
+        if args.reproducible_tool_dates:
+            env['ZERO_AR_DATE'] = '1'
         local_ipsw = args.ipsw
         if local_ipsw is None and not env.get("UNIXNU_IPSW"):
             candidate = ROOT / "iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw"
@@ -377,13 +434,17 @@ def main():
             if not (CORE / "out/zorn/tree/.cache/xnu-work/bsd/kern/bsd_init.c").is_file():
                 raise RuntimeError("--incremental-patched-tree requires the existing patched XNU tree")
             env["UNIXNU_PATCH_LIST"] = "1"
-        run("defconfig", [CORE / "unixnu", "defconfig", args.defconfig, "-D", ROOT / "UniXNU-zorn"], CORE)
+        from zorn_legacy_device import prepare as prepare_legacy_device
+        legacy_device = prepare_legacy_device(ROOT / "UniXNU-zorn", OUT / "legacy-device")
+        run("defconfig", [CORE / "unixnu", "defconfig", args.defconfig, "-D", legacy_device], CORE)
         run("cpu-source-profile", [sys.executable, ROOT / "UniXNU-zorn/scripts/prepare-zorn-smp-runtime.py",
                                   "--mode", "preflight8" if args.smp_preflight else "normal"])
         if args.smp_preflight:
             if args.smp_continue:
                 run("smp-qualified-remap-proof",[sys.executable,ROOT/"UniXNU-zorn/scripts/check-zorn-smp-proof.py"])
             run("smp-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-runtime.py"])
+            run("smp-startup-report-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-startup-report.py"])
+            run("smp-root-publication-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-root-publication.py"])
             run("log-ownership-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-log-ownership.py"])
         ram_data = "CONFIG_XNU_NATIVE_RAM_BLOCK=y" in (CORE / "out/zorn/.config").read_text().splitlines()
         data_report = None
@@ -405,8 +466,10 @@ def main():
             lines = [s for s in config.read_text().splitlines() if not s.startswith("CONFIG_XNU_OWNER_DATA_VOLUME_UUID=")]
             lines.append('CONFIG_XNU_OWNER_DATA_VOLUME_UUID="' + data_uuid + '"')
             config.write_text("\n".join(lines) + "\n")
-        if args.reuse_kernel_control:
-            control_dir = args.reuse_kernel_control.resolve()
+        if args.reuse_kernel_control or args.reuse_smp_publication_control or args.reuse_gui_budget_control:
+            publication_control = args.reuse_smp_publication_control is not None
+            budget_control = args.reuse_gui_budget_control is not None
+            control_dir = (args.reuse_gui_budget_control or args.reuse_smp_publication_control or args.reuse_kernel_control).resolve()
             control = json.loads((control_dir / "inputs.json").read_text())
             control_kernel = control_dir / "kernel.macho"
             kernel = CORE / "out/zorn/kernel/kernel.macho"
@@ -414,12 +477,26 @@ def main():
                     digest(control_dir / "boot.img") != control["sha256"] or
                     digest(control_kernel) != control["inputs"].get(str(kernel))):
                 raise RuntimeError("control kernel/archive identity differs")
+            if publication_control:
+                for key,value in record.items():
+                    if key not in ("status","started","phase","smp_root_publication") and control.get(key)!=value:
+                        raise RuntimeError("publication control profile differs: "+key)
+                if control.get("smp_root_publication") not in (0,1) or control["smp_root_publication"]==args.smp_root_publication:
+                    raise RuntimeError("publication control must change only explicit0/1")
+                for name in ("ArmCpu.cpp","ZornSmpRuntime.inc","ZornSmpPolicy.h"):
+                    if digest(control_dir/name)!=digest(OUT/"smp/runtime"/name):
+                        raise RuntimeError("publication control native source differs: "+name)
+            if budget_control:
+                from zorn_gui_budget_control import verify_control
+                run('gui-budget-control-host-check', [sys.executable, ROOT / 'UniXNU-zorn/scripts/check-zorn-gui-budget-control.py', '--control', control_dir])
+                budget_proof = verify_control(control_dir, record, ROOT)
+                (OUT / 'gui-budget-reuse-audit.json').write_text(json.dumps(budget_proof, indent=2) + '\n')
             comparable = ("defconfig", "display_mode", "root_composition", "library_path_fallback",
                           "gui_watch", "gui_user_stacks", "gui_launchservices", "gui_service_thread", "gui_backboard_thread", "keystore_state",
                           "shared_data_volume", "quiet_gui", "hid_family", "minimal_services", "skip_setup",
                           "disabled_jobs", "service_policy_preset", "gui_hold_seconds", "checkpoint_override",
                           "memory_mib", "early_watchdog_mode", "dyld_compact_info_disable_requested")
-            if control.get("development_wifi_identity") or control.get("gui_kernel_stacks", False) != record["gui_kernel_stacks"] or control.get("gui_runnable_kernel_stacks", False) != record["gui_runnable_kernel_stacks"] or any(control.get(key, 0 if key in ("gui_service_thread", "gui_backboard_thread") else None) != record.get(key) for key in comparable):
+            if not (publication_control or budget_control) and (control.get("development_wifi_identity") or control.get("gui_kernel_stacks", False) != record["gui_kernel_stacks"] or control.get("gui_runnable_kernel_stacks", False) != record["gui_runnable_kernel_stacks"] or any(control.get(key, 0 if key in ("gui_service_thread", "gui_backboard_thread") else None) != record.get(key) for key in comparable)):
                 raise RuntimeError("ADT trial must preserve every control profile option")
             plan_path = control_dir / "kernel-plan.json"
             if not plan_path.is_file():
@@ -437,16 +514,23 @@ def main():
                 raise RuntimeError("legacy archive needs a verified layout plan for its exact kernel")
             kernel.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(control_kernel, kernel)
-            reuse = {"kind": "reused-qualified-control", "control_boot_sha256": control["sha256"],
+            reuse = {"kind": "reused-smp-publication-control" if publication_control else "reused-qualified-control", "control_boot_sha256": control["sha256"],
                      "control_manifest_sha256": digest(control_dir / "inputs.json"),
                      "kernel_sha256": digest(kernel), "source_archive": str(control_dir)}
+            if budget_control:
+                reuse = budget_proof
             kernel.with_suffix(".json").write_bytes(plan_bytes)
             record["kernel_reuse"] = reuse
             save()
             print("[kernel] reused exact archived control " + reuse["kernel_sha256"], flush=True)
         else:
+            if args.reproducible_tool_dates:
+                record['kernel_date_environment'] = {key:value for key,value in env.items()
+                    if key.startswith(('UNIXNU_', 'XNU_')) or key == 'ZERO_AR_DATE'}
+                save()
             run("kernel", [CORE / "unixnu", "build", "kernel"], CORE, env)
         if args.smp_preflight:
+            run("smp-start-object-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-start-object.py"])
             run("smp-linked-call-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-smp.py"]+(["--continue-gui"] if args.smp_continue else []))
         if replay:
             verify_source_replay()
@@ -500,9 +584,11 @@ def main():
         payload_command += ['--data-profile',args.data_profile]
         if args.fresh_data:payload_command.append('--fresh-data')
         if args.smp_preflight:
-            payload_command += ["--smp-preflight", str(args.smp_preflight)]
+            payload_command += ["--smp-preflight", str(args.smp_preflight),"--smp-root-publication",str(args.smp_root_publication)]
         if args.smp_continue:
             payload_command.append("--smp-continue")
+        if args.smp_stop_after_pass:
+            payload_command.append("--smp-stop-after-pass")
         if ram_data:
             payload_command += ["--data-seed", ROOT / data_report["seed"]]
         elif verified_ufs:
@@ -513,6 +599,11 @@ def main():
             payload_command += ["--memory-mib", str(args.memory_mib)]
         if args.gui_watch:
             payload_command.append("--gui-watch")
+        if args.display_progress:
+            run("display-progress-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-display-progress.py"])
+            payload_command.append("--display-progress")
+        if args.cpu_active_observation:
+            payload_command.append("--cpu-active-observation")
         if args.gui_user_stacks:
             payload_command.append("--gui-user-stacks")
         if args.gui_kernel_stacks:
@@ -581,7 +672,11 @@ def main():
             payload_command += ["--early-watchdog", str(args.early_watchdog)]
         run("payload", payload_command)
         if args.smp_preflight:
-            run("smp-payload-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-smp.py", "--payload"]+(["--continue-gui"] if args.smp_continue else [])+(['--fresh-data'] if args.fresh_data else []))
+            run("smp-payload-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-smp.py", "--payload","--root-publication",str(args.smp_root_publication)]+(["--continue-gui"] if args.smp_continue else [])+(['--fresh-data'] if args.fresh_data else [])+(['--stop-after-pass'] if args.smp_stop_after_pass else []))
+        if args.cpu_active_observation:
+            run("cpu-active-final-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-cpu-active.py", "--payload"])
+        if args.display_progress:
+            run("display-progress-final-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-display-progress.py", "--payload"])
         image = OUT / "boot.img"
         if args.source_pins:
             if digest(args.source_pins) != record["source_pins_sha256"]:
@@ -591,21 +686,31 @@ def main():
         run("boot-image", [sys.executable, ROOT / "uefi-zorn/scripts/package-zorn-boot.py",
                            "--fd", args.fd, "--ramdisk", OUT / "payload.img", "-o", image])
         inputs = [CORE / "out/zorn/kernel/kernel.macho", CORE / "out/zorn/kernel/kernel.json", CORE / "out/zorn/.config",
-                  ROOT / "UniXNU-zorn/board.toml", ROOT / "UniXNU-zorn/configs" / args.defconfig,
+                  ROOT / "UniXNU-zorn/board.toml", ROOT / "UniXNU-zorn/compat/legacy/board.toml",
+                  ROOT / "UniXNU-zorn/scripts/zorn_legacy_device.py", legacy_device / "board.toml",
+                  ROOT / "UniXNU-zorn/configs" / args.defconfig,
                   ROOT / "uefi-zorn/payload/EFI/UniXNU/unixnu.toml", OUT / "kernel.macho.adt",
                   OUT / "payload-with-trustcache.adt",
                   trust, args.fd]
         if replay:
             inputs += [CORE / 'out/zorn/source-replay.json']
+            inputs += [ROOT / 'UniXNU-zorn' / layer['path'] for layer in replay.get('additional_patches', [])]
             inputs += [CORE / 'out/zorn/tree/.cache/xnu-work' / name
                        for name, value in replay['source_sha256'].items() if value is not None]
         if args.source_pins:
             inputs += [args.source_pins, CORE / "scripts/unixnu/feeds.py",
                        ROOT / "UniXNU-zorn/scripts/check-zorn-source-pins.py"]
+        if args.reuse_gui_budget_control:
+            inputs += [ROOT / 'UniXNU-zorn/scripts/zorn_gui_budget_control.py',
+                       ROOT / 'UniXNU-zorn/scripts/check-zorn-gui-budget-control.py',
+                       OUT / 'gui-budget-host-check.json', OUT / 'gui-budget-reuse-audit.json']
         if args.smp_preflight:
             inputs += [OUT / "smp/runtime/profile.json", OUT / "smp/runtime/ArmCpu.cpp",
                        OUT / "smp/runtime/ZornSmpPolicy.h", OUT / "smp/runtime/ZornSmpRuntime.inc",
                        OUT / "smp/runtime-host-check.json", OUT / "smp/log-ownership-host-check.json",
+                       ROOT / "UniXNU-zorn/scripts/check-zorn-smp-startup-report.py", OUT / "smp/startup-report-host/result.json",
+                       ROOT / "UniXNU-zorn/scripts/check-zorn-start-object.py", OUT / "smp/start-object-audit.json",
+                       ROOT / "UniXNU-zorn/scripts/check-zorn-smp-root-publication.py", OUT / "smp/root-publication-host/result.json",
                        OUT / "smp/linked-call-audit.json", OUT / ("payload-ramdata.toml" if args.smp_continue else "payload-debug.toml"),
                        CORE / "out/zorn/tree/build/armcpu/zorn-smp-build.json",
                        ROOT / "UniXNU-zorn/native/ufs-read/ZornUfsRead.cpp",
@@ -653,6 +758,7 @@ def main():
                        OUT / "data-store/data-probe-host-check.json"]
         if args.gui_watch:
             inputs.append(OUT / "gui-hook-audit.json")
+            inputs.append(ROOT / "UniXNU-zorn/scripts/zorn_display_progress.py")
             inputs += [ROOT / "UniXNU-zorn/native/ufs-read/ZornGuiLog.h",
                        ROOT / "UniXNU-zorn/scripts/read-zorn-log.py",
                        ROOT / "UniXNU-zorn/scripts/check-zorn-gui-stacks.py",
@@ -674,6 +780,7 @@ def main():
             inputs += [OUT / "trace-stage-host-checks.json", ROOT / "UniXNU-zorn/scripts/check-zorn-trace-stages.py",
                        ROOT / "UniXNU-zorn/native/ufs-read/ZornTraceStages.h", ROOT / "UniXNU-zorn/native/ufs-read/trace-stages.json"]
         if display_config:
+            inputs.append(ROOT / "UniXNU-zorn/native/display/ZornDisplayProgress.h")
             inputs += [CORE / "out/zorn/tree/build/native-legacy-display/build-report.json",
                        ROOT / "UniXNU-zorn/native/display/ZornPanelBrightness.h",
                        ROOT / "UniXNU-zorn/native/display/ZornDsiBrightness.h",
@@ -681,6 +788,16 @@ def main():
                        ROOT / "UniXNU-zorn/native/display/ZornTouchHandoff.h",
                        ROOT / "UniXNU-zorn/scripts/make-zorn-adt.py",
                        ROOT / "uefi-zorn/scripts/make-zorn-payload.py"]
+        if args.smp_preflight:
+            inputs += [p for p in (ROOT/'UniXNU-zorn/native/cpu-active').rglob('*') if p.is_file() and '__pycache__' not in p.parts]
+            inputs += [ROOT/'UniXNU-zorn/scripts/zorn_cpu_active.py',ROOT/'UniXNU-zorn/scripts/check-zorn-cpu-active.py',ROOT/'UniXNU-zorn/scripts/audit-zorn-cpu-active.py']
+            inputs.append(CORE/'out/zorn/tree/build/zorn-ufs/cpu-active-build.json')
+        if args.cpu_active_observation:
+            inputs += [OUT/'cpu-active/host-check.json',OUT/'cpu-active/linked-audit.json']
+        if args.display_progress:
+            inputs += [ROOT / "UniXNU-zorn/scripts/check-zorn-display-progress.py",
+                       ROOT / "UniXNU-zorn/scripts/audit-zorn-display-progress.py",
+                       OUT / "display-progress/host-check.json", OUT / "display-progress/linked-audit.json"]
         if args.brightness_mode:
             inputs += [OUT / "brightness/host-check.json", ROOT / "UniXNU-zorn/scripts/check-zorn-brightness.py"]
         if args.touch_probe:
@@ -721,13 +838,39 @@ def main():
                       completed=time.strftime("%Y-%m-%dT%H:%M:%S%z"))
         save()
         archive = OUT / "builds" / record["sha256"][:8]
-        archive.mkdir(parents=True, exist_ok=True)
+        if archive.exists():
+            raise RuntimeError("refuse to overwrite immutable existing image archive: "+str(archive))
+        archive.mkdir(parents=True, exist_ok=False)
         saved = [(image, archive / "boot.img"),
                  (CORE / "out/zorn/kernel/kernel.macho", archive / "kernel.macho"),
                  (CORE / "out/zorn/kernel/kernel.json", archive / "kernel-plan.json")]
+        saved += [(ROOT / "UniXNU-zorn/board.toml", archive / "format2-board.toml"),
+                  (ROOT / "UniXNU-zorn/compat/legacy/board.toml", archive / "legacy-board.toml"),
+                  (ROOT / "UniXNU-zorn/scripts/zorn_legacy_device.py", archive / "zorn_legacy_device.py")]
+        if args.smp_preflight:
+            saved += [(p,archive/'cpu-active'/p.relative_to(ROOT/'UniXNU-zorn/native/cpu-active')) for p in (ROOT/'UniXNU-zorn/native/cpu-active').rglob('*') if p.is_file() and '__pycache__' not in p.parts]
+            saved += [(ROOT/'UniXNU-zorn/scripts/zorn_cpu_active.py',archive/'zorn_cpu_active.py'),(CORE/'out/zorn/tree/build/zorn-ufs/cpu-active-build.json',archive/'cpu-active-build.json')]
+        if args.cpu_active_observation:
+            saved += [(OUT/'cpu-active/host-check.json',archive/'cpu-active-host-check.json'),(OUT/'cpu-active/linked-audit.json',archive/'cpu-active-linked-audit.json'),(ROOT/'UniXNU-zorn/scripts/check-zorn-cpu-active.py',archive/'check-zorn-cpu-active.py'),(ROOT/'UniXNU-zorn/scripts/audit-zorn-cpu-active.py',archive/'audit-zorn-cpu-active.py')]
+        if args.display_progress:
+            saved += [(ROOT / "UniXNU-zorn/native/display/ZornDisplayProgress.h", archive / "ZornDisplayProgress.h"),
+                      (ROOT / "UniXNU-zorn/native/display/ZornDisplayProbe.cpp", archive / "ZornDisplayProbe.cpp"),
+                      (ROOT / "UniXNU-zorn/native/ufs-read/ZornUfsRead.cpp", archive / "ZornUfsRead.cpp"),
+                      (ROOT / "UniXNU-zorn/scripts/zorn_display_progress.py", archive / "zorn_display_progress.py"),
+                      (ROOT / "UniXNU-zorn/scripts/read-zorn-log.py", archive / "read-zorn-log.py"),
+                      (ROOT / "UniXNU-zorn/scripts/check-zorn-display-progress.py", archive / "check-zorn-display-progress.py"),
+                      (ROOT / "UniXNU-zorn/scripts/audit-zorn-display-progress.py", archive / "audit-zorn-display-progress.py"),
+                      (OUT / "display-progress/host-check.json", archive / "display-progress-host-check.json"),
+                      (OUT / "display-progress/linked-audit.json", archive / "display-progress-linked-audit.json")]
+        if args.reuse_gui_budget_control:
+            saved += [(OUT / 'gui-budget-host-check.json', archive / 'gui-budget-host-check.json'),
+                      (OUT / 'gui-budget-reuse-audit.json', archive / 'gui-budget-reuse-audit.json')]
         if args.smp_preflight:
             saved += [(OUT / "smp/runtime/profile.json", archive / "smp-profile.json"),
                       (OUT / "smp/runtime-host-check.json", archive / "smp-host-check.json"),
+                      (OUT / "smp/startup-report-host/result.json", archive / "smp-startup-report-host-check.json"),
+                      (OUT / "smp/start-object-audit.json", archive / "smp-start-object-audit.json"),
+                      (OUT / "smp/root-publication-host/result.json", archive / "smp-root-publication-host-check.json"),
                       (OUT / "smp/log-ownership-host-check.json", archive / "log-ownership-host-check.json"),
                       (OUT / "smp/linked-call-audit.json", archive / "smp-linked-call-audit.json"),
                       (CORE / "out/zorn/tree/build/armcpu/zorn-smp-build.json", archive / "smp-driver-build.json"),
@@ -800,6 +943,7 @@ def main():
         # Publish a ready archive manifest only after every artifact is whole.
         saved.append((MANIFEST, archive / "inputs.json"))
         for source, destination in saved:
+            destination.parent.mkdir(parents=True, exist_ok=True)
             if destination.exists():
                 if digest(destination) != digest(source):
                     raise RuntimeError("archive artifact differs: " + str(destination))

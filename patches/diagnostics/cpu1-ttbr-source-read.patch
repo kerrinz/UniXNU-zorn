@@ -1,0 +1,38 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -814,6 +814,19 @@
+ 	adrp	x0, EXT(cpu_ttep)@page
+ 	add		x0, x0, EXT(cpu_ttep)@pageoff
+ 	ldr		x0, [x0]
++	.globl EXT(zorn_secondary_ttbr_source_capture)
++LEXT(zorn_secondary_ttbr_source_capture)
++	// Preserve the exact MMU-off load before writing TTBR1; x0 is untouched.
++	mrs x16, MPIDR_EL1
++	ubfx x16, x16, #8, #8
++	cmp x16, #8
++	b.hs 95f
++	adrp x17, EXT(zorn_cpu1_trace)@page
++	add x17, x17, EXT(zorn_cpu1_trace)@pageoff
++	add x17, x17, x16, lsl #6
++	str x0, [x17, #56]
++	dsb sy
++95:
+ 	MSR_TTBR1_EL1_X0
+ 1:
+ 
+@@ -945,13 +958,13 @@
+ 	str x18, [x17, #48]
+ 	nop // ZORN_TRANSLATION_NOP_CONTROL
+ 	isb
+-	mrs x18, PAR_EL1
++	ldr x18, [x17, #56]
+ 	str x18, [x17, #24]
+ 	ldr x18, [x17, #48]
+ 	msr PAR_EL1, x18
+ 	mrs x18, SCTLR_EL1
+ 	str x18, [x17, #32]
+-	mov x18, #0xa2
++	mov x18, #0xa3
+ 	str x18, [x17, #40]
+ 	dc cvac, x17
+ 	dsb sy

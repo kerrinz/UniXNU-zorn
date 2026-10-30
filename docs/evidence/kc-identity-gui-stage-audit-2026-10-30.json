@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-30",
+  "scope": "只读源码、实际编译配置、三个完整归档及既有匹配日志结果对照；未启动手机。",
+  "macro_configuration": {
+    "bootstrap": {
+      "__arm64__": "1",
+      "__x86_64__": null,
+      "CONFIG_IMAGEBOOT": "1",
+      "CONFIG_IMAGEBOOT_CHUNKLIST": null,
+      "NCONFIG_IMAGEBOOT_CHUNKLIST": null,
+      "VM_MAPPED_KEXTS": null,
+      "CONFIG_KEXT_BASEMENT": null
+    },
+    "imageboot": {
+      "__arm64__": "1",
+      "__x86_64__": null,
+      "CONFIG_IMAGEBOOT": "1",
+      "CONFIG_IMAGEBOOT_CHUNKLIST": null,
+      "NCONFIG_IMAGEBOOT_CHUNKLIST": "0",
+      "VM_MAPPED_KEXTS": null,
+      "CONFIG_KEXT_BASEMENT": null
+    }
+  },
+  "identity_findings": [
+    "Primary prelink dictionary KCID is copied into kernelcache_uuid and exported via kern.kernelcacheuuid.",
+    "Bootstrap UUID validation branch is conditional on Auxiliary collection; primary startup publishes the supplied ID without comparing it to an old disk ID in this function.",
+    "mapKCFileSet path is inside an x86 conditional, but validateKCFileSetUUID itself and bootstrap Auxiliary branch are present on ARM64; do not call the validator entirely absent.",
+    "CONFIG_IMAGEBOOT_CHUNKLIST is disabled in the exact imageboot compile recipe; authenticate_bootkc_uuid/root_version_check symbols are absent in these three complete bound kernels.",
+    "The built kernel is not MH_FILESET. Auxiliary collection reachability and all other consumers are not yet proven."
+  ],
+  "archive_hash_checks": {
+    "e700d2bb": 46,
+    "a889304d": 46,
+    "25a4e9c0": 48
+  },
+  "frame_evidence": [
+    {
+      "run": "20261030-105952-e700d2bb",
+      "kernel_sha256": "e0714460722601b7f0a4665c0ef10a6e27bf0a18423e3c3d253806d12a2f074a",
+      "log_sha256": "991a1945bd11b03366924962acff67c3b16e3978a3053ce66ae9d016f27add59",
+      "camera_lock_screen_visible": true,
+      "display": {
+        "accepted_swaps": 10,
+        "rejected_swaps": 0,
+        "transfer_observations": 10,
+        "last_transfer_status": 0,
+        "last_transfer_bytes": 18432000,
+        "last_client_open_status": 0,
+        "last_pm_status": 0
+      },
+      "ram_data_errors": 0,
+      "historical_inputs_matching_now": 223,
+      "historical_inputs_total": 227
+    },
+    {
+      "run": "20261030-113322-a889304d",
+      "kernel_sha256": "03029e8d683da3f7fb2588cda224cd1f8e820bdb8146f47a7f64f7ac074a8eb8",
+      "log_sha256": "e49659b240deafa7d3bae29908cd429e8416312aee8e0a0a3d37ccdc65260db9",
+      "camera_lock_screen_visible": false,
+      "display": {
+        "accepted_swaps": 4,
+        "rejected_swaps": 0,
+        "transfer_observations": 4,
+        "last_transfer_status": 0,
+        "last_transfer_bytes": 18432000,
+        "last_client_open_status": 0,
+        "last_pm_status": 0
+      },
+      "ram_data_errors": 0,
+      "historical_inputs_matching_now": 216,
+      "historical_inputs_total": 227
+    },
+    {
+      "run": "20261030-121534-25a4e9c0",
+      "kernel_sha256": "e0714460722601b7f0a4665c0ef10a6e27bf0a18423e3c3d253806d12a2f074a",
+      "log_sha256": "cdb10ac109de4e4765b8d0e0ec91a34306de43f9a428ce3744755571756b28aa",
+      "camera_lock_screen_visible": true,
+      "display": {
+        "accepted_swaps": 22,
+        "rejected_swaps": 0,
+        "transfer_observations": 22,
+        "last_transfer_status": 0,
+        "last_transfer_bytes": 18432000,
+        "last_client_open_status": 0,
+        "last_pm_status": 0
+      },
+      "ram_data_errors": 0,
+      "historical_inputs_matching_now": 231,
+      "historical_inputs_total": 231
+    }
+  ],
+  "historical_exit_comparison": "先按完整退出字典比较被每轮不同dyld slide拒绝；随后仅排除slide比较事件签名，原始slide/错误均保留。",
+  "limits": [
+    "元数据校验存在不等于本轮走到了失败分支。没有证明AuxKC路径实际可达，也未穷尽所有身份消费者。",
+    "chunklist检查未编入当前配置，不能把另一集合校验误写成ARM64完全没有。",
+    "旧e700/a889当前输入分别223/227、216/227；仅引用此前绑定分析，并核对旧完整归档和实际镜像/内核/日志，不声称旧输入当前仍全相同。25a工作区231/231仍匹配。",
+    "没有新解析等待栈；单次最终传帧计数不能证明回收/通知成功或永久死锁。",
+    "下一步轻量观察仅计划，未改代码、构建或启动；原CPU0深栈限制不放宽。"
+  ],
+  "next_observation": {
+    "created": "2026-10-30T13:12:40.696835+08:00",
+    "status": "planned-not-implemented",
+    "diagnostic_question": "When Apple-logo GUI stops issuing new observed frames, do actual retirement callbacks and vsync send attempts continue after the last successful CPU copy?",
+    "existing_evidence": "a889:4 accepted/4 transfer/0 rejected/laststatus0; good short10/10 and good long22/22. A transfer callback occurs before finishTransfer/retireSwap, so these counts do not answer retirement or later notification progress.",
+    "next_local_work": [
+      "Use existing device-level native_legacy_retirement_observed and native_legacy_vsync_observed hooks; do not edit original family instruction bytes or shared display queue behavior.",
+      "Design relaxed atomic counters and bounded last-event timing for retirement and each vsync event category; distinguish a send attempt from userspace receipt.",
+      "Verify worst-case log text length, 4KiB block/GUI ABI capacity and diagnostic overhead locally before building; preserve all original telemetry/errors.",
+      "Keep CPU0-only user/kernel stack sampler guards. No enabling them on8cores, no touching idle/runnable thread stacks.",
+      "Only after source/object/link/ready guards pass consider one bounded new diagnostic trial; source changes are measurement only, not a claimed repair."
+    ],
+    "phone_run_scheduled": false,
+    "code_modified": false,
+    "candidate_created": false,
+    "original_smp_timeout_unchanged": true,
+    "touch_or_gpu_changes": false,
+    "identity_or_validation_bypass": false
+  },
+  "local_reports": {
+    "out/zorn/reproducibility-20261030/kc-identity-audit/result.json": "f66e8ae27358f330cacdc4e5b9578fb2412175ce97e75b5f0b8af55438240b8f",
+    "out/zorn/reproducibility-20261030/gui-stage-comparison.json": "0898806c6f1745b7a743c43151c24b4dd8af88523bc3f25a8aeb93eeec54b9ef",
+    "out/zorn/reproducibility-20261030/gui-next-observation-plan.json": "ff4c2394cc4436c0520b8ee701bdcc192517ca932ae551bd48d300b7e0dcc227"
+  },
+  "phone_operations": false,
+  "gui_causation_proven": false
+}

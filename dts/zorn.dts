@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+/dts-v1/;
+/include/ "sm8650.dtsi"
+/ {
+    model = "Redmi K80 12GB+256GB";
+    compatible = "xiaomi,zorn", "qcom,sm8650";
+    // Preserve the legacy class-matching node. Register/PHY/DMA ownership
+    // remains in the existing board driver, not inferred from this node.
+    ufshc { compatible = "qcom,ufshc"; unixnu,adt-name = "ufshc"; };
+    // Nominal SKU map, not qualification of all12GiB. Owned XNU window is8GiB.
+    memory@80000000 { device_type = "memory"; reg = <0 0x80000000 3 0>; };
+    reserved-memory {
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+        firmware@a7100000 { reg = <0 0xa7100000 0 0x300000>; no-map; };
+        mailbox@a7601000 { reg = <0 0xa7601000 0 0x1000>; no-map; };
+        bootshim@a8000000 { reg = <0 0xa8000000 0 0x10000000>; no-map; };
+        framebuffer@fc400000 { reg = <0 0xfc400000 0 0x1194000>; no-map; };
+    };
+};

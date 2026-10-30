@@ -25,7 +25,9 @@
 #include "ZornSha256.h"
 #include "ZornVerifiedRoot.h"
 #include "ZornGuiLog.h"
+#include "../cpu-active/ZornCpuActive.h"
 #include "../display/ZornTouchTrace.h"
+#include "../display/ZornDisplayProgress.h"
 #include "ZornTraceStages.h"
 
 // Exact native XNU globals from the pinned osfmk/vm/vm_page.h. Diagnostic
@@ -299,6 +301,8 @@ struct ZornLogBlock {
 };
 static_assert(sizeof(ZornLogBlock) == 4096, "log must fit one UFS block");
 static ZornLogBlock gLogBlock;
+// Owned by the existing gLogBusy writer until synchronous transport returns.
+alignas(64) static uint8_t gCpuActiveWire[4096],gCpuActiveScratch[4096];
 struct ZornMacFailure {
 	char policy[12];
 	uint32_t error;
@@ -473,6 +477,10 @@ static void zorn_gui_fill_footer(void)
 		memcpy(snapshot.stacks, words, sizeof(words));
 		snapshot.version = 18;
 	}
+	// v19 preserves every v18 field and the text-ring capacity. Overlay only
+	// when all original/new values fit; otherwise leave the entire v18 image.
+	if (snapshot.version == 18 && zorn_display_progress_overlay(snapshot.display))
+		snapshot.version = 19;
 	for (unsigned i = 0; i < 6; ++i)
 		snapshot.touch[i + 1] = (snapshot.touch[i + 1] & 0xffffffffULL) |
 		    (static_cast<uint64_t>(__atomic_load_n(&zorn_touch_edge_stats[i], __ATOMIC_RELAXED)) << 32);
@@ -1201,7 +1209,8 @@ static IOReturn zorn_write_log4k(const void *source)
 	__atomic_fetch_add(&gLogWriteAttempts, 1, __ATOMIC_RELAXED);
 	zorn_gui_fill_footer();
 	uint64_t started = gGuiWatch ? mach_absolute_time() : 0;
-	IOReturn result = hostWriteLog4k(source);
+	const void *transport=zorn_cpu_active_transport(source,sizeof(gLogBlock),gCpuActiveWire,gCpuActiveScratch);
+	IOReturn result = hostWriteLog4k(transport);
 	if (gGuiWatch) {
 		uint64_t elapsed = 0;
 		absolutetime_to_nanoseconds(mach_absolute_time() - started, &elapsed);
@@ -1723,6 +1732,14 @@ static void zorn_ufs_arm_log(uint64_t start, uint64_t end)
 	int kernelStacks = 0;
 	PE_parse_boot_argn("zorn_gui_kstack", &kernelStacks, sizeof(kernelStacks));
 	gGuiKernelStacks = gGuiWatch && kernelStacks == 1;
+#if defined(ZORN_DISPLAY) && ZORN_DISPLAY
+	unsigned displayProgress = 0, progressTrace = 0, progressStacks = 0;
+	PE_parse_boot_argn("zorn_display_progress", &displayProgress, sizeof(displayProgress));
+	PE_parse_boot_argn("zorn_touch_trace", &progressTrace, sizeof(progressTrace));
+	PE_parse_boot_argn("zorn_gui_stack", &progressStacks, sizeof(progressStacks));
+	zorn_display_progress_configure(gGuiWatch && displayProgress == 1 && progressTrace == 1 &&
+	    !progressStacks && !gGuiKernelStacks ? 1 : 0);
+#endif
 	gGuiDiagnostics.dataSpace[0] = 0xffffffffU;
 	int quietGui = 0;
 	PE_parse_boot_argn("zorn_gui_quiet", &quietGui, sizeof(quietGui));
@@ -1775,6 +1792,32 @@ static void zorn_ufs_arm_log(uint64_t start, uint64_t end)
 	zorn_say("WRGO");
 	gLogEnabled = true;
 	gTraceEpoch = mach_absolute_time();
+	unsigned cpuActive=0,cpuProgress=0,cpuTrace=0,cpuUserStack=0,cpuKernelStack=0;
+	PE_parse_boot_argn("zorn_cpu_active",&cpuActive,sizeof(cpuActive));
+	PE_parse_boot_argn("zorn_display_progress",&cpuProgress,sizeof(cpuProgress));
+	PE_parse_boot_argn("zorn_touch_trace",&cpuTrace,sizeof(cpuTrace));
+	PE_parse_boot_argn("zorn_gui_stack",&cpuUserStack,sizeof(cpuUserStack));
+	PE_parse_boot_argn("zorn_gui_kstack",&cpuKernelStack,sizeof(cpuKernelStack));
+
+	unsigned cpuCores=0,cpuSmp=0,cpuContinue=0,cpuPublish=0,cpuStop=0,cpuStore=0,cpuRetained=0,cpuBrightness=0,cpuTouch=0;
+	PE_parse_boot_argn("cpus",&cpuCores,sizeof(cpuCores));
+	PE_parse_boot_argn("zorn_smp_preflight",&cpuSmp,sizeof(cpuSmp));
+	PE_parse_boot_argn("zorn_smp_continue",&cpuContinue,sizeof(cpuContinue));
+	PE_parse_boot_argn("zorn_smp_root_publish",&cpuPublish,sizeof(cpuPublish));
+	PE_parse_boot_argn("zorn_smp_stop",&cpuStop,sizeof(cpuStop));
+	PE_parse_boot_argn("zorn_data_store",&cpuStore,sizeof(cpuStore));
+	PE_parse_boot_argn("zorn_data_retained",&cpuRetained,sizeof(cpuRetained));
+	PE_parse_boot_argn("zorn_brightness",&cpuBrightness,sizeof(cpuBrightness));
+	PE_parse_boot_argn("zorn_touch",&cpuTouch,sizeof(cpuTouch));
+	bool cpuFixedProfile=false;
+#if defined(ZORN_SMP_PREFLIGHT) && ZORN_SMP_PREFLIGHT && defined(ZORN_DATA_8G) && ZORN_DATA_8G && defined(ZORN_RAM_DATA) && ZORN_RAM_DATA && defined(ZORN_TOUCH_RUNTIME_ENABLED) && ZORN_TOUCH_RUNTIME_ENABLED
+	cpuFixedProfile=cpuCores==8 && cpuSmp==8 && cpuContinue==1 && cpuPublish==1 && !cpuStop &&
+	    cpuStore==2 && cpuRetained==1 && cpuBrightness==3 && cpuTouch==6;
+#endif
+	zorn_cpu_active_configure(cpuFixedProfile && cpuActive==1 && cpuProgress==1 && cpuTrace==1 &&
+	    !cpuUserStack && !cpuKernelStack && gGuiWatch && gGuiHoldSeconds==300 &&
+	    gWatchdogMode==1 ? 1 : 0,gTraceEpoch);
+
 	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	gLogArmed = true;
 	if (zorn_write_log4k(&gLogBlock) != kIOReturnSuccess) {

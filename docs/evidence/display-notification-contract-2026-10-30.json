@@ -1,0 +1,102 @@
+{
+  "audited_at": "2026-10-30T14:22:59.967159+08:00",
+  "static_only": true,
+  "boot_sha256": "6aea024fab3d1b4e69e99b45b5c1040e322df08bb5ba77038300cf71a398bc7e",
+  "kernel_sha256": "c333be205c64b187aaca848db5033f5a79b8dcc9c4aa9468c91a8d686d26a1e8",
+  "log_sha256": "136bc0cfb31af36e9c145bbc239bf017f661f7b017b8aaba9780b1fd830b5c9b",
+  "inputs_verified": 233,
+  "archive_files_verified": 55,
+  "original_family_executable_sha256": "2e044ee68c1650397e1435234ca6459206262e4c7ed709cb7131c6f664f9bd9b",
+  "verified_instruction_sites": 24,
+  "registration": {
+    "selector": 72,
+    "scalar_inputs": 4,
+    "action": "0xfffffff00577a658",
+    "scalar2_is_type": true,
+    "type_range": "unsigned <6",
+    "callback_nonzero_registers": true,
+    "callback_zero_removes": true,
+    "provider_offset": 216,
+    "registration_slot": 208,
+    "removal_slot": 209,
+    "optional_success_slot": 210,
+    "queue_base": 5512,
+    "queue_stride": 16,
+    "vsync_type": 5,
+    "vsync_head_offset": 5592,
+    "type5_path": "0xfffffff005796050",
+    "type5_calls_slots": [
+      316,
+      290
+    ]
+  },
+  "sender": {
+    "address": "0xfffffff005796720",
+    "head_offset": 5592,
+    "words": 6,
+    "option": 1,
+    "call_target": "0xfffffff0057778c0",
+    "proves_user_receipt": false
+  },
+  "refresh": {
+    "original_getter": "0xfffffff00579ea5c",
+    "original_minimum_32_32": "0x04444444",
+    "original_publisher": "0xfffffff00579ebb8",
+    "property": "IOMFBDisplayRefresh",
+    "native_publish_and_observer_rate_range": [
+      61,
+      240
+    ],
+    "actual_menu_hz": 60,
+    "zero_properties_does_not_prove_no_query": true
+  },
+  "runtime_from_bound_previous_trial": {
+    "started": 1,
+    "armed": 0,
+    "sent": 0,
+    "idle": 0,
+    "late": 0,
+    "properties": 0,
+    "retired": 9,
+    "camera_lock_screen": true,
+    "new_phone_run": false
+  },
+  "supported_conclusions": [
+    "Type5 registration and original sender use exactly the head offset inspected by vsyncWanted; no static offset mismatch found.",
+    "Selector72 is generic notification registration; only scalar2=5 chooses the vsync queue. Invocation and success are not captured here.",
+    "At actual60Hz the linked subclass skips publishing refreshed properties and skips event5 even if its getter is queried.",
+    "Timer-start1 establishes setup reached its observed point; zero arm/sent counters do not identify the actual client or capture queue contents.",
+    "This successful lock-screen sample does not explain the older Apple-logo failure; source heartbeat comments are not consumer/runtime proof."
+  ],
+  "unmeasured": [
+    "actual selector72 calls/returns/type/client identity",
+    "queue contents at each arm attempt",
+    "user-space notification receipt or exact fallback pacing",
+    "target overhead/performance/long-term stability"
+  ],
+  "changes": {
+    "native_code": false,
+    "shared_family": false,
+    "queue_behavior": false,
+    "phone_io": false,
+    "built_image": false,
+    "default_boot": false
+  },
+  "next_action": "Retain current diagnosis and recovery state; do not force notification or raise refresh rate. No additional phone test is justified by zero counters alone. A future independently warranted GUI-failure run should use verified v19 and compare retirement progress before proposing more instrumentation.",
+  "disassembly_files": {
+    "native-getRefreshAttributes.asm.txt": "556983f64c96240156139ed2e4d7bb07675f6256e13c2df0045cebebd5d62886",
+    "native-registerService.asm.txt": "5d092bb5d931a3e94ccc6d7da9717ec9e5832fc99415becc9675e89aca359949",
+    "publish.asm.txt": "ebb5487056c75da8ae2acc7021653e1e304c048def7acd90a794af500c9de8c1",
+    "refresh.asm.txt": "48e6cf9a66ea8e424b90f3084c2fed3adc73fe63de85308efb199aec0800c6b4",
+    "register-client.asm.txt": "739200b67c80d37797da5a9f19cf5becbaafe3a6513edcd901a5e93f5a232f7b",
+    "register.asm.txt": "d803957025d3d9bd5fd1ff231c6e2589b0ac05e7f0839a67be36915a5ff61472",
+    "selector72.asm.txt": "a70c42301ef3f0fde62c34d9ced06d730826a68ef75bfa9ea96fc50848cb2985",
+    "sender-tail.asm.txt": "0cedd546de7c84ec0e754f57aba6daf8787b75d2441f53441915f15a8ac01dab",
+    "sender.asm.txt": "b67bd428d1839c6fc0655a4d85734879aef0f2df342f7759cb9b89b6d9748f29",
+    "type5-switch.asm.txt": "bc11afaf491b0c74164b6974a8f09292d40cb96236c0d89c9abc8bb1f8dcabac"
+  },
+  "audit_script_sha256": "b7117e3e529771004ef770988d6d4826b1ee1b8704d241b84c05b1fc46409cbc",
+  "local_full_report": "out/zorn/display-progress/contract-audit/result.json",
+  "local_full_report_sha256": "f0f522d37e7b988bb11ba8ca5497e0cb89cc6547064ca83efb66ac6975339178",
+  "local_audit_script": "out/zorn/display-progress/contract-audit/verify-contract.py"
+}

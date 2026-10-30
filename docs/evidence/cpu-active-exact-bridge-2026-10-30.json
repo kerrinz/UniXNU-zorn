@@ -1,0 +1,129 @@
+{
+  "recorded_at": "2026-10-30T17:24:19.772169+08:00",
+  "isolated_only": true,
+  "production_integrated": false,
+  "new_kernel": false,
+  "new_image": false,
+  "phone_operations": false,
+  "allow_boot": false,
+  "target": {
+    "original_inputs": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/out/zorn/smp/runtime/ArmCpu.cpp": "11753db6605f89940f5cb9046a21bf6448f15ac62ab734af8b3e12891126fbf2",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/out/zorn/smp/runtime/ZornSmpRuntime.inc": "8c57d9ddbc60d8972ba25da549ffa5b4cd837eb2e350ead446981b56e2ca52ef",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/out/zorn/smp/runtime/ZornSmpPolicy.h": "1689210cb305a2de5457843365d7eb9db220ee0b1d0e164a48226b8752462477",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/build/armcpu/compile-command.json": "ae1e377d29b35dd459edae4b3d85bd95206aba683e19797a2df998cf8e8476b2",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json": "446baf4831e90894687c5d1d245e8d7cffb9eb438c4131b2e52892d16ab18894",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/osfmk/DEVELOPMENT/processor.o.json": "9faa21bbec9ebc1c9935999f4113af9db2ea612d3bf5c74d7e5b8a3f6e6f7f21"
+    },
+    "original_objects": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/build/armcpu/ArmCpu.o": "e29ceaa343ade7d2aecb4f3cbb07504d3b7bc3c9c54f538f30e44930a7a378b6",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/osfmk/DEVELOPMENT/processor.o": "f97e8cb6dca244a297ae251be719c107495103586c4a265ad75ca7a4b8b0c39d"
+    },
+    "original_objects_unchanged": true,
+    "board_object": "0531629db41baad0dded7bec767266b11b60bfcce95b72d9bef66b7079b4b545",
+    "kernel_object": "56650a8931a04762916a22cfb133955232d83dbe8afb60678eb8e6192cbe1d31",
+    "production_integrated": false,
+    "phone_operations": false
+  },
+  "host": {
+    "asan_ubsan_pass": true,
+    "deterministic_controls": 59,
+    "snapshot_getter_does_not_dereference_board_objects": true,
+    "failed_reads_preserve_output": true,
+    "fake_positive_clock_forbidden": true
+  },
+  "audit": {
+    "source_sha256": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/kern/processor.c": "4a7ee2f14535c834adf27795d36ddfa5eb99198527aeb8e9c04cd0d0dc5ecb20",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/kern/processor.h": "ee2cdda4b024833a5fcc2ace950be483a3520d6ffa24744c9eebaafe830647f6",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm/cpu_common.c": "24a343871cb75180b9417c12d15bd0ff0a068b4a2645a1e91fade0122dff8610",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm64/cpu.c": "98c771788fde883817d14538363ab50bdfc2efb64cefea18cc33f3349ce8d679",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm64/machine_routines.c": "88b1fbb7dfae80258e2b6965d5e87792cb35a2293409c1919a3ae75927a13a5e",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm/machine_routines_common.c": "a349b1d0582e9e5a552543d1454e54454c6f2f31df7c161892f5b02bc9636ced",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm/rtclock.c": "9183bde501b31a0934b5eeca0560bcaa4dcfc3c0e05336e161173a0b2125bc01",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm/rtclock.h": "df78b4c8d7d61773e713f33545d77b5ee5cb3d90320a6a36f6957c6928cebab2",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/kern/clock.c": "001630fcf2089f7f8df7c39ee79f8ba9279b84aa06ec5d8883b016eb15fdc5b1",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/pexpert/arm/pe_init.c": "b0a16fd068f06e8bd4f91cc1b64ddd751ad65ecaf3d80f5540882d1e97f69d5e",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/Kernel/IOCPU.cpp": "e32ee45c0702366e14a936ad1324e379625e3ca605e282d856acc4cc8c20b24f",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/IOKit/IOCPU.h": "8292b37feace49994f844eec9b9e3f46c7703391084f8430afa3a15f5bffc131",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/bsd/kern/bsd_init.c": "4c5e0dadfcd29b2439b8321d2befa858ddf00303a8f032fa368c1d1cc7723d14"
+    },
+    "read_only_source_findings": [
+      "processor PERCPU_DATA is boot-reserved storage; ml_processor_register returns PERCPU_GET_RELATIVE and initializes cpu_id, then returns success. Sole cpu_data_free call is registration-error cleanup and frees stacks, not processor PERCPU storage.",
+      "Original coordinator acquire-dequeues secondary retained refs, completes registration/start/bound/remap, release-publishes done; original preflight acquire-checks all success and release-publishes phase80 before inactive0.",
+      "Candidate snapshots public IOCPU getter handles/CPU numbers under original successful preflight before inactive0; table-ready release precedes inactive0 release. Getter acquire-checks both and never touches IOCPU objects later. No new retain/release or object offsets.",
+      "Fixed compiled cpu_common profile has HAS_CLUSTER/USE_APPLEARMSMP absent (=0); native ml_cpu_can_exit is a call to ml_is_quiescing then bool normalize. Bridge refuses detected quiesce and availability!=8 before and after read; it does not prove no transition occurred between observations.",
+      "processor_avail_count writers are os_atomic increments/decrements. Bridge avoids processor scheduler-state fields and locks; immutable processor cpu_id is checked through actual private header.",
+      "ARM PE timebase callback supplies integer timebase_frequency_hz/den1; rtclock callback installs reduced ratio and second divisor. clock_timebase_init writes hz_tick_interval from10ms. clock bridge compares ratio conversion against actual one-second divisor with zero/change/range checks; no source timebase writes.",
+      "Caller insertion is planned after existing GUI tsleep, before user_output/proc_iterate/VFS. Actual gTraceEpoch lives in UFS code and is not bridged by this candidate yet."
+    ],
+    "getter_no_calls_or_backedges": true,
+    "new_interfaces_absent_from_current_6aea": true,
+    "offline_scope": "Detected offline/quiesce/change is unavailable; fixed profile only, no claim of atomic online snapshot or hotplug support.",
+    "clock_scope": "No live runtime measurements. Separate relaxed clock reads rely on audited post-boot fixed-timebase context and reject observable changes, not an atomic multiword snapshot.",
+    "initial_failures": [
+      "Board recipe initially run from osfmk directory selected incorrect relative headers, compile rejected; full log retained, corrected to actual iokit recipe directory. Original objects untouched.",
+      "Host test initializer_list include error avoided by explicit array; no target behavior change."
+    ],
+    "production_linked": false,
+    "native_offline_gate_call_relocation": "0000000000000fe4 ARM64_RELOC_BRANCH26     _ml_is_quiescing"
+  },
+  "baselines": {
+    "6aea024f": {
+      "current_inputs": 233,
+      "mismatches": []
+    },
+    "25a4e9c0": {
+      "current_inputs": 231,
+      "mismatches": []
+    },
+    "archive6aea_files": 55,
+    "default_boot_sha256": "42f3d5183b67bd42b2e02ec1d193ba888d0e6c2dc4cd50dafab2211ce589583e",
+    "original_two_sweep_artifacts_unchanged": true
+  },
+  "scope": "Exact source/candidate object and deterministic host checks, not final kernel linking or runtime CPU measurements.",
+  "unresolved": [
+    "Real GUI caller/epoch hook, transport ownership/cadence and main guarded integration pending.",
+    "Host shim does not prove XNU object layout; exact target compile uses real private/exported headers.",
+    "Clock/availability reads are separate; reject observed changes, not an atomic simultaneous snapshot. No weak-memory formal proof or live timing qualification.",
+    "Bounded reader kernel implementation is separately checked; current bridge host test injects helper results. Whole final call chain has not been linked/qualified."
+  ],
+  "next_plan": "out/zorn/cpu-load-design/exact-bridge/integration-next-plan.json",
+  "artifacts": {
+    "out/zorn/cpu-load-design/exact-bridge/host-result.json": "1809defc675c20d93a39a1b25b5ed4fd9d6eeef14dd0450330920e5c025a85f8",
+    "out/zorn/cpu-load-design/exact-bridge/ArmCpu.bridge.o.undefined.txt": "5cc78b2ae71e19349c4b7bc3794cf8e38aaaa0b8c1e912b2301f5c591eb67a49",
+    "out/zorn/cpu-load-design/exact-bridge/source-and-target-audit.json": "75d2922576a7e33a015c06783e8fe3f55d258e5059be84a08621ca1fd0fc0d42",
+    "out/zorn/cpu-load-design/exact-bridge/board-compile.log": "37c9279fecafbc4cd41a8bf1948980befe0d0cc14b9fb2cb93af4b7d6e112bee",
+    "out/zorn/cpu-load-design/exact-bridge/native-offline-gate.asm.txt": "d909037f51ea6b6787027610a2b9d19d426fd05194a86f20359c4409eaa4b7cf",
+    "out/zorn/cpu-load-design/exact-bridge/integration-next-plan.json": "097d66fb8e40b02f92f96a4e03de99c5c421f57281f616e313e878293ad71eb0",
+    "out/zorn/cpu-load-design/exact-bridge/prepare-and-compile.py": "f1ca8e3457c33bc3fdd1daa1f4a6733bcc264ae12e35579c2cd6e171bcb4744b",
+    "out/zorn/cpu-load-design/exact-bridge/active-kernel-bridge.c": "8bc5308bf8fef7910c804caf9c74ed2641455bd11630f343d8b3ca40bc94ac55",
+    "out/zorn/cpu-load-design/exact-bridge/baseline-check.json": "8bf46e43faa9d9b76116fdf029e68f73d8269eca2672edf9dfb899fe669fbf5c",
+    "out/zorn/cpu-load-design/exact-bridge/ZornSmpRuntime.inc": "076587200142fd80e475650554fcd5ee203d451c63069ca28ac953e2a127169b",
+    "out/zorn/cpu-load-design/exact-bridge/kernel-host-test.o": "0906c2a3eb93fd71025f5bf1d01a6da3d4db36f10ec1b5ae5c8628af833125d6",
+    "out/zorn/cpu-load-design/exact-bridge/target-compile-result.json": "61b497a328b8d68707ea86a029ba290ddae2220e67d2d084ac30d8ef25adec6d",
+    "out/zorn/cpu-load-design/exact-bridge/runtime-candidate.patch": "c6e8eb7101843fba143bb41f36d209725cd5cb61e024f539091ec8049294a7b8",
+    "out/zorn/cpu-load-design/exact-bridge/kernel-command.json": "77779978fa6fd02effc80f5a659299f0846e085faf81b46ba1f1ea5cccb634b3",
+    "out/zorn/cpu-load-design/exact-bridge/bridge-host-test": "035a0d5358afbd53ceff60580dbb75601762f6a52c84cf801238a89e8b4945e0",
+    "out/zorn/cpu-load-design/exact-bridge/active-handles.inc": "3aa15fa64c6247f0fd3ebccaddf38c44ba356236423ef66941c7f5f0403fb42f",
+    "out/zorn/cpu-load-design/exact-bridge/board-getters.asm.txt": "2d79de1f5b49a176a3f7434d72d04d82e5969e36505524683475f4b27310aaff",
+    "out/zorn/cpu-load-design/exact-bridge/kernel-bridge.asm.txt": "b9dc9cf56edeb3f893735850dd04db1eba90b100b3903deb37874ba4d0e06719",
+    "out/zorn/cpu-load-design/exact-bridge/cpu-common-relocations.txt": "a0aa2c9e972c6c5e5aa270c296923561049e0605109c98b6917f1e1ffba3a86b",
+    "out/zorn/cpu-load-design/exact-bridge/ZornSmpPolicy.h": "1689210cb305a2de5457843365d7eb9db220ee0b1d0e164a48226b8752462477",
+    "out/zorn/cpu-load-design/exact-bridge/active-kernel-bridge.o": "56650a8931a04762916a22cfb133955232d83dbe8afb60678eb8e6192cbe1d31",
+    "out/zorn/cpu-load-design/exact-bridge/bridge-host-shim.h": "b1ffc7c10cdd5064882a4a1572dbe9a7b183ead64907b1f742a45bd710d0a8f9",
+    "out/zorn/cpu-load-design/exact-bridge/board-initial-wrong-cwd.log": "24e06b098feb31772ea5e2b6bbc324f02f3ef687e4dd9544ed75822fcb540d37",
+    "out/zorn/cpu-load-design/exact-bridge/kernel-compile.log": "bfbdbe94fcc1b3615dce589116b0a12dc5ab77a176e2c46662470a57ba9f2cde",
+    "out/zorn/cpu-load-design/exact-bridge/bridge-host-test.cpp": "cd5e76f899a94d92cbe2b5504dca10cf9da80a1452945a79d125e6b62c309159",
+    "out/zorn/cpu-load-design/exact-bridge/active-kernel-bridge.o.undefined.txt": "bad382f248089e6f213e69c6d70d321977317003272880b5f822d55e6c6bfd58",
+    "out/zorn/cpu-load-design/exact-bridge/board-command.json": "7afadd94778ae113e3d24078e681c47e88045c54241c25f850dd21cbcfb86cc4",
+    "out/zorn/cpu-load-design/exact-bridge/ArmCpu.cpp": "11753db6605f89940f5cb9046a21bf6448f15ac62ab734af8b3e12891126fbf2",
+    "out/zorn/cpu-load-design/exact-bridge/ArmCpu.bridge.o": "0531629db41baad0dded7bec767266b11b60bfcce95b72d9bef66b7079b4b545",
+    "out/zorn/cpu-load-design/exact-bridge/preimage/ZornSmpRuntime.inc": "8c57d9ddbc60d8972ba25da549ffa5b4cd837eb2e350ead446981b56e2ca52ef",
+    "out/zorn/cpu-load-design/exact-bridge/preimage/ZornSmpPolicy.h": "1689210cb305a2de5457843365d7eb9db220ee0b1d0e164a48226b8752462477",
+    "out/zorn/cpu-load-design/exact-bridge/preimage/ArmCpu.cpp": "11753db6605f89940f5cb9046a21bf6448f15ac62ab734af8b3e12891126fbf2",
+    "out/zorn/cpu-load-design/exact-bridge/bridge-host-test.dSYM/Contents/Info.plist": "6d0f82686b7005a676301f47299155c2929577ad83e85101a10529d5d9144c41",
+    "out/zorn/cpu-load-design/exact-bridge/bridge-host-test.dSYM/Contents/Resources/DWARF/bridge-host-test": "087f782d2e469357764912f7030dd3b70d24ebd665aef109ecffcc8fc2e68146",
+    "out/zorn/cpu-load-design/exact-bridge/bridge-host-test.dSYM/Contents/Resources/Relocations/aarch64/bridge-host-test.yml": "4b8c1df25455913b3fbdd46555fcd4d2f8bcffcc5927e04c923a07913d2a8f0f"
+  }
+}

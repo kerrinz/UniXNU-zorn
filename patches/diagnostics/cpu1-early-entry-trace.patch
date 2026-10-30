@@ -1,0 +1,193 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -138,6 +138,26 @@
+  */
+ 	.text
+ 	.align 12
++
++// K80 diagnostic layer only. x16-x18 are scratch in the instrumented paths;
++// preserve all incoming context, table registers, stack pointers and LR.
++.macro ZORN_SECONDARY_STAGE number
++    mrs     x16, MPIDR_EL1
++    ubfx    x16, x16, #8, #8
++    cmp     x16, #8
++    b.hs    99f
++    adrp    x17, EXT(zorn_cpu1_trace)@page
++    add     x17, x17, EXT(zorn_cpu1_trace)@pageoff
++    add     x17, x17, x16, lsl #6
++    mov     x18, #\number
++    str     x18, [x17]
++.if \number >= 7
++    dc      cvac, x17
++.endif
++    dsb     sy
++99:
++.endmacro
++
+ 	.globl EXT(LowResetVectorBase)
+ LEXT(LowResetVectorBase)
+ 	/*
+@@ -177,6 +197,7 @@
+ 
+ 
+ 
++	ZORN_SECONDARY_STAGE 1
+ 	// Process reset handlers
+ 	adrp	x19, EXT(ResetHandlerData)@page			// Get address of the reset handler data
+ 	add		x19, x19, EXT(ResetHandlerData)@pageoff
+@@ -187,6 +208,7 @@
+ 	and		x0, x15, #0xFF						// CPU number is in MPIDR Affinity Level 0
+ #endif
+ 	ldr		x1, [x19, CPU_DATA_ENTRIES]			// Load start of data entries
++	ZORN_SECONDARY_STAGE 2
+ 	add		x3, x1, MAX_CPUS * 16				// end addr of data entries = start + (16 * MAX_CPUS)
+ Lcheck_cpu_data_entry:
+ 	ldr		x21, [x1, CPU_DATA_PADDR]			// Load physical CPU data address
+@@ -200,6 +222,7 @@
+ 	b.eq	Lskip_cpu_reset_handler				// Not found
+ 	b		Lcheck_cpu_data_entry	// loop
+ Lfound_cpu_data_entry:
++	ZORN_SECONDARY_STAGE 3
+ 
+ 
+ 	adrp	x20, EXT(const_boot_args)@page
+@@ -231,6 +254,7 @@
+ 	msr		TPIDR_EL1, x13
+ #endif /* __ARM_KERNEL_PROTECT__ */
+ 
++	ZORN_SECONDARY_STAGE 4
+ 	blr		x0
+ Lskip_cpu_reset_handler:
+ 	b		.									// Hang if the handler is NULL or returns
+@@ -273,40 +297,40 @@
+ 	.global	EXT(LowExceptionVectorBase)
+ LEXT(LowExceptionVectorBase)
+ 	/* EL1 SP 0 */
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
+ 	/* EL1 SP1 */
+ 	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
+ 	/* EL0 64 */
+ 	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
+ 	/* EL0 32 */
+ 	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
+-	.align	7
+-	b		.
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
++	.align	7
++	b		EXT(zorn_secondary_exception)
+ 	.align 12, 0
+ 
+ #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
+@@ -335,6 +359,7 @@
+ 
+ 	.align 2
+ start_cpu:
++	ZORN_SECONDARY_STAGE 5
+ #if defined(KERNEL_INTEGRITY_KTRR) || defined(KERNEL_INTEGRITY_CTRR)
+ 	// This is done right away in reset vector for pre-KTRR devices
+ 	// Set low reset vector now that we are in the KTRR-free zone
+@@ -816,8 +841,14 @@
+ 	ZORN_FB_BAND 3, 0xFFFF, 0xFFFF
+ 	// Enable caches, MMU, ROP and JOP
+ 	MOV64   x0, SCTLR_EL1_DEFAULT
++	cbz x21, 97f
++	ZORN_SECONDARY_STAGE 6
++97:
+ 	MSR_SCTLR_EL1_X0
+ 	isb		sy
++	cbz x21, 98f
++	ZORN_SECONDARY_STAGE 7
++98:
+ 
+ #if !VMAPPLE
+ 	MOV64   x1, SCTLR_EL1_DEFAULT
+@@ -896,6 +927,7 @@
+ 	add		x0, x0, x22
+ 	sub		x0, x0, x23
+ 
++	ZORN_SECONDARY_STAGE 8
+ 	// Branch to the trampoline
+ 	br		x0
+ 
+@@ -949,3 +981,31 @@
+ //#include	"globals_asm.h"
+ 
+ /* vim: set ts=4: */
++
++
++// Early exceptions keep the last good stage; no stack or C calls required.
++// Only the failing core's dedicated 64-byte diagnostic slot is written.
++.text
++.align 2
++.globl EXT(zorn_secondary_exception)
++LEXT(zorn_secondary_exception)
++    mrs     x16, MPIDR_EL1
++    ubfx    x16, x16, #8, #8
++    cmp     x16, #8
++    b.hs    99f
++    adrp    x17, EXT(zorn_cpu1_trace)@page
++    add     x17, x17, EXT(zorn_cpu1_trace)@pageoff
++    add     x17, x17, x16, lsl #6
++    mrs     x18, ESR_EL1
++    str     x18, [x17, #8]
++    mrs     x18, ELR_EL1
++    str     x18, [x17, #16]
++    mrs     x18, FAR_EL1
++    str     x18, [x17, #24]
++    mrs     x18, SCTLR_EL1
++    str     x18, [x17, #32]
++    mov     x18, #0xee
++    str     x18, [x17, #40]
++    dsb     sy
++99:
++    b       99b

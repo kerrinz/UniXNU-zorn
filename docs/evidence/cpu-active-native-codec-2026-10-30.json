@@ -1,0 +1,105 @@
+{
+  "recorded_at": "2026-10-30T16:56:53.033790+08:00",
+  "isolated_only": true,
+  "production_integrated": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "codec_cross_check": {
+    "isolated_only": true,
+    "production_integrated": false,
+    "phone_operations": false,
+    "native_python_byte_exact_cases": 258,
+    "legacy_field_roundtrips": 2,
+    "production_reader_rejected_experiment_cases": 258,
+    "crc_valid_semantic_refusals": 6,
+    "length_refusals": 5,
+    "epoch_overflow_refusals": 4,
+    "mask_overflow_refusals": 2,
+    "boundary_u32_u64_metadata_roundtrip": true,
+    "unknown_source_versions_refused": 4,
+    "double_pack_refused": true,
+    "unused_high_bits_refused": true,
+    "source_blob_size": 4096,
+    "legacy_footer_size": 3072,
+    "logical_text_slots": 84,
+    "payload_size": 166,
+    "input_envelope_validation": "ring count/next, magic/version; full legacy schema still belongs to legacy reader",
+    "strict_decoder_difference": "Unlike the frozen capacity model, strict native/Python decoders also reject CRC-valid invalid time/ring metadata.",
+    "crc_is_authentication": false,
+    "target_overhead_measured": false,
+    "artifacts": {
+      "active-log-codec.c": "cf2566febf0555085903e59d9a6368622633216c0c67d112a0595903bcd26d9d",
+      "active-log-codec.h": "5eb8edd9b9da2066d2b33125d809d3149f528ba44238365b858efed9ff51de5e",
+      "active_log_decoder.py": "64edc790a7b5bd4c0368f1660b5d191fbf8e59398a08ea1f3651bbb84dcd7c11",
+      "active-log-host-test.c": "9f3d836bfec3125237e7875844b7650247d0206cb0d7cea9bfcb00b5126ca704",
+      "check-native-active-codec.py": "7962c5a7064ef52665e795e936c6d5231416561d89c6af6acafc36dd92e62629"
+    }
+  },
+  "target_compile": {
+    "actual_arm64_recipe_compile": true,
+    "actual_recipe_sha256": "9faa21bbec9ebc1c9935999f4113af9db2ea612d3bf5c74d7e5b8a3f6e6f7f21",
+    "source_sha256": "cf2566febf0555085903e59d9a6368622633216c0c67d112a0595903bcd26d9d",
+    "object_sha256": "aa4a5fdb8b53c20dd0bcecc546c6e782cf7b74986abd0895b7a4fefe96d14f26",
+    "undefined_symbols": [],
+    "original_object_sha256": "f97e8cb6dca244a297ae251be719c107495103586c4a265ad75ca7a4b8b0c39d",
+    "original_object_changed": false,
+    "production_linked": false,
+    "initial_dependency": "Compiler generated memcpy for aggregate output assignment; initial report preserved, changed to explicit member publication, all qualification tests rerun.",
+    "header_sha256": "5eb8edd9b9da2066d2b33125d809d3149f528ba44238365b858efed9ff51de5e",
+    "observed_encode_stack_bytes": 80,
+    "observed_decode_stack_bytes": 688,
+    "full_page_scratch_is_caller_supplied": true,
+    "stack_numbers_are_local_object_not_final_call_chain": true
+  },
+  "native_host_test": {
+    "asan_ubsan_pass": true,
+    "full_roundtrips": 256,
+    "all4096_byte_position_corruption_refusals": true,
+    "counter_overflows": 32,
+    "text_incompatibility_refusals": 1008,
+    "alias_and_metadata_and_failed_output_preservation": true
+  },
+  "next_plan": {
+    "stage": "collector-design-after-isolated-native-codec",
+    "no_phone_boot_yet": true,
+    "source_sha256": {
+      "out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/bsd/kern/bsd_init.c": "4c5e0dadfcd29b2439b8321d2befa858ddf00303a8f032fa368c1d1cc7723d14",
+      "out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/kern/clock.c": "001630fcf2089f7f8df7c39ee79f8ba9279b84aa06ec5d8883b016eb15fdc5b1",
+      "out/zorn/repro-20261029/path-normalized/UniXNU/out/zorn/tree/.cache/xnu-work/osfmk/arm64/machine_routines.c": "88b1fbb7dfae80258e2b6965d5e87792cb35a2293409c1919a3ae75927a13a5e",
+      "out/zorn/repro-20261029/path-normalized/out/zorn/smp/runtime/ArmCpu.cpp": "11753db6605f89940f5cb9046a21bf6448f15ac62ab734af8b3e12891126fbf2",
+      "UniXNU-zorn/native/smp/ZornSmpRuntime.inc": "8c57d9ddbc60d8972ba25da549ffa5b4cd837eb2e350ead446981b56e2ca52ef"
+    },
+    "candidate_caller": "Existing bsd_init.c zorn_gui_sample_thread, immediately after tsleep and before proc_iterate, any logging and VFS access; not generic exec/runtime_snapshot caller",
+    "existing_caller_period_seconds": 15,
+    "proposed_timing_ms": {
+      "first_eligible": 60000,
+      "first_latest": 120000,
+      "second_eligible": 240000,
+      "second_latest": 270000,
+      "reference": "existing trace epoch, record actual sweep begin/end; late/missing is error, never shift watchdog deadline"
+    },
+    "kernel_clock_contract": "clock_timebase_init initializes hz_tick_interval from NSEC_PER_SEC/100; verify actual value and convert mach interval to nanoseconds, reject zero/change/overflow. Do not infer physical CPU MHz.",
+    "publication_requirements": [
+      "Gate on acquire-read of zorn_smp_preflight_active==0 plus existing phase80, coordinatorDone, boundff, failure0 and tlb-ready; mere gZornCpus nonnull is insufficient because it precedes registration.",
+      "Use actual generated8core adapter machProcessor handles; ml_processor_register returns perCPU processor storage. Verify CPU IDs with exact types and fixed no-hotplug/unload scope before access.",
+      "Normal thread; at most3 active-reader attempts/core, no locks/wait/interrupt disabling/IPI/bind."
+    ],
+    "capture_publication": "Single GUI sampler owns first and second sweep BSS. Publish immutable finalized capture only with release READY; packer uses acquire READY, no shared mutable struct read during collection. Preserve failure flags/status and missing masks.",
+    "remaining_errors_design": "Before freezing production payload choose an exact representation for each core/epoch helper status(OK/BUSY/INVALID/OVERFLOW), lateness and clock conversion; current166B candidate is v1 capacity/codec, not yet sufficient evidence that every acquisition error is represented.33 spare bytes are available; any revised payload needs explicit version and new cross-checks.",
+    "transport_integration_requirements": [
+      "Canonical gLogBlock remains D/v19 in RAM; use owned separate stable transport buffer/scratch for optional E/20 output, never leave canonical producer ring packed.",
+      "No extra persistent range: existing4096B write only. Feature off/fallback returns exact existing block.",
+      "Account for packing/CRC CPU cost at actual write cadence; no target-overhead claim from host test.",
+      "Preserve original immutable6aea/raw231 proof; back up/record any new source synchronization before integration."
+    ],
+    "next_action": "Implement isolated two-sweep state machine with injected clock/registration/read hooks and explicit per-core errors; test late/absent/duplicate/out-of-order/clock-change/partial-core/reader-busy/immutable-publication behavior. Resolve all representation and lifetime gates before main-source integration."
+  },
+  "limits": [
+    "No finalkernel/link/source manifest/payload or hardware qualification.",
+    "CRC is corruption detection, not authentication.",
+    "Input envelope is checked by codec; full restored legacy schema remains checked by legacy reader.",
+    "Private stable inputs and exclusive disjoint buffers are a caller requirement; no new concurrent sampling/persistence implementation exists."
+  ],
+  "local_full_report": "out/zorn/cpu-load-design/native-codec-combined-result.json",
+  "local_full_report_sha256": "52444d0c81e766ec221359e54229c349c12b0e5c29f18b2b225ed9a684b74d82"
+}

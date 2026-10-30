@@ -1,3 +1,4 @@
+# Format2 configuration. Legacy debug entry uses compat/legacy/board.toml; see docs/repository-format.md.
 # Redmi K80 (zorn), 12GB+256GB, SM8650-AB. Read by the unixnu build driver.
 # RAM boot only for the kernel image. [userdata] is the iPadOS 17.7.11 volume
 # file built by `unixnu build userdata`. That file was written to userdata on
@@ -7,16 +8,25 @@
 # The tested boot image is packed by uefi-zorn/scripts, because the generic
 # payload step does not use 512-byte FAT clusters.
 
+schema_version = 2
+
 [board]
 name = "zorn"
 soc = "SM8650"
-# Record identity only: the existing build remains schema 1 (no profile merge).
+soc_source = "zorn-sm8650"
 os_profile = "ipados-17.7.11-21H461"
 description = "Redmi K80 12GB+256GB"
 kit = "zorn"
 
 # Darwin 23.6 kernel. Same unpatched iPad7,1 / 17.7.11 image as UniXNU-sheng.
 # Use UNIXNU_IPSW or the debug builder --ipsw option for a local IPSW.
+[components]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "AppleKeyStoreState", "RamBlock", "VerifiedRoot", "GopFramebuffer", "XnuPrelink", "DarwinBoot"]
+
+[device_tree]
+source = "device:dts/zorn.dts"
+include_dirs = ["soc:dts"]
+
 [ipsw]
 url = "https://updates.cdn-apple.com/2025SpringFCS/fullrestores/122-77166/DCA6CFE8-90E9-4B92-880D-3DE171798E40/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw"
 product = "iPad7,1"
@@ -47,11 +57,18 @@ name = "SystemOS"
 component = "Cryptex1,SystemOS"
 
 [kernel]
-defconfig = "zorn_defconfig"
+defconfig = "zorn_union_defconfig"
+config_fragments = ["arch:configs/common.config"]
+# An explicit complete order replaces inherited arrays; see migration notes.
+patch_series = ["device:patches/xnu/series"]
 archives = [
   "build-corecrypto-14.py",
   "build-corecrypto-14.py --namespace",
-  "build-arm-driver.py ArmDTPlatform",
+  "component:ArmDTPlatform",
+  "component:ArmCpu",
+  "component:SoftwareAES",
+  "component:AppleKeyStoreState",
+  "component:RamBlock",
   "build-zorn-cpu.py",
   "build-zorn-aes.py",
   "build-zorn-verified-root.py",
@@ -66,7 +83,7 @@ archives = [
 # Same restore image and prelink pins as UniXNU-sheng. The addresses belong
 # to that iPad7,1 kernelcache, not to the zorn Mach-O.
 [kernel.prelink]
-tool = "kits/NativePrelink/emit_prelink.py"
+tool = "kits/XnuPrelink/emit_prelink.py"
 kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
 kernelcache_sha256 = "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7"
 slide = "-0x1000000"
@@ -151,9 +168,18 @@ trust_cache_sha256 = ["7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235
 kernel_args = ["rd=md0", "-v", "serial=3", "debug=0x14e", "zorn_pmgr=2", "zorn_checkpoint=NOHIT", "zorn_checkpoint_early=1", "zorn_log_only=1", "zorn_trace_compact=1", "zorn_wdt=1", "zorn_hash_budget=120", "zorn_service_trace=1"]
 
 [payload.adt]
-tool = "scripts/make-zorn-adt.py"
-chip_id = "0"
-owned_memory_size = "0x18000000"
+chip_id = "8011"
+unique_chip_id = "required"
+packed_data_ramdisk = true
+persistent_data = true
+owned_memory_size = "0x200000000"
 cpu_regs = "0"
 psci_method = "smc"
 ipad_identity = true
+
+# Keep the existing CPU-rendered OS identity override explicit.
+[adt.product.string]
+artwork-display-gamut = "sRGB"
+
+[adt.defaults.u32]
+sleep-disabled = 1

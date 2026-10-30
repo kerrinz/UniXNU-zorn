@@ -1,0 +1,22 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -938,6 +938,9 @@
+ 	.text
+ 	.align 2
+ arm_init_tramp:
++	.globl EXT(zorn_secondary_virtual_trace)
++LEXT(zorn_secondary_virtual_trace)
++	ZORN_SECONDARY_STAGE 9
+ 	/* On a warm boot, the full kernel translation table is initialized in
+ 	 * addition to the bootstrap tables. The layout is as follows:
+ 	 *
+@@ -973,6 +976,9 @@
+ 	mov		x0, x21
+ 	bl		EXT(phystokv)
+ 
++	.globl EXT(zorn_secondary_after_phystokv)
++LEXT(zorn_secondary_after_phystokv)
++	ZORN_SECONDARY_STAGE 10
+ 	mov		lr, x19
+ 
+ 	/* Return to arm_init() */

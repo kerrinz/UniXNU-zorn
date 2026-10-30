@@ -60,7 +60,20 @@ def from_recovery():
     return result.stdout
 
 
+def _cpu_active_block(block):
+    if block[:8] != b"ZORNLOGE":
+        return None
+    import importlib.util
+    path = Path(__file__).with_name("zorn_cpu_active.py")
+    spec = importlib.util.spec_from_file_location("zorn_cpu_active_bound", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.decode(block)
+
+
 def decode(block):
+    active = _cpu_active_block(block)
+    if active is not None: block = active["original_block"]
     if len(block) != BLOCK_SIZE:
         raise ValueError(f"log block is {len(block)} bytes, expected {BLOCK_SIZE}")
     if block[:8] not in FORMATS:
@@ -120,12 +133,14 @@ def touch_trace(raw):
 
 
 def gui_state(block):
+    cpu_active = _cpu_active_block(block)
+    if cpu_active is not None: block = cpu_active["original_block"]
     if len(block) != BLOCK_SIZE or block[:8] not in (b"ZORNLOG3", b"ZORNLOG4", b"ZORNLOG5", b"ZORNLOG6", b"ZORNLOG7", b"ZORNLOG8", b"ZORNLOG9", b"ZORNLOGA", b"ZORNLOGB", b"ZORNLOGD"):
         return None
     offset = {b"ZORNLOG3": 2176, b"ZORNLOG4": 2080, b"ZORNLOG5": 1960, b"ZORNLOG6": 1696, b"ZORNLOG7": 1648, b"ZORNLOG8": 1624, b"ZORNLOG9": 1192, b"ZORNLOGA": 1168, b"ZORNLOGB": 1120, b"ZORNLOGD": 1024}[block[:8]]
     magic, version, size, tick, stage, pid, sequence, ms = struct.unpack_from("<8s6IQ", block, offset)
     allowed = {b"ZORNLOG3": ((1, 1344), (2, 1920)), b"ZORNLOG4": ((3, 2016),),
-               b"ZORNLOG5": ((4, 2136),), b"ZORNLOG6": ((5, 2400),), b"ZORNLOG7": ((6, 2448),), b"ZORNLOG8": ((7, 2472),), b"ZORNLOG9": ((8, 2904), (9, 2904), (10, 2904)), b"ZORNLOGA": ((11, 2928), (12, 2928), (13, 2928)), b"ZORNLOGB": ((14, 2976), (15, 2976)), b"ZORNLOGD": ((16, 3072), (17, 3072), (18, 3072))}[block[:8]]
+               b"ZORNLOG5": ((4, 2136),), b"ZORNLOG6": ((5, 2400),), b"ZORNLOG7": ((6, 2448),), b"ZORNLOG8": ((7, 2472),), b"ZORNLOG9": ((8, 2904), (9, 2904), (10, 2904)), b"ZORNLOGA": ((11, 2928), (12, 2928), (13, 2928)), b"ZORNLOGB": ((14, 2976), (15, 2976)), b"ZORNLOGD": ((16, 3072), (17, 3072), (18, 3072), (19, 3072))}[block[:8]]
     maximum_tick = 60 if version >= 12 else 20 if version >= 6 else 12
     if magic != b"ZORNGUI1" or (version, size) not in allowed or tick > maximum_tick or stage > (14 if version >= 8 else 12):
         raise ValueError("invalid GUI snapshot header")
@@ -136,6 +151,14 @@ def gui_state(block):
               "pages": {"free": free, "active": active, "inactive": inactive, "wired": wired},
               "ram_data": {"reads": ram[0], "writes": ram[1], "errors": ram[2]},
               "display": list(display), "processes": [], "exits": []}
+    if cpu_active is not None:
+        result["cpu_active"] = {key: value for key, value in cpu_active.items() if key != "original_block"}
+    if version == 19:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("zorn_display_progress", Path(__file__).with_name("zorn_display_progress.py"))
+        decoder = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(decoder)
+        result["display"], result["display_progress"] = decoder.decode(display)
     if version >= 3:
         fields = ("dyld_flags", "owner_dyld_flags", "fixups_parsed", "fixups_applied",
                   "hold_seconds", "watchdog_mode", "owner_stage", "owner_mount_flags")
@@ -203,7 +226,7 @@ def gui_state(block):
     if version >= 8:
         result["user_stacks"] = []
         result["kernel_stacks"] = []
-        if version == 18:
+        if version in (18, 19):
             result["touch_trace"] = touch_trace(block[offset + 2472:offset + 2904])
         else:
             for index in range(3):

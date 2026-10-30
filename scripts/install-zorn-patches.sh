@@ -1,8 +1,8 @@
 #!/bin/sh
 # Copy patches/zorn into a UniXNU checkout's patches/xnu.
 #
-# The device repository must not contain patches/xnu. That directory name is
-# the base patch module, and a device copy would replace it. These files are
+# The format1 compatibility view must not expose patches/xnu. The root's
+# format2 patches/xnu/series is used only by the layered build. These files are
 # applied by the kernel build only after they sit next to the other
 # patches/xnu/*.patch files.
 #

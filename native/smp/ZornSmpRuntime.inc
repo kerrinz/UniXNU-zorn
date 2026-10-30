@@ -19,14 +19,34 @@ extern "C" kern_return_t pmap_enter_options_addr(pmap_t,vm_map_offset_t,uint64_t
     vm_prot_t,vm_prot_t,unsigned int,boolean_t,unsigned int,void *,uint8_t);
 extern "C" void pmap_remove(pmap_t,vm_map_offset_t,vm_map_offset_t);
 extern "C" const pmap_t kernel_pmap;
+extern "C" char start_cpu[], CpuDataEntries[];
+extern "C" vm_offset_t ml_vtophys(vm_offset_t);
+// Darwin23 ARM64 pmap_public.h defines pmap_paddr_t as uint64_t;
+// its private typedef is unavailable in the IOKit driver headers.
+extern "C" uint64_t cpu_ttep;
 extern "C" {
 volatile unsigned zorn_smp_tlb_ready;
 volatile unsigned zorn_smp_preflight_active=1;
+volatile uint64_t zornCpuRootBefore;
+volatile uint32_t zornCpuRootPublish;
+// Explicit assembly diagnostic layer owns one cache line per CPU. CPU0
+// publishes zeroes before CPU_ON, then never writes a secondary's line.
+alignas(64) volatile uint64_t zorn_cpu1_trace[8][8]={};
+}
+static void zornTraceRead(unsigned id,uint64_t out[6]) {
+    uint64_t ctr;__asm__ volatile("mrs %0,ctr_el0":"=r"(ctr));
+    if(id>=8 || (4ULL<<((ctr>>16)&15))!=64){out[0]=~uint64_t(0);return;}
+    auto address=reinterpret_cast<uintptr_t>(&zorn_cpu1_trace[id][0]);
+    // Its only CPU0 store was cleaned/invalidated before the worker started.
+    // Invalidate that clean reader alias before observing MMU-off PA stores.
+    __asm__ volatile("dc ivac,%0\n\tdsb sy\n\tisb"::"r"(address):"memory");
+    for(unsigned n=0;n<6;++n)out[n]=__atomic_load_n(&zorn_cpu1_trace[id][n],__ATOMIC_RELAXED);
 }
 static volatile uint64_t zornCoreMidr[8],zornCoreMpidr[8],zornCoreSys[8][4];
 static volatile uint32_t zornCoreBeats[8],zornCoreTlb[8];
 static volatile uint32_t zornSeen,zornBound,zornPhase,zornFailure,zornAbort,zornCoordinatorDone;
 static volatile uint32_t zornRemapEpoch,zornRemapStop,zornRemapStopped;
+#include "ZornActiveHandles.inc"
 static volatile uint32_t zornRemapAck[8],zornRemapError[8];
 static volatile uint64_t zornRemapObserved[8];
 static volatile uint64_t *zornRemapAlias;
@@ -152,8 +172,68 @@ void ArmCpu::zornReport(bool final,bool pass) {
             __atomic_load_n(&armcpu_smp_step[id],__ATOMIC_ACQUIRE),
             __atomic_load_n(&armcpu_smp_psci_rc[id],__ATOMIC_ACQUIRE),
             __atomic_load_n(&armcpu_smp_fail[id],__ATOMIC_ACQUIRE));
+        if(final && gZornCpus[id] && n>0 && unsigned(n)<sizeof(text)) {
+            // Observation after the existing gate failed, never another CPU_ON.
+            // PSCI 1.0 AFFINITY_INFO64, lowest affinity level zero:
+            // 0=ON, 1=OFF, 2=ON_PENDING; preserve all negative errors.
+            bool hvc=false;
+            int64_t info=psciConduit(&hvc)?psciCall(hvc,0xc4000004ULL,
+                gZornCpus[id]->signalTarget()&0xff00ffffffULL,0,0):-1001;
+            uint64_t entries=0,bootBases[2]={},slot[2]={},handler=0,trace[6]={};uint32_t vector[2]={},physicalId=0;
+            // Pinned Darwin23 ARM64 assym: CPU_DATA_ENTRIES=8,
+            // BA_VIRT_BASE=8, BA_PHYS_BASE=16. Only known static objects read.
+            memcpy(&entries,ResetHandlerData+8,sizeof(entries));
+            memcpy(bootBases,const_boot_args+8,sizeof(bootBases));
+            memcpy(vector,LowResetVectorBase,sizeof(vector));
+            memcpy(slot,CpuDataEntries+id*16,sizeof(slot));
+            // The real CPU table owns this wired allocation. Validate its
+            // virtual/physical pair before reading pinned Darwin23 fields.
+            bool readable=slot[0] && slot[1] && slot[1]<=~uint64_t(0)-444 &&
+                ml_vtophys(static_cast<vm_offset_t>(slot[1]))==slot[0] &&
+                ml_vtophys(static_cast<vm_offset_t>(slot[1]+443))==slot[0]+443;
+            if(readable) {
+                memcpy(&handler,reinterpret_cast<const void *>(slot[1]+168),sizeof(handler));
+                memcpy(&physicalId,reinterpret_cast<const void *>(slot[1]+440),sizeof(physicalId));
+            }
+            zornTraceRead(id,trace);
+            n+=snprintf(text+n,sizeof(text)-unsigned(n),
+                "AI=%lld K=%llx/%llx P0=%llx/%u V=%llx S=%llx R=%llx C=%llx/%llx B=%llx/%llx W=%08x/%08x D=%llx H=%llx P=%x Q=%u T=%llx/%llx/%llx/%llx/%llx/%llx ",
+                info,static_cast<uint64_t>(cpu_ttep),static_cast<uint64_t>(ml_static_vtop(reinterpret_cast<vm_offset_t>(&cpu_ttep))),
+                __atomic_load_n(&zornCpuRootBefore,__ATOMIC_ACQUIRE),__atomic_load_n(&zornCpuRootPublish,__ATOMIC_ACQUIRE),
+                static_cast<uint64_t>(ml_static_vtop(reinterpret_cast<vm_offset_t>(LowResetVectorBase))),
+                static_cast<uint64_t>(ml_static_vtop(reinterpret_cast<vm_offset_t>(start_cpu))),
+                static_cast<uint64_t>(ml_static_vtop(reinterpret_cast<vm_offset_t>(ResetHandlerData))),
+                entries,static_cast<uint64_t>(ml_static_vtop(reinterpret_cast<vm_offset_t>(CpuDataEntries))),
+                bootBases[0],bootBases[1],vector[0],vector[1],slot[0],handler,physicalId,readable?1U:0U,
+                trace[0],trace[1],trace[2],trace[3],trace[4],trace[5]);
+        }
+    }
+    // A final successful GUI report is the explicit preflight-stop profile.
+    // Sample only our CPU1 slot and known static root, without firmware calls.
+    // Normal GUI continuation uses a non-final report and never enters here.
+    const bool compactSuccessSnapshot=final && pass && gui==1 && failure==0;
+    if(compactSuccessSnapshot && n>0 && unsigned(n)<sizeof(text)) {
+        uint64_t trace[6]={};zornTraceRead(1,trace);
+        n+=snprintf(text+n,sizeof(text)-unsigned(n),
+            "K=%llx/%llx P0=%llx/%u T1=%llx/%llx/%llx/%llx/%llx/%llx ",
+            static_cast<uint64_t>(cpu_ttep),static_cast<uint64_t>(ml_static_vtop(reinterpret_cast<vm_offset_t>(&cpu_ttep))),
+            __atomic_load_n(&zornCpuRootBefore,__ATOMIC_ACQUIRE),__atomic_load_n(&zornCpuRootPublish,__ATOMIC_ACQUIRE),
+            trace[0],trace[1],trace[2],trace[3],trace[4],trace[5]);
     }
     for(unsigned id=0;id<8 && n>0 && unsigned(n)<sizeof(text);++id) {
+        // Keep the final failure snapshot within the existing GUI log budget.
+        // Seen/bound masks retain the other cores' progress; do not drop the
+        // failed core's evidence; preserve successful per-core records.
+        if(gui==1 && final && failure>=260 && failure<268 && id!=0 && id!=failure-260)continue;
+        if(compactSuccessSnapshot) {
+            // Identity checks still ran. Keep all eight counters plus root
+            // evidence inside800 bytes, including maximal diagnostic values.
+            n+=snprintf(text+n,sizeof(text)-unsigned(n),"C%u t=%u i=%u b=%u r=%u e=%u; ",id,
+                __atomic_load_n(&armcpu_core_timer[id],__ATOMIC_RELAXED),__atomic_load_n(&armcpu_core_sgi[id],__ATOMIC_RELAXED),
+                __atomic_load_n(&zornCoreBeats[id],__ATOMIC_ACQUIRE),__atomic_load_n(&zornRemapAck[id],__ATOMIC_ACQUIRE),
+                __atomic_load_n(&zornRemapError[id],__ATOMIC_ACQUIRE));
+            continue;
+        }
         if(gui==1) {
             n+=snprintf(text+n,sizeof(text)-unsigned(n),"C%u m=%llx p=%llx t=%u i=%u b=%u r=%u e=%u; ",id,
                 __atomic_load_n(&zornCoreMidr[id],__ATOMIC_ACQUIRE),__atomic_load_n(&zornCoreMpidr[id],__ATOMIC_ACQUIRE),
@@ -225,9 +305,27 @@ done:
     thread_terminate(current_thread());
 }
 
+static __attribute__((noinline)) void zornPrepareCpuRoot(void) {
+    unsigned publication=0;
+    PE_parse_boot_argn("zorn_smp_root_publish",&publication,sizeof(publication));
+    if(publication>1)panic("zorn SMP root publication mode");
+    uint64_t root=__atomic_load_n(&cpu_ttep,__ATOMIC_ACQUIRE);
+    if(!root || (root&4095))panic("zorn SMP root unavailable before CPU_ON");
+    __atomic_store_n(&zornCpuRootBefore,root,__ATOMIC_RELEASE);
+    __atomic_store_n(&zornCpuRootPublish,publication,__ATOMIC_RELEASE);
+    // The MMU-off warm path loads this known static root from physical RAM.
+    // Explicit experiment1 publishes only its containing cache line, not tables.
+    if(publication==1)cleanToMemory(&cpu_ttep,sizeof(cpu_ttep));
+}
+
 bool ArmCpu::zornPreflight(void) {
     unsigned mode=0;PE_parse_boot_argn("zorn_smp_preflight",&mode,sizeof(mode));
     if(mode!=8 || ml_get_max_cpu_number()!=7 || !gZornCpus[0] || !gZornHold)panic("zorn SMP preflight configuration");
+    zornPrepareCpuRoot(); // CPU0 snapshot/publication precedes the startup worker
+    // Per-boot initialization: a stage is evidence only after this core writes it.
+    for(unsigned id=0;id<8;++id)for(unsigned word=0;word<8;++word)
+        __atomic_store_n(&zorn_cpu1_trace[id][word],uint64_t(0),__ATOMIC_RELAXED);
+    cleanToMemory(const_cast<const uint64_t *>(&zorn_cpu1_trace[0][0]),sizeof(zorn_cpu1_trace));
     __atomic_store_n(&zornPhase,1U,__ATOMIC_RELEASE);zornReport(false,false);
     zorn_smp_tlb_flush(); // watchdog bounds a non-returning architectural probe
     __atomic_store_n(&zorn_smp_tlb_ready,1U,__ATOMIC_RELEASE);
@@ -250,6 +348,12 @@ bool ArmCpu::zornPreflight(void) {
     __atomic_store_n(&zornPhase,pass?80U:90U,__ATOMIC_RELEASE);
     unsigned gui=0;PE_parse_boot_argn("zorn_smp_continue",&gui,sizeof(gui));
     if(pass && gui==1) {
+        unsigned stop=0;PE_parse_boot_argn("zorn_smp_stop",&stop,sizeof(stop));
+        if(stop==1) {
+            zornReport(true,true); // full preflight passed; no root/Data publication
+            panic("zorn SMP pass-stop recovery returned");
+        }
+        zornActiveCaptureHandles(); // optional diagnostics; original gates already passed
         zornReport(false,true);
         __atomic_store_n(&zorn_smp_preflight_active,0U,__ATOMIC_RELEASE);
         return true;

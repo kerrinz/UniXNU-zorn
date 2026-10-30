@@ -1,45 +1,47 @@
-# 记录格式与发布范围
+# Format2 migration and publication scope
 
-本次整理日期：2026-10-29。后续源码与构建验证另见 [构建回归记录](progress-2026-10-29-repro-build.md)，本页保留此前文档整理范围。按机主确认，仅更新两个 README 和结构化移植记录，保留可用构建入口，不迁移驱动或构建布局。
+Updated2026-10-30. This change synchronizes non-GPU progress in the two existing repositories and migrates root device metadata for official record ingestion. It does not resume autonomous work, build a kernel/firmware/image, boot a phone, commit or push Git, or update GPU development.
 
-## 与官方格式 2 的关系
+## What the official site reads
 
-官方的[格式 2 设备仓库](https://unixnu.com/zh/porting/device-repository)包括构建配置分层、组件选择、板级 DTS、补丁顺序及发布记录。[sheng 设备页](https://unixnu.com/zh/devices/sheng)由结构化移植记录生成，README 只承担设备概况、构建入口与文档导航。
+The [official record guide](https://unixnu.com/zh/porting/records#publishing-and-reuse) specifies a format2 root `board.toml` (`schema_version=2`) and a valid `porting.toml` (`schema_version=1`) from a fixed published source commit. README supplies responsibilities, dependencies, build entry points and links; it is not parsed into the device's detailed record. The old root board omitted the version and was interpreted as format1, even while `porting-record.py check` accepted the record itself. That combination cannot produce a new format2 device page.
 
-本次采用这种说明与记录组织方式：
+[UniXNU-alioth](https://github.com/FFT-infra/UniXNU-alioth) is a publication/layout reference, not K80 hardware evidence. No component or hardware completion level is inherited from another board.
 
-- README 只保留当前结论、目录、依赖与使用入口，历史调查保留在按日期命名的文档内。
-- 根目录 `porting.toml` 按官方 13 个区域列出输入、配置、过程、经验、完成条件、范围、下一步和证据。
-- 记录文件的 `schema_version = 1` 是官方移植记录格式版本，与构建配置的 `schema_version = 2` 是两个独立概念，不能机械地同时改成 2。
-- `board.toml` 仍按格式 1 解析，仅增加与现有 IPSW 一致的 `board.os_profile` 身份元数据，供记录检查器核对；不启用 profile 合并，不改变输出路径。
-- 不新增空 `package/`，不将 `patches/zorn` 改成会替换基础补丁模块的 `patches/xnu`，不移动现有树或编译输入。
+## Root format2 route
 
-**本次不是完整格式 2 构建迁移。** 不应因此声明 DTS、SoC 配置层、干净补丁重放或新输出布局已经通过。将来迁移时，需另行验证所有层、路径、补丁和归档规则。
+- `board.toml` selects ARM64, `zorn-sm8650`, `ipados-17.7.11-21H461`, and the device layer.
+- `feeds.toml` selects tracked `soc/sm8650/`. This board-local resource slice is pinned by the enclosing device commit, not an invented external SoC repository or independent source revision.
+- `components.include` explicitly lists the9 required catalog components; each belongs to a record area. Board-native services remain explicit archive scripts.
+- `patches/xnu/series` explicitly lists the retained157-patch base/device/prelink order. Arrays replace inherited arrays; the order is not an implicit combination of several series. Base entries resolve via the selected ARM64 root, board entries via `device:`, prelink entries via `component:XnuPrelink`.
+- `dts/zorn.dts` includes the board-local SoC resource slice,8 CPU affinities,19.2MHz timebase, PSCI SMC and GIC. Nominal12GiB memory is not a claim that the full SKU map is hardware-qualified. The owned XNU request remains8GiB. Firmware, mailbox, shim and framebuffer reservations are explicit.
+- The shared generator handles hardware FDT plus typed OS identity. The GIC and the legacy UFS class-matching node are exported here; the existing UFS board driver still owns controller/PHY/clock/DMA constants and bounds. The new DTS does not pretend to replace those implementations or qualify a new runtime tree.
+- `package/` supplies kit identity. Common firmware modules remain in UniXNU's package. External IPSW/trust-cache/FD/seed/ABI inputs are documented, not redistributed.
 
-## 记录的验证等级
-
-已有设备结果来自尚未提交的工作树，使用 boot、kernel、日志和输入清单的 SHA256 绑定。当前不能为这些结果填写一个声称对应全部新代码的已发布 Git revision。
-
-因此有实现的区域暂用官方支持的 `implemented`，附 `kind = "source"` 的源码或已归档结果摘要引用；尚未接入的区域用 `planned`。这不是否认已有真机结果：结果及局限仍在各区正文和证据 JSON 中明确记录。`source` 引用不冒充一次新的主机或设备测试。
-
-待机主提交对应源码后，可将新一轮匹配该提交的主机、设备测试记为 `host` / `device` 证据，补充真实 revision 与实际命令，再按完成条件提高等级。不要用当前 HEAD 冒充未提交的触控或八核代码版本。
-
-## 只维护两个设备仓库
-
-- `UniXNU-zorn` 保存设备配置、SM8650 / K80 的本地代码、补丁、脚本与整机记录。
-- `uefi-zorn` 保存固件板级包、BootShim、菜单和打包工具；链接到设备仓库的整机记录。
-- UniXNU、Mu-Silicium 与公共依赖继续使用现有上游检出，不要求创建任何额外 GitHub 仓库，也未新增子模块。
-
-两仓库的 `origin` 已分别为 `kerrinz/UniXNU-zorn` 和 `kerrinz/uefi-zorn`。本次没有执行 Git 提交、推送、远程修改或仓库创建。
-
-## 本地检查与发布
-
-从主 UniXNU 检出执行：
+For isolated host checks, from UniXNU:
 
 ```sh
+./unixnu defconfig zorn_union_defconfig -D ../UniXNU-zorn --out ../out/zorn-format2
+./unixnu status --json -D ../UniXNU-zorn --out ../out/zorn-format2
 python3 scripts/porting-record.py check --device ../UniXNU-zorn
 ```
 
-设备仓库新增 `.github/workflows/porting-record.yml`，调用官方移植记录检查工作流。本地检查通过只说明当前记录满足检查器要求，不代表 GitHub Actions 已运行，也不代表完整格式 2 构建或官网已收录。
+Configuration/DTS/ADT/tree/record checks are separate from full kernel and payload qualification. Several board-native recipes retain historical flat-path/ABI assumptions; they require output-path and native-link equivalence checks before a full format2 build. No format2 kernel, image or device run is claimed in this migration. Do not run a generic build/boot command merely because record ingestion passes.
 
-机主审阅后只需提交并推送现有两个仓库；无需运行官网示例中的 `gh repo create`。如希望参与官方目录扫描，可在设备仓库添加 `unixnu` topic，并确认已发布提交的 `Porting record` 检查；完整格式 2 发布要求仍需在后续构建迁移完成时逐项复核。官网收录与网页生成不能仅凭本次本地文档检查保证。
+## Retained diagnostic entry
+
+The exact former root board is saved as `compat/legacy/board.toml`, SHA256 `d65567ecd289b9fcddb1c1a7dcbf5af277f990f1184a09def54a3582f194b380`.
+
+`build-zorn-debug.py` calls `zorn_legacy_device.py` to construct an owned generated view at the host workspace's `out/zorn/legacy-device/`. It selects that view with `-D` and keeps the original flat UniXNU output paths. Source/config/native paths are shared read-only inputs; the board and lock are independent generated files. The view excludes the new format2 feeds and `patches/xnu`, so it does not replace the legacy base patch module. Unknown nonempty views and a changed compatibility-board SHA are rejected. `stage-zorn-build-workspace.py` and the explicit firmware builder use the same compatibility selection.
+
+This adapter changes source provenance and therefore new builders/manifests must bind the root board, retained board and helper. It does not waive any existing source/ABI/object/start/final-link/ready/device/window/watchdog checks. Old manifests and ready files are not rewritten or automatically requalified. Host selection checks do not substitute for a new complete build, which is outside this documentation update.
+
+## Status and evidence
+
+Non-GPU record prose is concise English, as required for the shared Chinese/English site snapshots. The required GPU area remains a planned placeholder; detailed GPU progress is excluded from this synchronization and its investigation files are preserved separately. Working-tree implementations stay `implemented` with `source` references where no published commit identifies the tested bytes. `host` and `device` evidence require a genuine40-character revision and actual commands/logs; current HEAD must not be assigned to historical runs.
+
+The latest complete c50 diagnostic had255 inputs/77 archive files matched at recovery. Old6aea and954 input statements remain historical. The docs/config migration does not modify normalized/raw proof workspaces or old manifests. Default42 and both3a desktop runs remain preserved.
+
+## Publication
+
+After review, publish the complete source and record files, confirm the `Porting record` workflow, and set the device repository's `unixnu` topic. The official scanner must then ingest the published commit and generate a page linking that version. This local update does not claim a push, GitHub CI result or live-site acceptance. The firmware repository links the device record and does not duplicate root board metadata.

@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-30",
+  "scope": "本机工具时间戳控制；同一准备工作区的两次增量原生构建与实际链接，无手机操作。",
+  "ar": {
+    "tool_sha256": "85d15bd3999895f659e8a483b17ea9ab44b924c8e0b3026abfe359f2de02cbd7",
+    "fixed_object_sha256": "7caafc09d44b3133dc8f5e4c68a4e69e1f49aed1cf199d0fd81ba726102023b3",
+    "source_preserved": true,
+    "summary": {
+      "unset": {
+        "archives_identical": false,
+        "object_member_times": [
+          "1700000000",
+          "1700000060"
+        ]
+      },
+      "1": {
+        "archives_identical": true,
+        "object_member_times": [
+          "0",
+          "0"
+        ]
+      }
+    }
+  },
+  "ld": {
+    "tool_sha256": "374d9f0713bce2c8a9e1e82bde51615d5433516a10d99b63107eb6ee70542e4c",
+    "sdk_libsystem_tbd_sha256": "ead9078e5475b9661f2a9f8bbdd395a9798fb7d07bf36ef10f59c225a71bef7f",
+    "successful_cases": 16,
+    "default_dates_change_uuid_and_bytes": true,
+    "zero_date_or_reproducible_flag_stabilizes_probe": true,
+    "probe_outputs_executed": false,
+    "initial_missing_libsystem_failure_retained": true,
+    "scope": "单独对象及归档成员的16项链接探针；正式内核实验仅用子进程ZERO_AR_DATE=1，不追加链接器参数。"
+  },
+  "builder": {
+    "builder_sha256": "d62f1945ccdf3d575b35e5bf2aad23031d02c9a973e954a502b16014545e3505",
+    "actual_environment_branch_checked": true,
+    "child_only_zero_date": true,
+    "default_preserves_inherited_environment": true,
+    "parent_environment_unchanged": true,
+    "boot_reuse_stop_and_publication0_rejected_before_build": true,
+    "no_USB": true,
+    "no_native_or_UEFI_changes": true
+  },
+  "full_native_builds": {
+    "checked_at": "2026-10-30T13:01:10.510113+08:00",
+    "two_native_build_invocations": true,
+    "actual_ld_in_both": true,
+    "identical_child_environment": true,
+    "child_zero_ar_date": "1",
+    "complete_kernel_sha256": "f1d1d4653c174b9e857b070aae6a446263464ea7b9e2214ef7ea1716fc91c473",
+    "native_sha256": "c588ac916eea51e85a0ec98f565088640aa6bcf61fed247f15700b800c74b87a",
+    "complete_kernel_byte_identical": true,
+    "native_byte_identical": true,
+    "kernel_bytes": 125648896,
+    "lc_uuid": "1c9e58a550dc39cfab6c91912074ceae",
+    "native_noso_count": 972,
+    "all_noso_timestamps_zero": true,
+    "current_original_inputs_matching": 226,
+    "original_inputs_total": 227,
+    "generated_report_difference": "Only original_candidate_sha256 advanced from the pre-experiment kernel to the first date-controlled kernel; all display ABI/source/archive fields unchanged.",
+    "start_and_linked_audits_exact": true,
+    "historical_raw_inputs_still_exact": 231,
+    "first_archive_immutable": true,
+    "replacement_image_qualified": false,
+    "allow_boot": false,
+    "phone_operations": false,
+    "cold_clean_build_proven": false,
+    "gui_causation_proven": false,
+    "scope": "Two incremental native rebuild/relink invocations in one prepared workspace. No second packaging or USB run. First image archive is historical after one generated display-report input changed; no input checks relaxed."
+  },
+  "first_host_only_image": {
+    "boot_sha256": "954af9c1db7741c43c38e036b4a969795395daf65859515a68770c1cee7c4f56",
+    "kernel_sha256": "f1d1d4653c174b9e857b070aae6a446263464ea7b9e2214ef7ea1716fc91c473",
+    "input_count_checked_before_second_build": 227,
+    "booted": false,
+    "hardware_qualified": false,
+    "allow_boot": false
+  },
+  "input_boundary": "第二次构建后227项原输入中226项仍精确匹配；唯一变化是生成显示报告original_candidate_sha256从原936内核推进到第一次日期控制内核，其他ABI/源码/显示归档字段相同。旧清单保持；该新镜像不得按当前输入视为可启动。原25a4e9c0工作区231项仍全部精确一致。",
+  "limitations": [
+    "不是干净源码/全量对象bootstrap或跨机器复现。",
+    "没有证明UUID/KCID与此前GUI偶发苹果标志的因果关系。",
+    "没有更换默认42f3d518或桌面3a8ac966，没有修改UEFI FD/分区/原生行为或触控。"
+  ],
+  "local_reports": {
+    "out/zorn/reproducibility-20261030/archive-dates/result.json": "db0dfcd93bf5e0b5bceb3ed4726dfd627fd2766ece4a9ead959acda0b46c7ee3",
+    "out/zorn/reproducibility-20261030/link-date-probe/result.json": "94fd2132427391b138ecb2d202b079cfd809e7d7625b6956cce74760ddbd182c",
+    "out/zorn/reproducibility-20261030/first-full-build.json": "4d1bbf8d53955ffeeda9c9ac44f8f7af8d9ee1670cacb1c4ced137be93caa9d3",
+    "out/zorn/reproducibility-20261030/second-invocation.json": "571e78f63510ca4cd318d16233cd02b092bb6f1daac7863fb65d82a198c81d69",
+    "out/zorn/reproducibility-20261030/two-native-build-result.json": "ba0475286df3a340d6c32910dea2333f67030704335d068fd2b3c13516a42a17",
+    "out/zorn/reproducibility-20261030/first-kernel-equivalence.json": "2e3f68a8738f39070d963fed47b81788a650dfca4fc247ec57bc27aef2aae13f"
+  }
+}

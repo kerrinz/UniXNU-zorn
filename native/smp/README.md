@@ -1,9 +1,52 @@
 # zorn SMP preparation
 
-This directory holds an **offline candidate**, not an enabled SMP profile.
-The default board still describes CPU0. No zorn multicore boot or speedup has
-been demonstrated. The system lock screen is now owner-confirmed. The owner now explicitly requests a direct eight-core candidate. The phone is
-in recovery. No active GUI image uses SMP; touch candidates remain preserved.
+Current status (2026-10-30): the explicit eight-core GUI profile has passed
+per-core identity, timers, IPIs, bound tasks and nine cross-core remap epochs.
+The owner confirmed desktop operation in two source-capsule layout-control
+boots (`3a8ac966`), with retained 8 GiB Data and dim64. The normal non-preflight
+configuration remains separate; eight ADT nodes alone are never proof.
+
+The CPU1 two-second startup failure (`SMP261`, `START1 step4 rc0`) now has
+a controlled root-publication remedy. With identical kernels, explicit
+`zorn_smp_root_publish=0/1` produced fail/pass/fail/pass in fresh recovered
+logs. Mode 1 publishes only the cache line containing `cpu_ttep` before the
+startup worker; it changes neither the root value nor page tables. The
+original identity, timer, IPI, remap and timeout gates remain mandatory.
+
+After removing the extra early assembly probes, both measured address
+layouts passed all eight-core preflight checks. The original failing layout
+also reached two camera-confirmed lock screens in normal GUI operation;
+the alternate layout reached a lock screen with the clock advancing between
+120-second and 300-second captures. A subsequent 900-second observation
+retained the original CPU/Data checks but showed the Apple logo, so GUI
+stability is not generally qualified. A later experiment with the exact
+successful short kernel passed the 900-second bounded GUI window; this does
+not make metadata, Data or timing causal. The successful short and failed long kernels
+have identical executable/data bytes and segment layouts; only UUID,
+debug timestamps and KCID metadata differ. Budget, metadata and retained
+Data/timing still need separate controls. The narrow publication is
+selected by default in the canonical builder only for explicit eight-core
+preflight; non-eight-core defaults to 0 and explicit mode 0 remains available
+as the diagnostic control. Frozen proof workspaces still pass mode 1
+explicitly. The existing fallback boot image is unchanged. Compiler path mapping alone is not the remedy.
+Touch optimization is deferred to last by the owner.
+
+Earlier source-capture slots were zero even in successful boots and must
+not be interpreted as the actual MMU-off load value. The controlled proof
+uses late MRS TTBR1, CPU0's pre-worker/final root and exact image identities.
+Independent assembly/object and final-link audits also reject stale traced
+objects; an old claimed untraced result was withdrawn.
+
+The failure reporter now queries PSCI AFFINITY_INFO64 only after a final
+startup failure and records physical reset/start/data addresses and known
+static boot data. It never retries CPU_ON, alters the deadline, or interprets
+an error as success. Host ASan/UBSan exercises the actual reporter, all eight
+affinities, negative PSCI errors and the existing 800-byte GUI log budget.
+Hardware results are recorded separately in
+`docs/progress-2026-10-30-cpu1-layout.md`.
+
+The preparation notes below describe earlier stages; their pending/CPU0-only
+statements are historical and do not supersede the current evidence.
 
 The captured K80 FDT has affinities `0, 0x100, …, 0x700` and PSCI `smc`.
 The first pair has the same captured capacity. The actual pmap compile recipe

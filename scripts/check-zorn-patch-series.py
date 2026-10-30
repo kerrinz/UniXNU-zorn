@@ -29,6 +29,8 @@ def main():
     parser.add_argument("--reference", type=Path, help="local pristine, pinned Apple XNU checkout")
     parser.add_argument("--base-revision", help="explicit 40-digit core commit for base XNU patches; CLI stays current")
     parser.add_argument("--snapshot", type=Path, help="explicit generated qualified-working-tree source capsule")
+    parser.add_argument("--extra-patch", type=Path, action="append", default=[],
+                        help="explicit device-owned diagnostic layer after the base replay")
     parser.add_argument("--workdir", type=Path, required=True, help="new output directory; existing results are refused")
     args = parser.parse_args()
     core = args.core.resolve()
@@ -92,13 +94,20 @@ def main():
     selected = [snapshot_patch] if snapshot else [base[n] for n in sorted(base)] + sorted(prelink.glob("*.patch"))
     if not selected:
         parser.error("no patches selected")
-    rows = [{"name": p.name, "sha256": digest(p), "device_owned": p.name in board}
+    base_count = len(selected)
+    extra = [p.resolve() for p in args.extra_patch]
+    for path in extra:
+        if not path.is_relative_to(DEVICE) or not path.is_file() or path.suffix != '.patch':
+            parser.error('extra patches must be existing device-owned .patch files')
+    selected += extra
+    rows = [{"name": p.name, "sha256": digest(p), "device_owned": p.name in board or p in extra}
             for p in selected]
     report = {"status": "preparing", "source_commit": expected,
               "core_commit": git(core, "rev-parse", "HEAD").stdout.strip(),
               "base_patch_commit": args.base_revision,
               "source_snapshot_sha256": digest(args.snapshot) if snapshot else None,
-              "source_snapshot_profile": snapshot['profile'] if snapshot else None,
+              "source_snapshot_profile": (snapshot['profile'] + ('+extra-patches' if extra else '')) if snapshot else None,
+              "additional_patches": [dict(name=p.name, path=str(p.relative_to(DEVICE)), sha256=digest(p)) for p in extra],
               "patches": rows, "applied": 0, "old_xnu_objects_reused": False,
               "compiled": False, "device_operations": False}
     output.mkdir(parents=True, exist_ok=True)
@@ -127,6 +136,14 @@ def main():
                 if result.returncode:
                     raise RuntimeError(f"{path.name}: {result.stderr.strip()}")
             report["applied"] = index + 1
+            if snapshot and index + 1 == base_count:
+                changed = set(git(work, 'diff', '--name-only', 'HEAD').stdout.splitlines())
+                changed.update(git(work, 'ls-files', '--others', '--exclude-standard').stdout.splitlines())
+                base_map = {name: digest(work / name) if (work / name).is_file() else None
+                            for name in sorted(changed) if Path(name).name != '.DS_Store'
+                            and '__pycache__' not in Path(name).parts}
+                if base_map != snapshot['source_files']:
+                    raise RuntimeError('base source differs before the diagnostic layer')
         changed = set(git(work, "diff", "--name-only", "HEAD").stdout.splitlines())
         changed.update(git(work, "ls-files", "--others", "--exclude-standard").stdout.splitlines())
         changed = {name for name in changed if Path(name).name != '.DS_Store'
@@ -135,7 +152,7 @@ def main():
             name: digest(work / name) if (work / name).is_file() else None
             for name in sorted(changed)
         }
-        if snapshot and report['source_sha256'] != snapshot['source_files']:
+        if snapshot and not extra and report['source_sha256'] != snapshot['source_files']:
             raise RuntimeError('replayed source does not match every capsule file')
         pins = json.loads((DEVICE / "native/smp/runtime-source-pins.json").read_text())
         report["smp_baseline_pins_match"] = all(

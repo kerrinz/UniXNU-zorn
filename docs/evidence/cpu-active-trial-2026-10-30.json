@@ -1,0 +1,852 @@
+{
+  "recorded_at": "2026-10-30T18:07:29.640487+08:00",
+  "stage": "one-planned-trial-completed-bounded-pass-GPU-next",
+  "result": {
+    "analyzed_at": "2026-10-30T18:01:04.118091+08:00",
+    "status": "recovered-distinct-new-log",
+    "run": "out/zorn/repro-20261029/path-normalized/out/zorn/debug/20261030-175339-c50ca7ea",
+    "boot_sha256": "c50ca7ea115b4b7619193dcbf8125264829c8079ad3263bfe3d17c9bd6e0c389",
+    "kernel_sha256": "5310b1dd32cb1b06b83a4e37281496dd25d22fc7d1cac0acbd7e4795e40efa86",
+    "log_sha256": "55e643ec9a9021b5dd20435e61f7e11c22a794ba7567a86f4cafc1645ece56be",
+    "current_inputs_verified": 255,
+    "archive_files_verified": 77,
+    "raw_magic": "ZORNLOGE",
+    "wallclock_seconds": 395.0,
+    "smp_summary": "SMP8 phase=80 seen=ff bound=ff remap=ff timers=ff ipis=ff failure=0 tlb=1",
+    "all_eight_core_checks": true,
+    "retained_cookie_qualified": true,
+    "brightness64": true,
+    "data_space": {
+      "recorded": true,
+      "error": 0,
+      "supported": 15,
+      "block_bytes": 4096,
+      "blocks": 2097152,
+      "available_blocks": 1821153,
+      "uuid": "C7D77FF3-6437-4C4A-8E05-E8E239AC1641",
+      "total_bytes": 8589934592,
+      "available_bytes": 7459442688
+    },
+    "gui_snapshot": {
+      "tick": 20,
+      "stage": 12,
+      "pid": 0,
+      "sequence": 608,
+      "ms": 320689,
+      "pages": {
+        "free": 1227013,
+        "active": 172856,
+        "inactive": 107845,
+        "wired": 124770
+      },
+      "ram_data": {
+        "reads": 12943,
+        "writes": 4871,
+        "errors": 0
+      },
+      "display": [
+        10,
+        0,
+        6304,
+        6464,
+        1,
+        1,
+        1,
+        0,
+        8,
+        0,
+        205,
+        0,
+        18446744031350123392,
+        4,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8,
+        0,
+        0,
+        4229445,
+        4278190080,
+        4228827,
+        8,
+        0,
+        18432000
+      ],
+      "processes": [
+        {
+          "name": "launchd",
+          "pid": 1,
+          "tick": 20,
+          "slide": 453378048,
+          "main_header": 4314030080,
+          "thread_count": 4,
+          "truncated": false,
+          "threads": [
+            {
+              "index": 0,
+              "pc": 8162005288,
+              "lr": 7153372384,
+              "sp": 6155042704,
+              "fp": 6155042720,
+              "wait": 18446744023615867552,
+              "continuation": 18446744005188293664,
+              "state": 1,
+              "frames": [],
+              "original_index": 0
+            },
+            {
+              "index": 1,
+              "pc": 8161986792,
+              "lr": 8462542208,
+              "sp": 6154492720,
+              "fp": 6154492752,
+              "wait": 18446744027485487928,
+              "continuation": 18446744005187963332,
+              "state": 1,
+              "frames": [],
+              "original_index": 1
+            },
+            {
+              "index": 2,
+              "pc": 8161986792,
+              "lr": 8462542208,
+              "sp": 6155590448,
+              "fp": 6155590480,
+              "wait": 18446744027486670240,
+              "continuation": 18446744005187963332,
+              "state": 1,
+              "frames": [],
+              "original_index": 2
+            },
+            {
+              "index": 3,
+              "pc": 8162009796,
+              "lr": 8162009776,
+              "sp": 6157226064,
+              "fp": 6157226080,
+              "wait": 0,
+              "continuation": 0,
+              "state": 4,
+              "frames": [],
+              "original_index": 3
+            }
+          ]
+        },
+        {
+          "name": "SpringBoard",
+          "pid": 5,
+          "tick": 20,
+          "slide": 453378048,
+          "main_header": 4297814016,
+          "thread_count": 4,
+          "truncated": true,
+          "threads": [
+            {
+              "index": 0,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6169063888,
+              "fp": 6169063968,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 0
+            },
+            {
+              "index": 1,
+              "pc": 8161986792,
+              "lr": 8462542208,
+              "sp": 6170159920,
+              "fp": 6170159952,
+              "wait": 18446744027485379120,
+              "continuation": 18446744005187963332,
+              "state": 1,
+              "frames": [],
+              "original_index": 1
+            },
+            {
+              "index": 2,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6173449344,
+              "fp": 6173449424,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 2
+            },
+            {
+              "index": 3,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6175094784,
+              "fp": 6175094864,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 3
+            }
+          ]
+        },
+        {
+          "name": "backboardd",
+          "pid": 35,
+          "tick": 20,
+          "slide": 453378048,
+          "main_header": 4297994240,
+          "thread_count": 4,
+          "truncated": true,
+          "threads": [
+            {
+              "index": 0,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6168885424,
+              "fp": 6168885504,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 0
+            },
+            {
+              "index": 1,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6171074240,
+              "fp": 6171074320,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 1
+            },
+            {
+              "index": 2,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6172682688,
+              "fp": 6172682768,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 2
+            },
+            {
+              "index": 3,
+              "pc": 8161987416,
+              "lr": 8162001444,
+              "sp": 6174866848,
+              "fp": 6174866928,
+              "wait": 0,
+              "continuation": 18446744005183398788,
+              "state": 1,
+              "frames": [],
+              "original_index": 3
+            }
+          ]
+        }
+      ],
+      "exits": [
+        {
+          "sequence": 1,
+          "pid": 2,
+          "status": 1,
+          "namespace": 0,
+          "code": 0,
+          "name": "launchd",
+          "detail": {
+            "pc": 0,
+            "lr": 0,
+            "far": 0,
+            "slide": 453378048,
+            "main_header": 0,
+            "esr": 0,
+            "cpsr": 0,
+            "fixups": 0,
+            "reason": "",
+            "frames": []
+          }
+        }
+      ],
+      "cpu_active": {
+        "counters": [
+          457,
+          943,
+          473,
+          815,
+          371,
+          1431,
+          383,
+          1453,
+          394,
+          1465,
+          361,
+          1478,
+          371,
+          1506,
+          302,
+          1415,
+          1953,
+          2257,
+          1821,
+          2035,
+          1799,
+          4552,
+          1861,
+          4507,
+          1892,
+          4699,
+          1793,
+          4750,
+          1860,
+          4731,
+          1319,
+          4210
+        ],
+        "bounds_ms": [
+          63744,
+          63744,
+          243896,
+          243896
+        ],
+        "tick_interval_ns": 10000000,
+        "masks": [
+          255,
+          255
+        ],
+        "error": 0,
+        "status": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "clock_mach": [
+          192000,
+          192000,
+          192000,
+          192000
+        ],
+        "measurement_available": true,
+        "idle_observed": false,
+        "instantaneous_load_proven": false
+      },
+      "display_progress": {
+        "sample_uptime_ms": 357369,
+        "unknown_events": 0,
+        "events": {
+          "retired": {
+            "count": 8,
+            "last_published_uptime_ms": 301399,
+            "sample_overlapped": false,
+            "age_ms": 55970
+          },
+          "armed": {
+            "count": 0,
+            "last_published_uptime_ms": 0,
+            "sample_overlapped": false,
+            "age_ms": null
+          },
+          "sent": {
+            "count": 0,
+            "last_published_uptime_ms": 0,
+            "sample_overlapped": false,
+            "age_ms": null
+          },
+          "idle": {
+            "count": 0,
+            "last_published_uptime_ms": 0,
+            "sample_overlapped": false,
+            "age_ms": null
+          },
+          "late": {
+            "count": 0,
+            "last_published_uptime_ms": 0,
+            "sample_overlapped": false,
+            "age_ms": null
+          },
+          "started": {
+            "count": 1,
+            "last_published_uptime_ms": 38814,
+            "sample_overlapped": false,
+            "age_ms": 318555
+          },
+          "properties": {
+            "count": 0,
+            "last_published_uptime_ms": 0,
+            "sample_overlapped": false,
+            "age_ms": null
+          }
+        },
+        "receipt_confirmed": false,
+        "snapshot_policy": "independent relaxed atomic words; times may be stale or overlap adjacent callbacks"
+      },
+      "configuration": {
+        "dyld_flags": 9,
+        "owner_dyld_flags": 8,
+        "fixups_parsed": 3,
+        "fixups_applied": 3,
+        "hold_seconds": 300,
+        "watchdog_mode": 1,
+        "owner_stage": 6,
+        "owner_mount_flags": 343969825
+      },
+      "paths": [
+        {
+          "path": "/usr/lib/libobjc-trampolines.dylib",
+          "errno": 0,
+          "vnode_type": 1
+        },
+        {
+          "path": "/private/preboot/usr/lib/libobjc-trampolines.dylib",
+          "errno": 2,
+          "vnode_type": 0
+        },
+        {
+          "path": "/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
+          "errno": 0,
+          "vnode_type": 1
+        },
+        {
+          "path": "/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
+          "errno": 2,
+          "vnode_type": 0
+        }
+      ],
+      "ipc_attempts": [
+        {
+          "sequence": 902829,
+          "name": "launchd",
+          "pid": 1,
+          "message": 536870912,
+          "receiver_pid": 69,
+          "bits": 18,
+          "receiver_name": "audiomxd"
+        },
+        {
+          "sequence": 902828,
+          "name": "launchd",
+          "pid": 1,
+          "message": 536870912,
+          "receiver_pid": 69,
+          "bits": 18,
+          "receiver_name": "audiomxd"
+        },
+        {
+          "sequence": 902802,
+          "name": "SpringBoard",
+          "pid": 5,
+          "message": 11602,
+          "receiver_pid": 59,
+          "bits": 17,
+          "receiver_name": "logd"
+        },
+        {
+          "sequence": 902803,
+          "name": "SpringBoard",
+          "pid": 5,
+          "message": 78,
+          "receiver_pid": 5,
+          "bits": 17,
+          "receiver_name": "SpringBoard"
+        },
+        {
+          "sequence": 879066,
+          "name": "backboardd",
+          "pid": 35,
+          "message": 78,
+          "receiver_pid": 35,
+          "bits": 17,
+          "receiver_name": "backboardd"
+        },
+        {
+          "sequence": 895183,
+          "name": "backboardd",
+          "pid": 35,
+          "message": 78,
+          "receiver_pid": 35,
+          "bits": 17,
+          "receiver_name": "backboardd"
+        }
+      ],
+      "iokit_queries": [
+        {
+          "sequence": 305,
+          "name": "SpringBoard",
+          "pid": 5,
+          "status": 0,
+          "iterator_present": false,
+          "provider_class": "IOAcceleratorES"
+        },
+        {
+          "sequence": 303,
+          "name": "backboardd",
+          "pid": 35,
+          "status": 0,
+          "iterator_present": true,
+          "provider_class": ""
+        }
+      ],
+      "keystore": {
+        "stage": 3,
+        "status": 0,
+        "opens": 103,
+        "calls": 1095,
+        "refused": 0,
+        "last_selector": 17,
+        "last_result": 0
+      },
+      "startup_policy": {
+        "recorded": true,
+        "status": 0,
+        "uid": 0,
+        "gid": 0,
+        "mode": 33188,
+        "bytes": 1083
+      },
+      "user_stacks": [],
+      "kernel_stacks": [],
+      "touch_trace": {
+        "status": "coherent",
+        "total_records": 0,
+        "overwritten_records": 0,
+        "matrix_samples": 2253,
+        "bad_samples": 0,
+        "last_ms": 316847,
+        "max_sample_gap_ms": 148,
+        "coordinate_max": 32767,
+        "records": [],
+        "scope": "decoded sensor contacts before HID delivery; GUI receipt not implied"
+      },
+      "data_permissions": {
+        "recorded": true,
+        "stage": 4,
+        "error": 0,
+        "checked": 0,
+        "total": 232,
+        "root_uid": 0,
+        "root_gid": 0,
+        "policy": "verified-existing-marker; no template replay"
+      },
+      "data_space": {
+        "recorded": true,
+        "error": 0,
+        "supported": 15,
+        "block_bytes": 4096,
+        "blocks": 2097152,
+        "available_blocks": 1821153,
+        "uuid": "C7D77FF3-6437-4C4A-8E05-E8E239AC1641",
+        "total_bytes": 8589934592,
+        "available_bytes": 7459442688
+      },
+      "touch_edges": {
+        "installed": 1,
+        "dispatches": 0,
+        "digitizer_events": 0,
+        "edge_marks": 0,
+        "skipped_events": 0,
+        "install_error": 0
+      },
+      "touch": {
+        "reads": 2254,
+        "bad": 0,
+        "decoded": 2253,
+        "contacts": 0,
+        "x": 0,
+        "y": 0,
+        "stage": 4,
+        "error": 0,
+        "peak": 0,
+        "noise": 9,
+        "irq": 1040,
+        "counter_ms": 357277,
+        "hid_stage": 5,
+        "event_driver": true,
+        "reports": 0,
+        "last_result": 0,
+        "snapshot_policy": "independent aligned words; may span adjacent frames"
+      }
+    },
+    "camera_observations": [
+      {
+        "image": "out/zorn/repro-20261029/path-normalized/out/zorn/debug/20261030-175339-c50ca7ea/camera-20261030-175546.jpg",
+        "image_sha256": "74bf7f29f81ec8df8fa4a20d383fd1236251538da0c4b3fd130a47de89a8cb5f",
+        "boot_sha256": "c50ca7ea115b4b7619193dcbf8125264829c8079ad3263bfe3d17c9bd6e0c389",
+        "observed": "system-lock-screen",
+        "clock": "4:02",
+        "audio": false,
+        "scope": "One scheduled120s passive frame, no touch/desktop/performance or full-window qualification"
+      }
+    ],
+    "bounded_gui_qualified": true,
+    "cpu_acquisition_available": true,
+    "cpu_active": {
+      "counters": [
+        457,
+        943,
+        473,
+        815,
+        371,
+        1431,
+        383,
+        1453,
+        394,
+        1465,
+        361,
+        1478,
+        371,
+        1506,
+        302,
+        1415,
+        1953,
+        2257,
+        1821,
+        2035,
+        1799,
+        4552,
+        1861,
+        4507,
+        1892,
+        4699,
+        1793,
+        4750,
+        1860,
+        4731,
+        1319,
+        4210
+      ],
+      "bounds_ms": [
+        63744,
+        63744,
+        243896,
+        243896
+      ],
+      "tick_interval_ns": 10000000,
+      "masks": [
+        255,
+        255
+      ],
+      "error": 0,
+      "status": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "clock_mach": [
+        192000,
+        192000,
+        192000,
+        192000
+      ],
+      "measurement_available": true,
+      "idle_observed": false,
+      "instantaneous_load_proven": false
+    },
+    "per_core_deltas": [
+      {
+        "core": 0,
+        "user_ticks_delta": 1496,
+        "system_ticks_delta": 1314,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 1,
+        "user_ticks_delta": 1348,
+        "system_ticks_delta": 1220,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 2,
+        "user_ticks_delta": 1428,
+        "system_ticks_delta": 3121,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 3,
+        "user_ticks_delta": 1478,
+        "system_ticks_delta": 3054,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 4,
+        "user_ticks_delta": 1498,
+        "system_ticks_delta": 3234,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 5,
+        "user_ticks_delta": 1432,
+        "system_ticks_delta": 3272,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 6,
+        "user_ticks_delta": 1489,
+        "system_ticks_delta": 3225,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      },
+      {
+        "core": 7,
+        "user_ticks_delta": 1017,
+        "system_ticks_delta": 2795,
+        "counter_decrease": false,
+        "activity_recorded": true,
+        "sample_separation_range_ms": [
+          180152,
+          180152
+        ]
+      }
+    ],
+    "display_progress": {
+      "sample_uptime_ms": 357369,
+      "unknown_events": 0,
+      "events": {
+        "retired": {
+          "count": 8,
+          "last_published_uptime_ms": 301399,
+          "sample_overlapped": false,
+          "age_ms": 55970
+        },
+        "armed": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "sent": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "idle": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "late": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "started": {
+          "count": 1,
+          "last_published_uptime_ms": 38814,
+          "sample_overlapped": false,
+          "age_ms": 318555
+        },
+        "properties": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        }
+      },
+      "receipt_confirmed": false,
+      "snapshot_policy": "independent relaxed atomic words; times may be stale or overlap adjacent callbacks"
+    },
+    "apple_logo_reproduced": false,
+    "historical_apple_logo_cause_proven": false,
+    "desktop_qualified": false,
+    "touch_tested": false,
+    "performance_or_longterm_qualified": false,
+    "decision": "One planned trial consumed; absent an actionable failed-GUI observation, preserve unknown Apple-logo cause and proceed to GPU discovery.",
+    "limits": [
+      "Serial per-core readings are not a simultaneous snapshot; cumulative accounting can lag/straddle first sample.",
+      "Source counters were range-checked before narrowing; a decrease is retained as anomaly, not silently labeled UInt32 wrap.",
+      "Zero delta is not idle/unusable core. No CPU MHz, idle%, FPS or display-copy/lock-wait cost attribution.",
+      "Retirement counts/times are independent observations, not per-request bijection or continuous progress.",
+      "log_us includes encoding/I/O plus lock/preemption; cannot sum it into CPU or wall-clock percentages."
+    ]
+  },
+  "bindings": {
+    "out/zorn/repro-20261029/path-normalized/out/zorn/debug/20261030-175339-c50ca7ea/cpu-active-result.json": "bef80cb5e6924d26b87b2b44c5eaa9f381114187017782ebbeb970a232af0c93",
+    "out/zorn/repro-20261029/path-normalized/out/zorn/debug/20261030-175339-c50ca7ea/run.json": "94bb989af8308ad8e9fc80490769b29b8612f6e5ad4ad508a35a2218c38ba642",
+    "out/zorn/repro-20261029/path-normalized/out/zorn/debug/20261030-175339-c50ca7ea/checkpoints.bin": "55e643ec9a9021b5dd20435e61f7e11c22a794ba7567a86f4cafc1645ece56be",
+    "out/zorn/repro-20261029/path-normalized/out/zorn/debug/20261030-175339-c50ca7ea/build-inputs.json": "e9a884a3f36598065293bab46eb647f0b20be75208620d0713412fc4b2b3a4aa",
+    "out/zorn/cpu-load-main-integration/analyze-trial.py": "051d4d42eae3e7c17a7c763aaecfadaaeadadb70bc993771b96cedf6e10a5b56",
+    "out/zorn/cpu-load-main-integration/ready.json": "e5d4d16449a25485f28d979db1e6a91fe0b4d85cb21da0733cb12877a8bdf3a3",
+    "out/zorn/cpu-load-main-integration/publisher-supplement-result.json": "a589509d1fe5e7bdc0c3fa75b809d74f6c3395bfe6072c1cdef976c62e09dbfc",
+    "out/zorn/cpu-load-main-integration/negative-controls/result.json": "4d9faa63038f3067d780b4d0b7773551fda85c1775ae78b7f4c08762d92ee103"
+  },
+  "build_evidence": "docs/evidence/cpu-active-linked-2026-10-30.json",
+  "once_only_plan_consumed": true,
+  "current_inputs_verified": 255,
+  "immutable_archive_files_verified": 77,
+  "old_6aea_current_inputs": "historical after deliberate source integration; immutable manifest/archive retained",
+  "decision": "Finite CPU/GUI observation is consumed; no actionable Apple-logo failure reproduced, so switch to GPU as requested.",
+  "next_plan": "out/zorn/gpu-discovery-20261030/next-plan.json"
+}

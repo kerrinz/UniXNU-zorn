@@ -1,0 +1,159 @@
+# Redmi K80 (zorn), 12GB+256GB, SM8650-AB. Read by the unixnu build driver.
+# RAM boot only for the kernel image. [userdata] is the iPadOS 17.7.11 volume
+# file built by `unixnu build userdata`. That file was written to userdata on
+# 2026-10-25 and the read-back stopped at SHNGOK. Do not flash it again, and
+# do not boot Android while it is installed. OS reads remain read-only; the
+# diagnostic transport writes only its log block and the recovery BCB.
+# The tested boot image is packed by uefi-zorn/scripts, because the generic
+# payload step does not use 512-byte FAT clusters.
+
+[board]
+name = "zorn"
+soc = "SM8650"
+# Record identity only: the existing build remains schema 1 (no profile merge).
+os_profile = "ipados-17.7.11-21H461"
+description = "Redmi K80 12GB+256GB"
+kit = "zorn"
+
+# Darwin 23.6 kernel. Same unpatched iPad7,1 / 17.7.11 image as UniXNU-sheng.
+# Use UNIXNU_IPSW or the debug builder --ipsw option for a local IPSW.
+[ipsw]
+url = "https://updates.cdn-apple.com/2025SpringFCS/fullrestores/122-77166/DCA6CFE8-90E9-4B92-880D-3DE171798E40/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw"
+product = "iPad7,1"
+version = "17.7.11"
+build = "21H461"
+device_class = "j120ap"
+chip_id = 0x8011
+board_id = 12
+fetch = ["KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
+
+[ipsw.sha256]
+"044-76040-038.dmg" = "3f99b859c9728379110b66657c7b15285bcb1925ad8b5726542e2cdcf8b1028d"
+"044-76034-038.dmg" = "b4908cde41d23e6bc05e6af51a2c9eeb00cf0f863a6a18b1600c96a3fd70414f"
+
+# first_lba/last_lba only reproduce fastboot partition-size 0x3A1D0FB000
+# (60936443 blocks of 4096). They are not the GPT addresses.
+[userdata]
+first_lba = 0
+last_lba = 60936442
+lba_bytes = 4096
+
+[[userdata.windows]]
+name = "OS"
+component = "OS"
+
+[[userdata.windows]]
+name = "SystemOS"
+component = "Cryptex1,SystemOS"
+
+[kernel]
+defconfig = "zorn_defconfig"
+archives = [
+  "build-corecrypto-14.py",
+  "build-corecrypto-14.py --namespace",
+  "build-arm-driver.py ArmDTPlatform",
+  "build-zorn-cpu.py",
+  "build-zorn-aes.py",
+  "build-zorn-verified-root.py",
+  "build-libpthread-kernel.py",
+  "build-zorn-link-stubs.py",
+  "build-zorn-ufs.py",
+  "build-zorn-data.py",
+  "build-zorn-display.py",
+  "build-zorn-pmgr.py",
+]
+
+# Same restore image and prelink pins as UniXNU-sheng. The addresses belong
+# to that iPad7,1 kernelcache, not to the zorn Mach-O.
+[kernel.prelink]
+tool = "kits/NativePrelink/emit_prelink.py"
+kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
+kernelcache_sha256 = "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7"
+slide = "-0x1000000"
+early_security_init = "com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0"
+roots = [
+  "com.apple.AppleFSCompression.AppleFSCompressionTypeZlib",
+  "com.apple.driver.AppleARMPlatform",
+  "com.apple.driver.AppleARMWatchdogTimer",
+  "com.apple.driver.AppleAudioClockLibs",
+  "com.apple.driver.AppleEffaceableStorage",
+  "com.apple.driver.AppleIISController",
+  "com.apple.driver.AppleM2ScalerCSCDriver",
+  "com.apple.driver.AppleMobileFileIntegrity",
+  "com.apple.driver.ApplePMGR",
+  "com.apple.driver.IODARTFamily",
+  "com.apple.filesystems.apfs",
+  "com.apple.iokit.CoreAnalyticsFamily",
+  "com.apple.iokit.IOAVFamily",
+  "com.apple.iokit.IOAudio2Family",
+  "com.apple.iokit.IOCECFamily",
+  "com.apple.iokit.IOCryptoAcceleratorFamily",
+  "com.apple.iokit.IOGPUFamily",
+  "com.apple.iokit.IOHDCPFamily",
+  "com.apple.iokit.IOMobileGraphicsFamily",
+  "com.apple.iokit.IOReportFamily",
+  "com.apple.iokit.IOSlowAdaptiveClockingFamily",
+  "com.apple.iokit.IOStorageFamily",
+  "com.apple.iokit.IOSurface",
+  "com.apple.kec.Libm",
+  "com.apple.kec.corecrypto",
+  "com.apple.kext.AppleMatch",
+  "com.apple.kext.CoreTrust",
+  "com.apple.security.AppleImage4",
+  "com.apple.security.sandbox",
+  "com.apple.iokit.IOHIDFamily",
+  "com.apple.iokit.IOHIDEventDriver",
+]
+
+[firmware]
+config = "zorn"
+dsc = "Platforms/Xiaomi/zornPkg/zorn.dsc"
+fd = "Build/zornPkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
+submodules = ["Common/Mu", "Common/Mu_OEM_Sample", "Silicium-ACPI", "Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl"]
+packages = [
+  "{uefi}",
+  "{uefi}/Platforms/Xiaomi",
+  "{tree}/package",
+  "{tree}/drivers/DarwinBoot",
+  "{edk2}",
+  "{uefi}/Common/Mu",
+  "{uefi}/Common/Mu_OEM_Sample",
+  "{uefi}/Silicon/Qualcomm",
+  "{uefi}/Silicon/Silicium",
+  "{uefi}/Silicium-ACPI",
+  "{uefi}/Silicium-ACPI/Platforms/Xiaomi",
+  "{uefi}/Silicium-ACPI/Silicon/Qualcomm",
+]
+
+[firmware.defines]
+ENABLE_SECUREBOOT = "0"
+DEVICE_MODEL = "0"
+MEMORY_PROTECTION = "TRUE"
+SHIP_MODE = "FALSE"
+BUILDID_STRING = "zorn-research"
+
+# Header parameters come from uefi-zorn Resources/Configs/zorn.toml.
+# Do not add a splash node here until the stock DTB is in hand: pineapple
+# already has /reserved-memory/splash_region, and fdtput -c fails if it exists.
+
+# Numbers for the generic payload step. The image that reached MEND is the
+# one packed by uefi-zorn/scripts/make-zorn-payload.py: 512-byte clusters,
+# menu file payload/EFI/UniXNU/unixnu.toml. The verified-root candidate now
+# omits the old restore initrd; rd=md0 is the userdata OS container.
+[payload]
+volume = "ZORNESP"
+size_mib = 192
+loader = "firmware"
+title = "Boot XNU"
+dram_size = "0x300000000"
+timeout = 5
+trust_cache_sha256 = ["7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"]
+kernel_args = ["rd=md0", "-v", "serial=3", "debug=0x14e", "zorn_pmgr=2", "zorn_checkpoint=NOHIT", "zorn_checkpoint_early=1", "zorn_log_only=1", "zorn_trace_compact=1", "zorn_wdt=1", "zorn_hash_budget=120", "zorn_service_trace=1"]
+
+[payload.adt]
+tool = "scripts/make-zorn-adt.py"
+chip_id = "0"
+owned_memory_size = "0x18000000"
+cpu_regs = "0"
+psci_method = "smc"
+ipad_identity = true

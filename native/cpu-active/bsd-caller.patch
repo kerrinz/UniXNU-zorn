@@ -1,0 +1,28 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -674,6 +674,9 @@
+ 	zorn_ufs_gui_data_space(values);
+ }
+ 
++extern void zorn_cpu_active_gui_tick(void);
++extern void zorn_cpu_active_gui_finish(void);
++
+ static void
+ zorn_gui_sample_thread(__unused void *arg, __unused wait_result_t wr)
+ {
+@@ -688,6 +691,7 @@
+ 	if (period == 30) zorn_ufs_gui_hold_tick();
+ 	for (unsigned sample = 1; sample <= sample_limit; ++sample) {
+ 		(void)tsleep(&channel, PZERO, "zorngui", period * hz);
++		zorn_cpu_active_gui_tick(); // normal thread, before logging/proc/VFS
+ 		char text[64];
+ 		int n = snprintf(text, sizeof(text), "GUI SAMPLE %u/%u ", sample, sample_limit);
+ 		if (n > 0) zorn_ufs_user_output(0, text, (size_t)n);
+@@ -711,6 +715,7 @@
+ 		zorn_ufs_gui_stage(sample, 11, 0);
+ 		zorn_ufs_gui_hold_tick();
+ 	}
++	zorn_cpu_active_gui_finish();
+ 	zorn_ufs_gui_stage(sample_limit, 12, 0);
+ 	zorn_ufs_gui_flush();
+ 	thread_terminate(current_thread());

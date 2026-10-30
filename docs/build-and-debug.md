@@ -1,6 +1,6 @@
 # K80 构建、测试与日志
 
-本文对应 2026-10-29 的现有格式 1 构建入口。它记录已准备工作区的使用方式，不是全新克隆的一键安装说明。后续上游构建验证见 [构建回归记录](progress-2026-10-29-repro-build.md)，与已验收桌面基线分开记录。
+本文保留已有格式 1 调试入口；2026-10-30 根配置已迁移格式 2，调试构建器显式选择固定兼容配置，见 [迁移范围](repository-format.md)。它记录已准备工作区的使用方式，不是全新克隆的一键安装说明。后续上游构建验证见 [构建回归记录](progress-2026-10-29-repro-build.md)，与已验收桌面基线分开记录。
 
 ## 基线与前置输入
 
@@ -19,10 +19,11 @@
 
 ```sh
 ../UniXNU-zorn/scripts/install-zorn-patches.sh . --core
-./unixnu defconfig zorn_defconfig -D ../UniXNU-zorn
+python3 ../UniXNU-zorn/scripts/prepare-zorn-legacy-view.py
+./unixnu defconfig zorn_defconfig -D ../out/zorn/legacy-device
 ```
 
-安装器向基础补丁集追加 `patches/zorn`，不能直接把设备目录改名为 `patches/xnu`。公共 IOStorageFamily feed 固定为 `e45fbe30a7879e0b16e26dddb78538f1b00e0bff`，用于 ABI 参考，不将参考对象链接为替代的原版存储栈。
+安装器仅为旧调试路径向基础补丁集追加 `patches/zorn`。根目录新的 `patches/xnu/series` 属于格式 2 路径；兼容视图刻意不暴露它，避免替换旧基础补丁模块。公共 IOStorageFamily feed 固定为 `e45fbe30a7879e0b16e26dddb78538f1b00e0bff`，用于 ABI 参考，不将参考对象链接为替代的原版存储栈。
 
 在共同父目录准备原版 trust cache：
 
@@ -43,7 +44,7 @@ owner 验证输入的准备依赖既有只读镜像及 OpenSSL，使用 `prepare
 python3 UniXNU-zorn/scripts/build-zorn-debug.py \
   --incremental-patched-tree --defconfig zorn_union_defconfig --data-profile 8g \
   --source-pins UniXNU-zorn/source-pins.json \
-  --smp-preflight 8 --smp-continue --display-mode 3 --brightness-mode 3 \
+  --smp-preflight 8 --smp-continue --smp-root-publication 1 --display-mode 3 --brightness-mode 3 \
   --touch-handoff --touch-runtime --touch-edges --touch-kernel-parser --touch-trace \
   --gui-watch --development-wifi-identity --data-permissions --keystore-state \
   --shared-data-volume --data-store-mode 2 --retained-data --quiet-gui --hid-family \
@@ -100,3 +101,7 @@ log     3c5015fc70dbbd510459cc6a73bfc14167b02a6ba5811a9cd0f978ef72e9c508
 ```
 
 证据、主机检查及未解决的 CPU1 早退见 [触控阶段记录](progress-2026-10-29-touch-events.md) 与 [验收摘要](evidence/touch-desktop-fast-qualified.json)。诊断私钥、IPSW、完整系统副本、生成内核及手机镜像不提交到 Git。
+
+## 2026-10-30 当前结果
+
+两次3a桌面、CPU1窄发布对照、两布局及c50最终观察见 [非GPU最新摘要](progress-2026-10-30-non-gpu.md)。上文带日期的“待验收”保留原构建背景；当前 CPU1 有有界窄修正证据，偶发苹果标志原因仍未定。本文命令是已有调试配置入口，不授权在暂停期间构建或启动；旧c50唯一观察轮已消耗，不重复执行。

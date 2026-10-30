@@ -178,7 +178,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(sys.argv[1]) / 'scripts'))
 from unixnu import cli, feeds, tree
 from unixnu.config import Context
-ctx = Context(cli.parser().parse_args(['defconfig', 'zorn_union_defconfig', '-D', sys.argv[2]]))
+sys.path.insert(0, str(Path(sys.argv[2]) / 'scripts'))
+from zorn_legacy_device import prepare as legacy_view
+device = legacy_view(Path(sys.argv[2]), Path(sys.argv[2]).parent / 'out/zorn/legacy-device')
+ctx = Context(cli.parser().parse_args(['defconfig', 'zorn_union_defconfig', '-D', str(device)]))
 cli.cmd_defconfig(ctx)
 feeds.update_submodules(ctx)
 tree.assemble(ctx, feeds.resolve(ctx))

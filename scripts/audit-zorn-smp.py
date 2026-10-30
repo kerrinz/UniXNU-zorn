@@ -2,7 +2,8 @@
 """Inspect actual linked eight-core preflight paths, not ADT node claims."""
 from pathlib import Path
 import argparse,hashlib,importlib.util,json,re,struct,subprocess,tomllib
-parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--payload',action='store_true');parser.add_argument('--continue-gui',action='store_true');parser.add_argument('--fresh-data',action='store_true');args=parser.parse_args()
+parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--payload',action='store_true');parser.add_argument('--continue-gui',action='store_true');parser.add_argument('--fresh-data',action='store_true');parser.add_argument('--stop-after-pass',action='store_true');parser.add_argument('--root-publication',type=int,choices=(0,1),default=0);args=parser.parse_args()
+if args.stop_after_pass and not (args.payload and args.continue_gui):parser.error('pass-stop audit requires the continuation payload')
 ROOT=Path(__file__).resolve().parents[2];TREE=ROOT/'UniXNU/out/zorn/tree';OUT=ROOT/'out/zorn/smp'
 kernel=ROOT/'UniXNU/out/zorn/kernel/kernel.macho'
 nm=subprocess.check_output(['xcrun','nm','-n',str(kernel)],text=True)
@@ -18,6 +19,11 @@ calls('_zorn_ufs_read_gpt','_zorn_armcpu_preflight')
 preflight=find('zornPreflight');coordinator=find('zornCoordinator')
 calls('_zorn_armcpu_preflight',preflight)
 calls(preflight,'_zorn_smp_tlb_flush')
+prepare=[name for name in symbols if 'zornPrepareCpuRoot' in name and '.cold.' not in name];assert len(prepare)==1
+calls(preflight,prepare[0]);calls(prepare[0],'_PE_parse_boot_argn')
+clean=[name for name in symbols if 'cleanToMemory' in name and '.cold.' not in name]
+if not re.search(r'dc\s+civac',asm(prepare[0])):
+    assert len(clean)==1;calls(prepare[0],clean[0]);assert re.search(r'dc\s+civac[\s\S]*dsb\s+sy',asm(clean[0]))
 calls(coordinator,'_processor_start')
 calls(coordinator,'_thread_bind')
 calls(coordinator,'_zorn_smp_tlb_flush')
@@ -62,6 +68,10 @@ if args.payload:
     xnu=[e for e in entries if e.get('type')=='xnu'];assert len(xnu)==1
     assert bool(xnu[0].get('initrd'))==args.continue_gui
     tokens=xnu[0]['args'].split()
+    assert tokens.count('zorn_smp_root_publish='+str(args.root_publication))==1
+    assert all(t=='zorn_smp_root_publish='+str(args.root_publication) for t in tokens if t.startswith('zorn_smp_root_publish='))
+    assert tokens.count('zorn_smp_stop=1')==int(args.stop_after_pass)
+    assert not any(t.startswith('zorn_smp_stop=') and t!='zorn_smp_stop=1' for t in tokens)
     for token in ('zorn_smp_preflight=8','sheng-smp=1','armcpu-self-ipi=1','cpus=8'):assert tokens.count(token)==1
     if args.continue_gui:
         for token in ('zorn_smp_continue=1','zorn_data_store=2','zorn_brightness=3'):assert tokens.count(token)==1
@@ -71,5 +81,7 @@ if args.payload:
         assert all(t=='zorn_touch=6' for t in tokens if t.startswith('zorn_touch='))
     else:assert not any(t.startswith(('zorn_data_store=','zorn_data_retained=')) for t in tokens)
     result.update(actual_eight_distinct_affinities=True,psci_smc=True,payload_no_data=not args.continue_gui,
+                  stop_only_after_verified_preflight=args.stop_after_pass,
+                  explicit_root_publication=args.root_publication,
                   payload_adt_sha256=hashlib.sha256(adt.read_bytes()).hexdigest())
 (OUT/'linked-call-audit.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))

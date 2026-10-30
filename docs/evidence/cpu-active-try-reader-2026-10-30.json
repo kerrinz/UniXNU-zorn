@@ -1,0 +1,143 @@
+{
+  "host_only": true,
+  "phone_operations": false,
+  "active_source_tree_changed": false,
+  "final_kernel_linked": false,
+  "new_image": false,
+  "sc_model": {
+    "host_model_only": true,
+    "production_integrated": false,
+    "writer_changed": false,
+    "active_sc_interleavings": 210,
+    "finite_attempt_budget_max": 3,
+    "stuck_odd_and_continuous_writer_return_busy": true,
+    "generation_single_wrap_checked": true,
+    "unavailable_returns_no_values_not_zero": true,
+    "missing_load_fence_negative_control": {
+      "schedule": "RRWWWWWWRR",
+      "observed": {
+        "g0": 0,
+        "g1": 0,
+        "u": 110,
+        "s": 220
+      }
+    },
+    "stable_idle_double_read_is_insufficient": {
+      "schedule": "WRRRRW",
+      "stable_double_read": [
+        600,
+        9223372036854776808
+      ],
+      "inferred_at_now2000": 1600,
+      "correct_after_exit": 600
+    },
+    "proposed_metric": "coherently-read cumulative USER/SYSTEM accounting only; no idle snapshot or idle percentage",
+    "raw_source_counters_bits": 32,
+    "force_accounting_update": false,
+    "limits": [
+      "Sequential-consistency interleavings, not an ARM weak-memory proof.",
+      "No host non-atomic shared C++ data race or thread stress used as proof.",
+      "Reader barriers must be checked in actual ARM64 code against original writer release fences.",
+      "Idle writer has no common sequence; omit idle instead of changing writer or claiming coherence.",
+      "Cumulative accounting may lag current execution and straddle the first sample; zero delta does not establish idle or an unused CPU.",
+      "More than2^31 complete writer epochs between generation reads is an ABA limit; do not claim proof against arbitrary generation reuse.",
+      "Window sanity rejects questionable deltas and preserves raw evidence; no performance, frequency or GUI-cause claim."
+    ]
+  },
+  "target_candidate": {
+    "target_compile_pass": true,
+    "actual_recipe_sha256": "9faa21bbec9ebc1c9935999f4113af9db2ea612d3bf5c74d7e5b8a3f6e6f7f21",
+    "candidate_source_sha256": "25cfeddc15b550030acfa910f2b6759966ecbf559339e848d81ab54b708e3bbe",
+    "isolated_object_sha256": "0e945e660a2fe30562e89a430b20288789553dfcd00f105fd283ee876b15e6aa",
+    "actual_ldar_and_dmb_ishld": true,
+    "no_undefined_symbols": true,
+    "no_calls_waits_or_interrupt_register_writes": true,
+    "original_object_sha256": "f97e8cb6dca244a297ae251be719c107495103586c4a265ad75ca7a4b8b0c39d",
+    "original_object_changed": false,
+    "final_kernel_linked": false,
+    "caller_lifetime_and_weak_memory_contract_still_required": true,
+    "unrolled_attempts": 3,
+    "generation_acquire_loads": 6,
+    "payload_to_validation_load_fences": 3,
+    "no_backward_branches": true,
+    "only_store_is_private_output_pair": true,
+    "output_store_instruction": "78: a9002829     \tstp\tx9, x10, [x1]",
+    "first_branch_checker_refusal": "Initial regex selected TBZ bit-immediate0 rather than labeled target0x30; corrected parser to require target label. Object unchanged."
+  },
+  "transport_model": {
+    "host_only": true,
+    "production_integrated": false,
+    "wire_format_experiment": "E/20 not accepted by production reader",
+    "original_bytes": 4096,
+    "footer_bytes": 3072,
+    "logical_text_slots": 84,
+    "packed_text_bytes": 809,
+    "recovered_bytes": 199,
+    "cpu_payload_bytes": 166,
+    "spare_bytes": 33,
+    "counter_width_bits": 32,
+    "requires_all_raw_ticks_fit_without_truncation": true,
+    "epoch_begin_end_ms_bits": 32,
+    "tick_interval_ns_bits": 64,
+    "metric_names": [
+      "user",
+      "system"
+    ],
+    "idle_observed": false,
+    "crc32_not_authentication": true,
+    "roundtrips": 194,
+    "counter_overflow_refusals": 32,
+    "text_refusals": 252,
+    "representative_corruption_refusals": 12,
+    "original_footer_fields_restored_exactly": true,
+    "original_text_raw_slots_restored_exactly": true,
+    "limits": [
+      "No native encoder/reader or runtime collector exists.",
+      "This Python model does not prove ARM64 concurrency, performance or legal recount sampling.",
+      "Raw32bit USER/SYSTEM ticks only; decoding does not infer idle or CPU utilization.",
+      "Unsupported input must keep original v19 bytes and explicitly mark new observation unavailable."
+    ]
+  },
+  "host_actual_helper_test": {
+    "deterministic_paths": 8,
+    "asan_ubsan_pass": true,
+    "uses_source": "try-active-accounting.c",
+    "single_thread_injected_updates": true,
+    "not_xnu_layout_or_memory_model_proof": true
+  },
+  "next_plan": {
+    "stage": "isolated-helper-and-active-transport-model-tested-not-integrated",
+    "metric": "USER/SYSTEM cumulative accounting only; idle omitted",
+    "native_helper": "out/zorn/cpu-load-design/try-active-accounting.c",
+    "native_object": "out/zorn/cpu-load-design/try-active-accounting.arm64.o",
+    "transport_model": "out/zorn/cpu-load-design/active-transport-prototype.py",
+    "metadata": "two sweep begin/end timestamps in32bit ms; converted nanoseconds-per-tick64; source USER/SYSTEM ticks32; explicit masks/errors and CRC",
+    "raw_machine_time_conversion_still_required": true,
+    "core_identity_lifetime_requirements": [
+      "Use existing8core ArmCpu adapter registered machProcessor handles only after acquire-read of preflight-complete publication; no raw offsets or processor_list traversal.",
+      "Confirm per-CPU handle lifespan for this fixed boot profile and refuse missing/registration-incomplete/offline cases; no hotplug/unload claim."
+    ],
+    "scope_limits": [
+      "Normal thread only; no log/UFS/watchdog locks held during acquisition.",
+      "No forced accounting flush, thread migration, IPI or hardware counter changes.",
+      "No idle or idle-percent result; missing progress is not idle.",
+      "Counters may lag execution and straddle sweep boundaries; retain raw values and bounded sample timestamps."
+    ],
+    "next_steps": [
+      "Create portable native active-only log packing helper and exact decoder in isolatedout, matching active Python model; exercise4KiB original-byte recovery, all overflow/fallback and corruption checks.",
+      "Preserve old E/20 triple/UInt24 design as superseded capacity experiment; production decoder/version still unchanged.",
+      "Then design low-frequency two-sweep sampler and exact eight-handle publication/lifetime gates before integrating any board sources.",
+      "No candidate build/phone boot until actual native source/object/link/payload/full archive checks pass."
+    ]
+  },
+  "artifacts": {
+    "try-reader-model.py": "e782b76817f24c32a853f6c286c5f327f5f7935fc5f92b664bab332786949579",
+    "try-active-accounting.c": "25cfeddc15b550030acfa910f2b6759966ecbf559339e848d81ab54b708e3bbe",
+    "try-active-test-shim.h": "dcb756291ef9a591be69dd6f4942b3398c45dacbb79ef61e521c6d1fd3ed93a2",
+    "try-active-host-test.c": "5f1ced0e14374260f0fd7a785fd76c9ba5c81addbaed04b1cdef7613e91f2375",
+    "active-transport-prototype.py": "227864b794365e921129afe6b1b2695f12204d2376a2d190f50956a19d49b833"
+  },
+  "recorded_at": "2026-10-30T16:44:23.604566+08:00",
+  "local_full_report": "out/zorn/cpu-load-design/try-reader-combined-result.json",
+  "local_full_report_sha256": "01d103b4d4f87ee322c7215a7791b3185530b1e4d9b44e2561732d1e6777b8c1"
+}

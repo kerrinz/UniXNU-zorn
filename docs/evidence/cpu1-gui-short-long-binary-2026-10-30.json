@@ -1,0 +1,19 @@
+{
+  "short_kernel_sha256": "e0714460722601b7f0a4665c0ef10a6e27bf0a18423e3c3d253806d12a2f074a",
+  "long_kernel_sha256": "03029e8d683da3f7fb2588cda224cd1f8e820bdb8146f47a7f64f7ac074a8eb8",
+  "total_bytes": 125673472,
+  "equal_bytes": 125673394,
+  "changed_byte_count": 78,
+  "all_segment_addresses_sizes_equal": true,
+  "native_and_prelinked_instruction_bytes_equal": true,
+  "all_data_segments_equal": true,
+  "analyzed_at": "2026-10-30T11:57:22.269029+08:00",
+  "noncode_differences": [
+    "LC_UUID",
+    "21 N_OSO debugging object timestamp values",
+    "_PrelinkKCID metadata"
+  ],
+  "interpretation": "Successful short GUI and failed900s GUI have identical native/prelinked executable bytes, data segments and all segment layouts. These metadata changes remain real and may influence consumers; neither GUI duration nor metadata/Data timing is independently controlled yet.",
+  "cs_text_fixup_semantics": "applied counts page replacements, not a per-entry completion bitmap; parsed3/applied2 does not alone prove a patch error",
+  "next_step": "Design a strictly limited same-kernel GUI-budget control before new hardware tests; do not relax native/source/profile identity checks or change CPU gates. Not implemented or built."
+}

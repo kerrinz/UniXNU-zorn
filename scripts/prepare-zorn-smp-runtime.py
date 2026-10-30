@@ -24,6 +24,19 @@ def replace_function(text,original,name):
 
 def transform(relative,before,original):
     s=before.decode();ref=original.decode()
+    if relative=='bsd/kern/bsd_init.c':
+        native=ROOT/'UniXNU-zorn/native/cpu-active'
+        record=json.loads((native/'source-profile.json').read_text())
+        patch=native/'bsd-caller.patch'
+        if sha(before)!=record['before'] or sha(patch.read_bytes())!=record['patch_sha256']:
+            raise ValueError('CPU-active source/patch differs')
+        with tempfile.TemporaryDirectory(prefix='cpu-active-source-') as directory:
+            staging=Path(directory);target=staging/relative;target.parent.mkdir(parents=True);target.write_bytes(before)
+            subprocess.run(['git','apply','--check',str(patch)],cwd=staging,check=True)
+            subprocess.run(['git','apply',str(patch)],cwd=staging,check=True)
+            desired=target.read_bytes()
+        if sha(desired)!=record['after']:raise ValueError('CPU-active caller result differs')
+        return desired
     if relative=='osfmk/kern/lock_rw.c':return original
     if relative.endswith('pmap_internal.h'):
         for name in ('pmap_lock','pmap_lock_preempt'):s=replace_function(s,ref,name)
@@ -78,6 +91,7 @@ def main():
                 subprocess.run(['git','apply',str(NATIVE/patch)],cwd=staging,check=True)
             driver['ArmCpu.cpp']=output.read_bytes()
         for name in ('ZornSmpPolicy.h','ZornSmpRuntime.inc'):driver[name]=(NATIVE/name).read_bytes()
+        driver['ZornActiveHandles.inc']=(ROOT/'UniXNU-zorn/native/cpu-active/ZornActiveHandles.inc').read_bytes()
     files={}
     for relative,current,before,desired in changes:
         backup=OUT/'baseline'/relative;backup.parent.mkdir(parents=True,exist_ok=True)
@@ -90,7 +104,7 @@ def main():
         for name,data in driver.items():(OUT/name).write_bytes(data)
         output=OUT/'ArmCpu.cpp'
         report['driver_source_sha256']=sha(output.read_bytes())
-        report['driver_headers']={name:sha((OUT/name).read_bytes()) for name in ('ZornSmpPolicy.h','ZornSmpRuntime.inc')}
+        report['driver_headers']={name:sha((OUT/name).read_bytes()) for name in driver if name!='ArmCpu.cpp'}
     state.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))
 
 if __name__=='__main__':main()

@@ -1,0 +1,180 @@
+{
+  "recorded_at": "2026-10-30T19:31:30.600965+08:00",
+  "scope": "Synchronize latest non-GPU results and migrate root metadata/README for official format2 ingestion. GPU source and detailed GPU records are outside this update.",
+  "board_schema": 2,
+  "record_schema": 1,
+  "source": {
+    "core_checkout_revision": "066c8d8315f83749d28bcae2faf3595718646be5",
+    "device_HEAD_at_start": {
+      "UniXNU-zorn": "2e77f37b0d5ec5624a44807f9d4f2da700da5a79",
+      "uefi-zorn": "a0ddcf77a7ecbc405398dac87d5237375cd435a9"
+    },
+    "qualification": "Working-tree configuration/documentation checks only; these HEAD values are not revisions for the changed migration source or old hardware runs."
+  },
+  "checks": {
+    "format2": true,
+    "profiles": [
+      "arch",
+      "soc",
+      "os",
+      "device"
+    ],
+    "components": 9,
+    "patches": 157,
+    "archives": 16,
+    "DTS": true,
+    "host_ADT": true,
+    "host_tree": true,
+    "legacy_board_exact": true,
+    "legacy_flat_output": true,
+    "legacy_base_patch_module_preserved": true,
+    "legacy_negative_controls": 3,
+    "original_builder_guards_and_boot_logic_exact": true,
+    "catalog_simulation": {
+      "name": "zorn",
+      "repository": "kerrinz/UniXNU-zorn",
+      "title": "Redmi K80",
+      "title_zh": "Redmi K80",
+      "repository_id": 0,
+      "revision": "2e77f37b0d5ec5624a44807f9d4f2da700da5a79",
+      "board": "zorn",
+      "soc": "SM8650",
+      "format": 2,
+      "os_profile": "ipados-17.7.11-21H461",
+      "components": [
+        "ArmDTPlatform",
+        "ArmCpu",
+        "SoftwareAES",
+        "AppleKeyStoreState",
+        "RamBlock",
+        "VerifiedRoot",
+        "GopFramebuffer",
+        "XnuPrelink",
+        "DarwinBoot"
+      ],
+      "record_state": "available"
+    },
+    "site_live_verified": false,
+    "preview_scope": "Working-tree metadata simulation only; current HEAD is not a tested/published migration revision.",
+    "relative_links_checked": 45,
+    "record_areas": 13,
+    "commands": [
+      [
+        "/opt/homebrew/opt/python@3.13/bin/python3.13",
+        "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/build-zorn-debug.py",
+        "--help"
+      ],
+      [
+        "/opt/homebrew/opt/python@3.13/bin/python3.13",
+        "/Volumes/macData/projects/ios-zorn/uefi-zorn/scripts/build-zorn-firmware.py",
+        "--help"
+      ],
+      [
+        "/opt/homebrew/opt/python@3.13/bin/python3.13",
+        "/Volumes/macData/projects/ios-zorn/UniXNU/scripts/porting-record.py",
+        "check",
+        "--device",
+        "/Volumes/macData/projects/ios-zorn/UniXNU-zorn"
+      ],
+      [
+        "git",
+        "-C",
+        "/Volumes/macData/projects/ios-zorn/UniXNU-zorn",
+        "diff",
+        "--check",
+        "--",
+        ".",
+        ":!*.patch"
+      ],
+      [
+        "git",
+        "-C",
+        "/Volumes/macData/projects/ios-zorn/uefi-zorn",
+        "diff",
+        "--check"
+      ]
+    ],
+    "new_kernel": false,
+    "phone_operations": false,
+    "Git_commit_push": false
+  },
+  "preservation": {
+    "checked_at": "2026-10-30T19:27:52.064250+08:00",
+    "c50_current_inputs": 255,
+    "c50_immutable_archives": 77,
+    "raw231_inputs": 231,
+    "default42_preserved": true,
+    "desktop3a_preserved": true,
+    "automation": "PAUSED",
+    "keepawake_unloaded": true,
+    "last_known_device": "recovered; not queried again",
+    "active_build_run": false,
+    "Git_heads_unchanged": true,
+    "GPU_shared_source_preimage_exact": true,
+    "phone_operations": false,
+    "new_kernel": false
+  },
+  "implementation_bindings": {
+    "UniXNU-zorn/README.md": "94fa4361aee201ee743ab41ff1fbae0615a856e849b08e339d94de1691589446",
+    "uefi-zorn/README.md": "8acabee69c388d84e6d5d2a4abafffa459cc2761430342371dca662572a9c143",
+    "UniXNU-zorn/AGENTS.md": "fe082fb086082d0e810bb5870c0efbed03e2ca920899dca740bb2b84644334c0",
+    "uefi-zorn/AGENTS.md": "fe082fb086082d0e810bb5870c0efbed03e2ca920899dca740bb2b84644334c0",
+    "UniXNU-zorn/board.toml": "3c21fe7f39024c42c226cd9f3cbdaf42530697c33e66d97d1a3bff2879bc4721",
+    "UniXNU-zorn/feeds.toml": "61fb42492b11eb9bbf1547f9ee3676ef62785300edab26cfc67a263e904cdf3c",
+    "UniXNU-zorn/porting.toml": "b670bf68b8859e0d585610d310092da23fbbda9a48235515adb81380e666430e",
+    "UniXNU-zorn/local.toml.example": "1515bd0c2cdf4d8d68bdd7598db9ae1d2e0bce73361f81ade7fd86fe54473c49",
+    "UniXNU-zorn/proprietary-files.txt": "8e3575103b6f30e5d2f461bf3954f2140b5e4f0ead5436b2022284829cf84a36",
+    "UniXNU-zorn/compat/legacy/board.toml": "d65567ecd289b9fcddb1c1a7dcbf5af277f990f1184a09def54a3582f194b380",
+    "UniXNU-zorn/dts/zorn.dts": "e8a21c72d8fde70735655103002e6be800ef7c894f043cc473f840139dc9a683",
+    "UniXNU-zorn/soc/sm8650/soc.toml": "237798abe0eaf0c08b4e1716440651a6a9d7b3d0c448e96e6c7260dccd3ba6ed",
+    "UniXNU-zorn/soc/sm8650/dts/sm8650.dtsi": "3a929bafb3ff94232f8498fd23d3bb97bbda3fe45dc0ede9e63381af21cb0df3",
+    "UniXNU-zorn/soc/sm8650/README.md": "aeafea1ca6a86d31171cf03586df94dbd67c4857ead32c9ea14e9b297c74b4b3",
+    "UniXNU-zorn/package/Kit.toml": "dfa60a28cd64360b3a44b743c36f59da476cdb95b4a0e470aff6b87e7753eca4",
+    "UniXNU-zorn/package/README.md": "415a6f2e9716f98009305a0b25ed356ac868f8aa9f8e224411bc9b4f5e14b046",
+    "UniXNU-zorn/patches/xnu/series": "7a62978c98055e97870c8a654438ade3426c902466c5ac1c3420445c103f8e71",
+    "UniXNU-zorn/scripts/zorn_legacy_device.py": "cb744a85ab2340017d4a93ac47628648f8f0eb96482e8c2618236ab15801a5c3",
+    "UniXNU-zorn/scripts/prepare-zorn-legacy-view.py": "b89459befb20db4f8a8fbd0db82bc31c546b70f16f1701512ca296dae8dd943d",
+    "UniXNU-zorn/scripts/build-zorn-debug.py": "165dbff9cae791be142268bbb6141cb1c41f170c634cae8187267a05fc76b37f",
+    "UniXNU-zorn/scripts/stage-zorn-build-workspace.py": "839b14579e382b8bbeba00490f303f902e49b695c64a4e39084d9de907164fd3",
+    "UniXNU-zorn/scripts/install-zorn-patches.sh": "bce9a699f95fbdf70a41cba39a384f32e9607daa55d22c6d06d5547b3000faa2",
+    "uefi-zorn/scripts/build-zorn-firmware.py": "0f4f2d6014a47cbccb2c94f7d019069a0031f1f5ef750ec48699fe0a2a2aa4ac",
+    "UniXNU-zorn/docs/repository-format.md": "664d68950bcfbdd1e434fb0b5e660902491b20439d1865d868891d17f9b73959",
+    "UniXNU-zorn/docs/build-and-debug.md": "500f265acd105faab9293a5f5ebd6e4b9ef860803d27da49d5c6bb7673bba1f9",
+    "uefi-zorn/docs/build-and-handoff.md": "8e3476b89fb859b1bc40253130b395dc27aa3dcab247f7507558b2e03722cd75",
+    "UniXNU-zorn/docs/progress-2026-10-30-non-gpu.md": "8eb399316470d8a1c2aa56398a6091205f1c5bd0057031c787b632c63ae7b0a8",
+    "uefi-zorn/docs/progress-2026-10-30-non-gpu.md": "8eb399316470d8a1c2aa56398a6091205f1c5bd0057031c787b632c63ae7b0a8"
+  },
+  "external_tool": {
+    "source": "https://formulae.brew.sh/api/formula/dtc.json",
+    "version": "1.8.1",
+    "bottle": {
+      "cellar": ":any",
+      "url": "https://ghcr.io/v2/homebrew/core/dtc/blobs/sha256:c85117d5237ea464866d8712ff9fc264a1701eca34d9d470d720a935c79f61ba",
+      "sha256": "c85117d5237ea464866d8712ff9fc264a1701eca34d9d470d720a935c79f61ba"
+    },
+    "verified_bottle_sha256": "c85117d5237ea464866d8712ff9fc264a1701eca34d9d470d720a935c79f61ba",
+    "isolation": "Unpacked only under host output; no global install. Child DYLD_LIBRARY_PATH used existing libyaml.",
+    "libyaml_sha256": "8d6a60c8d8b91810f60e3fa1094d8c01fe79dad0f787fce8c1dbd59cccee99bb"
+  },
+  "check_outputs": {
+    "out/zorn/docs-sync-20261030/check-migration.py": "519dbeb7f3e2789845c6e1d608cb9f7d046f16b636cd3807c84dfed4030f064d",
+    "out/zorn/docs-sync-20261030/migration-result.json": "3bcd6b7bca5a6984c755881ed69cd3630d6887514a8c8067ab979d3af32dbb67",
+    "out/zorn/docs-sync-20261030/zorn-hardware.dtb": "0cfdb7ce32497d810d36ad2cc5d846a9433c8d811dd732e034d68a47e3ae0df2",
+    "out/zorn/docs-sync-20261030/format2-host.adt": "1fc6da751db9ab131e00db24941f9cab7dc3ba475e629d866a71ec67eaadce42",
+    "out/zorn/docs-sync-20261030/dtc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/docs-sync-20261030/dtc-command.json": "f2b360e21ec95e42bff11800ee979f3d03638755cf642b1ca5f2b60d92036f50",
+    "out/zorn/docs-sync-20261030/preservation-result.json": "764d6667ccdff6444c9830128e2a0129812ebe01f15ee7750f42e8d30464679f"
+  },
+  "publication_requirements": [
+    "Publish the reviewed complete files to an actual commit. No commit/push was performed here.",
+    "Confirm GitHub Porting record and official scan for that published commit; local simulation is not a live-site acceptance.",
+    "Do not assign old device runs to the new root config. Full native kernel/payload equivalence and new format2 device qualification remain pending."
+  ],
+  "claims_not_made": [
+    "Artifact-free bootstrap",
+    "New format2 native kernel/firmware/image or phone run",
+    "Historical Apple-logo root cause or long-term/performance qualification",
+    "Detailed GPU synchronization or hardware support"
+  ],
+  "autonomy": "PAUSED; keepawake unloaded; no resume, reboot, shutdown scheduling or device query."
+}

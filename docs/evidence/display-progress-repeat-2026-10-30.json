@@ -1,0 +1,342 @@
+{
+  "analyzed_at": "2026-10-30T16:16:46.582231+08:00",
+  "status": "recovered-new-log",
+  "run": "out/zorn/debug/20261030-160910-6aea024f",
+  "boot_sha256": "6aea024fab3d1b4e69e99b45b5c1040e322df08bb5ba77038300cf71a398bc7e",
+  "kernel_sha256": "c333be205c64b187aaca848db5033f5a79b8dcc9c4aa9468c91a8d686d26a1e8",
+  "log_sha256": "bda6e26a4f652c3f20d4fdb758f9d724e0962c391a4c32011a2257c677aa947f",
+  "inputs_verified": 233,
+  "archive_files_verified": 55,
+  "smp_summary": "SMP8 phase=80 seen=ff bound=ff remap=ff timers=ff ipis=ff failure=0 tlb=1",
+  "all_eight_core_checks": true,
+  "retained_cookie_qualified": true,
+  "brightness64": true,
+  "actual_gui_version": 19,
+  "display_progress": {
+    "sample_uptime_ms": 356349,
+    "unknown_events": 0,
+    "events": {
+      "retired": {
+        "count": 8,
+        "last_published_uptime_ms": 301401,
+        "sample_overlapped": false,
+        "age_ms": 54948
+      },
+      "armed": {
+        "count": 0,
+        "last_published_uptime_ms": 0,
+        "sample_overlapped": false,
+        "age_ms": null
+      },
+      "sent": {
+        "count": 0,
+        "last_published_uptime_ms": 0,
+        "sample_overlapped": false,
+        "age_ms": null
+      },
+      "idle": {
+        "count": 0,
+        "last_published_uptime_ms": 0,
+        "sample_overlapped": false,
+        "age_ms": null
+      },
+      "late": {
+        "count": 0,
+        "last_published_uptime_ms": 0,
+        "sample_overlapped": false,
+        "age_ms": null
+      },
+      "started": {
+        "count": 1,
+        "last_published_uptime_ms": 38781,
+        "sample_overlapped": false,
+        "age_ms": 317568
+      },
+      "properties": {
+        "count": 0,
+        "last_published_uptime_ms": 0,
+        "sample_overlapped": false,
+        "age_ms": null
+      }
+    },
+    "receipt_confirmed": false,
+    "snapshot_policy": "independent relaxed atomic words; times may be stale or overlap adjacent callbacks"
+  },
+  "observation_available": true,
+  "camera_observations": [
+    {
+      "observed_at": "2026-10-30T16:16:46.312947+08:00",
+      "run": "out/zorn/debug/20261030-160910-6aea024f",
+      "boot_sha256": "6aea024fab3d1b4e69e99b45b5c1040e322df08bb5ba77038300cf71a398bc7e",
+      "image": "out/zorn/debug/20261030-160910-6aea024f/camera-20261030-161118.jpg",
+      "image_sha256": "1a9ffcabbe160f4620471be42570bfaafc55479100997bfff01634fa3bf27658",
+      "lock_screen_visible": true,
+      "apple_logo_visible": false,
+      "observed_clock": "4:02",
+      "desktop_qualified": false,
+      "touch_tested": false,
+      "audio": false,
+      "observation": "Own repeat120s USB frame visibly shows system lockscreen, multicolor wallpaper, clock4:02 and home indicator. Single frame only; no interaction, continuous-window or performance qualification."
+    }
+  ],
+  "wallclock_seconds": 396.0,
+  "bounded_gui_qualified": true,
+  "desktop_qualified": false,
+  "touch_tested": false,
+  "historical_apple_logo_cause_proven": false,
+  "limits": [
+    "v18 fallback means progress unavailable, not zero events.",
+    "Times/counts are independent; sending callbacks do not establish receipt.",
+    "A passing lock-screen observation does not reproduce or explain earlier Apple-logo failure.",
+    "No runtime pressure/performance/interactive or long-term qualification."
+  ],
+  "started": "2026-10-30T16:09:10+0800",
+  "completed": "2026-10-30T16:15:46+0800",
+  "gui_ms": 319699,
+  "gui_tick": 20,
+  "configuration": {
+    "dyld_flags": 9,
+    "owner_dyld_flags": 8,
+    "fixups_parsed": 3,
+    "fixups_applied": 3,
+    "hold_seconds": 300,
+    "watchdog_mode": 1,
+    "owner_stage": 6,
+    "owner_mount_flags": 343969825
+  },
+  "display_words": [
+    10,
+    0,
+    6304,
+    6464,
+    1,
+    1,
+    1,
+    0,
+    8,
+    0,
+    205,
+    0,
+    18446744047835234816,
+    4,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    4229445,
+    4278190080,
+    4228827,
+    8,
+    0,
+    18432000
+  ],
+  "ram_data": {
+    "reads": 12852,
+    "writes": 6039,
+    "errors": 0
+  },
+  "data_space": {
+    "recorded": true,
+    "error": 0,
+    "supported": 15,
+    "block_bytes": 4096,
+    "blocks": 2097152,
+    "available_blocks": 1827164,
+    "uuid": "C7D77FF3-6437-4C4A-8E05-E8E239AC1641",
+    "total_bytes": 8589934592,
+    "available_bytes": 7484063744
+  },
+  "captured_exits": [
+    {
+      "sequence": 1,
+      "pid": 2,
+      "status": 1,
+      "namespace": 0,
+      "code": 0,
+      "name": "launchd",
+      "detail": {
+        "pc": 0,
+        "lr": 0,
+        "far": 0,
+        "slide": 175013888,
+        "main_header": 0,
+        "esr": 0,
+        "cpsr": 0,
+        "fixups": 0,
+        "reason": "",
+        "frames": []
+      }
+    }
+  ],
+  "first_repeat_comparison": {
+    "first_run": "out/zorn/debug/20261030-135043-6aea024f",
+    "repeat_run": "out/zorn/debug/20261030-160910-6aea024f",
+    "same_complete_image": true,
+    "same_complete_kernel": true,
+    "new_distinct_log": true,
+    "first_gui_qualified": true,
+    "repeat_gui_qualified": true,
+    "first_progress": {
+      "sample_uptime_ms": 357395,
+      "unknown_events": 0,
+      "events": {
+        "retired": {
+          "count": 9,
+          "last_published_uptime_ms": 300325,
+          "sample_overlapped": false,
+          "age_ms": 57070
+        },
+        "armed": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "sent": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "idle": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "late": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "started": {
+          "count": 1,
+          "last_published_uptime_ms": 38819,
+          "sample_overlapped": false,
+          "age_ms": 318576
+        },
+        "properties": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        }
+      },
+      "receipt_confirmed": false,
+      "snapshot_policy": "independent relaxed atomic words; times may be stale or overlap adjacent callbacks"
+    },
+    "repeat_progress": {
+      "sample_uptime_ms": 356349,
+      "unknown_events": 0,
+      "events": {
+        "retired": {
+          "count": 8,
+          "last_published_uptime_ms": 301401,
+          "sample_overlapped": false,
+          "age_ms": 54948
+        },
+        "armed": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "sent": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "idle": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "late": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        },
+        "started": {
+          "count": 1,
+          "last_published_uptime_ms": 38781,
+          "sample_overlapped": false,
+          "age_ms": 317568
+        },
+        "properties": {
+          "count": 0,
+          "last_published_uptime_ms": 0,
+          "sample_overlapped": false,
+          "age_ms": null
+        }
+      },
+      "receipt_confirmed": false,
+      "snapshot_policy": "independent relaxed atomic words; times may be stale or overlap adjacent callbacks"
+    },
+    "first_raw_exits": [
+      {
+        "sequence": 1,
+        "pid": 2,
+        "status": 1,
+        "namespace": 0,
+        "code": 0,
+        "name": "launchd",
+        "detail": {
+          "pc": 0,
+          "lr": 0,
+          "far": 0,
+          "slide": 533561344,
+          "main_header": 0,
+          "esr": 0,
+          "cpsr": 0,
+          "fixups": 0,
+          "reason": "",
+          "frames": []
+        }
+      }
+    ],
+    "repeat_raw_exits": [
+      {
+        "sequence": 1,
+        "pid": 2,
+        "status": 1,
+        "namespace": 0,
+        "code": 0,
+        "name": "launchd",
+        "detail": {
+          "pc": 0,
+          "lr": 0,
+          "far": 0,
+          "slide": 175013888,
+          "main_header": 0,
+          "esr": 0,
+          "cpsr": 0,
+          "fixups": 0,
+          "reason": "",
+          "frames": []
+        }
+      }
+    ],
+    "no_new_interaction_qualification": true,
+    "historical_apple_logo_cause_proven": false
+  },
+  "analysis_script": "out/zorn/display-progress/analyze-repeat-trial.py",
+  "analysis_script_sha256": "5113add8381cb650c167d8af9668ddc7843b7ef5705e293b41f0568318d1d4b1",
+  "interpretation": [
+    "Same full image passed a second independent bounded passive lockscreen trial; no extra kernel, rate or service change.",
+    "8 accepted /8 transfers /8 retirement callbacks; counts alone are not request identity or FPS.",
+    "First and repeat raw exit records retain different dyld slide; do not call full dictionaries identical.",
+    "Historical Apple-logo failure was not reproduced; no target overhead, user interaction or long-term qualification."
+  ]
+}
