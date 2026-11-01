@@ -4,6 +4,7 @@ from pathlib import Path
 import hashlib,json,os,re,subprocess,sys
 TREE=Path.cwd()
 DEVICE=Path(os.environ.get('UNIXNU_DEVICE') or json.loads((TREE.parents[1]/'state.json').read_text())['device']).resolve()
+DEVICE=(DEVICE/'native').resolve().parent
 ROOT=DEVICE.parent;STATE=ROOT/'out/zorn/smp/runtime/profile.json'
 mode=os.environ.get('UNIXNU_ZORN_SMP','0')
 if mode not in ('0','8'):raise SystemExit('unqualified zorn CPU profile')

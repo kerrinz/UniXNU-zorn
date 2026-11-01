@@ -11,3 +11,9 @@ RELATIVE_FIRST=(192 if LARGE else 10)*1024**3//4096
 PAGES=(8*1024**3 if LARGE else 512*1024**2)//4096
 BITMAP_BLOCKS=(PAGES+32767)//32768
 WINDOW_BLOCKS=1+BITMAP_BLOCKS+PAGES
+STORAGE=os.environ.get('UNIXNU_ZORN_STORAGE_PROFILE','legacy-userdata')
+if STORAGE not in ('legacy-userdata','unixnu64'):raise ValueError('unknown storage partition')
+if STORAGE=='unixnu64':
+    if not LARGE:raise ValueError('unixnu64 requires8GiB Data')
+    DIRECTORY=ROOT/'out/zorn/dual-system-reinstall-20261101/data-store'
+    RELATIVE_FIRST=16*1024**3//4096

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "name": "unixnu64",
+  "serial": "92988a43",
+  "product": "zorn",
+  "slot": "a",
+  "partition": {
+    "name": "unixnu",
+    "linux_by_name": "/dev/block/by-name/unixnu",
+    "type_guid": "0fc63daf-8483-4772-8e79-3d69d8477de4",
+    "unique_guid": "b279731f-ccad-4ef5-a8b7-e7440cd08de3",
+    "first_lba": 47271680,
+    "last_lba": 64048895,
+    "lba_bytes": 4096,
+    "bytes": 68719476736
+  },
+  "system": {
+    "format": "SHNGROOT",
+    "image_bytes": 9382658048,
+    "image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+    "runtime_readonly": true
+  },
+  "Data": {
+    "profile": "8g",
+    "relative_first_lba": 4194304,
+    "pages": 2097152,
+    "window_blocks": 2097217,
+    "bitmap_blocks": 64,
+    "volume_uuid": "C7D77FF3-6437-4C4A-8E05-E8E239AC1641",
+    "seed_sha256": "f05d5604237ef74da29181b5c1de5524b7ad0af9e18bad9c439df318dd5d2703"
+  },
+  "log": {
+    "relative_lba": 2291712,
+    "blocks": 1
+  },
+  "native_selection": {
+    "environment": "UNIXNU_ZORN_STORAGE_PROFILE=unixnu64",
+    "define": "ZORN_UNIXNU64=1",
+    "Android_userdata_fallback": false
+  },
+  "scope": "exact installed dedicated partition; 64GiB partition, initial8GiB logical Data; not a boot/I/O authorization"
+}

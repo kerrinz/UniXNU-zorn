@@ -26,6 +26,7 @@
 #include "ZornVerifiedRoot.h"
 #include "ZornGuiLog.h"
 #include "../cpu-active/ZornCpuActive.h"
+#include "../gpu-owned/ZornGpuOwnedRuntime.h"
 #include "../display/ZornTouchTrace.h"
 #include "../display/ZornDisplayProgress.h"
 #include "ZornTraceStages.h"
@@ -303,6 +304,7 @@ static_assert(sizeof(ZornLogBlock) == 4096, "log must fit one UFS block");
 static ZornLogBlock gLogBlock;
 // Owned by the existing gLogBusy writer until synchronous transport returns.
 alignas(64) static uint8_t gCpuActiveWire[4096],gCpuActiveScratch[4096];
+alignas(64) static uint8_t gGpuMemoryWire[4096];
 struct ZornMacFailure {
 	char policy[12];
 	uint32_t error;
@@ -1210,6 +1212,7 @@ static IOReturn zorn_write_log4k(const void *source)
 	zorn_gui_fill_footer();
 	uint64_t started = gGuiWatch ? mach_absolute_time() : 0;
 	const void *transport=zorn_cpu_active_transport(source,sizeof(gLogBlock),gCpuActiveWire,gCpuActiveScratch);
+	transport=zorn_gpu_owned_transport(transport,sizeof(gLogBlock),gGpuMemoryWire);
 	IOReturn result = hostWriteLog4k(transport);
 	if (gGuiWatch) {
 		uint64_t elapsed = 0;
@@ -1792,6 +1795,9 @@ static void zorn_ufs_arm_log(uint64_t start, uint64_t end)
 	zorn_say("WRGO");
 	gLogEnabled = true;
 	gTraceEpoch = mach_absolute_time();
+	unsigned gpuMemory=0,gpuRunnableStack=0;
+	PE_parse_boot_argn("zorn_gpu_owned_memory",&gpuMemory,sizeof(gpuMemory));
+	PE_parse_boot_argn("zorn_gui_krun",&gpuRunnableStack,sizeof(gpuRunnableStack));
 	unsigned cpuActive=0,cpuProgress=0,cpuTrace=0,cpuUserStack=0,cpuKernelStack=0;
 	PE_parse_boot_argn("zorn_cpu_active",&cpuActive,sizeof(cpuActive));
 	PE_parse_boot_argn("zorn_display_progress",&cpuProgress,sizeof(cpuProgress));
@@ -1817,6 +1823,9 @@ static void zorn_ufs_arm_log(uint64_t start, uint64_t end)
 	zorn_cpu_active_configure(cpuFixedProfile && cpuActive==1 && cpuProgress==1 && cpuTrace==1 &&
 	    !cpuUserStack && !cpuKernelStack && gGuiWatch && gGuiHoldSeconds==300 &&
 	    gWatchdogMode==1 ? 1 : 0,gTraceEpoch);
+	zorn_gpu_owned_configure(cpuFixedProfile && gpuMemory==1 && !cpuActive && !cpuProgress && cpuTrace==1 &&
+	    !cpuUserStack && !cpuKernelStack && !gpuRunnableStack && gGuiWatch && gGuiHoldSeconds==300 &&
+	    gWatchdogMode==1 ? 1 : 0);
 
 	if (!__sync_bool_compare_and_swap(&gLogBusy, 0, 1)) return;
 	gLogArmed = true;
@@ -2228,7 +2237,12 @@ extern "C" void zorn_ufs_read_gpt(void)
 	if (why) {
 		zorn_ufs_stop(why);
 	}
+#if defined(ZORN_UNIXNU64) && ZORN_UNIXNU64
+	// Never fall back to Android userdata on the dedicated dual-system profile.
+	const uint8_t *userdata = zornUnixnu64Entry(entries, count, size);
+#else
 	const uint8_t *userdata = gptNamed(entries, count, size, "userdata");
+#endif
 	const uint8_t *misc = gptNamed(entries, count, size, "misc");
 	if (!userdata) {
 		zorn_ufs_stop("UNAME");

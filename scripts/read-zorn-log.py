@@ -46,14 +46,24 @@ def touch_raw(block):
     return raw
 
 
-def from_recovery():
+def from_recovery(storage_profile='legacy-userdata'):
     adb = ["adb", "-s", SERIAL]
     serial = subprocess.run(adb + ["get-serialno"], capture_output=True, text=True, check=True)
     if serial.stdout.strip() != SERIAL:
         raise ValueError(f"unexpected adb serial: {serial.stdout.strip()!r}")
-    dd = (f"dd if=/dev/block/by-name/userdata bs={BLOCK_SIZE} "
+    if storage_profile not in ('legacy-userdata', 'unixnu64'):
+        raise ValueError('unknown storage profile')
+    partition = 'unixnu' if storage_profile == 'unixnu64' else 'userdata'
+    if partition == 'unixnu':
+        for command, expected in [(['shell','getprop','ro.product.device'],'zorn'),
+                                  (['shell','getprop','ro.boot.slot_suffix'],'_a'),
+                                  (['shell','blockdev','--getsize64','/dev/block/by-name/unixnu'],'68719476736')]:
+            value = subprocess.run(adb + command, capture_output=True, text=True, check=True, timeout=20)
+            if value.stdout.strip() != expected:
+                raise ValueError('unixnu64 recovery identity/size differs')
+    dd = (f"dd if=/dev/block/by-name/{partition} bs={BLOCK_SIZE} "
           f"skip={LOG_BLOCK} count=1 2>/dev/null")
-    command = adb + ["exec-out", "sh", "-c", dd]
+    command = adb + (["exec-out", dd] if partition == "unixnu" else ["exec-out", "sh", "-c", dd])
     result = subprocess.run(command, capture_output=True, check=True)
     if len(result.stdout) != BLOCK_SIZE:
         raise ValueError(f"read {len(result.stdout)} bytes, expected {BLOCK_SIZE}: {result.stderr!r}")
@@ -71,7 +81,20 @@ def _cpu_active_block(block):
     return module.decode(block)
 
 
+def _gpu_memory_block(block):
+    if len(block)!=4096 or block[:8]!=b"ZORNLOGD" or int.from_bytes(block[1032:1036],"little")!=21:
+        return None
+    import importlib.util
+    path = Path(__file__).with_name("zorn_gpu_memory.py")
+    spec = importlib.util.spec_from_file_location("zorn_gpu_memory_bound", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.decode(block)
+
+
 def decode(block):
+    gpu = _gpu_memory_block(block)
+    if gpu is not None: block = gpu["original_block"]
     active = _cpu_active_block(block)
     if active is not None: block = active["original_block"]
     if len(block) != BLOCK_SIZE:
@@ -133,6 +156,8 @@ def touch_trace(raw):
 
 
 def gui_state(block):
+    gpu_memory = _gpu_memory_block(block)
+    if gpu_memory is not None: block = gpu_memory["original_block"]
     cpu_active = _cpu_active_block(block)
     if cpu_active is not None: block = cpu_active["original_block"]
     if len(block) != BLOCK_SIZE or block[:8] not in (b"ZORNLOG3", b"ZORNLOG4", b"ZORNLOG5", b"ZORNLOG6", b"ZORNLOG7", b"ZORNLOG8", b"ZORNLOG9", b"ZORNLOGA", b"ZORNLOGB", b"ZORNLOGD"):
@@ -151,6 +176,8 @@ def gui_state(block):
               "pages": {"free": free, "active": active, "inactive": inactive, "wired": wired},
               "ram_data": {"reads": ram[0], "writes": ram[1], "errors": ram[2]},
               "display": list(display), "processes": [], "exits": []}
+    if gpu_memory is not None:
+        result["gpu_owned_memory"] = {key: value for key, value in gpu_memory.items() if key != "original_block"}
     if cpu_active is not None:
         result["cpu_active"] = {key: value for key, value in cpu_active.items() if key != "original_block"}
     if version == 19:
@@ -345,15 +372,30 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--block", type=Path, help="decode an existing 4096-byte local dump")
     parser.add_argument("--save", type=Path, help="save the raw block locally after adb read")
+    parser.add_argument('--storage-profile', choices=('legacy-userdata','unixnu64'), default='legacy-userdata')
     parser.add_argument("--tail", type=int, default=80, help="print this many latest words (default: 80)")
+    parser.add_argument("--early-expected", type=Path, help="expected nonce/kernel/input digests for a terminal early record; no device authorization")
     args = parser.parse_args()
     if args.tail < 1:
         parser.error("--tail must be positive")
     if args.block and args.save:
         parser.error("--save is only for adb reads")
-    block = args.block.read_bytes() if args.block else from_recovery()
+    block = args.block.read_bytes() if args.block else from_recovery(args.storage_profile)
     if args.save:
         args.save.write_bytes(block)
+    if block[:8] == b"ZORNGQF1":
+        import importlib.util
+        path = Path(__file__).with_name("zorn_early_failure.py")
+        spec = importlib.util.spec_from_file_location("zorn_early_failure_bound", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        expected = json.loads(args.early_expected.read_text()) if args.early_expected else None
+        if expected is not None and not isinstance(expected, dict):
+            parser.error("early expected identity must be a JSON object")
+        print("Early terminal checkpoint: " + json.dumps(module.decode(block, expected), separators=(",", ":")))
+        return
+    if args.early_expected:
+        parser.error("--early-expected requires a terminal early record")
     words = decode(block)
     raw_touch = touch_raw(block)
     if raw_touch is not None:

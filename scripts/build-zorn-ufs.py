@@ -70,10 +70,18 @@ if os.environ.get('UNIXNU_ZORN_SMP','0')=='8':
     command += ["-DZORN_SMP_PREFLIGHT=1"]
 if os.environ.get('UNIXNU_ZORN_DATA_PROFILE','512m')=='8g':
     command += ["-DZORN_DATA_8G=1"]
+storage = os.environ.get('UNIXNU_ZORN_STORAGE_PROFILE', 'legacy-userdata')
+if storage not in ('legacy-userdata', 'unixnu64'):
+    raise ValueError('unknown storage partition profile')
+if storage == 'unixnu64':
+    if os.environ.get('UNIXNU_ZORN_DATA_PROFILE') != '8g':
+        raise ValueError('unixnu64 requires the exact 8GiB seed')
+    command += ['-DZORN_UNIXNU64=1']
 if os.environ.get('UNIXNU_ZORN_TOUCH_RUNTIME','0')=='1':
     command += ["-DZORN_TOUCH_RUNTIME_ENABLED=1"]
 for path in includes:
     command += ["-I", str(path)]
+(out/'ufs-command.json').write_text(json.dumps(dict(arguments=command,cwd=str(TREE)),indent=2)+'\n')
 print(" ".join(command), flush=True)
 subprocess.run(command, check=True)
 if verified:
@@ -143,5 +151,9 @@ cpu_sha=lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
     object_sha256={str(p):cpu_sha(p) for p in cpu_objects},
     recipe_sha256=cpu_sha(cpu_recipe),commands=cpu_commands,
     fixed_eight_core=os.environ.get('UNIXNU_ZORN_SMP','0')=='8',hardware_qualified=False),indent=2)+'\n')
+# Every profile resolves the C ABI; the off path links only a no-op C stub.
+sys.path.insert(0,str(DEVICE/'scripts'))
+from zorn_gpu_owned_build import build as build_gpu_owned
+objects += build_gpu_owned(TREE,DEVICE,out/'gpu-owned',os.environ.get('UNIXNU_ZORN_GPU_MEMORY','0')=='1')
 subprocess.run(["xcrun", "ar", "rcs", str(archive), *objects], check=True)
 print(archive)

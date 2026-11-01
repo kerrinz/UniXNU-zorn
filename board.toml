@@ -1,10 +1,12 @@
 # Format2 configuration. Legacy debug entry uses compat/legacy/board.toml; see docs/repository-format.md.
 # Redmi K80 (zorn), 12GB+256GB, SM8650-AB. Read by the unixnu build driver.
 # RAM boot only for the kernel image. [userdata] is the iPadOS 17.7.11 volume
-# file built by `unixnu build userdata`. That file was written to userdata on
-# 2026-10-25 and the read-back stopped at SHNGOK. Do not flash it again, and
-# do not boot Android while it is installed. OS reads remain read-only; the
-# diagnostic transport writes only its log block and the recovery BCB.
+# file built by `unixnu build userdata`. Since the owner-requested 2026-11-01
+# dual-system reinstall it belongs to the dedicated64GiB unixnu partition.
+# Android userdata must never receive this raw image. The generic upstream
+# builder still prints "flash userdata"; do not execute that command here.
+# Select storage/unixnu64.json and its matching compiled-kernel proof instead.
+# OS reads remain read-only; only the bounded Data/log/BCB writers are enabled.
 # The tested boot image is packed by uefi-zorn/scripts, because the generic
 # payload step does not use 512-byte FAT clusters.
 
@@ -41,11 +43,11 @@ fetch = ["KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustC
 "044-76040-038.dmg" = "3f99b859c9728379110b66657c7b15285bcb1925ad8b5726542e2cdcf8b1028d"
 "044-76034-038.dmg" = "b4908cde41d23e6bc05e6af51a2c9eeb00cf0f863a6a18b1600c96a3fd70414f"
 
-# first_lba/last_lba only reproduce fastboot partition-size 0x3A1D0FB000
-# (60936443 blocks of 4096). They are not the GPT addresses.
+# Capacity-relative geometry of dedicated unixnu64 (16777216 blocks).
+# These are not absolute GPT LBAs. Actual identity is storage/unixnu64.json.
 [userdata]
 first_lba = 0
-last_lba = 60936442
+last_lba = 16777215
 lba_bytes = 4096
 
 [[userdata.windows]]
@@ -156,7 +158,7 @@ BUILDID_STRING = "zorn-research"
 # Numbers for the generic payload step. The image that reached MEND is the
 # one packed by uefi-zorn/scripts/make-zorn-payload.py: 512-byte clusters,
 # menu file payload/EFI/UniXNU/unixnu.toml. The verified-root candidate now
-# omits the old restore initrd; rd=md0 is the userdata OS container.
+# omits the old restore initrd; rd=md0 is the dedicated unixnu OS container.
 [payload]
 volume = "ZORNESP"
 size_mib = 192

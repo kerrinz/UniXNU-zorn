@@ -136,6 +136,7 @@ def main():
     parser.add_argument("--capture-after", type=int, default=0,
                         help="optional single USB-camera frame this many seconds after fastboot boot; 0 disables")
     parser.add_argument("--arm-recovery-bcb", action="store_true", help="prepare the bounded recovery BCB before an early-watchdog image")
+    parser.add_argument("--gpu-media-qualification-policy", type=Path, help="UNAPPLIED proposal; requires new specific approval and complete fresh candidate")
     args = parser.parse_args()
     if args.timeout < 10:
         parser.error("--timeout must be at least 10 seconds")
@@ -143,6 +144,11 @@ def main():
         parser.error("--capture-after must be 0 or 30..timeout-30 seconds")
     image = args.image.resolve()
     digest = hashlib.sha256(image.read_bytes()).hexdigest()
+    qualification = None
+    if args.gpu_media_qualification_policy:
+        from qualification_policy import validate, claim
+        policy = json.loads(args.gpu_media_qualification_policy.read_text())
+        qualification = validate(policy, image, args.timeout, args.capture_after, args.arm_recovery_bcb)
     out = ROOT / "out/zorn/debug" / (time.strftime("%Y%m%d-%H%M%S-") + digest[:8])
     out.mkdir(parents=True, exist_ok=False)
     manifest = {"serial": SERIAL, "image": str(image), "sha256": digest,
@@ -173,6 +179,9 @@ def main():
             build = json.loads(inputs.read_text())
             if build.get("status") != "ready" or build.get("sha256") != digest:
                 raise RuntimeError("build manifest is not ready or does not match boot.img; rebuild with build-zorn-debug.py")
+            if build.get("single_media_qualification") is True or qualification:
+                from qualification_policy import validate_build_manifest
+                validate_build_manifest(build, qualification)
             (out / "build-inputs.json").write_bytes(inputs.read_bytes())
             early_watchdog = early_watchdog or build.get("early_watchdog_mode", 0) != 0
         if args.capture_after and (not build or not build.get("gui_watch") or not early_watchdog):
@@ -182,7 +191,12 @@ def main():
             if args.timeout < minimum_gui_recovery_timeout(build.get("gui_hold_seconds", 0)):
                 raise RuntimeError("host timeout omits independent exec/GUI/watchdog/recovery budgets; no USB action attempted")
         print(f"image {digest}; artifacts {out}", flush=True)
+        if qualification:
+            claim(qualification)
+            manifest["single_media_qualification"] = "consumed-no-repeat"
         state = adb_state()
+        if qualification and state != "recovery":
+            raise RuntimeError("media qualification starts in recovery; bootstrap/extra boot forbidden")
         if early_watchdog and state is None and fastboot_visible():
             bootstrap = ROOT / "out/zorn/boot-ignition-natural-ee6681fd.img"
             if not bootstrap.is_file() or hashlib.sha256(bootstrap.read_bytes()).hexdigest() != \
@@ -197,6 +211,11 @@ def main():
             manifest["recovery_bootstrap_sha256"] = hashlib.sha256(bootstrap.read_bytes()).hexdigest()
             record()
         if state == "recovery":
+            if qualification:
+                exact_serial = command(["adb", "-s", SERIAL, "get-serialno"]).strip()
+                exact_slot = command(["adb", "-s", SERIAL, "shell", "getprop", "ro.boot.slot_suffix"]).strip()
+                if exact_serial != SERIAL or exact_slot != "_b":
+                    raise RuntimeError("exact serial/slot b required before any BCB write")
             product = command(["adb", "-s", SERIAL, "shell", "getprop", "ro.product.device"]).strip()
             if product != "zorn":
                 raise RuntimeError(f"unexpected recovery device: {product!r}")
@@ -229,8 +248,27 @@ def main():
         wait_for_recovery(args.timeout, args.capture_after, lambda elapsed: capture_screen(out, elapsed))
         print("recovery ADB online; reading checkpoint block", flush=True)
         reader = Path(__file__).with_name("read-zorn-log.py")
-        log = command([sys.executable, str(reader), "--save", str(out / "checkpoints.bin"),
-                       "--tail", "100"])
+        if qualification:
+            # Recover bytes first. Invalid/missing/mismatched early record is
+            # unavailable, not a fabricated native failure or storage success.
+            reader_spec = importlib.util.spec_from_file_location("qualification_reader", reader)
+            reader_module = importlib.util.module_from_spec(reader_spec)
+            reader_spec.loader.exec_module(reader_module)
+            block = reader_module.from_recovery()
+            (out / "checkpoints.bin").write_bytes(block)
+            from qualification_policy import recovered_record
+            observed = recovered_record(block, qualification["expected_path"], before_log)
+            (out / "qualification-record.json").write_text(json.dumps(observed, indent=2)+"\n")
+            manifest["qualification_record_available"] = observed["available"]
+            manifest["native_commit_status_available"] = False
+            if observed["available"]:
+                log = command([sys.executable, str(reader), "--block", str(out / "checkpoints.bin"),
+                               "--early-expected", qualification["expected_path"], "--tail", "100"])
+            else:
+                log = "qualification record unavailable: " + observed["reason"] + "\n"
+        else:
+            log = command([sys.executable, str(reader), "--save", str(out / "checkpoints.bin"),
+                           "--tail", "100"])
         (out / "checkpoints.txt").write_text(log)
         print(log, end="", flush=True)
         after_log = hashlib.sha256((out / "checkpoints.bin").read_bytes()).hexdigest()
@@ -249,6 +287,10 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        if '--unixnu64-install-trial' in sys.argv:
+            from zorn_unixnu64_run import main as run_unixnu64
+            run_unixnu64()
+        else:
+            main()
     except (OSError, RuntimeError, subprocess.SubprocessError) as error:
         sys.exit(str(error))

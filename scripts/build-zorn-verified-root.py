@@ -11,6 +11,7 @@ import sys
 TREE = Path.cwd()
 DEVICE = Path(os.environ.get("UNIXNU_DEVICE") or json.loads(
     (TREE.parents[1] / "state.json").read_text())["device"]).resolve()
+DEVICE = (DEVICE / "native").resolve().parent
 INPUT = DEVICE.parent / "out/zorn/verified-root"
 OUT = TREE / "build/zorn-verified-root"
 OUT.mkdir(parents=True, exist_ok=True)

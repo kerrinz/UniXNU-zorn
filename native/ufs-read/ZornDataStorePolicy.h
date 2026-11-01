@@ -3,14 +3,27 @@
 // K80-specific allocation, independently checked against both live GPT copies.
 // Blocks are 4096 bytes. The existing OS/SystemOS image and log are below it.
 #include <stdint.h>
+#if defined(ZORN_UNIXNU64) && ZORN_UNIXNU64
+#include "ZornUnixnu64.h"
+#if !defined(ZORN_DATA_8G) || !ZORN_DATA_8G
+#error unixnu64 requires the explicitly selected 8GiB Data seed
+#endif
+static constexpr uint64_t kZornDataPartitionFirst = kZornUnixnuFirst;
+static constexpr uint64_t kZornDataPartitionLast = kZornUnixnuLast;
+static constexpr uint64_t kZornDataRelativeFirst = 4194304; // 16GiB in unixnu
+#else
 static constexpr uint64_t kZornDataPartitionFirst = 3112704;
 static constexpr uint64_t kZornDataPartitionLast = 64049146;
 #if defined(ZORN_DATA_8G) && ZORN_DATA_8G
-static constexpr uint64_t kZornDataRelativeFirst = 50331648; //192GiB, separate from old512MiB
+static constexpr uint64_t kZornDataRelativeFirst = 50331648; // historical192GiB
+#else
+static constexpr uint64_t kZornDataRelativeFirst = 2621440;
+#endif
+#endif
+#if defined(ZORN_DATA_8G) && ZORN_DATA_8G
 static constexpr uint64_t kZornDataPages = 2097152;
 static constexpr uint64_t kZornDataWindowBlocks = 2097217; // header +64bitmap +8GiB
 #else
-static constexpr uint64_t kZornDataRelativeFirst = 2621440; // 10 GiB
 static constexpr uint64_t kZornDataPages = 131072;
 static constexpr uint64_t kZornDataWindowBlocks = 131077; // header + 4 bitmap + 512 MiB
 #endif

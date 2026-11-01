@@ -40,3 +40,9 @@ extern "C" int zorn_active_processor_handle(unsigned id,processor_t *out) {
     if(!p)return 0;
     *out=p;return 1;
 }
+
+// CPU-only GPU memory caller checks the original full preflight, without
+// requiring or reading any cross-core accounting handle/table.
+extern "C" int zorn_gpu_memory_profile_ready(void) {
+    return zornActiveGates(false);
+}

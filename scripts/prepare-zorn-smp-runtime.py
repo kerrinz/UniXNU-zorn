@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Apply/restore a pinned opt-in SMP source profile; never touch USB or Git."""
-import argparse,hashlib,json,re,subprocess,tempfile
+import argparse,hashlib,json,os,re,subprocess,tempfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 TREE=ROOT/'UniXNU/out/zorn/tree';WORK=TREE/'.cache/xnu-work'
@@ -36,8 +36,19 @@ def transform(relative,before,original):
             subprocess.run(['git','apply',str(patch)],cwd=staging,check=True)
             desired=target.read_bytes()
         if sha(desired)!=record['after']:raise ValueError('CPU-active caller result differs')
+        if os.environ.get('UNIXNU_ZORN_GPU_MEMORY','0')=='1':
+            native=ROOT/'UniXNU-zorn/native/gpu-owned'
+            record=json.loads((native/'source-profile.json').read_text());patch=native/'bsd-caller.patch'
+            if sha(desired)!=record['before'] or sha(patch.read_bytes())!=record['patch_sha256']:
+                raise ValueError('GPU memory caller source/patch differs')
+            with tempfile.TemporaryDirectory(prefix='gpu-memory-source-') as directory:
+                staging=Path(directory);target=staging/relative;target.parent.mkdir(parents=True);target.write_bytes(desired)
+                subprocess.run(['git','apply','--check',str(patch)],cwd=staging,check=True)
+                subprocess.run(['git','apply',str(patch)],cwd=staging,check=True)
+                desired=target.read_bytes()
+            if sha(desired)!=record['after']:raise ValueError('GPU memory caller result differs')
         return desired
-    if relative=='osfmk/kern/lock_rw.c':return original
+    if relative=='osfmk/kern/lock_rw.c' :return original
     if relative.endswith('pmap_internal.h'):
         for name in ('pmap_lock','pmap_lock_preempt'):s=replace_function(s,ref,name)
     if relative.endswith('/pmap.c'):

@@ -63,7 +63,40 @@ def verify_source_replay():
     return replay
 
 
+def assemble_unixnu64_image():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--unixnu64-host-image', action='store_true', required=True)
+    parser.add_argument('--os', choices=('17',), required=True)
+    parser.parse_args()
+    path = ROOT / 'out/zorn/dual-system-reinstall-20261101/image-policy.json'
+    if digest(path) != '1e0ebbef284b71d308643a59f749719779c29db3a559e9f99a576391d982dcd2':
+        raise RuntimeError('unixnu64 host image policy changed')
+    from zorn_gen7_image import assemble
+    assemble(ROOT, json.loads(path.read_text()))
+    raise SystemExit(0)
+
+if '--unixnu64-host-image' in sys.argv:
+    assemble_unixnu64_image()
+
+if '--unixnu64-retained-host-image' in sys.argv:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--unixnu64-retained-host-image', action='store_true', required=True)
+    parser.add_argument('--os', choices=('17',), required=True)
+    parser.parse_args()
+    path = ROOT / 'out/zorn/dual-system-reinstall-20261101/retained-image-policy.json'
+    if digest(path) != 'e4eebebeab5289333800fac543134a7a73e9c753b4ddcf41856edc535411d734':
+        raise RuntimeError('retained unixnu64 image policy changed')
+    from zorn_gen7_image import assemble
+    assemble(ROOT, json.loads(path.read_text()))
+    raise SystemExit(0)
+
+if '--unixnu64-native-build' in sys.argv:
+    from zorn_unixnu64_build import main as build_unixnu64
+    build_unixnu64()
+    raise SystemExit(0)
+
 def main():
+    global MANIFEST
     from zorn_session_guard import check_deadline, minimum_gui_recovery_timeout
     check_deadline()
     parser = argparse.ArgumentParser(description=__doc__)
@@ -133,6 +166,7 @@ def main():
                         help="verify frozen component revisions/bytes instead of updating submodules")
     parser.add_argument("--fd", type=Path, default=ROOT.parent /
                         "Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd")
+    parser.add_argument("--gpu-owned-memory-preflight", action="store_true", help="CPU-only fixed stock-SHA Gen7 backing qualification; no GPU activation")
     args = parser.parse_args()
     if args.smp_root_publication is None:
         args.smp_root_publication = 1 if args.smp_preflight == 8 else 0
@@ -153,6 +187,18 @@ def main():
         args.boot or args.gui_user_stacks or args.gui_kernel_stacks or args.gui_runnable_kernel_stacks or
         any(p is not None for p in (args.reuse_kernel_control,args.reuse_smp_publication_control,args.reuse_gui_budget_control))):
         parser.error('CPU active observation requires new pinned retained8GiB eight-core300/600 dim64/trace/progress/watchdog1; no boot, reuse, stop or stacks')
+    if args.gpu_owned_memory_preflight and (not (args.smp_preflight==8 and args.smp_continue and
+        args.smp_root_publication==1 and not args.smp_stop_after_pass and args.gui_watch and
+        args.touch_trace and args.touch_runtime and args.touch_edges and args.touch_kernel_parser and
+        args.touch_fast_poll and args.touch_handoff and args.hid_family and
+        args.retained_data and not args.fresh_data and args.data_profile=='8g' and args.memory_mib==8192 and
+        args.early_watchdog==1 and args.gui_hold_seconds==300 and args.display_mode==3 and
+        args.brightness_mode==3 and args.data_store_mode==2) or
+        args.cpu_active_observation or args.display_progress or args.gui_user_stacks or
+        args.gui_kernel_stacks or args.gui_runnable_kernel_stacks or args.boot or not args.source_pins or not args.incremental_patched_tree or
+        args.defconfig!='zorn_union_defconfig' or args.recovery_timeout!=600 or any(p is not None for p in
+        (args.reuse_kernel_control,args.reuse_smp_publication_control,args.reuse_gui_budget_control)) ):
+        parser.error('GPU owned memory requires a new pinned8core/8GiB retained dim64 touch/trace300/600 watchdog1 profile; no boot/reuse/stop/stacks/CPU-active/display-progress')
     if args.reproducible_tool_dates and (sys.platform != 'darwin' or args.boot or
         any(p is not None for p in (args.reuse_kernel_control,args.reuse_smp_publication_control,args.reuse_gui_budget_control)) or
         not (args.source_pins and args.incremental_patched_tree and args.smp_preflight==8 and args.smp_continue and not args.smp_stop_after_pass and args.smp_root_publication==1)):
@@ -288,6 +334,13 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     if shutil.disk_usage(OUT).free < 1024**3:
         parser.error("need at least 1 GiB of local build headroom; compact generated archives before building")
+    if args.gpu_owned_memory_preflight:
+        # Canonical source entry, separate diagnostic product/manifest. The
+        # owner's default42 image and its original manifest are not outputs.
+        if digest(OUT/'boot.img')!='42f3d5183b67bd42b2e02ec1d193ba888d0e6c2dc4cd50dafab2211ce589583e':
+            raise RuntimeError('protected default42 image differs')
+        (OUT/'gpu-memory-integration').mkdir(exist_ok=True)
+        MANIFEST=OUT/'gpu-memory-integration/build.inputs.json'
     disabled_jobs = ["com.apple.identityservicesd", "com.apple.locationd", "com.apple.CommCenter", "com.apple.bluetoothd", "com.apple.watchdogd"] if args.minimal_services else []
     if args.lite_services:
         policy_source = (ROOT / "UniXNU-zorn/native/startup-policy/BootWatchdogPolicy.c").read_text()
@@ -347,6 +400,8 @@ def main():
               "tool_zero_ar_date": '1' if args.reproducible_tool_dates else os.environ.get('ZERO_AR_DATE'),
               "xnu_extra_cflags": os.environ.get("XNU_EXTRA_CFLAGS")}
 
+    if args.gpu_owned_memory_preflight:
+        record['gpu_owned_memory_preflight'] = True
     if args.display_progress:
         record['display_progress'] = True
     if args.cpu_active_observation:
@@ -416,6 +471,7 @@ def main():
                     raise RuntimeError("firmware source changed since its capability record; rebuild first")
         env = dict(os.environ)
         env["UNIXNU_ZORN_SMP"] = str(args.smp_preflight)
+        env["UNIXNU_ZORN_GPU_MEMORY"] = "1" if args.gpu_owned_memory_preflight else "0"
         env["UNIXNU_ZORN_TOUCH_RUNTIME"]="1" if args.touch_runtime else "0"
         if args.reproducible_tool_dates:
             env['ZERO_AR_DATE'] = '1'
@@ -438,11 +494,13 @@ def main():
         legacy_device = prepare_legacy_device(ROOT / "UniXNU-zorn", OUT / "legacy-device")
         run("defconfig", [CORE / "unixnu", "defconfig", args.defconfig, "-D", legacy_device], CORE)
         run("cpu-source-profile", [sys.executable, ROOT / "UniXNU-zorn/scripts/prepare-zorn-smp-runtime.py",
-                                  "--mode", "preflight8" if args.smp_preflight else "normal"])
+                                  "--mode", "preflight8" if args.smp_preflight else "normal"], env=env)
+        if args.gpu_owned_memory_preflight:
+            run("gpu-owned-memory-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-gpu-owned-memory.py"])
         if args.smp_preflight:
             if args.smp_continue:
                 run("smp-qualified-remap-proof",[sys.executable,ROOT/"UniXNU-zorn/scripts/check-zorn-smp-proof.py"])
-            run("smp-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-runtime.py"])
+            run("smp-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-runtime.py"], env=env)
             run("smp-startup-report-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-startup-report.py"])
             run("smp-root-publication-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-smp-root-publication.py"])
             run("log-ownership-host-check", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-log-ownership.py"])
@@ -528,6 +586,51 @@ def main():
                 record['kernel_date_environment'] = {key:value for key,value in env.items()
                     if key.startswith(('UNIXNU_', 'XNU_')) or key == 'ZERO_AR_DATE'}
                 save()
+            if args.gpu_owned_memory_preflight:
+                # A failed first make can remove KernelConfigTables.cpo before
+                # archive export discovery, while leaving the compile-record
+                # sentinel behind. Ask the existing canonical bootstrap to repair
+                # this incomplete native tree; never omit a missing export object
+                # or manufacture/reuse a stale KernelConfigTables object.
+                native_base=CORE/'out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+                sentinel=native_base/'osfmk/DEVELOPMENT/startup.o.json'
+                missing=native_base/'iokit/DEVELOPMENT/KernelConfigTables.cpo'
+                if sentinel.is_file() and not missing.is_file():
+                    recovery=OUT/'gpu-memory-integration/bootstrap-record-preimage'
+                    recovery.mkdir(parents=True,exist_ok=True)
+                    backup=recovery/(str(time.time_ns())+'-startup.o.json')
+                    previous_hash=digest(sentinel)
+                    sentinel.rename(backup)
+                    (backup.with_suffix('.provenance.json')).write_text(json.dumps(dict(
+                        reason='incomplete native build: KernelConfigTables.cpo missing before archive exports',
+                        original=str(sentinel),preimage=str(backup),sha256=previous_hash,
+                        action='preserve sentinel to select existing unixnu compile-record bootstrap; do not change any object/filelist/guard'),indent=2)+'\n')
+                if not sentinel.is_file() and missing.is_file():
+                    recovery=OUT/'gpu-memory-integration/bootstrap-record-preimage'
+                    backups=sorted(recovery.glob('*-startup.o.json')) if recovery.is_dir() else []
+                    if not backups:raise RuntimeError('missing native compile record without owned preimage')
+                    backup=backups[-1];provenance=json.loads(backup.with_suffix('.provenance.json').read_text())
+                    if provenance['original']!=str(sentinel) or digest(backup)!=provenance['sha256']:
+                        raise RuntimeError('bootstrap compile-record preimage differs')
+                    recipe=json.JSONDecoder().raw_decode(backup.read_text())[0]
+                    actual=Path(recipe['directory'])/recipe['output']
+                    fresh=recovery/(backup.stem+'-independent.o')
+                    command=[];i=0;arguments=recipe['arguments']
+                    while i<len(arguments):
+                        token=arguments[i]
+                        if token in ('-MF','-MJ','-MT','-MQ'):i+=2;continue
+                        if token in ('-MD','-MMD','-MP'):i+=1;continue
+                        if token=='-o':command+=['-o',str(fresh)];i+=2;continue
+                        command.append(token);i+=1
+                    verified=subprocess.run(command,cwd=recipe['directory'],env=env,capture_output=True,text=True)
+                    fresh.with_suffix('.log').write_text(verified.stdout+verified.stderr)
+                    verified.check_returncode()
+                    if digest(fresh)!=digest(actual):raise RuntimeError('bootstrap sentinel object is not described by its saved recipe')
+                    sentinel.write_bytes(backup.read_bytes())
+                    fresh.with_suffix('.verification.json').write_text(json.dumps(dict(
+                        saved_recipe_sha256=digest(backup),independent_object_sha256=digest(fresh),
+                        active_object_sha256=digest(actual),restored_record=str(sentinel),
+                        active_object_unchanged=True),indent=2)+'\n')
             run("kernel", [CORE / "unixnu", "build", "kernel"], CORE, env)
         if args.smp_preflight:
             run("smp-start-object-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/check-zorn-start-object.py"])
@@ -604,6 +707,8 @@ def main():
             payload_command.append("--display-progress")
         if args.cpu_active_observation:
             payload_command.append("--cpu-active-observation")
+        if args.gpu_owned_memory_preflight:
+            payload_command.append("--gpu-owned-memory-preflight")
         if args.gui_user_stacks:
             payload_command.append("--gui-user-stacks")
         if args.gui_kernel_stacks:
@@ -670,6 +775,18 @@ def main():
             payload_command += ["--checkpoint", args.checkpoint]
         if args.early_watchdog:
             payload_command += ["--early-watchdog", str(args.early_watchdog)]
+        if args.gpu_owned_memory_preflight:
+            os_profile=CORE/'profiles/os/ipados-17.7.11-21H461/profile.toml'
+            cpu_proof=OUT/'cpu-profile/profile.json'
+            if not cpu_proof.is_file() or json.loads(cpu_proof.read_text())['profile_sha256']!=digest(os_profile):
+                preimage=OUT/'gpu-memory-integration/cpu-profile-preimage'
+                preimage.mkdir(exist_ok=True)
+                if cpu_proof.is_file():
+                    saved=preimage/(digest(cpu_proof)+'.json')
+                    if not saved.exists():saved.write_bytes(cpu_proof.read_bytes())
+                # Exact existing readonly SystemOS UUID/original-byte verifier;
+                # do not change or relax the payload's profile SHA guard.
+                run('cpu-OS-profile-readonly-verification', [sys.executable, ROOT/'UniXNU-zorn/scripts/prepare-zorn-cpu-profile.py'], env=env)
         run("payload", payload_command)
         if args.smp_preflight:
             run("smp-payload-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-smp.py", "--payload","--root-publication",str(args.smp_root_publication)]+(["--continue-gui"] if args.smp_continue else [])+(['--fresh-data'] if args.fresh_data else [])+(['--stop-after-pass'] if args.smp_stop_after_pass else []))
@@ -677,7 +794,9 @@ def main():
             run("cpu-active-final-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-cpu-active.py", "--payload"])
         if args.display_progress:
             run("display-progress-final-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-display-progress.py", "--payload"])
-        image = OUT / "boot.img"
+        if args.gpu_owned_memory_preflight:
+            run("gpu-owned-memory-final-audit", [sys.executable, ROOT / "UniXNU-zorn/scripts/audit-zorn-gpu-owned-memory.py", "--payload"])
+        image = OUT / ("gpu-memory-integration/boot.img" if args.gpu_owned_memory_preflight else "boot.img")
         if args.source_pins:
             if digest(args.source_pins) != record["source_pins_sha256"]:
                 raise RuntimeError("component pins changed during build")
@@ -792,6 +911,31 @@ def main():
             inputs += [p for p in (ROOT/'UniXNU-zorn/native/cpu-active').rglob('*') if p.is_file() and '__pycache__' not in p.parts]
             inputs += [ROOT/'UniXNU-zorn/scripts/zorn_cpu_active.py',ROOT/'UniXNU-zorn/scripts/check-zorn-cpu-active.py',ROOT/'UniXNU-zorn/scripts/audit-zorn-cpu-active.py']
             inputs.append(CORE/'out/zorn/tree/build/zorn-ufs/cpu-active-build.json')
+        gpu_build_path=CORE/'out/zorn/tree/build/zorn-ufs/gpu-owned/build.json'
+        gpu_build=json.loads(gpu_build_path.read_text())
+        if bool(gpu_build['enabled'])!=bool(args.gpu_owned_memory_preflight):
+            raise RuntimeError('GPU owned-memory build/profile differs')
+        inputs += [gpu_build_path,ROOT/'UniXNU-zorn/scripts/zorn_gpu_owned_build.py',
+                   ROOT/'UniXNU-zorn/native/gpu-owned/ZornGpuOwnedRuntime.h']
+        inputs += [Path(p) for p in gpu_build['source_sha256']]
+        for p,h in gpu_build['source_sha256'].items():
+            if digest(Path(p))!=h:raise RuntimeError('GPU source changed during build: '+p)
+        for p,h in gpu_build['object_sha256'].items():
+            if digest(Path(p))!=h:raise RuntimeError('GPU object changed during build: '+p)
+            inputs.append(Path(p))
+        if args.gpu_owned_memory_preflight:
+            gpu_host=json.loads((OUT/'gpu-memory-integration/host/result.json').read_text())
+            for p,h in gpu_host['bindings'].items():
+                if digest(ROOT/p)!=h:raise RuntimeError('GPU host-check input changed: '+p)
+                inputs.append(ROOT/p)
+            gpu_link=json.loads((OUT/'gpu-memory-integration/linked-audit.json').read_text())
+            for p,h in gpu_link['audit_bindings'].items():
+                if digest(Path(p))!=h:raise RuntimeError('GPU linked-audit input changed: '+p)
+                inputs.append(Path(p))
+            inputs += [ROOT/'UniXNU-zorn/scripts/zorn_gpu_link_audit.py']
+            inputs += [ROOT/'UniXNU-zorn/scripts/zorn_gpu_memory.py',ROOT/'UniXNU-zorn/scripts/zorn_display_progress.py',
+                       ROOT/'UniXNU-zorn/scripts/check-zorn-gpu-owned-memory.py',ROOT/'UniXNU-zorn/scripts/audit-zorn-gpu-owned-memory.py',
+                       OUT/'gpu-memory-integration/host/result.json',OUT/'gpu-memory-integration/linked-audit.json']
         if args.cpu_active_observation:
             inputs += [OUT/'cpu-active/host-check.json',OUT/'cpu-active/linked-audit.json']
         if args.display_progress:
@@ -833,6 +977,8 @@ def main():
                        ROOT / "UniXNU-zorn/native/startup-policy/data-permissions.json", OUT / "data-permissions-audit.json"]
         if args.checkpoint and not ram_data:
             inputs.append(OUT / "payload-debug.toml")
+        if args.gpu_owned_memory_preflight and digest(OUT/'boot.img')!='42f3d5183b67bd42b2e02ec1d193ba888d0e6c2dc4cd50dafab2211ce589583e':
+            raise RuntimeError('protected default42 image changed during build')
         record.update(status="ready", phase="packaged", image=str(image), sha256=digest(image),
                       inputs={str(path): digest(path) for path in inputs},
                       completed=time.strftime("%Y-%m-%dT%H:%M:%S%z"))
@@ -850,6 +996,20 @@ def main():
         if args.smp_preflight:
             saved += [(p,archive/'cpu-active'/p.relative_to(ROOT/'UniXNU-zorn/native/cpu-active')) for p in (ROOT/'UniXNU-zorn/native/cpu-active').rglob('*') if p.is_file() and '__pycache__' not in p.parts]
             saved += [(ROOT/'UniXNU-zorn/scripts/zorn_cpu_active.py',archive/'zorn_cpu_active.py'),(CORE/'out/zorn/tree/build/zorn-ufs/cpu-active-build.json',archive/'cpu-active-build.json')]
+        saved.append((gpu_build_path,archive/'gpu-owned-build.json'))
+        saved += [(Path(p),archive/'gpu-owned-objects'/Path(p).name) for p in gpu_build['object_sha256']]
+        saved += [(Path(p),archive/'gpu-owned-inputs'/Path(p).relative_to(ROOT)) for p in gpu_build['source_sha256']]
+        if args.gpu_owned_memory_preflight:
+            saved += [(ROOT/p,archive/'gpu-owned-host-inputs'/p) for p in gpu_host['bindings']]
+            saved += [(Path(p),archive/'gpu-owned-audit-inputs'/Path(p).relative_to(ROOT)) for p in gpu_link['audit_bindings']]
+            saved += [(ROOT/'UniXNU-zorn/scripts/zorn_gpu_link_audit.py',archive/'zorn_gpu_link_audit.py'),
+                      (ROOT/'UniXNU-zorn/scripts/audit-zorn-cpu-active.py',archive/'audit-zorn-cpu-active.py')]
+            saved += [(ROOT/'UniXNU-zorn/scripts/zorn_gpu_memory.py',archive/'zorn_gpu_memory.py'),
+                      (ROOT/'UniXNU-zorn/scripts/zorn_display_progress.py',archive/'zorn_display_progress.py'),
+                      (ROOT/'UniXNU-zorn/scripts/check-zorn-gpu-owned-memory.py',archive/'check-zorn-gpu-owned-memory.py'),
+                      (ROOT/'UniXNU-zorn/scripts/audit-zorn-gpu-owned-memory.py',archive/'audit-zorn-gpu-owned-memory.py'),
+                      (OUT/'gpu-memory-integration/host/result.json',archive/'gpu-owned-host-check.json'),
+                      (OUT/'gpu-memory-integration/linked-audit.json',archive/'gpu-owned-linked-audit.json')]
         if args.cpu_active_observation:
             saved += [(OUT/'cpu-active/host-check.json',archive/'cpu-active-host-check.json'),(OUT/'cpu-active/linked-audit.json',archive/'cpu-active-linked-audit.json'),(ROOT/'UniXNU-zorn/scripts/check-zorn-cpu-active.py',archive/'check-zorn-cpu-active.py'),(ROOT/'UniXNU-zorn/scripts/audit-zorn-cpu-active.py',archive/'audit-zorn-cpu-active.py')]
         if args.display_progress:
