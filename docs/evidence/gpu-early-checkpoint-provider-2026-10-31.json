@@ -1,0 +1,108 @@
+{
+  "recorded_at": "2026-10-31T00:34:05.928617+08:00",
+  "state": "isolated-UEFI-storage-descriptor-selector-and-archivedproviders-bound-livequery-still-unqualified",
+  "profile": {
+    "reader_constants": {
+      "BLOCK_SIZE": 4096,
+      "LOG_BLOCK": 2291712
+    },
+    "relative_log_lba": 2291712,
+    "historical_userdata_first": 3112704,
+    "historical_userdata_last": 64049146,
+    "historical_absolute_log_lba": 5404416,
+    "historical_not_current_GPT_attestation": true,
+    "partition_unique_GUID_not_pinned": true,
+    "descriptor_not_live_device_identity": true,
+    "block_count": 1,
+    "bytes": 4096,
+    "no_Data_window_configuration_changed": true,
+    "readback_qualified": false,
+    "write_authorized": false,
+    "source_hashes": {
+      "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-log.py": "700f5727c5b027fb66694719c7762d7725164d8718060c867ef53fe21e792248",
+      "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/data-store-reservation.json": "bdbcdb714773e3b583c75c04dc0dc2f54bce8f508e003cd4a5e41c18515fbc6c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/ufs-read/ZornUfsRead.cpp": "90f3b50617aea5f37bfa976305611b88763a51ceb8b105ba5ea74782dfb76b72"
+    }
+  },
+  "provider_archive": {
+    "fd_sha256": "05b8b30b93f6ed6b46d44c048798917474ebfba86669c2ccab364cc5f0c668b2",
+    "reader_sha256": "bd8cfa19a747bc6f96b05dae6a1e9a6bb6e5c0f139459041bbfb08f9f6f2728d",
+    "modules": {
+      "DiskIoDxe": {
+        "bytes": 40960,
+        "sha256": "27da79fa04219c6329e5ad9798c51b11c6e390665d20502ecf4302fbbd180696",
+        "selected_file": "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.efi",
+        "full_byte_match": true
+      },
+      "PartitionDxe": {
+        "bytes": 53248,
+        "sha256": "8b269013067ff88bc0407f21c1a32b3cb988e2a6b5ad10fd901c51f6f19eb0a0",
+        "selected_file": "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.efi",
+        "full_byte_match": true
+      },
+      "UFSDxe": {
+        "bytes": 143360,
+        "sha256": "b8dfd16aa3b9e629d419cb4ab6b8d10a0fe9e1f77ad30b170feeabf8f49e9164",
+        "selected_file": "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/UFSDxe/UFSDxe.patched.efi",
+        "full_byte_match": true
+      }
+    },
+    "files": 107,
+    "sections": 295,
+    "RAM_decompressed_bytes": 9883656,
+    "not_live_protocol_attestation": true,
+    "allow_boot": false
+  },
+  "selector": "Pure stablepreEBS typeddescriptor selector, max32candidates/512Bpath/32nodes. Matches standardUFS PUN0/LUN0, unique GPTuserdata child with exacthistoricalgeometry/signature matching HD node, exactparentprefix/physicalmedia,4096B/nonremovable/present/nonReadOnly and distinctlogicalpartition. Excludes original512B readonly nonlogical RAMDisk. Unknown vendorpath rejected; not actualQcompath attestation.",
+  "ownership": "Caller-zeroed exclusive persistentreport, singleuse; validates report/input/nested alias before publication, retains raw64 lookup errors/warnings and availabilitymask. Caller owns valid typed memory stable during call. Scope1/epoch are only softwareassertions; no liveLookupprotocol/borrowedhandle retained, EBS owner or hardwarelease inferred. CurrentpartitionuniqueGUID notpinned/GPTCRC notread; outputLiveDiscoveryVerified/GptReadVerified/WriteAuthorized always0 even DescriptorEligible1.",
+  "host": {
+    "candidate_refusals": 40,
+    "raw64_errors_warnings": 12,
+    "duplicate_scope_alias_reuse_controls": true,
+    "protocol_calls": 0,
+    "ASan_UBSan": true,
+    "source_mutants_refused": 2
+  },
+  "native": {
+    "independent_selector_full_SHA": "83dc8cbcf6413a84c6ba3034ecce97017720e44b7866b9de8c9ebb434dc6021a",
+    "layout": [
+      48,
+      8,
+      0,
+      12,
+      24,
+      144,
+      16,
+      42,
+      6,
+      1888
+    ],
+    "transitive_inputs": 45,
+    "no_indirect_protocol_calls": true,
+    "noentry_annotation": true,
+    "realSDK_libraries_and_originalAutoGen_driver_for_linkclosure": true,
+    "not_activeFD_or_newmodule": true
+  },
+  "first_failures": [
+    "Noentry link initially lacked DebugAssert/LShiftU64 then realgeneratedPCD/callerbase and originaldriver entry dependencies. All logs retained; linked actualselectedSDK libraries plus independently compiled originalAutoGen/driver under NOENTRY, no forcedunresolved or passstub. This is inert annotation, not deployedmodule or serviceexecution.",
+    "First wrongLUN mutant survived because testonlychanged childLUN, independently causing parentprefix mismatch. Firstfixture/output saved; testnowchanges childandparentLUN together so only intendedLUNguard decides, mutant then refused. Providerguard unchanged."
+  ],
+  "readback_gap": "Full84currenttext+272Brawquery preservation and before-loader abort coverage remain unqualified. Extractedprovider presence/descriptor eligibility doesnot authorize writes. Stop extendingdiagnostic chain; proceed actualGPUsecuritysource binding with allnativeinvocationsdisabled.",
+  "protections": {
+    "current342": 342,
+    "frozen255": 255,
+    "raw231": 231,
+    "archive_files": 190,
+    "original_GPU_sources": 88,
+    "default42_preserved": true,
+    "no_active_build_run_in_current": true
+  },
+  "next_plan": "out/zorn/gpu-early-checkpoint-provider/scm-pas-binding-next-plan.json",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "new_FD": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "combined_result": "out/zorn/gpu-early-checkpoint-provider/combined-result.json",
+  "combined_sha256": "bdf29c1473675ff56a1b945c7838e7c4378e96876b631a0c676a16bdd190e4c7"
+}

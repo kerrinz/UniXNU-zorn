@@ -1,5 +1,7 @@
 # K80 构建、测试与日志
 
+> 当前设备已改为slotA + Android +独立unixnu64。先阅读[新存储布局](storage-unixnu64.md)。下文slotB/userdata/192GiB命令属于历史配置；不可用于当前设备，尤其不可执行generic输出的flash userdata。历史兼容board及资格清单原样保留。
+
 本文保留已有格式 1 调试入口；2026-10-30 根配置已迁移格式 2，调试构建器显式选择固定兼容配置，见 [迁移范围](repository-format.md)。它记录已准备工作区的使用方式，不是全新克隆的一键安装说明。后续上游构建验证见 [构建回归记录](progress-2026-10-29-repro-build.md)，与已验收桌面基线分开记录。
 
 ## 基线与前置输入

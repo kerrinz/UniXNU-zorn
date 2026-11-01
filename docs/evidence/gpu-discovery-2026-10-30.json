@@ -1,0 +1,1461 @@
+{
+  "recorded_at": "2026-10-30T18:07:29.640487+08:00",
+  "stage": "read-only-discovery-started",
+  "owner_direction": "Finite CPU/GUI observation is consumed; no actionable Apple-logo failure reproduced, so switch to GPU as requested.",
+  "inventory": {
+    "stage": "cached-description-and-existing-driver-inventory-only",
+    "inputs": {
+      "out/zorn/touch/live-fdt.dtb": "8c3712d8850a3eba0c53d266ea96268f3b908975cabe9e866bcf991dbcc8382a",
+      "UniXNU-houji/scripts/fdt.py": "a6d0485146743e8b4bc9819e57d581f76842532b7ca7d8e88c4b19ea407a1dc1",
+      "UniXNU-zorn/docs/progress-2026-10-28-touch.md": "3d7a41ba6ee0be9df8f33006461fb1f4038530fdaf5c23a5e858f60675c0b566"
+    },
+    "capture_provenance": "Existing K80 touch-stage cached live FDT with matching historical documented SHA; no new phone capture or independent firmware attestation.",
+    "fdt_declared_bytes": 900407,
+    "selected_nodes": [
+      {
+        "path": "/soc/kgsl-smmu@3da0000",
+        "property_names": [
+          "#address-cells",
+          "#global-interrupts",
+          "#iommu-cells",
+          "#size-cells",
+          "clock-names",
+          "clocks",
+          "compatible",
+          "dma-coherent",
+          "interrupts",
+          "phandle",
+          "qcom,actlr",
+          "qcom,regulator-names",
+          "qcom,use-3-lvl-tables",
+          "ranges",
+          "reg",
+          "reg-names",
+          "vdd-supply"
+        ],
+        "compatible": [
+          "qcom,qsmmu-v500",
+          "qcom,adreno-smmu"
+        ],
+        "reg-names": [
+          "base",
+          "tcu-base"
+        ],
+        "clock-names": [
+          "gpu_cc_hlos1_vote_gpu_smmu",
+          "gcc_gpu_memnoc_gfx",
+          "gcc_gpu_snoc_dvm_gfx",
+          "gpu_cc_ahb"
+        ],
+        "reg": [
+          64618496,
+          262144,
+          64905216,
+          64
+        ],
+        "interrupts": [
+          0,
+          673,
+          4,
+          0,
+          677,
+          4,
+          0,
+          678,
+          4,
+          0,
+          679,
+          4,
+          0,
+          680,
+          4,
+          0,
+          681,
+          4,
+          0,
+          682,
+          4,
+          0,
+          683,
+          4,
+          0,
+          684,
+          4,
+          0,
+          685,
+          4,
+          0,
+          686,
+          4,
+          0,
+          687,
+          4,
+          0,
+          422,
+          4,
+          0,
+          476,
+          4,
+          0,
+          574,
+          4,
+          0,
+          575,
+          4,
+          0,
+          576,
+          4,
+          0,
+          577,
+          4,
+          0,
+          659,
+          4,
+          0,
+          661,
+          4,
+          0,
+          664,
+          4,
+          0,
+          665,
+          4,
+          0,
+          666,
+          4,
+          0,
+          668,
+          4,
+          0,
+          669,
+          4,
+          0,
+          699,
+          4
+        ],
+        "clocks": [
+          78,
+          18,
+          44,
+          37,
+          44,
+          38,
+          78,
+          0
+        ],
+        "#address-cells": [
+          1
+        ],
+        "#size-cells": [
+          1
+        ],
+        "#iommu-cells": [
+          2
+        ]
+      },
+      {
+        "path": "/soc/kgsl-smmu@3da0000/gpu_qtb@3de8000",
+        "property_names": [
+          "compatible",
+          "interconnects",
+          "phandle",
+          "qcom,iova-width",
+          "qcom,num-qtb-ports",
+          "qcom,stream-id-range",
+          "reg",
+          "reg-names"
+        ],
+        "compatible": [
+          "qcom,qsmmuv500-tbu",
+          "qcom,qtb500"
+        ],
+        "reg-names": [
+          "base",
+          "debugchain-base"
+        ],
+        "reg": [
+          64913408,
+          4096,
+          64929792,
+          4096
+        ]
+      },
+      {
+        "path": "/soc/qcom,gmu@3d69000",
+        "property_names": [
+          "clock-names",
+          "clocks",
+          "compatible",
+          "interrupt-names",
+          "interrupts",
+          "iommus",
+          "mbox-names",
+          "mboxes",
+          "phandle",
+          "qcom,gmu-freq-table",
+          "qcom,gmu-perf-ddr-bw",
+          "qcom,iommu-dma",
+          "qcom,ipc-core",
+          "reg",
+          "reg-names",
+          "regulator-names",
+          "vdd-supply",
+          "vddcx-supply"
+        ],
+        "compatible": [
+          "qcom,gen7-gmu"
+        ],
+        "reg-names": [
+          "gmu",
+          "gmu_pdc",
+          "gmu_ao_blk_dec0"
+        ],
+        "clock-names": [
+          "gmu_clk",
+          "cxo_clk",
+          "axi_clk",
+          "memnoc_clk",
+          "ahb_clk",
+          "hub_clk"
+        ],
+        "interrupt-names": [
+          "hfi",
+          "gmu"
+        ],
+        "reg": [
+          64389120,
+          225280,
+          187170816,
+          65536,
+          64225280,
+          65536
+        ],
+        "interrupts": [
+          0,
+          304,
+          4,
+          0,
+          305,
+          4
+        ],
+        "clocks": [
+          78,
+          4,
+          78,
+          6,
+          44,
+          14,
+          44,
+          37,
+          78,
+          0,
+          78,
+          21
+        ],
+        "iommus": [
+          253,
+          5,
+          0
+        ]
+      },
+      {
+        "path": "/soc/qcom,kgsl-3d0@3d00000",
+        "property_names": [
+          "#cooling-cells",
+          "clock-names",
+          "clocks",
+          "compatible",
+          "interconnect-names",
+          "interconnects",
+          "interrupt-names",
+          "interrupts",
+          "nvmem-cell-names",
+          "nvmem-cells",
+          "phandle",
+          "qcom,bus-table-cnoc",
+          "qcom,bus-table-ddr",
+          "qcom,chipid",
+          "qcom,gpu-model",
+          "qcom,gpu-qdss-stm",
+          "qcom,min-access-length",
+          "qcom,tzone-names",
+          "qcom,ubwc-mode",
+          "reg",
+          "reg-names",
+          "status"
+        ],
+        "compatible": [
+          "qcom,adreno-gpu-gen7-9-1",
+          "qcom,kgsl-3d0"
+        ],
+        "status": [
+          "ok"
+        ],
+        "reg-names": [
+          "kgsl_3d0_reg_memory",
+          "cx_dbgc",
+          "rscc",
+          "cx_misc",
+          "qdss_gfx",
+          "qdss_etr",
+          "qdss_tmc"
+        ],
+        "clock-names": [
+          "gcc_gpu_memnoc_gfx",
+          "gcc_gpu_snoc_dvm_gfx",
+          "gpu_cc_ahb",
+          "apb_pclk"
+        ],
+        "interrupt-names": [
+          "kgsl_3d0_irq"
+        ],
+        "reg": [
+          63963136,
+          262144,
+          64360448,
+          12288,
+          64290816,
+          65536,
+          64610304,
+          8192,
+          277872640,
+          524288,
+          268730368,
+          32768,
+          279990272,
+          4096
+        ],
+        "qcom,chipid": [
+          1124406273
+        ],
+        "interrupts": [
+          0,
+          300,
+          4
+        ],
+        "clocks": [
+          44,
+          37,
+          44,
+          38,
+          78,
+          0,
+          63,
+          0
+        ]
+      },
+      {
+        "path": "/soc/qcom,kgsl-3d0@3d00000/zap-shader",
+        "property_names": [
+          "memory-region"
+        ],
+        "memory-region": [
+          771
+        ]
+      },
+      {
+        "path": "/soc/qcom,kgsl-iommu@3da0000",
+        "property_names": [
+          "compatible",
+          "phandle",
+          "reg",
+          "vddcx-supply"
+        ],
+        "compatible": [
+          "qcom,kgsl-smmu-v2"
+        ],
+        "reg": [
+          64618496,
+          262144
+        ]
+      }
+    ],
+    "resolved_references": [
+      {
+        "consumer": "/soc/kgsl-smmu@3da0000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          18
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/kgsl-smmu@3da0000",
+        "property": "clocks",
+        "phandle": 44,
+        "provider": "/soc/clock-controller@100000",
+        "specifier": [
+          37
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@100000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_cx_ao-supply",
+            "vdd_mxa-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gcc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "bi_tcxo_ao",
+            "pcie_0_pipe_clk",
+            "pcie_1_phy_aux_clk",
+            "pcie_1_pipe_clk",
+            "sleep_clk",
+            "ufs_phy_rx_symbol_0_clk",
+            "ufs_phy_rx_symbol_1_clk",
+            "ufs_phy_tx_symbol_0_clk",
+            "usb3_phy_wrapper_gcc_usb30_pipe_clk"
+          ],
+          "reg": [
+            1048576,
+            2048512
+          ],
+          "clocks": [
+            45,
+            0,
+            45,
+            1,
+            61,
+            72,
+            73,
+            69,
+            74,
+            75,
+            76,
+            77
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/kgsl-smmu@3da0000",
+        "property": "clocks",
+        "phandle": 44,
+        "provider": "/soc/clock-controller@100000",
+        "specifier": [
+          38
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@100000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_cx_ao-supply",
+            "vdd_mxa-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gcc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "bi_tcxo_ao",
+            "pcie_0_pipe_clk",
+            "pcie_1_phy_aux_clk",
+            "pcie_1_pipe_clk",
+            "sleep_clk",
+            "ufs_phy_rx_symbol_0_clk",
+            "ufs_phy_rx_symbol_1_clk",
+            "ufs_phy_tx_symbol_0_clk",
+            "usb3_phy_wrapper_gcc_usb30_pipe_clk"
+          ],
+          "reg": [
+            1048576,
+            2048512
+          ],
+          "clocks": [
+            45,
+            0,
+            45,
+            1,
+            61,
+            72,
+            73,
+            69,
+            74,
+            75,
+            76,
+            77
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/kgsl-smmu@3da0000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          0
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          4
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          6
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "clocks",
+        "phandle": 44,
+        "provider": "/soc/clock-controller@100000",
+        "specifier": [
+          14
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@100000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_cx_ao-supply",
+            "vdd_mxa-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gcc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "bi_tcxo_ao",
+            "pcie_0_pipe_clk",
+            "pcie_1_phy_aux_clk",
+            "pcie_1_pipe_clk",
+            "sleep_clk",
+            "ufs_phy_rx_symbol_0_clk",
+            "ufs_phy_rx_symbol_1_clk",
+            "ufs_phy_tx_symbol_0_clk",
+            "usb3_phy_wrapper_gcc_usb30_pipe_clk"
+          ],
+          "reg": [
+            1048576,
+            2048512
+          ],
+          "clocks": [
+            45,
+            0,
+            45,
+            1,
+            61,
+            72,
+            73,
+            69,
+            74,
+            75,
+            76,
+            77
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "clocks",
+        "phandle": 44,
+        "provider": "/soc/clock-controller@100000",
+        "specifier": [
+          37
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@100000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_cx_ao-supply",
+            "vdd_mxa-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gcc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "bi_tcxo_ao",
+            "pcie_0_pipe_clk",
+            "pcie_1_phy_aux_clk",
+            "pcie_1_pipe_clk",
+            "sleep_clk",
+            "ufs_phy_rx_symbol_0_clk",
+            "ufs_phy_rx_symbol_1_clk",
+            "ufs_phy_tx_symbol_0_clk",
+            "usb3_phy_wrapper_gcc_usb30_pipe_clk"
+          ],
+          "reg": [
+            1048576,
+            2048512
+          ],
+          "clocks": [
+            45,
+            0,
+            45,
+            1,
+            61,
+            72,
+            73,
+            69,
+            74,
+            75,
+            76,
+            77
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          0
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          21
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,gmu@3d69000",
+        "property": "iommus",
+        "phandle": 253,
+        "provider": "/soc/kgsl-smmu@3da0000",
+        "specifier": [
+          5,
+          0
+        ],
+        "provider_description": {
+          "path": "/soc/kgsl-smmu@3da0000",
+          "property_names": [
+            "#address-cells",
+            "#global-interrupts",
+            "#iommu-cells",
+            "#size-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "dma-coherent",
+            "interrupts",
+            "phandle",
+            "qcom,actlr",
+            "qcom,regulator-names",
+            "qcom,use-3-lvl-tables",
+            "ranges",
+            "reg",
+            "reg-names",
+            "vdd-supply"
+          ],
+          "compatible": [
+            "qcom,qsmmu-v500",
+            "qcom,adreno-smmu"
+          ],
+          "reg-names": [
+            "base",
+            "tcu-base"
+          ],
+          "clock-names": [
+            "gpu_cc_hlos1_vote_gpu_smmu",
+            "gcc_gpu_memnoc_gfx",
+            "gcc_gpu_snoc_dvm_gfx",
+            "gpu_cc_ahb"
+          ],
+          "reg": [
+            64618496,
+            262144,
+            64905216,
+            64
+          ],
+          "interrupts": [
+            0,
+            673,
+            4,
+            0,
+            677,
+            4,
+            0,
+            678,
+            4,
+            0,
+            679,
+            4,
+            0,
+            680,
+            4,
+            0,
+            681,
+            4,
+            0,
+            682,
+            4,
+            0,
+            683,
+            4,
+            0,
+            684,
+            4,
+            0,
+            685,
+            4,
+            0,
+            686,
+            4,
+            0,
+            687,
+            4,
+            0,
+            422,
+            4,
+            0,
+            476,
+            4,
+            0,
+            574,
+            4,
+            0,
+            575,
+            4,
+            0,
+            576,
+            4,
+            0,
+            577,
+            4,
+            0,
+            659,
+            4,
+            0,
+            661,
+            4,
+            0,
+            664,
+            4,
+            0,
+            665,
+            4,
+            0,
+            666,
+            4,
+            0,
+            668,
+            4,
+            0,
+            669,
+            4,
+            0,
+            699,
+            4
+          ],
+          "clocks": [
+            78,
+            18,
+            44,
+            37,
+            44,
+            38,
+            78,
+            0
+          ],
+          "#address-cells": [
+            1
+          ],
+          "#size-cells": [
+            1
+          ],
+          "#iommu-cells": [
+            2
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,kgsl-3d0@3d00000",
+        "property": "clocks",
+        "phandle": 44,
+        "provider": "/soc/clock-controller@100000",
+        "specifier": [
+          37
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@100000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_cx_ao-supply",
+            "vdd_mxa-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gcc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "bi_tcxo_ao",
+            "pcie_0_pipe_clk",
+            "pcie_1_phy_aux_clk",
+            "pcie_1_pipe_clk",
+            "sleep_clk",
+            "ufs_phy_rx_symbol_0_clk",
+            "ufs_phy_rx_symbol_1_clk",
+            "ufs_phy_tx_symbol_0_clk",
+            "usb3_phy_wrapper_gcc_usb30_pipe_clk"
+          ],
+          "reg": [
+            1048576,
+            2048512
+          ],
+          "clocks": [
+            45,
+            0,
+            45,
+            1,
+            61,
+            72,
+            73,
+            69,
+            74,
+            75,
+            76,
+            77
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,kgsl-3d0@3d00000",
+        "property": "clocks",
+        "phandle": 44,
+        "provider": "/soc/clock-controller@100000",
+        "specifier": [
+          38
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@100000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_cx_ao-supply",
+            "vdd_mxa-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gcc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "bi_tcxo_ao",
+            "pcie_0_pipe_clk",
+            "pcie_1_phy_aux_clk",
+            "pcie_1_pipe_clk",
+            "sleep_clk",
+            "ufs_phy_rx_symbol_0_clk",
+            "ufs_phy_rx_symbol_1_clk",
+            "ufs_phy_tx_symbol_0_clk",
+            "usb3_phy_wrapper_gcc_usb30_pipe_clk"
+          ],
+          "reg": [
+            1048576,
+            2048512
+          ],
+          "clocks": [
+            45,
+            0,
+            45,
+            1,
+            61,
+            72,
+            73,
+            69,
+            74,
+            75,
+            76,
+            77
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,kgsl-3d0@3d00000",
+        "property": "clocks",
+        "phandle": 78,
+        "provider": "/soc/clock-controller@3d90000",
+        "specifier": [
+          0
+        ],
+        "provider_description": {
+          "path": "/soc/clock-controller@3d90000",
+          "property_names": [
+            "#clock-cells",
+            "#reset-cells",
+            "clock-names",
+            "clocks",
+            "compatible",
+            "phandle",
+            "reg",
+            "reg-name",
+            "vdd_cx-supply",
+            "vdd_mx-supply",
+            "vdd_mxc-supply"
+          ],
+          "compatible": [
+            "qcom,pineapple-gpucc",
+            "syscon"
+          ],
+          "clock-names": [
+            "bi_tcxo",
+            "gpll0_out_main",
+            "gpll0_out_main_div"
+          ],
+          "reg": [
+            64552960,
+            38912
+          ],
+          "clocks": [
+            45,
+            0,
+            44,
+            35,
+            44,
+            36
+          ],
+          "#clock-cells": [
+            1
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,kgsl-3d0@3d00000",
+        "property": "clocks",
+        "phandle": 63,
+        "provider": "/soc/power-controller@c300000",
+        "specifier": [],
+        "provider_description": {
+          "path": "/soc/power-controller@c300000",
+          "property_names": [
+            "#clock-cells",
+            "#power-domain-cells",
+            "compatible",
+            "interrupt-parent",
+            "interrupts",
+            "mboxes",
+            "phandle",
+            "reg"
+          ],
+          "compatible": [
+            "qcom,aoss-qmp"
+          ],
+          "reg": [
+            204472320,
+            1024
+          ],
+          "interrupts": [
+            0,
+            0,
+            1
+          ],
+          "#clock-cells": [
+            0
+          ]
+        }
+      },
+      {
+        "consumer": "/soc/qcom,kgsl-3d0@3d00000/zap-shader",
+        "property": "memory-region",
+        "phandle": 771,
+        "provider": "/reserved-memory/gpu_microcode_region@9b09a000",
+        "specifier": [],
+        "provider_description": {
+          "path": "/reserved-memory/gpu_microcode_region@9b09a000",
+          "property_names": [
+            "no-map",
+            "phandle",
+            "reg"
+          ],
+          "reg": [
+            0,
+            2601099264,
+            0,
+            8192
+          ]
+        }
+      }
+    ],
+    "reference_errors": [
+      {
+        "consumer": "/soc/qcom,kgsl-3d0@3d00000",
+        "property": "clocks",
+        "cell_index": 7,
+        "remaining_cells": [
+          0
+        ],
+        "error": "unresolved phandle; no guessed stride"
+      }
+    ],
+    "gpu_parent_cells": {
+      "address": 1,
+      "size": 1
+    },
+    "gpu_bus_regions": [
+      {
+        "name": "kgsl_3d0_reg_memory",
+        "bus_address": "0x3d00000",
+        "bytes": 262144
+      },
+      {
+        "name": "cx_dbgc",
+        "bus_address": "0x3d61000",
+        "bytes": 12288
+      },
+      {
+        "name": "rscc",
+        "bus_address": "0x3d50000",
+        "bytes": 65536
+      },
+      {
+        "name": "cx_misc",
+        "bus_address": "0x3d9e000",
+        "bytes": 8192
+      },
+      {
+        "name": "qdss_gfx",
+        "bus_address": "0x10900000",
+        "bytes": 524288
+      },
+      {
+        "name": "qdss_etr",
+        "bus_address": "0x10048000",
+        "bytes": 32768
+      },
+      {
+        "name": "qdss_tmc",
+        "bus_address": "0x10b05000",
+        "bytes": 4096
+      }
+    ],
+    "existing_adreno740_source_hashes": {
+      "UniXNU/drivers/Adreno740/NativeAdrenoA740HwInit.h": "008e9a923e78798ef54d3c4c37f44bbadd35911515d8832fe04793e51f31588c",
+      "UniXNU/drivers/Adreno740/NativeAdrenoABI.h": "b5574e34ee3a368616f722f9fa40ea2c87bbc5c03989a299d9d4f954c9f8be70",
+      "UniXNU/drivers/Adreno740/NativeAdrenoAccelerator.cpp": "c528018405c8a236c5f8bca85221df1933e2d25e9beb9c677e84779ec0b2dc8f",
+      "UniXNU/drivers/Adreno740/NativeAdrenoBoard.cpp": "273fedfdc89c64abab3195fadd27045f606bdd7868920842117a323c193cbd66",
+      "UniXNU/drivers/Adreno740/NativeAdrenoBoard.h": "648fefb774118d174bf5ef42ab89579edaf781c4f4f08bce393ee7100e54e19b",
+      "UniXNU/drivers/Adreno740/NativeAdrenoClient.cpp": "f280ffcb2c31a195d3305b4c3ee272b624bce7f458dd3290fb0ef5a4bf1ff4b4",
+      "UniXNU/drivers/Adreno740/NativeAdrenoClient.h": "ac6a35c5b2e3080655cdf41870f0d0551d0961b773192f7adf2effe283f5e7aa",
+      "UniXNU/drivers/Adreno740/NativeAdrenoCpInit.cpp": "02bb5791a021ae115b430187291a7de30002c069d1924ef69a9c3282633bbe49",
+      "UniXNU/drivers/Adreno740/NativeAdrenoCpInit.h": "8e192f1925da89e522b1f42d4d5659e8097d90f22e8deb54d5abd103ac80461b",
+      "UniXNU/drivers/Adreno740/NativeAdrenoCpu.cpp": "b22d613d1c8a73e33ef1ccaf02e0e5096a96c7a7c08ec911dea7b6df4e5e0515",
+      "UniXNU/drivers/Adreno740/NativeAdrenoFirmware.cpp": "87606cac2ded872d3f904decdaa47177192a019d3c365a49e138353a42279233",
+      "UniXNU/drivers/Adreno740/NativeAdrenoFirmware.h": "78d42a674a06aed96a5b206b927964772222eda33f93ae6d6509b6a5e9aba75b",
+      "UniXNU/drivers/Adreno740/NativeAdrenoFirmwareDefaults.cpp": "3a7dd96fbf51582f993aca45ab65c7bd6c8dd6712ee72698630cf342e63174db",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuConfig.cpp": "b9ba364145169828cf4c743ea8807f536213878f655ae1351334681e35ddf458",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuConfig.h": "e07d205c1fa429c1e1d4966e50a7de9bfe7d591027c54d15e11562421a421a1c",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuContext.cpp": "a6bcf51a336aac8f583e902e0ee2129427b3db33a8512501fe365683d693d05c",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuContext.h": "ba483ae025cdb82e7bd346c608a92ef854c76e15876658c7958bdcb93a9a203e",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuMemory.cpp": "12a09b352eec6aa04f86b3f488e648228fecfd8d9eee5dc376fd2ee2e9fe3af8",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuMemory.h": "3c6c40f2bf742fb7970577a195f70802b1918ac9cf420bab42d9e69d1f8973b6",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuPlatform.cpp": "1a9263b1a48df626a0e3ab4c3145d3450d34082aa9230cb4dbca7f8f97c7f2e0",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuPlatform.h": "5634adbedceac94f0bb75b2207caeff256115b5d9dcebf38fd88efba4d979d1d",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuService.cpp": "431c6709c95053a9033e3ec68d9788231fa8b7b892f5650a48e504a4288a6eaa",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGmuService.h": "69eb1d457b8bb4798cbc739b13ae86e2eb500e89ed13720deb8ed0728d55e04d",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGpu.cpp": "2c3e0238a4fd1be2f5a5224b7ad33b385987b437d27f28e8166406948e48f589",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGpu.h": "340259bbb2261da3cf4c0c0c0c8b96278de4980ab997286e7acd35a0f92d5dcf",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGpuContext.cpp": "0d9112f7ea685210221b6e2b4ca62c63bdc2b1b3352ccb67738e43ac1f0d67df",
+      "UniXNU/drivers/Adreno740/NativeAdrenoGpuContext.h": "077bbedefb96f3086047db931f39beb27b5ad0aaa3a110e4c2dc01caa48fa3c0",
+      "UniXNU/drivers/Adreno740/NativeAdrenoIrq.cpp": "65c005ce535296871db1b42af7b9e203221102d5a1f9d2c91951ba7cb4a1ee04",
+      "UniXNU/drivers/Adreno740/NativeAdrenoIrq.h": "c117f3462603574bf7a922b31105a5f0d59da1bcd1d8f108106c1304c07fc1f4",
+      "UniXNU/drivers/Adreno740/NativeAdrenoKernelTime.cpp": "ef6288b1cab7ff77998d9e6b53388714a3ff65022aef0b29697613d80dcc9bd1",
+      "UniXNU/drivers/Adreno740/NativeAdrenoKernelTime.h": "c7fcd3e339984278c3c5af98b0de87a72471e04c9855f42ff5934c271d71ec06",
+      "UniXNU/drivers/Adreno740/NativeAdrenoMemory.cpp": "37363469c9e1f1e200b368e0bfdb80111722861792411090f3cef67506c9adef",
+      "UniXNU/drivers/Adreno740/NativeAdrenoMemory.h": "8137491b5ef2657eb362a4f41cf2c2b8d8cb747fc93d7a63e453194d7c3288cc",
+      "UniXNU/drivers/Adreno740/NativeAdrenoPublish.cpp": "60460318437af589f75ebe7c60f999079b5fa13c55eaf1b72841a1e742cf4e30",
+      "UniXNU/drivers/Adreno740/NativeAdrenoPwrup.cpp": "625935493062e63f18d87a691436b4f53cce22969509501e77cbd58d27e398c4",
+      "UniXNU/drivers/Adreno740/NativeAdrenoPwrup.h": "708830fae4f6a5cea765992d44135126d7a034a239adece94f094d862819e889",
+      "UniXNU/drivers/Adreno740/NativeAdrenoPwrupRegs.h": "8067d9625e922173912eea09e6a504d9c1b31234d4656f8dd4148855882918e1",
+      "UniXNU/drivers/Adreno740/NativeAdrenoRing.cpp": "dc2c71b8225ec034b800e01d107939fa7d8a8b5335a2337323c016c9e5fc083e",
+      "UniXNU/drivers/Adreno740/NativeAdrenoRing.h": "0811915d30b72a15855714527c4c3f3657ba448597a528c30174765c19b32cda",
+      "UniXNU/drivers/Adreno740/NativeAdrenoService.cpp": "db3c1d2f51ff2cae9d7c9ced0df991a7c238485476ac31b19e4ac3a496575e42",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSha256.cpp": "ee624a483a075b8ca44f1dff2efd66acee38c5ccd784192c23614cdb6605db1f",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSha256.h": "4c4f1a23f146c1370615ee52912b9bb0c2a3b919ccf14e07314460ffcdb34a74",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSmmuContext.cpp": "caee8d5f6757f983d635fb01e9db820938c1e072f8af784fecd112dc647da4b8",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSmmuContext.h": "93ddf63bc1ddf449d3998a4fdc88946bf17e2d303cc6310b872b5d2bb04d68f5",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSmmuMemory.cpp": "422a1c2b14408bc2a4855822b7110a4c8b09c31cb5b9820b85dbde648a31d657",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSmmuMemory.h": "d2988cc8fe670e569dd14d9556924784994782b6f9efdc1715d2ab281baf3b90",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSmmuService.cpp": "7f0b5d3883ffd520ce8631c1d7e1764cde5cad6727a6b86fb5b8aba10e881cab",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSmmuService.h": "6e5a666a4c6b28c9dc3ae6c59ce4c55ccb1ef63ac49901cf56759f0dd5a905df",
+      "UniXNU/drivers/Adreno740/NativeAdrenoStatus.h": "7305cce3eefbf63176fd08f3d6eb92aa4b874fffb37bda94666fea53d62a2a34",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSubmit.cpp": "568c1d317ad6a59c012840e96bc2d1d3b7930e8c60743cf0d6546fb067339546",
+      "UniXNU/drivers/Adreno740/NativeAdrenoSubmit.h": "03e41ee4afb6bc6ff1970ac298f93cb0add8b49ac300a14fcffef17fd91bd841",
+      "UniXNU/drivers/Adreno740/NativeAdrenoTimer.cpp": "281221b6fc5c1175b71d7c54fda8275bab1b08d7b9819f7c60e4e4b10026f22a",
+      "UniXNU/drivers/Adreno740/NativeAdrenoTimer.h": "41fd744b29cb12a107d86b6e74a0abe33fa877326e2471e2d534241b016341eb",
+      "UniXNU/drivers/Adreno740/NativeAdrenoUserClient.cpp": "246192e878dbb1ace67b73b4f4028753eaca09fe84b4939a2aa4eae0f4d4e2f8",
+      "UniXNU/drivers/Adreno740/NativeAdrenoUserClient.h": "d1d34d37601e73cb4698f90f292e61494858de6f58325a76add7be03a3d61d0a",
+      "UniXNU/drivers/Adreno740/NativeAdrenoVm.cpp": "2b8af29039d900d171a2b07649898be7c967651440e5910678fd80ab98ec863b",
+      "UniXNU/drivers/Adreno740/NativeAdrenoVm.h": "da9bfcef9d5b7231d0143b853cf9de4535df0f749bb0023e2f052bb7823db6fa",
+      "UniXNU/drivers/Adreno740/NativeAdrenoVmAlias.h": "35fe908bd80389a18e395eb3bfdd5a40cb2c133fe6634dbead8d68cf2822eeea",
+      "UniXNU/drivers/Adreno740/tests/XnuMemoryFixture.h": "a6ca900d7e31d5df085019b309c649f35edc3999810a5dcfb31822f52017d1d3",
+      "UniXNU/drivers/Adreno740/tests/hostsim/builtin_cache.cpp": "0d41011413aa991e3b88436f3711f6549d527b3bd35d9d375e0a4b751d37ca6c",
+      "UniXNU/drivers/Adreno740/tests/hostsim/deferred_bo.cpp": "4e9c181dfdeb25f18993332ef075218d1ffd424b0403b1de6918474f0f46eda4",
+      "UniXNU/drivers/Adreno740/tests/hostsim/host_gpu_service.cpp": "a8971bf8533bd53b9eba2a5d4e3d7bf6de5fcc4b48012bb8d675440a2d01377b",
+      "UniXNU/drivers/Adreno740/tests/hostsim/host_iokit_shim.cpp": "6d9291627ced316ad57782f9f0b9607c56bf32fe2e0bd7e0644325791bc3635c",
+      "UniXNU/drivers/Adreno740/tests/hostsim/pipeline_cache.cpp": "db530bfff4bb1a746c53bd1f534fdcec044f27da11060a34b9e3dda7dbbae6c2",
+      "UniXNU/drivers/Adreno740/tests/hostsim/pipeline_cache_ios.cpp": "d00ddbcc8ca9d9c64f02b4ce6dbf6d8b2b35135a2cb0b1731bb6cbd5fe84a189",
+      "UniXNU/drivers/Adreno740/tests/hostsim/plugin_smoke.cpp": "ad75b7db12d3ac14e37258d6ef045f185c405773284aa0346788cc886da4f212",
+      "UniXNU/drivers/Adreno740/tests/hostsim/vulkan_smoke.c": "c5dfd26db68eb67708bcaeadcc0bba199c12572681d7abea9006962b720f4d28",
+      "UniXNU/drivers/Adreno740/tests/test_board.cpp": "9c69e63a10fbeace5dbcfbd2658b0849d0988374633bf89b18130277b389422f",
+      "UniXNU/drivers/Adreno740/tests/test_client.cpp": "97f5b0490950f2a9ec6779539ccf9c58340acad0598f74eb59a58b259ee6441c",
+      "UniXNU/drivers/Adreno740/tests/test_cpinit.cpp": "2723036b9e5298736f83747ab016a07a3e593fc63049205c8891480024e1abbb",
+      "UniXNU/drivers/Adreno740/tests/test_gmuconfig.cpp": "31af794c65cd00a8540443f0da9848a1de48200fa1c8a0089cc8fe2eddd1ec68",
+      "UniXNU/drivers/Adreno740/tests/test_gmuctx.cpp": "5799e5b350f7fe302248f353b874fd529808aafe10b347073a1ea41500449798",
+      "UniXNU/drivers/Adreno740/tests/test_gmumap.cpp": "3d521eeb5d3f1b16536bef4d54823fa28dcc7d4423c31740a0a937a8c7b023f1",
+      "UniXNU/drivers/Adreno740/tests/test_gmumem.cpp": "c95cce0b76e79e8b5f50bbe4a85c1fa66216a188df0b03398c21a0be4faa9fa5",
+      "UniXNU/drivers/Adreno740/tests/test_gmuplatform.cpp": "ebd70f6d718a9f39b1eda075e187bf3b69509556730810a51d2c4bcecedfd969",
+      "UniXNU/drivers/Adreno740/tests/test_gpu.cpp": "0a1f9c18555fccae1bed36731595d0b7cb3f5437c56e2bb3e572abbc3147f07a",
+      "UniXNU/drivers/Adreno740/tests/test_irq.cpp": "7673b7aa4e56874e366876a87feafe41731e7925ae1df681f1b389fe7323e837",
+      "UniXNU/drivers/Adreno740/tests/test_memory.cpp": "fbbe51c50e21fd9d80ab077d214df6c1641ba894e5787f70ff6c178d41da36e1",
+      "UniXNU/drivers/Adreno740/tests/test_pwrup.cpp": "f9d146bd0f57e4e74f3ad467eec09e8d020ce3d5789ae94825ed75c8945b7b1a",
+      "UniXNU/drivers/Adreno740/tests/test_ring.cpp": "e337367cf4f02f5139a612b348b1b5b827044e70ff360e5bad5ad5cea4b905f1",
+      "UniXNU/drivers/Adreno740/tests/test_sha256.cpp": "19d64203973452fbac152d7e1e5d3f620bc36ff48852dc62bee036d88db19468",
+      "UniXNU/drivers/Adreno740/tests/test_smmu_memory.cpp": "1e628769738e40d86611589075b4967990b42ec129d8f316c5dff213b1744bd1",
+      "UniXNU/drivers/Adreno740/tests/test_smmuctx.cpp": "1899981788582631322337ed7261dd2f6433d5c9f2059c2430b9638d538a3efd",
+      "UniXNU/drivers/Adreno740/tests/test_submit.cpp": "41c7c232ea872038ca5ef808e1b1e608ad7e3dfe9063e989a695aae904a41984",
+      "UniXNU/drivers/Adreno740/tests/test_timer.cpp": "95590914cc18f815ea2ef39571ea154b25e45a3b176dc9197d4379e9ff9ab08a",
+      "UniXNU/drivers/Adreno740/tests/test_userclient.cpp": "83f2b81ffc25d89bc777c40ead12416a0fc1cc61c375ce5b401b9b6c4674fcad",
+      "UniXNU/drivers/Adreno740/tests/test_vm.cpp": "19d888dcca99f9d1617289e8cd11168de7a5b908132fe1e33eda0c0c8fcc5040",
+      "UniXNU/drivers/Adreno740/tests/test_vm_alias.cpp": "a98c1fe4b9a882bc16ec8003a9920945bbf4299e499969f4c9c8de5a962fd2e4"
+    },
+    "limits": [
+      "Raw chipid/compatible are retained; no marketing revision or Adreno740 register compatibility inferred.",
+      "Bus addresses are decoded using parent cells; translation/ownership/power safety is not established.",
+      "Existing generic/sheng driver sources are a starting inventory, not K80 GPU support.",
+      "No phone operation, GPU MMIO, power vote, firmware load, SMMU programming, build or boot."
+    ],
+    "next_steps": [
+      "Locate matching local SM8650 vendor KGSL/GMU source and firmware provenance; resolve raw chipid/revision there.",
+      "Map actual GMU, GPU SMMU, clocks/resets/power and firmware dependencies against current Darwin IOGPU interface before adapting code.",
+      "Keep CPU display/known touch and all boot/Data protections; no hardware probe until a separate minimal bounded design is audited."
+    ]
+  },
+  "bindings": {
+    "out/zorn/gpu-discovery-20261030/inventory-result.json": "69829d6f419345c40f85700a7e434b1af4334a9ce0e626a781133b4426e571fa",
+    "out/zorn/gpu-discovery-20261030/inventory.py": "8b3c786ff2c05e3cb2d46d13c79a2e3239997f6806c61e53ff9e765273a011be",
+    "out/zorn/gpu-discovery-20261030/next-plan.json": "4247d3df0ffb366515bb1b78cd5692c837b3027d93c46ac51d9ff70394b18218"
+  },
+  "first_inventory_refusal": "Strict phandle parsing rejected trailing clock phandle0; final inventory retains the unresolved remainder instead of guessing its stride.",
+  "gpu_working": false,
+  "new_gpu_kernel": false,
+  "gpu_phone_operations": false,
+  "next_action": "Locate matching local SM8650 KGSL/GMU vendor sources and firmware provenance; resolve raw chipid and cached-DT provider mismatch before choosing any hardware initialization."
+}

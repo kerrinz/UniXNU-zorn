@@ -1,0 +1,83 @@
+{
+  "recorded_at": "2026-10-30T21:35:02.239726+08:00",
+  "state": "main-source-host-and-independent-target-integrated-not-final-build-ready",
+  "canonical_builder_sha256": "494110b92ce9b63c0e31e917f4d7d12f3deff203ef059cb993c0ad3cfc59bf3c",
+  "source_scope": "Canonical maintained sources changed only after exact preimage; independent target outputs. Not a new full kernel or hardware test.",
+  "log_scope": "D/v21 GPM1 on independent4096B transport copy; canonical D/v18 remains unchanged.16 high32 carriers,8PA frames32bit+8page counts8bit,packed state/epoch/status/masks,magic+CRC. Checked lossless errors; unrepresentable snapshots keep original log and observation unavailable. CRC is not authentication.",
+  "failures_retained": [
+    "first host quarantine fixture used prepare failure that correctly releases unpublished descriptor; changed fixture to metadata+complete failure for real retained quarantine test",
+    "second host old-reader fixture passed bytearray where original API requires bytes; converted fixture, no production parser guard loosened",
+    "ps process inventory denied by sandbox; no device action or concurrency inferred from that error"
+  ],
+  "next_plan": "out/zorn/gpu-memory-integration/final-audit-next-plan.json",
+  "allow_boot": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "result": "out/zorn/gpu-memory-integration/combined-result.json",
+  "result_sha256": "f4ea74c95171304e17b2c50829cd65bde42cd6d93b850a0548450e8882b123cd",
+  "host_summary": {
+    "wire": {
+      "wire_examples": 11,
+      "fallback_controls": 40,
+      "alias_controls": 2
+    },
+    "cross_language_examples": 11,
+    "corruptions_rejected": 4096,
+    "crc_valid_semantics_rejected": 7,
+    "runtime": [
+      {
+        "mode": 0,
+        "allocations": 0,
+        "cache_calls": 0,
+        "releases": 0
+      },
+      {
+        "mode": 1,
+        "allocations": 8,
+        "cache_calls": 8,
+        "releases": 0
+      },
+      {
+        "mode": 2,
+        "allocations": 0,
+        "cache_calls": 0,
+        "releases": 0
+      },
+      {
+        "mode": 3,
+        "allocations": 1,
+        "cache_calls": 0,
+        "releases": 0
+      }
+    ],
+    "guards": {
+      "UniXNU-zorn/scripts/build-zorn-debug.py": 34,
+      "uefi-zorn/scripts/make-zorn-payload.py": 26
+    },
+    "allow_boot": false,
+    "hardware_qualified": false,
+    "limits": [
+      "Actual native provider sources with host IOKit/cache doubles; no Apple object/virtual ABI or physical/DMA proof.",
+      "Canonical RAM log unchanged. Wire contains PA/page counts and losslessly representable report errors, not CPU/owner pointers. Incompatible extra error/shape keeps original log and makes GPU observation unavailable.",
+      "CRC detects tested corruption, not authentication. Snapshot release/acquire and caller exclusive writer scratch do not constitute full ARM weak memory proof."
+    ]
+  },
+  "target_summary": {
+    "source_baseline_sha256": "4c5e0dadfcd29b2439b8321d2befa858ddf00303a8f032fa368c1d1cc7723d14",
+    "source_gpu_sha256": "36ce318f343aeb0a02f065830bbe8014bb0f03f0aba90f33f99b35a95851da42",
+    "source_off_matches_original_pinned_caller": true,
+    "actual_source_transform": true,
+    "full_SHA_repeat": 10,
+    "off_stub_objects": 1,
+    "original_objects_unchanged": true,
+    "no_boot_initializer": true,
+    "no_internal_GPU_component_imports": true,
+    "limits": [
+      "Actual frozen XNU/IOKit recipes and independent ARM64 consumer units; not final kernel instructions/callbacks/BSS/virtual ABI/FAT/archive/ready qualification.",
+      "Remaining imports include original BSD/UFS/CPU components; only newly introduced GPU C/C++ dependencies were closed here."
+    ],
+    "allow_boot": false,
+    "new_kernel": false,
+    "phone_operations": false
+  }
+}

@@ -1,6 +1,6 @@
 # Format2 migration and publication scope
 
-Updated2026-10-30. This change synchronizes non-GPU progress in the two existing repositories and migrates root device metadata for official record ingestion. It does not resume autonomous work, build a kernel/firmware/image, boot a phone, commit or push Git, or update GPU development.
+Originally recorded2026-10-30; publication consistency reviewed2026-11-01. The format2 route and historical format1 trials below retain their separate provenance. Current root metadata additionally describes unixnu64; this review publishes existing code/records without new device operations or GPU activation.
 
 ## What the official site reads
 
@@ -38,7 +38,7 @@ This adapter changes source provenance and therefore new builders/manifests must
 
 ## Status and evidence
 
-Non-GPU record prose is concise English, as required for the shared Chinese/English site snapshots. The required GPU area remains a planned placeholder; detailed GPU progress is excluded from this synchronization and its investigation files are preserved separately. Working-tree implementations stay `implemented` with `source` references where no published commit identifies the tested bytes. `host` and `device` evidence require a genuine40-character revision and actual commands/logs; current HEAD must not be assigned to historical runs.
+Non-GPU record prose is concise English, as required for the shared Chinese/English site snapshots. The GPU area now describes implemented CPU-owned memory preparation and clearly separates isolated research summaries from unqualified hardware execution. The detailed dated ledger is archival context, not an activation plan. Working-tree implementations stay `implemented` with `source` references where no published commit identifies the tested bytes. `host` and `device` evidence require a genuine40-character revision and actual commands/logs; current HEAD must not be assigned to historical runs.
 
 The latest complete c50 diagnostic had255 inputs/77 archive files matched at recovery. Old6aea and954 input statements remain historical. The docs/config migration does not modify normalized/raw proof workspaces or old manifests. Default42 and both3a desktop runs remain preserved.
 

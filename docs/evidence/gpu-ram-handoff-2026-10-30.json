@@ -1,0 +1,179 @@
+{
+  "recorded_at": "2026-10-31T00:01:23.169876+08:00",
+  "state": "isolated-default-off-UEFI-producer-and-real-DarwinBoot-ADT-consumer-linked",
+  "capture_bytes": 272,
+  "publication_report_bytes": 24,
+  "default_off_exact_sources": true,
+  "staging": "stage-handoff.py --gpu-query-handoff --early-watchdog1 only; no canonical builder option or image authorization",
+  "source_basis": "Actual DarwinBoot AdtNode and node() encoder reused. No existing generic chosen insertion/configuration-table consumer existed: a pre-reserved exact272B zero property is required; no runtime tree expansion or duplicate parser/codec.",
+  "ownership": "Serialized normal-thread preEBS live system table and immutable static producer data; bounds/shape checks do not authenticate arbitrary pointers. Configuration-table GUID names descriptive data, not GPU token. Loader local copy then original whole-tree CopyMem enters kernel boot window before existing GetMap/EBS.",
+  "publication": "Once after query, originalqueryerror precedence preserved. Mandatory originalWDTstatus/mode1, closedowner/nonexpired/everyreturned-eventclosed before InstallConfigurationTable. Raw64 installation status/warning retained in separate immutable24B localreport; uncertain native publication retains staticdata, no free/replace/retry. Native service can allocate/reenter/block; not wallclock bounded.",
+  "consumer": "Unique bounded GUID table/Version1/272B/knownmask shape; raw64 versions/IDs/statuses never narrowed or interpreted as access rights. Existing actual AdtNode enforces chosen-only unique272B placeholder/onechosen, then checks allzero/exclusiveranges/observable source-table stability and copies exactbytes. Errors leave tree unchanged. Source immutability is a prerequisite, not proven by two compares.",
+  "host": {
+    "publication_scenarios": 14,
+    "consumer_rejections_per_scenario": 35,
+    "CLI_refusals": 4,
+    "actual_pipeline_scenarios": 7,
+    "actual_AdtNode_and_node_encoder": true,
+    "SMC_touch_protocols_doubles": true,
+    "ASan_UBSan": true
+  },
+  "native": {
+    "independent_full_SHA_objects": 12,
+    "transitive_inputs": 112,
+    "modules": {
+      "driver": "ea6f661fa0f5d26940954dcef43ef30bccbbe1c1ac2a68e65cf6a37fb8867075",
+      "loader": "3831616afd7a709bb85d25d126529a1cb49efe5a6fdef9056262ce2975973467"
+    },
+    "selected_old_module_archives_excluded": true,
+    "actual_Entry_reassembled_with_original_EDK_Trim": true,
+    "independent_modules_equal_except_raw_timestamp": true,
+    "audit": {
+      "native_layout": {
+        "capture": 272,
+        "publication_report": 24,
+        "InstallConfigurationTable": 192,
+        "ConfigurationTable": 112,
+        "NumberOfTableEntries": 104,
+        "BootServices": 96
+      },
+      "driver": {
+        "query": {
+          "site": 8560,
+          "target": 12676
+        },
+        "publication": {
+          "site": 8576,
+          "target": 11524
+        },
+        "install_slot": 192,
+        "native_call": 12472,
+        "callback": 16144,
+        "storage": [
+          {
+            "name": "Published",
+            "va": 44224,
+            "bytes": 272
+          },
+          {
+            "name": "Report",
+            "va": 44144,
+            "bytes": 24
+          },
+          {
+            "name": "Once",
+            "va": 44068,
+            "bytes": 4
+          },
+          {
+            "name": "Ready",
+            "va": 44072,
+            "bytes": 4
+          },
+          {
+            "name": "capture",
+            "va": 44496,
+            "bytes": 272
+          },
+          {
+            "name": "owner",
+            "va": 44768,
+            "bytes": 360
+          },
+          {
+            "name": "mGpuQueryCallerAttempted",
+            "va": 44064,
+            "bytes": 1
+          }
+        ],
+        "new_initializer": false
+      },
+      "loader": {
+        "boot_handoff": {
+          "site": 10460,
+          "target": 16556
+        },
+        "capture_copy_edges": [
+          {
+            "site": 16728,
+            "target": 17424
+          },
+          {
+            "site": 17160,
+            "target": 17424
+          }
+        ],
+        "bytes_each": 272,
+        "boot_copy_edges": 11,
+        "firmware_pointer_or_service_call_in_new_consumer": false,
+        "new_initializer": false
+      },
+      "actual_PE_mutations": [
+        {
+          "module": "driver",
+          "change": "caller-target",
+          "refused": true,
+          "reason": "actual caller query/publication target/order changed"
+        },
+        {
+          "module": "driver",
+          "change": "install-slot",
+          "refused": true,
+          "reason": "actual InstallConfigurationTable slot/register changed"
+        },
+        {
+          "module": "driver",
+          "change": "capture-write-permission",
+          "refused": true,
+          "reason": "capture storage not writable"
+        },
+        {
+          "module": "loader",
+          "change": "caller-target",
+          "refused": true,
+          "reason": "real loader handoff target changed"
+        },
+        {
+          "module": "loader",
+          "change": "copy-length",
+          "refused": true,
+          "reason": "capture CopyMem no longer exact272B"
+        }
+      ],
+      "pre_GenFw_only": true,
+      "not_exhaustive_CFG_PAGE_dataflow": true,
+      "allow_boot": false
+    },
+    "pre_GenFw_only": true
+  },
+  "first_failures": [
+    "Hostdouble BaseMemoryLib C linkage/ScanMem8 static mismatch refused; preserved firstfixture/log, actual header linkage corrected without productionguard relaxation.",
+    "New publisher expiry/partial-event guard added during source review before qualification, pre-guard source retained. One partial-event host fixture leaked alteredClosedEvents into independent consumer-control phase; assertion/log retained and fixture reset, not a phonefix.",
+    "Native make-var parser first omitted continuation/WORKSPACE substitution; initial checker preserved, resolved actual recipe vars rather than alter productionflags.",
+    "Assembly attempt stripped only preprocessor markers and left AutoGen C typedefs; actualassembler refused. Log retained, used real original EDK Trim --source-code --trim-long instead of invented trim.",
+    "Pipeline hostlink lacked C linkage CopyMem/CompareMem doubles; originalerror retained then exported proper double signatures.",
+    "First PE checker assumed movw2immediate directly adjacent CopyMem; actual firstcopy has one movx25,sp between. Originalchecker retained; accepts only either explicit observed sequence, mutations still refused."
+  ],
+  "protections": {
+    "current342": 342,
+    "frozen255": 255,
+    "raw231": 231,
+    "archive_files": 190,
+    "original_GPU_sources": 88,
+    "default42_preserved": true,
+    "no_active_build_run_in_current": true
+  },
+  "next_plan": "out/zorn/gpu-ram-handoff/native-consumer-next-plan.json",
+  "limits": [
+    "This is source/host/isolated nativepreGenFw qualification, not fullFD/FAT/kernel/phone/livequery proof. No activity touched88GPU sources/CPUdisplay/touch.",
+    "Criticalcall/callback/InstallConfigurationTable exactprototype/slot/BSS/copylength/name checked with actualPE mutants; not exhaustive optimizedCFG/PAGE dataflow or firmwareweakmemory proof.",
+    "Publication localreport is not carried in272B ADT. Query/table failure aborts oldpayloadpublication, so errorRAM does not imply loader/native/recoveredreadback. No claim allfailed paths reachable fromDarwin.",
+    "No recovereddiagnostic transport/nativeADT consumer yet; no new v18/19/20/21 protocol, no extra phonewrite. Genericfirmware lookup/configtable service may allocate/block, so standalone tests do not replace independentwatchdog/freshBCB."
+  ],
+  "allow_boot": false,
+  "new_FD": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "combined_result": "out/zorn/gpu-ram-handoff/combined-result.json",
+  "combined_sha256": "4981cb8eb8e2e34ca662865722b8c5ddae959a8e04b59e606dc094d4a96ee117"
+}

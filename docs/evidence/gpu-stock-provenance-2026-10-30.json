@@ -1,0 +1,1198 @@
+{
+  "recorded_at": "2026-10-30T18:34:12.326898+08:00",
+  "stage": "stock-four-firmware-and-KGSL-provenance-complete",
+  "package": {
+    "recorded_at": "2026-10-30T18:24:40.950029+08:00",
+    "source": "zorn_images_OS3.0.308.0.WOKCNXM_16.0/images/super.img",
+    "source_bytes": 9152354464,
+    "source_sha256": "3bf4e842a65b3046522d35cd574cc2e3267cbf9b3c55a28055cf5451bad230ae",
+    "source_size_mtime_inode_unchanged": true,
+    "metadata_sha256": "07ae567da7487b0f7465ac930e4ae58e3eb870c34ae542d54a752fbba37b6d6d",
+    "geometry": {
+      "maximum": 65536,
+      "slots": 3,
+      "logical_block_size": 4096,
+      "sha256": "bb51bbfa583316a57f8a78459c926727d8d4a007b1b43129613294c4f84e1108"
+    },
+    "LP_all_six_copies_valid_and_identical": true,
+    "outputs": [
+      {
+        "logical_partition_in_stock_package": "vendor_a",
+        "output": "out/zorn/gpu-discovery-20261030/stock/vendor_a.erofs",
+        "bytes": 478535680,
+        "sha256": "64629793e0992e588c4bbecbb34bb0fdc25366946063b290c3bd99e5e484bd53",
+        "extents": [
+          {
+            "bytes": 478535680,
+            "type": 0,
+            "target_bytes": 8566865920,
+            "source": 0
+          }
+        ]
+      },
+      {
+        "logical_partition_in_stock_package": "vendor_dlkm_a",
+        "output": "out/zorn/gpu-discovery-20261030/stock/vendor_dlkm_a.erofs",
+        "bytes": 31109120,
+        "sha256": "5b4547f66030c50099e27efc601ac88823c9ecae1c88ccfabdbec60b39592b72",
+        "extents": [
+          {
+            "bytes": 31109120,
+            "type": 0,
+            "target_bytes": 9046065152,
+            "source": 0
+          }
+        ]
+      }
+    ],
+    "full_super_expanded": false,
+    "phone_operations": false,
+    "limits": "Package logical partitions are named _a, _b empty; offline package names do not indicate/change phone active slot b. Package SHA is provenance, not a signature or proof of phone-installed firmware."
+  },
+  "selected_files": [
+    {
+      "partition": "vendor_a",
+      "path": "/firmware/gen70900_aqe.fw",
+      "bytes": 33176,
+      "sha256": "25237c161d727b8ea92b4beb837a31651b44ea78bfc34d95672af8f346a45825",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_aqe.fw",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_aqe.fw.inode.txt",
+      "stderr": ""
+    },
+    {
+      "partition": "vendor_a",
+      "path": "/firmware/gen70900_sqe.fw",
+      "bytes": 85300,
+      "sha256": "8e2c5ce74140de7e161f14654b44de999855bce01b690fdd18c3358a73498cd1",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_sqe.fw",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_sqe.fw.inode.txt",
+      "stderr": ""
+    },
+    {
+      "partition": "vendor_a",
+      "path": "/firmware/gmu_gen70900.bin",
+      "bytes": 78588,
+      "sha256": "9685f62c42543befcaee68d25355e16bf55cdb0d573bddcc9f6633f59eec3f72",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/gmu_gen70900.bin",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/gmu_gen70900.bin.inode.txt",
+      "stderr": ""
+    },
+    {
+      "partition": "vendor_dlkm_a",
+      "path": "/lib/modules/msm_kgsl.ko",
+      "bytes": 3538096,
+      "sha256": "cd3b49855aa26a1202645fd3ce5ed3feb249fe9ae62aea0638563ff9637ad14f",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/msm_kgsl.ko",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/msm_kgsl.ko.inode.txt",
+      "stderr": ""
+    },
+    {
+      "partition": "vendor_dlkm_a",
+      "path": "/lib/modules/modules.dep",
+      "bytes": 54213,
+      "sha256": "2fc2f0b87b034837e83d58185fbf91dfd6f72f6c309d152bd57382ff75e148c5",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/modules.dep",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/modules.dep.inode.txt",
+      "stderr": ""
+    },
+    {
+      "partition": "vendor_dlkm_a",
+      "path": "/lib/modules/modules.load",
+      "bytes": 6458,
+      "sha256": "4f8632d77929bd89f0a2ba4a699103da3f44286f9936c79fd1437a06cab35c58",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/modules.load",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/modules.load.inode.txt",
+      "stderr": ""
+    },
+    {
+      "partition": "vendor_a",
+      "path": "/build.prop",
+      "bytes": 17597,
+      "sha256": "e3ba8ed2c7e4cb575dd06d3813f210602c2a8e09c0520914ec80cbad7a021e8c",
+      "output": "out/zorn/gpu-discovery-20261030/stock/selected/build.prop",
+      "inode_report": "out/zorn/gpu-discovery-20261030/stock/selected/build.prop.inode.txt",
+      "stderr": ""
+    }
+  ],
+  "ZAP": {
+    "partition": "odm_a",
+    "path": "/firmware/gen70900_zap.mbn",
+    "bytes": 12088,
+    "sha256": "890f7e9da007890a40804d3110169ccc887e8a03bdf29e8b7bc3df0016bf9860",
+    "head_hex": "7f454c460101010000000000000000000200a4000100000000100000340000000000000003000000340020000300000000000000000000000000000000000000",
+    "fsck_rc": 0,
+    "signature_or_PAS_authentication_performed": false,
+    "executed": false,
+    "package_source": "same full SHA super as partition-extraction.json",
+    "odm_image_sha256": "c35f96beca7a60f7bd12639990261b17fbd2f4af6b211893b8f3d4267f292841",
+    "ELF": {
+      "type": 2,
+      "machine": 164,
+      "program_headers": [
+        {
+          "type": 0,
+          "offset": 0,
+          "vaddr": 0,
+          "paddr": 0,
+          "filesz": 148,
+          "memsz": 0,
+          "flags": 117440512,
+          "align": 0
+        },
+        {
+          "type": 1,
+          "offset": 4096,
+          "vaddr": 4096,
+          "paddr": 4096,
+          "filesz": 1072,
+          "memsz": 1072,
+          "flags": 134217735,
+          "align": 1048576
+        },
+        {
+          "type": 0,
+          "offset": 8192,
+          "vaddr": 0,
+          "paddr": 0,
+          "filesz": 3896,
+          "memsz": 3896,
+          "flags": 33554432,
+          "align": 4096
+        }
+      ]
+    }
+  },
+  "module": {
+    "sha256": "cd3b49855aa26a1202645fd3ce5ed3feb249fe9ae62aea0638563ff9637ad14f",
+    "ELF_type": "AArch64 ELF64 relocatable, not executed",
+    "modinfo": [
+      "parmtype=preempt_enable:bool",
+      "parm=preempt_enable:Enable GPU HW Preemption",
+      "parmtype=gpu_sku_override:uint",
+      "parm=gpu_sku_override:Override SKU code identifier for GPU driver",
+      "parmtype=gpu_speed_bin_override:uint",
+      "parm=gpu_speed_bin_override:Override GPU speed bin",
+      "description=3D Graphics driver",
+      "license=GPL v2",
+      "softdep=pre: arm_smmu nvmem_qfprom socinfo",
+      "import_ns=DMA_BUF",
+      "vermagic=6.1.68-android14-11-gef5271fe2aef-dirty SMP preempt mod_unload modversions aarch64",
+      "name=msm_kgsl",
+      "scmversion=gac1edcc37228",
+      "depends=msm_sysstats,mem_buf_dev,miev,clk-qcom,qcom-dcvs,mist,perfmgr,secure_buffer,qcom-scm,mdt_loader,minidump,qcom_va_minidump,msm_hw_fence,socinfo,llcc-qcom,cmd-db,qcom_iommu_util,msm_performance,qcom_aoss,metis,coresight",
+      "alias=of:N*T*Cqcom,kgsl-3d0",
+      "alias=of:N*T*Cqcom,kgsl-3d0C*"
+    ],
+    "gnu_build_ids": [
+      "0240c57ab32f9f5643e2bcc58c6cd92edec0c86e"
+    ],
+    "selected_symbols": [
+      {
+        "name": "adreno_gpu_core_gen7_9_1",
+        "section_index": 10,
+        "value_hex": "0x11660",
+        "bytes": 264,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_hfi_send_cmd_wait_inline",
+        "section_index": 11,
+        "value_hex": "0x7dc84",
+        "bytes": 740,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_gpu_perf_table.cmd_buf",
+        "section_index": 8,
+        "value_hex": "0x3b24",
+        "bytes": 800,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_hfi_irq_handler._rs",
+        "section_index": 9,
+        "value_hex": "0x11450",
+        "bytes": 40,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_hfi_irq_handler._rs.19",
+        "section_index": 9,
+        "value_hex": "0x11478",
+        "bytes": 40,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "snapshot_aqe_buffer",
+        "section_index": 11,
+        "value_hex": "0x7f810",
+        "bytes": 268,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "snapshot_aqe_buffer._rs",
+        "section_index": 9,
+        "value_hex": "0x114f0",
+        "bytes": 40,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_hfi_send_dms_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x85c20",
+        "bytes": 172,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_hw_fence_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x85dcc",
+        "bytes": 112,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_dispatch_queue_write",
+        "section_index": 11,
+        "value_hex": "0x88060",
+        "bytes": 504,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_dqs_lpac",
+        "section_index": 9,
+        "value_hex": "0x11e78",
+        "bytes": 60,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_hfi_dqs",
+        "section_index": 9,
+        "value_hex": "0x11eb4",
+        "bytes": 48,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_9_0_hwsched_perfcounter_groups",
+        "section_index": 10,
+        "value_hex": "0x21498",
+        "bytes": 3080,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen7_snapshot_aqe",
+        "section_index": 11,
+        "value_hex": "0x8fa74",
+        "bytes": 144,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "gen7_snapshot_aqe._rs",
+        "section_index": 9,
+        "value_hex": "0x1b340",
+        "bytes": 40,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "snapshot_aqe_buffer",
+        "section_index": 11,
+        "value_hex": "0x7f920",
+        "bytes": 268,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "snapshot_aqe_buffer._rs",
+        "section_index": 9,
+        "value_hex": "0x11518",
+        "bytes": 40,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen8_snapshot_aqe",
+        "section_index": 11,
+        "value_hex": "0xab6d8",
+        "bytes": 144,
+        "binding": 0,
+        "type": 2
+      },
+      {
+        "name": "gen8_snapshot_aqe._rs",
+        "section_index": 9,
+        "value_hex": "0x223c8",
+        "bytes": 40,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen8_3_0_cp_cp_pipe_aqe0_registers",
+        "section_index": 10,
+        "value_hex": "0x2cf88",
+        "bytes": 24,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "gen8_3_0_cp_cp_pipe_aqe1_registers",
+        "section_index": 10,
+        "value_hex": "0x2cfa0",
+        "bytes": 24,
+        "binding": 0,
+        "type": 1
+      },
+      {
+        "name": "adreno_zap_shader_load",
+        "section_index": 11,
+        "value_hex": "0x39b58",
+        "bytes": 80,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "adreno_gen7_9_0_hwsched_gpudev",
+        "section_index": 10,
+        "value_hex": "0x1f0c8",
+        "bytes": 328,
+        "binding": 1,
+        "type": 1
+      },
+      {
+        "name": "adreno_gen7_9_0_hwsched_perfcounters",
+        "section_index": 10,
+        "value_hex": "0x220a0",
+        "bytes": 16,
+        "binding": 1,
+        "type": 1
+      },
+      {
+        "name": "gen7_hfi_send_set_value",
+        "section_index": 11,
+        "value_hex": "0x7e34c",
+        "bytes": 224,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_gmu_load_fw",
+        "section_index": 11,
+        "value_hex": "0x77754",
+        "bytes": 624,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "__kcfi_typeid_gen7_hfi_irq_handler",
+        "section_index": 65521,
+        "value_hex": "0xf90f05f6",
+        "bytes": 0,
+        "binding": 2,
+        "type": 0
+      },
+      {
+        "name": "gen7_hfi_stop",
+        "section_index": 11,
+        "value_hex": "0x7f060",
+        "bytes": 88,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_irq_handler",
+        "section_index": 11,
+        "value_hex": "0x7f0bc",
+        "bytes": 264,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_init",
+        "section_index": 11,
+        "value_hex": "0x7d9c4",
+        "bytes": 248,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_start",
+        "section_index": 11,
+        "value_hex": "0x7edec",
+        "bytes": 624,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_get_value",
+        "section_index": 11,
+        "value_hex": "0x7e278",
+        "bytes": 208,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_generic_req",
+        "section_index": 11,
+        "value_hex": "0x7dbd0",
+        "bytes": 180,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "to_gen7_hfi",
+        "section_index": 11,
+        "value_hex": "0x7d460",
+        "bytes": 12,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_queue_read",
+        "section_index": 11,
+        "value_hex": "0x7d470",
+        "bytes": 652,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_queue_write",
+        "section_index": 11,
+        "value_hex": "0x7d720",
+        "bytes": 468,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_cmdq_write",
+        "section_index": 11,
+        "value_hex": "0x7d908",
+        "bytes": 184,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_core_fw_start",
+        "section_index": 11,
+        "value_hex": "0x7df6c",
+        "bytes": 196,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_generic_req_v5",
+        "section_index": 11,
+        "value_hex": "0x7e034",
+        "bytes": 324,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x7e17c",
+        "bytes": 248,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_process_queue",
+        "section_index": 11,
+        "value_hex": "0x7e478",
+        "bytes": 324,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_bcl_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x7e5c0",
+        "bytes": 228,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_clx_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x7e6a8",
+        "bytes": 592,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_acd_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x7e8fc",
+        "bytes": 456,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_ifpc_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x7eac8",
+        "bytes": 232,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_gpu_perf_table",
+        "section_index": 11,
+        "value_hex": "0x7ebb4",
+        "bytes": 564,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_cmd_async",
+        "section_index": 11,
+        "value_hex": "0x845c8",
+        "bytes": 512,
+        "binding": 1,
+        "type": 2
+      },
+      {
+        "name": "gen7_hfi_send_lpac_feature_ctrl",
+        "section_index": 11,
+        "value_hex": "0x82210",
+        "bytes": 60,
+        "binding": 1,
+        "type": 2
+      }
+    ],
+    "firmware_literal_names": [
+      "gen70900_aqe.fw",
+      "gen70900_sqe.fw",
+      "gen70900_zap.mbn",
+      "gmu_gen70900.bin"
+    ],
+    "modules_dep": "/vendor/lib/modules/msm_kgsl.ko: /vendor/lib/modules/msm_performance.ko /vendor/lib/modules/msm_hw_fence.ko /vendor/lib/modules/perfmgr.ko /vendor/lib/modules/msm_sysstats.ko /vendor/lib/modules/llcc-qcom.ko /vendor/lib/modules/coresight.ko",
+    "load_list_contains_module": true
+  },
+  "stock_properties": {
+    "ro.product.vendor.name": "mivendor_sm8650_cn",
+    "ro.vendor.build.fingerprint": "Xiaomi/mivendor_sm8650_cn/mivendor:14/UKQ1.240624.001/OS3.0.308.0.WOKCNXM:user/release-keys",
+    "ro.vendor.build.version.incremental": "OS3.0.308.0.WOKCNXM",
+    "ro.vendor.build.version.release": "14",
+    "ro.vendor.build.version.sdk": "34",
+    "ro.vendor.build.security_patch": "2026-09-01"
+  },
+  "stock_profile_relocations": {
+    "profile_symbol": "adreno_gpu_core_gen7_9_1",
+    "ELF_symbol_bytes": 264,
+    "module_sha256": "cd3b49855aa26a1202645fd3ce5ed3feb249fe9ae62aea0638563ff9637ad14f",
+    "references": [
+      {
+        "offset": 24,
+        "type": 257,
+        "symbol": "",
+        "addend": 21248,
+        "ascii_target": "qcom,adreno-gpu-gen7-9-1"
+      },
+      {
+        "offset": 40,
+        "type": 257,
+        "symbol": "adreno_gen7_9_0_hwsched_gpudev",
+        "addend": 0
+      },
+      {
+        "offset": 48,
+        "type": 257,
+        "symbol": "adreno_gen7_9_0_hwsched_perfcounters",
+        "addend": 0
+      },
+      {
+        "offset": 96,
+        "type": 257,
+        "symbol": "",
+        "addend": 21232,
+        "ascii_target": "gen70900_sqe.fw"
+      },
+      {
+        "offset": 104,
+        "type": 257,
+        "symbol": "",
+        "addend": 545,
+        "ascii_target": "gen70900_aqe.fw"
+      },
+      {
+        "offset": 112,
+        "type": 257,
+        "symbol": "",
+        "addend": 39006,
+        "ascii_target": "gmu_gen70900.bin"
+      },
+      {
+        "offset": 128,
+        "type": 257,
+        "symbol": "",
+        "addend": 9087,
+        "ascii_target": "gen70900_zap.mbn"
+      },
+      {
+        "offset": 152,
+        "type": 257,
+        "symbol": "",
+        "addend": 83576
+      },
+      {
+        "offset": 168,
+        "type": 257,
+        "symbol": "",
+        "addend": 82352
+      },
+      {
+        "offset": 184,
+        "type": 257,
+        "symbol": "",
+        "addend": 83648
+      },
+      {
+        "offset": 208,
+        "type": 257,
+        "symbol": "gen7_9_0_snapshot_block_list",
+        "addend": 0
+      }
+    ],
+    "limits": "Bounded ELF ABS64 relocations into the profile, not guessed C-field offsets, executing code, installed-module identity or runtime profile selection."
+  },
+  "GMU": {
+    "bytes": 78588,
+    "sha256": "9685f62c42543befcaee68d25355e16bf55cdb0d573bddcc9f6633f59eec3f72",
+    "blocks": [
+      {
+        "header_offset": 0,
+        "address_hex": "0x0",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x1dc",
+        "payload_offset": 16,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 16,
+        "address_hex": "0x4000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x12ff0",
+        "payload_offset": 32,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 32,
+        "address_hex": "0x200",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x383c",
+        "payload_offset": 48,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 48,
+        "address_hex": "0x100000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x1ab78",
+        "payload_offset": 64,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 64,
+        "address_hex": "0x200000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x12c80",
+        "payload_offset": 80,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 80,
+        "address_hex": "0x300000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x24bf8",
+        "payload_offset": 96,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 96,
+        "address_hex": "0x10004000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x2eb8",
+        "payload_offset": 112,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 112,
+        "address_hex": "0x10007000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0xf84",
+        "payload_offset": 128,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 128,
+        "address_hex": "0x10007fdc",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x18",
+        "payload_offset": 144,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 144,
+        "address_hex": "0x60000000",
+        "bytes": 0,
+        "type": 7,
+        "value_hex": "0x1000",
+        "payload_offset": 160,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 160,
+        "address_hex": "0x60001000",
+        "bytes": 0,
+        "type": 7,
+        "value_hex": "0x1000",
+        "payload_offset": 176,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 176,
+        "address_hex": "0x0",
+        "bytes": 476,
+        "type": 4022250974,
+        "value_hex": "0xefbeadde",
+        "payload_offset": 192,
+        "region": "ITCM",
+        "payload_sha256": "5364043d9c121f718c8f8e29436d1be4ddb0c58343a0c57005c5bcefb426862c"
+      },
+      {
+        "header_offset": 668,
+        "address_hex": "0x4000",
+        "bytes": 77808,
+        "type": 4022250974,
+        "value_hex": "0xefbeadde",
+        "payload_offset": 684,
+        "region": "CACHE",
+        "payload_sha256": "f462fc24a13a7bc41038efb102095219cec36d6c07b363a241baedaffa97d50d"
+      },
+      {
+        "header_offset": 78492,
+        "address_hex": "0x10007f98",
+        "bytes": 40,
+        "type": 4022250974,
+        "value_hex": "0xefbeadde",
+        "payload_offset": 78508,
+        "region": "DTCM",
+        "payload_sha256": "2c34ce1df23b838c5abf2a7f6437cca3d3067ed509ff25f11df6b11b582b51eb"
+      },
+      {
+        "header_offset": 78548,
+        "address_hex": "0x10007fdc",
+        "bytes": 24,
+        "type": 4022250974,
+        "value_hex": "0xefbeadde",
+        "payload_offset": 78564,
+        "region": "DTCM",
+        "payload_sha256": "bd291af86afa62716e467d4d10647b90cfe7eb10bcb4a7222ebdd991ee888cc4"
+      }
+    ],
+    "metadata": [
+      {
+        "header_offset": 0,
+        "address_hex": "0x0",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x1dc",
+        "payload_offset": 16,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 16,
+        "address_hex": "0x4000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x12ff0",
+        "payload_offset": 32,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 32,
+        "address_hex": "0x200",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x383c",
+        "payload_offset": 48,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 48,
+        "address_hex": "0x100000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x1ab78",
+        "payload_offset": 64,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 64,
+        "address_hex": "0x200000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x12c80",
+        "payload_offset": 80,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 80,
+        "address_hex": "0x300000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x24bf8",
+        "payload_offset": 96,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 96,
+        "address_hex": "0x10004000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x2eb8",
+        "payload_offset": 112,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 112,
+        "address_hex": "0x10007000",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0xf84",
+        "payload_offset": 128,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 128,
+        "address_hex": "0x10007fdc",
+        "bytes": 0,
+        "type": 1,
+        "value_hex": "0x18",
+        "payload_offset": 144,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 144,
+        "address_hex": "0x60000000",
+        "bytes": 0,
+        "type": 7,
+        "value_hex": "0x1000",
+        "payload_offset": 160,
+        "region": null,
+        "payload_sha256": null
+      },
+      {
+        "header_offset": 160,
+        "address_hex": "0x60001000",
+        "bytes": 0,
+        "type": 7,
+        "value_hex": "0x1000",
+        "payload_offset": 176,
+        "region": null,
+        "payload_sha256": null
+      }
+    ],
+    "version_scope": "Container metadata values only; no live GMU/HFI version, firmware execution or protocol compatibility proven"
+  },
+  "ucode": [
+    {
+      "file": "gen70900_aqe.fw",
+      "bytes": 33176,
+      "first_dword_hex": "0x0",
+      "payload_offset_from_OEM_reference": 4,
+      "payload_bytes": 33172,
+      "first_8_dwords_hex": [
+        "0x0",
+        "0x1520023",
+        "0x1002065",
+        "0x1000015",
+        "0x1000009",
+        "0x15a415b",
+        "0x1000000",
+        "0x70020023"
+      ],
+      "version_decoded": false
+    },
+    {
+      "file": "gen70900_sqe.fw",
+      "bytes": 85300,
+      "first_dword_hex": "0x0",
+      "payload_offset_from_OEM_reference": 4,
+      "payload_bytes": 85296,
+      "first_8_dwords_hex": [
+        "0x0",
+        "0x1520180",
+        "0x100534c",
+        "0x1520148",
+        "0x1002978",
+        "0x109d7dd",
+        "0x71820001",
+        "0xa802001c"
+      ],
+      "version_decoded": false
+    }
+  ],
+  "decoder_cross_check": {
+    "command": [
+      "clang",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-I/Volumes/macData/projects/ios-zorn/UniXNU/kits/AdrenoFirmware",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/stock/check_stock_gmu.c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/kits/AdrenoFirmware/AdrenoFirmware.c",
+      "-o",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/stock/check_stock_gmu"
+    ],
+    "actual_component_decoder": true,
+    "ASan_UBSan_pass": true,
+    "blocks_cross_checked": 15,
+    "negative_controls": 4,
+    "failure_output_unchanged": true,
+    "offline_DTCM_version_words": {
+      "core": {
+        "GMU_virtual_address": "0x10007fe0",
+        "raw_hex": "0x40020014",
+        "major": 4,
+        "minor": 2,
+        "step": 20,
+        "encoding": "GMU_VER arithmetic only, not a negotiated HFI message protocol"
+      },
+      "core_dev": {
+        "GMU_virtual_address": "0x10007fe4",
+        "raw_hex": "0xffffffff",
+        "decoded_version_semantics": false,
+        "all_ones_value_preserved": true
+      },
+      "power": {
+        "GMU_virtual_address": "0x10007fe8",
+        "raw_hex": "0x40020010",
+        "major": 4,
+        "minor": 2,
+        "step": 16,
+        "encoding": "GMU_VER arithmetic only, not a negotiated HFI message protocol"
+      },
+      "power_dev": {
+        "GMU_virtual_address": "0x10007fec",
+        "raw_hex": "0x0",
+        "decoded_version_semantics": false,
+        "all_ones_value_preserved": false
+      },
+      "hfi": {
+        "GMU_virtual_address": "0x10007ff0",
+        "raw_hex": "0x20060001",
+        "major": 2,
+        "minor": 6,
+        "step": 1,
+        "encoding": "GMU_VER arithmetic only, not a negotiated HFI message protocol"
+      }
+    },
+    "source_sha256": {
+      "UniXNU/kits/AdrenoFirmware/AdrenoFirmware.c": "c3cc714a65ce90216a0fc5c6f0e102ae1769c45e559c08f94a0b5f6fa3e97070",
+      "UniXNU/kits/AdrenoFirmware/AdrenoFirmware.h": "6b2e308f2feae92642f21da2667c3665a2e234ef79e7c5400e7aac7dd3c5b7ed",
+      "out/zorn/gpu-discovery-20261030/stock/check_stock_gmu.c": "007fef7f006ba826a022165dba06affe488a379c0a483fc4b419a905c6dcc942",
+      "out/zorn/gpu-discovery-20261030/stock/cross_check_gmu.py": "f725d6e64e22bcec16c0086a53a0357849f7cbc66954431af52080f6a8a1479e",
+      "out/zorn/gpu-discovery-20261030/stock/selected/gmu_gen70900.bin": "9685f62c42543befcaee68d25355e16bf55cdb0d573bddcc9f6633f59eec3f72"
+    },
+    "limits": "Version words are file-backed initialization payload at OEM-reference offsets, not observed live GMU/HFI negotiation; no execution or protocol compatibility proven."
+  },
+  "controls": {
+    "synthetic_subranges_exact": 231,
+    "malformed_sparse_rejected": 7,
+    "LP_corruptions_rejected": 7,
+    "real_LP_copies_checked": 6,
+    "limits": "Fixture/model controls and checksum integrity; not a general AOSP-equivalence or firmware authenticity proof."
+  },
+  "EROFS_selected_file_checks": [
+    {
+      "command": [
+        "out/zorn/gpu-discovery-20261030/stock/erofs-tools/fsck.erofs",
+        "--extract",
+        "--path=/firmware/gen70900_aqe.fw",
+        "out/zorn/gpu-discovery-20261030/stock/vendor_a.erofs"
+      ],
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "out/zorn/gpu-discovery-20261030/stock/erofs-tools/fsck.erofs",
+        "--extract",
+        "--path=/firmware/gen70900_sqe.fw",
+        "out/zorn/gpu-discovery-20261030/stock/vendor_a.erofs"
+      ],
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "out/zorn/gpu-discovery-20261030/stock/erofs-tools/fsck.erofs",
+        "--extract",
+        "--path=/firmware/gmu_gen70900.bin",
+        "out/zorn/gpu-discovery-20261030/stock/vendor_a.erofs"
+      ],
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "out/zorn/gpu-discovery-20261030/stock/erofs-tools/fsck.erofs",
+        "--extract",
+        "--path=/lib/modules/msm_kgsl.ko",
+        "out/zorn/gpu-discovery-20261030/stock/vendor_dlkm_a.erofs"
+      ],
+      "rc": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "bindings": {
+    "out/zorn/gpu-discovery-20261030/stock/profile-relocation-facts.json": "c061d1c270f4d05e6c6c6a813481be94452a1f839e6e50719d456895cffed5d3",
+    "out/zorn/gpu-discovery-20261030/stock/stock-analysis.json": "96fa5f6de28b253cb3bd6f8bc12cc7c69ceb28083ca08fd3baebdb8f8d704bc1",
+    "out/zorn/gpu-discovery-20261030/stock/dump.erofs-help.txt": "1d40ea560e2351f77f7a011d84ac22efa0ea3d72f38fd4ea5b820b42257c88e0",
+    "out/zorn/gpu-discovery-20261030/stock/vendor_a.erofs": "64629793e0992e588c4bbecbb34bb0fdc25366946063b290c3bd99e5e484bd53",
+    "out/zorn/gpu-discovery-20261030/stock/sparse-reader-check.json": "311efa8da5c0f7ad073906e51a1b64346082fbc6a8ebe98c446f99738275a117",
+    "out/zorn/gpu-discovery-20261030/stock/directory-listing-commands.json": "8a67b467f3e9ef36f1c3b7466fdecd53f3e310c660751f60b9559623cdb2cdcb",
+    "out/zorn/gpu-discovery-20261030/stock/mtools-provenance.json": "9aa2bc89633ee7f5409c67f0deed46bcb8e6fd1ed7f304ce21864582c681ac8e",
+    "out/zorn/gpu-discovery-20261030/stock/non-hlos-root-listing.txt": "33b2395486859334047e54f7db32ef05d87ee580d36ad8975e770a60d1431bfe",
+    "out/zorn/gpu-discovery-20261030/stock/selected-fsck-checks.json": "977ba08f333c825606b3e6af1bb5b363bbd956e848de0be3ef7aa2caef4f1a9d",
+    "out/zorn/gpu-discovery-20261030/stock/check_stock_gmu": "f5182a9f97b9e2d1a373e2d9aca1371cae9c8b9357b37d55762baa553e323661",
+    "out/zorn/gpu-discovery-20261030/stock/zap-extraction.json": "9623c127743e0140bd5f03c95c71868495731e8b5ede95ec7bf8f1eccb5905d5",
+    "out/zorn/gpu-discovery-20261030/stock/partition-extraction.json": "2d2f81b22e230f0823735eabf83c8f7b238c23fa2cae47f404c937d902519db0",
+    "out/zorn/gpu-discovery-20261030/stock/gmu-format-sources.json": "e5153fbae23a162b3ffe955e03f45fcf1c52f91b1bdcc22d14ba1ebec857d328",
+    "out/zorn/gpu-discovery-20261030/stock/selected-files.json": "d707170655f4b72de38b0a212da7c89a321475175e174d6ffa05d5c0dc997da2",
+    "out/zorn/gpu-discovery-20261030/stock/cross_check_gmu.py": "f725d6e64e22bcec16c0086a53a0357849f7cbc66954431af52080f6a8a1479e",
+    "out/zorn/gpu-discovery-20261030/stock/mtools-bottle.tar.gz": "a0f6aad93ce1be47de8f0d965033933a895f026caa8efc14e61431e6e5025d5f",
+    "out/zorn/gpu-discovery-20261030/stock/adreno.h": "15636117455bf216da1ad48224ce3af666417f7e5d0606aecdd265c9fae26151",
+    "out/zorn/gpu-discovery-20261030/stock/sparse_format.h": "b151b9d80ba7beb32e2e20ad1f94a0cbb1ab958860160fa814a75110b5794a62",
+    "out/zorn/gpu-discovery-20261030/stock/analyze_stock.py": "493ecf93d26dea9ddec56c204e1eb85d253ce17c358dae3d54e177a8f5013062",
+    "out/zorn/gpu-discovery-20261030/stock/fsck.erofs-help.txt": "a07ecf9a8464aeaeb1e251d578b66a68f4245560da6c4db5012fc9ece5d1bc1c",
+    "out/zorn/gpu-discovery-20261030/stock/gmu-decoder-cross-check.json": "de4ee7c58f4f00b458d9346ea0d04c532170a0b498d4bb57edfe81e7b8843db1",
+    "out/zorn/gpu-discovery-20261030/stock/read_profile_relocations.py": "569c46b0675911f3cff741c856117d5046f3c02f7aff1ea1c988da42a6aed0e6",
+    "out/zorn/gpu-discovery-20261030/stock/check_stock_gmu.c": "007fef7f006ba826a022165dba06affe488a379c0a483fc4b419a905c6dcc942",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-tool-files.json": "4bab9cc6a9d60b57a631e0a41d996e5e85b976710f3d18a4352294f8ff0b7626",
+    "out/zorn/gpu-discovery-20261030/stock/odm-firmware-listing.txt": "4a501c22bc3b7cc0584502c90aae8583ae516512a76dec632ef1e820736bf5eb",
+    "out/zorn/gpu-discovery-20261030/stock/kgsl_gmu_core.h": "560027dfe9af8a56cab6db4fbb08597c470abf722686675f138235b71181e8ca",
+    "out/zorn/gpu-discovery-20261030/stock/gmu-host-run.log": "fd2380ade0311d962300a45bed130192be0094aa0278f1b2a7ef5b2a0d4fd949",
+    "out/zorn/gpu-discovery-20261030/stock/vendor_dlkm_a-lib_modules-listing.txt": "104ab361f479ed80979e8d3153d80998485a939aaf0a340843432ca0fd178595",
+    "out/zorn/gpu-discovery-20261030/stock/check_sparse_lp.py": "9ec1dea57cc63408bc36adb07aee79fce9f5b63ef2f0912c0726b7c0abb6579a",
+    "out/zorn/gpu-discovery-20261030/stock/extract_partitions.py": "fb476de39e7743945577f0821c0885d854943cc97983739a4c827c630bfd1cfb",
+    "out/zorn/gpu-discovery-20261030/stock/gmu-host-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/stock/super-metadata.json": "efe8285f82cf53a1434f401c02a1d12426792589642a61fa3286a53630b6c412",
+    "out/zorn/gpu-discovery-20261030/stock/aosp-format-sources.json": "a26ac0a4dfc016ef6587286efe3ad6c5834d9595b21cdf2949845b157d410011",
+    "out/zorn/gpu-discovery-20261030/stock/sparse_lp.py": "c0e7bb8ac31f9c51f25748c6ce11184a65e4c383c083f9eb35473de3db0b4c4b",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-bottle-provenance.json": "9a088929707f306e40d7bcd7da558e01e22cb515e9205ff1b5fc309c137b0fd9",
+    "out/zorn/gpu-discovery-20261030/stock/vendor_dlkm_a.erofs": "5b4547f66030c50099e27efc601ac88823c9ecae1c88ccfabdbec60b39592b72",
+    "out/zorn/gpu-discovery-20261030/stock/mtools-files.json": "6d961447f5e8cb6b8f0ef09972ba1fcc97fb3fad1ae0af8576f632d78367d655",
+    "out/zorn/gpu-discovery-20261030/stock/vendor_a-firmware-listing.txt": "ff3c77f0f315043931b096088156ace437ce142adf6705a1de873ee4255c3a13",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-utils-bottle.tar.gz": "87e9ef8002a87275c018cffd127f7eb11de4553cc53edd7b20b81a8e407580c4",
+    "out/zorn/gpu-discovery-20261030/stock/odm-extraction.json": "26af6a376451fad3ae53fd9ee626baeada8f3c9ff8236feddc013379281ef34d",
+    "out/zorn/gpu-discovery-20261030/stock/metadata_format.h": "6fc7d8e07bb408c94627168ad33d063e4a7eb74a233d0d5b2e6a51afb70abd88",
+    "out/zorn/gpu-discovery-20261030/stock/mtools-formula.json": "2b7c16403bf45514199fc6caa05caf52b5ca3d4572884a4b1b391fce7449340f",
+    "out/zorn/gpu-discovery-20261030/stock/extract_gpu_files.py": "e27717382313233c597251a9b8b654ba37e910cf89f44e50e4fe60fa6594d6bd",
+    "out/zorn/gpu-discovery-20261030/stock/vendor_a-gpu-listing.txt": "403c0c0b238e350e67d0dd2b649ccde9345e33add49b5c5ff633cdf95022af97",
+    "out/zorn/gpu-discovery-20261030/stock/non-hlos-image-listing.txt": "e16fb88afe2daa415cd7463e72b9a7243a7568b9ee0f05f9b7823679179d0e64",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-formula.json": "ba07950819779a62bbf82f9020b8eafcfd05bb0303e0839561e30a5d591428c7",
+    "out/zorn/gpu-discovery-20261030/stock/gmu-decoder-first-raw-version-arithmetic.json": "527cf39349d9083d62c9282fa868bc431bcb9291f6c2ce68491cda661cf9f924",
+    "out/zorn/gpu-discovery-20261030/stock/odm_a.erofs": "c35f96beca7a60f7bd12639990261b17fbd2f4af6b211893b8f3d4267f292841",
+    "out/zorn/gpu-discovery-20261030/stock/selected/modules.dep.inode.txt": "0f437b8e1868f0e52c5ee0b8311522a6bfc74bdc16f9b428e2011f9c4f086385",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_sqe.fw.inode.txt": "7cf622776675ece357905124934bb77c493b97af6470a797b96beabb586042e8",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gmu_gen70900.bin": "9685f62c42543befcaee68d25355e16bf55cdb0d573bddcc9f6633f59eec3f72",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_zap.mbn": "890f7e9da007890a40804d3110169ccc887e8a03bdf29e8b7bc3df0016bf9860",
+    "out/zorn/gpu-discovery-20261030/stock/selected/msm_kgsl.ko.inode.txt": "e24472ec88f93e8f7427badf5c10a6811bca7f397851f92390b918201bfb86c5",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gmu_gen70900.bin.inode.txt": "ecb198407c497a53e9bfad3eb552576dd5246561cfbfb39a9da8b24620d9bd85",
+    "out/zorn/gpu-discovery-20261030/stock/selected/build.prop": "e3ba8ed2c7e4cb575dd06d3813f210602c2a8e09c0520914ec80cbad7a021e8c",
+    "out/zorn/gpu-discovery-20261030/stock/selected/modules.dep": "2fc2f0b87b034837e83d58185fbf91dfd6f72f6c309d152bd57382ff75e148c5",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_sqe.fw": "8e2c5ce74140de7e161f14654b44de999855bce01b690fdd18c3358a73498cd1",
+    "out/zorn/gpu-discovery-20261030/stock/selected/modules.load.inode.txt": "5739dbc95485f2798ff777c103cf76e685c96de74cef177bbe96794a2ff3fbfc",
+    "out/zorn/gpu-discovery-20261030/stock/selected/msm_kgsl.ko": "cd3b49855aa26a1202645fd3ce5ed3feb249fe9ae62aea0638563ff9637ad14f",
+    "out/zorn/gpu-discovery-20261030/stock/selected/build.prop.inode.txt": "edb559364da7aa1741b82b2a1aad36cdc8c3d0c3399cbbf6185a4bb1c12a30a5",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_aqe.fw.inode.txt": "34251ed0f14f0617f4a0633d786d56e15c42b052850e9d0418a5c6a6c17b9692",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_zap.mbn.inode.txt": "5596d621c57c083b1895da23176a964bafe07fa4794d9b8d60e203405c41eb0a",
+    "out/zorn/gpu-discovery-20261030/stock/selected/modules.load": "4f8632d77929bd89f0a2ba4a699103da3f44286f9936c79fd1437a06cab35c58",
+    "out/zorn/gpu-discovery-20261030/stock/selected/gen70900_aqe.fw": "25237c161d727b8ea92b4beb837a31651b44ea78bfc34d95672af8f346a45825",
+    "out/zorn/gpu-discovery-20261030/stock/mtools/mdir": "a654c7489cd768e81e1ac89c0b58da73bb0ee00e981d729901a6fa57ef96d65c",
+    "out/zorn/gpu-discovery-20261030/stock/mtools/mtype": "a654c7489cd768e81e1ac89c0b58da73bb0ee00e981d729901a6fa57ef96d65c",
+    "out/zorn/gpu-discovery-20261030/stock/mtools/mtools": "a654c7489cd768e81e1ac89c0b58da73bb0ee00e981d729901a6fa57ef96d65c",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-tools/fsck.erofs.1": "600e55d3ddde0f83b16d4559f87a230cf2cfc7f7b25cebb809e4c71af04e3fa9",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-tools/COPYING": "20fa22694a29d63c7637857242e96959868c4caa287049a128498653a14ac323",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-tools/dump.erofs.1": "6242679dabd26b05c2f574fd488b053b315bc714807dc859113cb1a93d980371",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-tools/fsck.erofs": "7b907c59d09c0a540d1b43570a4a3ce04084302cb467b51e0a7a372d14aadd75",
+    "out/zorn/gpu-discovery-20261030/stock/erofs-tools/dump.erofs": "2e1c2b2d2399183803c28bbf3e695d43db06083fb398be157ece48ce31c3ef0e",
+    "out/zorn/gpu-discovery-20261030/stock/check_stock_gmu.dSYM/Contents/Info.plist": "e333cbe3f7c7441a703bafb47bc469a5d4da972114c7369f2f133e0bb5d425bb",
+    "out/zorn/gpu-discovery-20261030/stock/check_stock_gmu.dSYM/Contents/Resources/DWARF/check_stock_gmu": "4eeed5fa5cfecfa3aaf038e328df226e262a29811a70e33122dde67c434c95d3",
+    "out/zorn/gpu-discovery-20261030/stock/check_stock_gmu.dSYM/Contents/Resources/Relocations/aarch64/check_stock_gmu.yml": "355356f3bb1c35795f422bef28f427985a92571de9b93d4896cdd518d957abe6",
+    "UniXNU/kits/AdrenoFirmware/AdrenoFirmware.c": "c3cc714a65ce90216a0fc5c6f0e102ae1769c45e559c08f94a0b5f6fa3e97070",
+    "UniXNU/kits/AdrenoFirmware/AdrenoFirmware.h": "6b2e308f2feae92642f21da2667c3665a2e234ef79e7c5400e7aac7dd3c5b7ed",
+    "out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.c": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+    "out/zorn/gpu-discovery-20261030/profile-reference/adreno-gpulist.h": "08293f60e0be8b3a16ec0b800588d700f54b34d2e9e32e64aac115f05548c8f3",
+    "zorn-kernel/arch/arm64/include/asm/elf.h": "14a01a2ef04682b49321c53ce37897cd6c3a5646b4f5a44f143da505fcce8993",
+    "/opt/homebrew/opt/lz4/lib/liblz4.1.dylib": "3ce8bec34557e6a5c76129cef6588dc59959caa51e1e54321f45ea7c6e528e07",
+    "/opt/homebrew/opt/xz/lib/liblzma.5.dylib": "1b2e12cc1b920264f3dd15eeba22e85b8afd589595d8945d1d12a52afa694b09",
+    "zorn_images_OS3.0.308.0.WOKCNXM_16.0/images/super.img": "3bf4e842a65b3046522d35cd574cc2e3267cbf9b3c55a28055cf5451bad230ae",
+    "zorn_images_OS3.0.308.0.WOKCNXM_16.0/images/NON-HLOS.bin": "70bb64df776bb14e43c13d5b7c1e8e452296165fa36587d225220ee85344dbdc"
+  },
+  "partial_search_history": "Initial stock-analysis.json preserves the stage when vendor/NON-HLOS ZAP search was incomplete; final ZAP found in ODM /firmware/gen70900_zap.mbn and fsck checked.",
+  "initial_tool_error": "Unrelocated Homebrew EROFS binary failed dependency resolution; preserved help stderr. Child-only DYLD_LIBRARY_PATH to existing SHA-bound lz4/xz resolves it; no binary/global dependency modified.",
+  "source_signature_verified": false,
+  "phone_installed_version_attested": false,
+  "firmware_executed": false,
+  "phone_operations": false,
+  "production_sources_modified": false,
+  "new_kernel": false,
+  "limits": [
+    "Four stock files now have exact package paths/length/SHA; provenance is not PAS/signature verification or boot compatibility.",
+    "Stock module profile ABS64 bindings prove contained references, not runtime profile selection or byte-equivalence to OnePlus source.",
+    "GMU15 records retain11 zero-sized metadata/preallocation requests and4 payload blocks; generic parser validates payload ranges and preserves metadata, not preallocation semantics/ownership.",
+    "File-backed DTCM version words are not live GMU/HFI negotiation; core_dev all-ones and power_dev zero remain uninterpreted.",
+    "No GPU power/reset/clock/SMMU/MMIO/SCM/PAS operation, no command submission or acceleration qualification."
+  ]
+}

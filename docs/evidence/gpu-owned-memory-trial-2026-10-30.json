@@ -1,0 +1,234 @@
+{
+  "recorded_at": "2026-10-30T22:31:48.779061+08:00",
+  "state": "canonical-build-and-single-CPU-owned-GPU-memory-trial-qualified",
+  "boot_sha256": "0fe61e0dd19d2968ea90a431954dee0854fa3eddd1a27e407dc5acc05f2f7360",
+  "kernel_sha256": "dcb055be71b2069f1ee31bdc15396c52e03b9cb918a8daa752c0ce3445526857",
+  "archive": "out/zorn/builds/0fe61e0d",
+  "run": "out/zorn/debug/20261030-222034-0fe61e0d",
+  "log_sha256": "2f10a7e2ccb49b4bc2fccd3c4af9eb0ccc7528351c1951736e8de8f0555504c5",
+  "current_inputs": 342,
+  "immutable_archive_files": 190,
+  "native_audit": {
+    "independent_objects": 13,
+    "linked_functions": 48,
+    "actual_call_edges": 336,
+    "original_virtual_slots": 81,
+    "actual_native_virtual_calls": 24,
+    "negative_controls": 6,
+    "packed_kernel_ADT_menu_exact": true,
+    "owned_callback_and_BSS_checked": true,
+    "page_scope": "Ordinary PAGE opcode/register checks; only callback PAGE targets and GOT relaxations have separately checked complete targets. Normal linker contract remains for other PAGE addresses.",
+    "note": "Special full PAGE checks are for callback pointers and new owned runtime/wire BSS. Ordinary shared-provider PAGE addresses remain normal linker contract; no exhaustive-address claim."
+  },
+  "trial": {
+    "status": "recovered-distinct-new-log",
+    "wallclock_seconds": 397.0,
+    "actual_gui_version": 21,
+    "all_eight_core_checks": true,
+    "smp_summary": "SMP8 phase=80 seen=ff bound=ff remap=ff timers=ff ipis=ff failure=0 tlb=1",
+    "retained_cookie_qualified": true,
+    "brightness64": true,
+    "data_space": {
+      "recorded": true,
+      "error": 0,
+      "supported": 15,
+      "block_bytes": 4096,
+      "blocks": 2097152,
+      "available_blocks": 1817276,
+      "uuid": "C7D77FF3-6437-4C4A-8E05-E8E239AC1641",
+      "total_bytes": 8589934592,
+      "available_bytes": 7443562496
+    },
+    "gpu_memory_observation_available": true,
+    "cpu_owned_memory_prepared": true,
+    "cpu_owned_memory_qualification": true,
+    "camera_observations": [
+      {
+        "observed_at": "2026-10-30T22:25:18.942921+08:00",
+        "run": "out/zorn/debug/20261030-222034-0fe61e0d",
+        "boot_sha256": "0fe61e0dd19d2968ea90a431954dee0854fa3eddd1a27e407dc5acc05f2f7360",
+        "image": "out/zorn/debug/20261030-222034-0fe61e0d/camera-20261030-222241.jpg",
+        "image_sha256": "6fa50830bab5c95ae12de1858f2089e0c005f4a130ca5ea40ad9c91cc9ecef77",
+        "observed": "system-lock-screen",
+        "lock_screen_visible": true,
+        "clock": "4:02",
+        "audio": false,
+        "scope": "Single scheduled120s USB-camera frame visually inspected: colored wallpaper, lock-screen clock4:02 and home indicator. No desktop/touch/continuous/performance/long-term qualification.",
+        "camera_metadata": "out/zorn/debug/20261030-222034-0fe61e0d/camera-20261030-222241.json",
+        "desktop_qualified": false,
+        "touch_tested": false
+      }
+    ],
+    "GPU_runtime_complete": false,
+    "GPU_rendering_qualified": false
+  },
+  "gpu_memory": {
+    "state": 2,
+    "phase": 5,
+    "index": 8,
+    "failure_source": 0,
+    "status": 0,
+    "epoch": 1,
+    "plan_attempted": true,
+    "plan_status": 0,
+    "original_native_status": 0,
+    "original_gate_status": 0,
+    "original_snapshot_status": 0,
+    "allocation_status": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "output_policy_bits": 40,
+    "attempted_mask": 255,
+    "backed_mask": 255,
+    "described_mask": 255,
+    "quarantined_mask": 0,
+    "cleanup_status_available": true,
+    "snapshots": [
+      {
+        "index": 0,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 37861593088,
+        "bytes": 77824
+      },
+      {
+        "index": 1,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 37861670912,
+        "bytes": 110592
+      },
+      {
+        "index": 2,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 37861781504,
+        "bytes": 77824
+      },
+      {
+        "index": 3,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 37861859328,
+        "bytes": 151552
+      },
+      {
+        "index": 4,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 39818469376,
+        "bytes": 4096
+      },
+      {
+        "index": 5,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 39818342400,
+        "bytes": 4096
+      },
+      {
+        "index": 6,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 37862010880,
+        "bytes": 65536
+      },
+      {
+        "index": 7,
+        "snapshot_present": true,
+        "description_accepted": true,
+        "physical": 37862121472,
+        "bytes": 73728
+      }
+    ],
+    "available": true,
+    "runtime_complete": false,
+    "physical_is_iova": false,
+    "retained_bytes": 565248
+  },
+  "gui": {
+    "tick": 20,
+    "ms": 316265,
+    "configuration": {
+      "dyld_flags": 9,
+      "owner_dyld_flags": 8,
+      "fixups_parsed": 3,
+      "fixups_applied": 3,
+      "hold_seconds": 300,
+      "watchdog_mode": 1,
+      "owner_stage": 6,
+      "owner_mount_flags": 343969825
+    },
+    "ram_data": {
+      "reads": 12927,
+      "writes": 5616,
+      "errors": 0
+    }
+  },
+  "source_binding": {
+    "baseline_entries": 97,
+    "runtime_variants": [
+      "bsd/kern/bsd_init.c",
+      "osfmk/arm/pmap/pmap.c",
+      "osfmk/arm/pmap/pmap_internal.h",
+      "osfmk/arm64/tlb.h",
+      "osfmk/kern/lock_rw.c"
+    ],
+    "fresh_replay_performed": false,
+    "old_xnu_objects_reused": true,
+    "scope": "All97 baseline source entries and tracked-change closure match archived qualified replay, with only5 exact separately pinned SMP/GPU-caller transforms. No fresh patch replay or clean build claim."
+  },
+  "provenance": [
+    "final-audit/preimage.json",
+    "final-audit/env-fix-provenance.json",
+    "final-audit/root-source-binding.json",
+    "bootstrap-record-preimage",
+    "cpu-profile-preimage"
+  ],
+  "failures_retained": [
+    "Attempt1 exact SMP checker environment omitted GPU source selection; explicitly passed same environment, source equality unchanged.",
+    "Attempt2 sandbox sysctl host CPU/memory denial; subsequent canonical builds were explicitly escalated, no fake sysctl values/CPU timeouts or guard changes.",
+    "Attempt3 missing KernelConfigTables after interrupted make blocked corecrypto export discovery. Canonical builder preserves startup recipe sentinel to select existing bootstrap; no export/object guard omitted.",
+    "Attempt4 repair insertion indentation error was refused before any build; source/log retained, syntax fixed and checked.",
+    "Attempt5 bootstrap regenerated missing object but ended at expected unresolved native helper link and did not rewrite an up-to-date startup compile record. Original record restored only after independent exact-recipe full-SHA equality with unchanged active startup.o.",
+    "Attempt6 new complete kernel8710f295 had no root source-replay marker. Derived current root marker only after all97 source entries plus tracked-change closure matched frozen qualified replay with5 independently pinned transforms; no new replay/clean build claim.",
+    "Attempt7 new complete kernel dcb055be passed source/start/SMP gates; payload rejected old CPU OS profile SHA even though3 fixup entries were identical. Ran existing readonly original SystemOS UUID/original-byte verifier; old proof retained, SHA guard unchanged.",
+    "New auditor initial critical PAGE matcher lacked base-register matching; fixed without changing older auditors. Over-broad shared pool PAGE proof encountered alternate-basic-block ADRPs; retained refusal and kept shared ordinary PAGE addresses at explicit linker-contract boundary. New owned runtime/wire BSS and callback targets remain checked.",
+    "First BSS corruption fixture tried writing an unbacked zerofill VA. Revised actual kernel-copy test changes owned BSS segment write permission;6 real mutations all refused. Original kernel unchanged.",
+    "Candidate qualifier initially assumed root reader alias. Actual immutable reader is nested under gpu-owned-host-inputs/UniXNU-zorn/scripts/read-zorn-log.py, with archived decoder dependencies bound exactly. No archive/manifest changed."
+  ],
+  "protections": {
+    "default42_preserved": true,
+    "frozen_inputs": [
+      255,
+      231
+    ],
+    "frozen_archive_files": 77,
+    "original_GPU_sources": 88,
+    "last_device_state": "recovery",
+    "no_active_build_run": true,
+    "Data_window_unchanged": true,
+    "CPU_display_and_touch_preserved": true,
+    "no_shutdown": true,
+    "Git_commit_or_push": false
+  },
+  "limits": [
+    "D/v18 fallback is observation unavailable, never zero allocation/success. Preserve all errors/unknowns.",
+    "Eight sequential allocations are not one contiguous extent or a wall-time bound. Physical addresses are not IOVAs;40bit is explicit allocation policy, not measured SMMU OAS.",
+    "Only one camera frame, no full-window continuous output, interaction or long-term stability. No CPU/GUI-root-cause inference.",
+    "log_us includes encoding/I/O/lock waits/preemption; no CPU time/FPS/MHz or idle percentage.",
+    "One GPU CPU-owned memory qualification only. Descriptor/PA/zeroed CPU/cache-helper path, not SMMU lease, IOVA, GPU execution, firmware authentication, DMA coherence, power/clock/HFI, fences or Metal.",
+    "CPU-owned memory passes do not establish GPU stop/power/security/IOVA/SMMU/firmware authentication/execution/DMA/HFI/fence/Metal. Single trial consumed; no repeat."
+  ],
+  "next_plan": "out/zorn/gpu-memory-integration/native-window-owner-next-plan.json",
+  "allow_boot": false,
+  "completion": "out/zorn/gpu-memory-integration/trial-completion.json",
+  "completion_sha256": "0f8cf46ad7f312643716e61c6ff67d64fdc0c05431a3a3399b0dd3a7f96cbe2d"
+}

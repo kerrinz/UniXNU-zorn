@@ -1,0 +1,353 @@
+{
+  "recorded_at": "2026-10-30T23:42:56.586817+08:00",
+  "state": "isolated-default-off-real-UEFI-query-caller-and-C-ABI-module-linked",
+  "staged_ON": {
+    "gpu_query": true,
+    "default_off": true,
+    "source_original_sha256": "cd4798ced90fe05b5930622c27ea1462dbeeb399549041e0f0517b80e59e2bbb",
+    "staged_source_sha256": "7fe43ea036822447f835a60a28040fc49e7bee9fb9e770c1eb22cd4a15722d13",
+    "source_OFF_exact": "inverse4exactedits matches original",
+    "requires_fresh_runner_verified_recovery_BCB": true,
+    "requires_early_watchdog": 1,
+    "early_Bark_Bite_unchanged": [
+      60000,
+      65000
+    ],
+    "allow_boot": false,
+    "active_firmware_output_changed": false,
+    "no_kernel": true,
+    "no_wire_or_persistent_format": true
+  },
+  "staged_OFF": {
+    "gpu_query": false,
+    "default_off": true,
+    "source_original_sha256": "cd4798ced90fe05b5930622c27ea1462dbeeb399549041e0f0517b80e59e2bbb",
+    "staged_source_sha256": "cd4798ced90fe05b5930622c27ea1462dbeeb399549041e0f0517b80e59e2bbb",
+    "source_OFF_exact": true,
+    "requires_fresh_runner_verified_recovery_BCB": true,
+    "requires_early_watchdog": 1,
+    "early_Bark_Bite_unchanged": [
+      60000,
+      65000
+    ],
+    "allow_boot": false,
+    "active_firmware_output_changed": false,
+    "no_kernel": true,
+    "no_wire_or_persistent_format": true
+  },
+  "caller_order": [
+    "existing range validation",
+    "new diagnostic once guard",
+    "unchanged ArmEarlyWatchdog plus actual mode1 readback",
+    "unchanged touch handoff",
+    "ZornGpuQueryRun mandatory markers/status",
+    "original payload copy/publish suffix"
+  ],
+  "capture": {
+    "bytes": 272,
+    "kind": "RAM-only scalar C ABI snapshot, not a wire or Darwin live-service ABI",
+    "immutable_after_release": true,
+    "pointers_or_event_handles": false,
+    "raw": "all versions/IDs/locate/query/create/close/native failure statuses/masks/expiry retained, guard refusal uses MAX_UINT32 unavailable fields",
+    "producer": "persistent constant-initialized owner, exact target no new ctor/destructor registration",
+    "ready": "reader symbol forced retained via /include, Run noinline for actual edge audit; initial unqualified preimage saved"
+  },
+  "host": {
+    "actual_caller_prefix": true,
+    "original_watchdog_source": true,
+    "touch_double": true,
+    "all_native_providers_doubles": true,
+    "cases": [
+      {
+        "scenario": 0,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 10,
+        "capture_available": true
+      },
+      {
+        "scenario": 1,
+        "SMC_double_calls": 1,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 2,
+        "SMC_double_calls": 2,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 3,
+        "SMC_double_calls": 3,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 4,
+        "SMC_double_calls": 4,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 5,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 6,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 7,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 8,
+        "SMC_double_calls": 0,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 0,
+        "capture_available": true
+      },
+      {
+        "scenario": 9,
+        "SMC_double_calls": 0,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 10,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 0,
+        "query_native_double_calls": 0,
+        "capture_available": false
+      },
+      {
+        "scenario": 11,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 0,
+        "capture_available": true
+      },
+      {
+        "scenario": 20,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 1,
+        "capture_available": true
+      },
+      {
+        "scenario": 21,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 3,
+        "capture_available": true
+      },
+      {
+        "scenario": 22,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 5,
+        "capture_available": true
+      },
+      {
+        "scenario": 23,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 6,
+        "capture_available": true
+      },
+      {
+        "scenario": 24,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 7,
+        "capture_available": true
+      },
+      {
+        "scenario": 25,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 8,
+        "capture_available": true
+      },
+      {
+        "scenario": 26,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 9,
+        "capture_available": true
+      },
+      {
+        "scenario": 27,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 10,
+        "capture_available": true
+      },
+      {
+        "scenario": 28,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 9,
+        "capture_available": true
+      },
+      {
+        "scenario": 29,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 10,
+        "capture_available": true
+      },
+      {
+        "scenario": 30,
+        "SMC_double_calls": 5,
+        "touch_double_calls": 1,
+        "query_native_double_calls": 3,
+        "capture_available": true
+      }
+    ],
+    "guard_refusals": [
+      [
+        "--gpu-query"
+      ],
+      [
+        "--gpu-query",
+        "--early-watchdog",
+        "2"
+      ],
+      [
+        "--boot"
+      ],
+      [
+        "--reuse"
+      ]
+    ],
+    "scope": "C ABI + real PublishRange prefix program order. Host SMC is a controlled double, not actual watchdog hardware or BCB verification. Full actual module target compile/link separately.",
+    "allow_boot": false
+  },
+  "native": {
+    "independent_full_SHA_objects": 4,
+    "real_selected_libraries": 26,
+    "pre_GenFw_module_sha256": "c22d27b6ccfdd3cf4ba4321ec3b562c579444bedbb860d978e3b1d669d6e6dda",
+    "module_audit": {
+      "caller_query_edge": [
+        {
+          "site": 8556,
+          "target": 11500
+        }
+      ],
+      "notify": 15168,
+      "storage": [
+        {
+          "name": "capture",
+          "va": 44160,
+          "bytes": 272,
+          "section": ".data"
+        },
+        {
+          "name": "owner",
+          "va": 44432,
+          "bytes": 360,
+          "section": ".data"
+        },
+        {
+          "name": "ready",
+          "va": 44040,
+          "bytes": 4,
+          "section": ".data"
+        },
+        {
+          "name": "attempted",
+          "va": 44036,
+          "bytes": 4,
+          "section": ".data"
+        },
+        {
+          "name": "mGpuQueryCallerAttempted",
+          "va": 44032,
+          "bytes": 1,
+          "section": ".data"
+        }
+      ],
+      "readonly_names_checked": 5,
+      "new_constructor_registration": false,
+      "new_wrapper_no_direct_SMC": true,
+      "independent_link_except_timestamp_equal": true,
+      "timestamp_raw": [
+        "aeb8e46a",
+        "45bae46a"
+      ],
+      "actual_module_mutations": [
+        {
+          "mutation": "caller-target",
+          "refused": true,
+          "reason": "caller no longer targets real query C ABI"
+        },
+        {
+          "mutation": "callback-store",
+          "refused": true,
+          "reason": "callback release latch changed"
+        },
+        {
+          "mutation": "storage-permission",
+          "refused": true,
+          "reason": "new storage not writable"
+        }
+      ],
+      "source_OFF_exact": true,
+      "scopes": [
+        "Actual final linked module includes staged C consumer, C++ wrapper/lifetime/query and real selected libraries; active module archive excluded.",
+        "Critical caller B/BL target, callback release/no-call, target-size writable/zero BSS, retained RAM reader and5readonly input strings checked.",
+        "This is pre-GenFw linked PE, not a new final FD/payload/ready or exhaustive proof of all optimized CFG/PAGE targets; compiler/linker contract remains for other addresses.",
+        "Protocol GUID IN-parameter pools can remain writable; only named readonly strings checked, not blanket all-provider-reference readonly assertion.",
+        "Host original-prefix tests establish source program order and marker refusal, not actual watchdog hardware or physical BCB state."
+      ],
+      "allow_boot": false
+    },
+    "transitive_compile_inputs": 73,
+    "old_module_archive_excluded": true,
+    "independent_link": "all bytes equal except separately recordedPEtimestamp; no metadata-consumer or stableGUI causal claim"
+  },
+  "protections": {
+    "current342": 342,
+    "frozen255": 255,
+    "raw231": 231,
+    "archive_files": 190,
+    "original_GPU_sources": 88,
+    "default42_preserved": true,
+    "no_active_build_run": true
+  },
+  "next_plan": "out/zorn/gpu-real-caller/RAM-handoff-next-plan.json",
+  "first_failures": [
+    "Host actualwatchdog prefix needed originalmarker macro and logical-expression parentheses; firstfixture/log retained, no productionwarning/guard suppression.",
+    "Initial LTO module had no retained reader consumer. Kept unqualified source/module/map preimage, forced C ABI reader retention and noinline Run before actual moduleaudit; this is not a phonefix.",
+    "Final LTO folded standaloneSTLR into actualSTLUR w9,[x8,#0x38] release store. Firstauditor/script retained; exact observedopcode0x99038109 accepted with actualdisassembly, no sourcechange/ARMweakmemory claim."
+  ],
+  "limits": [
+    "Host SMC/touch/nativeproviders are doubles; source order is exercised but not a new hardwarewatchdog/BCB/GPUquery result.",
+    "Actual linkedPE is preGenFw isolated output, not finalFD/kernel/payload. Criticaledge/callback/BSS/read-onlynames checked, not exhaustiveoptimizedCFG/PAGE/metadata consumer proof.",
+    "ProtocolGUID INparameter pools may be writable; only5actualreadonlynames/marker inputs checked, not blanket readonlyproviderdata.",
+    "Immutable RAM snapshot exists but has no persistent recovery transport or canonical image/ready guard yet; allow_boot=false. No liveprovideroperation or phoneaction.",
+    "SourceOFF is exact original bytes and selected objects independently compiled; not a newly boot-qualified format2 firmware equivalence claim."
+  ],
+  "allow_boot": false,
+  "new_FD": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "combined_result": "out/zorn/gpu-real-caller/combined-result.json",
+  "combined_sha256": "594c6c6413f548b0a2a1f1000bc911e08f0d8a1b5d95d7b0fc79eb890b437ef9"
+}

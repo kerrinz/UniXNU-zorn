@@ -1,0 +1,103 @@
+{
+  "recorded_at": "2026-10-30T22:50:06.482677+08:00",
+  "state": "isolated-native-role-window-owner-implemented-and-target-checked",
+  "implementation": {
+    "capacity": 10,
+    "selected_roles": "fixed K80 GPU7/GMU3 via unchanged public ZornGpuDescribeResources parser",
+    "mapping_options": "Anywhere|InhibitCache|Unique",
+    "no_handle_or_volatile_MMIO_accessor": true,
+    "states": [
+      "FRESH",
+      "PREPARING",
+      "CPU_MAPPED",
+      "RETAINED_FAILURE",
+      "RETIRING",
+      "RETIRED"
+    ],
+    "overlap": "Any selected physical-page overlap refused before first factory, including GMU/CX-misc0x1000; no shared-map cleanup hazards.",
+    "failure": "Keep actual acquired descriptor/map references and quarantine masks; null factories have unavailable native error, not invented NoMemory. Exact gate/describe/unmap IOReturn retained.",
+    "retirement": "Only explicit CPU-only success path unmaps/releases; failed or duplicate calls never retry. Destructor never releases. No handle/address escapes.",
+    "unmap_error": "Actual XNU unmap clears fAddress/fAddressMap even when doUnmap reports error. Attempted versus successful masks separate, mapping usability unknown after error; retain references/no retry.",
+    "caller": "Serialized normal thread with stable per-boot epoch, no UFS/log/watchdog locks. Gate is serialization only, not hardware quiescence. No wall-clock bound on IOKit calls."
+  },
+  "host": {
+    "role_subsets": 1023,
+    "overlap_refused_before_factory": 256,
+    "native_fault_paths": 150,
+    "gate_fault_paths": 73,
+    "arguments": 9,
+    "private_contexts": 128,
+    "destructor_retains": true,
+    "reentrant_prepare_retire_rejected": true
+  },
+  "negative_controls": [
+    {
+      "mutation": "overlap-accepted",
+      "refused": true,
+      "exit_code": -6
+    },
+    {
+      "mutation": "duplicate-prepare",
+      "refused": true,
+      "exit_code": -6
+    },
+    {
+      "mutation": "unmap-error-erased",
+      "refused": true,
+      "exit_code": -6
+    }
+  ],
+  "native": {
+    "real_frozen_XNU_IOKit_recipe": true,
+    "general_regs_only": true,
+    "compiled_objects": 3,
+    "full_Apple_vtable_slots": 98,
+    "actual_virtual_calls": 11,
+    "slots": {
+      "map": 29,
+      "desc_length": 22,
+      "desc_pa": 19,
+      "va": 15,
+      "map_pa": 16,
+      "map_length": 17,
+      "desc": 19,
+      "options": 20,
+      "unmap": 21,
+      "map_release": 5,
+      "desc_release": 5
+    },
+    "link_imports": [
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_memcpy"
+    ],
+    "constinit_no_initializer": true,
+    "factory_runtime_class": "IOGeneralMemoryDescriptor; IODeviceMemory withRange is a factory cast, no separate IODeviceMemory vtable",
+    "scope": "Fresh class annotation objects compared to qualified0fe complete kernel. No new provider final kernel/callsite or hardware mapping.",
+    "independent_objects_full_SHA_equal": 3
+  },
+  "first_failure": "ABI checker searched createMappingInTask instead of actual map virtual slot29 and base pure physical instead of concrete IOGeneralMemoryDescriptor method; first script/refusal retained, checker corrected. Provider not changed for that correction.",
+  "protections": {
+    "current342": 342,
+    "frozen255": 255,
+    "raw231": 231,
+    "archive_files": 190,
+    "default42": true,
+    "no_new_build_run": true,
+    "original_GPU_sources": 88
+  },
+  "next_plan": "out/zorn/gpu-native-window-owner/power-clock-provider-next-plan.json",
+  "limits": [
+    "Host IOKit doubles are not physical mapping/cache/DMA/power evidence.128 private contexts do not prove shared-owner concurrency or ARM weak memory.",
+    "11 virtual calls and98 original Apple slots checked; typed serialization callback sites10. Actual class headers/recipes, not guessed Darwin22 offsets.",
+    "No active source or0fe candidate input changed; provider only in isolated out. No GPU service attachment, MMIO read/write, clock/power/reset/SCM/PAS/SMMU/IOVA, device reference or firmware copy/execute.",
+    "CPU mapping ownership does not establish access-safe/powered/stopped/security ownership; all hardware runtime providers remain incomplete. GPU rendering/Metal unqualified.",
+    "Explicit normal retirement is CPU-only. Partial or uncertain failure retains resources for a separately designed recovery; no recovery implementation claimed."
+  ],
+  "allow_boot": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "combined_result": "out/zorn/gpu-native-window-owner/combined-result.json",
+  "combined_sha256": "b046e44d95aa213b7477e20ae78bd08e597bdecb4272a9c8a73dfa0e1283e7ad"
+}

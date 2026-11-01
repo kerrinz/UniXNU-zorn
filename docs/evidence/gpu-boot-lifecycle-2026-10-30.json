@@ -1,0 +1,409 @@
+{
+  "recorded_at": "2026-10-30T23:22:39.942465+08:00",
+  "state": "isolated-real-EBS-lifetime-and-archived-FD-modules-qualified-host-target-only",
+  "host": {
+    "success": 1,
+    "native_failure_warning_partial_paths": 34,
+    "exit_injection_paths": 21,
+    "arguments": 5,
+    "private_contexts": 128,
+    "no_callback_BS_calls": true,
+    "no_auto_cleanup": true
+  },
+  "negative_controls": [
+    {
+      "name": "expired-query-allowed",
+      "refused": true,
+      "exit_code": -6
+    },
+    {
+      "name": "event-latch-missing",
+      "refused": true,
+      "exit_code": -6
+    },
+    {
+      "name": "unknown-event-closed",
+      "refused": true,
+      "exit_code": -6
+    }
+  ],
+  "native": {
+    "independent_real_LTO_objects": 2,
+    "full_SHA_equal": true,
+    "transitive_inputs": 52,
+    "ABI": {
+      "real_CreateEventEx_offset": 368,
+      "real_CloseEvent_offset": 112,
+      "callback": "actual EFI_EVENT_NOTIFY signature; one STLR, no calls or other stores",
+      "expired_reads": "actual recipe armv9.2+rcpc emits LDAPR; independent C++ acquire flags, not consistent all-state snapshot or generic ARM weak-memory proof",
+      "real_LTO_annotation_link": true,
+      "annotation_has_no_entry": true,
+      "undefined_symbols_forced": false,
+      "actual_compiler_intrinsics_library": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib/OUTPUT/CompilerIntrinsicsLib.lib",
+      "library_sha256": "28a288c764e8eab248c9f2298cd095e018a4141f4022c4b7f2d1951e21527428",
+      "linked_annotation_sha256": "a7093db5d2b8b7193167edb7ccaa6ee843569337bf0068dbe7da31e1b261da0c",
+      "commands": [
+        {
+          "arguments": [
+            "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/toolchain/clang",
+            "-g",
+            "-Os",
+            "-fshort-wchar",
+            "-fno-builtin",
+            "-fno-strict-aliasing",
+            "-Wall",
+            "-Werror",
+            "-Wno-array-bounds",
+            "-include",
+            "AutoGen.h",
+            "-fno-common",
+            "-fstack-protector",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-DSTRING_ARRAY_NAME=ZornBootMemoryDxeStrings",
+            "-Wno-parentheses-equality",
+            "-Wno-tautological-compare",
+            "-Wno-tautological-constant-out-of-range-compare",
+            "-Wno-empty-body",
+            "-Wno-varargs",
+            "-Wno-unknown-warning-option",
+            "-Wno-unaligned-access",
+            "-Wno-microsoft-enum-forward-reference",
+            "-fno-stack-protector",
+            "-funsigned-char",
+            "-ftrap-function=undefined_behavior_has_been_optimized_away_by_clang",
+            "-Wno-address",
+            "-Wno-shift-negative-value",
+            "-Wno-unknown-pragmas",
+            "-Wno-incompatible-library-redeclaration",
+            "-Wno-null-dereference",
+            "-mno-implicit-float",
+            "-mms-bitfields",
+            "-mno-stack-arg-probe",
+            "-fno-omit-frame-pointer",
+            "-D",
+            "__GNUC__=4",
+            "-D",
+            "__GNUC_MINOR__=2",
+            "-D",
+            "__GNUC_PATCHLEVEL__=1",
+            "-D",
+            "__MINGW32__=1",
+            "-m64",
+            "-mcmodel=small",
+            "-Oz",
+            "-flto",
+            "-target",
+            "aarch64-unknown-windows-msvc",
+            "-gcodeview",
+            "-funwind-tables",
+            "-Wno-deprecated-non-prototype",
+            "-Wno-constant-conversion",
+            "-Werror",
+            "-Wno-unused-const-variable",
+            "-Wno-sometimes-uninitialized",
+            "-Wno-unaligned-access",
+            "-Wno-deprecated-non-prototype",
+            "-D",
+            "CLANG",
+            "-D",
+            "ENABLE_SECUREBOOT=0",
+            "-D",
+            "__DEPRECATED_AARCH64_4K_RUNTIME_GRANULARITY",
+            "-D",
+            "HAS_ACTLR_EL1_UNIMPLEMENTED_ERRATA=1",
+            "-D",
+            "HAS_AMCNTENSET0_EL0_UNIMPLEMENTED_ERRATA=1",
+            "-D",
+            "HAS_GIC_V3_WITHOUT_IRM_FLAG_SUPPORT_ERRATA=1",
+            "-D",
+            "HAS_PSCI_MEMPROTECT_FAILING_ERRATA=0",
+            "-march=armv9.2-a+crypto+rcpc",
+            "-I/Volumes/macData/projects/Mu-Silicium/Platforms/Xiaomi/zornPkg/Drivers/ZornBootMemoryDxe",
+            "-I/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe/DEBUG",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Test/UnitTest/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Library/MipiSysTLib/mipisyst/library/include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Include/AArch64",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Silicium/SiliciumPkg",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Silicium/SiliciumPkg/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Platforms/Xiaomi/zornPkg",
+            "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver",
+            "-std=c++17",
+            "-c",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifetime-probe.cpp",
+            "-o",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifetime-probe.obj",
+            "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle"
+          ],
+          "cwd": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe"
+        },
+        {
+          "arguments": [
+            "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/toolchain/clang",
+            "-g",
+            "-Os",
+            "-fshort-wchar",
+            "-fno-builtin",
+            "-fno-strict-aliasing",
+            "-Wall",
+            "-Werror",
+            "-Wno-array-bounds",
+            "-include",
+            "AutoGen.h",
+            "-fno-common",
+            "-fstack-protector",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-DSTRING_ARRAY_NAME=ZornBootMemoryDxeStrings",
+            "-Wno-parentheses-equality",
+            "-Wno-tautological-compare",
+            "-Wno-tautological-constant-out-of-range-compare",
+            "-Wno-empty-body",
+            "-Wno-varargs",
+            "-Wno-unknown-warning-option",
+            "-Wno-unaligned-access",
+            "-Wno-microsoft-enum-forward-reference",
+            "-fno-stack-protector",
+            "-funsigned-char",
+            "-ftrap-function=undefined_behavior_has_been_optimized_away_by_clang",
+            "-Wno-address",
+            "-Wno-shift-negative-value",
+            "-Wno-unknown-pragmas",
+            "-Wno-incompatible-library-redeclaration",
+            "-Wno-null-dereference",
+            "-mno-implicit-float",
+            "-mms-bitfields",
+            "-mno-stack-arg-probe",
+            "-fno-omit-frame-pointer",
+            "-D",
+            "__GNUC__=4",
+            "-D",
+            "__GNUC_MINOR__=2",
+            "-D",
+            "__GNUC_PATCHLEVEL__=1",
+            "-D",
+            "__MINGW32__=1",
+            "-m64",
+            "-mcmodel=small",
+            "-Oz",
+            "-flto",
+            "-target",
+            "aarch64-unknown-windows-msvc",
+            "-gcodeview",
+            "-funwind-tables",
+            "-Wno-deprecated-non-prototype",
+            "-Wno-constant-conversion",
+            "-Werror",
+            "-Wno-unused-const-variable",
+            "-Wno-sometimes-uninitialized",
+            "-Wno-unaligned-access",
+            "-Wno-deprecated-non-prototype",
+            "-D",
+            "CLANG",
+            "-D",
+            "ENABLE_SECUREBOOT=0",
+            "-D",
+            "__DEPRECATED_AARCH64_4K_RUNTIME_GRANULARITY",
+            "-D",
+            "HAS_ACTLR_EL1_UNIMPLEMENTED_ERRATA=1",
+            "-D",
+            "HAS_AMCNTENSET0_EL0_UNIMPLEMENTED_ERRATA=1",
+            "-D",
+            "HAS_GIC_V3_WITHOUT_IRM_FLAG_SUPPORT_ERRATA=1",
+            "-D",
+            "HAS_PSCI_MEMPROTECT_FAILING_ERRATA=0",
+            "-march=armv9.2-a+crypto+rcpc",
+            "-I/Volumes/macData/projects/Mu-Silicium/Platforms/Xiaomi/zornPkg/Drivers/ZornBootMemoryDxe",
+            "-I/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe/DEBUG",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Test/UnitTest/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Library/MipiSysTLib/mipisyst/library/include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Include/AArch64",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Silicium/SiliciumPkg",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Silicium/SiliciumPkg/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Platforms/Xiaomi/zornPkg",
+            "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver",
+            "-std=c++17",
+            "-c",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifetime-probe.cpp",
+            "-o",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifetime-probe-audit.obj",
+            "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle",
+            "-fno-lto",
+            "-mgeneral-regs-only"
+          ],
+          "cwd": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe"
+        },
+        {
+          "arguments": [
+            "xcrun",
+            "llvm-objdump",
+            "-d",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifetime-probe-audit.obj"
+          ],
+          "cwd": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe"
+        },
+        {
+          "arguments": [
+            "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/toolchain/lld-link",
+            "/nologo",
+            "/nodefaultlib",
+            "/machine:arm64",
+            "/dll",
+            "/noentry",
+            "/subsystem:efi_boot_service_driver",
+            "/opt:ref",
+            "/export:ZblLinkProbe",
+            "/out:/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifecycle-link-annotation.bin",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifetime-probe.obj",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/ZornGpuBootLifetime.obj",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/ZornGpuPowerResolver.obj",
+            "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib/OUTPUT/CompilerIntrinsicsLib.lib"
+          ],
+          "cwd": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe"
+        },
+        {
+          "arguments": [
+            "xcrun",
+            "llvm-objdump",
+            "--private-headers",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-boot-lifecycle/lifecycle-link-annotation.bin"
+          ],
+          "cwd": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe"
+        }
+      ],
+      "limits": [
+        "No-entry link annotation only, never published/inserted in FD/executed; actual final firmware volume/link/ready not qualified.",
+        "Real EBS dispatch depends on selected DXE single-caller contract; injected host callbacks and private contexts are not an arbitrary concurrent firmware proof."
+      ],
+      "allow_boot": false
+    }
+  },
+  "FD": {
+    "fd_sha256": "05b8b30b93f6ed6b46d44c048798917474ebfba86669c2ccab364cc5f0c668b2",
+    "files": {
+      "CmdDbDxe": {
+        "bytes": 32768,
+        "sha256": "5c58d445f356af9f8497ea6f449ba534fd7920b045067cd3b02ad997863077bf"
+      },
+      "RpmhDxe": {
+        "bytes": 65536,
+        "sha256": "cdebce5c9f96d16e71a0db8f9c4dbf591ed314dd94a6543b08c238902df65267"
+      },
+      "ClockDxe": {
+        "bytes": 229376,
+        "sha256": "53c18b9e1569cebbcb9837c1d773cc5e836fb7e902df7c29b27b485a13d4fdfc"
+      }
+    },
+    "ffs_files": 107,
+    "sections": 295,
+    "decompressed_bytes": 9883656
+  },
+  "FD_controls": {
+    "corruption_controls": [
+      {
+        "name": "fv_header_checksum",
+        "refused": true,
+        "error": "AssertionError"
+      },
+      {
+        "name": "ffs_header_checksum",
+        "refused": true,
+        "error": "AssertionError"
+      },
+      {
+        "name": "invalid_file_state",
+        "refused": true,
+        "error": "AssertionError"
+      },
+      {
+        "name": "unknown_guid_compression",
+        "refused": true,
+        "error": "AssertionError"
+      },
+      {
+        "name": "corrupt_lzma",
+        "refused": true,
+        "error": "LZMAError"
+      },
+      {
+        "name": "declared_expansion_over_limit",
+        "refused": true,
+        "error": "AssertionError"
+      },
+      {
+        "name": "noncanonical_guid_data_offset",
+        "refused": true,
+        "error": "AssertionError"
+      },
+      {
+        "name": "truncated_volume",
+        "refused": true,
+        "error": "AssertionError"
+      }
+    ],
+    "exact_provider_SHA_matches": 3,
+    "relocation_normalization_needed": false,
+    "limits": [
+      "Subset reader: fixed known FFS2, short file/section headers, known GUID LZMA only; not a general PI/UEFI verifier.",
+      "16MiB cumulative output/64MiB LZMA memory limit/depth<5/files<1024/sections<4096.",
+      "Only3selected PE32 files written.9.9MB decompressed bytes remain temporary RAM, not a full extracted tree.",
+      "Header and optional file payload checksums follow PI attributes; source FD exact SHA is mandatory for the public extraction script."
+    ]
+  },
+  "findings": [
+    "Actual selected DXE signals BeforeExitBootServices before terminating memory map, once per attempted exit, and ExitBootServices after successful termination. Owner permanently expires on either, including a failed map-key attempt.",
+    "Callback actualEFI_EVENT_NOTIFY has one release STLR and no calls. Acquire flags compile to LDAPR under the actualarmv9.2+rcpc recipe, not the initial checker assumptionLDAR. This is not a full ARM weak-memory proof.",
+    "Partial failed registration events and duplicate returned handles retain uncertain references. Only known successful events may be explicitly closed pre-expiry; duplicate alias quarantines without double-close. No hidden destructor release or retries.",
+    "Selected CoreCloseEvent removes queued notify/signal entries before invalidating/freeing its event. Correctness still requires persistent owner and selected single-caller firmware contract; callbacks cannot cancel in-flight native provider.",
+    "Read only3MiB original archived FD05b8 with bounded FFS2/header/file-checksum/LZMA subset.107FFS files/295sections,9883656decompressed RAM bytes, only3target PE32 files written. All3wholemodule SHAs exactly match selected binaries; no relocation normalization needed. PatchedClock53c18 is now actual archive evidence, not inferred from currentBuild FFS."
+  ],
+  "first_failures": [
+    "Host fixture misleading indentation refused Werror; originalfixture/log retained and braces fixed, sourceguard unchanged.",
+    "ABI script initially assumed output argumentlast but recipe had trailinginclude; firstscript retained, corrected exact-o operand selection.",
+    "ABI checker initially expected LDAR but realarmv9.2+rcpc recipe emits LDAPR; originalscript retained, exactrecipe/actualopcode checked without altering provider or claiming universal weakmemory proof."
+  ],
+  "protections": {
+    "current342": 342,
+    "frozen255": 255,
+    "raw231": 231,
+    "archive_files": 190,
+    "original_GPU_sources": 88,
+    "default42_preserved": true,
+    "no_active_build_run": true
+  },
+  "next_plan": "out/zorn/gpu-boot-lifecycle/real-caller-next-plan.json",
+  "limits": [
+    "Host injected events/private contexts are not real EBS timing or arbitrary shared concurrent ownership proof. Only the NEXT native call is prevented after expiry, not cancellation of an in-flight call.",
+    "No-entry LTO PE is an annotation: no final staged module/FD/link/ready or phone invocation. Existing activeFD and source inputs unchanged.",
+    "Subset PIreader is not universal UEFI parser; only knownformat/compression, full sourceFD SHA mandatory, output/memory/depth/count caps and8corruptioncontrols. Unsupported formats reject.",
+    "Power/security/access/GPUstop/DMA ownership remains unimplemented. No power/clock/SCM/PAS/MMIO/SMMU/IOVA/firmware activation, CPUdisplay/touch preserved."
+  ],
+  "allow_boot": false,
+  "new_kernel": false,
+  "new_FD": false,
+  "phone_operations": false,
+  "combined_result": "out/zorn/gpu-boot-lifecycle/combined-result.json",
+  "combined_sha256": "caf8fff352fde29ecbf4f4deff902ebfcce8712ce705e7078f17dac1cc5a51c1"
+}

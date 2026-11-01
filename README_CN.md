@@ -14,7 +14,7 @@
 
 CPU1 页表根发布修正通过同一完整内核的「0 失败 / 1 通过 / 0 失败 / 1 通过」对照，以及两个相差 16 KiB、无附加早期探针的布局验证。这是该窄修正的有界证据。另一个偶发停苹果标志的 GUI 问题仍未解决。最后一次 `c50ca7ea` 观察显示锁屏，记录到全部八核的 USER / SYSTEM 累计记账进展，并自动回到 recovery；它不构成性能或长期稳定性验收。
 
-默认镜像仍为 `42f3d518`；`3a8ac966` 的两次机主确认桌面结果作为独立基线保留。它们均为会有界自动回收的调试镜像。Wi-Fi、蓝牙、音频、蜂窝通信、相机、传感器和完整电源管理尚未验收。本文不宣称硬件图形加速已可用，本次更新不包含 GPU 开发进度。
+默认镜像仍为 `42f3d518`；`3a8ac966` 的两次机主确认桌面结果作为独立基线保留。它们均为会有界自动回收的调试镜像。Wi-Fi、蓝牙、音频、蜂窝通信、相机、传感器和完整电源管理尚未验收。硬件图形加速尚未验收，GPU 后续工作在下方单独记录。
 
 证据与验收边界见两仓库同步维护的[非 GPU 进度摘要](docs/progress-2026-10-30-non-gpu.md)。
 
@@ -57,12 +57,18 @@ python3 UniXNU-zorn/scripts/build-zorn-debug.py --help
 
 ## 设备与存储边界
 
-唯一授权目标为 `92988a43` / `zorn` / 槽位 `b`；`f85d4270` 是 CC9，禁止操作。使用固定目标 runner 和临时 `fastboot boot`；不刷写、不擦除、不改槽位或 GPT。
+当前新安装目标为 `92988a43` / `zorn` / 槽位 `a`；`f85d4270` 是 CC9，禁止操作。机主完整重刷Android后，明确授权创建64GiB独立`unixnu`分区并重新安装iPadOS17，保留Android系统、OrangeFox和槽位A。只用固定runner显式`--unixnu64-install-trial`与临时`fastboot boot`；历史slotB/userdata镜像不得启动到新布局。
 
-手机 userdata 已包含准备好的系统，禁止启动 Android 或重新安装 userdata。OS / SystemOS 保持只读。持久写入仅限 userdata 相对 192 GiB 处的既有 Data 窗口（2,097,217 个 4096 字节块）、原有单个 4 KiB 日志块，以及保留尾部并完整读回的 recovery BCB。禁止重置或扩大 Data。`board.toml` 中的 userdata 范围是相对于容量的历史描述，不是绝对 GPT 地址。
+新`unixnu`为4096字节LBA47271680..64048895，uniqueGUID `b279731f-ccad-4ef5-a8b7-e7440cd08de3`。OS/SystemOS已写入并全量读回，运行时仍只读。初始8GiB Data COW窗口移至unixnu相对16GiB，共2097217块；新元数据/cookie与旧store不同。日志仍仅unixnu相对2291712的单4KiB块，recovery BCB保留尾部并整页读回。64GiB是专用分区容量，目前逻辑Data仍8GiB。Android实际启动、长期完整性和GPU执行需分别验收。详见[新安装证据](docs/evidence/dual-system-reinstall-2026-11-01.json)。
 
 ## 发布与许可
 
 对于尚无匹配已发布提交来标识受测工作树字节的结果，记录使用 `implemented` 和源码引用。不要把当前 Git HEAD 指派给历史运行，也不要在缺少匹配证据时提高完成等级。发布经审阅的源码与记录文件，并确认 `Porting record` 工作流后，再请求官方目录收录；本地验证通过不代表官网已经更新。
 
 新增代码主要使用 [BSD-2-Clause-Patent](LICENSE)；PMGR 保留其 [MIT 许可](native/pmgr/LICENSE.MIT)，上游文件保留各自声明。Apple 镜像、私钥、厂商二进制和生成的启动镜像不随仓库分发。
+
+## GPU范围
+
+已发布CPU自有内存准备代码及默认关闭的诊断辅助工具，硬件GPU执行、渲染和Metal仍未验收。详细研究摘要保留于[GPU进度](docs/progress-2026-10-30-gpu.md)；大量隔离源码胶囊和原始日志属于本地归档，不代表完整生产驱动。历史输入计数仅属于各自冻结轮次。
+
+当前原厂重刷后的unixnu64安装、Data保留和机主确认的触控结果见[存储说明](docs/storage-unixnu64.md)。旧userdata/slotB镜像不得用于新布局。

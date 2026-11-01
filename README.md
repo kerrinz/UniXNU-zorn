@@ -14,7 +14,7 @@ As of 2026-10-30, the owner has confirmed a desktop, swipe-to-unlock and icon ta
 
 The CPU1 root-publication change passed the same-kernel 0-fail / 1-pass / 0-fail / 1-pass control and two uninstrumented layouts 16 KiB apart. This is bounded evidence for the narrow fix. A separate intermittent Apple-logo GUI failure remains unresolved. The final `c50ca7ea` observation recovered automatically, showed a lock screen, and recorded USER and SYSTEM accounting progress on all eight cores; it is not a performance or long-term stability result.
 
-The default image remains `42f3d518`; the two owner-confirmed desktop runs of `3a8ac966` remain separate baselines. These are diagnostic images with bounded automatic recovery. Wi-Fi, Bluetooth, audio, cellular, cameras, sensors and complete power management are not qualified. Hardware graphics acceleration is not claimed here; this update excludes GPU development progress.
+The default image remains `42f3d518`; the two owner-confirmed desktop runs of `3a8ac966` remain separate baselines. These are diagnostic images with bounded automatic recovery. Wi-Fi, Bluetooth, audio, cellular, cameras, sensors and complete power management are not qualified. Hardware graphics acceleration remains unqualified; ongoing GPU work is recorded separately below.
 
 See the shared [non-GPU progress snapshot](docs/progress-2026-10-30-non-gpu.md) for evidence and qualification limits.
 
@@ -57,12 +57,18 @@ It uses the fixed format-1 compatibility board in [compat/legacy/board.toml](com
 
 ## Device and storage boundaries
 
-The only authorized target is `92988a43` / `zorn` / slot `b`; `f85d4270` is a CC9 and must not be operated on. Use the fixed-target runner and temporary `fastboot boot`; no flashing, erasing, slot changes or GPT changes.
+The active installation targets `92988a43` / `zorn` / slot `a`; `f85d4270` is a CC9 and must not be operated on. After the owner full-stock-flashed Android, they authorized a fresh dual-system installation with a dedicated64GiB `unixnu` partition. Android system, OrangeFox and slotA are preserved. Use the fixed runner's explicit `--unixnu64-install-trial` path and temporary `fastboot boot`; historical slotB and userdata-backed images must not be booted on this layout.
 
-The phone's userdata already contains the prepared system. Do not boot Android or reinstall userdata. OS / SystemOS remain read-only. Persistent writes are restricted to the existing Data window at userdata-relative 192 GiB (2,097,217 blocks of 4096 bytes), the existing single 4 KiB log block, and the recovery BCB with its tail preserved and read back. Never reset or enlarge Data. The `board.toml` userdata range is a capacity-relative legacy description, not an absolute GPT address.
+The new `unixnu` partition spans4096-byte LBAs47271680..64048895, uniqueGUID `b279731f-ccad-4ef5-a8b7-e7440cd08de3`. OS/SystemOS were restored and fully read back; runtime access remains read-only. The initial8GiB Data COW store is unixnu-relative16GiB,2097217 blocks; its fresh metadata/cookie is distinct from the historical store. The log remains one4KiB block at unixnu-relative2291712. Preserve the BCB tail and read back the entire page.64GiB is the partition capacity, not the current logical Data capacity. Full Android boot, long-term integrity and GPU execution remain separate checks. See [new installation evidence](docs/evidence/dual-system-reinstall-2026-11-01.json).
 
 ## Publication and license
 
 Records currently use `implemented` plus source references where the tested working-tree bytes do not have a published matching commit. Do not assign the current Git HEAD to old runs or raise completion levels without matching evidence. Publish the reviewed source / record files and confirm the `Porting record` workflow before requesting official catalog ingestion; local validation does not mean the site has already updated.
 
 New code is mainly [BSD-2-Clause-Patent](LICENSE); PMGR retains its [MIT license](native/pmgr/LICENSE.MIT), and upstream files retain their notices. Apple images, private keys, vendor binaries and generated boot images are not distributed here.
+
+## GPU scope
+
+GPU-owned memory preparation and its closed diagnostic helpers are published as implemented source. Hardware GPU execution, rendering and Metal remain unqualified. Detailed research summaries are retained in [GPU progress](docs/progress-2026-10-30-gpu.md); many isolated capsules and large logs are local archives, not a runnable production driver. Historical input counts describe their own frozen runs.
+
+The current stock-reflash/unixnu64 installation and owner-confirmed retained Data/touch are documented in [storage-unixnu64](docs/storage-unixnu64.md). Old userdata/slotB images must not be booted on that layout.

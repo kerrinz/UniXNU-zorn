@@ -5,3 +5,8 @@
 # SM8650 DXE inputs are resolved from the existing Mu-Silicium giulia source.
 # Exact FD, seed, ABI and host-tool identities are per-build input manifests;
 # these files are required external inputs, not downloads performed by this list.
+
+# Optional CPU-only GPU-memory preflight: obtain these SM8650 stock files locally.
+# The local relative paths/sizes/full SHA256 values are native/gpu-owned/firmware-pins.json.
+# AQE gen70900_aqe.fw; SQE gen70900_sqe.fw; GMU gmu_gen70900.bin; ZAP gen70900_zap.mbn.
+# This lists required inputs only and does not authorize signature bypass or firmware execution.

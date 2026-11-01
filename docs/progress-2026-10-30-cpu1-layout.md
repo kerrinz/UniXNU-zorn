@@ -496,3 +496,53 @@ GPU先完成缓存DT和现有驱动的只读盘点：旧K80 live FDT SHA8c3712d8
 ## GPU显式HFI停止态接口完成
 
 17队列停止态初始化/校验及原3队列回归通过隔离host与ARM64接口链接。Gen7 ACK匹配和错误语义与旧接口不同，下一步明确适配收发；尚无GPU初始化、最终内核或手机操作。CPU1证据/默认镜像/触控保留，详见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU内存模块主源集成推进
+
+默认关闭的CPU自有GPU backing资格模块已接入规范源码，host与真实冻结配方的独立消费者编译通过；最终内核/虚表ABI审计及第一次完整compat构建尚未完成，allow_boot=false，无新手机轮次。CPU1窄修正与历史苹果标志未知根因保留，不再追加CPU/GUI观察。冻结c50的255/77及raw231仍匹配，详见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU内存资格轮完成，CPU/GUI观察不追加
+
+0fe61e0d规范compat完整构建及唯一397秒GPU-memory轮已自动回recovery，八核/Data/dim64与120秒锁屏通过；D/v21记录8项CPU-owned backing共565248B准备成功。342当前输入/190归档及冻结255/77/raw231匹配。仅说明内存provider路径，未初始化GPU或定位历史苹果标志；不重复此轮/c50/CPU观察。详见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU窗口持有层隔离实现
+
+原CPU1窄修正和历史GUI结论不变，未追加CPU/GUI/内存手机轮。GPU CPU映射引用持有层完成隔离源码、host失败控制和真实IOKit ABI检查，尚无寄存器访问或GPU执行；342/190与冻结255/raw231仍匹配。见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU电源资源查询接口隔离实现
+
+完成真实UEFI头/协议ABI的CPU-only GPU资源查询适配，尚未在固件调用provider或改变时钟/电源。没有新增CPU/GUI/内存手机轮；原342/190与冻结255/raw231保护保持，详见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU查询生命周期和FD模块离线资格完成
+
+真实UEFI退出事件持有层/目标链接注解及归档FD三模块完整SHA核对通过；无新增手机轮或CPU/GUI观察，342/190与冻结255/raw231保护保持。GPU供电/渲染仍未验收，见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU真实固件调用入口隔离链接
+
+默认关闭的GPU查询caller/C ABI及真实固件module链接完成，watchdog/touch前后顺序有源/host前缀与目标证据。仍无新FD/kernel/手机轮、无CPU/GUI回归，342/190与冻结255/raw231保护保持；GPU渲染未验收，详见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU查询 RAM/ADT 交接继续推进，未新增CPU轮
+
+配对staged固件driver和真实DarwinBoot完成272B无指针查询结果交接、host拒绝控制与独立目标/链接检查；仍无新FD/kernel/手机轮，原342/190与冻结255/raw231保持。native消费者和回收后读回未闭合，allow_boot=false；CPU1证据/历史GUI未知结论/原显示触控不变，详见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU查询的原生ADT消费者隔离完成
+
+Darwin23消费者/真实BSD门槛接合与独立目标对象检查完成；原日志不能同时保留满84text和完整272B查询结果，且失败可能早于native，读回明确不可用。无新增CPU/GUI/内存轮或FD/kernel/手机操作；342/190与冻结255/raw231保持。见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU查询早期介质身份检查推进
+
+原日志块坐标和三个原归档存储模块已绑定，纯描述符selector/host拒绝/真实头目标检查完成；没有live介质查询、读写或新phone轮，342/190与冻结255/raw231保持。完整报告读回仍不可用，转GPU安全provider源码绑定，不扩CPU/GUI诊断或改原显示触控。见[GPU阶段记录](progress-2026-10-30-gpu.md)。
+
+
+## GPU固件终止记录离线接合，无新增CPU轮（2026-11-01）
+
+新FD接入机主批准的专用终止记录及只读候选身份，原生查询/写入继续OFF；精确复用cab内核/FAT/menu/ADT，CPU/GUI/内存和已消耗c50/0fe均未重跑。原CPU显示/触控/门槛保持，旧342当前338/4的差异属授权源码变化，历史资格不改。详见[GPU进度](progress-2026-10-30-gpu.md)。

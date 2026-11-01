@@ -1,0 +1,305 @@
+{
+  "recorded_at": "2026-10-30T23:07:43.925695+08:00",
+  "state": "isolated-typed-UEFI-GPU-power-resource-resolver-implemented-host-target-only",
+  "host": {
+    "raw_status_failures": 36,
+    "gate_failures": 12,
+    "ABI_scope_argument_controls": 23,
+    "private_contexts": 128,
+    "exact_calls_success": 6,
+    "reentry_close_duplicate_refused": true,
+    "destructor_no_firmware_calls": true
+  },
+  "negative_controls": [
+    {
+      "mutation": "darwin-scope-accepted",
+      "refused": true,
+      "exit_code": -6
+    },
+    {
+      "mutation": "warning-normalized",
+      "refused": true,
+      "exit_code": -6
+    },
+    {
+      "mutation": "wrong-resource-tag",
+      "refused": true,
+      "exit_code": -6
+    }
+  ],
+  "native": {
+    "actual_firmware_recipe": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe/GNUmakefile",
+    "real_LTO_object_sha256": "164a09040aae959c58e9add14dcc4df5cb4158b0dd33cf25de1f65a8a4cd1f97",
+    "independent_full_SHA_equal": true,
+    "imports": [],
+    "instruction_variant": "same recipe + explicit fno-lto/mgeneral-regs-only for disassembly; no firmware linking/execution",
+    "ABI": {
+      "actual_EFI_prefix_offsets": {
+        "query_clock": 8,
+        "query_domain": 80,
+        "query_protocol": 320
+      },
+      "actual_indirect_call_sites": 3,
+      "clock_query_branches": [
+        8,
+        80
+      ],
+      "gate_offset": 16,
+      "LocateProtocol_offset": 320,
+      "EFI_STATUS_bits": 64,
+      "UINTN_bits": 64,
+      "opaque_RPMh_CmdDb_prefix_bytes": 8,
+      "opaque_methods_called": 0,
+      "initializer_registration": false,
+      "general_regs_only_audit_variant": true,
+      "commands": [
+        {
+          "arguments": [
+            "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/toolchain/clang",
+            "-g",
+            "-Os",
+            "-fshort-wchar",
+            "-fno-builtin",
+            "-fno-strict-aliasing",
+            "-Wall",
+            "-Werror",
+            "-Wno-array-bounds",
+            "-include",
+            "AutoGen.h",
+            "-fno-common",
+            "-fstack-protector",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-DSTRING_ARRAY_NAME=ZornBootMemoryDxeStrings",
+            "-Wno-parentheses-equality",
+            "-Wno-tautological-compare",
+            "-Wno-tautological-constant-out-of-range-compare",
+            "-Wno-empty-body",
+            "-Wno-varargs",
+            "-Wno-unknown-warning-option",
+            "-Wno-unaligned-access",
+            "-Wno-microsoft-enum-forward-reference",
+            "-fno-stack-protector",
+            "-funsigned-char",
+            "-ftrap-function=undefined_behavior_has_been_optimized_away_by_clang",
+            "-Wno-address",
+            "-Wno-shift-negative-value",
+            "-Wno-unknown-pragmas",
+            "-Wno-incompatible-library-redeclaration",
+            "-Wno-null-dereference",
+            "-mno-implicit-float",
+            "-mms-bitfields",
+            "-mno-stack-arg-probe",
+            "-fno-omit-frame-pointer",
+            "-D",
+            "__GNUC__=4",
+            "-D",
+            "__GNUC_MINOR__=2",
+            "-D",
+            "__GNUC_PATCHLEVEL__=1",
+            "-D",
+            "__MINGW32__=1",
+            "-m64",
+            "-mcmodel=small",
+            "-Oz",
+            "-flto",
+            "-target",
+            "aarch64-unknown-windows-msvc",
+            "-gcodeview",
+            "-funwind-tables",
+            "-Wno-deprecated-non-prototype",
+            "-Wno-constant-conversion",
+            "-Werror",
+            "-Wno-unused-const-variable",
+            "-Wno-sometimes-uninitialized",
+            "-Wno-unaligned-access",
+            "-Wno-deprecated-non-prototype",
+            "-D",
+            "CLANG",
+            "-D",
+            "ENABLE_SECUREBOOT=0",
+            "-D",
+            "__DEPRECATED_AARCH64_4K_RUNTIME_GRANULARITY",
+            "-D",
+            "HAS_ACTLR_EL1_UNIMPLEMENTED_ERRATA=1",
+            "-D",
+            "HAS_AMCNTENSET0_EL0_UNIMPLEMENTED_ERRATA=1",
+            "-D",
+            "HAS_GIC_V3_WITHOUT_IRM_FLAG_SUPPORT_ERRATA=1",
+            "-D",
+            "HAS_PSCI_MEMPROTECT_FAILING_ERRATA=0",
+            "-march=armv9.2-a+crypto+rcpc",
+            "-I/Volumes/macData/projects/Mu-Silicium/Platforms/Xiaomi/zornPkg/Drivers/ZornBootMemoryDxe",
+            "-I/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe/DEBUG",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Test/UnitTest/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Library/MipiSysTLib/mipisyst/library/include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdePkg/Include/AArch64",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/MdeModulePkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg/Include",
+            "-I/Volumes/macData/projects/ios-zorn/UniXNU/out/feeds/mu_basecore-89034cbb/UefiCpuPkg/Test/Mock/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Silicium/SiliciumPkg",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Silicium/SiliciumPkg/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg",
+            "-I/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg/Include",
+            "-I/Volumes/macData/projects/Mu-Silicium/Platforms/Xiaomi/zornPkg",
+            "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver",
+            "-std=c++17",
+            "-c",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/prototype-probe.cpp",
+            "-o",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/prototype-probe.obj",
+            "-fno-lto",
+            "-mgeneral-regs-only"
+          ],
+          "cwd": "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/AARCH64/zornPkg/Drivers/ZornBootMemoryDxe/ZornBootMemoryDxe"
+        }
+      ],
+      "limits": [
+        "Real selected EFIClock header prefix version1.0.9 compared with selected binary1.0.a slots1/10 only; no claim that unconsumed tail ABI is identical.",
+        "No public RPMh/CmdDb method signatures available: version prefix only, not full-protocol ABI proof.",
+        "COFF/LTO objects and annotation, not linked FD, live protocol lookup, post-EBS kernel provider or GPU runtime."
+      ],
+      "allow_boot": false
+    },
+    "transitive_compile_inputs": 51
+  },
+  "provider": {
+    "selected_build_module": "ClockDxe.patched.efi",
+    "old_touch_checker_pinned": "ClockDxe.efi",
+    "provider_bindings": {
+      "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/ClockDxe/ClockDxe.efi": "b1608ab9a4759dbbc50e5e5836ee402ff832d8076011e5145460e4af97ba7686",
+      "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/ClockDxe/ClockDxe.patched.efi": "53c18b9e1569cebbcb9837c1d773cc5e836fb7e902df7c29b27b485a13d4fdfc",
+      "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/RpmhDxe/RpmhDxe.efi": "cdebce5c9f96d16e71a0db8f9c4dbf591ed314dd94a6543b08c238902df65267",
+      "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/CmdDbDxe/CmdDbDxe.efi": "5c58d445f356af9f8497ea6f449ba534fd7920b045067cd3b02ad997863077bf",
+      "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/Ffs/ABA01FF8-2CCB-4E12-8B2E-CD3F4A742993CmdDbDxe/ABA01FF8-2CCB-4E12-8B2E-CD3F4A742993SEC2.1.pe32": "ded9afa09275f0df98e85716caa25d58fe21b29e47635bc9e850ed0b1e7fe4b1",
+      "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/Ffs/4DB5DEA6-5302-4D1A-8A82-677A683B0D29ClockDxe/4DB5DEA6-5302-4D1A-8A82-677A683B0D29SEC2.1.pe32": "fbd1276d711dc690596acd022e17e38b93261b44e608918fa025ade6c4fbba01",
+      "/Volumes/macData/projects/Mu-Silicium/Build/zornPkg/DEBUG_CLANGPDB/FV/Ffs/CB29F4D1-7F37-4692-A416-93E82E219766RpmhDxe/CB29F4D1-7F37-4692-A416-93E82E219766SEC2.1.pe32": "5a1badf6786e5f04af7d59cd992bad80e33c05c6430c8b782049504ec1e157d6",
+      "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/ClockDxe/ClockDxe.inf": "3bd4b7cb606bf0e6fcf2cb7f8456182fe3ee7e0b60adc69d66e786bfc5ff8ad7",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x14dc.log": "c284194148ce9ee03984f2a724cfa2e2ecc7e314bbb8a347a543dfbddcefd74b",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x47e0.log": "1d6ea1f74e7d3fdb1332fb6489c684efea1ce535b6c68fb8ff4571f86f89b3a4",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x3ea4.log": "8a36efc9eb2ba04a52c7acc1716b673815f7653283568f033aa9ab26e551799b",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x3f60.log": "1ff939bb4c47e65a920ac51f4629ba5f056d50c973810568d06b716f74f60fec",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x42e4.log": "7ef72fe2c45874c541cd3a7182cc232db2d7ea9e5577ebd3b15433486c6184b6",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x4478.log": "3084b1ecd108b095199a26bf5958a82c41d3ef56ed37c01a49e142420cbd2ee4",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x6ec0.log": "3c280439db5862c2fece502c4f88be8a11d8e1245116a8b4b3382c0522ca965c",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x7240.log": "db38dbb06b1a7f5b1001fdab861685d92d1f5b9b7d58ee19e0752a6fafa0e53a",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-resolver/ClockDxe-0x685c.log": "fa4c4901de462712ac576b547769d2afd82fca2e3e995377d3c7666886e9bef6",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched.c": "5452e244e35f19e8d5f896f3fd1805edf420211f04cfc8f39decd003eb01bc21",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched.h": "2ecbaa727174127a53368893d1cff2522345a6b5acb7da0cde98e0f097961c30",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/stock/kgsl_gmu_core.h": "560027dfe9af8a56cab6db4fbb08597c470abf722686675f138235b71181e8ca",
+      "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/graphics/gpu/pineapple-gpu.dtsi": "9770c5dec92dbf2ced5414492b168c374f9d4b842380383b86e06debce60dabc",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno-gpulist.h": "08293f60e0be8b3a16ec0b800588d700f54b34d2e9e32e64aac115f05548c8f3"
+    },
+    "clock_protocol_version": 65546,
+    "header_version_macro": 65545,
+    "used_prefix_slots": {
+      "GetClockID": 1,
+      "GetClockPowerDomainID": 10
+    },
+    "same_lookup_address": 5340,
+    "clocks_string_offsets": {
+      "gpu_cc_cx_gdsc": 89897,
+      "gpu_cc_cx_gmu_clk": 86453,
+      "gpu_cc_hub_cx_int_clk": 86694,
+      "gpu_cc_hub_aon_clk": 86675
+    },
+    "dispatch_entries": [
+      28352,
+      17124,
+      17528,
+      16224,
+      29248,
+      26716
+    ],
+    "patched_difference": {
+      "file_offset": 43024,
+      "bytes": 4,
+      "lookup_code_identical": true
+    },
+    "current_build_FFS": [
+      {
+        "module": "ABA01FF8-2CCB-4E12-8B2E-CD3F4A742993CmdDbDxe",
+        "payload_matches": "CmdDbDxe/CmdDbDxe.efi",
+        "section_sha256": "ded9afa09275f0df98e85716caa25d58fe21b29e47635bc9e850ed0b1e7fe4b1"
+      },
+      {
+        "module": "4DB5DEA6-5302-4D1A-8A82-677A683B0D29ClockDxe",
+        "payload_matches": "ClockDxe/ClockDxe.patched.efi",
+        "section_sha256": "fbd1276d711dc690596acd022e17e38b93261b44e608918fa025ade6c4fbba01"
+      },
+      {
+        "module": "CB29F4D1-7F37-4692-A416-93E82E219766RpmhDxe",
+        "payload_matches": "RpmhDxe/RpmhDxe.efi",
+        "section_sha256": "5a1badf6786e5f04af7d59cd992bad80e33c05c6430c8b782049504ec1e157d6"
+      }
+    ],
+    "hwsched_contract": {
+      "GMU_MAX_PWRLEVELS": 2,
+      "first_clock_index": 1,
+      "local_DTS_frequency_corner_pairs": [
+        [
+          260000000,
+          "LOW_SVS"
+        ],
+        [
+          625000000,
+          "SVS"
+        ]
+      ],
+      "reference_gen7_9_1_hub_hz": 200000000,
+      "rates_applied": false,
+      "source_not_Xiaomi_stock_equivalence": true
+    },
+    "query_side_effects": [
+      "ClockDxe name resolver traverses six provider tables.",
+      "Clock/domain hit branches tail-call0x3ea4; it traverses an unbounded client list and may allocate24B bookkeeping through0x3928, then links owner/context.",
+      "No Enable/SetRate/IsOn/ReadReg/RPMh/CommandDB method invocation by this new adapter; no provider execution in this stage."
+    ],
+    "missing_opaque_headers": "No RPMh/CmdDb public headers in selected Qcom checkout: only binary-bound UINT64 version prefixes are consumed, no guessed callable protocol methods.",
+    "scope": "Current INF + build FFS payload provenance only. Not re-extraction of archived FD or installed-device provider attestation; full module embedding needed before any future invocation.",
+    "allow_boot": false
+  },
+  "implementation": {
+    "resources": [
+      "gpu_cc_cx_gdsc",
+      "gpu_cc_cx_gmu_clk",
+      "gpu_cc_hub_cx_int_clk"
+    ],
+    "mode": "UEFI Boot Services only; protocol/name lookup, not Darwin native provider",
+    "statuses": "Full64bit locate/query/gate errors and warnings + raw outputs retained. Nonzero warnings stop; no fabricated native error for local pointer/version/ID failures.",
+    "lifetime": "Borrowed pointers/private persistent owner; no native token, allocation, release, disable or destructor calls. Explicit close invalidates local usability before EBS, never calls firmware.",
+    "missing": "Concrete EBS event owner is not integrated. No live protocol/resource lookup has been performed, no power/security/stop ownership. Missing full RPMh/CmdDb callable headers remain explicit."
+  },
+  "protections": {
+    "current342": 342,
+    "frozen255": 255,
+    "raw231": 231,
+    "archive_files": 190,
+    "original_GPU_sources": 88,
+    "default42_preserved": true,
+    "no_active_build_run": true
+  },
+  "first_failures": [
+    "Wrong-tag negative fixture reused a wrong ID, so duplicate-ID validation masked removed tag validation; first checker/test/log retained. Changed fixture to distinct wrong tags and asserted early failing index. Provider unchanged; all3 mutations then refused.",
+    "xcrun llvm-readobj unavailable; retained diagnostic and switched section inspection to installed llvm-objdump. No ABI/native guard removed.",
+    "Dependency-only preprocess with original code-generation flags was refused as unused-argument Werror; stderr retained. Preprocess-only command suppresses that diagnostic, no production compile flags or guard changed."
+  ],
+  "limits": [
+    "Known Clock header macro1.0.9 versus selected binary1.0.a: only used prefix slots1/10 bound, not a full tail ABI proof. Clock query names can allocate24B provider bookkeeping and traverse an unbounded list; no wall-clock guarantee.",
+    "Current INF/Build FFS matches patched53c18; old touch checker pins originalb1608. Old evidence unchanged; archived-FD and installed-phone exact module identity not newly proved.",
+    "Host doubles/128 private contexts are not firmware execution, real EBS ordering or shared-context concurrency proof. Real LTO objects not linked into FD or kernel.",
+    "No rate/power/clock/regulator/SCM/PAS/reset/SMMU/IOVA/MMIO/firmware execution/new kernel/phone operation; CPU display/touch/default/baselines preserved. Hardware GPU/Metal remains unqualified."
+  ],
+  "next_plan": "out/zorn/gpu-power-resolver/boot-lifecycle-next-plan.json",
+  "allow_boot": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "combined_result": "out/zorn/gpu-power-resolver/combined-result.json",
+  "combined_sha256": "c947579970920e40b4c59a930133ebf8ca0a27f49ef70772d6b0a89433ef209e"
+}

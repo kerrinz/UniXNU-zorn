@@ -1,0 +1,302 @@
+{
+  "recorded_at": "2026-10-30T19:03:41.088021+08:00",
+  "stage": "isolated-explicit-stopped-HFI-profile-host-and-target-pass",
+  "result": {
+    "recorded_at": "2026-10-30T18:58:17.005734+08:00",
+    "host": {
+      "wire_corruption_cases": 276,
+      "invalid_argument_cases": 26,
+      "lease_and_lifecycle_cases": 24,
+      "private_parallel_contexts": 128,
+      "read_only_validation": true,
+      "quarantine_PROT_NONE_pass": true,
+      "notify_calls": 0
+    },
+    "legacy_regression_stdout": "PASS: 510 modern HFI wrapped command/response cases, 4100 sequence exchanges, padded-space guard, malformed/stale/error/timeout quarantine\nSoftware peer only; no actual GMU ACK, firmware startup, MMIO or GPU execution\n",
+    "old_source_prefix_exact": true,
+    "old_header_API_ABI_unchanged": true,
+    "patch_replay_exact": true,
+    "source_header_oracle_full_backing_equal": true,
+    "target": {
+      "SDK": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+      "file": "out/zorn/gpu-discovery-20261030/hfi-profile/AdrenoHfi-candidate-arm64.o",
+      "sha256": "bd092f36f1cfd780e066cc8fbc268bd3eb455daa795aa5668ac8066037b71939",
+      "imports": [
+        "___stack_chk_fail",
+        "___stack_chk_guard"
+      ]
+    },
+    "ack_contract": {
+      "match": "Full echoed header after clearing RECORD bit18 on both, not only sequence",
+      "dispatch": "ACK type1 checked before receive",
+      "failure": "word2==0xffffffff; other values may be command data, not automatically success semantics",
+      "legacy_difference": "Legacy Poll compares only sequence and treats any nonzero word2 as error; cannot reuse unchanged for Gen7.",
+      "Gen7_Send_Poll_implemented": false
+    },
+    "limits": [
+      "Append-only isolated candidate; production source/normalized/raw proof trees unchanged; no native kernel/final link/ready.",
+      "New API checks caller assertions through callbacks, not hardware stop, exclusive mapping, cache coherence or actual lease attestation.",
+      "Private serialized context and stable lease required; no concurrent mutation/ARM memory-model proof.",
+      "Validation reads fresh stopped backing only. No active transport state, queue notification, ACK, authentication or firmware execution.",
+      "Prototype does not release/reset quarantined storage; real platform stop+DMA/TLB drain still required."
+    ],
+    "commands": [
+      [
+        "patch",
+        "-p1",
+        "-i",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/stopped-profile-isolated.patch",
+        "-d",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/patch-replay"
+      ],
+      [
+        "clang",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout",
+        "-c",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/source-initializer-oracle.c",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/source-oracle-host.o"
+      ],
+      [
+        "clang",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate",
+        "-c",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate/AdrenoHfi.c",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate-host.o"
+      ],
+      [
+        "clang++",
+        "-std=c++17",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-pthread",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate-host.o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/source-oracle-host.o",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped"
+      ],
+      [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped"
+      ],
+      [
+        "clang",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/preimage",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/preimage/AdrenoHfi.c",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/preimage/test_hfi.c",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-baseline"
+      ],
+      [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-baseline"
+      ],
+      [
+        "clang",
+        "-std=c11",
+        "-O1",
+        "-g",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate/AdrenoHfi.c",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate/test_hfi.c",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-candidate"
+      ],
+      [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-candidate"
+      ],
+      [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang",
+        "-target",
+        "arm64-apple-ios17.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+        "-std=c11",
+        "-O2",
+        "-ffreestanding",
+        "-mgeneral-regs-only",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate",
+        "-c",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate/AdrenoHfi.c",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/AdrenoHfi-candidate-arm64.o"
+      ],
+      [
+        "nm",
+        "-u",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/AdrenoHfi-candidate-arm64.o"
+      ]
+    ]
+  },
+  "boundary": {
+    "C_ABI_imports": [
+      "_AdrenoHfiInitializeStoppedProfile",
+      "_AdrenoHfiValidateStoppedProfile"
+    ],
+    "linked_imports": [
+      "___stack_chk_fail",
+      "___stack_chk_guard"
+    ],
+    "files": {
+      "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-arm64.o": "f5582172e6f32ce914a44f5cf901020ad69db88bb1e9985c25c5e1c150a0afdc",
+      "out/zorn/gpu-discovery-20261030/hfi-profile/profile-boundary-linked.o": "4f942fa876823d0b5b98ce9383578203c310a5eb079a205b46e0c2a70303e0bd",
+      "out/zorn/gpu-discovery-20261030/hfi-profile/boundary.cpp": "66a7e2c7f51cf99f4859b6fe4d388071caeac35cbcceb1c20931cb3c84d67cd9",
+      "out/zorn/gpu-discovery-20261030/hfi-profile/check-boundary.py": "229862ccec2b2b029d9b7727ca25d3e02d59f3f83bdcd4f3c12d7dacdf4b6a06"
+    },
+    "commands": [
+      [
+        "xcrun",
+        "--sdk",
+        "iphoneos",
+        "clang++",
+        "-target",
+        "arm64-apple-ios17.0",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+        "-std=c++17",
+        "-O2",
+        "-ffreestanding",
+        "-mgeneral-regs-only",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-I/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/candidate",
+        "-c",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/boundary.cpp",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/boundary-arm64.o"
+      ],
+      [
+        "nm",
+        "-u",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/boundary-arm64.o"
+      ],
+      [
+        "xcrun",
+        "ld",
+        "-r",
+        "-arch",
+        "arm64",
+        "-platform_version",
+        "ios",
+        "17.0",
+        "27.0",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/AdrenoHfi-candidate-arm64.o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/boundary-arm64.o",
+        "-o",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/profile-boundary-linked.o"
+      ],
+      [
+        "nm",
+        "-u",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/hfi-profile/profile-boundary-linked.o"
+      ]
+    ],
+    "kernel_link": false,
+    "hardware": false
+  },
+  "bindings": {
+    "UniXNU/kits/AdrenoFirmware/AdrenoHfi.c": "5d7da3145157fd945d626d4567c95626fdbbc8fb6a65d8f67701ffb1e64f7d2e",
+    "UniXNU/kits/AdrenoFirmware/AdrenoHfi.h": "615cb21d1c7bd3729e3b36d361f0f78bbaacb1bd8931a268797e00505e05f0b8",
+    "UniXNU/kits/AdrenoFirmware/test_hfi.c": "b1b7354bf2a185a501636bc8d3b1ab1d6d2c398c267cb7355a94f3aa162b9159",
+    "out/zorn/gpu-discovery-20261030/gen7-command-ack-next-plan.json": "c8c5bac4ebe0b6d972d4597862924a6874aa63d8690f18ed9d703ca1452d0c0e",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/AdrenoHfi-candidate-arm64.o": "bd092f36f1cfd780e066cc8fbc268bd3eb455daa795aa5668ac8066037b71939",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-arm64.o": "f5582172e6f32ce914a44f5cf901020ad69db88bb1e9985c25c5e1c150a0afdc",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-imports.log": "a97f692cf18ebc1aad2fe4c2470f0cd4c785dec296ad6793f9fdd57fcb09ac61",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-linked-imports.log": "d2815b38f26f7b5903f5e9cb2d5247bd1567b634fb784e2f9d8320faf6654954",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary-result.json": "0bb2800b7db35367bdcc7964f893b6207a15b8c65213057fad5659e9f286f1ab",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/boundary.cpp": "66a7e2c7f51cf99f4859b6fe4d388071caeac35cbcceb1c20931cb3c84d67cd9",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/candidate/AdrenoHfi.c": "9df95937ba2a887fdc117d3736f9e3ea87f49554efabfa4c955ca211ae4ee661",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/candidate/AdrenoHfi.h": "9157e136fbf4aa5721a7868cb7864ee5ed00b83be45b4bf7d024c5a80b42617b",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/candidate/test_hfi.c": "b1b7354bf2a185a501636bc8d3b1ab1d6d2c398c267cb7355a94f3aa162b9159",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/candidate-host-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/candidate-host.o": "15055c7b2e294fb43d059bdbcd035f0e87b879623c9ce05476ac1066ba04e9b8",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/check-boundary.py": "229862ccec2b2b029d9b7727ca25d3e02d59f3f83bdcd4f3c12d7dacdf4b6a06",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/check-stopped.py": "e384eeede217f3cee11d2ae92821e4ff41a3de933973ea7d391bd510da1aff18",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/first-oracle-compile-refused.log": "8c04458aacf5f68a5d22ec7c4e7c37518cb853399f06a2e88c86d0c5ca61a851",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/first-stopped-host-VM-alignment-refused.log": "7e87f97ec2de29513d1fe6fa3a1c5d5b385e8696f07cbba8337a073814d4d7f1",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/legacy-baseline-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/legacy-baseline-run.log": "36529b0571157c38b7d1d747aa7905a71ba26165ab9e542006f7aafab0a1cfbd",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/legacy-candidate-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/legacy-candidate-run.log": "36529b0571157c38b7d1d747aa7905a71ba26165ab9e542006f7aafab0a1cfbd",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/oracle-host-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/patch-replay/AdrenoHfi.c": "9df95937ba2a887fdc117d3736f9e3ea87f49554efabfa4c955ca211ae4ee661",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/patch-replay/AdrenoHfi.h": "9157e136fbf4aa5721a7868cb7864ee5ed00b83be45b4bf7d024c5a80b42617b",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/patch-replay.log": "78a3eb0023c48912d6f1f950d757570c04406cca4602c408c302840c25a805bf",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/preimage/AdrenoHfi.c": "5d7da3145157fd945d626d4567c95626fdbbc8fb6a65d8f67701ffb1e64f7d2e",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/preimage/AdrenoHfi.h": "615cb21d1c7bd3729e3b36d361f0f78bbaacb1bd8931a268797e00505e05f0b8",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/preimage/test_hfi.c": "b1b7354bf2a185a501636bc8d3b1ab1d6d2c398c267cb7355a94f3aa162b9159",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/preimage.json": "611b00ce631432f1a0e3d99bea28e3e00ad785d0254a83ea4fce8ea590b96f44",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/profile-boundary-linked.o": "4f942fa876823d0b5b98ce9383578203c310a5eb079a205b46e0c2a70303e0bd",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/profile-result.json": "f8c0a5a0d389c3c0df638e4941a8b0cc44fad754701bb9b573aa3dc4f3c8dc58",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/record-stage.py": "a57ebbe850da5183afcbd44f5faf140b1e5df2b0b126254d81bc7fd3aa4a3205",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/source-initializer-oracle.c": "1bb48f5fd979db8b32b77d5cb84bfe53abe93753d78199ea3f4c1b78790f0583",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/source-oracle-host.o": "e630f932ad4c6a48a7186388fa9e45878df30f69e231062627c2dfd4f7c00611",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/source-oracle-provenance.json": "6fc370ef50a905ab58aa7db3d096893fb83312f24d891dc91ec19899c2e11cc3",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/stopped-host-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/stopped-host-run.log": "fa82da61ac2acf9271c71d78893c3c85764fecb76deade6768b13713133260d7",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/stopped-profile-isolated.patch": "4b9b30819b2f7e27b4fbfa8101ffa28a54077ceec359d1103347f23195a9818a",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/stopped-profile.c.inc": "1f78764e04491ec68ecec3eac71069f56ffec46f09dc64790843e07da172b9cb",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/stopped-profile.h.inc": "ccf6d3e70b605be988c9a0fc7db1590df3416cea8518925fecb56d505e471a80",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/target-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/target-undefined.log": "d2815b38f26f7b5903f5e9cb2d5247bd1567b634fb784e2f9d8320faf6654954",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-baseline": "26412bded2f8c731867ab067d95f135c7e2315f99fb559425894c374ccdb1d22",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-baseline.dSYM/Contents/Info.plist": "8643f125c4c5c4afbed6a85f044f24f5ffb9f8e33d7b27cc646399cbf4aac699",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-baseline.dSYM/Contents/Resources/DWARF/test-legacy-baseline": "aec0d7186d014d2781c31d8d8214c6cc761d93ed36929e93f49658c240320737",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-baseline.dSYM/Contents/Resources/Relocations/aarch64/test-legacy-baseline.yml": "51d70a9c9eef33f2c436d678a2818a3518e5210e6b56c2f622eadb91e47d09a5",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-candidate": "94d0c20b47211e4b0ee02dda10e8a15382ae992704e26cf6095d1e006c4cb8a2",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-candidate.dSYM/Contents/Info.plist": "d6ee4953839cb0928954056b9e2844346306aa733afbc6e145eb4f81329e5666",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-candidate.dSYM/Contents/Resources/DWARF/test-legacy-candidate": "eac25ea12410f0404015d6e3f6c8a5917ca7d2263b0e2cfc5a141bfef9ed913f",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-legacy-candidate.dSYM/Contents/Resources/Relocations/aarch64/test-legacy-candidate.yml": "a47d47a88cade43af63d3d7a642874707af960c3e8bf49009dcc23792ba3e2e9",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped": "a066f9d8af4bc4a8271fd10cbdc2f769ba624b303ea014184038b76a9c861598",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped.cpp": "a072ee683e8232ee3a60528b7bc7455ee0ba1d563767cacf4278576536c668ab",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped.dSYM/Contents/Info.plist": "86cf70e0674c95778e902079714895c59fedd609c22852321dd2ee733a074ca2",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped.dSYM/Contents/Resources/DWARF/test-stopped": "829b42376cbebdafb328db63a06fd261e3c04c2ca16e28a9e9557065c7e49051",
+    "out/zorn/gpu-discovery-20261030/hfi-profile/test-stopped.dSYM/Contents/Resources/Relocations/aarch64/test-stopped.yml": "31d1a0250bbdf785f6bcfc6282bf30a34be9ea560a4e52a976e334605d29760d",
+    "out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.c": "306930a131d0fa3bc3cc3873dbfaf205b6bd5a4243f55a74cced411c08de6782",
+    "out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.h": "2aad7f0d5f3f1961e0e063cc119ee340820ee35527147f785690bcc7dd8cd896",
+    "out/zorn/gpu-discovery-20261030/layout/vendor-wire-structs.h": "812afd1bea2b07712b1dc468a73cd2e3e55082d8d079a51885f0fb01d24a7bde",
+    "out/zorn/gpu-discovery-20261030/profile-reference/adreno_hfi.h": "03fe8212d1a75148999f67df2044133a047501e91a234d0c1176d264428f713c"
+  },
+  "profile_sizes": {
+    "Modern3": 16384,
+    "Gen7Hwsched17": 73728
+  },
+  "oracle_scope": "Actual pinned OEM initializer writes the840B header only. The host fixture separately zeroes backing; comparison of the full73728B does not attribute whole-buffer zeroing to OEM. Strict fresh zero queue/padding validation is a new stopped-profile policy.",
+  "ownership_scope": "Callback validates caller assertions only. Caller must hold a real stable stopped/exclusive/coherent platform lease for the entire operation; post-write failure quarantines and retains its record. No release/reset implementation.",
+  "source_scope": "Pinned OnePlus reference is not attested exact Xiaomi stock source or runtime wire ABI.",
+  "initial_failures": [
+    "Missing HFI_QUEUE_SIZE in source-oracle fixture caused compile refusal; fixed fixture macro, not OEM code.",
+    "Host mprotect fixture incorrectly used4KiB alignment on16KiB macOS pages; fixed host allocation only, GPU4KiB granule unchanged."
+  ],
+  "production_sources_modified": false,
+  "new_kernel": false,
+  "phone_operations": false,
+  "Gen7_Send_Poll": false,
+  "allow_boot": false,
+  "next_plan": "out/zorn/gpu-discovery-20261030/gen7-command-ack-next-plan.json"
+}
