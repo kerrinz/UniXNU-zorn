@@ -1,0 +1,29 @@
+{
+  "status": "CommandDB-real-descriptor-resource-backend-compiled-linked-unexecuted",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-commanddb-resources-80b1554c088d418987d694f3971c641e",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-resources26-80b1554c088d418987d694f3971c641e",
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-resources26-80b1554c088d418987d694f3971c641e/verification.json",
+  "date": "2026-11-10T09:15:51.973961+00:00",
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-resources26-80b1554c088d418987d694f3971c641e/full-link-current/kernel.ZORN26-CommandDB-resources.UNSELECTED.macho",
+  "sha256": "ae1ab98414a34fea263d658b783a3c9d8663a4afb38f050f0df4acbcc730a4bd",
+  "bytes": 30339896,
+  "inputs": 1394,
+  "replaced": 4,
+  "added": 1,
+  "preserved": 1389,
+  "undefined_symbols": 0,
+  "compile_warnings": 12,
+  "new_resource_source_warnings": 0,
+  "implementation": [
+    "Version-independent resource lookup copies real immutable descriptor bytes through the existing bounded C decoder; no independently expected version or synthetic header is asserted.",
+    "Actual region capture retains original resource identity, managed-RAM exclusion, independent stable-WB-read grant and read-only WB mapping gates. Strict snapshot alternative is unchanged.",
+    "Resource address/slave/row-version/AUX are copied only after bounds and output-alias checks. Successful CPU-only copy storage has normal final-release cleanup; failed partial construction stays retained."
+  ],
+  "limitations": [
+    "ARC/XO/BCM consumers are not yet migrated to this resource route.",
+    "This produces CPU data only; no clock/GPU readiness or read-authority implementation is supplied."
+  ],
+  "initial_failure": "Missing extern C for the existing decoder caused initial complete-link failure; initial objects/header and failed link retained. Corrected declaration compiled and final link has zero undefined symbols.",
+  "GPU_or_phone_execution": false,
+  "full_goal_complete": false
+}

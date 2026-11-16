@@ -1,0 +1,74 @@
+{
+  "scope": "source-derived service reference lifetime repair;no live use-after-free reproduction",
+  "original_SHA": "65331246929103a23edac795d9f84b50a28cbd3639aaad2a90f9b9aa9bde7c2c",
+  "candidate_SHA": "6a221e7a00f7b1102ddfe368c528f4e91dc9a5fbc552f66b3e0c012837110386",
+  "copy_ownership_contract_header_SHA": "4ab37d4968a4def538eaefc730ee09232182c66e378a5ec89b4c8fede848642d",
+  "before_source_trace": {
+    "acquire_offset": 4001,
+    "release_offset": 4811,
+    "cast_offset": 5639,
+    "borrowed_window_use_offsets": [
+      5703,
+      5726,
+      5792,
+      5872
+    ],
+    "return_offsets": [
+      22831,
+      22956
+    ],
+    "reference_held_at_cast_and_window_access": false
+  },
+  "after_source_trace": {
+    "acquire_offset": 4001,
+    "release_offset": 22777,
+    "cast_offset": 5614,
+    "borrowed_window_use_offsets": [
+      5678,
+      5701,
+      5767,
+      5847
+    ],
+    "return_offsets": [
+      22910,
+      23035
+    ],
+    "reference_held_at_cast_and_window_access": true
+  },
+  "four_source_corruptions_refused": [
+    {
+      "name": "release-before-cast",
+      "refused": "borrowed node access after copied owner release or return before cleanup"
+    },
+    {
+      "name": "missing-release",
+      "refused": "the copied reference must be released exactly once"
+    },
+    {
+      "name": "double-release",
+      "refused": "the copied reference must be released exactly once"
+    },
+    {
+      "name": "return-before-cleanup",
+      "refused": "review new control-flow exits before retaining this check"
+    }
+  ],
+  "one_release_after_last_synchronous_use_before_both_returns": true,
+  "only_reference_release_position_changed": true,
+  "object_not_mapping_or_quiescence_lease": true,
+  "new_candidate_iOS17_object_pass": true,
+  "target_object_SHA": "3eb093f995645028193986e16f8fae96761a2675bcfa8359240def339bd61ca4",
+  "target_object_not_linked_or_executed": true,
+  "existing_metaclass_initializer_unexecuted": true,
+  "optional_board_rules_votes_CommandDB_not_enabled": true,
+  "no_role_API_workaround_or_fullcore_retry": true,
+  "catalog_and_old_patches_unchanged": true,
+  "no_successful_provider_peer_or_native_function_execution": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "review_document_SHA": "b389272e231a4680631bf273759da8ca57b44ae2ae706d8fad9419749dd5ef9f",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-service-smmu-reference-20261103/service-smmu-reference.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

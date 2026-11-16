@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T18:08:25.334171+08:00",
+  "state": "Catalog149-poisoned-VM-close-gates-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-poison-close-contract/source-contract.json",
+  "functions_body_SHA_recorded": 11,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all31_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 conditional failed precommit rollback to BoFree/releaseAll/close gates only.11bodySHA/full primary identities,no old suites/targets/native lifecycle calls.",
+    "mapped_free": "freeBo first refuses unreleasable/mapping leases;for mapped Entry it ignores retireCompleted status but then invokes VM unmap. Poisoned VM unmap returns NotReady before record/table erase or counters change. freeBo returns this error before clearing mapped_state/mapped/iova or releasing memory/clearing Entry. No active Submit Job is required for this refusal.",
+    "memory": "Memory release refuses device refs or quarantine before descriptor/pages/spans changes. releaseSystemInto falls back to release when refs/quarantine present,so this case does not transfer descriptor to deferred-free output. VM detach also rejects poison before freeTables. These source gates retain accounting/backing metadata,not hardware stop/owner/DMA proof.",
+    "release_all": "waitRange validates Submit attachment/poison,then only active queue-domain Jobs;VM-only poison with no accepted Job is not a Submit outstanding Job. It can return0 when range empty,then releaseAll clears each used Entry mapping_leases before freeBo. First failed free aborts loop before queue reset/close. Direct close additionally refuses liveObjects/range/jobs/other queues. No close-success inference from wait0.",
+    "published": "AGX clientClose drops views before g.lock,withdraws mailbox owner then releaseAll. Nonzero prevents forgetVm/destroyVm/live=false and termination call. free deletes core only if not live. Thus original core/space stay on failed teardown,while view withdrawal/mailbox change/lease clearing can already happen. Not an all-or-nothing rollback or universal exclusion contract.",
+    "limits": "Conditional poison/retention is not actual K80 leak/UAF/successful page retirement or safe force-free/retry authorization. Old6th legacy retention candidate not composed;current dynamic128/perVM difference persists. Error statistics and accepted Job metadata gap remain separately recorded;no new fake fence/bitmap/refcount/quarantine policy.",
+    "decision": "No32nd cleanup/reset/retry/stopDMA policy.31 independent UNAPPLIED;all native/device OFF,no new component/caller/image/wire/CPU/security policy. Actual K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable."
+  },
+  "qualification": "Conditional poisoned-VM close/retention source only;not hardware stop or atomic rollback",
+  "GPU_execution_rendering_Metal_complete": false
+}

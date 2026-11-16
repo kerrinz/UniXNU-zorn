@@ -1,0 +1,87 @@
+{
+  "scope": "independent UNAPPLIED preflight control reads;default plan only",
+  "original_SHA": "8d70643d9de405db9f349e76b28ff8a6c5231e7bd9102c9493b9cb36ef02f9e2",
+  "candidate_SHA": "ba14fdb45ac42a9f424a9e38a9b0fcde7fd58ad995c651bdd270bb7983fa375d",
+  "original_unchanged": true,
+  "two_actual_before_after_refusals": [
+    {
+      "control": "approval",
+      "original_error": "pinned approval identity mismatch",
+      "before": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-review-preflight-control-bounds-20261103/over-control.bin",
+          "requested": -1,
+          "returned": 1056768
+        }
+      ],
+      "after": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-review-preflight-control-bounds-20261103/over-control.bin",
+          "requested": 1048577,
+          "returned": 1048577
+        }
+      ]
+    },
+    {
+      "control": "manifest",
+      "original_error": "only the approved four-source manifest is allowed",
+      "before": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-review-preflight-control-bounds-20261103/over-control.bin",
+          "requested": -1,
+          "returned": 1056768
+        }
+      ],
+      "after": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-review-preflight-control-bounds-20261103/over-control.bin",
+          "requested": 1048577,
+          "returned": 1048577
+        }
+      ]
+    }
+  ],
+  "four_exact_plus_one_boundaries": [
+    {
+      "control": "approval",
+      "size": 1048576,
+      "reader_bound": false,
+      "SHA_gate_retained": true
+    },
+    {
+      "control": "approval",
+      "size": 1048577,
+      "reader_bound": true,
+      "SHA_gate_retained": false
+    },
+    {
+      "control": "manifest",
+      "size": 1048576,
+      "reader_bound": false,
+      "SHA_gate_retained": true
+    },
+    {
+      "control": "manifest",
+      "size": 1048577,
+      "reader_bound": true,
+      "SHA_gate_retained": false
+    }
+  ],
+  "strict_SHA_gates_retained": true,
+  "valid_plan_output_content_SHA_and_compile_commands_identical": true,
+  "dependency_bytes_identical_only_mirror_paths_differ": true,
+  "approval_parsed_from_same_SHA_checked_bytes": true,
+  "approval_read_once": true,
+  "control_budget_bytes": 1048576,
+  "guarded_no_write_process": true,
+  "no_output_directory_created": true,
+  "no_header_emit_compile_or_old_suite": true,
+  "hardware_qualification": false,
+  "native_execution": false,
+  "device_operations": false,
+  "review_document_SHA": "93d1e5534091a0bef4f54c468f8658f1300cc7d11419a158107231184d737de1",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-review-preflight-control-bounds-20261103/preflight-controls.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

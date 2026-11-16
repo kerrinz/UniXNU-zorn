@@ -1,0 +1,194 @@
+{
+  "status": "CPU-work-interval-privilege-policy-native-candidate-UNSELECTED",
+  "recorded_at": "2026-11-12T10:22:53.707866+08:00",
+  "record_id": "c1d6a802b6df438c8d08414a7bbe125d",
+  "helper_protocol_run_id": "cce96d56630b4b0680fe31845102c730",
+  "root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+  "root_unchanged": true,
+  "prior_hardware_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-platform-identity-observed26.json",
+    "sha256": "7bc3634c88ae2c59a53d541123e6e554e5db2e398a9751fc2b3ea18e97bc1cf3"
+  },
+  "GitHub_primary_research": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-cross-device-github-research26.json",
+    "sha256": "11a4ef5e0f7f83a92bdca23d2e7ab05fc0887a9686e673196e0298b3e9d1f46b"
+  },
+  "actual_missing_policy_source_audit": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/linked-work-interval-policy-audit/result.json",
+    "sha256": "f15b4a7810dae7e1745ff84bd37074d2b28b81a61846defb87e57dc58d079f81"
+  },
+  "policy_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-work-interval-c1d6a802b6df438c8d08414a7bbe125d/native/kern_priv.c",
+    "sha256": "54ad119edc2a82ceca9bc01406e24626e0502ba3e371470eb41a0b8362343e2f"
+  },
+  "policy_source_proof": {
+    "original_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/kern/kern_priv.c",
+    "original_sha256": "0fcad4887c4ad72d5659057c88d8bf33ee329ce2c24154016e28a980adab7ab1",
+    "source_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/linked-work-interval-policy-audit/result.json",
+    "patched_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-work-interval-c1d6a802b6df438c8d08414a7bbe125d/native/kern_priv.c",
+    "policy_block": "#if ARM64_BOARD_CONFIG_ZORN\n    /* K80 trusted guest policy,matching the qualified iOS17/UniXNU rule.\n     * Permission only: original work-interval allocation,ownership,ports and\n     * native create/destroy/error handling remain in the public backend.\n     */\n    if (priv == PRIV_WORK_INTERVAL) {\n        return 0;\n    }\n#endif\n\n",
+    "original_restored_exactly": true,
+    "only_K80_work_interval_authorization_changed": true,
+    "actual_interval_creation_backend_unchanged": true,
+    "other_privilege_paths_preserved": true,
+    "root_unchanged": true
+  },
+  "host_checks": {
+    "result": "PASS",
+    "actual_source": {
+      "original_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/kern/kern_priv.c",
+      "original_sha256": "0fcad4887c4ad72d5659057c88d8bf33ee329ce2c24154016e28a980adab7ab1",
+      "source_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/linked-work-interval-policy-audit/result.json",
+      "patched_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-work-interval-c1d6a802b6df438c8d08414a7bbe125d/native/kern_priv.c",
+      "policy_block": "#if ARM64_BOARD_CONFIG_ZORN\n    /* K80 trusted guest policy,matching the qualified iOS17/UniXNU rule.\n     * Permission only: original work-interval allocation,ownership,ports and\n     * native create/destroy/error handling remain in the public backend.\n     */\n    if (priv == PRIV_WORK_INTERVAL) {\n        return 0;\n    }\n#endif\n\n",
+      "original_restored_exactly": true,
+      "only_K80_work_interval_authorization_changed": true,
+      "actual_interval_creation_backend_unchanged": true,
+      "other_privilege_paths_preserved": true,
+      "root_unchanged": true
+    },
+    "public_constants": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/sys/priv.h",
+      "sha256": "26a1bbbb7cb4c44b142e0d274cf3b8d6540f7c98cba9b200c23437f47cfb2cd4",
+      "names": [
+        "PRIV_WORK_INTERVAL",
+        "PRIV_NET_PRIVILEGED_SOCKET_DELEGATE",
+        "PRIV_VM_FOOTPRINT_LIMIT",
+        "PRIVCHECK_DEFAULT_UNPRIVILEGED_FLAG"
+      ]
+    },
+    "policy_controls": 256,
+    "build_variants": [
+      {
+        "K80": false,
+        "CONFIG_MACF": 0,
+        "controls": 64,
+        "arguments": [
+          "/usr/bin/clang",
+          "-std=c11",
+          "-fsanitize=address,undefined",
+          "-DARM64_BOARD_CONFIG_ZORN=0",
+          "-DCONFIG_MACF=0",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-host.c",
+          "-o",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-board0-macf0"
+        ]
+      },
+      {
+        "K80": false,
+        "CONFIG_MACF": 1,
+        "controls": 64,
+        "arguments": [
+          "/usr/bin/clang",
+          "-std=c11",
+          "-fsanitize=address,undefined",
+          "-DARM64_BOARD_CONFIG_ZORN=0",
+          "-DCONFIG_MACF=1",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-host.c",
+          "-o",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-board0-macf1"
+        ]
+      },
+      {
+        "K80": true,
+        "CONFIG_MACF": 0,
+        "controls": 64,
+        "arguments": [
+          "/usr/bin/clang",
+          "-std=c11",
+          "-fsanitize=address,undefined",
+          "-DARM64_BOARD_CONFIG_ZORN=1",
+          "-DCONFIG_MACF=0",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-host.c",
+          "-o",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-board1-macf0"
+        ]
+      },
+      {
+        "K80": true,
+        "CONFIG_MACF": 1,
+        "controls": 64,
+        "arguments": [
+          "/usr/bin/clang",
+          "-std=c11",
+          "-fsanitize=address,undefined",
+          "-DARM64_BOARD_CONFIG_ZORN=1",
+          "-DCONFIG_MACF=1",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-host.c",
+          "-o",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/work-interval-policy-board1-macf1"
+        ]
+      }
+    ],
+    "other_privileges_and_MAC_checks_grants_match_original": true,
+    "non_K80_branch_matches_original": true,
+    "actual_interval_create_destroy_backend_unchanged": true,
+    "host_only_policy_peers_not_hardware_backend_stubs": true,
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "device_access": false
+  },
+  "native_checks": {
+    "result": "PASS",
+    "actual_native_public_priv_header": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/sys/priv.h",
+    "actual_Zorn_define": true,
+    "actual_CONFIG_MACF": "1",
+    "BSD_interval_syscall_and_OSFMK_create_destroy_objects_byte_unchanged": true,
+    "normalized_write_and_machine_exclusion_sources_unchanged": true,
+    "policy_object_depends_on_new_exact_source_and_recompiles_byte_identically": true,
+    "host_policy_peers_not_target_execution": true,
+    "device_access": false
+  },
+  "actual_native_binding": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/observer-native-binding-proof.json",
+    "sha256": "af1ec894380dfa6bd7e63c0ead345512e63c03a781978e67b99dbcd13e22be58"
+  },
+  "actual_root_binding": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/RootPlatform-dependency-proof.json",
+    "sha256": "5f2ef8cc5d08441e057930e41971c7f2ef1750034737c8ba87867eff0984a64b"
+  },
+  "ADT": {
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/kernel.work-interval.UNSELECTED.adt",
+    "output_sha256": "f2f455d14aabd347a93c9158a77153de628f589f2379f1ce084c04610397689a",
+    "root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+    "root_unchanged": true,
+    "parent_adt": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/kernel.platform-fix.UNSELECTED.adt",
+    "byte_identical_to_actual_b450_ADT": true,
+    "documented_four_chosen_properties_preserved": true
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/full-link/kernel.ZORN26-CURRENT-ROOT-USERLAND-CONTROL.UNSELECTED.macho",
+    "sha256": "2f2ac6825b11eb57adebfd75b5f822e420c1f07cf046b559e065d0bea4ca1eb9",
+    "bytes": 30497696,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 17,
+    "preserved": 1380,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/boot-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "48c922d99605a0074260614127f5266d4ed01781e61571eed776609de454e3f1",
+    "bytes": 11657216
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-work-interval26-c1d6a802b6df438c8d08414a7bbe125d/boot-package/verified.json",
+    "sha256": "998e2a4b809bcb8e5f74d5d1ee844df82ef63f0059f117145f92b62af74c6aef"
+  },
+  "installed_root_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-delta-review26-75fd3a70/admission/run/result.json",
+    "sha256": "0187f3bba3d1e445b64d302470830f43bc49cb025bb8a8afa71700f5dbc000b8"
+  },
+  "only_functional_change_K80_work_interval_privilege_rule": true,
+  "actual_native_interval_backend_unchanged": true,
+  "root_installation_required": false,
+  "device_access": false,
+  "scope_or_claim_created": false,
+  "hardware_trial_performed": false,
+  "SIGTRAP_cause_proven": false,
+  "lockscreen_proven": false,
+  "goal_complete": false,
+  "next_action": "New c1d6 CPU work-interval source candidate: GitHub ios-sweet matching startup dependency, local qualified17 and upstream public12377 source policy reused only for K80 PRIV_WORK_INTERVAL. 256 actual-source ASan/UBSan privilege checks ensure nonK80/otherprivs/native MAC callbacks unchanged; original sys_work_interval.o/work_interval.o byte-identical. Six selected native recipe/dependency/byte proofs including public priv.h and Zorn macro pass. Full1397-input/17replacement kernel2f2ac682/boot48c922d9 on actual unchanged64c/helpercce,ADT byte-identical to b450,CPU/GPUoff/touchoff/sample0/WDT300;runtime errno/SB/first-frame not proven. Next verify new record tag/native formatter and inherited source byte controls,bind actual81-page receipt and separate fresh scope/ready/claim with host refusals,then one bounded CPU boot. No new root install,unmodified retry,private operation numbers,or reverse engineering. If work privilege does not move first frame,reassess public AppleKeyStore events path and bounded ordinary history clipping;no blind daemon removal. Goal active."
+}

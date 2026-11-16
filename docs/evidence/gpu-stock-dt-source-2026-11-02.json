@@ -1,0 +1,203 @@
+{
+  "implementation": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/extract-zorn-source-fdts.py",
+  "script_sha256": "490c054f11410c054b2439f3dfc2cf86e385ba4ace90397f9b5a78913cf772d6",
+  "source_images": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/zorn_images_OS3.0.9.0.WOKCNXM_16.0/images/dtbo.img",
+      "sha256": "8c12e401409e29c753b5bfda546d67d3c4e627bb3e5c528ae927209616703f0f"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/zorn_images_OS3.0.9.0.WOKCNXM_16.0/images/vendor_boot.img",
+      "sha256": "e4ff2d94105af6684c60cf654f8d79602a2bbb70c888c49a29e37cc57fd496bc"
+    }
+  ],
+  "valid_base_FDTs": 4,
+  "overlay_source_FDTs": 1,
+  "source_clock_comparison": [
+    {
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.dtb",
+        "sha256": "4c87e7fcb971592ae7f9f34d978b45d0801bc0f6dbc911dedd7767c5fc5f2bb6"
+      },
+      "clocks_hex": "0000002c000000250000002c000000260000004e000000000000003f00000000",
+      "references": [
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            37
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            38
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@3d90000",
+          "source_arguments": [
+            0
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/power-controller@c300000",
+          "source_arguments": []
+        },
+        {
+          "property": "clocks",
+          "unresolved_phandle": 0,
+          "unresolved_tail_cells": [
+            0
+          ],
+          "reason": "provider/arity unavailable; no argument boundaries inferred"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.dtb",
+        "sha256": "74b702105990399697b7d38def4ab3931a5ef79e20f0a0cc8cc9fc2c865eff52"
+      },
+      "clocks_hex": "0000002c000000250000002c000000260000004e000000000000003f00000000",
+      "references": [
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            37
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            38
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@3d90000",
+          "source_arguments": [
+            0
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/power-controller@c300000",
+          "source_arguments": []
+        },
+        {
+          "property": "clocks",
+          "unresolved_phandle": 0,
+          "unresolved_tail_cells": [
+            0
+          ],
+          "reason": "provider/arity unavailable; no argument boundaries inferred"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+        "sha256": "b082a6b8813d392b6fdb554ed46212a9b064a7399f341dd2910b06819f08f511"
+      },
+      "clocks_hex": "0000002c000000250000002c000000260000004e000000000000003f00000000",
+      "references": [
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            37
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            38
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@3d90000",
+          "source_arguments": [
+            0
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/power-controller@c300000",
+          "source_arguments": []
+        },
+        {
+          "property": "clocks",
+          "unresolved_phandle": 0,
+          "unresolved_tail_cells": [
+            0
+          ],
+          "reason": "provider/arity unavailable; no argument boundaries inferred"
+        }
+      ]
+    },
+    {
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.dtb",
+        "sha256": "ed761aa6d7e8623792c75f20693a97407974ee2445254e725ce202a8f0ffaa76"
+      },
+      "clocks_hex": "0000002c000000250000002c000000260000004e000000000000003f00000000",
+      "references": [
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            37
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@100000",
+          "source_arguments": [
+            38
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/clock-controller@3d90000",
+          "source_arguments": [
+            0
+          ]
+        },
+        {
+          "property": "clocks",
+          "provider": "/soc/power-controller@c300000",
+          "source_arguments": []
+        },
+        {
+          "property": "clocks",
+          "unresolved_phandle": 0,
+          "unresolved_tail_cells": [
+            0
+          ],
+          "reason": "provider/arity unavailable; no argument boundaries inferred"
+        }
+      ]
+    }
+  ],
+  "cached_live_clocks_hex": "00000000",
+  "scope": "SHA-bound local source extraction only,not Android header/DTBO table attestation,overlay application,bootvariant selection or hardware policy",
+  "new_tool_checks": "PASS:concat source offsets,truncated length,invalid version,input SHA and no-overwrite",
+  "overlay_graph_refusal": "Existing graph inspector rejects overlay-only source without GPU/GMU compatible root;retained graph-attempts.json,not interpreted as missing GPU hardware.",
+  "generated_policy": false,
+  "boot_variant_selected": false,
+  "hardware_qualification": false,
+  "old_suites_reexecuted": false,
+  "new_driver_patches": 0,
+  "device_operations": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

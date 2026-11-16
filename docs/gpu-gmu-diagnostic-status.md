@@ -1,0 +1,13 @@
+# Best-effort GMU diagnostic callback returns
+
+Exact GmuContext readBack issued five callback reads and discarded every int return. A callback may fail without updating its output,or leave partial data;the report previously provided no attempt/returned/result channel for those diagnostic fields. The separate program_readback_valid describes the kit's primary program readback,not these later best-effort reads. Service currently prints diagnostic ttbr0 on primary success. No live failure or native callback was executed to demonstrate this source loss.
+
+An independent UNAPPLIED candidate preserves each actual callback int return and adds source-report attempted,returned and zero-return masks. Status order is SMR,S2CR,CBAR,SCTLR,TTBR0. A zero-initialized status with returned-mask bit0 is unknown. A zero-return bit records only the callback's actual zero;it is not a GPU,stop,ownership or mapping proof. These int values are not relabeled underlying IOKit or EFI errors. Failed-output register bytes remain uninterpretable as successful readings without their corresponding mask.
+
+All five callback calls,offsets and order remain identical,and the existing precondition skip remains. Primary bringUp code,status,ready state and error retention are byte-identical. A diagnostic failure does not become a new startup failure or retry. No wire,normal log,query,HFI or carrier field changes. Existing Service log formatting is unchanged;future consumers must explicitly honor the new source report masks.
+
+Four source controls reject dropped raw return,forged zero status,lost availability and an extra read. There are no synthetic callback return values,callback peers or behavior tests. New real-header iOS17 objects compile the changed context,the source-identical caller against the changed report,and POD report storage. Report size grows144->176 bytes;future integration needs consistent callers and cannot mix old144-byte stack storage with the new producer. The Service/context class storage itself is not expanded by this report-only change. None of the objects,metaclass code or callbacks executes or links into a kernel.
+
+The first layout fixture compile correctly rejected an uninitialized constinit aggregate. Its source and raw diagnostic are retained;the fixture was corrected to explicit empty initialization and only that changed fixture was recompiled. Already passing context/caller objects were not rebuilt. No compiler flags or SDK changed.
+
+Original catalog sources,32 driver patches,8 profiles and all previous candidates remain unchanged and uncombined. This improves unselected software error-channel observability;it is not GPU execution,Metal or device qualification.

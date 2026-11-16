@@ -1,0 +1,24 @@
+{
+  "updated": "2026-11-02T16:50:53.329725+08:00",
+  "state": "Catalog149-stall-waited-ring-carrier-private-repair-UNAPPLIED",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-stall-ring-carrier/source-contract.json",
+  "new_source_mutations_refused": 3,
+  "new_current_iOS17_independent_pairs": 1,
+  "patch_count": 31,
+  "all31_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "source_reachability": "One global issue number advances above newest of all rings;each ring writes only its own completion values. Therefore observed+1 is not established as next issued fence on that waited ring even with intact tag cache;tag miss additionally has frozen28 fallback ambiguity. wait already selected actual nonnull r from active Job.ring or original historical query before observing it. No successful fence sequence/OOM/model or actual K80 fault needed or claimed.",
+    "repair": "31st independent stall-waited-ring-carrier.UNAPPLIED.patch only adds typed private ring parameter to noteStall,passes original r at both timeout calls,and replaces inferred ringOfFence(next)/ring0 selection with that argument. No new return/guard/field/refcount/queue/mode/cancel/reset/retry/stop/diagnostic policy. Everything else including observed+1,static stall epoch,thresholds,callback errors,find(next) VM selection and log/wire stays byte-identical under inverse.",
+    "scope": "Corrects callback target association with the actual observation source only. Historical wait may itself have guessed r;patch does not prove that initial lookup,non-NULL lifetime/serialization,per-ring first pending Job VM,hardware callback rights,ACK/stop/DMA or bounded recovery. Snapshot VM find(next) remains a separate gap;13/28/other30 patches are not composed.",
+    "verification": "3 new source refusals,independent two-file git apply/reverse review,wholefile inverse bytes equal.1fresh whole Submit currentiOS17 independent SHA pair312 inputs;sealed original312/current exact headers verified not rebuilt;union320 notallfresh. Actual private symbol/x3 argument/callee consumption,Submit3672/Job3168/imports same. Private signature requires future whole owner/consumers rebuild;not final kernel/AppleABI/native eligibility.",
+    "preservation": "All30 parents/8profiles/3111+39/default42/CPU/full64/390+320+317 inputs and old capsules preserved.31st remains independent UNAPPLIED/unselected. All native/ring/stall/VM/callback/provider/MMIO/phone OFF,no success object/fence/clock/address peer,new component/runtimecaller/FD/kernel/candidate/query/HFI/log/carrier/wire/CPU/security policy. K80 ownership/context/route/stop/DMA/readablefailure/GPU/rendering/Metal/rolefullcore unavailable."
+  },
+  "qualification": "Private typed waited-ring association candidate only,not snapshot VM identity/hardware stop/DMA or K80 execution",
+  "GPU_execution_rendering_Metal_complete": false
+}

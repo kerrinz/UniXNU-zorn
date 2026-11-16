@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T17:18:24.442553+08:00",
+  "state": "Catalog149-fault-output-error-availability-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-fault-output-contract/source-contract.json",
+  "functions_body_SHA_recorded": 4,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all31_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 faultState output/error/owner availability source only;4 function SHA/full primary identities,no old suites/targets or MMIO invocation.",
+    "guards": "faultState rejects null output/unattached/poisoned as BadArgument before writing output. Iteration selects last nonzero region state context_offset,not explicit queried Job/ring/current/table context;zero offset returns NotReady without writing. Copied io/borrowed region state are not retained hardware owner proofs.",
+    "reads": "Four sequential read32 callbacks write directly to caller array. First nonzero callback result folds to IOError,without preserving raw callback code,clearing output or rolling back prior values. Earlier completed entries remain;failing entry content depends callback contract;later entries untouched. Successful four reads are not one atomic snapshot,context lease or hardware acknowledgment.",
+    "caller": "Sole exact call is noteStall default vm_,with fault[4] zero-initialized. Earlier stallState error returns before this call. Later faultState IOReturn is explicitly discarded;all four words copied to existing diagnostic array regardless of status,then original IB/fetch diagnostics continue. Zero/partial diagnostics cannot distinguish missing context/read error from actual zero registers. No raw error value manufactured;no fields or wire changes.",
+    "provider": "Original Service smmu_read32 guards window/value/base/alignment/extent before volatile load,then returns0. Guard rejection writes no output in this specific provider;volatile access is not a recoverable hardware-error channel. VM attaches by struct copy and borrowed context/region pointers after validation/allocation/observe. Actual selected K80 provider/context epoch and safe readable failure remain unavailable;unselected Service source does not establish a live callback peer.",
+    "decision": "No32nd automatic error guard/zero sentinel/default VM or diagnostic policy. Changing skip/copy/error retention requires separately scoped consumer/availability contract. All31 patches remain independent UNAPPLIED,no13/28/31 composition. No native/provider/allocator/page/address/clock/fence peer or old suite/target/device execution;GPU/rendering/Metal remain unavailable."
+  },
+  "qualification": "Fault output/error availability source only;not readable-failure hardware or no-fault qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

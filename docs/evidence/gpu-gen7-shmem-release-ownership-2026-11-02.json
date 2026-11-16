@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T09:08:46.236938+08:00",
+  "state": "Gen7-SHMEM-release-cookie-and-owner-boundary",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-shmem-release-ownership/source-contract.json",
+  "new_source_mutations_refused": 4,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "new_primary_fetches": 0,
+  "voidfree_MAPPED_retains_backing_not_descriptor_owner_proof": true,
+  "raw_cookie_not_descriptor_ref": true,
+  "exact_core_hook_quiescence_module_lifetime_unbound": true,
+  "all24_patches_independent_UNAPPLIED": true,
+  "no_native_file_page_refcount_map_success_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "OEM reference source release/cookie/lifetime boundary only,no safe page/file/descriptor teardown,DMA or GPU qualification",
+  "details": {
+    "scope": "Fixed453d8875 exact OEM reference SHMEM release source,not Xiaomi exact/K80 kernel execution. Reuses newly bound Kconfig/Kbuild and primary sharedmem/kgsl/header SHA;no new fetch/geometry/allocator/old target suite. No new25th patch or automatic24th composition.",
+    "file_cookie": "SHMEM file_setup stores returned file or propagates PTR_ERR after NULLing it,initializes list,then places raw memdesc pointer as u64 in inode android_vendor_data1 and makes mapping unevictable. Cookie is a borrowed pointer,not a memdesc/process/entry/file reference. file and actual cached pages have core references not proven here;no raw address copied to report or preEBS/Darwin.",
+    "hook": "kgsl_core_init calls kgsl_register_shmem_callback;SHMEM branch registers android_rvh_shmem_get_folio with actual local callback,nonSHMEM body empty. Callback reads raw cookie,checks ERR/NULL,uses/refills memdesc list,returns first folio and removes its list node. It takes no explicit descriptor kref/file ref in this function. Restricted hook implementation,registration return ABI/module pinning/synchronous scope/inode locking/core config are unbound;do not claim actual callback-after-free,unload bug or need for unregistration from source names.",
+    "normal_SHMEM_release": "_kgsl_free_pages warns if shmem_page_list nonempty but continues,puts every nonNULL pages[] entry,clears inode cookie,then fputs file. kgsl_free_pages first unmaps CPU kernel mapping/warns hostptr,then returns immediately if MAPPED remains. Only otherwise invokes helper,zeros page_count,frees array,sets pagesNULL. This source ordering is not proof all core page/file references or GPU DMA are retired;WARN does not establish empty list.",
+    "caller_domain": "kgsl_sharedmem_free is void,checks descriptor/size/ops,then invokes optional put_gpuaddr and optional free with no returned status. For pageops put_gpuaddr points to kgsl_unmap_and_put_gpuaddr,which may return on failed unmap leaving MAPPED/gpuaddr/pagetable. After detach,entry destroy still invokes sharedmem_free then unconditional kfree(entry),with no MAPPED test or owner handoff. Thus source can retain pages/file in a voidfree early-return while losing this descriptor owner;if reached,raw cookie can remain. No persistent quarantine/stop proof or native resource lease is supplied by retained backing.",
+    "lifetime_limits": "Existing detach removes ID/drops process ref before final sharedmem_free;no new ref is established for retained descriptor there. Successful or failed callback/kernel unmap is not observable from void signatures. Actual backend error reachability/core hook exclusion/config still missing. Repair would require concrete ownership/quarantine/teardown contract;do not invent force-unmap,free retry,ref resurrection,leak policy,cancel/reset or DMAstop.",
+    "other_cleanup_sites": "Allocation failure and secure-SG cleanup contain fput sites outside normal helper;not every such site clears cookie explicitly. Core final-fput/inode lifecycle and exact callback exclusion are unbound,so no specific actual UAF/leak/free defect or cleanup change inferred. They remain locators,not a reason to port foreign core headers or run successful file/page peers.",
+    "relation_to24": "24th remaining-unpinned-slot repair only changes final count debit and remains independent UNAPPLIED. It does not keep descriptor owner on MAPPED early-return,unregister hook,clear cookie or make page/file release safe. Historical counters/shrinker arithmetic unchanged. All24 patches/8profiles/capsules remain frozen.",
+    "checks": "4new source mutations refused:cookie clear removed,fileput moved before clear,MAPPED exclusion removed,entry owner retention falsely inserted. Assertions bind actual source facts and missing policy;no execution of file/page/allocator/refcount/map/tracehook/free/MMIO APIs or success models. No new native component/target/full Linux build,core ABI or AppleABI qualification. No old detach4/review/config-primary/allocator/CPU suite reruns.",
+    "next_platform": "Core hook contract cannot be closed from this fixed module without exact core identity. Advance an independent actual platform item:exact catalog149 NativeAdrenoMemory release/releaseSystemInto/default destructor and actual Entry owner retention,comparing per-function delta with frozen legacy/catalog proofs first. Do not transplant Linux voidfree/SHMEM policy into Darwin or mechanically compose legacy candidates.",
+    "remaining": "Native/device paths OFF,no runtimecaller/component/FD/kernel/candidate/query/HFI/log/carrier or CPU policy change. K80 real owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal,catalog roleAPI/fullcore,selected Linux core/shmem/kref/queue/devres and externalmanager remain incomplete."
+  },
+  "GPU_execution_rendering_Metal_complete": false
+}

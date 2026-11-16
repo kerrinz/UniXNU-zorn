@@ -16,6 +16,301 @@ CORE = ROOT / "UniXNU"
 OUT = ROOT / "out/zorn"
 MANIFEST = OUT / "boot.inputs.json"
 
+if '--ios26-lockscreen-touch-cpu-image' in sys.argv:
+    from zorn_ios26_lockscreen_touch_cpu_trial import main as lockscreen_touch_cpu
+    lockscreen_touch_cpu(mode='build')
+    sys.exit(0)
+
+if '--ios26-ft3683-image' in sys.argv:
+    from zorn_ios26_ft3683_trial import main as ft3683
+    ft3683(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-presenter-refusal-image' in sys.argv:
+    from zorn_ios26_presenter_refusal_trial import main as build_presenter_refusal
+    build_presenter_refusal(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-smmu-cfgprobe-image' in sys.argv:
+    from zorn_ios26_native_smmu_cfgprobe_trial import main as native_smmu_cfgprobe
+    native_smmu_cfgprobe(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-smmu-bootcpu-irq-image' in sys.argv:
+    from zorn_ios26_native_smmu_bootcpu_irq_trial import main as native_smmu_bootcpu_irq
+    native_smmu_bootcpu_irq(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-smmu-irq-observed-image' in sys.argv:
+    from zorn_ios26_native_smmu_irq_observed_trial import main as native_smmu_irq_observed
+    native_smmu_irq_observed(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-smmu-global-irq-image' in sys.argv:
+    from zorn_ios26_native_smmu_global_irq_trial import main as native_smmu_global_irq
+    native_smmu_global_irq(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-cx-timer-image' in sys.argv:
+    from zorn_ios26_native_cx_timer_trial import main as native_cx_timer
+    native_cx_timer(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-cxo-parentless-poll-image' in sys.argv:
+    from zorn_ios26_cxo_parentless_poll_trial import main as cxo_parentless_poll
+    cxo_parentless_poll(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gmu-clock-owned-frames-image' in sys.argv:
+    from zorn_ios26_gmu_clock_owned_frames_trial import main as gmu_clock_owned_frames
+    gmu_clock_owned_frames(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-gmu-clocks-image' in sys.argv:
+    from zorn_ios26_native_gmu_clocks_trial import main as native_smmu_power
+    native_smmu_power(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-smmu-probe-image' in sys.argv:
+    from zorn_ios26_native_smmu_probe_trial import main as native_smmu_power
+    native_smmu_power(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-parentless-smmu-clock-image' in sys.argv:
+    from zorn_ios26_parentless_smmu_clock_trial import main as native_smmu_power
+    native_smmu_power(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-smmu-power-results-image' in sys.argv:
+    from zorn_ios26_smmu_power_results_trial import main as native_smmu_power
+    native_smmu_power(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-smmu-power-image' in sys.argv:
+    from zorn_ios26_native_smmu_power_trial import main as native_smmu_power
+    native_smmu_power(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-native-cx-primary-image' in sys.argv:
+    from zorn_ios26_native_cx_primary_trial import main as native_cx_primary
+    native_cx_primary(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-guarded-gpu-maps-image' in sys.argv:
+    from zorn_ios26_guarded_gpu_maps_trial import main as guarded_gpu_maps
+    guarded_gpu_maps(mode='build')
+    sys.exit(0)
+
+if '--ios26-native-register-maps-image' in sys.argv:
+    from zorn_ios26_native_register_maps_trial import main as cx_location_fix
+    cx_location_fix(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-cx-location-fix-image' in sys.argv:
+    from zorn_ios26_cx_location_fix_trial import main as cx_location_fix
+    cx_location_fix(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-domain-live-image' in sys.argv:
+    from zorn_ios26_domain_live_trial import main as domain_live
+    domain_live(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gpucc-lock-fix-image' in sys.argv:
+    from zorn_ios26_gpucc_lock_fix_trial import main as gpucc_lock_fix
+    gpucc_lock_fix(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gpucc-detail-image' in sys.argv:
+    from zorn_ios26_gpucc_detail_trial import main as gpucc_detail
+    gpucc_detail(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-clock-live-image' in sys.argv:
+    from zorn_ios26_clock_live_trial import main as clock_live
+    clock_live(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-enable-image' in sys.argv:
+    from zorn_ios26_rsc_enable_trial import main as rsc_enable
+    rsc_enable(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-workloop-fix-image' in sys.argv:
+    from zorn_ios26_rsc_workloop_fix_trial import main as rsc_workloop_fix
+    rsc_workloop_fix(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-factory-boundary-image' in sys.argv:
+    from zorn_ios26_rsc_factory_boundary_trial import main as rsc_factory_boundary
+    rsc_factory_boundary(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-prewrite-boundary-image' in sys.argv:
+    from zorn_ios26_rsc_prewrite_boundary_trial import main as rsc_prewrite_boundary
+    rsc_prewrite_boundary(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-reserve-boundary-image' in sys.argv:
+    from zorn_ios26_rsc_reserve_boundary_trial import main as rsc_reserve_boundary
+    rsc_reserve_boundary(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-ram-checkpoint-image' in sys.argv:
+    from zorn_ios26_rsc_ram_checkpoint_trial import main as rsc_ram_checkpoint
+    rsc_ram_checkpoint(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-screen-stage-image' in sys.argv:
+    from zorn_ios26_rsc_screen_stage_trial import main as rsc_screen_stage
+    rsc_screen_stage(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-masked-stage-image' in sys.argv:
+    from zorn_ios26_rsc_masked_stage_trial import main as rsc_masked_stage
+    rsc_masked_stage(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-only-image' in sys.argv:
+    from zorn_ios26_rsc_only_trial import main as rsc_only
+    rsc_only(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-bootcpu-image' in sys.argv:
+    from zorn_ios26_rsc_bootcpu_trial import main as rsc_bootcpu
+    rsc_bootcpu(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gic-route-order-image' in sys.argv:
+    from zorn_ios26_gic_route_order_trial import main as gic_route_order
+    gic_route_order(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gic-observation-image' in sys.argv:
+    from zorn_ios26_gic_observation_trial import main as gic_observation
+    gic_observation(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-clock-image' in sys.argv:
+    from zorn_ios26_rsc_clock_trial import main as rsc_clock
+    rsc_clock(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-runtime-image' in sys.argv:
+    from zorn_ios26_rsc_runtime_trial import main as rsc_runtime
+    rsc_runtime(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-logdirs-boot-image' in sys.argv:
+    from zorn_ios26_logdirs_boot_trial import main as logdirs_boot
+    logdirs_boot(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-userland-progress-image' in sys.argv:
+    from zorn_ios26_userland_progress_trial import main as userland_progress
+    userland_progress(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-rsc-readonly-image' in sys.argv:
+    from zorn_ios26_rsc_readonly_trial import main as rsc_readonly
+    rsc_readonly(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-commanddb-observation-image' in sys.argv:
+    from zorn_ios26_commanddb_observation_trial import main as commanddb_observation
+    commanddb_observation(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-current-platform-image' in sys.argv:
+    from zorn_ios26_current_platform_trial import main as current_platform
+    current_platform(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-platform-board-stage-image' in sys.argv:
+    from zorn_ios26_platform_board_stage_trial import main as build_platform_board_stage
+    build_platform_board_stage(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gpu-provider-census-v73-image' in sys.argv:
+    from zorn_ios26_gpu_provider_census_trial import main as build_gpu_provider_census_v73
+    build_gpu_provider_census_v73(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gpu-provider-census-predevice-002-image' in sys.argv:
+    from zorn_ios26_gpu_provider_census_predevice_002_trial import main as build_gpu_provider_census_predevice_002
+    build_gpu_provider_census_predevice_002(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gpu-provider-census-predevice-003-image' in sys.argv:
+    from zorn_ios26_gpu_provider_census_predevice_003_trial import main as build_gpu_provider_census_predevice_003
+    build_gpu_provider_census_predevice_003(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-gpu-provider-census-predevice-004-image' in sys.argv:
+    from zorn_ios26_gpu_provider_census_predevice_004_trial import main as build_gpu_provider_census_predevice_004
+    build_gpu_provider_census_predevice_004(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-presenter-known-image' in sys.argv:
+    from zorn_ios26_presenter_known_image_trial import main as build_presenter_known_image
+    build_presenter_known_image(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-presenter-console-mode-image' in sys.argv:
+    from zorn_ios26_presenter_console_mode_trial import main as build_presenter_console_mode
+    build_presenter_console_mode(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-presenter-result-image' in sys.argv:
+    from zorn_ios26_presenter_result_trial import main as build_presenter_result
+    build_presenter_result(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-CPU-presenter-image' in sys.argv:
+    from zorn_ios26_CPU_presenter_trial import main as build_CPU_presenter
+    build_CPU_presenter(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-EL0-root-image' in sys.argv:
+    from zorn_ios26_EL0_root_trial import main as build_EL0_root
+    build_EL0_root(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-PID1-root-image' in sys.argv:
+    from zorn_ios26_PID1_root_trial import main as build_PID1_root
+    build_PID1_root(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-mounted-root-image' in sys.argv:
+    from zorn_ios26_mounted_root_trial import main as build_mounted_root
+    build_mounted_root(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-current-root-image' in sys.argv:
+    from zorn_ios26_current_root_trial import main as check_current_root_image
+    check_current_root_image(mode='build')
+    raise SystemExit(0)
+
+if '--ios26-installed-root-image' in sys.argv:
+    from zorn_ios26_installed_root_image import main as build_installed_root_image
+    build_installed_root_image()
+    raise SystemExit(0)
+
+if '--ios26-root-input-probe-image' in sys.argv:
+    from zorn_ios26_root_input_probe import main as build_root_input_probe
+    build_root_input_probe('build')
+    raise SystemExit(0)
+
+if '--ios26-platform-record-image' in sys.argv:
+    from zorn_gpu_ios26_platform_record import main as build_ios26_platform_record
+    build_ios26_platform_record('build')
+    raise SystemExit(0)
+
+if '--ios26-platform-image' in sys.argv:
+    from zorn_gpu_ios26_platform import main as build_ios26_platform
+    build_ios26_platform('build')
+    raise SystemExit(0)
+
 
 def digest(path):
     result = hashlib.sha256()
@@ -86,6 +381,42 @@ if '--unixnu64-retained-host-image' in sys.argv:
     path = ROOT / 'out/zorn/dual-system-reinstall-20261101/retained-image-policy.json'
     if digest(path) != 'e4eebebeab5289333800fac543134a7a73e9c753b4ddcf41856edc535411d734':
         raise RuntimeError('retained unixnu64 image policy changed')
+    from zorn_gen7_image import assemble
+    assemble(ROOT, json.loads(path.read_text()))
+    raise SystemExit(0)
+
+if '--gpu-unixnu64-closed-image' in sys.argv:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu-unixnu64-closed-image', action='store_true', required=True)
+    parser.add_argument('--os', choices=('17',), required=True)
+    parser.parse_args()
+    path = ROOT / 'out/zorn/gpu-unixnu64-closed-firmware/image-policy.json'
+    if digest(path) != 'e3c9782208b42e2845fbcd9deeca6c594e7b5163a7e79bb31c7648ce5519460a':
+        raise RuntimeError('Closed unixnu64 GPU image policy changed')
+    from zorn_gen7_image import assemble
+    assemble(ROOT, json.loads(path.read_text()))
+    raise SystemExit(0)
+
+if '--gpu-unixnu64-media-image' in sys.argv:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu-unixnu64-media-image', action='store_true', required=True)
+    parser.add_argument('--os', choices=('17',), required=True)
+    parser.parse_args()
+    path = ROOT / 'out/zorn/gpu-unixnu64-media-candidate/image-policy.json'
+    if digest(path) != '9cc77c35d2815f103ef1e8bb435daca66e14c7b453a5236a89d5a64927230052':
+        raise RuntimeError('Dedicated unixnu64 media image policy changed')
+    from zorn_gen7_image import assemble
+    assemble(ROOT, json.loads(path.read_text()))
+    raise SystemExit(0)
+
+if '--gpu-resource-observation-image' in sys.argv:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu-resource-observation-image', action='store_true', required=True)
+    parser.add_argument('--os', choices=('17',), required=True)
+    parser.parse_args()
+    path = ROOT / 'out/zorn/gpu-resource-observation-candidate/image-policy.json'
+    if digest(path) != '14be7c63391fb38df8636673c0498913191e71a1d739f32884ecfa24e5a26593':
+        raise RuntimeError('Resource observation candidate image policy changed')
     from zorn_gen7_image import assemble
     assemble(ROOT, json.loads(path.read_text()))
     raise SystemExit(0)

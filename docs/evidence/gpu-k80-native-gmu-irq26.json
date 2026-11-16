@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-09T12:50:41.654501+00:00",
+  "classification": "progress: real native GIC GMU IRQ integrated through existing completed-CX board stage and retained real SCM session;legacy external callback path preserved,no fabricated grant",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate",
+  "native_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-gpu-native-gmu-irq-candidate",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.19302034378051758,
+    "inputs": 1385,
+    "replaced": 12,
+    "preserved": 1373,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gmu-irq26/full-link/kernel.ZORN26-native-gmu-irq.UNSELECTED.macho",
+    "sha256": "7eb25c4de659b30ed30b23df350e0c187ca060f47f759140e3ad9f4f1d9d340a",
+    "bytes": 30223544
+  },
+  "checks": {
+    "affected_native_translation_units": 12,
+    "shared_header_dependencies_all_recompiled": {
+      "changed_header": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7GmuIrq26.h",
+      "affected_firmware_TUs": [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7HwschedBuffers26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7HwschedHfi26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7GmuIrq26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7HostGpuRegisters26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7StartupOwner26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7DirectHfi26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7BootBuffers26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7HostRing26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7SmmuDomain26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7RegistryStartup26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gmu-irq-candidate/ZornGen7HostGpuCode26.cpp"
+      ],
+      "changed_native_TU": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-gpu-native-gmu-irq-candidate/k80/runtime/startup/ZornGen7DarwinBoardOwner.cpp",
+      "all_recompiled": true
+    },
+    "full_link_inputs": 1385,
+    "replaced_inputs": 12,
+    "preserved_inputs": 1373,
+    "undefined_symbols": 0,
+    "new_link_diagnostics": 0,
+    "inherited_warning_observations": 18,
+    "inherited_warning_sites": 3,
+    "new_compile_warning_sites": 0,
+    "actual_compiler_inputs": 594,
+    "source_files": 660,
+    "unchanged_source_files": 655,
+    "changed_source_files": [
+      "ZornGen7GmuIrq26.h",
+      "ZornGen7GmuIrq26.cpp",
+      "ZornGen7StartupOwner26.cpp",
+      "ZornGen7RegistryStartup26.cpp",
+      "k80/runtime/startup/ZornGen7DarwinBoardOwner.cpp"
+    ],
+    "original_sources_unchanged_and_separate_inodes": true,
+    "board_refusal_edges_exclude_native_factory": 5,
+    "native_factory_refusal_edges_exclude_impl": 5,
+    "actual_GIC_raw_return_stored_and_selects_state": true,
+    "external_grant_callback_skipped_without_synthetic_return_in_native_mode": true,
+    "legacy_authority_record_class_data_and_vtable_declarations_unchanged": true,
+    "actual_CX_success_producer_unchanged": true,
+    "actual_GIC_overlay_provenance": {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/zorn26-component-integration-candidate/rsc-gic-control-lock-candidate/gic_v3_irq.c",
+      "source_sha256": "93de26b8b116517b7ddf31873c5f06ea92cd673612f548a23b7cbc7266b78550",
+      "compile_command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-zorn-integration26/attempts/1794209052220706000/027-gic_v3_irq.o-command.json",
+      "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-zorn-integration26/attempts/1794209052220706000/027-gic_v3_irq.o",
+      "object_sha256": "8320f2394b691595e22fa411a6ee603d7e4e5baf20d8850b9490d3909f568c93",
+      "current_link_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gmu-irq26/full-link/inputs/0374-0374-0374-0374-0374-0374-0374-0374-1253-027-gic_v3_irq.o",
+      "current_link_object_unchanged": true,
+      "scope": "Actual native masked registration/configuration readback backend,not a current hardware lease or IRQ-delivery proof"
+    }
+  },
+  "behavior": "Private board startup path requires CpuReady,actual completed CX security,retained actual CX SCM owner and first attempt under its real recursive startup gate. Native factory also checks normal context,held gate and actual registered platform parent. It retains the SCM session and uses the real checked GIC masked-registration return for state;no external authority callback or returned-grant value is fabricated. Legacy external factory still requires its real callback. Existing initially-masked,real receiver-before-enable,mask/unmask,error and failure-retain behavior remains unchanged.",
+  "limitations": [
+    "Offline compilation/link and static instruction/source checks only;no allocation,map,IRQ,MMIO,GIC,SCM,native or phone execution.",
+    "CX callback completion and native GIC software checks are not global power/security/IRQ-delivery or persistent hardware qualification. Actual upstream prerequisites remain mandatory.",
+    "Real early clock/power/security/PM/SCM/SMMU/CommandDB and platform creator handoffs remain incomplete;not a complete GPU startup.",
+    "Earlier exact f73 platform/UFS device trial is consumed-no-repeat and does not qualify this new kernel."
+  ],
+  "native_or_device_execution": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gmu-irq26/verified.json",
+  "actual_compile_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gmu-irq26/actual-inputs.json",
+  "compiled_refusal_CFG": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gmu-irq26/compiled-refusal-CFG.json",
+  "source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gmu-irq26/original-source-manifest.json",
+  "static_checker_corrections": "Initial host CFG checker selected a bit-index immediate as branch target;corrected to destination before symbol. Second classifier incorrectly included target retain virtual call;corrected to test reachability of actual external authorization call. Both failed checker versions retained;no source/object rebuild or API execution."
+}

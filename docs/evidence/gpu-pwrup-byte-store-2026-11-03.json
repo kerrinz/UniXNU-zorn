@@ -1,0 +1,22 @@
+{
+  "scope": "unaligned uint8_t output store contract; isolated 4-byte store only",
+  "original_SHA": "625935493062e63f18d87a691436b4f53cce22969509501e77cbd58d27e398c4",
+  "candidate_SHA": "8edeff4193cc8053939b0198cd8ca07f28c9ddf356d7c449dbc80d7b00f15569",
+  "before_isolated_store_UBSan_misaligned_failure_preserved": true,
+  "after_four_byte_alignments_canaries_native_order_pass": true,
+  "source_mutations_refused": [
+    "typed-store-restored",
+    "short-copy",
+    "short-step"
+  ],
+  "new_Pwrup_iOS17_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "all_list_counts_limits_order_layout_and_callbacks_unchanged": true,
+  "no_buildA740_pack_policy_list_register_read_callback_native_or_provider_execution": true,
+  "no_generated_or_selected_power_rate_vote_bin_variant_policy": true,
+  "no_actual_K80_unaligned_buffer_claimed": true,
+  "firmware_alias_review": "only retained Service caller has local rules,member firmware view,and external embedded image;no concrete alias found,no alias patch or validate/SHA execution",
+  "catalog_pins_32patches_profiles_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

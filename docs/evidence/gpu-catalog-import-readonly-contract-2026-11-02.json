@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T20:38:37.923826+08:00",
+  "state": "Catalog149-import-readonly-prepare-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-import-readonly-contract/source-contract.json",
+  "functions_body_SHA_recorded": 7,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 importTask read-only fallback against actual selected iOS17 prepare direction/error source.7bodySHA/full identities,no old suites/targets/pair rerun/native prepare/map.",
+    "constant": "Catalog literal kNativeAdrenoProtectionFailure2 equals selected mach KERN_PROTECTION_FAILURE2. Selected prepare returns wireVirtual result;wireVirtual abort path remaps KERN_FAILURE to CannotWire and MEMORY_ERROR to NoResources,leaving other errors including raw2. NotWritable is a different IOKit error for an already read-only prepared descriptor asked for write access;do not conflate it with raw2.",
+    "direction": "importRange builds original InOut descriptor,tries persistent then original fallback. importTask prepare() uses selected default None,wireVirtual fills direction from descriptor. Out sets UPL_COPYOUT_FROM/read DMA access;In or combined uses original write/combined access. This source mapping supports read-only fallback intent,not actual successful pin/permission/owner proof.",
+    "fallback": "Only returned raw2 causes first descriptor release and recreation with Out. Read_only bool becomes true only if second prepare returns0. Other failures return actual status. Successful branch then prepares metadata and validates segments;later failure uses original release path. No repeated arbitrary error fallback or broader access grant introduced.",
+    "map": "UserClient map strips write permission bit when memory.readOnly(),retains original other validation/VM transaction. Flag records driver fallback outcome,not global task/PTE writability or cache coherence. release clears read_only at final completed cleanup only;failure may retain original state under frozen gates.",
+    "partial": "Selected wireVirtual may prepare multiple UPL pieces before error and abort its accumulated list. Exact ownership/error cleanup is a separate lower contract,not proof object release alone safely tears down every partial resource or stopDMA. No successful descriptor/page/task/address peer or synthetic protection-failure sequence used.",
+    "decision": "No33rd new protection/read-only/security/grant/cache/retry/free/refcount policy or foreign SDK/stub.32 independent UNAPPLIED/no composition;all native/device OFF. Actual K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable;no component/caller/image/wire/CPU expansion."
+  },
+  "qualification": "Prepare direction/raw-error compatibility source only;not successful pin/access or stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

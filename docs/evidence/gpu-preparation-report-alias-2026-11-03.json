@@ -1,0 +1,715 @@
+{
+  "scope": "pure reporting methods over injected exclusion metadata;no native objects,prepare,getters,bind or callback execution",
+  "collision_cases_before_write": 24,
+  "collision_cases_after_reject_unchanged": 24,
+  "adjacent_cases_preserved": 16,
+  "unbound_snapshot_methods_preserved": true,
+  "malformed_exclusion_metadata_refuses_unchanged": true,
+  "rejection_releases_lock": true,
+  "ASan_UBSan_pass": true,
+  "candidate_cpp_sha256": "66faaa58c126865c1bf902b89b8fcc51219923e35fe70339a8e9b5a8b222e327",
+  "candidate_header_sha256": "b0d5395c3018bbc783d2d189b0395990b798289db54ef70d1577d7017d741942",
+  "patch_sha256": "08761bd9fa54c64e89e0a73692ca4eef13de2606455b19a0c5e6cd5451b8ecac",
+  "main_sources_unchanged": true,
+  "old_child_visibility_patch_not_composed": true,
+  "headers_and_source": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTablePreparation.cpp": "66b3e97d4030d3f63ccba88a5ee5b3be23db6c43e68c5d0e439ca3cf3350cd44",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTablePreparation.h": "e59197f4850f607b6c232eb6c0703344cfbc1989e994b7cd5f329b05b68a99d0",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.cpp": "b6a6f16a031e9619c83aafaa33a66cb0147801a5483c590438e9f4c2eb9737d0",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.h": "f972953ad3f6c7fe67278340165a6c1080dd473858e8b98308a9ae1c298ea998"
+  },
+  "host_outputs": {
+    "original": "PASS=1 class_bytes=168 collision_cases=24 adjacent_cases=16 no-native-or-getter-execution\n",
+    "candidate": "PASS=1 class_bytes=240 collision_cases=24 adjacent_cases=16 no-native-or-getter-execution\n"
+  },
+  "native_or_device_execution": false,
+  "old_suite_reexecuted": false,
+  "candidate_iOS17_targets": {
+    "scope": "only changed candidate OFF/compile-only-ON objects and constinit storage;not old target/suite or selected runtime",
+    "objects": {
+      "0": {
+        "sha256": "fe425adfb1abec6cb5d2fc8eda2c62b4ae9d82fb7091521d28c2cd14178fa907",
+        "minimum_OS": "17.0",
+        "imports": [
+          "__ZN22ZornGpuTableVisibility8snapshotEPNS_6ReportE"
+        ],
+        "sections": [
+          {
+            "name": "__text",
+            "address": 0,
+            "bytes": 1728,
+            "file_offset": 1192
+          },
+          {
+            "name": "__debug_loc",
+            "address": 1728,
+            "bytes": 2835,
+            "file_offset": 2920
+          },
+          {
+            "name": "__debug_abbrev",
+            "address": 4563,
+            "bytes": 768,
+            "file_offset": 5755
+          },
+          {
+            "name": "__debug_info",
+            "address": 5331,
+            "bytes": 4728,
+            "file_offset": 6523
+          },
+          {
+            "name": "__debug_ranges",
+            "address": 10059,
+            "bytes": 752,
+            "file_offset": 11251
+          },
+          {
+            "name": "__debug_str",
+            "address": 10811,
+            "bytes": 4987,
+            "file_offset": 12003
+          },
+          {
+            "name": "__apple_names",
+            "address": 15798,
+            "bytes": 716,
+            "file_offset": 16990
+          },
+          {
+            "name": "__apple_objc",
+            "address": 16514,
+            "bytes": 36,
+            "file_offset": 17706
+          },
+          {
+            "name": "__apple_namespac",
+            "address": 16550,
+            "bytes": 36,
+            "file_offset": 17742
+          },
+          {
+            "name": "__apple_types",
+            "address": 16586,
+            "bytes": 859,
+            "file_offset": 17778
+          },
+          {
+            "name": "__debug_frame",
+            "address": 17448,
+            "bytes": 288,
+            "file_offset": 18640
+          },
+          {
+            "name": "__debug_line",
+            "address": 17736,
+            "bytes": 1940,
+            "file_offset": 18928
+          }
+        ],
+        "symbols": [
+          {
+            "name": "ltmp0",
+            "kind": 14,
+            "section": 1,
+            "value": 0
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation17snapshotPublisherEPN22ZornGpuTableVisibility6ReportE",
+            "kind": 15,
+            "section": 1,
+            "value": 1296
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation5enterEv",
+            "kind": 15,
+            "section": 1,
+            "value": 0
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation5leaveEv",
+            "kind": 15,
+            "section": 1,
+            "value": 40
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation6retainEP18NativeAdrenoMemoryP18ArmSmmu4KLiveStatej",
+            "kind": 15,
+            "section": 1,
+            "value": 656
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation7prepareEP18NativeAdrenoMemoryPKNS_8GeometryEP18ArmSmmu4KLiveArenaP18ArmSmmu4KLiveStateP23ArmSmmu4KLiveVisibility",
+            "kind": 15,
+            "section": 1,
+            "value": 688
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation8separateEPKvmS1_m",
+            "kind": 15,
+            "section": 1,
+            "value": 52
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation8snapshotEPNS_6ReportE",
+            "kind": 15,
+            "section": 1,
+            "value": 772
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation9zeroStateEPK18ArmSmmu4KLiveState",
+            "kind": 15,
+            "section": 1,
+            "value": 496
+          },
+          {
+            "name": "__ZNK23ZornGpuTablePreparation11outputClearEPKvm",
+            "kind": 15,
+            "section": 1,
+            "value": 212
+          },
+          {
+            "name": "__ZNK23ZornGpuTablePreparation8disjointEPKvm",
+            "kind": 15,
+            "section": 1,
+            "value": 124
+          },
+          {
+            "name": "__ZN22ZornGpuTableVisibility8snapshotEPNS_6ReportE",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          }
+        ]
+      },
+      "1": {
+        "sha256": "5d66e0c68d0ca515c3ec786ecb1cf7fc3024f395ca2893c28a3b891d91f9a07e",
+        "minimum_OS": "17.0",
+        "imports": [
+          "__Z29NativeAdrenoPrepareSmmuMemoryP18NativeAdrenoMemoryjjyyjmP18ArmSmmu4KLiveArenaP18ArmSmmu4KLiveStateP23ArmSmmu4KLiveVisibility",
+          "__ZN22ZornGpuTableVisibility4bindEP18NativeAdrenoMemoryP23ArmSmmu4KLiveVisibility",
+          "__ZN22ZornGpuTableVisibility8snapshotEPNS_6ReportE",
+          "__ZNK22ZornGpuTableVisibility12selectedModeEv",
+          "___stack_chk_fail",
+          "___stack_chk_guard"
+        ],
+        "sections": [
+          {
+            "name": "__text",
+            "address": 0,
+            "bytes": 2916,
+            "file_offset": 1288
+          },
+          {
+            "name": "__const",
+            "address": 2920,
+            "bytes": 40,
+            "file_offset": 4208
+          },
+          {
+            "name": "__debug_loc",
+            "address": 2960,
+            "bytes": 6368,
+            "file_offset": 4248
+          },
+          {
+            "name": "__debug_abbrev",
+            "address": 9328,
+            "bytes": 826,
+            "file_offset": 10616
+          },
+          {
+            "name": "__debug_info",
+            "address": 10154,
+            "bytes": 5753,
+            "file_offset": 11442
+          },
+          {
+            "name": "__debug_ranges",
+            "address": 15907,
+            "bytes": 1200,
+            "file_offset": 17195
+          },
+          {
+            "name": "__debug_str",
+            "address": 17107,
+            "bytes": 5196,
+            "file_offset": 18395
+          },
+          {
+            "name": "__apple_names",
+            "address": 22303,
+            "bytes": 904,
+            "file_offset": 23591
+          },
+          {
+            "name": "__apple_objc",
+            "address": 23207,
+            "bytes": 36,
+            "file_offset": 24495
+          },
+          {
+            "name": "__apple_namespac",
+            "address": 23243,
+            "bytes": 36,
+            "file_offset": 24531
+          },
+          {
+            "name": "__apple_types",
+            "address": 23279,
+            "bytes": 859,
+            "file_offset": 24567
+          },
+          {
+            "name": "__debug_frame",
+            "address": 24144,
+            "bytes": 312,
+            "file_offset": 25432
+          },
+          {
+            "name": "__debug_line",
+            "address": 24456,
+            "bytes": 2719,
+            "file_offset": 25744
+          }
+        ],
+        "symbols": [
+          {
+            "name": "ltmp0",
+            "kind": 14,
+            "section": 1,
+            "value": 0
+          },
+          {
+            "name": "__ZZN23ZornGpuTablePreparation7prepareEP18NativeAdrenoMemoryPKNS_8GeometryEP18ArmSmmu4KLiveArenaP18ArmSmmu4KLiveStateP23ArmSmmu4KLiveVisibilityE5sizes",
+            "kind": 14,
+            "section": 2,
+            "value": 2920
+          },
+          {
+            "name": "ltmp1",
+            "kind": 14,
+            "section": 2,
+            "value": 2920
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation17snapshotPublisherEPN22ZornGpuTableVisibility6ReportE",
+            "kind": 15,
+            "section": 1,
+            "value": 2484
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation5enterEv",
+            "kind": 15,
+            "section": 1,
+            "value": 0
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation5leaveEv",
+            "kind": 15,
+            "section": 1,
+            "value": 40
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation6retainEP18NativeAdrenoMemoryP18ArmSmmu4KLiveStatej",
+            "kind": 15,
+            "section": 1,
+            "value": 656
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation7prepareEP18NativeAdrenoMemoryPKNS_8GeometryEP18ArmSmmu4KLiveArenaP18ArmSmmu4KLiveStateP23ArmSmmu4KLiveVisibility",
+            "kind": 15,
+            "section": 1,
+            "value": 688
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation8separateEPKvmS1_m",
+            "kind": 15,
+            "section": 1,
+            "value": 52
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation8snapshotEPNS_6ReportE",
+            "kind": 15,
+            "section": 1,
+            "value": 1960
+          },
+          {
+            "name": "__ZN23ZornGpuTablePreparation9zeroStateEPK18ArmSmmu4KLiveState",
+            "kind": 15,
+            "section": 1,
+            "value": 496
+          },
+          {
+            "name": "__ZNK23ZornGpuTablePreparation11outputClearEPKvm",
+            "kind": 15,
+            "section": 1,
+            "value": 212
+          },
+          {
+            "name": "__ZNK23ZornGpuTablePreparation8disjointEPKvm",
+            "kind": 15,
+            "section": 1,
+            "value": 124
+          },
+          {
+            "name": "__Z29NativeAdrenoPrepareSmmuMemoryP18NativeAdrenoMemoryjjyyjmP18ArmSmmu4KLiveArenaP18ArmSmmu4KLiveStateP23ArmSmmu4KLiveVisibility",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          },
+          {
+            "name": "__ZN22ZornGpuTableVisibility4bindEP18NativeAdrenoMemoryP23ArmSmmu4KLiveVisibility",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          },
+          {
+            "name": "__ZN22ZornGpuTableVisibility8snapshotEPNS_6ReportE",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          },
+          {
+            "name": "__ZNK22ZornGpuTableVisibility12selectedModeEv",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          },
+          {
+            "name": "___stack_chk_fail",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          },
+          {
+            "name": "___stack_chk_guard",
+            "kind": 1,
+            "section": 0,
+            "value": 0
+          }
+        ]
+      }
+    },
+    "real_iOS17_candidate_context_bytes": 240,
+    "storage_no_initializer": true,
+    "real_headers_no_host_friend_or_IOKit_shim": true,
+    "original_XNU_recipe_flags_preserved": true,
+    "inputs": {
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json": "7d7657233ee844bed452ed9100578a9db20d27be88ebf6461118569b3b809701",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/san/kasan-blacklist-arm64": "3dd012bcff3115f6fb0436187d0cbdb380387e6cdba57bf08af81b92cc497ea9",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-preparation-report-alias-20261103/ios17-candidate/ZornGpuTablePreparation.cpp": "66faaa58c126865c1bf902b89b8fcc51219923e35fe70339a8e9b5a8b222e327",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/meta_features.h": "d157200a4e0481e11d6b148a049da72ade3206a14c6b77e0c69661c78f2c00b8",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/iokitcpp.h": "09da9be8942ea8ec0f176e304998f408834bf53d4c6f03c91d7195f10e89da81",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/kdebug.h": "63e021288b7e70888d209ffbec5c526f483d39019eb6e68fcc619824435fe9a0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/networking.h": "18f691a09f699bfdadf0c5c78601bda0f5392bd38e4b088ffd0abe4cfce4787d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/hibernation.h": "74e3720b223356e924a95605d1d4e5b5f2828de147cd9a01af5e869efd83b969",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/crypto.h": "f539558eeb8cb90cb31c83651d0a990de9aba2c86b2b0e1dc680ced5a30d3a57",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/config_dtrace.h": "f8c1ac08c61f8115dc74a10c8cf23803d5d1ba6db06dbdad96562c66f60832c9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/mach_assert.h": "a39983b09d4fab2f28a22ecaa9c8da5d4b991552aa9302967aa300d596ceb179",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-preparation-report-alias-20261103/ios17-candidate/ZornGpuTablePreparation.h": "b0d5395c3018bbc783d2d189b0395990b798289db54ef70d1577d7017d741942",
+      "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.h": "f972953ad3f6c7fe67278340165a6c1080dd473858e8b98308a9ae1c298ea998",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.h": "8137491b5ef2657eb362a4f41cf2c2b8d8cb747fc93d7a63e453194d7c3288cc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/IOKit/IOTypes.h": "f79e7bf7b97a1afbcb9023a2bc97d4ec3a969182f0dc36d4b9ccc841196266ad",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/cdefs.h": "a90a8dc578b095f45de82147096c0cefaf1264320e5c6c6d332b780df4b853af",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/ptrcheck.h": "1d8c9764147068de332576aa0e5ec63d957647c9f1f0581014fb522b195cf15a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/IOKit/system.h": "0fb1b02f26511e6fc857a6dbc68e0685c54be8fc7aa268256c00ba9fcbc3652c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/thread.h": "daecd6003e7048356b3eb0f7dd17587b2a7f0e30fd9e0904bb489f3aeb3f5068",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/kern_return.h": "4577d58f74dfbb8ef07ce460f82cb7a45999ad2a0479486df8d22658d4847f50",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/kern_return.h": "160d3b4460244b7f469a34f3030071bd717d2918cb748527c1207ca78310d51d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/kern_return.h": "c06cb329babef0663cd8c86b5e5f545fafc8d8659bb83cef75506281187ef9f1",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_types.h": "fb1d4f5fcd4163f8209289d09f5dab5db615d132bcd853971c73142fd71b1bae",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/stdint.h": "2291ecc66967238af4c871f5a85e25d8c31769ef6c493cadd4601466715e22c7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/machine/types.h": "76e7c59451d996fe674a6fc7e518366609a95875c9b9aec9fd590a3ac138dddd",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/arm/types.h": "83b4738e2536bad884818548d5499c788b63aac572fda43b61154cee85a723f6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/arm/_types.h": "ad7a22ae6c61d7ce8e99c1b61438b99cefca9cf34a1a502c9e9e191d67027d55",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_int8_t.h": "607f6beede0251eb801e763493df26fd45d46eb951e4ff9cac17f1ac951b8cc0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_int16_t.h": "e40d40ad59c6dc98577b2c7cfdba1121ebfee17b29e093cbd10b7936df496d8e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_int32_t.h": "77127195e57f1690402377ddd72e3dcda684ddf591346f08ef4772dddcbbc281",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_int64_t.h": "a2427b34e5e83996bd28d83cec920cf3b82a366af90e767234557bd11fa33a18",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_int8_t.h": "7505dbbdf3ecca2b8e585871ad81c0e67a3cb63c97c47abe73fe262e071a3ebb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_int16_t.h": "9dabbd8280c28416a5ba115355678d2540588df1a7251bd9b4a13e30c309a71b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_int32_t.h": "196cba7a865c086bba457758d3b2605a4c1299c54a758366b7d420a585895f1d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_int64_t.h": "d096eee54a5acc2c3cd5cf71256d69198ada8f8d82cdb0a717bc8ed65650ad93",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_intptr_t.h": "7b45af46d5dc1c1790e726c0eb7c56be27e1245ee027521520a1fdc9ce300448",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_uintptr_t.h": "e435f739013a22883da08b7d8b8819d6fd421756d025b369fecdee90ff40eb39",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/host_info.h": "45903a1cb2b253134ae0482299955aeeab76d4bc3ad066c3e0a50e2c2f1eaf42",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/message.h": "41d875b0dbdf98ad84802792607d91b7bf2fae28565ec624fd8df8cde96a9fe5",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/stddef.h": "a9bf26094aa1fc7493589a94776047cde29bfe6917cdb41c605c7d1cddc73939",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/machine/limits.h": "50345f1ab843fca787a38c552a84177e678d79dab86e714434f94f2546839357",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/arm/limits.h": "9632b8eb7e5a3a6032112574fe1d0d929b826901863c8611f0e8c06323a7afcb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/arm/_limits.h": "b64325f6b5aba08a361b7b8e537df3d8d193538c1d6329a4c4a7e72f5aa63478",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/port.h": "6b48b83b2118ccff0e37410e44de6189bbd3c21ab407aa40a66769491ccc77cb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/boolean.h": "c050da6ed29d186ac403c0ba187031aca3ac32da2b4e618e0d0c8ba1b7665523",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/boolean.h": "a22e0c8c541b9117a86d85ab4a977eda49917a9867b24576f5972b6fa6554f23",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/boolean.h": "03ceda8c88250b93a3bebca92e03dd558e13fe68e83eff6bba5db32f95b48b6d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/vm_types.h": "1c2a4ff4b5843ded602775a447494f353a295015ca8d913a0a13439f4ee28654",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/vm_types.h": "b2deb6cfadc2972a42f698b1822393d240f96c1f91426f4f087e0cffc367225d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/Availability.h": "9f2368b50f303c6f8313010e33323c52f385fe1a8f281746329f7f736a41f1ae",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/AvailabilityInternal.h": "b9a1e937266c181b8c61c6da7853303d811f3eeb2f65f9ea9fa1e97db0626aa3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/fakeroot/usr/local/include/AvailabilityProhibitedInternal.h": "0ada99ebdf23d3337dbd7d2830209f227e8c4607892ae5f7c8c862a4732047ee",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/ptrauth.h": "9a8eb54a418f84216e6c7f0ed0b4206d32917f73015e22e7965ca9075c37bd51",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/appleapiopts.h": "efd9793f56c08917cf1ddf5108b78240ede88a5bbc8977d6fdaf1684b6b01c1c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/base.h": "39ebc0c1f016a9cd24ee8be1f0f9122020e32bf768904cef55270d78b97c305e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/overflow.h": "776965f5343582b345fbe5c6d6b135cc0628d146105639e9339ba53eb69dc1de",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/stdbool.h": "446ec4556c41c5c4c88ec8c895a179111427e403818d3a0422a88f4ae51ef50b",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdbool.h": "48655faf4ebd4ca0af26a1ee8e3e16f8dc68385c9cd550ffb3629320681305b3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/debug.h": "024c763b6905a3803fd7e2fc1b74156402bd062167518db3a4da43491dcc41e0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kcdata.h": "784a0d82bb861eec54f825d60af4b81ec8dd9142993ad9745f4d6273afa2e2cf",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/string.h": "d3719b802853af4f1d11ef1953545eb0f668486f758dd3a4bf4c96ce639e731b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/types.h": "f8b136bb10d56bb604e7b253f1ec23858d0b4ae21fe85eaede0ccc66afdb554a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types.h": "05c2492e48ffb3929b077b1d191b25495361c87773a761951f9b61b4602b2f3d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/machine/_types.h": "f27264f8fdec9f164b4fc2b556f666ed7c5c0e5b88fd9f23db0b731ffa6cf864",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_offsetof.h": "54838992f46ae7c3376ccd32b1a30fc8cd40418a1b0ace6bd220b9fffa128320",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/machine/endian.h": "37f9e1c8599a729e605477a5b6a77cea727fa66816e4585d0dd32e3ba377f450",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/arm/endian.h": "2e6a952f394a135df76d9e0c31c5b42ac266fd2ac7f31a7445932b9ed4a08817",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_endian.h": "14033d0a2bba2f8a018952cd2929811958a70d304dfb5afb7f5237ee31ea1c19",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/_OSByteOrder.h": "17e0812916668d7179e319a0bc52fb4f2d51d737d06bba4a122bcc1d56f4f69c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/arm/OSByteOrder.h": "2f293c0246a66b7ea8acd0c3af286574c29b21a999d055c00a7ed2aa734bc961",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/arm/arch.h": "9c6c2b16a06afddccc63421fb96e0ba9a444051ba4c9e3a3249e1dfa27bc38cc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_char.h": "50e11dbb6152079cdefd9eaf854e3182496130b651142e0fc08fcd1456802e81",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_short.h": "f78b1ac66a04e293df9a08ce2466401f50075a773c5f64000864b9d59ec4edc9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_u_int.h": "85e9858c13fdc4fb614948fbcadec5f5973dbf6874b97464044a3b4e23486978",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_caddr_t.h": "8f3cb6951661925334f0d2b306842b710ba352110234a9f2d688cd79a9848f02",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_dev_t.h": "4ba3d19759544b9f7bf424d2a16a518ff586e31ed968d525440e678cfbb07a5d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_blkcnt_t.h": "3526cf25ca7734bf6bc945c9483727b8c1ab3fde5ad8fb23acad7489e231330d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_blksize_t.h": "4331ba446f9b5930e5da1dc065c97e258672ed0cbec5b3f0816c228fd0198955",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_gid_t.h": "e687ad58c03701c132a02ebf20699c8cacfd34c3a67271bd2a415a5a8e4a9ea7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_in_addr_t.h": "8da608117e441ff6e6b108d35334d7cf4b346b838522f97bcc621d925e0ba7fe",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_in_port_t.h": "cf4b90c7af861346ee46c6b9e5d57cfe20bd62a03b1533ee9a369480ace0bac9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_ino_t.h": "1e067108b372f2c81cfcad28413d6c0d2b9ef21d34fab740c3c8af059deadfea",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_ino64_t.h": "f143d5c0bfea65489ef89a866e96c9065d7ac28d62c0cec36f79d4dd7269fd13",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_key_t.h": "42e8a3f076c5892d7b8ca5594b15a989eb206df5834070bd2b89b1febb3e9913",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_mode_t.h": "7c4261bde41387fc23aefe5dee1e6298ae6b6f5592bca51947fdd9736e0640a6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_nlink_t.h": "7cc46bfc5d0f4238c735ff28bb1a8dcefc26d1f0e52b7098a5c89e68bf87288a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_id_t.h": "fb7255c9872e2a805c206796326e21d47146e22c93c09752126d7166bdaba5e5",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_pid_t.h": "052a6dbbec8e30623c2d33dd373992f6c5d0c57c57ed4949d2b48c4ab0976487",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_off_t.h": "7b07626d71084f1b3220e045089f54fd30f4d736be9cd0449042c5fe411fc569",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_uid_t.h": "d2140a65a17943a857381757c0b73a920f35ade41dc9809437c168be457c276a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_clock_t.h": "e7be094e48f450875288ef68a59409e530dbe2d9449c78ff3d9ea9d654e0e857",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_size_t.h": "466586df6a9fa94dbd17fd65ec89aa8252f6784213508cffb8d5da18f5481842",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_ssize_t.h": "58eb3bdea24b27e6b5fb45e203e476faf2510b5c0aa81a0b45c17b528aa9c192",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_time_t.h": "c0a28cdc5c9c8cf99abea53556895bd8001a6cb13ae6ca9f366955500678b35a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_useconds_t.h": "37c49808a92cc4417181adb1530cc24ca11cc89f064c6c0494a1aff981f92870",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_suseconds_t.h": "d799ffc16cf29b6559b36d879fc7d5fec80ec3c39502eaef078ae9178eeaf275",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_rsize_t.h": "5756d7c08aed7b65fec529bc57eab103986e2340b77396d9db02c4fd89f4390a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_errno_t.h": "ca230b22b22becab1bb191bfe5a8dd4595ea0566f5c8cc9b299eca308ee5a271",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_def.h": "78f8810f1080b28e7857d2b068076ee00912b9a72dbecc470218049f39798579",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_setsize.h": "e3f939c5cb0ac33582de3266dc41e5064878d8151800900b9a91b152167ef6d9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_set.h": "551f6071cb842a0988f529eb3e543abd36c15583ed6d5153b28556d8841b53b5",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_clr.h": "c6f6dbf7f22f218c13bf0714030e7455ac866ca35ad3fb8134c515c54acc0925",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_zero.h": "cc50d427d02466ac54ea805ff363905d861f42a427e34aaffb140992b2d79adf",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_isset.h": "ba75c556025875617bb0064f4e2164a5dae669c41c97801675eeb3e1c56db3e2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fd_copy.h": "52769f18d0c4077216f44d4a4fffc53d621296e62855adde5d79cd79b50f5fd7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fsblkcnt_t.h": "f986ed21599c2e0e1fc2efb8e014aae5a99e9f40d374a3e1af9b7c98ac9815cf",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fsfilcnt_t.h": "e56f6f9b9c48eb7c035d5241a611169cd130a6319a5d179522c818d9d3384cdb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/machine/trap.h": "a7bf4d94e10bebdd19cba7a63be97939b85f17942939cf1ff713b5bd830023b3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/arm/trap.h": "7c67bcba20f1c1a54be563671be9c2348596e43a0ed659d2e100ea6a9285a4dc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/san/san/memintrinsics.h": "626bf1ae82b43b47ca87bd0a4298e18d2c454480c63f2ff8e291991b50da3a92",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/uuid/uuid.h": "50ce8ec9cee87771ff8d7dc668954ff059c3fe4e960d857b5e7c69de5a81acb2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_uuid_t.h": "ba8364ff4aed847f5ca3259e27fc2d1920432d02e8e79c7ac57ec043f1dc2842",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/stdarg.h": "990404c67d712199daaad8d41af1c807417462867b69c82e21fb6a3464f02b81",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdarg.h": "ce6e43d79dc89b50208ecf259b1ffd519f5a78cd3a2c7fcaac6386f376b89fef",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/__stdarg_header_macro.h": "7b3fbcc442af2508f36bb2dc98d9ad2b8a1f5c0f5333394fb2159c8bd5ecd5b8",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/__stdarg___gnuc_va_list.h": "feca975bfdfb254d17458a8e3d51f8ad6d9bdc9fd6287727f0f8b2fb81fcb0b0",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/__stdarg_va_list.h": "81c3055f7033e26e7f53705653bc9d69b5202f25c2692e03b3a4f77ff44a7d76",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/__stdarg_va_arg.h": "274c75a1db86f649439aa3bcc1dead4170725e6f803925c3fc38a2e93307afdc",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/__stdarg___va_copy.h": "f0a8d3c963338173f2d57b2cbc209dde38c90536107b15eb0cf78166d4caee1f",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/__stdarg_va_copy.h": "bb195f56cb08d4cee6a60bd9f62f34466e8ac4f89f6fed043b044cb2f7ead010",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_types.h": "5010893b91204ffc8a202db6275554f437205a6c61f41711b177c1df6c2c5645",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_statistics.h": "c3c28a49f3597c41a968708f4f9fa9f8571afd6ad1ce39661d75a4170063f896",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine.h": "d8001e350d106083f9571ebd1d30ccbae006487f76ea5bd29cef59bb2ecbf7f8",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/time_value.h": "b11b0606d2f5f44bd0fa1728928ff6dd301b42d67d5ab2c035a84be85f1f7b21",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/host_notify.h": "31b3050a653a792d3f40294224d5edd5d0257611b48c34e123ee3296b7bf181a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/host_special_ports.h": "ada5ee89705f3423fd16adbc0a814f9bfbdee14053be7c3110e5e5144d85ec3b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/memory_object_types.h": "4b945587d76ecc6cf363492cb5e168679edbeb6ab24fe9e484862d8c42165af2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_prot.h": "0b0dd01c6819a75724400de9c2aeca1348ecab535674f549f1d4b84cfb35570b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_sync.h": "666d92238e97817a42ff7c2aeca7ec701eef133bf895661399dcaac266bd63d2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/refcnt.h": "c1841db3343cb6acc4cb986220aac1a8cb81d3731ea202068fb667d0ecab6932",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/stdatomic.h": "782e502115fa053b32fe805a9a1191a7a2a7788a52578490617f99c2d99e4d25",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include/stdatomic.h": "728b690f127fc85faa32b9031e3a0019da92f77db92ca91b749571e45617a9ea",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/refcnt_internal.h": "15865bdecad4128d6c2718f3ee68a0dd34420d523b9aa592ea91dc203fd8653b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/exception_types.h": "58612f14b6cebe98e1d0ff43b3c42406381f4a604bc9ae76a4b5cca1a2be9a53",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/exception.h": "50a572de0f7b9ddd7925debb3de372a1535baa0a6955c53e5709cbbf3947be94",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/exception.h": "c91ed8a1dc19e768e93cd0d80c9a4ede236dff902fcfa7df3e677268d2391135",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/thread_status.h": "ebffe87f2b535072fb6d6da945fbcdd6da7e6eab26bcb5383807d34e0299162b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/thread_status.h": "756a3db7289b7cea839f9bd9e9556427ab3c9effa77e552bdc9b2e6e096d2f7c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/thread_status.h": "b60a7ca29ad85c2da1142c929122ad2dd75496cbacd11ec45f685d57dbcf807e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/_structs.h": "410350f04225bf139bd89f1a99418a55734e4ab2101bb93dc301f790a130f59c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/_structs.h": "4102233310cd4124549e9243208b19e3912c787834d07150398a9b6efec9ebbc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/thread_state.h": "c3f5251c26e2bd1eaad3d57df544254e8ce4ffadde120c5394badcf24f9d6086",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/thread_state.h": "ab91af1d14bd3ff1e028709e7d4db215eac0df620ff81ad3aa38ae295a50aed0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/assert.h": "80a2de626d3cee3bfe08d2b2d705002c5be59ffa338dee2f1185b8ab4c34a576",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/macro_help.h": "6bf35433d7fab3ea45dd0e19dd0998f59974bf87b2cf2b661be9d45ab3789d24",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/arm64/proc_reg.h": "ba73bb4e48d59d630d1d86493601355d57457025f03ba96294da48b80208c741",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/pexpert/pexpert/arm64/board_config.h": "07b80a7d6e71ce7538cc9ca62fb4d725872687a7a3484beb91a836e037df7006",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/pexpert/pexpert/arm64/BCM2837.h": "a00dc8b3fdccfb46b04404c9fa920e09473b2874927044543ec391f9477dd86a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/ipc_info.h": "30e7dae3dc521b5394ccc5fdfada8c26b2cec176bbf5bf78ac6d3bae3a9843eb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_voucher_types.h": "0aaabcd2eb7b388e28783241991273be5fdaa0240618e1a2a9ae1a73097a03e6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/std_types.h": "839d581eb7f1b8ac5d74ed9506fd11f49e287e0c2fb39ffc62f9139dffcdf3fb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/processor_info.h": "d96524e982971ed9f369f12247484c8cd956f7aae70e13b7afdc506b80d2f0da",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/processor_info.h": "806acb7cca13b111b07ca0aee27c12e72ea264d7e9220ceaeb2c24889129fd1b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/processor_info.h": "221c68381baa90adc77aff8e73cb374f9818534ed6f1661ab1ac1313d3bbb7c6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/task_info.h": "edcb45dcb34bc914b103c068884edb91d91c26df532217fed6b3ce1f2f8f9748",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/policy.h": "a457c6acb170fab0e17c517959c01098c9625960e1d077d232a89a5b288595b8",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/task_inspect.h": "686e81a4c1c01904b6ce238d98341bc9652dffe7df3e78c2814f12957de04471",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/task_policy.h": "3f11a39e36bc01421d747e416c9ecdc4a7ba53401d9a459c2ad2421aeb8be08f",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/task_policy_private.h": "ea0682963b62eed6ef17b4bb5e4e1bb32ab4bbf5a343a782fc897f057d223132",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/task_special_ports.h": "1229346aa214a879cc8661c1e97752a2a8722b1734add4b43089c834731c088a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/thread_info.h": "0248ce5526e6239e2e6ee824b358a60f74dff68d81a5ff912aea72e15d54440b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/thread_policy.h": "16fd7bc787aaab51fb76a580d4c18d090936b0b9a4c14ec7d395cace5431ab8b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/thread_policy_private.h": "745d86aaf62b50c495fe946e3387f0b1e5de455a911d7ef75896d840685a0dc0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/thread_special_ports.h": "e1bede553979e7d79b9035c351d303a68f1d0384de5e8098929f07d04f34beb1",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/clock_types.h": "eadbcec07f37d0f7c07dc4c2f7c3a4c5c6949bcdd54c440b484e69dee55f25f0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_attributes.h": "b00af7534a5025e955c6dec28e8ab2085f652fc59d000f45cf1f9fbe39579222",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_inherit.h": "e17decc7bed87d828afbf77199b6263d12c1d5219f0f9c5b6600d81d6463d266",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_purgable.h": "d63a19a52f2e9cd3c0b7528111f3ee52609ea52b72f28158c92cddff79826c26",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_behavior.h": "d66c8ece3199e00a7de189e4af1d506d083ad76e98b57a2e29797f145037382d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_region.h": "e137d05cf33d62a7303fd5a3f62c6963546fcffbc8fa4aeca65a4d06fa58667d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/vm_param.h": "574cf089b3d18d6334da1339692ffff16d15d5064692af27fc0a94042603a2d8",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/vm_param.h": "1ac7f2f3b595475cdf6593c259b60f2d9294965c87e15fcbde9f9e2ba56d2cea",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/kmod.h": "a8fcc1de6620c9484ff96f699d20d37e2b1504615f2acfc547e8f0d14198a2f7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/dyld_kernel.h": "1fceeeca56348b1aad6e6c97d5b12c5616094459fad45676b0bd57cb603a9c83",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fsid_t.h": "63908a097cb2628d6d652317974e416a0df39e46b1a9a0ab0a10b83ea8948a2f",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_fsobj_id_t.h": "f411229eb775e55326d5f3e1e00c822c97fff57e474e5f66574aa1572d67259f",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_param.h": "8fd18ed05b56d29bc485b1d014db681502de18100d5978d3da15398bd46b02c3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_memtag.h": "a6eb7c283eb20c8ffacdcbb3bf5b43ad12eaa3f3a80856446739e34989e658a9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_param.h": "eb32eacc91c909cdc66a60a13f79c16cbd7b79cd33aadc9d1772fe71800d8756",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kern_types.h": "6f4328fcd0667a189ffda5e40441cd457409bf8727cf016b6790edf8324b510b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_kern.h": "d955e3a12bd1a44e56e60ff4b12385dd30110d1f55e0977db290dbaaff35e035",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/locks.h": "9fe6c3169d91077f51c9864f3372f87981763e958b95934f91a82d5d7ddeab63",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/machine/locks.h": "0650343b50c27f44e5a3f68ab742e2acdd3aaddfae50a107c4f554832120d08d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/arm/locks.h": "eb50083f6fd0c6c3a208321eb3d0554dbcf02f2adaf247f1c171bd48975ba3e7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/lock_types.h": "62fc2f824e5f650df19b6327cb3a09d6f86f7c8797fa993c34620f5b2131e04f",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/lock_attr.h": "f5235929a5c9456a22d2eda390ee3baede014860772af8795d07112e4e038bf8",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/lock_group.h": "4f02514cb8a8dbfba1d08038cfa792c3d1546f5761807b3f5f7bf904b33c3b50",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/queue.h": "c7b422e473562a7ecf5345bd4f739f7cfbfbcf4c7906fe7d6092675f4c12a5fd",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h": "1eab0c0f02f3101a26c03b85b09d78784dff77f62d4fc3c5acc2c6e52fa5dd06",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/section_keywords.h": "d191b5e88f9d8418558fe4a12491dd6793553fe889f1ba6e88c577772ca06298",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/lock_mtx.h": "e22b95131cb1650c012162a28ac45780ce60765fc89cff5786090cf13753ee31",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/lock_rw.h": "95b636c65ab5352a540e06bbddf430ee18b1c7b4c2067301c8813401eedd8d2a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/ticket_lock.h": "148cd1b871b56938b8ee89a6fcaf553527c65038fbadd6d5a3295af0f67754da",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/counter.h": "0c588f39122e61bfc7dce5f70c38bed6a49659dccac84980f5c0d1d00e227f6b",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h": "98c6c4dc7cb8a93a053ff287cb28630cae0d2a55536bd647f9c9c1e13f19cbb3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/zone_info.h": "1f919b1ca0f8b4f6ea4f767701d50965c2a6d2b3e8bafca8f5ddb05f60c93cb1",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/alloc_util.h": "6ed8f292e73da669ede50e3cb83bb6c95380e4fae0914caeaaa18a2da2d18323",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/cpp_util.h": "e957f06cfd6e27e6e5ed04309a774c83222027ec1c644bbfcee693ffd2ac1861",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/os/atomic.h": "1d1e9040d4433cb265abd88a7cd5a5cf576e6652667f2fae5839b1444956cd08",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/cpu_number.h": "8c660625c90fb1d6b36cfe2fb3aad4e83872e12b896a3f97f648483cd7bc4fb1",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/machine/cpu_number.h": "9b85c05365b8cf50ddce6724444afb6be9a32523e3dd8f56ba10a45e3453a900",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/arm/cpu_number.h": "da610f5bcb8ff05bcce9aaa2b77f7a605a39095afed1036273b853a2b213960d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/percpu.h": "6d47bb7fb54989487a7773223ded51ee97050815b61288ede32c0995839812e4",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/priority_queue.h": "673ab1518e2812d69d72e528a614361b40dbe6b382fdc51fe69e3f9f92e45076",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/IOKit/assert.h": "d67228bd894e89517c03fb73fd8993f1b7bf2b055eeb994fab3fe1799a86e6ef",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/task.h": "5920aeb0d164667466d12757fe76d3dd8885e80fbe0477b1be4674715124d98c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/task_ref.h": "b0f722ecde6c46b489ef92ffbeb7a95d4c9ab6464b1172b72cae50d6fd5bd665",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/btlog.h": "2940b16fa48ee24e2d7c28f8eaf88f4c3f940c8ca4202d383acc83f913572da3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kern_cdata.h": "e1a7f8b8f03e98f9c06411fac78e6cfa73e5e9de60088a771377c51a3081fb56",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/zlib.h": "a3aa40faa1ecb75e48f7d384fbbe281aa01d126e73a3afa29fbbe030f5c2303d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/zconf.h": "71d589d47bebbe0f7ce5fc05210faf1e993d9622e85c882439c32456ff12d6ed",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/sfi_class.h": "b9ed3dbd2c9f30fd7cfcda12be73b2d2753d566a7ffce654db3346ac0a165ab3",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/cs_blobs.h": "7cd21aa6574bd8b934488da8391eb188599873568e486c4a0583c0cd7e0750e0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/recount.h": "c3650c0f1ece4595e4ef7b3ec2c39f8ddd03f7bb3e2321f13c7f6e9c63ae6f72",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/kern_sysctl.h": "8b342563abba376ebffb13618dea13aee0238fb676af9a119aec2aa040cc2e7a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/sched_prim.h": "44d7b5b2df700913c933ae7f22e3bf9131410273e56a103adfe1b508b2d5c1ea",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/clock.h": "a2657effae6e918f73f815d9c53e73054cd0a716a38a3ccd77b71050e957afe6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_time.h": "2d67a10454e4531fd3b4b9e8d32f2d25402a609581df6fd2e98ff0851cd3f614",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_time_private.h": "5851df05aacc2651418ee83aaa0a1d808a1f22d49a53f2a74abd9f9110df1e9c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/block_hint.h": "432fa16a0149dcb3136c7bcf48d5c0e180b94abae34c19d94257d93dd63e7d31",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/ipc_mig.h": "87a9f61cbf25277030e4d65ca0fb84110f81303cc3b7afea81d8d00aa2cdb596",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mig.h": "f28d4093d58f9ea2e8f4b8fdc0a4d34793bbca0f963a15f54b5bb96012fde380",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/kdebug.h": "71ae39f5e1ddf7736a63255ef218c9e1d31ccaed78fd9472715687c3e133070f",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/kdebug_private.h": "406203682421b91e3242b0be38eb38f710fb0bf5629bdea841de451304cf3593",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/kdebug_kernel.h": "fa21c615081cef0d5f45d765362b9f20b5b9440467d0bba218c69a998e531b12",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/libkern/libkern.h": "b5036cd85a9d75e56189d6f80336a818eab16e776cd3b854e494a1900f13cc3d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/crc.h": "ee72e1c66e7fb88760ec8970354045554f5b2cfaef677f066cf369c41b82c623",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/libkern/copyio.h": "9eaba5b823e52ac4a1ba9c95b4181e8d8829a6226795015b4bd2576f759663f9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h": "1c44d54ce13549d24fb11fb31fafe3678be43daf15e237b5382dc4dd625afa0c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_interface.h": "7cdd657ba2f518372b279cdd9f869ce668362984684d69d24e200f7a840f5f63",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/clock.h": "a585e3cd0647600450d10cbd9c04dd8b373e71bcee3ff0a6071521f2ed0d21cd",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/ndr.h": "2fe22ecac00808ca9c927748c58f51844fdb3b70f4d0f95cebe1e7fe15ff400c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/OSByteOrder.h": "d17d3304cb999d80a98165490aa38e0a550a8a3fa914b764e906dd68681bd3c9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/notify.h": "27e62c4585f9b23413df9bf0ce50cf777d619e70d99a63f7132fedaed98b3343",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mig_errors.h": "5f9b82c31996cb2929d7bca5acb91ff5ffb1959e74da7e47deef1e25033a89c6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mig_strncpy_zerofill_support.h": "20937df811221e2b01bed456cd369a326606ff6f020f9346941f4a688a77118e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/clock_priv.h": "86a9c286baf87975efaaf36326aa35b4e3819d063c62cfd735fc4778d7007e1a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/clock_reply_server.h": "7f28a0ea82331d3110679065a4ad869ee13cec49f57ed342a4398c3e7e8be1c4",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/exc_server.h": "3fcd2e12e77ff2e82cac71098e5d33393fa230f8a7770e1f54a60ae9646f5843",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/host_priv.h": "d2e965e9026f2bf42d3ec05530fd6179e9c49160b4e783d767e1d73937ff0016",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/mach_debug_types.h": "40fd2fb8998d29e2dbfaaf4ef8540bdebb3e1ebae749b6e82b1d511c8f5113bd",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/vm_info.h": "6fff640b0422da5f051f6373c053a4bc56b800e79fd58baaab50ad3b76fb8892",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/page_info.h": "9c7143b9e06a8b94cc27d98374275699f930ba286e6cbe7193f65d06930d08e6",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/hash_info.h": "43856caea0a9d8c799083e6ff5f2f1806e18ea66fad8e657f83fa4df77e94078",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach_debug/lockgroup_info.h": "a009f5856efa59f9e6010447e4b9f38777ff2c624af23abb5dd028a35e99df2e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/host_security.h": "4432dde9bd8a5a5dbad634c0e18d4dcba3d3ce828aeebbf1245fd0ebc0db1fd0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_exc_server.h": "da4e4dd7e3a98d91a668f84555ed31b83dda0917a8d894e3b9bae946f62bccfc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_host.h": "69f14b0aa0225a1d3894359dc789a1922bf318865d1cee3f419ae37cd4732cf7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/mach_port.h": "81111de0a5bd20e3234f93c7e30d5ca4a0bfdb0014ddadec1508edf5d61b46a8",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/notify_server.h": "e0d7a13f849c48c543780d79024e2a036e73212a5b3fcfdec0e02ec19002f413",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/processor.h": "38346be85c982b3338d8b010b97e64971fb3aba669fbb431889d229b5a75e545",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/processor_set.h": "dd9d122040de1765f297bb62724666cffb2df51ea9ea49486616133c9bde2102",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/semaphore.h": "7fed6106a3e3a677a617b1e2e35f083b97d3067b8c80146aa3e5d83bdc41190d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/sync_policy.h": "f6eefc41523b41dee1bac5023b5df3018174512fb265f7ce018ba9b3098bbcd2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/task.h": "8daecfbf4fda79cd4665dea30f40ce15a48726b119f1c52086ad3f74f475014e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/thread_act.h": "76125ae98399ee942cc83c1acc2433194c0658823776faf77afad335350fdca9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/vm_map.h": "7a7cd590ff9042f5a816dbff9d4a623673c531e37cd735f80aec3f66c4b03ddd",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/upl.h": "eb71ec907e7cafa8aa30b7e38710effb6bdca874acc818b4fe44721153e5da82",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/pmap.h": "55b335cc0887eedd378297777bd677719a7cba52df47b8e4fb15cb8a776e9455",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/trustcache.h": "60a71bb9b8fc7f1ee2d922c35acd04b606b7a6664cb4c0312f2293b5b80793e2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/CoreEntitlements.h": "62a7c7be31ce621feafa48e7bbc425d0700c6a97c9b628fffee0cfbee05df9f2",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/Errors.h": "828289945e92fce84c21361793389c5e5b7b9bfc9c9b19d3c9ecced1de62b7ea",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/Result.h": "593a15b66a7eb50e472429f65714c7c1e1534ddbe0d4af93a83d29f155d8bf92",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/Runtime.h": "9c1b1b6f9a9611b73f6f7d14ea6957432f71e7e043a1774b5fc5c1898cb6b179",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/Entitlements.h": "9f69e97a9051e3eb176c6abfb26a877efaac37b3863a6ac308247f1661b9ef18",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/QueryHelpers.h": "7b7cbe31a705edb33d94197a6485ab22844efc3b3701755e3c827306c73159f9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/Serialization.h": "633e568105037d86ef436b3c229efab6833f7dec06a95b59598a4105079988b0",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/EXTERNAL_HEADERS/CoreEntitlements/Index.h": "cf1b8450bb52c807615d6bd0a12154dc67925841ca48c14231f51b06835af739",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_map.h": "aa356431b157c5b73ab4404b7bfb432e40a4773393dd12586a857760c398d76d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/sdt.h": "801a8b5ccfd9ec3c069a4c318f26cedd6611df0a4e0fc9565d1cf1f432756660",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/sdt.h": "14ce6242f160de3837971d283c5671468f0070d69b329f48269dc4d68200132a",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/machine/sdt_isa.h": "f832143587113bde3dd0f22ae4d1633eae11fc3033cde1c7e9a60b7129fb7fb1",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/arm/sdt_isa.h": "d1c70346443402e2e33603025bc61face4d7cc1d6513d9383f40d1ad541df2f5",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_protos.h": "27ff0a0f98d452c3fcf9448aee6bcc6faca942508e876ca003c2a3ff9aaf442c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_options.h": "609160dbce41542bd53643a3eabd8a8ba6bad396289796069de7e8da1d883702",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/IOKit/IOReturn.h": "4767dd8a847d4b7dcff0b74c7a67013f0462f3ea6313e5a483f49fe046f93ab1",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/mach/error.h": "dc2640f5c3a348c61c0a31644f9208fc3c05002e3659ed03461239c0f8e92728",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/OSTypes.h": "d69bfc819b4c2974d47feef84a9e02b91d723f0901db89e1685d0138a0494f08",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/bsd/sys/_types/_os_inline.h": "0b4aa055199f1aa01485a7951a191aed5e3c8377be334e9a9e928988d52d1409",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/OSBase.h": "d3d2697a914bc09d7542651866598c5ea8eac1a6e7a089b1b9573afd5edfd345",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/device/device_types.h": "1b9abf6e3e65537b386db22d315b8432406150e2bd9cc10f753f143c85b191dd",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/IOKit/IOMapTypes.h": "b1f69f417aba9a7bb08b39299b907da369a0d224f23a25a167809227393770c7",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KLive.h": "7532ad419d630dd308628e60746860c992499474d14237f3f39e04e20e0722bb",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KProgram.h": "171900c3ed400b805c3a1587959f66bc4a19db18aedc8111e862651a90bb8d8f",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KContext.h": "c842e78f37eab2e7cbba28cb89f4b993d9202503e75fee9e49a871101b936e53",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4K.h": "e25063b9134afc7eb79e7c030bc2858608cf0ade5da714d5dfd600fee5007e8e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoSmmuMemory.h": "d2988cc8fe670e569dd14d9556924784994782b6f9efdc1715d2ab281baf3b90",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-preparation-report-alias-20261103/ios17-candidate/storage.cpp": "4fa6d61ef7c1e5f4f68e8ed94fc8bacee0128817f616fdba16b2e2dbe5b8cce5"
+    },
+    "selected_component_or_caller": false,
+    "compile_only_ON_not_executed": true,
+    "no_native_getter_or_prepare_or_provider_executed": true,
+    "target_objects_not_linked_or_executed": true,
+    "hardware_qualified": false
+  },
+  "static_population_order_verified": true,
+  "no_new_native_getters": true,
+  "public_Report_fields_unchanged": true,
+  "private_context_layout_change": {
+    "original_host_bytes": 168,
+    "candidate_host_and_iOS17_bytes": 240,
+    "delta_bytes": 72,
+    "old_profiles_not_updated": true,
+    "requires_independent_integration_and_consistent_caller_storage": true
+  },
+  "no_Geometry_or_ephemeral_callback_output_retained": true,
+  "all_native_prepare_getter_bind_callback_paths_unexecuted": true,
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-preparation-report-alias-20261103/preparation-report-exclusions.UNAPPLIED.patch",
+  "source_patch_not_applied_to_main": true,
+  "old_child_visibility_candidate_not_composed": true,
+  "source_checker_sha256": "cea4d64ce7acbbc5554bb4fa429d71a1cd4a9f42adf75bb04ca7ca95d9834230",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "compiler_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+  "review_document_sha256": "af4733c85b42a53cc2fab49041a7966afbcd5654e47d7a299b6538e1f644adbd"
+}

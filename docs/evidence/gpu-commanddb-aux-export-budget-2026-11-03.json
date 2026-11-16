@@ -1,0 +1,52 @@
+{
+  "scope": "new output amplification regression only;synthetic offline files",
+  "new_refusals": [
+    {
+      "case": "actual-before-accepted-amplified-file",
+      "error": "aggregate AUX export exceeds offline output budget",
+      "peak_traced_bytes": 3159
+    },
+    {
+      "case": "one-byte-over-budget",
+      "error": "aggregate AUX export exceeds offline output budget",
+      "peak_traced_bytes": 2783
+    },
+    {
+      "case": "aggregate-across-slave-rows",
+      "error": "aggregate AUX export exceeds offline output budget",
+      "peak_traced_bytes": 3095
+    }
+  ],
+  "exact_8MiB_AUX_boundary_pass": true,
+  "within_budget_output_identical_to_preimage": true,
+  "mutable_input_preserved_by_immutable_copy": true,
+  "guarded_CLI_exit2_without_partial_output": true,
+  "CLI_stdout_sha256": "82a726cf17044dc3ff20ed14c8713e213f690c1aecfc166707e0b5d7ab31c1fb",
+  "CLI_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decoder_sha256": "cd1ba2fb032db26d0eded95ba3013027e7ba07720850fd3026f280749050d24c",
+  "old_suites_rerun": false,
+  "driver_or_native_target_recompiled": false,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "before_reproduction": {
+    "source_bytes": 75000,
+    "entries": 256,
+    "materialized_AUX_hex_chars": 33553920,
+    "decoded_before": true,
+    "overlapping_AUX_not_qualified": true,
+    "issue": "Small valid-extent file expands repeated AUX ranges into33553920 hex characters despite bounded input/count;maximum4096 entries could request536862720 AUX hex characters",
+    "original_source_sha256": "e38e164598552f8f72c6f0ab018695f929d4698194b0fea69d88356d4479657f",
+    "synthetic_fixture_not_device_capture": true
+  },
+  "source_files": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/decode-zorn-commanddb-file.py": "cd1ba2fb032db26d0eded95ba3013027e7ba07720850fd3026f280749050d24c",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-commanddb-aux-budget.py": "b0f2ecf088719f54fb95040ede1260f3540dc9297d9ef2df547fc2802bc8a0dc",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-commanddb-aux-export-budget-20261103/decoder-preimage.py.txt": "e38e164598552f8f72c6f0ab018695f929d4698194b0fea69d88356d4479657f"
+  },
+  "AUX_output_budget_bytes": 8388608,
+  "maximum_AUX_hex_chars": 16777216,
+  "initial_checker_import_failure": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-commanddb-aux-export-budget-20261103/initial-checker-failure.json",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

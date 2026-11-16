@@ -1,0 +1,56 @@
+{
+  "recorded_at": "2026-11-13",
+  "assessment": "K80 iOS26 userland Metal and Turnip offline integration audit",
+  "device_accessed": false,
+  "userland_artifacts": {
+    "metal_app_service_candidate": {
+      "status": "independent-normal-IOKit-application-Metal-plugin-linked-offline-unselected",
+      "plugin_sha256": "1115930fe4591e99c327c57293394c63c681cc0d84412fe4a27b32149983a685",
+      "turnip_sha256": "a767f6360d59a7d78ad9e58465413196c4569f225b80a1af43c8ceb4407a8b31",
+      "bridge_archive_sha256": "a98a52c93272abe25d6f1843168525d678694c5f3ca49cb825cedd6a3649b7ea",
+      "runtime_id": "bb0835e46522e8edead5296a7714c3b7",
+      "installed": false,
+      "target_executed": false,
+      "automatic_metal_discovery_qualified": false,
+      "application_execution_authority_bound": false
+    },
+    "metal_complete_reference": {
+      "status": "complete-reference-graphics-stack-built-not-K80-qualified",
+      "architecture": "arm64e",
+      "deployment_target": "26.0",
+      "kernel_abi": 1,
+      "plugin_sha256": "d8085e39ed4c1dafb4863dca2d4eec73b63e2c272dc9c3364c4f7f497f8b5e9e",
+      "turnip_sha256": "ad57aa249fb68fd325fdb817ee9037f74b490d1120f1feb5e87791323217a5b0",
+      "bridge_archive_sha256": "a98a52c93272abe25d6f1843168525d678694c5f3ca49cb825cedd6a3649b7ea",
+      "static_validation": "Mach-O, dyld dependencies, exports, undefined symbols, and code signature passed",
+      "hardware_verified": false,
+      "device_accessed": false,
+      "installed": false,
+      "k80_board_startup_connected": false,
+      "full_k80_kernel_linked_with_this_bundle": false
+    }
+  },
+  "kernel_surface": {
+    "service_class": "ZornGen7AppIoService26",
+    "open_type": "0x4147",
+    "kernel_source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-runtime-task-authority-forward-v84-20261113/direct-runtime/ZornGen7AppIo26.cpp",
+    "metal_plugin_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-app-service-candidate/NativeAdrenoMetalPlugin.mm",
+    "source_contract_matches": "plugin selects the same service class and open type; kernel exposes NativeAdreno ABI methods behind task/client authority checks",
+    "startup_status": "maintained K80 root still does not construct the complete ZornGen7StartupGpuInputs26 owner graph or bind application execution authority"
+  },
+  "cpu_reference": {
+    "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "preserved": true
+  },
+  "gpu_candidate": {
+    "latest_kernel_candidate": "v84",
+    "status": "offline full-linked; not packaged, selected, booted, or tested on device",
+    "gpu_discovery_allow_boot": false,
+    "next_missing_owner": "actual root-to-startup authority graph and all-master GPU/GMU quiescence owner"
+  },
+  "limits": [
+    "The existing Metal and Turnip artifacts are build/static-validation evidence only.",
+    "The source-level service/open-type match is not proof of IOServiceOpen, GPU submission, fences, rendering, Metal discovery, or display on K80.",
+    "Historical v59/v60 GPU real-device attempts remain the only recorded K80 GPU hardware trials; they did not reach the iOS lockscreen."
+  ]
+}

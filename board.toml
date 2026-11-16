@@ -185,3 +185,11 @@ artwork-display-gamut = "sRGB"
 
 [adt.defaults.u32]
 sleep-disabled = 1
+
+# Official fixed packaging entry. Default17 baseline remains selected;the26
+# source archive is not advertised as a generic release profile.
+[package]
+unixnu = "../UniXNU"
+
+[package.defconfig]
+"ipados-17.7.11-21H461" = "zorn_union_defconfig"

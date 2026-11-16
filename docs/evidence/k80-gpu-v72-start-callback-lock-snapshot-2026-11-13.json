@@ -1,0 +1,58 @@
+{
+  "title": "K80 GPU v72 start callback lock-order snapshot",
+  "date": "2026-11-13",
+  "status": "offline source/build candidate; unselected, unpackaged, and unbooted",
+  "parent_candidate": {
+    "name": "v71-map-bound-start-owner",
+    "kernel_sha256": "958b8f02ea07fc08fe1b8d3fbdc6de905213f5470eec64ebc3167cd466e3f218"
+  },
+  "change": "The BoardOwner GPU start callback now snapshots retained InactiveOwner/RegisterMaps pointers under the BoardOwner startup lock, drops that lock before checking map/provider identity, then reacquires the lock and confirms both pointers are unchanged before continuing the one-shot owner-state checks. BoardOwner retains the parent/map references after successful MMU startup; the map check itself revalidates provider claims before and after its protected identity comparison.",
+  "compile": {
+    "translation_unit": "ZornGen7DarwinBoardOwner.cpp",
+    "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v72-start-callback-lock-snapshot-20261113/ZornGen7DarwinBoardOwner.cpp",
+    "source_sha256": "1f461592c07ba6459c74f14dbe56be3ec6fa80bdb4d8507bb51eec3fe92dfd2f",
+    "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v72-start-callback-lock-snapshot-20261113/ZornGen7DarwinBoardOwner.cpo",
+    "object_sha256": "15ab9658a5befa26bff791e403037de041a89032bd95946bfbae4094acf06cd0",
+    "exit_code": 0,
+    "warning_count": 3,
+    "warnings": [
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+    ]
+  },
+  "full_link": {
+    "command_record": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v72-start-callback-lock-snapshot-20261113/full-link/link-command.json",
+    "parent_command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/full-link/link-command.json",
+    "filelist_sha256": "fb76a362906291585e644e75f565d7302e966bd6f165c83702de8256b3fc0630",
+    "input_count": 1397,
+    "missing_inputs": 0,
+    "candidate_object_replacements_from_v68": 4,
+    "total_object_replacements": 46,
+    "linker_undefined_diagnostics": 0,
+    "nm_undefined_line_count": 0,
+    "linker_warning_count": 10,
+    "linker_warnings": [
+      "ld: warning: -segment_order should list all segments, __PRELINK_TEXT is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_INFO is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_TEXT_EXEC is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_DATA is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_DATA_CONST is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LLVM_COV is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LINKEDIT is missing",
+      "ld: warning: -segment_order should list all segments, __LINKINFO is missing",
+      "ld: warning: -segment_order of __LINKEDIT is ignored, the segment must be ordered last",
+      "ld: warning: -sectalign reduces alignment of __DATA,__bss from 16384 to 4096"
+    ],
+    "output": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v72-start-callback-lock-snapshot-20261113/full-link/kernel.ZORN26-CURRENT-INTEGRATED-GMU-IDLE-GBIF-HALT-V72.UNSELECTED.macho",
+    "output_bytes": 30509384,
+    "output_sha256": "98982ef77bea728f305afd2b7b9b6574cdf12a3fdf9243b445e2a42e2c3bdc00"
+  },
+  "limitations": [
+    "The actual iOS26 root/board startup source still does not construct the complete GPU authority input graph; the full link reuses the existing root/bridge objects.",
+    "The callback synchronization change and exact source-level provider/map identity checks do not demonstrate live provider ownership, scheduler exclusion, DMA, GPU execution, or Metal output.",
+    "No package, image, phone, or partition operation was performed. FT3683 remains paused."
+  ],
+  "tests_run": [],
+  "hardware_operations_performed": false
+}

@@ -1,0 +1,90 @@
+{
+  "version": 241,
+  "date": "2026-11-16",
+  "status": "offline-source-full-kernel-only-not-hardware-ready",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498",
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/full-link/kernel.ZORN26-METAL241.UNSELECTED.macho",
+    "sha256": "f86ec1c0b0518371f8c565f364d70b552735e50a806256c8cb54041640a9b013",
+    "bytes": 30985272,
+    "inputs": 1398,
+    "replaced": 24,
+    "preserved": 1374,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/full-link/exact-inputs.json",
+      "sha256": "fcef09232fe6c9c72ae35fe96fdaa72c5645914913a5c9701e1c58fb2a7f8baa"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "IOUserClient.cpo",
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "debug.o",
+      "houji_recovery26.o",
+      "pe_init.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "193e5f01df3b0481412a980f4e7c562401762af53ffe2ea051fee11b66f5fc0e",
+    "application_probe_qualification": false,
+    "Metal_probe_candidate": true
+  },
+  "functional_change": "Reuse actual application observation nonblocking snapshot once at terminal into static POD;format existing scalar identities,session/method/return/close fields in native paniclog;omit request key/pointers",
+  "source_inputs": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/houji_recovery26.c",
+      "sha256": "412cbf55cfb1585e651282dbe8512b8315f22d464253bb56db0645aeffa95a89"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/ZornApplicationObservation26.h",
+      "sha256": "3465ab82b7a7334da265455a294a69c9b998df6258f2d0642f3aa0da27fce25f"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/ZornApplicationObservation26.inc",
+      "sha256": "b4cf91414c5870ed2c6ef4398d4da4bfe8d65e96bb9fdb85d5fc91a54b816f0e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/ZornNativeReturn225.h",
+      "sha256": "0184e635160a8cd1153d6d6a829378fbedad78489edd3a009fa6309752215b6a"
+    }
+  ],
+  "tests": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/terminal-session-host/result.json",
+      "sha256": "03c2579971becb5c9793144490eae6f4c4238c1ff6b864f1167a20248d7d728c"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v241-terminal-session-8eae8662b4894169b58c2c2d773cd498/full-build-review.json",
+      "sha256": "8d6114a1813657cc4311d9bd43ad92a77971f79e10cb0c190984ef2392dea4e8"
+    }
+  ],
+  "hardware_access": false,
+  "remaining": [
+    "Review new terminal helper together with complete actual terminal branch and affected source checks",
+    "Strict parser/capture for APP241 numeric fields,unavailable state,duplicate/corrupt/truncated envelopes",
+    "Build and read back complete isolated boot package;do not bypass old source review/ready gates",
+    "New fixed receiver-first scope/ready/claim and source-binding/negative/PTY/check-only reviews before any trial"
+  ],
+  "risk": "Added formatting and static data alter timing/layout;offline success cannot prove hardware panic writer or root cause;nonblocking snapshot may be unavailable",
+  "GPU_PAC_root_cause_known": false
+}

@@ -1,0 +1,26 @@
+{
+  "status": "K80-rejects-foreign-GPU-service-and-userclient-factories-compiled-linked-unexecuted",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/legacy-gpu-service-isolation-70ef38ff266f45558a00b6fef74c819a/RedwoodGPU.cpp",
+  "original_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/RedwoodGPU.cpp",
+  "source_sha256": "9d139b8d6a489ba9bf67d19bb33431a2bd0cb5d970adbc1cfef855c6468a95d5",
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-legacy-gpu-service-isolation26-70ef38ff266f45558a00b6fef74c819a/full-link/kernel.ZORN26-legacy-gpu-service-isolated.UNSELECTED.macho",
+  "kernel_sha256": "710da1440948c826fdb5f8ecb1b9e17938077905808a869e17e36c20b48818ca",
+  "inputs": 1392,
+  "replaced": 1,
+  "preserved": 1391,
+  "compile_warnings": 0,
+  "undefined_symbols": 0,
+  "legacy_object_bodies_or_SHARED_API_removed": false,
+  "GPU_or_phone_execution": false,
+  "date": "2026-11-10T08:00:52.947837+00:00",
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-legacy-gpu-service-isolation26-70ef38ff266f45558a00b6fef74c819a/actual-service-isolation-proof.json",
+  "watchdog_source_context": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-legacy-gpu-service-isolation26-70ef38ff266f45558a00b6fef74c819a/actual-watchdog-smc-context.asm",
+  "watchdog_actual_function_id": "0x86000007",
+  "Linux_SCM_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/firmware/qcom_scm-smc.c",
+    "sha256": "eba2b1d6cedbfc9f77bf4fb61441e03faa63071e6c8af4ada3e6088f079506ff",
+    "finding": "Normal-call serialization and atomic/fast-call treatment are distinct;this does not grant K80 power/security or prove all callers excluded."
+  },
+  "full_goal_complete": false,
+  "next_action": "Implement the real K80 SCM calling-epoch backend using actual normal-call serialization and retained code/context;preserve independent watchdog/PSCI fast-call paths. Finish caller applicability before issuing a grant;current platform direct-ring entry still requires real power/security/SMMU/ICC inputs."
+}

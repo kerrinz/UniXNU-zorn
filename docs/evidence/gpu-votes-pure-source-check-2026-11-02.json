@@ -1,0 +1,49 @@
+{
+  "new_cpu_schema_refusals": [
+    "multi-reference",
+    "unknown-property",
+    "short-frequency",
+    "missing-level",
+    "duplicate-frequency",
+    "multi-SKU"
+  ],
+  "actual_K80_base_source_refusals": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+      "sha256": "b082a6b8813d392b6fdb554ed46212a9b064a7399f341dd2910b06819f08f511",
+      "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.dtb",
+      "sha256": "74b702105990399697b7d38def4ab3931a5ef79e20f0a0cc8cc9fc2c865eff52",
+      "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.dtb",
+      "sha256": "4c87e7fcb971592ae7f9f34d978b45d0801bc0f6dbc911dedd7767c5fc5f2bb6",
+      "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.dtb",
+      "sha256": "ed761aa6d7e8623792c75f20693a97407974ee2445254e725ce202a8f0ffaa76",
+      "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    }
+  ],
+  "pure_function_executed_without_open_import_subprocess_capabilities": true,
+  "prepare_AST_unchanged_and_not_executed": true,
+  "generator_module_not_imported": true,
+  "previous_generator_repair_not_composed": true,
+  "apply_reverse_inverse_exact": true,
+  "source_sha256": "dfb330a56d990eb71ed60fd73f056fbcacca0a5533e6f011f7ee85286a6157ba",
+  "candidate_sha256": "cda93bf6896e267dae0376526866b7d9be91c4577ad19f9b4973cd6966635295",
+  "policy_headers_emitted": 0,
+  "driver_patch_count_remains32": true,
+  "old_suites_reexecuted": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "checker": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-votes-pure-source.py",
+  "checker_sha256": "c1497e54c2e17e59c3377c57a16275558d96277017bba1d72b94544649a669f9",
+  "scope": "Independent UNAPPLIED pure schema entry against exact original generator;not composed with previous preflight-order patch or32driver patches",
+  "limitation": "Shape/refusal entry only;not K80 policy or whole generator validation,default prepare path remains original and is not run"
+}

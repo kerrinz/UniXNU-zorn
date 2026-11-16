@@ -1,0 +1,51 @@
+{
+  "status": "actual-RSC-only-without-clock-continuation-recovered-no-fresh-record",
+  "scope": "single-K80-ios26-bootCPU-RSC-runtime-only90s-v26",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-only26-0f1f64cf6c794510b8aab0f92786d832/root-trial-rsc-only/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-only26-0f1f64cf6c794510b8aab0f92786d832/root-trial-rsc-only/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-only26-0f1f64cf6c794510b8aab0f92786d832/full-link/kernel.ZORN26-RSC-ONLY.UNSELECTED.macho",
+    "sha256": "bceb8f36720fdbd6af8874ea2c7d2ee2c2fd8fe9dc83722d26c2d819269842c2",
+    "bytes": 30384240,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 6,
+    "preserved": 1390,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-only26-0f1f64cf6c794510b8aab0f92786d832/root-package-rsc-only/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "87871535913cbce284513fe322b44bc0be6b421411c64d9705b9c9f904d2f20f",
+    "bytes": 11612160
+  },
+  "clock_continuation_selected": false,
+  "root_Data_written": false,
+  "new_stage_record_observed": false,
+  "record_changed": false,
+  "recovery_seconds": 89.95628316700459,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "full_root_readback_performed": false,
+  "scope_consumed_no_repeat": true,
+  "camera": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-only26-0f1f64cf6c794510b8aab0f92786d832/root-trial-rsc-only/camera/rsc-only45s.json",
+  "camera_observation": "Actual landscape phone with black console and unreadable white text at left edge;not a readable panic,display corruption diagnosis or lockscreen proof.",
+  "failure_stage": "unproven before the terminal observer;RSC-only scope removes clock continuation from this failure,so do not diagnose it as a later clock prefix hang.",
+  "PM_or_GIC_return_from_this_epoch": "unobserved;v23/v24 values are history,not current grants",
+  "GPU_or_Metal_or_lockscreen_proven": false
+}

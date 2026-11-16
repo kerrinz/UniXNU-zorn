@@ -1,0 +1,103 @@
+{
+  "status": "actual-root-CPU-staging-observed-refused-before-resources",
+  "time": "2026-11-10T03:56:56.529865+00:00",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-root-input-probe-entry26/trials/8342de9b2e274d359d64e4d2bf71ddb2/run/run.json",
+  "result": {
+    "scope": "single-K80-ios26-root-input-probe20s-v1",
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "boot_sha256": "d9820e030154de508d06737c82b63757914766007200db9aee07ba0f775fe2d7",
+    "status": "recovered-native-root-input-observation",
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 51.4104744590004,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "log_changed": true,
+    "kernel_record_available": true,
+    "platform_entry_proven": true,
+    "GPU_execution_proven": false,
+    "native_writer_readback_success_proven": false,
+    "root_or_desktop_proven": false,
+    "terminal_observer": "native-one-page-Hp26-artifact-record",
+    "CPU_root_input_observation": {
+      "step": "10",
+      "cpu": "5",
+      "staged": "0",
+      "creation_returned": "1",
+      "creation_raw": "00000000",
+      "result_returned": "1",
+      "phase": "4",
+      "node0": "1",
+      "node1": "1",
+      "count_mask": "0",
+      "count0": "0",
+      "count1": "0",
+      "retained": "0",
+      "stage_returned": "0"
+    },
+    "note": "Only the fresh actual CPU-staging observation and record-worker/UFS path are eligible; no GPU,root,terminal-reset completion or native readback ACK inferred"
+  },
+  "actual_native_record": {
+    "CPU_root_input_observation": {
+      "step": "10",
+      "cpu": "5",
+      "staged": "0",
+      "creation_returned": "1",
+      "creation_raw": "00000000",
+      "result_returned": "1",
+      "phase": "4",
+      "node0": "1",
+      "node1": "1",
+      "count_mask": "0",
+      "count0": "0",
+      "count1": "0",
+      "retained": "0",
+      "stage_returned": "0"
+    },
+    "observation_is_not_root_mount_or_hardware_authority": true,
+    "status": "existing-Hp26-record-byte-envelope-valid",
+    "run_id": "8342de9b2e274d359d64e4d2bf71ddb2",
+    "text": "K80 root input probe: step=10 cpu=5 staged=0 createReturned=1 createRaw=00000000 resultReturned=1 phase=4 lookups=1/1 countsReturned=0 counts=0/0 retained=0 stageReturned=0",
+    "freshness": "before/after local pages differ; artifact tag absent before",
+    "matches_platform_worker_milestone": true,
+    "can_support_fresh_trial_when_bound_to_actual_capture_and_bundle": true,
+    "standalone_inspection_proves_native_or_device_execution": false,
+    "GPU_execution_proven": false,
+    "root_or_desktop_proven": false,
+    "native_writer_readback_success_proven": false
+  },
+  "interpretation": "Actual phase4 PlatformNodeInput;creator returned raw0,both registry nodes found;no count returned,so zero count not evidence of empty resources. Root input staging did not occur.",
+  "source_contradiction": "Actual XNU MakeReferenceTable creates raw DT nodes with new IOService;root creator treated any IOService as existing attached provider and refused missing service provider.",
+  "source_fix_candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt26-a5cf3700d1de42f491e3a742b7cfacac",
+  "not_proven": [
+    "root mount",
+    "desktop",
+    "GPU",
+    "native writer self-readback ACK",
+    "complete filesystem invariants"
+  ],
+  "protected_scope": "Fixed runner actual before/after dictionaries equal;GPT/rootmanifest/Data metadata and fences covered,not all storage contents."
+}

@@ -1,0 +1,39 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_MSGQ_LOWER_READ_REFUSAL_REPAIR",
+    "timestamp": "2026-11-03T18:15:05.835248+00:00",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-msgq-read-refusal-20261104/source-contract.json",
+    "checks": {
+      "source_mutations_refused": [
+        "unguarded-ordinary",
+        "unguarded-context",
+        "repeat-failed-read"
+      ],
+      "oversize_raw_count_witnesses": 236,
+      "ordinary_length_controls": 20,
+      "context_bad_length_controls": 256,
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "only_message_consumer_body_changed": true,
+      "reader_native_device_or_provider_execution": false,
+      "Linux_kernel_or_native_target_compiled": false,
+      "old_suites_run": false
+    },
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-msgq-read-refusal-20261104/msgq-read-refusal.UNAPPLIED.patch",
+    "patch_sha256": "d0dd4ee3de81b10896b8c14d98efc7c9b1031298885614b99ebe2dc6f8e03f9f",
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-msgq-read-refusal-20261104/linux-reference",
+    "runtime_selection": false,
+    "GPU_device_native_callback_execution": false,
+    "Linux_kernel_target_compiled": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-msgq-read-refusal-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-msgq-read-refusal-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-msgq-read-refusal-20261104/archive.json"
+}

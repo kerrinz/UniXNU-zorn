@@ -1,0 +1,67 @@
+{
+  "title": "K80 iOS26 native SMMU context-bank allocator source candidate",
+  "recorded_at": "2026-11-13",
+  "status": "source-only-candidate-full-linked-unselected",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "os": "iOS 26.6.2 (23G90)",
+    "hardware": "K80 / Adreno 750v2 Gen7.9.1"
+  },
+  "basis": {
+    "previous_hardware_record": "docs/evidence/k80-native-SMMU-readonly-bank-stream-census-observed-2026-11-13.json",
+    "previous_snapshot_limit": "v60 observed all 22 context banks with CBAR/CBA2R zero and SCTLR.M clear, and all 24 SMR valid bits clear; this was a live snapshot, not a retained software or hardware lease.",
+    "controller_claim": "The existing native PM owner retains the actual IOService open and active power reference for the exact controller; nativeHeldFor revalidates controller, provider claim, startup gate, active reference, and state. The source restricts this to exact IOService/IOPlatformDevice metaclasses whose default IOService open contract is single-owner.",
+    "claim_limit": "The controller claim grants no stream-master quiescence, DMA/security/IRQ/global-fault authority, or GPU permission."
+  },
+  "implementation": {
+    "source_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-bank-lease-v61-439f6b3d19c94a8f8729bc55b6df6d21/ZornGen7SmmuDomain26.cpp",
+    "source_sha256": "2e1cce92f621e6b40d7c922c3b432461ab65f5c16c7b66e4b6905b88fec42ed9",
+    "scope": "Only the native reserveActual path; accepts only the three exact endpoint objects and packed IDs populated by reserveNativeEndpoints. The external acquireActualBank callback path remains unchanged.",
+    "checks": [
+      "Require retained native controller claim, startup gate, active power reference, ordinary SMMUv2 stream matching, exact 22-bank/24-group K80 geometry, and a read-only MMIO interface.",
+      "Read and check CR0 CLIENTPD/EXIDS, GFSR, and global TLBI-active state.",
+      "Read all 24 SMR/S2CR groups; reject an active SMR matching the requested ID and avoid any candidate bank targeted by a translation S2CR.",
+      "For each bounded candidate bank, read CBAR, CBA2R, and context SCTLR; accept only CBAR=0, CBA2R=0, SCTLR.M=0, and no translation route.",
+      "Recheck the retained controller claim around every read and before returning. Store only an in-memory reserved[] bit and retained consumer/source references."
+    ],
+    "hardware_register_writes": false,
+    "stream_table_mutations": false,
+    "context_translation_enable": false,
+    "DMA_or_GPU_execution": false,
+    "touch_changes": false
+  },
+  "build_validation": {
+    "compile": {
+      "exit_code": 0,
+      "cwd": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-zorn-source-kernel26/obj26/DEVELOPMENT_ARM64_ZORN/libkern/DEVELOPMENT",
+      "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-bank-lease-v61-439f6b3d19c94a8f8729bc55b6df6d21/ZornGen7SmmuDomain26.cpo",
+      "object_bytes": 602368,
+      "object_sha256": "86a0c6707c55ade021179f4112d9e573e1a32aea9d617de8cd54374080e55abd",
+      "warnings": 3,
+      "warning_origin": "Existing HoujiFullHostNativeMemory.h size_t-to-uint32_t diagnostics; matches v60 compile warning count."
+    },
+    "full_link": {
+      "exit_code": 0,
+      "input_count": 1396,
+      "link_filelist_inputs": 1317,
+      "replaced_inputs": 1,
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-bank-lease-v61-439f6b3d19c94a8f8729bc55b6df6d21/full-link/kernel.ZORN26-NATIVE-SMMU-BANK-LEASE-CANDIDATE.UNSELECTED.macho",
+      "kernel_sha256": "1943c4d078b14009ef799c41c3592440a13589716d553bf1afa1225ac81e3885",
+      "undefined_symbols": 0,
+      "linker_warning_count": 10,
+      "linker_warnings_match_v60_baseline": true
+    },
+    "packaged": false,
+    "booted": false,
+    "device_accessed": false
+  },
+  "qualification_limits": [
+    "No runtime bank reservation was attempted or observed.",
+    "No fresh package or device scope was created for this candidate.",
+    "Independent stream-master quiescence/ownership and SMMU mapping authority remain absent.",
+    "No SMMU mapping/translation, GMU firmware, GPU execution, Metal, or touch result is claimed."
+  ],
+  "next_step": "Implement and review a distinct native stream-master quiescence lease while preserving the external grant requirement, then establish mapping/page-table ownership; only after those independent owners exist can a fresh exact-scope hardware trial exercise the allocator."
+}

@@ -1,0 +1,104 @@
+{
+  "date": "2026-11-09T14:32:56.754653+00:00",
+  "status": "actual-persistent-root-write-incomplete-host-adb-SIGSEGV-device-operations-stopped",
+  "owner_install_and_recovery_authorizations": [
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/owner-authorization.json",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/owner-recovery-entry-authorization.json",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/owner-direct-install-no-preimage.json"
+  ],
+  "actual_Recovery_entry": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/recovery-entry-db4f7a3e54904af7af776ed621a55f1e/run/result.json",
+  "actual_fresh_metadata_preflight": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/preflight-28cdbb7cbd874a76b77582027569d44b/run/result.json",
+  "old_Data_GPT_manifest_matched_before_write": true,
+  "optional_whole_target_preimage_cancelled_before_any_write": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/installation-d1806d23ccfe4ad79dd2e0a0af89ddf8/run/result.json",
+  "partial_backup_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/installation-d1806d23ccfe4ad79dd2e0a0af89ddf8/run/root-window.preimage.gz",
+  "phone_OS_backup_required": false,
+  "actual_write_failure": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/installation-f0498758cacf44e4902010c69644b592/run/result.json",
+  "source_image_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "intended_window": {
+    "partition": "unixnu",
+    "relative_first_lba": 6291712,
+    "blocks": 8388608,
+    "bytes": 34359738368
+  },
+  "host_sent_progress_observed_at_least_bytes": 1073741824,
+  "persisted_bytes_unknown": true,
+  "complete_readback_performed": false,
+  "installed": false,
+  "booted_iOS": false,
+  "boot_or_recovery_partitions_written": false,
+  "Data_payload_reset_or_migrated": false,
+  "post_failure_protection_bytes_not_rechecked": true,
+  "current_Recovery_identity_unknown": true,
+  "phone_operations_after_write_failure": 0,
+  "host_failure_evidence": {
+    "report": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/host-adb37/old-adb-crash.ips",
+    "sha256": "edc6c3d69c458a207ed7ffc0cd9a53f71307f39c57d533ae18db2c30566596b2",
+    "timestamp": "2026-11-09 22:18:51.00 +0800",
+    "exception": {
+      "codes": "0x0000000000000001, 0x000094d207ea31d8",
+      "rawCodes": [
+        1,
+        163629796831704
+      ],
+      "type": "EXC_BAD_ACCESS",
+      "signal": "SIGSEGV",
+      "subtype": "KERN_INVALID_ADDRESS at 0x000094d207ea31d8"
+    },
+    "termination": {
+      "flags": 0,
+      "code": 11,
+      "namespace": "SIGNAL",
+      "indicator": "Segmentation fault: 11",
+      "byProc": "exc handler",
+      "byPid": 3886
+    },
+    "faulting_symbols": [
+      "pthread_mutex_lock",
+      "std::__1::mutex::lock()",
+      "LibusbConnection::write_cb(libusb_transfer*)",
+      "usbi_handle_transfer_completion",
+      null,
+      "libusb_handle_events_timeout_completed",
+      "libusb_handle_events",
+      null,
+      "_pthread_start",
+      "thread_start"
+    ],
+    "diagnosis_scope": "actual host adb35.0.2 SIGSEGV in libusb write callback occurred during transfer;not proof of phone storage error or safety"
+  },
+  "new_isolated_host_tool": {
+    "official_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/host-adb37/repository2-3.xml",
+    "official_archive": {
+      "version": [
+        37,
+        0,
+        1
+      ],
+      "url": "platform-tools_r37.0.1-darwin.zip",
+      "bytes": 16110554,
+      "checksum": "6ae73f4de6452dc57e62ec02b68eed92a4c21661",
+      "checksum_type": {
+        "type": "sha1"
+      }
+    },
+    "archive_sha1_matched": true,
+    "archive_sha256": "ee39ad5967e95c2a07f04dbcbde96b1a0c916ba376096db5d2f498b7727a5d1d",
+    "adb": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/host-adb37/platform-tools/adb",
+    "adb_sha256": "1811e253b21b12cbfda7201ebaf86c10e7ddcb5c606a7a81f7c82b4c429c2d3b",
+    "version_output": "Android Debug Bridge version 1.0.41\nVersion 37.0.1-15733141\nInstalled as /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/host-adb37/platform-tools/adb\nRunning on Darwin 27.0.0 (arm64)\n",
+    "one_device_server_option_present": true,
+    "server_started": false,
+    "phone_accessed": false,
+    "existing_SDK_replaced": false,
+    "mac37_native_USB_default_reference": "https://developer.android.com/tools/releases/platform-tools#3701_july_2026"
+  },
+  "new_retry_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/native-usb-reentry-review/compatibility-decision.json",
+  "new_retry_plan_host_checks": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/native-usb-reentry-review/host-scope-controls.json",
+  "new_ADB_server_started": false,
+  "global_SDK_or_server_replaced": false,
+  "new_retry_approved_or_executed": false,
+  "device_operations_stopped": true,
+  "installed_root_validation_candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-installed-root-watchdog26.json",
+  "GPU_Metal_root_Data_or_touch_hardware_qualified": false,
+  "full_goal_complete": false
+}

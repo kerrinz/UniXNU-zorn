@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Unattended offline Gen7 VMA contract and pure extent checking, no native import qualification.",
+  "result": {
+    "updated": "2026-11-01T23:54:41.663629+08:00",
+    "state": "gen7-vma-size-reservation-import-contract-bound-pure-extent-helper-maintained-no-mapping",
+    "reference_revision": "453d8875f815bf9dfad9035982861226a4823a6c; reference not Xiaomi exact stock source",
+    "source_pins": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.c": "306930a131d0fa3bc3cc3873dbfaf205b6bd5a4243f55a74cced411c08de6782",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.h": "2aad7f0d5f3f1961e0e063cc119ee340820ee35527147f785690bcc7dd8cd896",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.c": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.h": "8137491b5ef2657eb362a4f41cf2c2b8d8cb747fc93d7a63e453194d7c3288cc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.cpp": "37363469c9e1f1e200b368e0bfdb80111722861792411090f3cef67506c9adef",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_hfi.h": "03fe8212d1a75148999f67df2044133a047501e91a234d0c1176d264428f713c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/ZornGpuStartupPlan.h": "b9dd071da7c8cef080a6084915be9d9f9233dfece8096a05807dfd50bbd3bbef",
+      "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/runtime/ZornGpuStartupPlan.c": "e6b5076ef44bd8681138a1a71ac68fa8f070bdfc91b904e294d6e734e531512c",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoVm.h": "da9bfcef9d5b7231d0143b853cf9de4535df0f749bb0023e2f052bb7823db6fa",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoVm.cpp": "2b8af29039d900d171a2b07649898be7c967651440e5910678fd80ab98ec863b"
+    },
+    "source_profile": "UniXNU-zorn/native/gpu-owned/runtime/gmu/source-profile.json",
+    "sources": {
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/ZornGpuGmuExtent.h": "1d20a98ca35f4a5ffeb42811fa6de54c5897c98dee92ddc8cd84f4267d80e9e8",
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/ZornGpuGmuExtent.c": "093f7f57ef2af269113c0416ee98c3f95fcc0fec114d046d9084d4bacc5cb1a1"
+    },
+    "findings": [
+      "Dynamic path reserves ALIGN(md->size,size_alignment) before calling gmu_core_map_memdesc; VA alignment is separate. Mapping length can be smaller than reservation; the comment explicitly preserves a VA hole.",
+      "Dynamic failure searches find_va(vma,md->gmuaddr,size), while addr is the just-reserved local address and md->gmuaddr is assigned in the success branch. Without the exact lower helper body, whether failure has mutated md->gmuaddr remains unknown. Native retention must not assume this lookup retires the attempted reservation.",
+      "Static path selects next_va only when input addr is zero; next_va advances by rounded size only after successful mapping. Explicit-address validation and caller serialization need independent binding; no aperture constants or addresses are adopted.",
+      "gen7_free_gmu_block keeps its VMA node if iommu_unmap returns fewer bytes than md->size, but still reaches sharedmem_free. This source behavior does not authorize native release after uncertain DMA/unmap.",
+      "Current NativeAdrenoVm::findAddress searches mapped spans; NativeVm map covers actual memory bytes. It does not implement a separate Gen7 rounded reservation ledger for unmapped tail bytes. The previous handle0/retained-refs finding is reused, not retested.",
+      "Real Gen7 reservation owner, aperture, domain/context/route, per-request mapping attributes and power/stop lifetime are missing. No callable native import adapter was fabricated."
+    ],
+    "new_component": "Pure ZGCheckGmuExtent rederives the existing decoded request without a new codec. It checks supplied backing is page-sized/covers request and reservation rounds BACKING length, retaining separate VA/size alignment and unbacked-tail byte count. It rejects secure/fixed/preallocated paths. Counts remain caller data; no address, native status, handle, ACK or authority is emitted.",
+    "new_reference_semantic_refusals": 3,
+    "new_actual_extent_source_mutations_refused": 3,
+    "independent_current_iOS17_objects": 3,
+    "recursive_target_inputs": 143,
+    "remaining_link_imports": [
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_memcmp",
+      "_memcpy"
+    ],
+    "no_initializer": true,
+    "initial_checker_failure": "Expected source corruption removed a token; ValueError escaped the static negative-control handler before host/target checks. Checker preimage/refusal retained; only missing-token refusal handling corrected, production source/flags unchanged.",
+    "host_tests_are_size_arithmetic_not_allocator_or_address_model": true,
+    "native_or_phone_calls": 0,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "mode": "unattended",
+    "physical_assistance_available": false,
+    "limits": [
+      "Fully unattended: physical_assistance_available=false. No device execution authorization remains; no phone/USB/provider/allocator/cache/SMEM/MMIO/SCM/PAS/power/clock/reset/SMMU map/unmap/IOVA/GPU calls. No new runtime caller/FD/kernel/device candidate.",
+      "Ordinary extent arithmetic is not an ownership or observed-backing result. Missing native context/routing, lifetime, attributes/permissions and genuine stop proof remain unavailable. Do not adopt legacy A6xx/A740 constants or translate DT SID into authority.",
+      "No new codec, query/HFI/272B/ZORNGQF1/normal-log field/fragment/carrier or EFI/Darwin pointer handoff. Preserve old capsules/profiles/manifests and all consumed claims.",
+      "Do not repeat new reference3/extent3/native3 or prior composition/publisher/registry/startup/HFI/CPU GUI suites. Only new exact helper/retention source checks and current target evidence.",
+      "If physical assistance becomes necessary or bounded recovery fails, stop device operations, save concrete evidence/plan and notify; no improvised flash/recovery/shutdown."
+    ],
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gen7-vma-contract/combined-result.json",
+    "checks": "out/zorn/gpu-gen7-vma-contract/check-result.json",
+    "maintained": "out/zorn/gpu-gen7-vma-contract/maintained-result.json",
+    "next_plan": "out/zorn/gpu-gen7-vma-contract/next-plan.json"
+  }
+}

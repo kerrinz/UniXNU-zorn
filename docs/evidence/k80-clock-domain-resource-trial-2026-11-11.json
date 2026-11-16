@@ -1,0 +1,110 @@
+{
+  "status": "actual-clock-graph-list-CX-register-prefix-returned-CX-core-BadArgument-recovered",
+  "time": "2026-11-10T17:36:20.914879+00:00",
+  "scope": "single-K80-ios26-clock-graph-and-CX-SMMU-resources90s-v38",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-gpucc-lock-fix-ef7e9894db3a4c36b7477e6e7334d818",
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/source-selection.json",
+  "original_native_sequence": "ZornGen7PrepareNativeClockPrefixInto26 then clockReady-gated ZornGen7PrepareNativeDomainPrefixInto26",
+  "domain_steps": [
+    "Gen79hub metadata",
+    "actual DDR DT metadata",
+    "Gen79 core inputs",
+    "CX GDSC register initialization",
+    "CX core registration",
+    "CX completion registration",
+    "SMMU power-resource construction"
+  ],
+  "native_sequence_changed": false,
+  "identity_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/identity-compile-result.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/full-link/kernel.ZORN26-DOMAIN-LIVE.UNSELECTED.macho",
+    "sha256": "5310d496192db06cc2d59469e7594f7ff35e32d97d429ca673c980c47438ee0e",
+    "bytes": 30390192,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 6,
+    "preserved": 1390,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/root-package-domain-live/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "3e3d16d96945e5d705fdfa3ff90331787aab3345d45ba0530c7b6c85579ac53a",
+    "bytes": 11616256
+  },
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/root-package-domain-live/verified.json",
+  "record_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/clock-domain-completed-result.patch",
+  "actual_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-domain-live26-ec4f31af14b949c5966d4564052d3fd1/root-trial-domain-live/trial/run.json",
+  "root_Data_readonly": true,
+  "full_root_readback": false,
+  "SMMU_translation_mapping": false,
+  "GMU_or_GPU_selected": false,
+  "hardware_result_pending": false,
+  "actual_clock_domain": {
+    "gpucc": {
+      "returned": true,
+      "complete": true
+    },
+    "graph": {
+      "returned": true,
+      "assessment": 6,
+      "hardware_constructed": 29,
+      "namespace_records": 3,
+      "cores_registered": 29,
+      "complete": true
+    },
+    "list": {
+      "returned": true,
+      "assessment": 3,
+      "raw_available": true,
+      "raw": 6,
+      "entries_returned": 6
+    },
+    "hub": {
+      "returned": true,
+      "raw": 0
+    },
+    "ddr": {
+      "returned": true,
+      "raw": 0
+    },
+    "core_inputs": {
+      "returned": true,
+      "raw": 0
+    },
+    "cx_probe": {
+      "returned": true,
+      "attempted": true,
+      "configuration_store_returned": true,
+      "retain_update_returned": false,
+      "native_prefix_returned": true
+    },
+    "cx_core": {
+      "returned": true,
+      "raw": 3758097090
+    },
+    "completion": {
+      "returned": false,
+      "registered": null
+    },
+    "smmu_power_resources": {
+      "returned": false,
+      "raw": null
+    }
+  },
+  "clock_prefix_complete": true,
+  "domain_resource_prefix_complete": false,
+  "recovery_seconds": 122.89408737500071,
+  "verified_recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_captures_unchanged": true,
+  "scope_consumed_no_repeat": true,
+  "qualification": "29 actual clock cores/3namespace records registered;6GMU list entries returned with original positive6 result,not errno0. CX configuration store returned;retain update false is original conditional collapsed-state branch,not failure. CX node/core raw0xe00002c2;completion/SMMU-resource steps not called.",
+  "source_contradiction": "actual MakeReferenceTable calls setLocation then removes gIODTUnitKey (AAPL,unit-string). CxGdscNodes propertiesMatch still requires original flat ADT unit-string OSData and original count. Must match consumed property through actual getLocation(gIODTPlane),preserving exact remaining property bytes/count;no new hardware address selection."
+}

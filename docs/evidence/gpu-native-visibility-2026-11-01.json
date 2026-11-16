@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "scope": "New isolated native visibility owner source/OFF-only host/selected target inspection; no native publication or hardware qualification.",
+  "result": {
+    "updated": "2026-11-01T23:03:41.041121+08:00",
+    "state": "persistent-native-visibility-publisher-implemented-default-OFF-selected-target-only",
+    "sources": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-native-visibility-publisher/ZornGpuTableVisibility.h": "9d365cd35f202ac14f3cb433de79869f7d9f43af7177a99f26aa8a7b5d8510a1",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-native-visibility-publisher/ZornGpuTableVisibility.cpp": "7e336e7531d1d679bc5cd64546786b78ca717e2eb638dd11f87a8bf9e90a0383"
+    },
+    "context_lifetime": "Caller-retained real NativeAdrenoMemory/table and persistent owner must outlive every returned callback. Already-held device references are accounting, not hardware stop/route proof. No rebind/reset/release/destructor cleanup.",
+    "table_pool_checks": "Native descriptor, no imported/WC/pool backing, one span/offset0/fullbytes, nonzero real device refs, stable mapping/bytes,4KiB pages within range. Valid stable typed objects/exclusive caller gate are preconditions, not arbitrary-pointer authentication.",
+    "native_capture": "First raw32 native error and last native result with availability/attempt index are retained separately from adapter failures. A later post-call failure preserves native SUCCESS0 as original result, never overwrites it.",
+    "failure_behavior": "Permanent local failure latch; failed publication quarantines retained table object; reentry latches failure, no native retry or automatic cleanup. Counter overflow refuses.",
+    "default_OFF_no_native_import_or_callback_export": true,
+    "selected_only_import": "NativeAdrenoMemory::publishForDevice(size_t,size_t,bool,bool)",
+    "actual_call_modes": "4096B page, writes=false/include_write_combined=false; actual raw w0 saved after return",
+    "new_host_negatives": [
+      "OFF forged-success actual-source refusal",
+      "ON host link refused without native publisher stubs"
+    ],
+    "new_static_source_refusals": 3,
+    "new_object_mutations_refused": 2,
+    "new_wrong_callback_size_compile_refused": 1,
+    "independently_matching_native_objects": 3,
+    "recursive_inputs": 288,
+    "objects": {
+      "0": {
+        "sha256": "d85fc902c2f500c1b3114c054f4eb4c9397e4b584a4191834898553c4b04d6b2",
+        "imports": [],
+        "independent_raw_SHA_equal": true
+      },
+      "1": {
+        "sha256": "028c230b87f8869456ef8d931e56c081fad60824d8ebbb194480d4aa76a16905",
+        "imports": [
+          "__ZN18NativeAdrenoMemory16publishForDeviceEmmbb"
+        ],
+        "independent_raw_SHA_equal": true
+      }
+    },
+    "ABI_sha256": "c531dd60507630a7fb59dbf5c16008df61218d07fd33d6a4631e244bdc5785d6",
+    "constinit_storage_no_initializer": true,
+    "native_callback_or_backend_executed": false,
+    "host_success_publication_address_handle_model": false,
+    "private_report_not_query_or_log_carrier": true,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "limitations": [
+      "Selected callback/native error paths were compiled and statically inspected, not executed or tested with successful/failing native publishers.",
+      "Synchronous native cache publication may block. Snapshot returns Busy while a call is in flight; no cancellation/wall-time/readable-failure guarantee is claimed.",
+      "Actual context/stream/power/security/stop/route ownership remains absent. Callback binding and NativeMemory reference count do not supply it.",
+      "Caller must retain both native memory and callback owner through every possible callback. Source lifetime/range checks do not prove arbitrary concurrent or corrupted kernel memory safety.",
+      "Old NativeAdrenoSmmuMemory still uses its original binary-status callback until a separate default-OFF composition is qualified; upstream files/legacy patch remain unchanged."
+    ]
+  },
+  "source_recipe": "UniXNU-zorn/scripts/check-zorn-native-visibility.py",
+  "source_recipe_sha256": "50076f7f7ffa0778da824dfd8659d58fa3f53a4cb07a3f8d21c28636ff5bbb29",
+  "local_native_edge_check": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-native-visibility-publisher/check-native-edge.py"
+}

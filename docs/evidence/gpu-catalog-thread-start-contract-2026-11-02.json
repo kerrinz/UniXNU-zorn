@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T12:48:24.076255+08:00",
+  "state": "Catalog149-selected-thread-start-output-ref-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-thread-start-contract/source-contract.json",
+  "functions_body_SHA_recorded": 6,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact selected iOS17 kernel thread start wrappers used by catalog149 mount. Frozen direct poller/IPC owner proof read first;6selected bodySHA and available base delta recorded. Selected thread.c has existing zorn instrumentation;no new edits or assignment of pure Apple/main source identity to it. No old scheduler/CPU/IPC/map/VM suite or target rerun.",
+    "actual_chain": "kernel_thread_start delegates start_priority with priority-1;start_priority calls kernel_thread_create,which calls thread_create_internal for kernel_task. It does not call user-state thread_create_running. That name was a locator only,not proof of this producer. create_internal stores continuation and parameter pointers and initializes raw refcount2;this is not object/page/module lifetime retention for arbitrary parameter pointees.",
+    "output_error": "kernel_thread_create returns its internal nonzero result before writing caller output. start_priority likewise returns nonzero before writing caller output. Mount initializes local thread=nullptr and consumes it only on KERN_SUCCESS. Errors are kern_return_t,not Linux error pointers or EFI/IOKit/hardware ACK. Stack allocation/assertions/selected instrumentation can block/panic/nonreturn;no universal nullable/failure-injection or bounded completion claim.",
+    "success": "create writes returned thread after stack setup;start_priority writes output before thread_start under thread mutex and returns result. Continuation may become runnable before caller records started flag;returned success is not proof continuation executed or mailbox serviced. Actual mount holds g.lock;poller later takes same gate for owner snapshot. No successful thread/task/stack/address model or native call performed.",
+    "reference": "thread_deallocate uses thread_ref_release and only on final release enters deallocate_complete,which requires TH_TERMINATE2 and otherwise panics. Releasing returned caller reference therefore is not terminate/cancel/join or a stop witness. Initial count2 alone is not a runtime refcount invariant. Continuation code/parameter storage and client/page refs have separate lifetimes;actual poller parameter is nullptr and owner refs are obtained per iteration as frozen earlier.",
+    "decision": "Mount existing returned-success gate and returned-ref release do not establish a new source defect requiring31st guard/refcount/stop policy. No guessed cancel/reset/retry/free/continuation/module-retain strategy. Actual K80 producer/method eligibility/owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal remain unbound.30 independent patches/8profiles/3111+39/default42/CPUstorage/full64primary/oldinputs/archives preserved;all native/thread/start/refcount/poller/IPC/allocator/provider/MMIO/phone OFF,no caller/component/image/wire/CPU policy change."
+  },
+  "qualification": "Selected thread output/ref/continuation source only;not thread execution/termination,page/provider/stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

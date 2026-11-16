@@ -1,0 +1,67 @@
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+// Host stand-ins test our wrappers; no Apple implementation or device execution.
+#include <assert.h>
+#include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef void*id;typedef void*Class;typedef void*SEL;typedef signed char BOOL;
+#define nil NULL
+#define YES 1
+#define NO 0
+static int object,stale,actualError,calls,describedStale,describedError,failed,pb_tracing=1;
+static void say(const char*s,...){(void)s;}
+static const char*pb_desc(id x,char*b,size_t n){if(x==&stale)++describedStale;if(x==&actualError)++describedError;snprintf(b,n,"value");return b;}
+static id pb_without(id x,const char*s){(void)x;(void)s;return nil;}
+static id complete(id*e){++calls;if(failed){if(e)*e=&actualError;return nil;}return &object;}
+static id provider(id a,SEL b,id c,id*e){return complete(e);}
+static id dynamic(id a,SEL b,id c,id d,id*e){return complete(e);}
+static BOOL migrate(Class a,SEL b,id c,unsigned long d,unsigned long e,BOOL f,id*g){return complete(g)!=nil;}
+static id build(id a,SEL b,id c,id d,id e,id f,BOOL g,id*h){return complete(h);}
+static BOOL create(id a,SEL b,id c,BOOL d,id e,id*f){return complete(f)!=nil;}
+static BOOL writeData(id a,SEL b,id c,unsigned long d,id*e){return complete(e)!=nil;}
+static BOOL copyItem(id a,SEL b,id c,id d,id*e){return complete(e)!=nil;}
+static BOOL update(id a,SEL b,id c,id*d){return complete(d)!=nil;}
+static id (*orig_store_for_provider)(id,SEL,id,id*)=provider;
+static id (*orig_create_dynamic)(id,SEL,id,id,id*)=dynamic;
+static BOOL (*orig_migrate)(Class,SEL,id,unsigned long,unsigned long,BOOL,id*)=migrate;
+static id (*orig_build)(id,SEL,id,id,id,id,BOOL,id*)=build;
+static BOOL (*orig_fm_create)(id,SEL,id,BOOL,id,id*)=create;
+static BOOL (*orig_data_write)(id,SEL,id,unsigned long,id*)=writeData;
+static BOOL (*orig_fm_copy)(id,SEL,id,id,id*)=copyItem;
+static BOOL (*orig_url_update)(id,SEL,id,id*)=update;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@WRAPPERS@
+
+int main(int argc,char**argv){assert(argc==4);int which=atoi(argv[1]),mode=atoi(argv[2]),baseline=atoi(argv[3]);failed=mode>=2;id slot=mode==0||mode==2?&stale:nil;id*error=mode==4?NULL:&slot;id result=nil;BOOL ok=0;
+ switch(which){
+ case 0:result=pb_store_for_provider(nil,nil,nil,error);ok=result!=nil;break;
+ case 1:result=pb_create_dynamic(nil,nil,nil,nil,error);ok=result!=nil;break;
+ case 2:ok=pb_migrate(nil,nil,nil,59,61,0,error);break;
+ case 3:result=pb_build(nil,nil,nil,nil,nil,nil,0,error);ok=result!=nil;break;
+ case 4:ok=pb_fm_create(nil,nil,nil,0,nil,error);break;
+ case 5:ok=pb_data_write(nil,nil,nil,0,error);break;
+ case 6:ok=pb_fm_copy(nil,nil,nil,nil,error);break;
+ case 7:ok=pb_url_update(nil,nil,nil,error);break;
+ default:return 2;
+ }
+ assert(ok==!failed&&calls==1);if(!failed&&error)assert(slot==(mode==0?&stale:nil));if(failed&&error)assert(slot==&actualError);
+ if(baseline){if(mode==0&&which<4)assert(describedStale==1);}else assert(!describedStale);
+ if(failed)assert(describedError==1);return 0;
+}

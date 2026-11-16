@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-09T11:54:01.605422+00:00",
+  "classification": "progress: genuine private IOKit claimant and non-seizing exclusive clock-provider open implemented in actual map/bind path;separate hardware authority preserved",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-clock-provider-claim-candidate",
+  "changed_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-clock-provider-claim-candidate/ZornGen7ClockResources26.cpp",
+  "prior_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-console-image-candidate",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.18534398078918457,
+    "inputs": 1384,
+    "replaced": 1,
+    "preserved": 1383,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-provider-claim26/full-link-final/kernel.ZORN26-clock-provider-claim.UNSELECTED.macho",
+    "sha256": "2d01f6b91d5da9b9461bd83f6daa209df0db7ea7207882105d4b4361edb57d69",
+    "bytes": 30198232
+  },
+  "checks": {
+    "new_native_objects": 1,
+    "unmodified_source_files": 162,
+    "public_header_and_Result_ABI_unchanged": true,
+    "full_link_inputs": 1384,
+    "preserved_full_link_inputs": 1383,
+    "undefined_symbols": 0,
+    "compile_warnings": 0,
+    "new_link_diagnostics": 0,
+    "actual_compiler_inputs": 443,
+    "compiled_failure_CFG_excludes_clock_binding": 6,
+    "XNU_open_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-provider-claim26/XNU-open-contract.json",
+    "independent_authority_before_mapping_preserved": true
+  },
+  "behavior": "Real private IOService client is attached and retained,each exact native base-class provider is opened with options0 before descriptor authorization/mapping;subclasses with possible shared handleOpen are refused;open/isOpen failures stop before binding. Claims/maps/partial objects stay retained on failure;no close,PMinit,PMstop,reset or retry added. Existing callbacks still independently own hardware permissions and unmanaged PM lifetime.",
+  "limitations": [
+    "No whole-physical-region exclusion from IOService opens;other aliases and firmware/security are not covered by this software claim.",
+    "Real power/security/PM access authority and complete GPU startup caller still need integration;no successful hardware callback manufactured.",
+    "No source claimant/open/map/clock/native/device execution;kernel remains unselected and unexecuted.",
+    "Prior f73bd420/49ebea4e native platform device milestone does not qualify this new kernel or any GPU stage."
+  ],
+  "original_failure_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-provider-claim26/iterations/link-list-check-0.json",
+  "native_or_device_execution": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-provider-claim26/verified.json",
+  "actual_compile_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-provider-claim26/actual-compile-inputs.json",
+  "source_delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-provider-claim26/source.delta"
+}

@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-11-12T12:07:46.152468+08:00",
+  "status": "prepared-platform-application-route-compiled-and-linked-offline",
+  "root_cause": "Existing prepared application factory assumes the platform topology owner is also the hardware callback owner. Direct-ring milestones pass them separately, and the platform lacked an application I/O path.",
+  "behavior": "The platform application entry shares the existing ready/one-shot/composition-lock path. It preserves the caller hardware owner and separate application execution owner while reusing the platform topology and inventory at the prepared handoff. It dispatches the actual worker application route after the existing known-image path.",
+  "source_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-prepared-application26/source.patch",
+    "sha256": "09125e3cf2fbad8760f635ec9cfc379288cf01aa6a43eccb8d0b568e7b62f8cd",
+    "bytes": 12760
+  },
+  "source_and_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-prepared-application26/full-link/link-result.json",
+    "sha256": "70e8b666a91f5037157b91c3256103a54ad4deae06b9b04f3115186e935177ca",
+    "bytes": 2407
+  },
+  "compiled_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-prepared-application26/compile-result.json",
+    "sha256": "82693acb7574432e3cc0492ab3287cbd59d429e5b0191947117b3d5f5a3f6b80",
+    "bytes": 7572
+  },
+  "host_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-prepared-application26/host-regression.json",
+    "sha256": "40a29a00d47b73b57b0d0ccda821906c6ecef010069c9c9c86192779ebf97e30",
+    "bytes": 972
+  },
+  "risk": "The candidate reaches the existing GPU startup and application publication worker when given real owners. It still depends on actual board-wide exclusion, reset-held GMU firmware load, SCM and per-application grants. The host fixture stops at the worker boundary.",
+  "selected": false,
+  "new_boot_package": false,
+  "device_access": false
+}

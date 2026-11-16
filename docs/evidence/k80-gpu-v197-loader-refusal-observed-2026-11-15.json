@@ -1,0 +1,92 @@
+{
+  "version": 197,
+  "status": "recovered-Vulkan-loader-open-or-required-entry-failure",
+  "ready": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v197-bridge-stderr-ready-2026-11-15.json",
+    "sha256": "8dbcf1c0f34389946272248df5ff8d1410257010d8f568f5c8b3cbab65d38fc5"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v197-metal-trial-7d13f747733a450f886fef3490fd9ca0/root-trial/trial/run.json",
+    "sha256": "146428bfb30608e66d3f9f6122544ea0bb6594c162b38e39cb0395637dc1b8d7"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v197-metal-trial-7d13f747733a450f886fef3490fd9ca0/root-trial/trial/cdc-capture.json",
+    "sha256": "8770eaf16e931a307621d26df5b775f534fb3fc30f51268aeb2849f29d7bf0e6"
+  },
+  "raw": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v197-metal-trial-7d13f747733a450f886fef3490fd9ca0/root-trial/trial/cdc.raw",
+    "sha256": "e117beebed47d49c7cff063f31cbbde604624ed42140b7e8141a119e48840d10"
+  },
+  "recovery_seconds": 332.7815232499852,
+  "protection_pairs": [
+    "before-root_first_page.bin",
+    "before-before.bin",
+    "before-root_after.bin",
+    "before-after.bin",
+    "before-Data.bin",
+    "before-root_before.bin",
+    "before-Data_metadata.bin"
+  ],
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "application": {
+    "published": true,
+    "program_identity": {
+      "unique": 10,
+      "pid": 10
+    },
+    "raw_stderr": "ZORN195DISC es=1 name=1 class=1\nZORN195PLUG s=1 v=8211\nZORN195PLUG s=30 v=5\nZORN195PLUG s=9 v=0\nzorn-metal-probe193: native-metal: device refused: device: LoaderNotFound(LoaderNotFound { tried: [\"/System/Library/Extensions/NativeAdrenoMetal.bundle/libvulkan\nZORN195PLUG s=15 v=0\nZORN195DISC bundle=1 load=1 principal=1 code=0\n",
+    "raw_stderr_dropped": 0,
+    "complete": false,
+    "render_complete": false,
+    "native_teardown_complete": false,
+    "native": {
+      "unique": 0,
+      "pid": 0,
+      "flags": 0,
+      "calls": 0,
+      "method": 0,
+      "raw": 0,
+      "close_returned": 0,
+      "close_raw": 0,
+      "attempts": 10,
+      "copy_errors": 0,
+      "lines": 3,
+      "bytes": 151,
+      "dropped": 0
+    },
+    "sessions": [],
+    "session_rejected": 0,
+    "report_terminal": 0,
+    "report": {
+      "phase": 3,
+      "flags": 1,
+      "status": -1,
+      "code": 1,
+      "service": 4294967886,
+      "device": 0,
+      "crc": 0,
+      "first_bad": 4294967295,
+      "ticks": 3868977949
+    },
+    "error": null,
+    "reasons": [
+      "Metal-render-not-complete",
+      "native-teardown-not-complete"
+    ]
+  },
+  "bytes": 2557,
+  "known_image_complete": true,
+  "finding": "NormalMetal enters plugin and bridge; existingNBLOG says device:LoaderNotFound. Rawstderr326B captured withoutdrops; existingfrontend intentionallylimitsmessage to140B. Runtime open_loader collapses ash LibraryLoadFailure or required-entry lookup error intoLoaderNotFound; neither exactdyldcause nor missingentry is yet established. ActualownedTurnipfile is readable; no nativeclientadmission observed.",
+  "source_audit": [
+    "Pinned runtime device/create.rs:518-529 discards individual ash loading errors.",
+    "Pinned ash0.38 entry.rs:138 opens library then StaticFn::load_checked; libloading0.8.9 unixmod.rs:134 uses RTLD_LAZY|RTLD_LOCAL.",
+    "Selected Turnip source declares PUBLIC vkGetInstanceProcAddr under __APPLE__; actualsource/linktargetarm64eios26 verified. Do not infer its runtime availability from source."
+  ],
+  "next": "Source-owned principal dependency preflight with same dlopenflags and required public vkGetInstanceProcAddr lookup, bounded dlerror head/tail logging, no Vulkan function calls or alternate driver path; retain loadedhandle forprocess lifetime, preserve one-shot normalMetalcreation. Then collect exactdynamicloader reason.",
+  "constraints": "Recovery332.7815s/TWRP/7protectionpairs/BCBpass;197claimconsumed. Root197966db7d9 nowinstalled;activegoal,Metalrender/presentation/fullFT3683/stability incomplete. No disassembly/reverseengineering."
+}

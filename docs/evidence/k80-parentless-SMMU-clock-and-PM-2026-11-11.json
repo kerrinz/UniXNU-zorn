@@ -1,0 +1,126 @@
+{
+  "status": "v44-native-SMMU-power-four-clock-enables-and-held-PM-cycle-complete",
+  "scope": "single-K80-ios26-parentless-SMMU-clock-enable90s-v44",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-parentless-smmu-clock26-f16e5ef2e0ed4b4bac7c0fad18b1c54d/full-link/kernel.ZORN26-PARENTLESS-SMMU-CLOCK.UNSELECTED.macho",
+    "sha256": "fea8084c5a18e428c455c7490174aa678295b9f59d1c66df3f743abd196172d6",
+    "bytes": 30407352,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-parentless-smmu-clock26-f16e5ef2e0ed4b4bac7c0fad18b1c54d/root-package-parentless-smmu-clock/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "95830e5b19c844fc228bbc5bf152ea8ead9d3bcb0e476f8bb7ff6bdbad82d390",
+    "bytes": 11620352
+  },
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-parentless-smmu-clock26-f16e5ef2e0ed4b4bac7c0fad18b1c54d/source-selection.json",
+  "source_fix": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-parentless-smmu-clock26-f16e5ef2e0ed4b4bac7c0fad18b1c54d/parentless-SMMU-clock-enable.patch",
+  "source_gap_and_compatibility": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-parentless-smmu-clock26-f16e5ef2e0ed4b4bac7c0fad18b1c54d/source-gap-and-compatibility.json",
+  "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-parentless-smmu-clock26-f16e5ef2e0ed4b4bac7c0fad18b1c54d/root-trial-parentless-smmu-clock/trial/run.json",
+  "actual": {
+    "gpucc": {
+      "returned": true,
+      "complete": true
+    },
+    "graph": {
+      "returned": true,
+      "assessment": 6,
+      "hardware_constructed": 29,
+      "namespace_records": 3,
+      "cores_registered": 29,
+      "complete": true
+    },
+    "list": {
+      "returned": true,
+      "assessment": 3,
+      "raw_available": true,
+      "raw": 6,
+      "entries_returned": 6
+    },
+    "hub": {
+      "returned": true,
+      "raw": 0
+    },
+    "ddr": {
+      "returned": true,
+      "raw": 0
+    },
+    "core_inputs": {
+      "returned": true,
+      "raw": 0
+    },
+    "cx_probe": {
+      "returned": true,
+      "attempted": true,
+      "configuration_store_returned": true,
+      "retain_update_returned": false,
+      "native_prefix_returned": true
+    },
+    "cx_core": {
+      "returned": true,
+      "raw": 0
+    },
+    "completion": {
+      "returned": true,
+      "registered": true
+    },
+    "smmu_power_resources": {
+      "returned": true,
+      "raw": 0
+    },
+    "CPU_register_mappings": {
+      "returned": true,
+      "raw": 0
+    },
+    "CX_primary": {
+      "returned": true,
+      "wait_assessment": 1,
+      "wait_raw_available": false,
+      "wait_raw": null,
+      "regulator_disposition": 0,
+      "regulator_domain": 2,
+      "regulator_raw_available": true,
+      "regulator_raw": 0
+    },
+    "SMMU_source_power": {
+      "returned": true,
+      "disposition": 0,
+      "domain": 2,
+      "raw_available": true,
+      "raw": 0
+    },
+    "SMMU_native_held_PM": {
+      "returned": true,
+      "raw": 0
+    },
+    "SMMU_power_progress": {
+      "caller_phase": 12,
+      "source_phase": 8,
+      "bulk_assessment": 3,
+      "prepare_assessment": 5,
+      "enable_assessment": 3,
+      "prepare_entries": 4,
+      "enable_entries": 4
+    }
+  },
+  "recovery_seconds": 122.95125858400024,
+  "protected_captures_unchanged": true,
+  "whole_root_readback": false,
+  "claim_consumed_no_repeat": true,
+  "actual_completed": [
+    "ControllerPower source transition",
+    "Four CCF prepare entries and four enable entries",
+    "Native-held runtime PM adoption and balanced get/markLastBusy/put above retained startup hold"
+  ],
+  "unproven": [
+    "SMMU register access through generic guarded callback backend",
+    "SMMU capabilities/bank/ASID/translation",
+    "Normal suspend/DMA stop",
+    "GMU/HFI/GPU execution",
+    "Metal/lockscreen/touch acceptance"
+  ],
+  "next_action": "Implement actual powered native SMMU register backend using this real held source reference/PM and exact retained provider/descriptor under same startup gate;preserve generic external guard path.Unavailable callbacks must not become successful stubs.Actual ID reads may feed existing capability/domain source;do not infer OAS/bank/route/stop rights from clock/PM completion."
+}

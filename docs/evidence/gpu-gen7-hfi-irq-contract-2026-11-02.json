@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Offline exact selected HFI IRQ source contract and pure supplied CPU classification only",
+  "result": {
+    "updated": "2026-11-02T01:40:32.844522+08:00",
+    "state": "selected-Gen7-hwsched-HFI-domain-bound-supplied-scalar-maintained-no-native-IRQ",
+    "source_contract": "source-contract.json",
+    "selected_handler_correction": "gen7_9_1 -> adreno_gen7_9_0_hwsched_gpudev -> gen7_hwsched_hfi_probe -> gen7_hwsched_hfi_handler",
+    "narrow_supplied_scalar_sources": {
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/hfi-status/ZornGpuGmuHfiStatus.h": "0090a65455bff2e7da5c0b575e81d14d1f188551ee51abbddacce1baedcb9ed1",
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/hfi-status/ZornGpuGmuHfiStatus.c": "0db1d750e72e3e61a163875d8b96649d8269bb9f05395d3bf331c2d2f28a424e"
+    },
+    "source_profile": "UniXNU-zorn/native/gpu-owned/runtime/gmu/hfi-status/source-profile.json",
+    "new_reference_source_corruptions_refused": 4,
+    "new_scalar_source_corruptions_refused": 3,
+    "new_actual_object_corruptions_refused": 3,
+    "independent_current_iOS17_objects_raw_SHA_equal": 3,
+    "actual_recursive_inputs": 383,
+    "data_only_ABI_no_imports_initializer_or_callable_provider": true,
+    "source_promotion_byte_identical_independent_inodes": true,
+    "unknown_raw_side_message_high_bits_preserved": true,
+    "bit24_boundary_preserved": true,
+    "auxiliary_status_not_invented": true,
+    "failures": "Initial manifest lookup was refused because GMU source belongs to supplement manifest. Initial ordering-only source negative was refused after a comment matched INFO; exact regread target check added. Both checker preimages/logs preserved; production flags/source guards unchanged.",
+    "native_IRQ_MMIO_getter_allocator_provider_callback_phone_calls": 0,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "no_successful_hardware_address_handle_fence_model": true,
+    "limitations": [
+      "Fully unattended physical_assistance_available=false;no new device activation. All native methods/IRQ/controller/MMIO/ack/mask/NMI/cache/allocator/provider/phoneUSB/SMEM/SCM/PAS/power/clock/reset/VM/SMMU/IOVA/GPU calls OFF. No runtimecaller/FD/kernel/devicecandidate.",
+      "Only source/target work for the new exact fault/stop contract. HFI scalar is supplied CPU data, not native observation, IRQ_HANDLED, command/OOB/fence completion, hardware owner or DMA retirement. Actual route/context/stop/readablefailure remain unqualified.",
+      "No query/HFI/272B/ZORNGQF1/normal-log field/fragment/carrier change or preEBS/Darwin pointer transfer. Do not widen CPU policy, apply old repairs, repeat completed suites, reset/release retained backing or choose625/200MHz.",
+      "HW_FENCE external client/native provider and MEMSTORE native lifetime remain unavailable. Three historical repairs remain UNAPPLIED and unselected;all old profiles/capsules/inputs/default42 protected. allow_boot/readback/WriteAuthorized0."
+    ],
+    "physical_assistance_available": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gen7-hfi-irq-contract/combined-result.json",
+    "contract": "out/zorn/gpu-gen7-hfi-irq-contract/source-contract.json",
+    "target_checks": "out/zorn/gpu-gen7-hfi-irq-contract/check-result.json",
+    "maintained": "out/zorn/gpu-gen7-hfi-irq-contract/maintained-result.json",
+    "next_plan": "out/zorn/gpu-gen7-hfi-irq-contract/next-plan.json"
+  }
+}

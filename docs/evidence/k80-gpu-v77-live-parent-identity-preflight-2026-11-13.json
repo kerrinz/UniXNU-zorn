@@ -1,0 +1,48 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 v77 GPU live parent identity preflight",
+  "status": "OFFLINE_FULL_LINKED_UNSELECTED; not packaged or booted",
+  "ancestor": {
+    "candidate": "v76 parent identity preflight",
+    "kernel_sha256": "3d632b05ba71a168dc4dbb5c014d106526706a58ddfb42e06e82ef20e9bb3405"
+  },
+  "change": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-live-parent-identity-v77-20261113/ZornRootPlatform26.cpp",
+    "source_sha256": "e6f5374332210ab468ca3374bbd0de59a57cd645503f1ac537156e21d7016ed1",
+    "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v77-live-parent-identity-20261113/ZornRootPlatform26.cpo",
+    "object_sha256": "a38ee17b8076402bda302e8687534369fee5a212ac1bef207584766e3023f272",
+    "behavior": "Immediately before either direct scheduling API claims its one-shot preparation slot, resolve the live arm-io/gpu and arm-io/gmu registry entries again. Require the current entry and parent IDs to match the complete positive observation captured by the current board stage; GPU/GMU entry IDs must differ and the shared parent ID must be nonzero.",
+    "scope": "Identity revalidation only. It does not provide provider exclusion, scheduler ownership or quiescence, MMIO, SMMU, DMA, or direct runtime authority."
+  },
+  "build": {
+    "compile_exit": 0,
+    "compiler_warning_count": 0,
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v77-live-parent-identity-20261113/full-link/kernel.ZORN26-GPU-LIVE-PARENT-IDENTITY-V77.UNSELECTED.macho",
+    "kernel_sha256": "be07e1184cab37dfc52b3ccc004c247f55e5c61d1d3a3b67cbc8937962cb483d",
+    "bytes": 30548184,
+    "link_exit": 0,
+    "input_count": 1397,
+    "filelist_input_count": 1318,
+    "direct_input_count": 79,
+    "missing_input_count": 0,
+    "undefined_symbol_lines": 0,
+    "link_warning_count": 10,
+    "link_warnings_match_v76": true
+  },
+  "cpu_lock_screen_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "device_operations_performed": false,
+  "candidate_selected_packaged_or_booted": false,
+  "GPU_MMIO_DMA_submission_fences_Metal_or_GPU_display": false,
+  "touch_driver_work": false,
+  "active_device_gate": "The existing v73 fixed-runner Recovery stop gate remains active after the protected root first-page pin mismatch; this offline candidate does not clear that gate.",
+  "remaining_owner_gap": {
+    "root_constructs_complete_ZornGen7StartupGpuInputs26": false,
+    "real_current_all_master_GPU_GMU_scheduler_quiescence_owner": false,
+    "source_review": "The root/board preparation path is CPU-only. The full input bundle requires real host/stock mapping, GPU start/MMU/register/IRQ, CP/ZAP/bootstrap and direct-runtime owners. Search of the maintained root, bridge and startup-owner sources finds no caller constructing this bundle.",
+    "next_step": "Continue source-backed root/board GPU owner construction. Do not synthesize authority callbacks; identify and implement a real all-master scheduler/quiescence owner before opening direct startup."
+  }
+}

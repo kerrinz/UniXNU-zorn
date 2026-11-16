@@ -1,0 +1,93 @@
+{
+  "scope": "two independent public context I/O-table input guards;no native execution",
+  "GMU": {
+    "scope": "public input-preflight guard source/nullability cardinalities only;no context execution",
+    "original_SHA": "0ed3348b09a9ecac01651beaa7d53b3e225d14413c10b5dfb5bc36a98912fda1",
+    "candidate_SHA": "549794c358b2dc56c7fa148ddf8038ecb274e9e84d7cbca8a26977b6e5fdf3fc",
+    "old_guard_accepts_missing_callbacks_before_first_unconditional_read32": true,
+    "guard_dominates_used_latch_progress_and_first_callback": true,
+    "incomplete_presence_combinations_refused": 31,
+    "short_register_byte_counts_refused": 44,
+    "complete_presence_byte_controls_preserved": 3,
+    "host_output": "PASS=1 incomplete_tables=31 short_byte_counts=44 complete_table_byte_controls=3 no-callback-or-object\n",
+    "five_removed_guard_source_controls": [
+      {
+        "missing_check": "read32",
+        "source_refused": true
+      },
+      {
+        "missing_check": "read64",
+        "source_refused": true
+      },
+      {
+        "missing_check": "write32",
+        "source_refused": true
+      },
+      {
+        "missing_check": "write64",
+        "source_refused": true
+      },
+      {
+        "missing_check": "barrier",
+        "source_refused": true
+      }
+    ],
+    "ASan_UBSan_pass": true,
+    "new_candidate_iOS17_object_pass": true,
+    "object_SHA": "0de8d555c78f2e0bed19cdae81996176e1f33e7e0b4d5641bfe7221a8261b056",
+    "object_not_linked_or_executed": true,
+    "header_class_report_layout_unchanged": true,
+    "existing_two_callers_provide_complete_tables_not_claimed_faulting": true,
+    "no_cookie_ownership_or_mapping_right_inferred": true,
+    "no_callback_values_or_native_context_provider_success_peer_model": true,
+    "diagnostic_candidate_not_combined": true,
+    "catalog_32patches_profiles_and_role_API_unchanged": true,
+    "hardware_qualification": false,
+    "device_operations": false
+  },
+  "GPU": {
+    "scope": "second distinct public context same pre-callback argument gap;source/compile only",
+    "original_SHA": "c438ae89296658b494480128b492395ba4fd785bc669960b5bb552591e28c63b",
+    "candidate_SHA": "42bf7f15a687fa8c5df300e5b7079ad00b4a73425dd61583221a8d68eee3a41f",
+    "five_missing_member_source_controls": [
+      {
+        "missing_check": "read32",
+        "source_refused": true
+      },
+      {
+        "missing_check": "read64",
+        "source_refused": true
+      },
+      {
+        "missing_check": "write32",
+        "source_refused": true
+      },
+      {
+        "missing_check": "write64",
+        "source_refused": true
+      },
+      {
+        "missing_check": "barrier",
+        "source_refused": true
+      }
+    ],
+    "guard_before_used_kernel_asid_progress_and_first_read": true,
+    "only_initial_IO_completeness_guard_changed": true,
+    "slot_sid_bank_and_asid_rules_unchanged": true,
+    "header_class_and_report_layout_unchanged": true,
+    "new_candidate_iOS17_object_pass": true,
+    "object_SHA": "73e0aabb8c0b02e0541d1bf8361f1535fcec5275c9da6887202fc85cda43a782",
+    "object_not_linked_or_executed": true,
+    "shared_presence_arithmetic_contract_checked_once_in_GMU_review_not_repeated": true,
+    "no_native_context_callback_allocator_provider_or_route_model": true,
+    "original_catalog_pins_profiles_and_role_API_unchanged": true,
+    "hardware_qualification": false,
+    "device_operations": false
+  },
+  "review_document_SHA": "df67543c23fde622fd4c1ac1e4861b33655b7fd0d10a607cbf0bd8d623903c26",
+  "initial_source_control_checker_failure_preserved": true,
+  "diagnostic_candidate_not_combined": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

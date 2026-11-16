@@ -1,0 +1,55 @@
+{
+  "status": "actual-bootCPU-RSC-clock-trial-recovered-without-fresh-record",
+  "scope": "single-K80-ios26-bootCPU-RSC-source-clocks90s-v25",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-bootcpu26-9b28aa61a5934a1990eb984f6280f411/root-trial-rsc-bootcpu/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-bootcpu26-9b28aa61a5934a1990eb984f6280f411/root-trial-rsc-bootcpu/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-bootcpu26-9b28aa61a5934a1990eb984f6280f411/full-link/kernel.ZORN26-RSC-BOOTCPU-CLOCKS.UNSELECTED.macho",
+    "sha256": "50d2927e57fb809d0aaba2e806cfc343e28f28589fc56e3bb86cb0f1153e4b7a",
+    "bytes": 30388232,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 14,
+    "preserved": 1382,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-bootcpu26-9b28aa61a5934a1990eb984f6280f411/root-package-rsc-bootcpu/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "adb27ef9b85f61b32c12ada2b45f0e07b1212aaeb0bb80b0ec5126ef698a3a86",
+    "bytes": 11612160
+  },
+  "reuse": {
+    "source": "/Volumes/macData/projects/ios-zorn/UniXNU-houji/kernel/ios26/overlay/pexpert/arm/HoujiSpi26.inc",
+    "sha256": "566d13861cb845f2fe533870dc473c1f8480dd082d58ebc5c7fce9f450960c77",
+    "exact_reference_behavior": "INTID37 uses ml_get_topology_info()->boot_cpu->phys_id and requires initialized boot redistributor;not the migrating worker currentMPIDR",
+    "differences": "Native RSC entry stays masked;failure retains resources,does not detach/retry;existing generic current-CPU entry remains",
+    "new_root_or_Data_write": false,
+    "hardware_outcome_unproven": true
+  },
+  "recovery_seconds": 90.31432620898704,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "record_changed": false,
+  "native_record_refusal": "record identity differs",
+  "actual_failure_stage": "unknown;absence of the scoped terminal record does not prove a specific RSC or clock stage",
+  "RSC_runtime_or_clock_success_proven": false,
+  "full_root_readback_performed": false,
+  "scope_consumed_no_repeat": true,
+  "next": "Separate RSC-only exact scope with clock continuation off;do not repeat v25 or guess hardware reset/release."
+}

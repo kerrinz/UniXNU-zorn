@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-13",
+  "candidate": "v97",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v97-cpu-desktop-2ba5624c2a4547a39e88dacd3ff8ae2e/boot-package/boot.ZORN26-GPU-V97-CPU-DESKTOP-UNSELECTED.img",
+    "sha256": "d995146e36d243dc61be8fa1a966967634fe29bb8a4a1eaa26009bd5b63b35d1",
+    "bytes": 11685888
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v97-cpu-desktop-2ba5624c2a4547a39e88dacd3ff8ae2e/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "dfa65350a455a0043de51357d620756b1e3f56f8395393ec183cb824b4e255a8",
+    "bytes": 30574704,
+    "inputs": 1397,
+    "replaced": 19,
+    "preserved": 1378,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v97-cpu-desktop-2ba5624c2a4547a39e88dacd3ff8ae2e/full-link/exact-inputs.json",
+      "sha256": "422f1e1f25867c8d766078b4e48fcd59ae9e90ef7f17561087ec41f378fc116a"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "1245-ZornGen7RegisterMaps26.cpo",
+      "1246-ZornGen7SmmuRuntimePm26.cpo",
+      "1250-ZornGen7SmmuDomain26.cpo",
+      "1256-ZornGen7SmmuFaultIrq26.cpo",
+      "1257-ZornGen7SmmuStream26.cpo",
+      "1272-ZornGen7IccInputs26.cpo",
+      "1287-ZornGen7StartupOwner26.cpo",
+      "1305-ZornTouchPlatform26.cpo",
+      "1306-ZornRootPlatform26.cpo",
+      "1311-ZornGen7NativeBoardStage26.cpo",
+      "1312-ZornGen7PlatformBoardBridge26.cpo",
+      "1317-ZornGen7QtbFence26.cpo",
+      "1322-ZornGen7InactiveOwner26.cpo",
+      "1374-ZornGen7DarwinBoardOwner.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "houji_recovery26.o"
+    ],
+    "device_access": false,
+    "platform_root_contract_rebuilt": true
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v97-cpu-desktop-2ba5624c2a4547a39e88dacd3ff8ae2e/boot-package/verified.json",
+    "sha256": "8550a47f7e8c3a9c5abbbd119a8e0f45fd0a05c1e76d411a78dd250b07da4226"
+  },
+  "cpu_desktop_parent": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-no-home26-fb591cab872e44a099af1968fe02391b/boot-package/verified.json",
+    "sha256": "3df0ff779ec07ffde6e1ea070845550a22c833184a0b286bcf78e720f0ee8de6"
+  },
+  "gpu_source_parent": "v96 guarded SMMU reservation",
+  "gpu_scope": "Guarded mappings, SMMU capability probe and endpoint reservation. CPU rendering selected.",
+  "checkpoint": "One CPU/FT3683/GPU record after PID1 EL0, using the existing single native page.",
+  "root_contract_refusal": "First merge refused the old root digest. GPU root platform object rebuilt with the unchanged desktop root window header and the v87 board-stage header.",
+  "tests": [
+    "Full ordered 1397-object link and exact input archive",
+    "No undefined symbols",
+    "Desktop ADT, FD and installed root digest matched",
+    "FAT readback and loader parser passed",
+    "Five integrated decoder controls passed"
+  ]
+}

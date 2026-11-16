@@ -1,0 +1,60 @@
+{
+  "time": "2026-11-10T23:42:04.335504+00:00",
+  "status": "K80-iOS26-framebuffer-format-admission-compiled-and-reference-linked",
+  "source_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-store-completion-98943c6418c94577939817e85c17f4b6",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-format-admission-candidate",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-format-admission26/present-format-admission.patch",
+  "compile": {
+    "name": "MiniIOMobileFramebuffer.cpo",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-format-admission26/MiniIOMobileFramebuffer.cpo",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-format-admission-candidate/MiniIOMobileFramebuffer.cpp",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-store-completion26-98943c6418c94577939817e85c17f4b6/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+    "sha256": "4e05e89c8a265d22c0c9b9038a5b51618ec231412ff36f5cdd375a0a9149bce6",
+    "warnings": 0
+  },
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-format-admission26/full-link/kernel.ZORN26-PRESENT-FORMAT-ADMISSION.UNSELECTED.macho",
+    "sha256": "66a5f4306d7e8c371b5f6b046f85097f2430798deb0b1a496add1368fe116114",
+    "bytes": 30415448,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "object_disassembly": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-format-admission26/admission-disassembly.txt",
+  "findings": [
+    "MiniIOSurface creation supports planar surfaces. The existing CPU draw and acquire routines only support a single packed 32-bit plane.",
+    "The new SwapEnd admission returns Unsupported for an existing surface that the CPU compositor cannot draw, before publishing any queue slot. All newly acquired references, including the rejected surface, are dropped after unlocking.",
+    "Empty layers, missing-surface handling, the issuer barrier, and the actual cache-acquire terminal path remain separate."
+  ],
+  "producer_lineage": {
+    "inputs": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostRing26.cpp",
+        "sha256": "e7d26938f28abb3aa125e2a5c9cc3a7d1fcbbc651232dc77dc43f538742445b3"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/common/gpu/metal-abi/NativeAdrenoABI.h",
+        "sha256": "0a37fb621488b410e2f1206a161e5d537313c2eed7e27bd9c46817c09d81bc13"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/graphics/turnip/src/freedreno/vulkan/tu_knl_darwin.cc",
+        "sha256": "7bca2f6fa1590d51adc6be9d1a2bd8f263b09b7eed14ecefe05cc2ae1aebae86"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/MiniIOSurface.cpp",
+        "sha256": "197f895aec02954a8e26d6b7478127a85bea93214461c09a66a446f15d1b02a1"
+      }
+    ],
+    "bound": false,
+    "finding": "The Metal frontend retains IOSurface identity. Turnip sends only task address and extent through BoImport, and submit names IB handles and ranges. Actual direct retirement acquires the writable imports conservatively. None of these records declares which IOSurface was written by a particular submission. The existing ring barrier was retained."
+  },
+  "installed": false,
+  "target_executed": false,
+  "phone_access": false,
+  "full_root_readback_performed": false,
+  "limits": [
+    "No planar composition was added. No GPU fence attribution, physical display, or SwapWait runtime evidence."
+  ]
+}

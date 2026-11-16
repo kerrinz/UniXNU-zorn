@@ -1,0 +1,57 @@
+{
+  "status": "offline-native-active-SMMU-global-fault-controller-and-IRQ-promotion-compiled-linked-unexecuted",
+  "time": "2026-11-10T21:48:02.044272+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-active-faults26-ca22256f225a46c1b0e91b6d42ce34d4",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-active-faults-ca22256f225a46c1b0e91b6d42ce34d4",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-active-faults26-ca22256f225a46c1b0e91b6d42ce34d4/full-link/kernel.ZORN26-NATIVE-SMMU-ACTIVE-FAULTS.UNSELECTED.macho",
+    "sha256": "b49cfd1cd937bd8cbc6e3eb8365fe0a75cc00d8fc485ae2c0286ef05ee874edc",
+    "bytes": 30435184,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 40,
+    "preserved": 1356,
+    "undefined_symbols": 0
+  },
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-active-faults26-ca22256f225a46c1b0e91b6d42ce34d4/native-smmu-active-faults.patch",
+  "primary_source": {
+    "arm-smmu.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu.c",
+      "sha256": "2cbba16819120e420aa0c770affe2a3439f794c14ed1582647dd101131082524"
+    },
+    "arm-smmu-impl.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-impl.c",
+      "sha256": "90a299b1dd1dd14773d843e8318868e11c7a25b0f742abc599d0c1ecca0d113c"
+    },
+    "arm-smmu-qcom.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c",
+      "sha256": "17897f264124133ae29d09d5461005bad8ea9e262a3b81ca4c5946508ec50ede"
+    },
+    "arm-smmu.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu.h",
+      "sha256": "ad504868b094ccaf4ee5d5c1b5ced20aca4390ec3be2200d03d23dff5518c1d3"
+    },
+    "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9"
+  },
+  "implementation": "Under actual native controller client/PM/maps/startup owner:CR0 active and GFSR0 required;global sync with explicit4096 read budget;only GFRE/GFIE/GCFGFRE/GCFGFIE0x36 added;exact CR0 readback and GFSR checked;then sole native masked handler promotes through actual checked GIC enable and verifies no fault. Real failure latches/retained resources;no retry/reset/FSR clear.",
+  "bounded_poll": "4096 actual reads,not Linux elapsed-time equivalence",
+  "native_mmio_backend": "Actual map32bit read0/48/74 and write0(with only0x36 permitted against actual lastCR0) or70(UINTMAX sync);actualDSB barrier;no constant success authority callbacks.",
+  "normal_external_authority_path_preserved": true,
+  "disabled_controller_rejected": true,
+  "disabled_controller_cold_init_still_incomplete": true,
+  "all_foreign_secure_bank_DMA_ownership_not_inferred": true,
+  "context_stream_bank_reset_translation_not_added": true,
+  "native_arm_only_after_actual_control_readback": true,
+  "IRQ_fault_during_enable_not_overwritten": true,
+  "actual_link_symbol_check": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-active-faults26-ca22256f225a46c1b0e91b6d42ce34d4/actual-link-symbols.txt",
+  "header_dependent_objects_recompiled": 34,
+  "identity_objects_recompiled_for_changed_struct_layout": 6,
+  "source_entry": "ZornGen7DarwinBoardOwner::prepareNativeGlobalMaskedSmmuIrq conditional zorn26_smmu_active_faults=1",
+  "new_flag_selected": false,
+  "new_device_identity": false,
+  "new_device_scope": false,
+  "new_boot_package": false,
+  "device_execution": false,
+  "hardware_qualified": false,
+  "latest_actual_hardware": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-native-SMMU-bootCPU-IRQ26.json"
+}

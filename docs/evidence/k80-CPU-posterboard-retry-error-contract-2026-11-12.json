@@ -1,0 +1,57 @@
+{
+  "recorded_at": "2026-11-12T14:00:36.198608+08:00",
+  "status": "maintained-iOS26-PosterBoard-error-output-contract-patch-offline-verified",
+  "source_candidate": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-retry-error26-109747c765804e629d250861a4234247/result.json",
+    "sha256": "a9503057b450d712ba82e6561876ecbcd193f023f60c96d3342c62869ee80e19"
+  },
+  "source_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/ios26/userland/posterboard-nserror-contract.patch",
+    "sha256": "6c2e324f774c8beb7940b21b2a78e93d0027614cc4d4a594934b1c1559e02541"
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/ios26/userland/posterboard-nserror-contract.json",
+    "sha256": "9eef0230afdffc7d0f1c38a3a949104b8941628166e1d76a1cf8253be99eaa59"
+  },
+  "apply_script": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/apply-ios26-posterboard-error-contract.py",
+    "sha256": "b1c98ec59741354b6343478c57bcf90183a4f72c15ba3cca83cb2936dda4a625"
+  },
+  "regression_script": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-posterboard-error-contract.py",
+    "sha256": "25fafaa170967b8a8c13243325efb60dde8333328a368c5a551b1fe800524848"
+  },
+  "maintained_actual_body_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-retry-error26-109747c765804e629d250861a4234247/maintained-regression/result.json",
+    "sha256": "34e9199e81117faa210bc5cb17328a5c695f9c8dc1ec0c2d2f4422dcb760a4af"
+  },
+  "patch_application_and_native_library": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-retry-error26-109747c765804e629d250861a4234247/maintained-patch-verification.json",
+    "sha256": "a15f2ea13019ddcf8f7348ade64f46ddcbb66645c736309a40a754a9e23e9269"
+  },
+  "findings": [
+    "Existing fallback successes could leave intermediate failure errors in caller output or clear caller output on success.",
+    "The URL-conformance fallback could expose the first rather than the final failed attempt error.",
+    "All five wrappers now buffer errors locally and publish to the caller only after final failure;success leaves caller output untouched.",
+    "Eight initial error-read guards remain integrated;underlying call counts,argument sequences,compatibility options and Boolean results remain unchanged."
+  ],
+  "tests": {
+    "read_cases_each_variant": 40,
+    "retry_cases_each_variant": 69,
+    "baseline_caller_output_differences": 16,
+    "success_differences": 14,
+    "final_failure_differences": 2,
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "native_iOS26_compile_and_signature_verified": true,
+    "wrong_baseline_and_existing_output_refused": true
+  },
+  "scope": "Our C wrapper logic at typed host boundaries and native iOS26 compilation;Apple framework internals and physical boot behavior not tested by these regressions.",
+  "pending64page_installation_unchanged": true,
+  "root_image_created_for_fix": false,
+  "phone_access": false,
+  "UI_cause_proven": false,
+  "goal_complete": false
+}

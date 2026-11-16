@@ -1,0 +1,40 @@
+{
+  "updated": "2026-11-02T23:12:32.566058+08:00",
+  "implementation": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect-zorn-gpu-dt-inputs.py",
+  "source_sha256": "4e53b565ef8eaf46ec9fab115d53adfebbeee965e397c94f13573a3fee6bd9d8",
+  "parser": "/Volumes/macData/projects/ios-zorn/UniXNU/scripts/unixnu/devicetree.py",
+  "parser_sha256": "cfda7d9aad326729d1e60bbf2db555c3d1af298d25747377b314dac007e8097d",
+  "input": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/touch/live-fdt.dtb",
+    "sha256": "8c3712d8850a3eba0c53d266ea96268f3b908975cabe9e866bcf991dbcc8382a"
+  },
+  "roots": [
+    "/soc/qcom,kgsl-3d0@3d00000",
+    "/soc/qcom,gmu@3d69000"
+  ],
+  "source_nodes": 84,
+  "unresolved": [
+    {
+      "node": "/soc/qcom,kgsl-3d0@3d00000",
+      "reference": {
+        "property": "clocks",
+        "unresolved_phandle": 0,
+        "unresolved_tail_cells": [
+          0
+        ],
+        "reason": "provider/arity unavailable; no argument boundaries inferred"
+      }
+    }
+  ],
+  "tests": "New tool only: reference arity,duplicate phandle/path,unresolved tail,SHA and no-overwrite guards passed",
+  "initial_refusal": "First cached tree traversal refused clocks=<0>;now retains unresolved tail without guessing provider argument boundaries. Initial GPU-only output preserved;Gen7 GMU compatible added from actual cached input.",
+  "generated_policy": false,
+  "hardware_qualification": false,
+  "new_driver_patches": 0,
+  "existing32_patches_independent_UNAPPLIED": true,
+  "old_suites_reexecuted": false,
+  "device_operations": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

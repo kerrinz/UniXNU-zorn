@@ -1,0 +1,63 @@
+{
+  "scope": "source declared-window-extent guard;no live mapped-window or MMIO reproduction",
+  "original_SHA": "65331246929103a23edac795d9f84b50a28cbd3639aaad2a90f9b9aa9bde7c2c",
+  "candidate_SHA": "1190015495dd8ac0a1fa40d66bf1ac166e6bf39aa49f900c1f857b93ce34b871",
+  "five_direct_loads": [
+    [
+      "id0",
+      "0x20"
+    ],
+    [
+      "id1",
+      "0x24"
+    ],
+    [
+      "id2",
+      "0x28"
+    ],
+    [
+      "scr0",
+      "0x0"
+    ],
+    [
+      "fault",
+      "0x48"
+    ]
+  ],
+  "last_load_required_bytes": 76,
+  "short_nonzero_declared_byte_counts_refused": 75,
+  "inclusive_byte_controls_preserved": 3,
+  "host_output": "PASS=1 short_declared_counts_rejected=75 inclusive_extent_controls=3 no-getter-window-or-MMIO\n",
+  "ASan_UBSan_pass": true,
+  "three_source_corruptions_refused": [
+    {
+      "name": "missing-gate",
+      "refused": "last32-bit read must fit declared bytes"
+    },
+    {
+      "name": "last-read-not-covered",
+      "refused": "last32-bit read must fit declared bytes"
+    },
+    {
+      "name": "extra-read",
+      "refused": ""
+    }
+  ],
+  "existing_getter_counts_and_read_count_order_offsets_unchanged": true,
+  "no_new_return_stop_mapping_or_policy_call": true,
+  "source_type_and_class_layout_unchanged": true,
+  "new_candidate_iOS17_object_pass": true,
+  "object_SHA": "c57a0cd13279ece1736acb69478fb281e535cc8aba8d00199d14847040391c78",
+  "target_not_linked_or_executed": true,
+  "other_service_reference_cookie_diag_candidates_not_combined": true,
+  "existing_K80_window_not_claimed_short": true,
+  "no_getter_service_provider_window_base_address_or_MMIO_model": true,
+  "catalog_pins_32patches_profiles_and_role_API_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "review_document_SHA": "e5ae3ab41043114bdf1f0f785ccf091cab0f5ea8a5283e0c0330505c347d2555",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-service-smmu-extent-20261103/service-smmu-extent.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

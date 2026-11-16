@@ -1,0 +1,38 @@
+{
+  "scope": "declared fence-buffer byte count before framed timeline packet emission",
+  "original_SHA": "85df538657861424f2f1c598d8126add5ab5e3401e76438d8e1ddfdef7b672c9",
+  "candidate_SHA": "7e42ed3c7c66b236d045345d14f0a033c74153e0413c5bab6556f0ed75d8924c",
+  "original_attach_accepts_fence_bytes_at_least_64": true,
+  "original_timeline_reader_has_extent_guard_but_writer_preflight_missing": true,
+  "original_public_setTimeline_does_not_check_extent": true,
+  "required_declared_bytes": 1536,
+  "three_short_counts_previously_unchecked_now_refused": [
+    64,
+    512,
+    1535
+  ],
+  "four_boundary_mode_controls_preserved": true,
+  "three_source_mutations_refused": [
+    "removed",
+    "off-by-one",
+    "plain-only"
+  ],
+  "scalar_output": "ok=1 short_declared_counts=3 boundary_controls=4 scalar-only\n",
+  "ASan_UBSan_pass": true,
+  "new_iOS17_Ring_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "only_new_preflight_no_packet_log_or_layout_changes": true,
+  "no_ring_words_address_IOVA_stamp_callback_cache_or_native_success_model": true,
+  "actual_K80_short_fence_not_claimed": true,
+  "old_commit_patch_and_32patches_not_combined": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "prior_count_audit": {
+    "ring_words_minimum": 2048,
+    "ring_words_maximum": 262144,
+    "max_framed_extra": 101,
+    "reserved_words": 8,
+    "no_count_overflow_or_underflow_gap": "attach minimum dominates extra+8; first size bound dominates later sum; no old arithmetic suite rerun",
+    "old_drainBus_issue": "already documented in stall-eligibility contract; not reopened or turned into new stop/ACK policy"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "two_real_static_source_envelopes": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/zorn_images_OS3.0.9.0.WOKCNXM_16.0/images/aop.mbn",
+      "sha256": "99c42ab41cf00caa1c3d9a43f84a54531791fe1bfffdfb5ad7c6c1dff3c5dffb",
+      "program_rows": 11,
+      "static_ELF_refused_as_DB": true,
+      "metadata_PT_NULL_preserved": true
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/zorn_images_OS3.0.9.0.WOKCNXM_16.0/images/aop_devcfg.mbn",
+      "sha256": "3ac23872cccfae26ffe66d6b7d0d74328fae7f8aa105493d35f7be8c915ecdf8",
+      "program_rows": 4,
+      "static_ELF_refused_as_DB": true,
+      "metadata_PT_NULL_preserved": true
+    }
+  ],
+  "new_malformed_refusals": [
+    {
+      "case": "short-header",
+      "error": "truncated ELF32 source header"
+    },
+    {
+      "case": "wrong-endianness",
+      "error": "ELF32 little-endian source envelope required;no snapshot eligibility inferred"
+    },
+    {
+      "case": "wrong-header-size",
+      "error": "unsupported ELF source header version/size"
+    },
+    {
+      "case": "program-table-OOB",
+      "error": "invalid source program-table extent"
+    },
+    {
+      "case": "program-row-width",
+      "error": "invalid source program-table extent"
+    },
+    {
+      "case": "extended-program-count",
+      "error": "extended/oversized ELF tables are outside this source reader"
+    },
+    {
+      "case": "load-file-OOB",
+      "error": "program file extent outside supplied source"
+    },
+    {
+      "case": "load-file-larger-than-memory",
+      "error": "load source file bytes exceed declared memory bytes"
+    },
+    {
+      "case": "invalid-alignment",
+      "error": "non-power-of-two source alignment"
+    },
+    {
+      "case": "contradictory-section-metadata",
+      "error": "extended/contradictory empty section metadata unsupported"
+    },
+    {
+      "case": "unknown-nonELF-kind",
+      "error": "ELF32 little-endian source envelope required;no snapshot eligibility inferred"
+    },
+    {
+      "case": "wrong-source-SHA",
+      "error": "local source SHA mismatch"
+    },
+    {
+      "case": "file-backed-section-OOB",
+      "error": "section file extent outside supplied source"
+    }
+  ],
+  "new_scope_edge_cases": [
+    {
+      "case": "empty-payload-no-file-ownership",
+      "passed": true
+    },
+    {
+      "case": "NOBITS-not-file-backed",
+      "passed": true
+    },
+    {
+      "case": "literal-magic-not-a-live-DB",
+      "passed": true
+    },
+    {
+      "case": "literal-report-bound-no-absence-claim",
+      "passed": true
+    }
+  ],
+  "child_no_write_or_process": true,
+  "source_inputs_unchanged": true,
+  "no_success_commandDB_snapshot_or_expected_version": true,
+  "no_firmware_or_native_execution": true,
+  "old_firmware_suites_or_driver_compiles_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "scope": "SHA-bound static ELF source envelope only;not coherent memory DB or firmware authentication",
+  "bounded_reader": {
+    "two_new_byte_boundaries_pass": true,
+    "inspect_function_AST_unchanged": true,
+    "one_changed_reader_real_source_guarded_pass": true,
+    "child_no_write_or_process": true,
+    "original_suite_not_rerun": true
+  },
+  "source_files": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect-zorn-aop-source-kind.py": "3dea6af4787f222717e242f759ad398a6572c5294fcfcf59b8918f0e6f627f6d",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-aop-source-kind.py": "df1f75adea113f4da60bc146d38343a425983c1a222753bb9073a20a097f6dde",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-aop-source-kind-20261103/pre-bounded-read-inspector.py.txt": "986bf9323aebc0c284a15e2c35faf7ca0596a8b33c96bcf10e939264fff3fa3e"
+  },
+  "hardware_qualification": false,
+  "generated_policy": false,
+  "native_execution": false
+}

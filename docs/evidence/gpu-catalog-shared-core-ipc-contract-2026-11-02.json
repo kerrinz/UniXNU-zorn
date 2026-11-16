@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T16:08:17.633993+08:00",
+  "state": "Catalog149-shared-core-IPC-mutable-storage-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-shared-core-ipc-contract/source-contract.json",
+  "functions_body_SHA_recorded": 8,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 alternate shared-core mutable storage and selected IPC gate applicability only.8 method hashes,3 SDK IPC methods unchanged frozen provenance. No new client/request/thread/buffer/address peer or race reproduction,old suites/targets/native execution.",
+    "storage": "submit_request_ and submit_buffers_ are members of NativeAdrenoUserClient,not wrapper/stack-local. Dispatch copies Submit input into core member then passes reference;submit builds core member buffer list before lower submit. Alternate factory wrappers share one borrowed core;fresh AGX private core is a different ownership path. No new allocator/storage/reset policy.",
+    "IPC": "Selected callExternalMethod uses per-client lock:defaultLocking+singleThreadExternalMethod gives write,defaultLocking alone read,disabled gives none. Read calls may overlap same client;different wrapper objects have separate lock members even write. ipcEnter/Exit increments/decrements client __ipc for lifecycle/finalize bookkeeping;not a shared-core lock or page/provider lease. Actual property/kext flags/K80 caller remain unbound.",
+    "route": "Alternate action/externalMethod add no common core lock;action forwards direct dispatch. This static call path does not inherit published AGX g.lock. Thus IPC alone supplies no general exclusion for shared mutable core across wrapper connections. No actual successful open/overlapping submit/K80 data race asserted;unselected startup/roleAPI/attachment/provider gaps remain.",
+    "global_clock": "Core dispatch has function-static borrowed vm_clock shared across all core instances and installs global native_adreno_vm_now_us lambda;assignment precedes schema validation. Alternate null clock can install the same callback with null borrowed value;published passes static g.clock. No per-object clock lifetime or atomic publication inferred;actual VM readers and concurrent provider/caller need separate source binding. No clock return/status/default policy selected.",
+    "AGX": "Frozen runCore g.lock serializes listed published generic dispatch/setters;direct poller routes runCore but does not gain runTimed extras. SDK per-connection gates and shared g.lock protect different scopes. Cross-alternate/published source coexistence is not proof both paths are selected or active on K80.",
+    "decision": "No31st guessed global/per-core lock,atomic/generation/refcount/cancel/reset/free/retry/clock/priority/security repair.30 independent UNAPPLIED/all native OFF;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal/rolefullcore unavailable. No alternate selection/component/caller/kernel/FD/candidate/query/HFI/log/carrier/wire/CPU expansion."
+  },
+  "qualification": "Conditional shared-core mutable storage/IPC applicability source only;not actual race/native request/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

@@ -1,0 +1,116 @@
+{
+  "date": "2026-11-09T16:23:26.324056+00:00",
+  "status": "actual-installed-root-ADT-producer-consumer-mismatch-fixed-in-new-offline-carrier",
+  "previous_boot_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-installed-root-trial26.json",
+  "old_boot_sha256": "5a4431773133876d2b2ca597392877afee4e7f2ddb1c2ddda8f55c1c2ba82781",
+  "actual_previous_ADT_sha256": "59db3a06fed99034bc2c2451911bde380ad17d2b7b12c5f4d0bbe24dfd52e724",
+  "actual_original_loader_C_consumer": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/loader-reference/DarwinBootPkg/Driver/DarwinBootImage.h",
+  "actual_loader_PE_sha256": "ccae7c1d2d7934812a5668c9b33c409ae3850d21aa20999259d592a533b021d8",
+  "consumer_contract": "AdtNode requires chosen dram-base/dram-size zero u64 relocation slots and one zero hakios,secondary-entry slot;Boot rejects a failed parse/missing slot before kernel entry. These are filled only from actual loader allocation and trampoline.",
+  "actual_defect": "Installed-root ADT still had donor nonzero dram-base/dram-size and lacked secondary-entry. Prior package builder checked hashes/root/RAMDisk shape but omitted already available K80 loader normalization.",
+  "implementation": "Maintained fixed builder now always reuses existing prepare_adt.py on the root ADT before creating the independent FAT/carrier. Changes exactly the two zero relocation slots plus secondary-entry;reads back all5 FAT members. No new memory values,scope claims or target effects.",
+  "producer_and_delta": {
+    "source_ADT": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/UniXNU/Payloads/kernel.macho.adt",
+    "source_ADT_sha256": "59db3a06fed99034bc2c2451911bde380ad17d2b7b12c5f4d0bbe24dfd52e724",
+    "normalized_ADT": "out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/kernel.loader-bound.UNSELECTED.adt",
+    "normalized_ADT_sha256": "7fdd32a78ea44ac5bce8dedc9ffa34dd684ee73e8623e193c095093fc222bb49",
+    "existing_producer": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/boot/prepare_adt.py",
+    "existing_producer_sha256": "8974ded8bf8b89e41115577f8072606d33961c8809a80c72589b2315685e5295",
+    "codec": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/common/boot/ios26_adt.py",
+    "codec_sha256": "6b0e43def40570c8dec0d5290b3f94cf760eb5a9f143c40534c9978437bc57ef",
+    "changed_properties": [
+      "/device-tree/chosen/dram-base",
+      "/device-tree/chosen/dram-size",
+      "/device-tree/chosen/hakios,secondary-entry"
+    ],
+    "slots_zero_not_addresses": true,
+    "allocation_request_8GiB_unchanged": true,
+    "root_window_digest_board_and_other_properties_unchanged": true,
+    "idempotent": true,
+    "phone_accessed": false
+  },
+  "actual_original_C_consumer_checks": {
+    "actual_original_C_header": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/loader-reference/DarwinBootPkg/Driver/DarwinBootImage.h",
+    "genuine_UEFI_scalar_headers": true,
+    "host_ABI_correction": "Use actual SDK CONST VOID* reader prototypes and UEFI short wchar;initial host compile kept. No target headers/stubs or runtime changed.",
+    "cases": [
+      {
+        "case": "actual-deployed-raw-ADT-rejected",
+        "arguments": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/consumer-check/actual-consumer",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-terminal26/full-link/kernel.ZORN26-installed-root-artifact.UNSELECTED.macho",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/UniXNU/Payloads/kernel.macho.adt",
+          "0"
+        ],
+        "exit": 0,
+        "actual": "{\"kernel_status\":0,\"ADT_parser_ok\":false,\"bytes_consumed\":9400,\"ADT_bytes\":48192,\"owned_window_request_bytes\":0,\"required_slots_present\":false,\"loader_preflight_admitted\":false,\"target_code_executed\":false}\n",
+        "sanitizer_stderr": "",
+        "parsed_actual": {
+          "kernel_status": 0,
+          "ADT_parser_ok": false,
+          "bytes_consumed": 9400,
+          "ADT_bytes": 48192,
+          "owned_window_request_bytes": 0,
+          "required_slots_present": false,
+          "loader_preflight_admitted": false,
+          "target_code_executed": false
+        }
+      },
+      {
+        "case": "normalized-loader-slots-admitted",
+        "arguments": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/consumer-check/actual-consumer",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-terminal26/full-link/kernel.ZORN26-installed-root-artifact.UNSELECTED.macho",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/kernel.loader-bound.UNSELECTED.adt",
+          "1"
+        ],
+        "exit": 0,
+        "actual": "{\"kernel_status\":0,\"ADT_parser_ok\":true,\"bytes_consumed\":48236,\"ADT_bytes\":48236,\"owned_window_request_bytes\":8589934592,\"required_slots_present\":true,\"loader_preflight_admitted\":true,\"target_code_executed\":false}\n",
+        "sanitizer_stderr": "",
+        "parsed_actual": {
+          "kernel_status": 0,
+          "ADT_parser_ok": true,
+          "bytes_consumed": 48236,
+          "ADT_bytes": 48236,
+          "owned_window_request_bytes": 8589934592,
+          "required_slots_present": true,
+          "loader_preflight_admitted": true,
+          "target_code_executed": false
+        }
+      }
+    ],
+    "EFI_services_executed": false,
+    "target_kernel_or_PAC_executed": false,
+    "device_calls": 0
+  },
+  "corrected_boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/boot.ZORN26-INSTALLED-UFS-ROOT.UNSELECTED.img",
+    "sha256": "bb5b914fbaca861ddecb2d0b038b3401fcdd37e22184a181c0a670ab3bf497a4",
+    "bytes": 11567104
+  },
+  "corrected_FAT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/loader-bound-files.UNSELECTED.fat",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/inputs/FAT-loader-bound-files.UNSELECTED.fat",
+    "sha256": "728579af93b059f2a459eb164af9e0f3f75665515a675f81bcbae3dd633712fa"
+  },
+  "corrected_ADT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/kernel.loader-bound.UNSELECTED.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/inputs/member_kernel.macho.adt-kernel.loader-bound.UNSELECTED.adt",
+    "sha256": "7fdd32a78ea44ac5bce8dedc9ffa34dd684ee73e8623e193c095093fc222bb49"
+  },
+  "pack_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/verified.json",
+  "source_provenance": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-loader-bound-boot26-20261110/inputs",
+  "kernel_unchanged_sha256": "0d867627c845212405f5e341bc444fe2e79feeac51b784b64879c9a68f99c266",
+  "FD_unchanged_sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+  "manager_loader_menu_unchanged": true,
+  "root_image_unchanged_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "root_UFS_installation_not_repeated": true,
+  "actual_scope_consumed_no_retry": true,
+  "phone_accessed_this_repair": false,
+  "target_kernel_EFI_or_API_executed_this_repair": false,
+  "normalizer_executed_on_host_bytes_only": true,
+  "cause_qualification": "Proves a concrete loader rejection for the exact prior input and that corrected bytes pass the same C preflight;not an observation of the phone PC or proof that later allocation/PAC/kernel/root stages succeed.",
+  "new_phone_authorization_or_claim": false,
+  "ready": false,
+  "full_goal_complete": false
+}

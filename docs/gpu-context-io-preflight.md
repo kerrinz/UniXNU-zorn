@@ -1,0 +1,13 @@
+# Public GMU and GPU I/O-table preflight
+
+Both exact context bringUp methods checked a nonnull I/O-record pointer but did not check its callback members before latching used state,calling progress and unconditionally invoking read32 for ID2. The kit checks required callbacks later,after this first use and potentially after allocations. An incomplete caller-supplied table can therefore reach a null indirect call or start work before its invalid argument is diagnosed. The retained Service and board binder supply complete tables;this review does not claim either current caller faults.
+
+Two independent UNAPPLIED source candidates now require read32/read64/write32/write64/barrier and at least0x2c register bytes before the first latch/progress/callback. The byte bound is derived solely from the existing first read at0x28 plus4;it is not selected K80 geometry or ownership. Cookie is not newly required to be nonnull,because a callback may legitimately use no cookie. Existing bank/ASID/slot/SID rules,report/class layouts and all subsequent code remain unchanged. This adds no retry loop or native operation.
+
+The host fixture represents only five member-presence booleans and a byte count,no function pointers or callback returned values. It covers31 incomplete tables,44 short counts and3 complete-presence byte controls. Those positive decisions mean input completeness only,not a successful context or hardware peer. Five removed-check source controls are checked for each distinct context. The common boolean arithmetic is run once rather than repeated for the GPU sibling. One changed-candidate real-header iOS17 object per context compiled;neither object links or executes. No native context/index/object,allocator,provider,progress/read/write/barrier callback or MMIO runs.
+
+An initial checker control incorrectly assumed a space after the multiline write64 guard. It failed before compilation. Its checker preimage/error record are retained;whitespace-aware removal fixed the test. Candidate implementation and compiler flags were unchanged. The passing GMU review is in review/,and the distinct GPU review is in gpu-context/.
+
+Original catalog,pins,32 patches,8 profiles and prior diagnostic/cookie candidates remain unchanged and uncombined. The diagnostic report expansion is not included here;the original report ABI remains in use. No wire/log/carrier or component/runtime-caller selection changes.
+
+A separate pending source question is Service's direct five SMMU ID/fault loads: windowCount and windowAddress are checked,but the raw byte extent before the last load at0x48 needs explicit source/caller review. Do not construct a window or execute a getter,service or register read to investigate it.

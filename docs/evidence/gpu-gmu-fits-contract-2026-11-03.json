@@ -1,0 +1,27 @@
+{
+  "scope": "static fits/BindMmio audit and numeric expression model only;no MMIO descriptors or real addresses",
+  "primary_sha256": "d61daa0b10038314922400daf6288a957e973043e171f986f5f226f2dff2de09",
+  "numeric_boundary_cases": 15,
+  "sanitizers_pass": true,
+  "static_publication_order": {
+    "output_zeroed_before_validation": true,
+    "all_window_checks_before_publication": true,
+    "no_argument_failure_after_publication": true,
+    "requires_disjoint_input_output_from_primary_header": true
+  },
+  "counterexample_found": false,
+  "source_patch_required": false,
+  "branch_finite_complete": true,
+  "native_descriptor_or_callback_constructed": false,
+  "BindMmio_or_MMIO_or_validator_executed": false,
+  "selected_target_compile": false,
+  "hardware_qualification": false,
+  "mapping_authority": false,
+  "generated_policy": false,
+  "compiler_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+  "checker_sha256": "2fd2ff90937125bbc8f6feaffe140891ed5b3764eea4bba7fdc97f809b8944d2",
+  "header_sha256": "551fb5cc0a7b6d547ab1f9d9dfa6be2b602b291f5a6d6b278ca2d5a64e164b24",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

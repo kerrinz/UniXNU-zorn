@@ -1,0 +1,32 @@
+{
+  "candidate": "K80 iOS26 v89 guarded GPU register mapping",
+  "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-guarded-native-maps-v89-20261113/ZornGen7StartupOwner26.cpp",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-native-maps-v89-20261113/full-link-v1/link-result.json",
+  "package_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-native-maps-package-v89-20261113/verified.json",
+  "artifact_id": "92b030ab36d443559ece82db516de52c",
+  "kernel_sha256": "357447ed2f4150048fb07d174b9de995afe2c1c6ff3a0f89639d7605562bafe4",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-native-maps-package-v89-20261113/boot-package/boot.ZORN26-GPU-GUARDED-NATIVE-MAPS-V89.UNSELECTED.img",
+    "sha256": "3369fe8b74cd1069a1a6b936ff652d7faa90f5aac9079980df1cc25f2e9b863a",
+    "bytes": 11689984
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_userland_progress=1 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0 zorn26_gpu_board_stage=1 zorn26_gpu_board_record=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1",
+  "cpu_baseline": {
+    "owner_confirmed_lockscreen_kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "before_and_after": {
+      "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+      "boot_sha256": "9c674c2959074a25db38e44cc26674e397f4b4c56184f439bffd8df3f647801f",
+      "fat_sha256": "c7c9c13f75c4ecd418011d019351ad96f2cd3e75107deaa15f5223beed4d9cc9",
+      "menu_sha256": "a9d254b6658f55991b0fa2f99ffa2d83bf4ab8d3b90251d274d65d7ccb4973bf"
+    },
+    "read_only_reference": true,
+    "modified": false
+  },
+  "stage": "The native captured CommandDB worker requires the live board-stage provider claim before progressing. After RSC, clock and domain preparation it creates the operation guard on the handed-off owner and binds the exact maps. The selected route returns at that point.",
+  "hardware": {
+    "device_accessed": false,
+    "booted": false,
+    "fixed_runner_scope_created": false
+  },
+  "next": "Qualify a new fixed runner scope with exact v89 inputs and fresh Recovery protections. Complete GMU firmware and HFI authorities independently."
+}

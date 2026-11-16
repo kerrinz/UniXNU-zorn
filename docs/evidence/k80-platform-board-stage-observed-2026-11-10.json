@@ -1,0 +1,121 @@
+{
+  "status": "actual-platform-owned-native-CPU-board-preparation-observed-recovered",
+  "date": "2026-11-10T07:31:00.535769+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e",
+  "source_selection": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-board-stage-180df53490bb4965960ba02415a3e12e",
+    "firmware_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-board-stage-cf0230c42a654e18b2e7c9af1a0ec326",
+    "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-board-stage26-cf0230c42a654e18b2e7c9af1a0ec326/full-link-current",
+    "prior": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8",
+    "scope": "Actual root platform owns topology gate,explicit empty imported-GPU-backing collection and stage/worker references;no GPU/hardware authority result inferred"
+  },
+  "compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/compile-result.json",
+  "actual_call_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/actual-platform-board-link-proof.json",
+  "EL0_call_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/actual-EL0-link-proof.json",
+  "source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/source-manifest.json",
+  "kernel_sha256": "cddf629cc692e705f385f27bf37c2ebd42d48eb3591f3055671553ae00c1757b",
+  "boot_sha256": "776438868b4553b825c03a6e5ae5d8684200fb2af48eaf67fc882f4082638292",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/root-trial-platform-board-stage/trial/run.json",
+  "actual_run_result": {
+    "scope": "single-K80-ios26-platform-owned-GPU-board-CPU-stage300s-v15",
+    "status": "recovered-actual-platform-native-board-stage-record",
+    "GPU_started": false,
+    "root_mount_proven": true,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 332.8172187500022,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "PID1_image_activation_proven": true,
+    "user_mode_instructions_proven": true,
+    "log_changed": true,
+    "native_writer_readback_success_proven": false,
+    "syscall_completion_proven": false,
+    "native_CPU_board_preparation_proven": true,
+    "actual_board_stage_returns": {
+      "setup_raw": 0,
+      "thread_returned": true,
+      "thread_raw": 0,
+      "handle_returned": true,
+      "input_returned": true,
+      "input_raw": 0,
+      "preparation_returned": true,
+      "preparation_raw": 0,
+      "phase": 3,
+      "board_construction_returned": true,
+      "board_construction_raw": 0,
+      "clock_preparation_returned": true,
+      "clock_preparation_raw": 0,
+      "xo_returned": true,
+      "xo_core_initialized": true
+    },
+    "physical_display_proven": false
+  },
+  "decoded_record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/root-trial-platform-board-stage/trial/decoded-native-record.json",
+  "protected_captured_pages": {
+    "before-root_first_page.bin": {
+      "bytes": 4096,
+      "sha256": "9d18873705562ead9d5b10da6a8a51692e4361f312246367fdcbe4175aa2e05d",
+      "after_equal": true
+    },
+    "before-before.bin": {
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "after_equal": true
+    },
+    "before-root_after.bin": {
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "after_equal": true
+    },
+    "before-after.bin": {
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "after_equal": true
+    },
+    "before-Data.bin": {
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "after_equal": true
+    },
+    "before-root_before.bin": {
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "after_equal": true
+    },
+    "before-Data_metadata.bin": {
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "after_equal": true
+    }
+  },
+  "camera_summary": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e/root-trial-platform-board-stage/camera-capture-summary.json",
+  "camera_240s_inspection": "Phone shows black background with pale console columns;no legible panic text,desktop or GPU image conclusion. CPU pattern intentionally disabled in this scope.",
+  "qualification": "Actual CPU graph/zero/provider preparation,native clock resource CPU mappings and XO software core initialization only. No clock-enable,register MMIO,GPU task/fence,Metal,desktop or touch qualification.",
+  "scope_consumed_no_repeat": true,
+  "full_goal_complete": false,
+  "next_action": "Continue the direct-ring startup from the retained,device-proven platform board stage:bind real full-startup authority producers and its consuming prepared-stage caller;retain fabric-wide ICC prerequisites and actual power/security/SMMU guards. Do not rerun v14 CPU image or v15 preparation-only trial,or replace missing producers with success callbacks."
+}

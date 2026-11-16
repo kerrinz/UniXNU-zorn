@@ -1,3 +1,10 @@
 # Preserve byte-bound unified-diff context (space + tab / blank context lines).
 # Validate this data file with git apply; outer diff whitespace rules misread it.
 native/gpu-owned/bsd-caller.patch -whitespace
+# Preserve byte-pinned unified diff context in the published iOS26 patches.
+patches/ios26/userland/*.patch -whitespace
+# Preserve exact unified-diff context for the tested245 presentation sources.
+patches/diagnostics/ios26-present245/*.patch -whitespace
+# Preserve exact unified-diff context of the246 source association patches.
+patches/diagnostics/ios26-surface246/*.patch -whitespace
+patches/diagnostics/ios26-known-present247/*.patch -whitespace

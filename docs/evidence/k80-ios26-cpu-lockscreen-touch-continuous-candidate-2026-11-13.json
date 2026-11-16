@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-13",
+  "record_id": "3a3487663aae4ee1bbea4aa8e4432d93",
+  "status": "offline continuous FT3683 CPU lockscreen candidate",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-continuous26-3a3487663aae4ee1bbea4aa8e4432d93/boot-package/boot.ZORN26-CPU-LOCKSCREEN-TOUCH-CONTINUOUS-UNSELECTED.img",
+    "sha256": "4156b2f270bc06bcf90f0115c05a936fe4d769ee498811c147228a458596cc70",
+    "bytes": 11669504
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-continuous26-3a3487663aae4ee1bbea4aa8e4432d93/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "6ef15851333de5e4f22b1cb9f9360bcc9acc56be7598708f5d540a11ebceb476",
+    "bytes": 30530760,
+    "inputs": 1397,
+    "replaced": 6,
+    "preserved": 1391,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-continuous26-3a3487663aae4ee1bbea4aa8e4432d93/full-link/exact-inputs.json",
+      "sha256": "b38cfb23e6f73071908737009dfc170a6035f67c0130d1c3ebb63665811eefa0"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "1305-ZornTouchPlatform26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "houji_recovery26.o"
+    ],
+    "device_access": false,
+    "platform_object_unchanged": true
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-continuous26-3a3487663aae4ee1bbea4aa8e4432d93/boot-package/verified.json",
+    "sha256": "8219440e012c26b0926525c2141a82d99de385512ebb63c30884ab2f90201e98"
+  },
+  "sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-lockscreen-touch-continuous-3a3487663aae4ee1bbea4aa8e4432d93/ZornTouchPlatform26.cpp",
+      "sha256": "74d54e28c3cc880d3e660f317a16c5d2bd79b89cbf4258dba283056c068d41c8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-lockscreen-touch-continuous-3a3487663aae4ee1bbea4aa8e4432d93/ZornUfsOwner26.cpp",
+      "sha256": "348d23373d8ea9d253b3a50abb8e8ab93daadb75abc1471fd6ea938a3307eb90"
+    }
+  ],
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1",
+  "snapshot_after_pid1_seconds": 150,
+  "decoder": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect_ios26_lockscreen_continuous_touch_record.py",
+    "sha256": "dcd3f71eb6aa2b557cba9134b8084505da600701743c177c147bb30f9440bdd6"
+  },
+  "decoder_checks": "Five host controls, including active polling past 64, finite-record rejection, and overflow rejection.",
+  "device_admission": false,
+  "device_execution": false
+}

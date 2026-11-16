@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-11-12T21:42:00+08:00",
+  "status": "offline prefix candidate packaged, not booted",
+  "finding": "The installed root contains /private/var/db/lsd and does not contain /private/var/db/com.apple.lsd. The observer prefix /var/db/lsd does not match /var/db/com.apple.lsd, so any access to the absent directory was included in the 13438 unclassified paths from scope 998f15fd.",
+  "root_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-peer26-048883009e194aa38440ac58bb8f0725/lsd-root-configuration-audit.json",
+  "record_id": "56812d907cb74b76b18555be61763ef2",
+  "kernel_sha256": "510082418f6660fb312d34b6da21d122929ce6bc6d7d81276415ce170fff2ffe",
+  "boot_sha256": "d60000a5533c2a4e867f7ea74ae2b5d4aa1f072a5f3f22638fbc624e407bf377",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "host_test": "PASS",
+  "device_ready": false,
+  "booted": false,
+  "next": "A new fixed-runner scope can boot this unselected package once. The diagnostic bit distinguishes /var/db/com.apple.lsd from /var/db/lsd. Do not reuse scope 998f15fd."
+}

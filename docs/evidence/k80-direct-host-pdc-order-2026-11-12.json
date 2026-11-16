@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-11-12T12:20:56.046475+08:00",
+  "status": "direct-host-source-PDC-order-full-linked-unselected",
+  "cause": "The K80 KGSL direct first boot initializes CX security, observes CM3 init, loads PDC/RSC, and starts HFI. The candidate previously required PDC/RSC before CX security.",
+  "linux_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/references/k80-zorn-trees-gpu-20261106/linux-graphics/adreno_gen7_gmu.c",
+    "sha256": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+    "revision": "7d16b7d994c942808a01e2ae6b18ff7a1b7f9285",
+    "url": "https://raw.githubusercontent.com/zorn-trees/android_kernel_xiaomi_sm8650-modules/7d16b7d994c942808a01e2ae6b18ff7a1b7f9285/qcom/opensource/graphics-kernel/adreno_gen7_gmu.c",
+    "function": "gen7_gmu_first_boot"
+  },
+  "fix": "Use the existing guarded PDC/RSC programmer with the actual retained board flags after CM3 initialization and before HFI control. Report the actual PDC return. Refuse subsequent startup on CM3/PDC/HFI failure while retaining the original resources.",
+  "risk": "K80 has yet to exercise this order. PDC/RSC access after CM3 depends on the actual guarded register windows and on the existing clock, SMMU and SCM conditions. No successful host case qualifies a device operation.",
+  "source_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-pdc-order26/source.patch",
+    "sha256": "3352f9731b4db53f9cffcff8d5535fa2297a4ad7f26ad2b0a3011d0beff863c6"
+  },
+  "compile_and_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-pdc-order26/full-link/link-result.json",
+    "sha256": "cec4ac048342248ac6aa7f8d74e0ebeb84f3d951ea3050de945c6a00f95b0e63"
+  },
+  "host_order_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-pdc-order26/host-regression.json",
+    "sha256": "2c7fbda48637e00532639515bd922a02397b9c65541bfb664764cf203246687e"
+  },
+  "host_hfi_protocol_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-pdc-order26/warmboot-regression.json",
+    "sha256": "391138c7688b60302d3d75e20a0806a127edf80bfd4642fa4cb9de369918b879"
+  },
+  "initial_link_preflight_correction": "Fixed the build-only exact-input Counter comparison to count keys. Reused the already verified rebuilt objects.",
+  "device_access": false,
+  "selected": false
+}

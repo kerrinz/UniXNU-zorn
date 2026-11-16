@@ -1,0 +1,93 @@
+{
+  "status": "offline-real-TBU-power-canonical-ICC-and-normal-resume-native-cold-backend-linked-unexecuted",
+  "time": "2026-11-10T22:12:42.252282+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/full-link-final/kernel.ZORN26-NATIVE-QTB-POWER-RESUME.UNSELECTED.macho",
+    "sha256": "f91cb468f41868513e65ed87a1baa9a86432a77efbd64d13b4da2a7c0b520d49",
+    "bytes": 30462776,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 44,
+    "preserved": 1353,
+    "undefined_symbols": 0
+  },
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/native-qtb-power-resume.patch",
+  "source_delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/final-source-delta.json",
+  "primary_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-qcom-pm.c",
+      "sha256": "24877019f94ff64fd63495a684ad8a0a3b7aa3556a0781f28dd7935a23292243"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c",
+      "sha256": "17897f264124133ae29d09d5461005bad8ea9e262a3b81ca4c5946508ec50ede"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu.c",
+      "sha256": "2cbba16819120e420aa0c770affe2a3439f794c14ed1582647dd101131082524"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-pineapple-icc-source-20261109/verified/drivers/interconnect/qcom/pineapple.c",
+      "sha256": "5ffe4e07d87407b97325e967c6b151b0857fc4f82f394aa8aeb3ee8c907887b2"
+    }
+  ],
+  "MiCode_kernel_commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+  "canonical_ICC": "New real TCU requests/path0->561->4->512 share actual19nodes/domain/voter/4BCMs with GPU path17->561->4->512. No duplicated BCM graph;zero TCU request still aggregates GPU requests on canonical nodes. Real retained NativeConstraintApplication owner invokes actual RPMh backend.",
+  "TBU_source_bandwidth": "arm-smmu-qcom-pm exact avg0/peak1000 raise,avg0/peak0 normal lower;already ICC kB/s,no MBps conversion. Actual active-only property absent;default tag0 retains existing SourceTagAlways semantics.",
+  "TBU_power_before_fence": "Real current QoS-ready ICC owner,actual child/controller/source route/absence of own clock-regulator metadata checked;actual source vote0 required before QTB mapping or FENCEREQ. Same parentSMMU real PM reference independently required;no success callback or hardware lease fabricated.",
+  "early_construction": "Removed unnecessary HFI-ready admission only for genuine ICC metadata/initial-vote/QoS preparation. Existing HFI/GMU fault,when those actual objects exist,still refuses;missing SMMU domain explicitly refuses before dereference. Later GPU bootstrap/host-clock/host-bandwidth HFI requirements unchanged.",
+  "normal_resume_order": "Only after genuine cold initializer complete plus actual armed global fault IRQ:clear64bit FENCEREQ bit0 preserving other bits;actual QTB SWID_LOW read and request readback;actual parent SMMU ID0 read/write-sync;then actual TCU0/0 bandwidth request. No timeout/fault auto-resume,unmap,reset,rollback or retry.",
+  "IRQ_reuse": "Native cold path reuses the actual registered masked705 handler and promotes only after source cold init/readbacks complete;no second registration.",
+  "native_cold_MMIO": "Private retained CPU map backend exposes source ID/sCR0/GFSR/SMR/S2CR/SCTLR/FSR/global invalidation/sync offsets only,with live ID-derived geometry. Bind is reachable only after independent actual whole-controller cold authority callback returns0;QTB ACK/client open/readback never synthesizes this grant.",
+  "independent_cold_hardware_grant_still_mandatory": true,
+  "bank_context_stream_authorities_unchanged": true,
+  "full_controller_exclusion_source_implemented": false,
+  "no_foreign_secure_master_ownership_inferred": true,
+  "source_cold_initializer_not_reimplemented": true,
+  "normal_release_does_not_free_still_retained_driver_lifetime_objects": true,
+  "shared_headers_recompiled_native": 38,
+  "identity_consumers_recompiled": 6,
+  "actual_final_symbols": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/actual-final-control-symbols.txt",
+  "actual_QTB_codegen": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/actual-QTB-power-resume-object.disassembly",
+  "initial_power_link_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/full-link/link-result.json",
+  "ADT": {
+    "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/kernel.QTB-RESOURCE-PROJECTION.UNSELECTED.adt",
+    "input_sha256": "555cddad2f594cc01c2cc84880e6c251e66d4723b1c6372a0ceb244afbe53ab4",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-resume26-f05e722179f1481f8dd3ba3673690515/kernel.QTB-POWER-RESOURCE-PROJECTION.UNSELECTED.adt",
+    "output_sha256": "5c5d7d3826b7e79d6aa5e0582203625e2a2d2b7639656d0b97cf9c91a4b084b0",
+    "source": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/msm-arm-smmu-pineapple.dtsi",
+    "source_sha256": "5bac47ae22bdf7dcd078bfdab1e125159b609c263df4ed438654c1f157e73d32",
+    "source_binding_header": "/Volumes/macData/projects/ios-zorn/references/k80-pineapple-icc-source-20261109/verified/include/dt-bindings/interconnect/qcom,pineapple.h",
+    "source_binding_sha256": "108e65fde8e9e13791dbaa47c0a854d75670b53faf9d42bdb65c98781c0ceffd",
+    "source_ICC_endpoint_ids": [
+      0,
+      512
+    ],
+    "actual_path": [
+      0,
+      561,
+      4,
+      512
+    ],
+    "native_phandle_or_hardware_rights_inferred": false,
+    "only_added_property": "arm-io/gpu-smmu/gpu-qtb/k80,source-icc-route;big-endian source endpoint IDs,not native interconnect binding",
+    "old_tree_byte_identical_after_removing_only_added_property": true,
+    "selected_stock_overlay_qualified": false,
+    "device_boot_eligible": false,
+    "boot_package_created": false,
+    "device_execution": false
+  },
+  "native_GEM_QoS_backend_and_grant_still_required": true,
+  "selected_stock_overlay_qualified": false,
+  "new_device_identity": false,
+  "new_package": false,
+  "new_scope": false,
+  "new_flag_selected": false,
+  "device_executed": false,
+  "whole_image_readback": false,
+  "latest_hardware": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-native-SMMU-bootCPU-IRQ26.json",
+  "rejected_v55_device_trial_still_unexecuted": true,
+  "full_goal_complete": false
+}

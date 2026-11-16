@@ -1,0 +1,81 @@
+{
+  "recorded_at": "2026-11-14T20:15:29.118524+08:00",
+  "version": 184,
+  "stage": 5,
+  "status": "offline-real-kernel-IOUserClient-image-probe-integrated-diagnostics-and-full-build-pending",
+  "working_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "working_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage5-client-probe-snapshot/manifest.json",
+    "sha256": "ff30c704c6f27e14541aaa411116f592a377e7c0ace6b3483575a7d2f60cc91d"
+  },
+  "prior_snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/manifest.json",
+    "sha256": "bb63e09ffe990894e9bfdcfb98188f5972fbedc7d3f005f80f71df75a0090eb1"
+  },
+  "changed_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage5-client-probe-snapshot/source/ZornGen7DarwinBoardOwner.cpp",
+      "sha256": "f3edb8c66817bed0294ce3358208754dd57153e5e7b0cc8084795b3e67be4353"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage5-client-probe-snapshot/source/ZornGen7HostRing26.cpp",
+      "sha256": "13371405f49166780bb8539a9f22ba5339f6741f224d851c5ecd31ab040276bb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage5-client-probe-snapshot/source/ZornGen7HostRing26.h",
+      "sha256": "f0b156002e6b3cfa0a5bd7d79d386be988e4b2b50b7376b38a9c54f6a4c6d25f"
+    }
+  ],
+  "checks": {
+    "native-client-probe": {
+      "passed": true,
+      "result": "PASS 137 actual kernel IOUserClient probe order, exact ABI, result and failure-retention assertions\n",
+      "source_sha256": "13371405f49166780bb8539a9f22ba5339f6741f224d851c5ecd31ab040276bb",
+      "scope": "Actual wrapper/body extracted from candidate, real ABI/known-image builder/verifier, mocked IOKit/GPU/backend. Every real operation boundary injected; explicit mapping ownership and fail retention. Only target DSB is replaced by a host no-op. No hardware or Mach IPC qualification."
+    },
+    "native-client-handoff": {
+      "passed": true,
+      "result": "PASS 38 actual startup handoff lock, owner and publication failure assertions\n",
+      "source_sha256": "f3edb8c66817bed0294ce3358208754dd57153e5e7b0cc8084795b3e67be4353",
+      "scope": "Actual Board startup call site extracted with mock retained owners/gates. Nested held lock refuses publication without changing depth; failure always restores entry lock and drops only temporary call references. No hardware qualification."
+    }
+  },
+  "compilation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage5-client-probe-snapshot/compile-native-client-probe/result.json",
+    "sha256": "d909b9a17f7b8bceea3cc45a6efec6d889667f93be45f0ab4363e890096f1c31",
+    "units": 6
+  },
+  "inherited_method_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage5-client-probe-snapshot/unchanged-stage4-methods.json",
+    "sha256": "f1664210e7fbb094e1c8909d1378a3f1dea3e272336be8de0933a4bd4d140d71",
+    "count": 97
+  },
+  "implementation": [
+    "Native startup now releases its owned startup lock before actual InactiveOwner/Board publication and Ring probe, retains the exact owners across callouts and restores the same lock before returning. Any still-held nested startup gate refuses publication. Existing native service/client MACF and filter policy setup are used, without a fabricated service or new admission bypass.",
+    "Probe opens actual published service with kernel_task/type0x4147. Real IOUserClient::callExternalMethod invokes the actual externalMethod dispatch for Query/GetDeviceInfo/BoAlloc/BoCpuMap/BoMap/Submit/WaitFence/BoCpuUnmap/BoFree. The aperture and opaque BO/token/fence come from the real client. It submits the existing 247-word K80/Mesa CP_BLIT known-image command and verifies all32768 bytes through a real IOKit CPU view after actual fence/idle/cache acquire.",
+    "Inspected actual XNU mapClientMemory64 returns a caller-owned map without adding it to the Mach mapping registry. Probe explicitly retains/unmaps/releases that exact map before the real CPU-unmap method drops descriptor/lease and BoFree unmaps GPU pages. It does not claim userspace mapping registry or full Mach IPC filter-path qualification.",
+    "Normal clientClose performs inherited process close/root restore/VM detach/ASID retirement/OOB return. Probe requires empty real process list, no outstanding/poisoned resources, exactly two balanced process table transactions and matching completed fence before releasing its client reference. Failures stop/mask and retain all remaining client/map/BO resources, without reset/retry/rollback.",
+    "Adds40-word in-memory client observation including actual return/phase/method, flags, real ring/fence/CRC, BO/token/ASID, transaction counts, client OOB and close results. New startup outcomes85/86 are selected only in this offline working source; UART/UFS formatter/parser and UUID are not yet updated. No complete candidate or device operation is implied."
+  ],
+  "remaining": [
+    "Connect40-word client observation to UART/UFS formatters/parsers and retag all v184 diagnostic identity. Existing serial frame buffer must be sized for the larger payload; preserve USB transport bounds and UFS single-block constraints.",
+    "Rebuild complete affected header/layout/object closure including current ProcessTables, link full kernel, package exact candidate and run fixed new-scope input/runner checks before any hardware operation.",
+    "Run bounded real-device qualification with fresh scope/claim, independent watchdog and Recovery checks; latest completed hardware result remains v183 dedicated2D.",
+    "General application/Mach IPC client, shader/Metal, GPU presentation and complete FT3683/lifecycle hardware acceptance remain."
+  ],
+  "hardware": {
+    "executed": false,
+    "full_link": false,
+    "package": false,
+    "runner": false,
+    "claim": false,
+    "publication_entry_selected_in_working_source": true,
+    "diagnostic_retag_complete": false
+  },
+  "last_hardware_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v183-native-known-image-observed-2026-11-14.json",
+    "sha256": "e4da5840139e6605c693a931ebe1d812822d66c46e3cc19565800882c1f2ca70"
+  },
+  "constraints": "No disassembly/reverse engineering, phone operation, commit or push. All historical snapshots and consumed v183 claim unchanged. Goal active."
+}

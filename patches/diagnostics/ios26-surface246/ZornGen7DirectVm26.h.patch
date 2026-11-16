@@ -1,0 +1,18 @@
+--- a/direct-runtime/ZornGen7DirectVm26.h
++++ b/direct-runtime/ZornGen7DirectVm26.h
+@@ -67,6 +67,7 @@
+         uint64_t handle=0,iova=0;
+         size_t spans=0,mapped_spans=0;
+         unsigned permissions=0,writeback=0,shareability=0,jobs=0;
++        void *surface246=nullptr;
+     };
+     Mapping *mappings_=nullptr;
+     ZornGen7DirectVm26Region regions_[2]{};
+@@ -160,6 +161,7 @@
+      * (an IOSurface) reads what the GPU wrote, not a line prefetched while the GPU ran. Jobs name only their IBs, so every such BO
+      * is covered. int-071: an imported render target read back 672 of 4096 texels stale. */
+     IOReturn acquireImported();
++    void noteSurfaceCompletion246(uint32_t);
+     /* Diagnostic, never a proof of coherence: the 32-bit word at a mapped GPU address as the kernel's cacheable alias reads it
+      * and, when the board installed zorn_direct_dram_read32, as DRAM reads it through an uncached mapping (else ~0). */
+     IOReturn sampleWord(uint64_t iova,uint32_t *cached,uint32_t *dram) const;

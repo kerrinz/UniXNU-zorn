@@ -1,0 +1,111 @@
+{
+  "version": 222,
+  "status": "ready-retained-root-no-root-write-no-systemboot",
+  "summary": "v222 \u5b8c\u6210\u5916\u5c42mapClientMemory64\u56db\u70b9\u5019\u9009\uff1a\u5df2\u6062\u590d215\u539f\u751frun/action/clientMemoryForType\u548cowner\u8def\u5f84\uff0ckind257\u4ec5\u662f\u8bca\u65ad\u6807\u8bc6\u3002\u5f53\u524d\u5ba2\u6237\u7aef\u6700\u540e\u6210\u529fBoCpuMap13\u540e\uff0c\u4f9d\u6b21\u89c2\u5bdf\u5916\u5c42\u5165\u53e3\u3001\u771f\u5b9e\u89c6\u56fe\u56de\u8c03\u8fd4\u56de\u3001\u539f\u77ed\u8def\u5171\u4eab\u4e0a\u4e0b\u6587\u5224\u65ad\u8fd4\u56de\u548c\u539fmapping/release\u5757\u5b8c\u6210\u6216\u8df3\u8fc7\uff1bbr\u8bb0\u5f55\u56de\u8c03\u771f\u5b9e\u8fd4\u56de\u7801\uff0cbv\u8bb0\u5f55\u8fd4\u56de\u63cf\u8ff0\u7b26\u662f\u5426\u5b58\u5728\uff0cbm\u8bb0\u5f55\u5224\u65ad/\u6620\u5c04\u5bf9\u8c61\u72b6\u6001\uff0c\u4e0d\u63d0\u4f9b\u539f\u751f\u6743\u9650\u6216\u4f2a\u9020\u6210\u529f\u3002\u6bcf\u70b910\u79d2\u7b49\u5f85\u5168\u90e8\u5728issuer/serial\u9501\u548c\u539fFAKE_STACK_FRAME\u533a\u95f4\u5916\uff1b\u539f\u6709IPC\u53ef\u7761\u7720\u8bfb\u5199\u9501\u3001\u539f\u8c03\u8bd5\u5b8f\u3001\u6620\u5c04\u9009\u9879/\u4efb\u52a1/\u5730\u5740/\u63cf\u8ff0\u7b26\u91ca\u653e\u5757\u4fdd\u6301\u300285\u9879\u5b9e\u9645\u6620\u5c04\u51fd\u6570\u4e0e\u7236\u7248\u5bf9\u7167\u300126\u7ec4\u5b9e\u9645gate/observer\u300150map parser/52\u539fparser/5\u540c\u6b21UFS/formatter-worker ASanUBSan\u901a\u8fc7\uff1b\u6700\u5927\u683c\u5f0f1944B\u5c0f\u4e8e3072B\u300222\u5bf9\u8c61\u91cd\u7f16/1398\u5b8c\u6574\u8f93\u5165/0undefined/40\u5934\u6587\u4ef6\u901a\u8fc7\uff0ckernel9be0f402/bootafcfc0ae\uff1b\u6cbf\u7528root/probe/frontend215\u548cRust214\uff0c\u65e0\u65b0\u6839\u5199\u5165\u3002\u65b0scope/owner/ready/admission/check-only\u901a\u8fc7\uff0cCDC120\u79d2/39\u5e27/119808B\u3001300\u79d2\u770b\u95e8\u72d7/600\u79d2Recovery\u3002\u5df2\u67e5\u516c\u5f00GPU\u6559\u7a0b/\u673a\u578b\u6e90\u7801\uff0c\u672a\u53d1\u73b0\u53ef\u76f4\u63a5\u786e\u8ba4\u7684\u76f8\u540cPAC\u4fee\u590d\uff1bPAC\u6839\u56e0\u672a\u4fee\u590d\uff0c222\u5c1a\u65e0\u771f\u673a\u7ed3\u679c\u3002",
+  "next_action": "\u53ea\u8fd0\u884cread-zorn-gpu-metal222-cdc.py\u63a5\u6536\u5668\u5148\u542f\u52a8\u4e00\u6b21\u4e34\u65f6\u542f\u52a8\uff0c\u56fa\u5b9a\u8fd0\u884c\u5668\u91cd\u65b0\u68c0\u67e592988a43/slotA/Recovery\u3001\u5b8c\u6574BCB\u53ca\u4fdd\u62a4\u533a\u3002\u5148\u533a\u5206\u5b9e\u9645\u5230\u8fbe\u56db\u70b9\uff0c\u4e0d\u628a\u6700\u540e\u70b9\u4e4b\u524d\u7684map\u975e\u7a7a\u5f53\u4f5c\u5916\u5c42\u51fd\u6570/IPC\u8fd4\u56de\u3001\u6620\u5c04\u53ef\u7528\u6216Metal\u521b\u5efa\u6210\u529f\uff1b\u672a\u77e5\u7ed3\u679c\u4fdd\u6301\u672a\u77e5\u3002\u8bca\u65ad\u62d2\u7edd\u4ec5\u4fdd\u7559\u672a\u4ea4\u63a5descriptor/map\u5f15\u7528\uff0c\u6b63\u5e38\u5f15\u7528\u5904\u7406\u548c\u6743\u9650\u4e0d\u53d8\u3002\u6cbf\u7528215\u6839\uff0c\u82e5600\u79d2Recovery\u6709\u754c\u8fd4\u56de\u5931\u8d25\u7acb\u5373\u505c\u6b62\u8bbe\u5907\u64cd\u4f5c\u3002",
+  "candidate": {
+    "version": 222,
+    "tag": "8e2ea9a4ea604e838119aff32b435c68",
+    "program_tag": "e24d087ce9994306ac3c936887498d2e",
+    "frontend_tag": "e24d087ce9994306ac3c936887498d2e",
+    "rust_tag": "7a16d3fe9b1a44cb859527a1ca87b961",
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68",
+    "parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v221-client-memory-view-ada59109acaf4b51aeb428d2cc6804a6",
+    "retained_root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/root-candidate/ios26-root-metal215.UNSELECTED.hfsx",
+      "sha256": "4a12265d312a0f07ea1348a2f2ea16734dd290ccc58fd2443c637b4f3687a523",
+      "bytes": 34359738368
+    },
+    "retained_probe": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/user-probe-launch/zorn-metal-probe193",
+      "sha256": "b94be7df06710c6e3fd0f3740fa618019588c1959def9e0e088261a9df2baccd",
+      "cdhash": "cc831b02a00755e8803bb1a6ee3bc25e6165f645"
+    },
+    "root_payload_changed": false,
+    "kernel_built": true,
+    "hardware_trial_ready": true,
+    "PAC_root_cause_fixed": false,
+    "purpose": "Observe mapClientMemory64 entry/view callback return/sharing predicate/mapping-and-release return;kind257 notnativeABI,no waits inside fake-frame region",
+    "system_booted": false
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/ready-snapshot/manifest.json",
+    "sha256": "b8bcadf8f650cd16bed64afdff30b855e53d325389e39f9b91f4d7de280bda13"
+  },
+  "trial_binding": {
+    "scope": "single-K80-ios26-gpu-v222-IOKit-map-return-300s-8e2ea9a4",
+    "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-metal-trial-8e2ea9a4ea604e838119aff32b435c68/root-trial",
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-metal-trial-8e2ea9a4ea604e838119aff32b435c68/root-trial/bundle.json",
+      "sha256": "205488a54ccb370f9c01d29e2f7c3ec39f44e44fd3159ddaf7f839289a3673c4"
+    },
+    "capture": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-metal222-cdc.py",
+    "runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_gpu_v222_metal_trial.py",
+    "application_probe_run_id": "e24d087ce9994306ac3c936887498d2e",
+    "boot_attempted": false
+  },
+  "launch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/launch-command.json",
+    "sha256": "921bcfedd7ff3944f08191462cc8e0f55ebd752c99d1be7a8e0c788737b058e5"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/boot-package/boot.ZORN26-GPU-V222-METAL-UNSELECTED.img",
+    "sha256": "afcfc0ae2c39d8e9a7f1e23d5c3b595b0008ff10095eb13db520fe8204edaba1",
+    "bytes": 11755520
+  },
+  "kernel_sha256": "9be0f402914d31c552e180a05ccc95bcea1c29fc68d23d8ee6a57a5dfdc52357",
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/root-candidate/ios26-root-metal215.UNSELECTED.hfsx",
+    "sha256": "4a12265d312a0f07ea1348a2f2ea16734dd290ccc58fd2443c637b4f3687a523",
+    "bytes": 34359738368
+  },
+  "root_installation_required": false,
+  "checks": {
+    "source-cohort-review.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/source-cohort-review.json",
+      "sha256": "dfdf4aca5e31cd474de5be890478fab406bf3c3cc0965648b3b6d3df0a630bcb"
+    },
+    "full-build-review.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/full-build-review.json",
+      "sha256": "00fffd930e53a8babaaa6cf4064105e951c9e03ab37f8e153e54547cfe72ef12"
+    },
+    "map-host-check.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/map-host-check.json",
+      "sha256": "8f561a6ae04bd69506d7f63c5acecb304a354ca8eda05977b842deb0bb7ec784"
+    },
+    "callback-host-check.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/callback-host-check.json",
+      "sha256": "7877977c86450a749ff45d83b6044462566c883bad175924d3a31cdd45f4344e"
+    },
+    "callback-decoder-check.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/callback-decoder-check.json",
+      "sha256": "821fee1000a18f7cff9357916ea1887f60a2283f6a764675fe1c4b1e2c780923"
+    },
+    "progress-parser-check.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/progress-parser-check.json",
+      "sha256": "1dfd937533f5e8aa4a3e00650a6ac63de84b4b982945cc1e4daf80403eaefc0b"
+    },
+    "progress-capture-check.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/progress-capture-check.json",
+      "sha256": "56dccf08b6a713623a3c0fa828c1851dfc82b91c25de920311aacbfce67928ba"
+    },
+    "capture-budget-check.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/capture-budget-check.json",
+      "sha256": "ef4fe39654c2cd3f99e93a106871076bc0bda487a4e4617cf06e911e88277b82"
+    },
+    "progress-host-check/result.json": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/progress-host-check/result.json",
+      "sha256": "c76a24ddd3de70a4ceb0af5b1ccab513dfded8a62b890686383ee8b9a9840f12"
+    }
+  },
+  "wait_context": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68/wait-context-review.json",
+    "sha256": "1bbc547f26c51a6060778507ede7a7121f1f5699d6de8e9f4f868b15c31c177f"
+  },
+  "watchdog_seconds": 300,
+  "recovery_deadline_seconds": 600,
+  "PAC_fix_claimed": false,
+  "hardware_qualification": false,
+  "goal_complete": false
+}

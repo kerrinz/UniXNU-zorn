@@ -1,0 +1,53 @@
+{
+  "version": 216,
+  "status": "source-only-observer-binding-fixed-PAC-root-cause-unresolved",
+  "summary": "v216 \u5df2\u5b8c\u6210\u6e90\u7801\u7ea7\u62a5\u544a\u6807\u8bc6\u4fee\u590d\uff1a\u5b9e\u9645 observer \u5c06215\u7a0b\u5e8ftage24d087c\u8bef\u5f53\u4f5craw\uff0c\u539f\u56e0\u662f\u7ed3\u6784\u5316\u524d\u7f00\u4ecd\u56fa\u5b9a208tag704a8add\u3002\u5df2\u53ea\u4fee\u6539ZornApplicationObservation26.inc\u7684\u524d\u7f00\uff1b\u7528\u5b9e\u9645215\u65e7\u6e90\u7801\u590d\u73b0\u62d2\u6536\uff0c\u5e76\u4ee5\u5b9e\u9645216\u6e90\u7801\u901a\u8fc7\u5f53\u524dtag\u63a5\u6536\u3001\u65e7tag/\u5f02\u4efb\u52a1/\u9519PID/\u4e0d\u5b8c\u6574\u884c/\u63a7\u5236\u5b57\u8282/copy\u9519\u8bef\u62d2\u6536\u53ca\u539ftry-lock\u63a7\u5236\uff1bASan/UBSan\u901a\u8fc7\u3002\u6e90\u7801/\u5df2\u7f16\u8bd1probe\u6765\u6e90/215artifact identity/capture\u7a0b\u5e8ftag\u4e00\u81f4\u6027\u5df2\u6838\u5bf9\u3002\u672c\u4fee\u590d\u53ea\u5f71\u54cd\u8bca\u65ad\u62a5\u544a\u91c7\u7eb3\uff0c\u672a\u4fee\u6539\u539f\u751f\u6388\u6743\u6216GPU\u884c\u4e3a\uff0c\u4e5f\u672a\u4fee\u590d\u7167\u7247\u786e\u8ba4\u7684\u5185\u6838IA-PACpanic\u3002216\u5c1a\u672a\u5b8c\u6210\u5185\u6838\u8eab\u4efd\u91cd\u7ed1\u3001\u5b8c\u6574\u6784\u5efa\u3001\u8fd0\u884c\u5ba1\u67e5\u6216\u771f\u673a\u9a8c\u8bc1\u3002",
+  "next_action": "\u7ee7\u7eed\u6e90\u7801\u7ea7PAC/\u56de\u8c03ABI\u4e0e\u751f\u547d\u5468\u671f\u5ba1\u67e5\uff0c\u4f7f\u7528215\u5b9e\u9645\u7f16\u8bd1\u547d\u4ee4\u3001\u5339\u914d\u7684XNU\u5934\u6587\u4ef6\u548cprincipal\u8c03\u7528\u8fb9\u754c\uff1b\u5fc5\u8981\u65f6\u8bbe\u8ba1\u65e0\u5730\u5740/\u5bc4\u5b58\u5668/\u56de\u6eaf/\u6307\u4ee4\u5185\u5bb9\u7684\u6709\u754ccallout\u89c2\u6d4b\u3002\u4e0d\u80fd\u5c06\u6700\u540e\u5df2\u5b8c\u6210\u7684BOalloc selector2\u5f53\u4f5c\u5d29\u6e83\u8c03\u7528\u3002216\u53ef\u5148\u590d\u7528\u5df2\u5b89\u88c5215root4a12265d/probe/frontend\u548cRust214\uff0c\u5355\u7eafkernel observer\u4fee\u6b63\u4e0d\u9700\u8981\u6839\u5199\u5165\uff1b\u4ecd\u9700\u7cbe\u786e\u65b0kernel/ADT/boot\u3001\u5b9e\u9645\u62a5\u544a\u524d\u7f00\u7ed1\u5b9a\u56de\u5f52\u3001fresh scope/owner/ready/claim\u3001300s\u770b\u95e8\u72d7/600sRecovery\u53careceiver-first\u6d41\u7a0b\u3002\u5f53\u524d\u65e0livejob\uff0c\u624b\u673a\u5df2\u56deTWRP\uff0c215\u5b89\u88c5\u548c\u542f\u52a8claim\u5747\u6d88\u8017\uff1b\u4e0d\u76f2\u91cd\u8bd5215\uff0c\u4e0d\u5173\u95edPAC\u3002",
+  "candidate": {
+    "version": 216,
+    "tag": "8e9c1cdd2147439199f3c6092338856a",
+    "program_tag": "e24d087ce9994306ac3c936887498d2e",
+    "frontend_tag": "e24d087ce9994306ac3c936887498d2e",
+    "rust_tag": "7a16d3fe9b1a44cb859527a1ca87b961",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v216-observer-binding-PAC-audit-8e9c1cdd2147439199f3c6092338856a",
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v216-observer-binding-PAC-audit-8e9c1cdd2147439199f3c6092338856a",
+    "parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e",
+    "retained_root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/root-candidate/ios26-root-metal215.UNSELECTED.hfsx",
+      "sha256": "4a12265d312a0f07ea1348a2f2ea16734dd290ccc58fd2443c637b4f3687a523",
+      "bytes": 34359738368
+    },
+    "retained_probe": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/user-probe-launch/zorn-metal-probe193",
+      "sha256": "b94be7df06710c6e3fd0f3740fa618019588c1959def9e0e088261a9df2baccd",
+      "cdhash": "cc831b02a00755e8803bb1a6ee3bc25e6165f645"
+    },
+    "purpose": "Correct confirmed structured-report prefix mismatch and audit kernel IA-PAC source callouts; not a PAC fix or a ready hardware trial",
+    "root_payload_changed": false,
+    "kernel_identity_retag_pending": true,
+    "kernel_built": false,
+    "hardware_trial_ready": false,
+    "PAC_root_cause_fixed": false
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v216-observer-binding-PAC-audit-8e9c1cdd2147439199f3c6092338856a/source-binding-snapshot/manifest.json",
+    "sha256": "50abfbd2a6a3e2d81f3440ba2b7da855d4dff5187e706ad6d4d6f9a24eb0cba5"
+  },
+  "source_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v216-observer-binding-PAC-audit-8e9c1cdd2147439199f3c6092338856a/observer-binding-source-review.json",
+    "sha256": "8f1ba237ba2b775630254a0d4db2d82ebf074e0773113fd483aaa9ab34a7b69d"
+  },
+  "parent_panic_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/user-observation/observation.json",
+    "sha256": "09865d47c7f4ea656dd4f31658597261ac292e2758dfeec00e9e961305d7a602"
+  },
+  "parent_PAC_source_audit": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/PAC-source-audit-initial.json",
+    "sha256": "48ab2eedc24a848463c5bfe77241f6c64aebdef679c9892b084f51d7860c9bc6"
+  },
+  "kernel_built": false,
+  "root_payload_changed": false,
+  "hardware_executed": false,
+  "PAC_fix_claimed": false,
+  "goal_complete": false
+}

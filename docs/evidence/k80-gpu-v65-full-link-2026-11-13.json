@@ -1,0 +1,152 @@
+{
+  "recorded_at": "2026-11-13",
+  "status": "K80 iOS26 GPU QTB/RSC startup full-link checkpoint; offline and unselected",
+  "candidate": "v65-current-integrated-qtb-peer-stream-gate",
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83",
+    "top_level_files": 170,
+    "aggregate_sha256": "67f1ed8c79a7758c3a958c64b39f56491ffcbc1a8d83c5c00ba6b3fac6c934e1",
+    "provenance": "Coherent merge candidate derived from the current-integrated and v64 QTB/RSC trees; after resolving the BoardOwner resource-route conflict in favor of the source-backed reader path, the resulting 174-file source snapshot is byte-identical to v64.",
+    "matches_v64_source_snapshot": true,
+    "v64_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83"
+  },
+  "compile": {
+    "result": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83/compile-result.json",
+    "translation_units": 44,
+    "succeeded": 44,
+    "failed": 0,
+    "warning_occurrences": 60,
+    "warning_translation_units": [
+      {
+        "translation_unit": "ZornGen7BoardInputs26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7CommandDbRegion26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7FirmwareAssets26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7GpuIrq26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7HostGpuCode26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7HostGpuRegisters26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7HostRing26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7InactiveOwner26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7MmioCallbacks26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7NativeBoardStage26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7PreparedRuntime26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7RegisterMaps26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7RegistryStartup26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7RscControllerOwner26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7RscProbe26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7RscRegistry26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7SmmuDomain26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7StartupOwner26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7StockIdentity26.cpp",
+        "warnings": 3
+      },
+      {
+        "translation_unit": "ZornGen7ZapOwner26.cpp",
+        "warnings": 3
+      }
+    ]
+  },
+  "full_link": {
+    "result": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83/full-link/link-result.json",
+    "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83/full-link/link-command.json",
+    "input_manifest": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83/full-link/input-manifest.json",
+    "input_count": 1397,
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "omitted_inputs": [],
+    "exit_code": 0,
+    "undefined_symbols": 0,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83/full-link/kernel.ZORN26-CURRENT-INTEGRATED-QTB-PEER-STREAM-GATE-V65.UNSELECTED.macho",
+      "bytes": 30474792,
+      "sha256": "0f19ae8ec9cd402f1fb73d6234266ca781d4c84ec4649531f69e31a54eaf6c8f"
+    },
+    "map": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v65-449b188b4b410a83/full-link/kernel.map",
+      "bytes": 10796496,
+      "sha256": "919662f386cc0d44145a492dcb85400f80cd57a3e84009f7509d84dbb579082f"
+    },
+    "linker_warnings": 10,
+    "warning_details": [
+      "ld: warning: -segment_order should list all segments, __PRELINK_TEXT is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_INFO is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_TEXT_EXEC is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_DATA is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_DATA_CONST is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LLVM_COV is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LINKEDIT is missing",
+      "ld: warning: -segment_order should list all segments, __LINKINFO is missing",
+      "ld: warning: -segment_order of __LINKEDIT is ignored, the segment must be ordered last",
+      "ld: warning: -sectalign reduces alignment of __DATA,__bss from 16384 to 4096"
+    ]
+  },
+  "qualification": {
+    "selected": false,
+    "packaged": false,
+    "booted": false,
+    "phone_access": false,
+    "gpu_execution": false,
+    "metal_or_display_gpu_rendering": false,
+    "touch_driver_work": false,
+    "cpu_lockscreen_milestone": "docs/evidence/k80-CPU-keystore-retag-observed-2026-11-13.json",
+    "remaining_source_gaps": [
+      "No maintained OS/board producer constructs the actual direct-ring ZornGen7StartupGpuInputs26 authority set.",
+      "The actual whole-GPU producer-stop/GMU scheduler lease and independent SMMU mapping/page-table owner are not established.",
+      "QTB TBU halt ACK is a bounded transaction fence, not proof of producer quiescence or global GPU ownership."
+    ],
+    "next_action": "Implement and connect source-backed GPU/MMU ownership providers; keep the candidate offline until the real stop, authority, mapping, producer and recovery conditions are independently established. FT3683 work remains paused per user direction."
+  }
+}

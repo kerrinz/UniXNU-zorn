@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T19:48:37.619427+08:00",
+  "state": "Catalog149-end-fault-output-mutation-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-end-fault-contract/source-contract.json",
+  "functions_body_SHA_recorded": 6,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 endFault ready/output/error prefix and original mutating request order only.6bodySHA/full identities;MMIO/bringUp/recovery/SDK/packet source provenance,no old suites/targets/pair rerun.",
+    "readiness": "Null output or !ready returns BadArgument before output initialization. Otherwise zeros four words then reads internal SMMU IO/state accessors. They return addresses of contained struct members,not independent retained objects/owner leases. Zero context offset returns NotReady with zeros. ready initializes false and bringUp sets true after original setup/maps;no runtime audit/stop/DMA permission inferred.",
+    "reads": "Original first read writes out0;returned nonzero becomes IOError before original mask. After mask zero exits API0 without remaining reads/mutating requests. Nonzero takes three sequential output reads,short-circuit first error and retains partial values. Failing callback may itself write output;unknown raw native details not reconstructed. No caller-array atomic snapshot/validity certificate.",
+    "mutation": "After original read prefix,source can issue conditional resume then fault-clear then barrier. Resume error skips clear/barrier;clear error skips barrier;barrier error occurs after attempted clear. All fold to IOError with no rollback/readback. This is not a diagnostic-only getter:original mutating requests are distinguished,not executed,adopted or translated into K80 bank/register/stop policy.",
+    "caller": "Only exact caller hang poller starts zero local output,records only endFault0 with nonzero fault0. Any returned error suppresses that diagnostic copy but subsequent recover still runs if restart hook exists. Suppressed record does not prove no attempt,no fault or no mutation. API0 after requests is not verified hardware clearing/stopDMA.",
+    "limits": "bringUp ready is software phase intent;contained IO cookie/state still require actual board/context lifetime. No actual K80 provider/IRQ/readable-failure or recovery authorization supplied. No success read/resume/clear/context/address peer or observed partial hardware fault fabricated.",
+    "decision": "Bounded fault output/mutation source branch closes without33rd validity/error-gate/retry/reset/refcount/free/cleanup policy.32 independent UNAPPLIED/all native/device OFF,no component/caller/image/wire/CPU/security expansion. GPU/rendering/Metal and K80 owner/context/route/stop/DMA/readablefailure remain unavailable."
+  },
+  "qualification": "Source output/mutating-prefix availability only;not fault clear/stop/reset/DMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

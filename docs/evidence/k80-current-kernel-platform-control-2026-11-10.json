@@ -1,0 +1,93 @@
+{
+  "status": "CURRENT_ZORN_KERNEL_PLATFORM_CONTROL_FRESH_NATIVE_MILESTONE_OBSERVED",
+  "time": "2026-11-10T02:57:03.554992+00:00",
+  "experiment": {
+    "purpose": "Discriminate root-mode-specific failure from current kernel platform regression",
+    "prior_root_trial": "k80-root-zorn-closure26-f73c8f0bce7b413eb01254ac708db6da/root-trial-zorn/trial/run.json",
+    "functional_source_difference": "None except fresh retained native identity;four identity consumers compiled under same actual ZORN recipe",
+    "changed_selection": "20s platform record only;no root/presenter/touch/GPU selection",
+    "outcomes": "Fresh platform record narrows failure to selected root-related route;no record retains earlier-stage ambiguity. Recovery alone proves neither.",
+    "root_image_write": false,
+    "log_write": "Only original one4KiB page;existing envelope/guard unchanged",
+    "no_retry": true
+  },
+  "actual_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/3b2df65a311646979e2b30c2adcb48a3/run/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-platform20s-one-log-record-dual-recovery-v2",
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "boot_sha256": "302ad650f70c703c959f3b2678c6e7982f84754d5f6daa0494a3f17d7406014b",
+    "status": "recovered-native-platform-milestone-record",
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 53.449812957995164,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "log_changed": true,
+    "kernel_record_available": true,
+    "platform_entry_proven": true,
+    "GPU_execution_proven": false,
+    "native_writer_readback_success_proven": false,
+    "root_or_desktop_proven": false,
+    "terminal_observer": "native-one-page-Hp26-artifact-record",
+    "note": "Only the recorded platform worker/UFS milestone is eligible; no GPU,root,terminal-reset completion or native readback ACK inferred"
+  },
+  "fresh_record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/3b2df65a311646979e2b30c2adcb48a3/run/decoded-native-record.json",
+  "source_selection": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/current-kernel-platform-control-3b2df65a311646979e2b30c2adcb48a3",
+    "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-zorn-closure26-f73c8f0bce7b413eb01254ac708db6da/full-link",
+    "prior": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-zorn-closure26-f73c8f0bce7b413eb01254ac708db6da",
+    "functional_source_change": "None;fresh identity only plus used attribute preserves exact16byte identity constant required by existing host guard,which is unchanged",
+    "test_difference": "20s platform record selected;root/presenter/touch selectors absent"
+  },
+  "compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-kernel-platform-control26-3b2df65a311646979e2b30c2adcb48a3/compile-result.json",
+  "full_link": {
+    "exit": 0,
+    "seconds": 0.152612500001851,
+    "inputs": 1390,
+    "replaced": 4,
+    "preserved": 1386,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-kernel-platform-control26-3b2df65a311646979e2b30c2adcb48a3/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "91114573afff6c0abd495fb601231ca6c330d7254117a2cd3f731855ae427f28",
+    "bytes": 30315640
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-kernel-platform-control26-3b2df65a311646979e2b30c2adcb48a3/offline-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "302ad650f70c703c959f3b2678c6e7982f84754d5f6daa0494a3f17d7406014b",
+    "bytes": 11587584
+  },
+  "exact_bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-kernel-platform-control26-3b2df65a311646979e2b30c2adcb48a3/fixed-entry/candidate-bundle.json",
+  "admission": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/3b2df65a311646979e2b30c2adcb48a3/admission.json",
+  "consumed_claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/3b2df65a311646979e2b30c2adcb48a3/one-shot.claim.json",
+  "interpretation": "Source-identical current ZORN kernel (fresh retained identity only) succeeds in platform-only mode. The previous root-selected packet failure is now bounded to additional selected root/presenter/touch route or its admission,not demonstrated as a global current-kernel platform regression. Does not identify the exact failing root step.",
+  "limits": "Fresh tag/CRC/platform worker/UFS milestone qualifies this exact packet only. No root mount,desktop,touch,Metal,GPU or native write/readback ACK proof. Platform recovery helper compares GPT/rootmanifest/Data metadata and Data fences,not all root image bytes or root-adjacent fences. EF11 installed full32GiB hash remains a separate earlier completed readback.",
+  "root_image_written": false,
+  "OS_booted_from_RAM": false,
+  "GPU_started": false,
+  "scope_consumed_no_repeat": true,
+  "native_identity_retention": "used attribute retains same actual identity constants for existing final-kernel tag guard;no change to record format or host validator",
+  "independent_source_review": "Resource factory/count/owner staging/context finite review found no concrete new contradiction;no fake authority callback introduced."
+}

@@ -1,0 +1,92 @@
+{
+  "version": 189,
+  "status": "domain-prepare-diagnostic-ready-unbooted",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v189-domain-prepare-trace-7173af69358b43149021cdd849195659/ready-snapshot/manifest.json",
+    "sha256": "19718e4938228a8204b036b3766751aa1d6d9ca85ef00e8504c4bc0df03acbd4"
+  },
+  "changed_source": [
+    "ZornGen7HostRing26.cpp",
+    "ZornGen7HostRing26.h",
+    "ZornGen7SmmuDomain26.cpp",
+    "ZornUfsOwner26.cpp",
+    "ZornUsbCdc26.c"
+  ],
+  "parent_source_unchanged": true,
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v189-domain-prepare-trace-7173af69358b43149021cdd849195659/full-link/kernel.ZORN26-APPLICATION189.UNSELECTED.macho",
+    "sha256": "f9e4b4f51791a3835fd5cad52b6b8d07910fa0ae967de270d3a0ade96051062a",
+    "bytes": 30742272,
+    "inputs": 1398,
+    "replaced": 21,
+    "preserved": 1377,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v189-domain-prepare-trace-7173af69358b43149021cdd849195659/full-link/exact-inputs.json",
+      "sha256": "a13f5c02a5223d8bd1e9958b947422d28fb0d49b554d7817d5dce333d4fb11f7"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "houji_recovery26.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "application_probe_qualification": true
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v189-domain-prepare-trace-7173af69358b43149021cdd849195659/boot-package/boot.ZORN26-GPU-V189-APPLICATION-UNSELECTED.img",
+    "sha256": "367e849a02de66d927dad376ec47146cda0c9508b950fefc7164034f345062ff",
+    "bytes": 11751424
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/ios26-root-gpu-application186.UNSELECTED.hfsx",
+    "sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "bytes": 34359738368
+  },
+  "trial": {
+    "scope": "single-K80-ios26-gpu-v189-domain-prepare-300s-7173af69",
+    "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v189-application-trial-7173af69358b43149021cdd849195659/root-trial",
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v189-application-trial-7173af69358b43149021cdd849195659/root-trial/bundle.json",
+      "sha256": "a02aeb4f901f81f37f26f822089d32aa6eb6d32c94d4cb57b2f88002756c74b9"
+    },
+    "capture": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-application189-cdc.py",
+    "runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_gpu_v189_application_trial.py",
+    "application_probe_run_id": "d55c2bab3d6d436386ca54c7b6a74f06",
+    "boot_attempted": false
+  },
+  "checks": [
+    "35 actual Domain Prepare before/after paths preserve native calls/order/raw/locks/partial retention; ASan/UBSan pass. Other operations not exercised by this fixture.",
+    "9 actual Ring diagnostic-forwarder checks preserve real client identity and thread/operation guards; no permission grant.",
+    "221 capture checks; stages40..52 required for successful native preparation. Existing observer/CDC format unchanged except boot identity.",
+    "1398 exact inputs/21 replacements/1377 retained/0undefined;32 changed-header resolutions validated. Source literal identity check only."
+  ],
+  "diagnostic": [
+    "Adds bounded source-defined stages40..52 inside actual Domain Prepare only, using existing first-error observer, same admitted client and actual operation thread.",
+    "Stage51 detail records software partial allocation/seed/audit/ASID/prepared/poisoned bits only. No added hardware access, retry, cleanup or relaxed guard.",
+    "Root4d636 and signed programd55 retained; boot/USB7173 distinct. Only FAT kernel changes."
+  ],
+  "remaining": "One authorized300sWDT/600sRecovery trial to identify precise Domain failure; then source repair and application image/normalclose, Metal/render/presentation/fullFT3683. No functional success yet.",
+  "constraints": "No disassembly/reverse engineering; preserve Android/iOS17/Data/history; goal active"
+}

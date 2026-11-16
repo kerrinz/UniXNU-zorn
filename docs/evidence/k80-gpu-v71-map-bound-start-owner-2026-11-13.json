@@ -1,0 +1,120 @@
+{
+  "title": "K80 GPU v71 map-bound start owner",
+  "date": "2026-11-13",
+  "status": "offline source/build candidate; unselected, unpackaged, and unbooted",
+  "candidate_chain": [
+    {
+      "name": "v68-submit-smmu-gate",
+      "kernel_sha256": "4356f205fb9cc1d6c91a7a998cc0cdefefd9ca22ccb98ab4cdd8036ace75236f"
+    },
+    {
+      "name": "v69-gpu-start-lease",
+      "register_maps_source_sha256": "419aa79183b14d401ca966a267e2388f3da7115e403187aa343b6ca0e58f6ae4",
+      "register_maps_object_sha256": "df26368d7252855580a6e94e8b9d49e2764b39274d96b9023aaacc18d152b69b",
+      "kernel_sha256": "6c3e66d957f34b6a6384b2640b58b4d3271397c02c20236de92fa000fb6bacc0"
+    },
+    {
+      "name": "v70-darwin-start-owner",
+      "board_owner_source_sha256": "6f794f22d48f0d063d83aa66d6b9b6ad1558775d4f8f99730f668f30006defd5",
+      "board_owner_object_sha256": "6009e72ff87145599abe44ecb7f329362c301a74c39b07d95b4a34456f5935c3",
+      "startup_owner_source_sha256": "b2aed323b165774c4e6d3e70c4f16a141a2eb60ed2f0696cec00a313a133f0e9",
+      "startup_owner_object_sha256": "b6a3440d0e89e2b6e8d3135d120ac4c72f467da00a65ce6b9a6adc089f6d1538",
+      "kernel_sha256": "4d2df1992ecf9c2b7f7f85013ef75840bd197819579b2a3fd4af2c7274170f6d"
+    }
+  ],
+  "v71_changes": [
+    "RegisterMaps exposes a private BoardOwner-only predicate that requires the exact retained InactiveOwner, mapsReady, accepted GPU/GMU register views, exact provider/resource descriptor identities, and live provider claims before and after checking.",
+    "InactiveOwner passes its exact identity and retained RegisterMaps instance to the MMU and GPU OOB owner methods.",
+    "DarwinBoardOwner requires the same parent/maps pair for MMU start and OOB, verifies that its retained SMMU global-I/O guard is bound to that RegisterMaps instance, retains both owners after successful MMU startup, and checks the callback service/resource pair against that map before granting the one-shot GPU-start window."
+  ],
+  "compile": {
+    "translation_units": [
+      {
+        "translation_unit": "ZornGen7RegisterMaps26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v71-map-bound-start-owner-20261113/ZornGen7RegisterMaps26.cpp",
+        "source_sha256": "98839c97aa85ab2496873829b8a41f4f17c24fbcf44512823bde83b12f6c43b2",
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/ZornGen7RegisterMaps26.cpo",
+        "object_sha256": "e6d555dd539933338652eae596062e91a85a013e22fff206d97152ca6fc6cc40",
+        "exit_code": 0,
+        "warning_count": 3,
+        "warnings": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "translation_unit": "ZornGen7DarwinBoardOwner.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v71-map-bound-start-owner-20261113/ZornGen7DarwinBoardOwner.cpp",
+        "source_sha256": "143c1aa299936e1b0059f7f50737f6ec2de562044c634bbb47d89faa8e9599f3",
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/ZornGen7DarwinBoardOwner.cpo",
+        "object_sha256": "b2a707381c91b9b7a3d98188ec0d1997753cedfe727c148c38b129b88b68e032",
+        "exit_code": 0,
+        "warning_count": 3,
+        "warnings": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "translation_unit": "ZornGen7InactiveOwner26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v71-map-bound-start-owner-20261113/ZornGen7InactiveOwner26.cpp",
+        "source_sha256": "9922cd82f84b779db73fa87d969c0f8fa94b49b61fa61f4ddf2e50ceada6a42a",
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/ZornGen7InactiveOwner26.cpo",
+        "object_sha256": "93c6ab5552a4b593370776d21c683046ccbfea48e9fde40c760873f88366c7f3",
+        "exit_code": 0,
+        "warning_count": 3,
+        "warnings": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      }
+    ],
+    "initial_board_owner_compile": "Rejected because the new derived-owner reference was incomplete in the implementation unit; adding the explicit InactiveOwner header include fixed the final compile. No source or device state outside the offline candidate was affected."
+  },
+  "reused_object": {
+    "translation_unit": "ZornGen7StartupOwner26.cpp",
+    "source_sha256": "b2aed323b165774c4e6d3e70c4f16a141a2eb60ed2f0696cec00a313a133f0e9",
+    "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v70-darwin-start-owner-20261113/ZornGen7StartupOwner26.cpo",
+    "object_sha256": "b6a3440d0e89e2b6e8d3135d120ac4c72f467da00a65ce6b9a6adc089f6d1538",
+    "source_matches_v71": true
+  },
+  "full_link": {
+    "command_record": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/full-link/link-command.json",
+    "filelist": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/full-link/link.filelist",
+    "filelist_sha256": "fb76a362906291585e644e75f565d7302e966bd6f165c83702de8256b3fc0630",
+    "output": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v71-map-bound-start-owner-20261113/full-link/kernel.ZORN26-CURRENT-INTEGRATED-GMU-IDLE-GBIF-HALT-V71.UNSELECTED.macho",
+    "output_bytes": 30509368,
+    "output_sha256": "958b8f02ea07fc08fe1b8d3fbdc6de905213f5470eec64ebc3167cd466e3f218",
+    "input_count": 1397,
+    "filelist_entries": 1318,
+    "direct_inputs": 79,
+    "missing_inputs": 0,
+    "candidate_object_replacements_from_v68": 4,
+    "total_object_replacements": 46,
+    "linker_undefined_diagnostics": 0,
+    "nm_undefined_line_count": 0,
+    "linker_warning_count": 10,
+    "linker_warnings": [
+      "ld: warning: -segment_order should list all segments, __PRELINK_TEXT is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_INFO is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_TEXT_EXEC is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_DATA is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_DATA_CONST is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LLVM_COV is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LINKEDIT is missing",
+      "ld: warning: -segment_order should list all segments, __LINKINFO is missing",
+      "ld: warning: -segment_order of __LINKEDIT is ignored, the segment must be ordered last",
+      "ld: warning: -sectalign reduces alignment of __DATA,__bss from 16384 to 4096"
+    ]
+  },
+  "limitations": [
+    "The actual iOS 26 root/board entry still does not construct the startup inputs and full owner graph; this candidate link reuses the existing root/bridge inputs.",
+    "Provider claims and MMU/OOB lease binding in candidate source are not proof of live hardware ownership, DMA, GPU execution, or safe activation.",
+    "No package or image was produced from this kernel; no phone or partition operation occurred. GPU/Metal rendering and GPU display remain unverified; FT3683 work remains paused."
+  ],
+  "tests_run": [],
+  "hardware_operations_performed": false
+}

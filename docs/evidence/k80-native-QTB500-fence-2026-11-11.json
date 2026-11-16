@@ -1,0 +1,87 @@
+{
+  "status": "offline-native-K80-QTB500-fence-backend-and-real-conditional-caller-linked-unexecuted",
+  "time": "2026-11-10T22:01:09.679258+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-fence-d75876a96c974739a63ec3bbb0ed0a89",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/full-link-final/kernel.ZORN26-NATIVE-QTB-FENCE.UNSELECTED.macho",
+    "sha256": "e10bbb10b81d413a6d1b0d608cb8dbeedd4038a5297ba70ec423a03a615acb19",
+    "bytes": 30451224,
+    "inputs": 1397,
+    "added": 1,
+    "replaced": 41,
+    "preserved": 1355,
+    "undefined_symbols": 0
+  },
+  "primary_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c",
+      "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+      "sha256": "17897f264124133ae29d09d5461005bad8ea9e262a3b81ca4c5946508ec50ede"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/msm-arm-smmu-pineapple.dtsi",
+      "commit": "e6826f9350752ebceebee4d1d4ed20e0edf4d3a4",
+      "sha256": "5bac47ae22bdf7dcd078bfdab1e125159b609c263df4ed438654c1f157e73d32"
+    }
+  ],
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/native-qtb-fence.patch",
+  "source_delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/final-source-delta.json",
+  "actual_backend": "Exact existing native child/provider/resources;real private IOService open with parent/controller lifetime;existing descriptor0x3de8000/0x1000 maps cache inhibited;64bit FENCEREQ0x410 RMW and FENCEACK0x418 bounded poll. No arbitrary CPU pointer or physical descriptor fallback. SMMU native-held PM/startup gate retained;failed/uncertain resources/request kept.",
+  "caller": "Native BoardOwner explicit zorn26_qtb_fence conditional -> Domain resolves genuine child gpu-qtb,promotes only inspected raw native entry or reuses exact IOPlatformDevice,getResources/find exact real descriptor ->actual backend. Missing node/provider refuses.",
+  "source_semantics": "QTB500 single64bit fence request/ACK. Two-port property describes outstanding transaction snapshot diagnostics;it does not select two independent halt operations. Ordinary TBU32bit debug SID/status path is not substituted.",
+  "timeout": "Explicit4096 read budget;not Linux100us wall-clock equivalent;preserved failure-retain compatibility instead of Linux timeout unhalt/automatic resume. No existing halted request/ACK accepted as our lease.",
+  "no_halt_options": "Actual no-qtb-atos-halt or opt-out-tbu-halting property refuses;never claim a no-op is a halted bus.",
+  "current_scope": "Unselected offline fence prefix. Full cold-init integration/normal source resume and release remain pending;not a completed startup/stop lifecycle.",
+  "separate_tbu_power_interconnect_backend_complete": false,
+  "selected_stock_DT_overlay_and_firmware_handoff_qualification": false,
+  "no_secure_foreign_context_stream_reset_rights_inferred_from_ACK": true,
+  "ADT": {
+    "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/kernel.logdirs-root.UNSELECTED.adt",
+    "input_sha256": "3ff5fc7e4ffcee66277ace679f5a2d3dbcaa636115facd23210dc52959893302",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/kernel.QTB-RESOURCE-PROJECTION.UNSELECTED.adt",
+    "output_sha256": "555cddad2f594cc01c2cc84880e6c251e66d4723b1c6372a0ceb244afbe53ab4",
+    "source": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/msm-arm-smmu-pineapple.dtsi",
+    "source_sha256": "5bac47ae22bdf7dcd078bfdab1e125159b609c263df4ed438654c1f157e73d32",
+    "source_scope": "K80 MiCode pineapple base DTS child only;not installed-stock-overlay/firmware-state qualification",
+    "CPU_ranges_derived_from_actual_input": true,
+    "exact_physical_resources": [
+      [
+        64913408,
+        4096
+      ],
+      [
+        64929792,
+        4096
+      ]
+    ],
+    "old_tree_byte_identical_after_removing_only_added_child_and_three_bus_properties": true,
+    "new_native_bus_address_cells": 2,
+    "new_native_bus_size_cells": 2,
+    "new_bus_ranges": "identity;parent arm-io translation preserved",
+    "interconnect_vote_backend_projected": false,
+    "QTB_security_or_power_lease_inferred": false,
+    "IOVA_width_or_geometry_selected": false,
+    "boot_package_created": false,
+    "device_execution": false,
+    "device_boot_eligible": false,
+    "next_admission": "Complete real TBU power/interconnect ownership and native source/overlay input binding before selecting fence;fence ACK alone never supplies all secure/context/global-reset rights."
+  },
+  "source_header_access_change": "Added private PM friend for real backend;all36affected/new native and6identity/layout consumers rebuilt after header change. Initial private-access compile failure archived;no change to public PM API or PM operational behavior.",
+  "initial_failure": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/initial-private-PM-access-ZornGen7QtbFence26.cpo.stderr",
+  "native_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/compile-result.json",
+  "identity_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/identity-compile-result.json",
+  "actual_symbols": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/actual-QTB-final-symbols.txt",
+  "actual64bit_MMIO_codegen": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/actual-QTB-object.disassembly",
+  "complete_final_link": true,
+  "initial_link_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-fence26-d75876a96c974739a63ec3bbb0ed0a89/full-link/link-result.json",
+  "boot_package_created": false,
+  "new_identity_created": false,
+  "new_device_scope_created": false,
+  "new_flags_selected": false,
+  "device_executed": false,
+  "whole_image_readback": false,
+  "GPU_or_IRQ_delivery_or_translation_proven": false,
+  "blocked_v55": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/automatic-approval-rejection.json",
+  "latest_actual_hardware": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-native-SMMU-bootCPU-IRQ26.json"
+}

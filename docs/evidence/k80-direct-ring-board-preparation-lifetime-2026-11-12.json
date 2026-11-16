@@ -1,0 +1,37 @@
+{
+  "recorded_at": "2026-11-12T11:42:04.840080+08:00",
+  "status": "GPU-board-preparation-early-allocation-lifetime-fixed-offline",
+  "baseline": "iOS 26 direct-ring IOSurface lifetime full link",
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-board-preparation-lifetime-candidate/ZornGen7NativeBoardStage26.cpp",
+    "sha256": "987fdd196b240f74bc96d193c1a5ccd84e2478e4cbc89d6b1072ed3d12bf0ccc"
+  },
+  "parent_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7NativeBoardStage26.cpp",
+    "sha256": "c9f14408c8664be5cc818c0a9a8e638fa5e2fbdc5c6da63ccb71cecc7a5957e4"
+  },
+  "native_recipe": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7NativeBoardStage26.cpo-command.json",
+    "sha256": "0e8f76f80382f565651abaa6ea793c3ee2d8fa81966e1fa0e0c2a0d509ccbdb7"
+  },
+  "source_diff": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-board-preparation-lifetime26/source.patch",
+    "sha256": "8edec4084c0c5f34391b534b6b90f1af928cad7c463b19b633bd92ac0b2679e8"
+  },
+  "host_fault_cases": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-board-preparation-lifetime26/allocation-lifetime-host-check.json",
+    "sha256": "6ff63cea2712d7dfc34511ff180a3610ec5cb8113c00704b7f778c610ec68f6d"
+  },
+  "full_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-board-preparation-lifetime26/full-link/link-result.json",
+    "sha256": "8af14986724ff88f49b247dc2bc316065a05a17abf32e48333524b911a54c5a5"
+  },
+  "cause": "The stage and owner references were pinned before lock and storage allocation could fail, although the native provider had not been entered.",
+  "fix": "Release the stage and any allocated lock if initialization fails before entering the provider. Retain the stage at the existing provider boundary. Preserve the one-shot attempt and later uncertain ownership.",
+  "original_object_byte_reproduced": true,
+  "linked_object_count": 1397,
+  "undefined_symbols": 0,
+  "GPU_authority_producers_complete": false,
+  "native_MMIO_tested": false,
+  "phone_access": false
+}

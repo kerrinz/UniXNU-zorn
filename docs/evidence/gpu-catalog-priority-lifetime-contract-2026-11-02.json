@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T15:35:05.465766+08:00",
+  "state": "Catalog149-priority-member-reuse-error-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-priority-lifetime-contract/source-contract.json",
+  "functions_body_SHA_recorded": 13,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 priority member reuse/error lifetime in core and actual published versus Service factories.13 function hashes,3 parent role consumer hashes unchanged;no old open/close/Submit/SDK/Service targets or suites. All source paths conditional/unselected for K80.",
+    "core": "priority_foreground/background initialize-1 and priority_told0 in class. Successful open and close do not reset them;releaseAll returns errors before close or delegates close after original draining/free. Core close clears open/vm/submit/ring pointers on success,so a generic same-object reopen is mechanically possible but actual priority reset policy is unspecified. No reset/one-shot assumption or fabricated reopen success model.",
+    "published": "Actual AGX mount allocates fresh NativeAdrenoUserClient before original g.lock/open/scope. Successful scope transfers local core to member;failure local object is deleted after unlock. Inspected native new-client helper allocates fresh connection then mounts once;no published re-open of same core established. clientClose retains live state on teardown error;success marks not live and original free deletes core. Per-client defaults on this path come from fresh construction,not close reset.",
+    "alternate": "Actual catalog Service startup separately allocates one core after CP bringup gate;newUserClient creates wrapper with borrowed same core via setCore. Wrapper close clears only its borrowed pointers and terminates,not core close/reset. This is shared-core source semantics,distinct from AGX private core. Selected startup/fullcore/K80 producer remain unbound;do not mechanically impose per-wrapper priority or locking policy on it.",
+    "shared": "UserClient submit rejects original preconditions before setting shared nextOwner/nextPriority/nextRole. After setters,lower submit error returns without restoring shared priority/role. Following actual UserClient submit always overwrites both before lower call;early rejection never reaches lower call. Frozen startup diagnostic temporarily overrides priority then restores-1. Generic direct submit callers are not thereby proved to set/clear metadata;no actual K80 overlap/race or wrong-ring outcome claimed.",
+    "errors": "Invalid setPriority/open checks return before original priority stores. Successful setPriority preserves existing role query/diagnostics;missing API remains compile gap. releaseAll/close failures do not imply hardware stop or permit destruction. No inferred default-role/zero/stub/security change or success task/context/fence/address peer.",
+    "decision": "No31st priority reset,one-shot,generation,lock/refcount or cleanup repair from generic possible reuse alone. Keep30 independent UNAPPLIED/all native OFF. K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal/rolefullcore unavailable;no component/caller/kernel/FD/candidate/query/HFI/log/carrier/wire/CPU/security expansion."
+  },
+  "qualification": "Static fresh/shared priority member lifetime only;not native reuse/roleAPI/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

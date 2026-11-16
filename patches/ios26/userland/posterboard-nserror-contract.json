@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "os": "iOS26.6.2-23G90",
+  "source_component": "K80 libredwood26 native-HID injection",
+  "base_source_sha256": "42b7cb72357bdd0dc6d1b2a36d00fe5f96f66ef7da51fbbedd16974bf7148fb9",
+  "patched_source_sha256": "04d568e7405f97f6eb2f9ae8e0967f99cae3618381391c04aa5b60ea3887ead9",
+  "patch_sha256": "6c2e324f774c8beb7940b21b2a78e93d0027614cc4d4a594934b1c1559e02541",
+  "changes": [
+    "Read NSError out-parameters only after direct method failure",
+    "Buffer existing compatibility-attempt errors locally;leave caller error untouched on final success and publish final attempt error on failure"
+  ],
+  "ordinary_entry_markers_added": false,
+  "private_API_added": false,
+  "default_iPadOS17_configuration_changed": false,
+  "source_reference": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard26-6b4d623251e747fa9ad2c540f625f109/posterboard-reply-offline/inject26.c",
+  "regressions": [
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-error-contract26-856aa8f4e5c64727ab1f1fdc0272091a/result.json",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-retry-error26-109747c765804e629d250861a4234247/result.json"
+  ],
+  "public_contract": "https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ErrorHandlingCocoa/CreateCustomizeNSError/CreateCustomizeNSError.html",
+  "runtime_cause_proven": false,
+  "maintained_regression": {
+    "script": "scripts/check-ios26-posterboard-error-contract.py",
+    "result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-retry-error26-109747c765804e629d250861a4234247/maintained-regression/result.json"
+  },
+  "variants": [
+    {
+      "name": "pre-entry-markers",
+      "base_source_sha256": "42b7cb72357bdd0dc6d1b2a36d00fe5f96f66ef7da51fbbedd16974bf7148fb9",
+      "patched_source_sha256": "04d568e7405f97f6eb2f9ae8e0967f99cae3618381391c04aa5b60ea3887ead9",
+      "patch": "posterboard-nserror-contract.patch",
+      "patch_sha256": "6c2e324f774c8beb7940b21b2a78e93d0027614cc4d4a594934b1c1559e02541",
+      "diagnostic_entry_markers_preserved": false
+    },
+    {
+      "name": "installed-three-entry-markers",
+      "base_source_sha256": "192557e92278f66d415c0230899a0d3bb71013aea1ebbd137182a540ca7eb18b",
+      "patched_source_sha256": "65581b241cc8fbe1be940cd7e7920248b0fd8d147f10ca4028ae96cdaa9e095d",
+      "patch": "posterboard-entry-nserror-contract.patch",
+      "patch_sha256": "3230bccf68cc4e78e57a3dbd55a0099fb1d88e3c407954010134159c5a05cffe",
+      "diagnostic_entry_markers_preserved": true,
+      "source_reference": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-entry-library26-fe46b6a23a6c4b67b7bebbb4c1ba10c5/inject26.c",
+      "source_root_sha256": "7850439114768d67395f43f2bbcaa0e15b14bd526cf05bbf7107c24fe04345bf"
+    }
+  ]
+}

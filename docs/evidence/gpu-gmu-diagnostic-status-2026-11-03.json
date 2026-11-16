@@ -1,0 +1,66 @@
+{
+  "scope": "source diagnostic callback-return loss repair;no callback behavior test or native observation",
+  "original_CPP_SHA": "0ed3348b09a9ecac01651beaa7d53b3e225d14413c10b5dfb5bc36a98912fda1",
+  "original_header_SHA": "51ee80df7fabd0fdb1927c70ec02ff9d4d3bb7dec60462eab09637e1ac7a3b07",
+  "candidate_CPP_SHA": "83adf3266e5800f63127e0a756da6eb70f80fe699fcf7fb64351c26c71296c24",
+  "candidate_header_SHA": "f36b622c3c61751ea3191de3d2607aa1fffa045de6d10cee9ce6e8ffae159f62",
+  "before_five_callback_returns_discarded": true,
+  "after_five_raw_int_returns_with_attempted_returned_zero_masks": true,
+  "four_source_corruptions_refused": [
+    {
+      "name": "lost-raw-return",
+      "refused": "substring not found"
+    },
+    {
+      "name": "false-zero",
+      "refused": "substring not found"
+    },
+    {
+      "name": "lost-return-availability",
+      "refused": "substring not found"
+    },
+    {
+      "name": "extra-MMIO",
+      "refused": ""
+    }
+  ],
+  "callback_count_order_offsets_unchanged": true,
+  "primary_bringUp_body_status_and_ready_unchanged": true,
+  "diagnostic_failure_not_promoted_to_startup_failure": true,
+  "historical_report_bytes": 144,
+  "candidate_report_bytes": 176,
+  "report_ABI_requires_consistent_caller_rebuild": true,
+  "new_iOS17_objects": {
+    "context": {
+      "SHA256": "7468342da77d22fb63cd31ec2c02ad5eaf4e0100e67bb43f1f73ccd7da1dec85",
+      "minimum_OS": "17.0",
+      "candidate_header_used": true,
+      "executed": false
+    },
+    "caller": {
+      "SHA256": "911038b3b8bfbbc8b80f2c48dfdb496c26fb9db9d6b58c7b28464b068c65da3f",
+      "minimum_OS": "17.0",
+      "candidate_header_used": true,
+      "executed": false
+    },
+    "report-layout": {
+      "SHA256": "de43e0cd5ec741d4acbf99c3e99bc7d752c9948d2c08f4adbd0cebebda32b849",
+      "minimum_OS": "17.0",
+      "candidate_header_used": true,
+      "executed": false
+    }
+  },
+  "no_wire_log_carrier_or_field_expansion": true,
+  "no_callback_readBack_bringUp_service_native_or_MMIO_execution": true,
+  "no_synthetic_return_values_or_success_peer": true,
+  "catalog_old_patches_and_profiles_unchanged": true,
+  "fixture_constinit_initial_failure_preserved": true,
+  "only_corrected_fixture_recompiled_context_caller_not_repeated": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "review_document_SHA": "e13848a1802b75730bc3cc321fc23ff382c88b41d3cba6e00a76fa4c9713bb3f",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-diagnostic-status-20261103/gmu-diagnostic-status.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

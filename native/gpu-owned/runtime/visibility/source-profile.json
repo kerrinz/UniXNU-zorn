@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "scope": "Unselected default-OFF native table preparation/visibility composition; source and target inspection only.",
+  "source_files": {
+    "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTablePreparation.h": "e59197f4850f607b6c232eb6c0703344cfbc1989e994b7cd5f329b05b68a99d0",
+    "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTablePreparation.cpp": "66b3e97d4030d3f63ccba88a5ee5b3be23db6c43e68c5d0e439ca3cf3350cd44",
+    "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.h": "f972953ad3f6c7fe67278340165a6c1080dd473858e8b98308a9ae1c298ea998",
+    "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.cpp": "b6a6f16a031e9619c83aafaa33a66cb0147801a5483c590438e9f4c2eb9737d0"
+  },
+  "upstream_dependencies": {
+    "UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.h": "8137491b5ef2657eb362a4f41cf2c2b8d8cb747fc93d7a63e453194d7c3288cc",
+    "UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.cpp": "37363469c9e1f1e200b368e0bfdb80111722861792411090f3cef67506c9adef",
+    "UniXNU/drivers/NativeAdreno/NativeAdrenoSmmuMemory.h": "d2988cc8fe670e569dd14d9556924784994782b6f9efdc1715d2ab281baf3b90",
+    "UniXNU/drivers/NativeAdreno/NativeAdrenoSmmuMemory.cpp": "422a1c2b14408bc2a4855822b7110a4c8b09c31cb5b9820b85dbde648a31d657",
+    "UniXNU/kits/ArmSmmu4K/ArmSmmu4KLive.h": "7532ad419d630dd308628e60746860c992499474d14237f3f39e04e20e0722bb"
+  },
+  "capsule": "out/zorn/gpu-visibility-composition/corrected",
+  "native_calls_default_OFF": true,
+  "source_selects_no_component_or_caller": true,
+  "native_execution_qualified": false,
+  "hardware_ownership_qualified": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

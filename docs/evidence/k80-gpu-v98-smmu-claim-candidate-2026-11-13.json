@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-13",
+  "candidate": "v98",
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v98-smmu-claim-a1e32a04b7cd4569b9d3a82f95d0de78/boot-package/verified.json",
+    "sha256": "a2a9e42dd8fa3972e0aa89e241e421d4cdaf89890b5d67cdf6287382cdf36dad"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v98-smmu-claim-a1e32a04b7cd4569b9d3a82f95d0de78/boot-package/boot.ZORN26-GPU-V98-SMMU-CLAIM-UNSELECTED.img",
+    "sha256": "93560bfe911dd49ca6184062d360c681d2033640fa89819387a7f632ea197eb0",
+    "bytes": 11685888
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v98-smmu-claim-a1e32a04b7cd4569b9d3a82f95d0de78/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "0ccdd8ff3cf0277ff02737322823b15ed8f7656ee4091d39e0e7057cf3859dd5",
+    "bytes": 30574384,
+    "inputs": 1397,
+    "replaced": 19,
+    "preserved": 1378,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v98-smmu-claim-a1e32a04b7cd4569b9d3a82f95d0de78/full-link/exact-inputs.json",
+      "sha256": "4f65e744dc5cfd15ef83b6f215991995946c5667a6a443cd8a9ff2a5a1573153"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "1245-ZornGen7RegisterMaps26.cpo",
+      "1246-ZornGen7SmmuRuntimePm26.cpo",
+      "1250-ZornGen7SmmuDomain26.cpo",
+      "1256-ZornGen7SmmuFaultIrq26.cpo",
+      "1257-ZornGen7SmmuStream26.cpo",
+      "1272-ZornGen7IccInputs26.cpo",
+      "1287-ZornGen7StartupOwner26.cpo",
+      "1305-ZornTouchPlatform26.cpo",
+      "1306-ZornRootPlatform26.cpo",
+      "1311-ZornGen7NativeBoardStage26.cpo",
+      "1312-ZornGen7PlatformBoardBridge26.cpo",
+      "1317-ZornGen7QtbFence26.cpo",
+      "1322-ZornGen7InactiveOwner26.cpo",
+      "1374-ZornGen7DarwinBoardOwner.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "houji_recovery26.o"
+    ],
+    "device_access": false,
+    "platform_root_contract_rebuilt": true
+  },
+  "change": "Reuse the exact startup-gated controller claim retained by native-held runtime PM. Eliminate the domain probe second exclusive open. Subsequent native checks verify the original claim and active power reference.",
+  "probe_scope": "Guarded SMMU identification and endpoint reservation, with CPU rendering, FT3683 continuous acquisition and per-core accounting.",
+  "device_boot_attempts": 0
+}

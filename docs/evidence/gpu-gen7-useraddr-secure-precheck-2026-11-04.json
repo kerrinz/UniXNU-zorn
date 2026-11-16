@@ -1,0 +1,44 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_EXISTING_USERADDR_REJECTION_PRECHECK",
+    "timestamp": "2026-11-03T18:54:14.102044+00:00",
+    "changed_files": [
+      "kgsl.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-useraddr-secure-precheck-20261104/useraddr-secure-precheck.UNAPPLIED.patch",
+    "patch_sha256": "a8bdb5679fa9012ce75623aa411260f48ceb6fb9a287ea06da5089a34e0f78fa",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-useraddr-secure-precheck-20261104/source-contract.json",
+    "checks": {
+      "pure_bit_witnesses": 3,
+      "ordinary_single_bit_controls": 63,
+      "zero_flag_control": true,
+      "exact_ABI_macro_definitions": true,
+      "source_mutations_refused": [
+        "lost-guard",
+        "test-allowed-bit",
+        "post-mask"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "only_existing_guard_moved": true,
+      "no_new_security_power_mapping_or_runtime_policy": true,
+      "Linux_native_device_allocator_getter_or_callback_execution": false,
+      "no_successful_import_fd_handle_or_address_model": true,
+      "old_suites_run": false
+    },
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-useraddr-secure-precheck-20261104/linux-reference",
+    "runtime_selection": false,
+    "Linux_kernel_or_native_target_compiled": false,
+    "GPU_native_device_or_callback_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-useraddr-secure-precheck-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-useraddr-secure-precheck-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-useraddr-secure-precheck-20261104/archive.json"
+}

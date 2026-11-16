@@ -1,0 +1,98 @@
+{
+  "version": 196,
+  "status": "recovered-normal-Metal-plugin-entry-bridge-open-returns-nil",
+  "ready": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v196-metal-capture-ready-2026-11-15.json",
+    "sha256": "2d61c922dc7d504325a09a5004c9073400e7f13609e4a3b51e2ec94bae51784d"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-trial-fc0d5f2856924f90b61a65b3dff845c6/root-trial/trial/run.json",
+    "sha256": "07867091ec85b63b61f77546ec9358639e7c12345dbfcdf618e41e0961613b6b"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-trial-fc0d5f2856924f90b61a65b3dff845c6/root-trial/trial/cdc-capture.json",
+    "sha256": "a9b5e530a2cbd0f3fa0fcfad716e0a78f04d39d08040837f04961b678d7f1dfd"
+  },
+  "raw": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-trial-fc0d5f2856924f90b61a65b3dff845c6/root-trial/trial/cdc.raw",
+    "sha256": "43fe8bfeecb195a6a0a14884b2d4ba68178f5800b704e15ffd848d6513509d29"
+  },
+  "recovery_seconds": 332.8137498750002,
+  "protection_pairs": [
+    "before-root_first_page.bin",
+    "before-before.bin",
+    "before-root_after.bin",
+    "before-after.bin",
+    "before-Data.bin",
+    "before-root_before.bin",
+    "before-Data_metadata.bin"
+  ],
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "application": {
+    "published": true,
+    "program_identity": {
+      "unique": 10,
+      "pid": 10
+    },
+    "raw_stderr": "ZORN195DISC es=1 name=1 class=1\nZORN195PLUG s=1 v=8211\nZORN195PLUG s=30 v=5\nZORN195PLUG s=9 v=0\nZORN195PLUG s=15 v=0\nZORN195DISC bundle=1 load=1 principal=1 code=0\n",
+    "raw_stderr_dropped": 0,
+    "complete": false,
+    "render_complete": false,
+    "native_teardown_complete": false,
+    "native": {
+      "unique": 0,
+      "pid": 0,
+      "flags": 0,
+      "calls": 0,
+      "method": 0,
+      "raw": 0,
+      "close_returned": 0,
+      "close_raw": 0,
+      "attempts": 9,
+      "copy_errors": 0,
+      "lines": 3,
+      "bytes": 151,
+      "dropped": 0
+    },
+    "sessions": [],
+    "session_rejected": 0,
+    "report_terminal": 0,
+    "report": {
+      "phase": 3,
+      "flags": 1,
+      "status": -1,
+      "code": 1,
+      "service": 4294967887,
+      "device": 0,
+      "crc": 0,
+      "first_bad": 4294967295,
+      "ticks": 3863429095
+    },
+    "error": null,
+    "reasons": [
+      "Metal-render-not-complete",
+      "native-teardown-not-complete"
+    ]
+  },
+  "bytes": 2340,
+  "known_image_complete": true,
+  "finding": "Actual normalMetaldiscovery seesIOAcceleratorES/MetalPluginName/class and calls principal initWithAcceleratorPort. Stage30/errno5 shows first confstr cache failure only; stage9 proves a later usable temporary cache and allprincipalpreconditions passed. native_bridge_metal_open returnsnil atstage15; independent NSBundle load/principal lookup succeeds. No nativeclientadmission observed. Failure is within bridge device creation, not missing bundle/entry or final cache-directory refusal.",
+  "next": "Enable existing source-defined NMB_LOG_STDERR=1 in the ordinary probe before normal Metal creation; this preserves current frontend/Rust/Turnip and routes existing NBLOG device-refusal reason to captured stderr. Do not infer which nmb_device_open/Vulkan/runtime step failed without its actual error.",
+  "source_audit": {
+    "frontend": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-command-handle-lifetime-candidate/NativeBridgeMetalFrontend.mm",
+      "sha256": "3b0f5c5301c1f188409a382f38d6da84317564fd1c312cea000a4ffca8ad64fa"
+    },
+    "open_line": 5020,
+    "device_open_line": 5024,
+    "device_refusal_line": 5038,
+    "stderr_environment_line": 763,
+    "remaining_possible_late_failure": "Actual bridge error still needed; no allocation/ABI/driver-load cause inferred"
+  },
+  "constraints": "Only authorized196temporaryboot,oneclaim,300sWDT/600sRecovery; root195unchanged;CPU presenter selected;Metal render/presentation/fullFT3683/stability incomplete;strictly no reverse engineering."
+}

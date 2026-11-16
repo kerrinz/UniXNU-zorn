@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-11-12T23:20:00+08:00",
+  "status": "recovered-fresh-PID1-userland-progression",
+  "scope": "single-K80-ios26-CPU-long-window-1080s-6412899f",
+  "record_id": "6412899fa15647fab94a6530177d180f",
+  "boot_sha256": "e34e7ee098282b9142f727d9a4f64b2ae74ba257e6fb30298759e8bcb4058da6",
+  "kernel_sha256": "4ad42760b8780bd9ece6d0d69a4385462856cd2c2c0780c7fbe9fac157a65f8f",
+  "ADT_sha256": "7d0e29c1c4622df3a118be49ff7da01c6ebf8a5146d46712e260074921d9db2d",
+  "single_variable": "Trial length 300s to 1080s, late checkpoint 150s to 900s, and the SpringBoard main thread's own sync-receive peer. ADT, root, FD and the network-identity addresses are the previous boot's.",
+  "recovery_observed_seconds": 1112.732,
+  "recovery_family": "TWRP",
+  "claim": "consumed-no-repeat",
+  "diagnostic_status": "Hp26-base-and-source-owned-metadata-context-valid",
+  "at_45_seconds": {
+    "springboard_threads": 5,
+    "main_thread": "unfair-lock wait",
+    "lock_owner_peer": "lsd"
+  },
+  "at_900_seconds": {
+    "springboard_threads": 12,
+    "main_thread": "sync Mach receive",
+    "sync_reply_destination": "destination-unbound",
+    "lock_owner": null
+  },
+  "comparison_with_0035ea43_at_150_seconds": {
+    "springboard_threads": {
+      "at_150": 12,
+      "at_900": 12
+    },
+    "main_thread": "sync Mach receive at both samples",
+    "lsd_unclassified_file_operations": {
+      "at_150": 94051,
+      "at_900": 94049
+    },
+    "lsd_watched_reservations": {
+      "at_150": 23,
+      "at_900": 23
+    },
+    "framebuffer_swaps_between_checkpoints": 0
+  },
+  "vsync_port_registered": false,
+  "lockscreen_proven": false,
+  "GPU_started": false,
+  "touch_started": false,
+  "interpretation": "The state reached by 150s is unchanged at 900s. lsd file activity does not grow after the early checkpoint, and SpringBoard's main thread stays blocked in a synchronous Mach receive whose special-reply destination port has no resolvable receiver task (classified by fe04d302 as a live plain port). A longer wait does not reach the lock screen.",
+  "next": "This scope is consumed. Do not repeat the 1080s window. fe04d302 classified the reply destination; see k80-CPU-reply-destination-observed-2026-11-12.json."
+}

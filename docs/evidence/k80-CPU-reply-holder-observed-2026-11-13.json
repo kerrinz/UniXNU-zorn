@@ -1,0 +1,54 @@
+{
+  "recorded_at": "2026-11-13T00:50:00+08:00",
+  "trials": [
+    {
+      "status": "recovered-fresh-PID1-userland-progression",
+      "scope": "single-K80-ios26-CPU-reply-holder-300s-babbbe2b",
+      "record_id": "babbbe2bb2af4b318f09b13049d760a6",
+      "boot_sha256": "05ab0ba700563e99a88b4d56f5c4282d3e3dea97f861424ec0316e503f363d6e",
+      "kernel_sha256": "2a71ef64c5c7ab3d623d62a13799ffc02a2969aace99b41cfb6ffdf524789c45",
+      "single_variable": "For a destination-unbound sync reply, record the destination's exact io_state, and for in-transit ports walk ip_destination one lock at a time to the final holding port's receiver.",
+      "recovery_observed_seconds": 332.16,
+      "recovery_poll_attempts": 164,
+      "claim": "consumed-no-repeat",
+      "diagnostic_page": "fresh; run ID absent before boot and matched after",
+      "at_150_seconds": {
+        "destination_state": "in-transit",
+        "destination_kind": "plain-port",
+        "transit_holder": "other-unlisted-user"
+      }
+    },
+    {
+      "status": "recovered-fresh-PID1-userland-progression",
+      "scope": "single-K80-ios26-CPU-holder-name-300s-056afd15",
+      "record_id": "056afd15056746e8878c08f90daf35ad",
+      "boot_sha256": "b6840969609184bbfd559245e5c9335f415050a725dbcb39b0838d1f513abe1d",
+      "kernel_sha256": "b49a6624986fc8a8a8405c235e49344c1625624f9a2a78463015e75f4b69c081",
+      "single_variable": "For an unlisted final holder, export its sanitized p_comm (rechecked against the receiver task after lookup), the holding port's queued message count, and whether the holding port is a service port.",
+      "recovery_observed_seconds": 332.76,
+      "recovery_poll_attempts": 164,
+      "claim": "consumed-no-repeat",
+      "diagnostic_page": "fresh; run ID absent before boot and matched after",
+      "at_150_seconds": {
+        "destination_state": "in-transit",
+        "destination_kind": "plain-port",
+        "transit_holder_process": "launchd.ios",
+        "holding_port_is_service_port": true,
+        "holding_port_queued_messages": 3
+      }
+    }
+  ],
+  "common": {
+    "ADT_sha256": "7d0e29c1c4622df3a118be49ff7da01c6ebf8a5146d46712e260074921d9db2d",
+    "root": "installed root 227ba6, read-only at runtime, not rewritten",
+    "springboard_threads_at_150_seconds": 12,
+    "lsd_unclassified_file_operations": [94051, 94050],
+    "framebuffer_swaps_between_checkpoints": 0,
+    "recovery_family": "TWRP",
+    "GPU_started": false,
+    "touch_started": false,
+    "lockscreen_proven": false
+  },
+  "interpretation": "launchd.ios is Apple's launchd exec'd as PID 1 by the ramfs init (init.c runs /sbin/launchd.ios), so the allowlist entry 'launchd' did not match its p_comm. SpringBoard's main thread is blocked on a synchronous request to a plain (connection) port whose receive right is inside one of three undelivered messages queued on a service port still held by launchd. This matches an XPC client connecting to a MachService whose job has not been launched or has not checked in: until the job takes the service port from launchd, the connection port stays in transit and the reply never arrives.",
+  "next": "Both scopes are consumed. The next probe should export the holding service port's launchd service name and domain from its ipc_service_port_label (CONFIG_SERVICE_PORT_INFO is enabled), identifying which job SpringBoard is waiting for."
+}

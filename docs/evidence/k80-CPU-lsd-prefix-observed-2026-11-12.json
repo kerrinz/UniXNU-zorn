@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-11-12T21:50:00+08:00",
+  "status": "recovered-fresh-PID1-userland-progression",
+  "scope": "single-K80-ios26-CPU-lsd-vfs-prefix-300s-56812d90",
+  "record_id": "56812d907cb74b76b18555be61763ef2",
+  "boot_sha256": "d60000a5533c2a4e867f7ea74ae2b5d4aa1f072a5f3f22638fbc624e407bf377",
+  "recovery_observed_seconds": 334.06027300001006,
+  "recovery_family": "TWRP",
+  "claim": "consumed-no-repeat",
+  "diagnostic_status": "Hp26-base-and-source-owned-metadata-context-valid",
+  "diagnostic_freshness": "before/after differ;run-ID absent before",
+  "lsd_vfs_observation": {
+    "first_matching_pid": 24,
+    "reservations": 15,
+    "copy_errors": 53,
+    "unclassified": 14048,
+    "budget_exhausted": false,
+    "lsd_db": {"count": 1, "com_apple_lsd_prefix_seen": false, "operations_seen": ["stat"], "native_outcomes_seen": ["ENOENT"]},
+    "containers": {"count": 14, "com_apple_lsd_prefix_seen": false},
+    "mobile_caches_and_installation": {"count": 0, "com_apple_lsd_prefix_seen": false}
+  },
+  "springboard_pid": 6,
+  "springboard_peer": "lsd",
+  "pixel_copies": 2,
+  "vsync_port_registered": false,
+  "lockscreen_proven": false,
+  "GPU_started": false,
+  "conclusion": "lsd did not touch /var/db/com.apple.lsd during the 150 second sample. The single database stat ENOENT is under the /var/db/lsd prefix. The absent /private/var/db/com.apple.lsd directory is not the observed stat target.",
+  "next": "Do not reuse this scope. Do not create /private/var/db/com.apple.lsd from this page."
+}

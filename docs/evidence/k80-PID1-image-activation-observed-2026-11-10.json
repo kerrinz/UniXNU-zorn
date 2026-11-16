@@ -1,0 +1,79 @@
+{
+  "status": "actual-PID1-image-activation-return-and-UFS-root-device-match-observed",
+  "time": "2026-11-10T04:40:11.025077+00:00",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac/root-trial-PID1/trial/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-PID1-image-UFS-root300s-v8",
+    "status": "recovered-fresh-PID1-image-activation-matching-UFS-device",
+    "GPU_started": false,
+    "root_mount_proven": true,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 332.93680566600233,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "PID1_image_activation_proven": true,
+    "user_mode_instructions_proven": false,
+    "log_changed": true,
+    "native_writer_readback_success_proven": false
+  },
+  "record": {
+    "status": "existing-Hp26-record-byte-envelope-valid",
+    "run_id": "3027f9f1fd594afb91eb87d3bc1dd4ac",
+    "text": "K80 IOS26 PID1 image activation returned successfully; UFS rootdev matches registered mdev; user instructions and GPU not proven",
+    "freshness": "before/after local pages differ; artifact tag absent before",
+    "matches_PID1_image_activation_and_device_milestone": true,
+    "can_support_fresh_trial_when_bound_to_actual_capture_and_bundle": true,
+    "standalone_inspection_proves_native_or_device_execution": false,
+    "GPU_execution_proven": false,
+    "root_or_desktop_proven": false,
+    "native_writer_readback_success_proven": false
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.16413712500070687,
+    "inputs": 1390,
+    "replaced": 6,
+    "preserved": 1384,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "8366697dbbbb4e6cd98e3c7a374f79eac2c598b92cb7bef3a252b07a487c6d77",
+    "bytes": 30304064
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac/root-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "c744218290657e1f8d44dc7b725bba3bb8f56c82603df4fe19a0aa4e1d6a8cca",
+    "bytes": 11587584
+  },
+  "actual_source_branch_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac/actual-init-link-proof.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac/root-trial-PID1/trial/one-shot.claim.json",
+  "consumed_no_repeat": true,
+  "meaning": "Actual load_init_program returned;actual proc_pid was1 and actual rootdev matched returned registered UFS device. All load-init failure paths panic;this proves image activation return only,not EL0 instruction execution,dyld completion,launchd services or desktop.",
+  "protected_scope": "Fixed runner compared actual GPT/rootmanifest/Data metadata/rootpage/fences before/after;not whole filesystem content proof or native writer self-readback ACK.",
+  "next_EL0_candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae",
+  "next_EL0_link_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/actual-EL0-link-proof.json",
+  "next_EL0_executed": false
+}

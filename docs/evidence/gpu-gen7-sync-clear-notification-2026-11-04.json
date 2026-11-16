@@ -1,0 +1,43 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_SYNC_CLEAR_NOTIFICATION_REPAIR",
+    "reference": "retained exact OEM453d8875; not Xiaomi installed-kernel/K80 runtime",
+    "changed_files": [
+      "kgsl_drawobj.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-clear-notification-20261104/sync-clear-notification.UNAPPLIED.patch",
+    "patch_sha256": "48fa7eeeaa8f44f6d0732826a9800c25bfc9103a45fac9d8a800cc5103bf04d5",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-clear-notification-20261104/source-contract.json",
+    "checks": {
+      "software_flag_patterns": 259,
+      "source_mutations_refused": [
+        "notify-empty",
+        "drop-observation",
+        "reuse-cleared-mask"
+      ],
+      "existing_callback_shape_and_all_cancel_put_operations_unchanged": true,
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "source_bitmap_clear_not_hardware_stop_or_cancellation_success": true,
+      "no_syncobj_fence_callback_provider_or_native_execution": true,
+      "Linux_kernel_or_native_target_compiled": false,
+      "old_suites_run": false
+    },
+    "delta_replay_byte_equal": true,
+    "parent9_sources_unchanged": true,
+    "no_new_cancel_put_refcount_or_callback_operation": true,
+    "no_wire_log_or_public_layout_change": true,
+    "Linux_kernel_or_native_target_compiled": false,
+    "native_objects_provider_fence_callback_allocator_or_device_execution": false,
+    "runtime_selection": false,
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "timestamp": "2026-11-03T17:53:41.301156+00:00"
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-clear-notification-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-clear-notification-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-clear-notification-20261104/archive.json"
+}

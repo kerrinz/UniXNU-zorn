@@ -1,0 +1,99 @@
+{
+  "recorded_at": "2026-11-14T21:51:40.318212+08:00",
+  "version": 186,
+  "stage": 4,
+  "status": "offline-ordinary-task-fixed-ABI-probe",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/stage4-user-probe-snapshot/manifest.json",
+    "sha256": "61603780d8ef9775b79e6b552dfcb5b30460b3ddc38e09fcfa1b4ae58f13e3e0"
+  },
+  "kernel_process_stage": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/stage3-application-process-snapshot/manifest.json",
+    "sha256": "49ab47f6cf5164b5fad37c0083d3971235a8351cf793eb06be2d5395bd0602a6"
+  },
+  "build": {
+    "status": "offline-arm64e-ios26-fixed-ABI-user-probe-built-signed",
+    "binary": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/user-probe/zorn-gpu-probe186",
+      "sha256": "72eee48385c16cb89f15e3ff6295fedab35ae4538108c0a941f44e2f02eb1a13",
+      "cdhash": "1725387b321bf87f3cd8815a77ff2d4f687ec14f"
+    },
+    "target": "arm64e-apple-ios26.0",
+    "sdk": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk",
+    "entitlements": {
+      "com.apple.private.security.no-container": true,
+      "com.apple.security.iokit-user-client-class": [
+        "ZornGen7AppIoClient26"
+      ]
+    },
+    "source": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/GpuKnownImage2d.h",
+        "sha256": "7947d1d6008d4ea6a5ca312b9f9c7585c11136df8c25d59273dc644abde80fc9"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/K80KnownImage26.h",
+        "sha256": "1ca330fce0b78775e05bad52eeb1ee55cdd52b81036aff260fe0e340d48e519d"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/NativeAdrenoABI.h",
+        "sha256": "0a37fb621488b410e2f1206a161e5d537313c2eed7e27bd9c46817c09d81bc13"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/ZornGpuApplicationProbe26.cpp",
+        "sha256": "8c02c8fc9b68a02874d2b0c5c75b6119ce9781cb4dc544201691e847fa81f872"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/ZornGpuApplicationProbe26.h",
+        "sha256": "c9e1082756583024c7c2c09f0d76499ffb03ef68b4111fd20195b7966d3df7de"
+      }
+    ],
+    "hardware_executed": false,
+    "installed": false,
+    "trust_bundle_included": false,
+    "launch_path_selected": false,
+    "scope": "Exact app-service class and open type; normal fixed selectors, real Mach CPU mapping and 32768B known 2D image; normal close only after successful completion. Launch/trust/log/payload integration pending."
+  },
+  "test": {
+    "passed": true,
+    "result": "PASS 276 actual user-probe transaction assertions; mocked transport/output only\n",
+    "source_sha256": "c9e1082756583024c7c2c09f0d76499ffb03ef68b4111fd20195b7966d3df7de",
+    "scope": "Actual transaction source with mocked IOKit transport and simulated device output. Success order, all13 failure boundaries, malformed lengths/identity/address/fence and corrupt image/padding. No target or GPU execution."
+  },
+  "actual_shared_inputs": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/Adreno740/NativeAdrenoABI.h",
+      "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/NativeAdrenoABI.h",
+      "sha256": "0a37fb621488b410e2f1206a161e5d537313c2eed7e27bd9c46817c09d81bc13"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-kernel-client-owner-candidate/direct-runtime/K80KnownImage26.h",
+      "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/K80KnownImage26.h",
+      "sha256": "1ca330fce0b78775e05bad52eeb1ee55cdd52b81036aff260fe0e340d48e519d"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-kernel-client-owner-candidate/direct-runtime/GpuKnownImage2d.h",
+      "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/userland/GpuKnownImage2d.h",
+      "sha256": "7947d1d6008d4ea6a5ca312b9f9c7585c11136df8c25d59273dc644abde80fc9"
+    }
+  ],
+  "implementation": [
+    "Uses exact owned application service class/type, genuine IOServiceOpen and IOConnectCallStructMethod with original fixed selectors and exact sizes. One actual open attempt after bounded120s service discovery; no alternate service, selector tunnel or mailbox fallback.",
+    "Copies exact selected kernel ABI and source-defined K80 known-image helper. Ordinary user task allocates32768B BO, maps real Mach CPU alias and allowed IOVA, fills source-defined247-word2D command, submits once, waits1s, validates whole allocation and image CRC, queries real timestamp, unmaps/returns CPU lease/frees/closes in order.",
+    "Every failed explicit transaction stops without additional GPU/unmap/free/close calls. Actual kernel client task-death/failure lifecycle remains required for device qualification.",
+    "arm64e iOS26 target compiled/linked and locally signed with own class entitlement and no-container. This local signature is not device trust or a successful launch. No plugin/Metal runtime or phone files changed."
+  ],
+  "remaining": [
+    "Integrate supported owner launch/trust/log path for this probe without changing Android or historical Data; current phone root/boot package remain unchanged.",
+    "Select native application-only startup and coherent diagnostics, full-link all actual affected objects including new AppIo layout, then package/freeze/runner proof and bounded hardware run.",
+    "Ordinary-task admission, Mach mappings/cache visibility, real image/fence/timestamp and clean close need exact hardware evidence; Metal/presentation/full touch still pending."
+  ],
+  "hardware": {
+    "executed": false,
+    "installed": false,
+    "launch_selected": false,
+    "owner_trust_bundle_selected": false,
+    "boot_package_created": false
+  },
+  "constraints": "Strictly source/compilation/signing/host regression only; no disassembly or reverse engineering. Host simulated image is explicitly not GPU proof. Goal active."
+}

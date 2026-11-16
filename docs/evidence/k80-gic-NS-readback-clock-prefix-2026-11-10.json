@@ -1,0 +1,49 @@
+{
+  "status": "offline-native-clock-prefix-reused-and-GIC-nonsecure-readback-candidate-linked",
+  "date": "2026-11-10T14:24:19.600773+00:00",
+  "clock_prefix_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-prefix26-04f441cd824040378c4f55a2774ae2e3",
+  "clock_prefix_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-clock-prefix-04f441cd824040378c4f55a2774ae2e3",
+  "clock_prefix_compilation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-prefix26-04f441cd824040378c4f55a2774ae2e3/compile-result.json",
+  "clock_prefix_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-clock-prefix26-04f441cd824040378c4f55a2774ae2e3/full-link/link-result.json",
+  "clock_functions_reused": [
+    "prepareArcNodes",
+    "prepareClockNodes",
+    "prepareGccClockRails",
+    "prepareGccGpuClockPrefix",
+    "prepareNativeGpuccPrefix",
+    "prepareNativeGmuClockGraph",
+    "prepareNativeGmuClockList"
+  ],
+  "GIC_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gic-NS-group-readback-c381522ed76346929f61ea32a27139f2/gic_v3_irq.c",
+  "GIC_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-NS-group-readback26-c381522ed76346929f61ea32a27139f2/compile-result.json",
+  "GIC_rationale": {
+    "actual_trigger": "v21 cpu-power hold returned0;RSC masked attach aggregate kIOReturnIOError;precise failed register is not in the old record",
+    "architectural_source_gap": "Unconditional IGROUPR bit-set readback cannot succeed for Non-secure accesses when DS==0",
+    "sources": [
+      "https://support.arm.com/documentation/ddi0595/2021-06/External-Registers/GICD-IGROUPR-n---Interrupt-Group-Registers",
+      "https://documentation-service.arm.com/static/67eaa4d098aa3c3b6eea7351"
+    ],
+    "change": "DS==1 retains group validation;DS==0 checks already-written priority while preserving actual route/type/masked checks",
+    "does_not_prove": "actual DS/security view or fixed hardware outcome;new fresh scoped execution still required",
+    "no_DS_write": true,
+    "no_constant_success": true,
+    "device_executed": false
+  },
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-NS-group-readback26-c381522ed76346929f61ea32a27139f2/full-link/kernel.ZORN26-RSC-GIC-NS-READBACK.UNSELECTED.macho",
+    "sha256": "7d0861efcd73ce682850ce5cf923ad00858ad17a4abd1dceb6860f49e992216d",
+    "bytes": 30400856,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1395,
+    "undefined_symbols": 0
+  },
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-NS-group-readback26-c381522ed76346929f61ea32a27139f2/source-selection.json",
+  "current_link_unselected": true,
+  "GIC_fix_device_executed": false,
+  "clock_prefix_device_executed": false,
+  "actual_v21_observation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-rsc-runtime-observed26.json",
+  "root_readback_policy": "Only changed pages and protected metadata/fences;no complete image readback or new device-root whole hash",
+  "remaining": "Fresh identity/package/scope required for this GIC readback change. RSC runtime,source clock/rail operations,GMU/HFI/direct-ring/Metal/lockscreen/touch remain unqualified."
+}

@@ -1,0 +1,159 @@
+{
+  "real_source_graphs": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.gpu.json",
+      "json_sha256": "541b036cf81499492ea38345a8c68dfa1fcdfc55f2a35bcfcb381e18cd2f11c8",
+      "dtb_sha256": "b082a6b8813d392b6fdb554ed46212a9b064a7399f341dd2910b06819f08f511",
+      "closure": {
+        "roots": [
+          "/soc/qcom,kgsl-3d0@3d00000",
+          "/soc/qcom,gmu@3d69000"
+        ],
+        "node_count": 84,
+        "resolution_complete": false
+      }
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.gpu.json",
+      "json_sha256": "b2cf39281de27e8695c943d8f77bfd64941c157140e02f087ee62552ba458f0e",
+      "dtb_sha256": "74b702105990399697b7d38def4ab3931a5ef79e20f0a0cc8cc9fc2c865eff52",
+      "closure": {
+        "roots": [
+          "/soc/qcom,kgsl-3d0@3d00000",
+          "/soc/qcom,gmu@3d69000"
+        ],
+        "node_count": 86,
+        "resolution_complete": false
+      }
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.gpu.json",
+      "json_sha256": "cbdeba65f4d646342d615f927b9a66530c2ee4787429a9ff0ba457f21887b10a",
+      "dtb_sha256": "4c87e7fcb971592ae7f9f34d978b45d0801bc0f6dbc911dedd7767c5fc5f2bb6",
+      "closure": {
+        "roots": [
+          "/soc/qcom,kgsl-3d0@3d00000",
+          "/soc/qcom,gmu@3d69000"
+        ],
+        "node_count": 84,
+        "resolution_complete": false
+      }
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.gpu.json",
+      "json_sha256": "ab4cc0500909dd1dc14e330cdfbca858b18476722d69acd69316fa1eb483e0d9",
+      "dtb_sha256": "ed761aa6d7e8623792c75f20693a97407974ee2445254e725ce202a8f0ffaa76",
+      "closure": {
+        "roots": [
+          "/soc/qcom,kgsl-3d0@3d00000",
+          "/soc/qcom,gmu@3d69000"
+        ],
+        "node_count": 86,
+        "resolution_complete": false
+      }
+    }
+  ],
+  "new_graph_refusals": [
+    {
+      "case": "missing-root",
+      "error": "declared roots differ from raw compatible roots"
+    },
+    {
+      "case": "reordered-roots",
+      "error": "declared roots differ from raw compatible roots"
+    },
+    {
+      "case": "duplicate-root",
+      "error": "declared roots differ from raw compatible roots"
+    },
+    {
+      "case": "unrelated-root",
+      "error": "declared roots differ from raw compatible roots"
+    },
+    {
+      "case": "missing-child",
+      "error": "declared node set differs from raw source dependency closure"
+    },
+    {
+      "case": "missing-provider",
+      "error": "declared node set differs from raw source dependency closure"
+    },
+    {
+      "case": "extra-honest-node",
+      "error": "declared node set differs from raw source dependency closure"
+    },
+    {
+      "case": "forged-resolution",
+      "error": "declared resolution flag differs from raw source closure"
+    },
+    {
+      "case": "numeric-resolution",
+      "error": "declared resolution flag differs from raw source closure"
+    }
+  ],
+  "new_closure_cases": [
+    {
+      "case": "disabled-root-child-provider-cycle-unknown-tail",
+      "closure": {
+        "roots": [
+          "/gpu"
+        ],
+        "node_count": 3,
+        "resolution_complete": false
+      }
+    },
+    {
+      "case": "no-supported-root",
+      "error": "raw source has no supported GPU/GMU roots"
+    }
+  ],
+  "child_no_write_or_process": true,
+  "policy_headers_emitted": 0,
+  "prepare_audit_formatter_executed": false,
+  "old_suites_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/verify-zorn-gpu-reference-source.py": "05973a22c22e8b40d83ae37d67890ab4af7d96b5c91a1f73de4992d6f9caa19b",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-source-graph-closure.py": "45418e67c18fe41cca7dfe7d3c3a0d88ea946fb71a89c786d715d4c44ef30bae",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-source-schema-route.py": "911270acad5cad88f0b7170663d1128eac04283d3308cf30c3c796c1587d5d9c"
+  },
+  "combined_source_schema_routes": {
+    "new_combined_routes": [
+      {
+        "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.gpu.json",
+        "graph_verified": true,
+        "source_schema_compatible": false,
+        "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+      },
+      {
+        "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.gpu.json",
+        "graph_verified": true,
+        "source_schema_compatible": false,
+        "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+      },
+      {
+        "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.gpu.json",
+        "graph_verified": true,
+        "source_schema_compatible": false,
+        "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+      },
+      {
+        "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.gpu.json",
+        "graph_verified": true,
+        "source_schema_compatible": false,
+        "error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+      }
+    ],
+    "missing_graph_flag_refused": true,
+    "child_no_write_or_process": true,
+    "pure_function_AST_only": true,
+    "prepare_module_not_executed": true,
+    "policy_headers_emitted": 0,
+    "old_suites_reexecuted": false
+  },
+  "header_scope_approval_received": false,
+  "scope": "Raw source graph roots/closure completeness and independent pure generator schema compatibility;not hardware readiness"
+}

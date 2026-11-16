@@ -1,0 +1,54 @@
+{
+  "status": "actual-disabled-install-only-trial-recovered-without-fresh-record",
+  "time": "2026-11-10T15:34:05.125338+00:00",
+  "scope": "single-K80-ios26-RSC-disabled-install90s-v27",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/root-trial-rsc-masked-stage/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/root-trial-rsc-masked-stage/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/full-link/kernel.ZORN26-RSC-MASKED-STAGE.UNSELECTED.macho",
+    "sha256": "254116c275ec41dca0fbe628536e255dcbb46d5c42e1c2bde6c28ddb4ec478a0",
+    "bytes": 30395344,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 30,
+    "preserved": 1366,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/root-package-rsc-masked-stage/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "cdcde3d2b1637a6aaac223a2f6e7673721b1ebe5023471006855ac99a0257b64",
+    "bytes": 11612160
+  },
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-stage-036c4e639c1341718ebb72a5940b6f24",
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/source-selection.json",
+  "compilation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/compile-result.json",
+  "identity_compilation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-stage26-036c4e639c1341718ebb72a5940b6f24/identity-compile-result.json",
+  "implementation": "Original real disabled event-source installation and enable are distinct one-attempt methods;normal installAndEnable invokes both. ready_ only publishes after actual enable;clock binding still separately required. Explicit masked stage returns software NotReady after successful disabled installation and never declares full runtime ready.",
+  "native_enable_selected": false,
+  "clock_GMU_GPU_selected": false,
+  "record_changed": false,
+  "fresh_stage_record_observed": false,
+  "failure_stage": "not localized before terminal observer;do not assume the disabled-install call itself was reached or completed. Source excludes the explicit enable continuation.",
+  "recovery_seconds": 90.11207120900508,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "full_root_readback_performed": false,
+  "scope_consumed_no_repeat": true,
+  "full_runtime_or_GPU_or_lockscreen_proven": false
+}

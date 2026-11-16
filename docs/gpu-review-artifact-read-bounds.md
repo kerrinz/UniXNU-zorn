@@ -1,0 +1,9 @@
+# Bounded local source-review artifact verification
+
+The verify-only entry previously read result.json completely before its 16 MiB check. Source bodies, object bytes, compiler streams and event history were also whole-file reads. Five actual oversized-file paths reproduced this behavior under the no-write/no-process guard.
+
+An independent UNAPPLIED candidate now bounds the actual read request before hashing/parsing. Reconstructed source bodies use their exact expected byte lengths. Receipt and object budgets are 16 MiB, event history 1 MiB, individual compiler stdout/stderr 8 MiB and combined logs 16 MiB. Stream reads use their independently anchored byte count only after checking a nonnegative integer within the explicit cap. These are offline work budgets, not target memory geometry. A correctly anchored archive over a new budget is deliberately refused by this candidate.
+
+Five before/after traces show original read(-1) versus bounded reads and refusal without a verified result. Negative, boolean and over-budget stream lengths refuse before opening the stream. An exact 16 MiB padded receipt passes. Non-UTF8 and NUL raw stream bytes retain their original semantics. An unchanged copied artifact verifies identically through the changed path; no compile process or target executes. Test receipt anchors for malformed copies are synthetic inputs and confer no trusted execution or hardware qualification.
+
+The candidate copies exact existing dependencies without changing their pins; it does not combine the earlier candidate reader chain. Original builder, source artifacts, receipts, 32 driver patches and 8 profiles remain unchanged. No old 13-case suite or compile was rerun. Fresh test artifacts are independent inode copies. The maintained preflight still reads caller-supplied approval/manifest controls before their strict identity checks; those separate entry reads are not claimed repaired here.

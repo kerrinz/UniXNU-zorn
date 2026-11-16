@@ -1,0 +1,110 @@
+{
+  "status": "recovered-fresh-SMMU-global-fault-control-record",
+  "recorded_at": "2026-11-13T02:23:00+08:00",
+  "device": "Redmi K80 92988a43 / zorn / slot a",
+  "scope": "single-K80-ios26-native-SMMU-global-GFRE-GFIE90s-v59",
+  "run_id": "abf7dbca0f12486dab4fa73c33c2454f",
+  "authorization": "Explicit current user authorization for unattended work on the connected K80 iOS 26 partition.",
+  "artifact_root": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-global-fault-irq-v59-abf7dbca0f12486dab4fa73c33c2454f",
+  "build": {
+    "kernel_sha256": "39c43058da32d3543a40731a7279b8aaab9c4a73c5f7934d07fa60843da01af0",
+    "boot_sha256": "118bc8eb30f9643fc122ecbfb753dea9d0c0ad53176f98b113c78635cb90c1eb",
+    "fat_sha256": "48321336e97ffe5bb7df80e64b32d5bd690235e8d6f7cb70999b54a8757decb3",
+    "full_link_inputs": 1396,
+    "undefined_symbols": 0,
+    "proof": "source-build-proof.json"
+  },
+  "execution": {
+    "status": "recovered-fresh-smmu-active-fault-record",
+    "boot_attempts": 1,
+    "trial_seconds": 90,
+    "host_timeout_seconds": 600,
+    "recovery_observed_seconds": 122.84503862500424,
+    "recovery_before": "TWRP",
+    "recovery_after": "TWRP",
+    "fastboot_returned_success": true,
+    "fresh_record_decoded_after_recovery": true,
+    "native_writer_readback_success_proven": false,
+    "root_mount_proven": true,
+    "PID1_image_activation_proven": true,
+    "user_mode_instructions_proven": true,
+    "desktop_proven": false,
+    "CPU_presenter": false,
+    "GMU_cold_clock_prefix_complete": true,
+    "GMU_firmware_startup_proven": false,
+    "GPU_startup_proven": false,
+    "GPU_execution_proven": false,
+    "Metal_rendering_proven": false,
+    "touch_startup_proven": false
+  },
+  "native_SMMU_global_fault_control": {
+    "attempted": true,
+    "controller_active": true,
+    "GFSR": "0x00000000",
+    "global_TLB_sync_write_returned": true,
+    "sync_status": "0x00000000",
+    "sync_active_reads": 1,
+    "CR0_before": "0x002f0406",
+    "CR0_readback": "0x002f0406",
+    "GFRE_GFIE_mask": "0x00000006",
+    "GFRE_GFIE_already_set_before_write": true,
+    "CR0_write_returned": true,
+    "context_fault_bits_4_5_unchanged": true,
+    "global_IRQ_arm_returned": true,
+    "global_IRQ_arm_raw": 0,
+    "IRQ_delivery_proven": false,
+    "SMMU_mapping_or_translation_proven": false,
+    "note": "The controller started with GFRE/GFIE already set. The read/write/readback path completed, but this run did not observe an off-to-on transition or create a fault to test delivery."
+  },
+  "fresh_log": {
+    "changed": true,
+    "before_sha256": "57c0530e8fc04189b091c4e532508b4e00425814e33f3da2974c172038533c5a",
+    "after_sha256": "0fb338d50fb2ac620f271ad39f73c403c77dd1c06a1f5e23c22a7087811f6ae2",
+    "decoded_record": "trial/decoded-native-record.json"
+  },
+  "protected_captures": [
+    {
+      "name": "Data",
+      "before_sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "after_sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "equal": true
+    },
+    {
+      "name": "Data_metadata",
+      "before_sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "after_sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "equal": true
+    },
+    {
+      "name": "root_first_page",
+      "before_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "after_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "equal": true
+    },
+    {
+      "name": "root_before_fence",
+      "before_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "after_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "equal": true
+    },
+    {
+      "name": "root_after_fence",
+      "before_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "after_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "equal": true
+    }
+  ],
+  "BCB": {
+    "full_page_readback": true,
+    "tail_preserved": true,
+    "size_bytes": 4096,
+    "before_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared_sha256": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a",
+    "readback_sha256": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "limits": [
+    "No GIC fault delivery, SMMU context/bank/stream ownership, mapping/translation, GMU firmware startup, GPU execution, Metal result, desktop or touch path was proven.",
+    "The native writer's own readback success flag is false; freshness and contents were established by the host reading and decoding the changed log page after Recovery.",
+    "The runner compared its bound Data, root-page and root-fence captures and verified the BCB page/tail. This record does not claim a post-trial whole-image or whole-GPT readback."
+  ]
+}

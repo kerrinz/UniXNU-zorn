@@ -1,0 +1,67 @@
+--- a/userland/ZornMetalProbe193.mm
++++ b/userland/ZornMetalProbe193.mm
+@@ -5,6 +5,7 @@
+ #import <IOSurface/IOSurfaceRef.h>
+ #import <CoreVideo/CVPixelBuffer.h>
+ #include "ZornSurfaceProbe224.h"
++#include "ZornKnownPresent247.h"
+ #include <IOKit/IOKitLib.h>
+ #include <dispatch/dispatch.h>
+ #include <mach/mach_time.h>
+@@ -15,7 +16,7 @@
+ #include <time.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-static constexpr char tag[]="65f3efb4a587473a9caebe54d7a99aea";
++static constexpr char tag[]="c0bed9d9c79d4aeca33d0ad509f2984d";
+ static uint32_t stages,actualCRC,firstBad=UINT32_MAX;
+ static uint64_t serviceID,deviceID;
+ static uint32_t crc32(const uint8_t *p,size_t n){uint32_t c=~0u;for(size_t i=0;i<n;i++){c^=p[i];for(unsigned j=0;j<8;j++)c=(c>>1)^((0u-(c&1u))&0xedb88320u);}return ~c;}
+@@ -49,6 +50,38 @@
+ static bool accessSurface224(IOSurfaceRef surface,uint8_t *out){
+  return zornSurface224Access(IOSurfaceGetBaseAddress(surface),IOSurfaceGetWidth(surface),IOSurfaceGetHeight(surface),
+   IOSurfaceGetBytesPerRow(surface),IOSurfaceGetAllocSize(surface),IOSurfaceGetPlaneCount(surface),(size_t)getpagesize(),out);
++}
++// Board source API;ordinary IOKit open honours the existing client entitlement.
++// SwapWait is intentionally unused:the existing implementation returns success
++// before actual presentation. Only the real frame/SID record can acknowledge.
++static bool presentKnown247(IOSurfaceRef surface){
++ const uint32_t sid=IOSurfaceGetID(surface);if(!sid)return false;
++ io_service_t display=IOServiceGetMatchingService(kIOMainPortDefault,IOServiceMatching("IOMobileFramebuffer"));
++ if(display==IO_OBJECT_NULL)return false;
++ io_connect_t connection=IO_OBJECT_NULL;
++ kern_return_t raw=IOServiceOpen(display,mach_task_self(),0,&connection);IOObjectRelease(display);
++ if(raw!=KERN_SUCCESS)return false;
++ uint64_t input=sid,frame=0;uint32_t count=1;
++ raw=IOConnectCallScalarMethod(connection,ZornKnownPresentSubmit247,&input,1,&frame,&count);
++ bool complete=false;
++ if(raw==KERN_SUCCESS && count==1 && frame && frame<=UINT32_MAX){
++  const uint64_t query[2]={frame,sid};
++  for(unsigned poll=0;poll<200;++poll){
++   uint64_t record[16]={};count=16;
++   raw=IOConnectCallScalarMethod(connection,ZornKnownPresentQuery247,query,2,record,&count);
++   if(raw==KERN_SUCCESS){
++    complete=count==16 && record[0]==2 && record[1]==frame && record[7]==sid && record[3]==2 &&
++      record[6]==1 && record[8]==1 && record[9]==1 && record[10]==1 && record[15]!=0 &&
++      record[15]<=record[5] && record[5]==record[4] && record[2]<=record[5] &&
++      uint32_t(record[12]-record[11])==1;
++    break;
++   }
++   if(raw!=kIOReturnNotReady)break;
++   usleep(10000);
++  }
++ }
++ const kern_return_t closed=IOServiceClose(connection);
++ return complete && closed==KERN_SUCCESS;
+ }
+ static int probe(){
+  report(1,0);
+@@ -160,6 +193,8 @@
+  }
+  if(firstBad!=UINT32_MAX){report(10,(long)status,1);return 10;}
+  stages|=256;report(10,(long)status);
++ // Keep texture and its real IOSurface alive until actual acquire/show acknowledgement.
++ if(!presentKnown247(surface.value)){report(10,(long)status,8);return 10;}
+  // Completion is established before releasing GPU resources. Process teardown is observed separately in kernel logs.
+  encoder=nil;command=nil;pass=nil;texture=nil;queue=nil;pipeline=nil;pipelineDesc=nil;
+  vertex=nil;fragment=nil;library=nil;device=nil;

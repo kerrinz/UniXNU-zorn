@@ -1,0 +1,95 @@
+{
+  "recorded_at": "2026-11-14T22:18:28.437145+08:00",
+  "version": 186,
+  "stage": 5,
+  "status": "offline-ordinary-application-launch-root-and-exact-delta-replay",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/stage5-application-root-snapshot/manifest.json",
+    "sha256": "71c01939f0d081645fcdcb5dab36b0bb86f12b07ad1806678f5a6046e10a9a00"
+  },
+  "root_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/root-result.json",
+    "sha256": "a526b12a3fabf5e774c917e0467bb403a2429d69bfe35bdb34a0ed7a373c61bb"
+  },
+  "image": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/ios26-root-gpu-application186.UNSELECTED.hfsx",
+    "sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "bytes": 34359738368
+  },
+  "probe": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/user-probe-launch/zorn-gpu-probe186",
+    "sha256": "5c9550e38f19c7520482d9ba850af5b329ae98c6998746477a6f3da74c0bf38c",
+    "cdhash": "b94513d4602ec7f32540b091e2d0071d8dbe3a84"
+  },
+  "probe_build": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/user-probe-launch/build-result.json",
+    "sha256": "61602ea3e4da238c5af8685c6d4636c0a424646fdf64e6797b39ae5ad843bf3b"
+  },
+  "launch_job": {
+    "Label": "org.unixnu.zorn.gpu-probe186",
+    "ProgramArguments": [
+      "/redwood/sbin/zorn-gpu-probe186"
+    ],
+    "UserName": "mobile",
+    "GroupName": "mobile",
+    "RunAtLoad": true,
+    "KeepAlive": false,
+    "ProcessType": "Background",
+    "StandardOutPath": "/dev/console",
+    "StandardErrorPath": "/dev/console"
+  },
+  "source_consistency": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/launch-source-consistency.json",
+    "sha256": "02dcd355f0d8f2210b49389949daf8df087fe68994b6df37bcb72221c73aae56"
+  },
+  "timing_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/user-launch-timing-review.json",
+    "sha256": "0be9d678099d5a8d38a8e1cd278b0843ca106af6362ca8e142eb14d349e3a90e"
+  },
+  "layout_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/layout-and-replay-result.json",
+    "sha256": "4ef5c2d9000527a73f3b577183bd62069f6a6451e40c7a5b2305811316e9e063"
+  },
+  "root_window_provenance": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/parent-root-window-provenance.json",
+    "sha256": "330af3220969aa944d1ca50d2100797e028fc04524190d9d8dde764f7f5efc2f"
+  },
+  "delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/delta.json",
+    "sha256": "23094daffba1932aea574b3cd682d84902dd06b951ebe0b8793fe95499de25a6"
+  },
+  "changed_pages": 92,
+  "changed_bytes": 376832,
+  "write_groups": 12,
+  "max_group_pages": 64,
+  "monitored_existing_files": 563,
+  "negative_controls": [
+    "Data-overlap",
+    "log-overlap",
+    "out-of-partition",
+    "unaligned",
+    "last-preimage-refused-before-write",
+    "first-readback-failure-stops-later-writes"
+  ],
+  "implementation": [
+    "Added only a locally signed ordinary-task executable and own RunAtLoad launchd job under mobile:mobile, KeepAlive false, standard streams /dev/console. Existing init/rc/injection/all installed launch jobs/CPU/touch/Metal files and attributes preserved.",
+    "Corrected service discovery wait from120s to240s because actual selected kernel invokes GPU startup after25+20+105s. Transaction/image/ABI source unchanged; target rebuilt and signature/entitlements verified. Prior stage4 snapshot and first unselected120s-root retained as history, not selected for device.",
+    "Reused existing HFSX root-clone workflow, exact two-file UID/GID repair from public HFS catalog definitions, clean unmount, filesystem verification, complete candidate and parent hashing. No binary analysis or reverse engineering.",
+    "Whole32GiB comparison produced92 pages of4096B each,376832 bytes. Local replay in an independent clone exactly reproduces the full candidate hash. Android/iOS17/Data/log windows excluded; same root geometry with782336B Data gap and8588886016B trailing reserve.",
+    "Actual v185 ZornRootPlatform dependencies identify the parent root header, byte-identical to its immutable snapshot. Current v186 kernel still carries parent root binding until a coherent full build; this root is not a boot package."
+  ],
+  "remaining": [
+    "Select actual application publication instead of kernel-client probe after known image; avoid old Metal plugin automatically claiming the exclusive qualification service.",
+    "Integrate bounded ordinary-task output capture plus native application/OOB/process/close observations into the actual CDC report. Publication occurs only after150s checkpoint; capture must wait boundedly for app result before one-shot CDC report.",
+    "Rebind exact root hash in kernel/ADT and coherent new run diagnostics; recompile/link all affected native objects including AppIo/AppExecution/Hwsched and new log hook objects if used; package and freeze.",
+    "Use current authorized fixed runner with fresh scope/ready/claim, installation layout/preimage checks if applying root delta, fullBCB/tail/protection readback, independent300s watchdog and600s Recovery bound. No v186 phone access yet.",
+    "Ordinary-task signature/admission/Mach mapping/cache/image/fence/timestamp/close still require exact hardware evidence; Metal/render/presentation/full touch remain unfinished."
+  ],
+  "hardware": {
+    "executed": false,
+    "root_installed": false,
+    "boot_package_created": false,
+    "trust_or_launch_qualified": false
+  },
+  "constraints": "Strictly public/local source, compile/sign, defined HFS metadata and offline byte comparison/replay. No disassembly/reverse engineering; no Android or device I/O; goal active."
+}

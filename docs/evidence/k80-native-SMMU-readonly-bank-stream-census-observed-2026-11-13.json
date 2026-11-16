@@ -1,0 +1,374 @@
+{
+  "title": "K80 iOS26 native SMMU read-only bank and stream census",
+  "recorded_at": "2026-11-13",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "os": "iOS 26.6.2 (23G90)",
+    "hardware": "K80 / Adreno 750v2 Gen7.9.1"
+  },
+  "scope": "single-K80-ios26-native-SMMU-readonly-bank-stream-census90s-v60",
+  "run_id": "06a3d3fbe6124d6e9f1cd2fada451e95",
+  "kernel_sha256": "8cbc97bb5a85664fd80164ac30c07ed26c3d2b8afa2ec27af1e593098b39054e",
+  "boot_sha256": "5aae67e5506921f082c680dad0fce8ed118390645eed1ecc6568d9910d474e1a",
+  "command": "python3 -B UniXNU-zorn/scripts/zorn_ios26_native_smmu_census_v60_trial.py --ios26-native-smmu-census-trial <v60 bundle.json> --admission <v60 admission.json>",
+  "trial_directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-readonly-census-v60-06a3d3fbe6124d6e9f1cd2fada451e95/root-trial-native-smmu-readonly-census-v60",
+  "one_shot_claim": {
+    "scope": "single-K80-ios26-native-SMMU-readonly-bank-stream-census90s-v60",
+    "status": "consumed-no-repeat",
+    "boot_sha256": "5aae67e5506921f082c680dad0fce8ed118390645eed1ecc6568d9910d474e1a",
+    "before_first_USB": true
+  },
+  "boot_attempts": 1,
+  "fastboot_returned_success": true,
+  "recovered_to": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_observed_seconds": 122.81393845801358,
+  "root_mount_proven": true,
+  "PID1_image_activation_proven": true,
+  "user_mode_instructions_proven": true,
+  "native_log_page": {
+    "changed": true,
+    "before": {
+      "bytes": 4096,
+      "sha256": "0fb338d50fb2ac620f271ad39f73c403c77dd1c06a1f5e23c22a7087811f6ae2"
+    },
+    "after": {
+      "bytes": 4096,
+      "sha256": "cf18d957d502f01419c7fa854be952212afa9ba51b49030d85c9a62c10b0d43b"
+    },
+    "native_writer_readback_success_proven": false,
+    "decoded_record_status": "existing-Hp26-record-byte-envelope-valid",
+    "decoded_freshness": "before/after local pages differ; artifact tag absent before"
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "protected_captures": {
+    "Data": {
+      "before": {
+        "bytes": 266240,
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "bytes": 266240,
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "equal": true
+    },
+    "Data_metadata": {
+      "before": {
+        "bytes": 266240,
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "bytes": 266240,
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "equal": true
+    },
+    "root_before": {
+      "before": {
+        "bytes": 4096,
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "bytes": 4096,
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    "root_after": {
+      "before": {
+        "bytes": 4096,
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "bytes": 4096,
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    "root_first_page": {
+      "before": {
+        "bytes": 4096,
+        "sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+      },
+      "after": {
+        "bytes": 4096,
+        "sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+      },
+      "equal": true
+    }
+  },
+  "SMMU_readonly_census": {
+    "complete": true,
+    "reads": 117,
+    "bytes": 492,
+    "crc32": 2602934958,
+    "global_registers_CR0_GFSR_sTLBGSTATUS": [
+      "0x2f0406",
+      "0x0",
+      "0x0"
+    ],
+    "banks": 22,
+    "bank_register_order": [
+      "CBAR",
+      "CBA2R",
+      "SCTLR"
+    ],
+    "banks_raw_hex": [
+      [
+        "0x0",
+        "0x0",
+        "0x3fdbe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ffbe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3efee51e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ffbe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fede71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ffde71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3bffe71a"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ff5e71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x37fbe31c"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe70c"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ff7e716"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe51e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3efbe71a"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ffee71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffe70e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3fffa71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x3ffbe71e"
+      ],
+      [
+        "0x0",
+        "0x0",
+        "0x37edc71e"
+      ]
+    ],
+    "CBAR_all_zero": true,
+    "CBA2R_all_zero": true,
+    "context_SCTLR_M_bit0_set_count": 0,
+    "streams": 24,
+    "stream_register_order": [
+      "SMR",
+      "S2CR"
+    ],
+    "streams_raw_hex": [
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ],
+      [
+        "0x0",
+        "0x20000"
+      ]
+    ],
+    "SMR_valid_bit31_set_count": 0,
+    "S2CR_unique_hex": [
+      "0x20000"
+    ]
+  },
+  "stage_results": {
+    "native_SMMU_global_masked_irq_complete": true,
+    "native_SMMU_nonsecure_cfg_probe_complete": true,
+    "native_SMMU_global_fault_control_complete": false,
+    "native_SMMU_readonly_census_complete": true,
+    "IRQ_delivery_proven": false,
+    "SMMU_mapping_proven": false,
+    "GMU_startup_proven": false,
+    "GPU_startup_proven": false,
+    "touch_startup_proven": false,
+    "lockscreen_proven": false
+  },
+  "scope_limits": [
+    "The census sampled the live controller after actual PM ownership and a read-only SMMU callback; the preceding selected non-secure sACR probe still includes its existing write/readback step.",
+    "No context-bank, stream-match, translation, or global-fault-control register was written by the census stage.",
+    "Raw idle register slots do not create a bank, ASID, stream, security, or DMA quiescence lease.",
+    "No SMMU translation or GPU memory mapping, IRQ delivery, GMU firmware start, GPU execution, Metal rendering, or touch start was proven.",
+    "Root, Data, metadata and fence captures match; BCB full-page readback preserved its tail. The native log writer internal readback flag remains false."
+  ],
+  "next_implementation": "Build a fail-closed native context-bank allocator under the retained exclusive SMMU provider claim; keep stream-master quiescence, DMA-stop and security grants independent."
+}

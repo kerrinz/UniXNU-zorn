@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T14:39:12.294673+08:00",
+  "state": "Catalog149-selected-stoplist-insertion-count-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-stoplist-insertion-contract/source-contract.json",
+  "functions_body_SHA_recorded": 4,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Selected iOS17 scheduleStop/terminateWorker insertion failure/count source only;4 new function hashes,9+2 frozen hashes provenance only,macro/init SHA ranges. No allocator/native execution,fence/client/provider success peer,old suites or targets.",
+    "parallel": "Global stop/client and provider arrays initialized separately with requested16 and asserted nonnull. Only scheduleStop appends these globals in inspected IOService.cpp;it appends both under gJobsLock and increments work without checking either bool. Worker indexes provider with same client index/asserts nonnull. Successful-insertion correspondence is conditional;one-sided returned failure could break pairing,but actual returned-failure reachability/domain not established and no K80 defect reproduced.",
+    "count": "Append forwards current count as index;canonical setObject uses unsigned newCount=count+1,refuses index>count/null object,then grows if required before retaining/publishing. init rejects requested count above UINT_MAX/sizeof element. ensureCapacity rounds by capacityIncrement,returns old capacity on rounded overflow or failed grow;successful grow replaces capacity with allocator-returned capacity. No selected finite live-service/duplicate-queue bound was found at these callers;initial16 is not a permanent count bound and no UINT_MAX successful sequence is manufactured.",
+    "lower": "XNU_KERNEL_PRIVATE OSLib container macros use typed kalloc_ext/krealloc_ext and kt_size with Z_FULLSIZE/SPRAYQTN/SET_NOTSHARED,copy result size-derived count back. OSArray passes Z_WAITOK_ZERO. Macros/type domain are pinned,not native execution or proof every branch is nullable/recoverable. Lower returned-null versus panic/nonreturning/oversize behavior remains unbound for this new call domain;do not call it ordinary OOM or infer count bound from comments.",
+    "set": "OSSet containsObject requires nonnull then identity member scan. Existing object makes setObject return false without insertion;otherwise delegates to OSArray append. Thus ignoredfalse may mean already held or failed growth,not uniformly loss. Worker freeList starts requested16 but may accumulate unique finalize victims and stop client/provider pairs across batches;no local single-batch16 bound or guaranteed insertion. It attempts insertion before removing source list roots as frozen worker proof.",
+    "decision": "Record conditional source hazard,not actual returned-null/OOM/mismatched provider or UAF/K80 hardware fact. No31st pair rollback,reserve,force free,ref resurrection,retry/reset/clamp/lock/policy without selected lower/count contract.30 independent UNAPPLIED/all native OFF;K80 provider/owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable. No component/caller/image/wire/display/CPU/security changes."
+  },
+  "qualification": "Conditional collection insertion/count source only;not actual OOM/pair corruption/K80 owner or DMA proof",
+  "GPU_execution_rendering_Metal_complete": false
+}

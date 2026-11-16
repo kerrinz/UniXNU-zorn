@@ -1,0 +1,42 @@
+{
+  "cpu_baseline_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+  "cpu_baseline_boot_sha256": "9c674c2959074a25db38e44cc26674e397f4b4c56184f439bffd8df3f647801f",
+  "candidate_package_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-smp26-7d0ecb28997a4a25a09d95a1134f9a47/boot-package/verified.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-smp26-7d0ecb28997a4a25a09d95a1134f9a47/boot-package/boot.ZORN26-CPU-LOCKSCREEN-TOUCH-UNSELECTED.img",
+    "sha256": "4049d5f91342aa93722706f1c95c7e2f873cd58a7d68955ee61fb864f524e153",
+    "bytes": 11669504
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-smp26-7d0ecb28997a4a25a09d95a1134f9a47/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "f6eb7952a090d34d911408d8ff0e29797792e176a5dd32bb39e54b3847e36139",
+    "bytes": 30530696,
+    "inputs": 1397,
+    "replaced": 6,
+    "preserved": 1391,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-smp26-7d0ecb28997a4a25a09d95a1134f9a47/full-link/exact-inputs.json",
+      "sha256": "fec304a24b663e60bd004c3d45ad6a210a74dad8b2950612937f40577a213780"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "1305-ZornTouchPlatform26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "houji_recovery26.o"
+    ],
+    "device_access": false,
+    "platform_object_unchanged": true
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_limit=64 zorn26_touch_record=1",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "adt_sha256": "7d0e29c1c4622df3a118be49ff7da01c6ebf8a5146d46712e260074921d9db2d",
+  "fd_sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+  "adt_cpu_nodes": 8,
+  "touch_scope": "64-frame FT3683 test using the prior hardware-observed power handoff entry and markers",
+  "cpu_census": "Existing XNU processor_avail_count sampled with the FT3683 record. CPU startup remains the baseline implementation.",
+  "booted": false
+}

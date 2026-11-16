@@ -546,3 +546,23 @@ Darwin23消费者/真实BSD门槛接合与独立目标对象检查完成；原�
 ## GPU固件终止记录离线接合，无新增CPU轮（2026-11-01）
 
 新FD接入机主批准的专用终止记录及只读候选身份，原生查询/写入继续OFF；精确复用cab内核/FAT/menu/ADT，CPU/GUI/内存和已消耗c50/0fe均未重跑。原CPU显示/触控/门槛保持，旧342当前338/4的差异属授权源码变化，历史资格不改。详见[GPU进度](progress-2026-10-30-gpu.md)。
+
+## 2026-11-13 iOS 26 CPU 锁屏、八核和 FT3683 有限采集
+
+按机主指定顺序，先归档 GPU v96，再从 CPU 锁屏镜像 b0da41e9 派生候选 4049d5f9。一次 fastboot 临时启动，约 49 秒画面出现局部纵向色块，约 183.5 秒拍到 iOS 锁屏日期和时间 4:03。约 332.3 秒自动回到 TWRP，运行器通过 Recovery、GPT 和根分区/Data 的保护检查，归档的七组前后样本一致，BCB 全页读回通过且尾部保留。
+
+本轮新记录在 PID1 EL0 后采样 XNU 的 processor_avail_count，读到 8。启动路径继承锁屏基线，后续需记录每颗核心各自执行的调度工作。FT3683 读到芯片/固件标识 36 83 35，完成 32 次初始采样、8 次有效基线和 64 次读帧调用。HID 已启动，最后一次本地提交和结束时的触点释放均返回 0。下一候选验证锁屏期间持续采集，随后用实际点按、滑动和抬起验证系统输入。
+
+[本轮构建、原始页、解码、照片与回收证据](evidence/k80-ios26-cpu-lockscreen-touch-smp-observed-2026-11-13.json) · [GPU v96 交接](progress-2026-10-30-gpu.md#2026-11-13-gpu-handoff-before-cpu-lockscreen-work)
+
+已完成持续采集候选 4156b2f2 的离线完整构建。候选复用此前的 FT3683 持续采集 worker，在 PID1 EL0 后 150 秒采样在线核数与触控状态，保留 300 秒看门狗。完整链接 1,397 个输入，未解析符号为 0，启动包读回与加载器解析通过。候选尚待独立固定运行范围和真机验证。[持续采集候选证据](evidence/k80-ios26-cpu-lockscreen-touch-continuous-candidate-2026-11-13.json)
+
+持续采集版 4156b2f2 真机通过。临时启动约 273 秒拍到锁屏 4:04。PID1 EL0 后 150 秒的归档记录显示 FT3683 仍在轮询，已返回 1,246 次读帧，最后一次本地 HID 提交返回 0，XNU 报告 8 核在线。约 332.7 秒自动回 TWRP，七组存储保护样本前后一致。无人值守期间未操作触屏，手势仍待实机验收。[持续采集真机证据](evidence/k80-ios26-cpu-lockscreen-touch-continuous-observed-2026-11-13.json)
+
+逐核候选 eb21f52f 临时启动并进入锁屏，332.1 秒自动回到 TWRP。XNU 在 PID1 EL0 后约 25 秒和 150 秒分别采样，CPU 0–7 的两次读数全部有效，每颗核心的 USER 和 SYSTEM 计数均增长。机主实测屏幕键盘输入正常跟手，另报告锁屏显示“Press home to open”，K80 无实体 Home 键。实际启动包为 iPhone18,1/V53 的 phone 配置，缺少 /buttons。已按 [UniXNU 手势配置文档](https://unixnu.com/guide/mobilegestalt#full-screen-gestures) 生成独立候选 996ff287，仅追加 /buttons，声明电源和音量键及 home-button-type=2。新内核行为与逐核候选相同，使用独立的日志身份。原 ADT 去掉新增节点后可逐字节还原，原系统和 Data 使用相同的只读运行范围。[逐核与触控真机证据](evidence/k80-ios26-cpu-lockscreen-percore-observed-2026-11-13.json)
+
+### 阶段性验收 · iOS 26 CPU 渲染桌面、基础触控和八核
+
+无实体 Home 键候选 996ff287 由机主操作进入桌面并打开系统设置，约 160.8 秒的摄像头画面可见设置界面。上一轮机主已确认屏幕键盘正常跟手。继续操作设置时，机主观察到系统异常并退回锁屏，尚未定位到具体进程或内核故障。按机主指示归档为阶段性成功，设置稳定性留待后续。
+
+本轮新日志再次显示八核在线，CPU 0–7 的 USER 和 SYSTEM 计数均增长，FT3683 采样时仍在轮询并已返回 1,245 次读帧。约 332.3 秒自动回 TWRP，七组存储保护样本一致，Recovery BCB 整页读回通过。原 CPU 锁屏基线 b0da41e9 和独立的桌面验收候选均已固定。[阶段验收证据](evidence/k80-ios26-cpu-desktop-touch-eightcore-milestone-2026-11-13.json)

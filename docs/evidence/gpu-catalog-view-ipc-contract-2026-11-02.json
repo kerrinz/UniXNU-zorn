@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T12:28:32.258143+08:00",
+  "state": "Catalog149-view-IPC-conditional-exclusion-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-view-ipc-contract/source-contract.json",
+  "functions_body_SHA_recorded": 9,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact selected iOS17 map/unmap/close/externalMethod IPC gates versus actual149 g.lock. Frozen pager/no-original-page-owner,16/17/30th and published-owner proof read first.9function SHA records,no old suites/targets/native IPC/map execution.",
+    "SDK_gates": "ipcEnter Write takes IORWLockWrite,Read takes IORWLockRead,None takes no RW lock;all increment __ipc. callExternalMethod chooses None if defaultLocking false,otherwise Read or Write according to SingleThreadExternalMethod. Map/unmap choose Write when defaultLocking true and hold it across clientMemoryForType and actual mapping/unmapping. is_io_service_close always takes Write around clientClose after its closed CAS;returned clientClose status is discarded as frozen earlier. __ipc tracks object-call/finalize lifetime,not physical BO owner.",
+    "conditional_exclusion": "With defaultLocking true,standard same-connection map Write excludes an externalMethod Read/Write and close Write across the complete SDK map operation,including the interval after descriptor callback releases g.lock. Two ordinary external methods may share Read and still require driver g.lock for their metadata. With defaultLocking false,map/external calls do not acquire the RW lock and cannot inherit close exclusion from its Write alone. Different connections have different IPC locks. No source-only claim these cases co-occurred on K80.",
+    "configuration": "Selected service-open initializes flags from default-locking properties. If no properties,non-IOUserClient2022 and absent IOSurface kext dependency may enable defaultLocking;IOSurface dependency and supplied properties change this branch. Catalog AGX class does not explicitly set these properties in inspected source;initWithTask receives caller properties. Actual selected K80 class/kext dependency/open properties and resulting flags were not supplied. Dormant class names or generic defaults do not establish actual runtime values. No locking flag/dependency/property was changed.",
+    "catalog_gate": "clientMemoryForType protects cache/backing lookup/retain with g.lock then releases it before SDK mapping. runCore core dispatch and clientClose original operations use g.lock,but runTimed view handling may drop it between stages. Standard IPC lock can cover these intervals only under bound flag/caller conditions. Direct run/runCore/native helper/poller callers are not automatically IPC-locked merely because externalMethod usually is. Need their real call eligibility and owner exclusion before asserting map-after-withdraw reachability.",
+    "decision": "No reproduced race,PTE reuse or safe teardown guarantee. No31st speculative global/default lock,pin/free/unmap/ref resurrection/retry/reset/quarantine policy. Descriptor/map/pager refs protect their objects,not original NativeMemory pages. Exact flags/direct caller gaps recorded;advance actual mailbox owner/poller-to-runCore eligibility and reference/IPC boundary without decoding or changing carrier fields.30 independent patches remain UNAPPLIED,no composition/new component/caller/image/wire/CPU policy. All native/IPC/allocator/view/map/refcount/provider/cache/MMIO/phone OFF;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unqualified."
+  },
+  "qualification": "Conditional source IPC lock exclusion only;not actual flag/caller values,race reproduction,page pin/stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

@@ -1,0 +1,67 @@
+{
+  "status": "actual-GIC-route-write-readback-mismatch-recovered",
+  "scope": "single-K80-ios26-GIC-actual-readback-CPU90s-v23",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-observation26-12791de39e904efb9317e705ee52ea60/root-trial-gic-observation/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-observation26-12791de39e904efb9317e705ee52ea60/root-trial-gic-observation/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-observation26-12791de39e904efb9317e705ee52ea60/full-link/kernel.ZORN26-GIC-OBSERVATION.UNSELECTED.macho",
+    "sha256": "eee9a5dec674c1392ce6f006ee5c902f26cebbc5b2f64664f5e286251155939a",
+    "bytes": 30393320,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 14,
+    "preserved": 1382,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-observation26-12791de39e904efb9317e705ee52ea60/root-package-gic-observation/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "a1915915d35e82565c950d64af77c5f8673a27d802d950572af34f3824246e84",
+    "bytes": 11612160
+  },
+  "raw_record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-observation26-12791de39e904efb9317e705ee52ea60/root-trial-gic-observation/trial/after-log.bin",
+  "decoded": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-observation26-12791de39e904efb9317e705ee52ea60/root-trial-gic-observation/trial/decoded-native-record.json",
+  "actual_GIC_attach": {
+    "status_copied": true,
+    "cpu_power_returned": true,
+    "cpu_power_raw": 0,
+    "attach_returned": true,
+    "attach_raw": 5,
+    "read_mask": 63,
+    "intid": 37,
+    "requested_type": 0,
+    "actual_type": 0,
+    "requested_route": 512,
+    "actual_route": 0,
+    "enabled": false,
+    "control": 210,
+    "group": 1,
+    "modifier": 0,
+    "priority": null,
+    "RSC_operation_returned": true,
+    "RSC_operation_raw": 3758097098
+  },
+  "actual_interpretation": "IRQ37 type0/group1/modifier0/masked accepted;control0xd2 has DS1 and ARE1;requested route0x200 read0 is the actual mismatched field. Previous DS0-view fix did not resolve this actual route failure. No fabricated register values.",
+  "recovery_seconds": 123.01806099999521,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "full_root_readback_performed": false,
+  "native_trial_seconds": 90,
+  "clock_or_GMU_GPU_execution": false,
+  "scope_consumed_no_repeat": true
+}

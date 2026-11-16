@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T19:38:50.030092+08:00",
+  "state": "Catalog149-hang-poller-recovery-gate-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-hang-poller-contract/source-contract.json",
+  "functions_body_SHA_recorded": 7,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 hang-poller start/recovery eligibility and callback/software counters only.7bodySHA/full identities;unchanged recovery/MMIO/packet/VM/SDK bodies provenance,no old suites/targets/pair rerun.",
+    "publication": "native_adreno_publish validates pointer/current clock and once flag,allocates lock/service,stores raw VM/Submit/ring/context and copied clock. It publishes g.service/g.published before kernel_thread_start. Only returned KERN_SUCCESS deallocates output thread reference;failure does not roll back publication or prevent final Success/registerService. Comment requires persistent owner;no actual K80 caller/startup/thread selection bound.",
+    "gate": "Hangcheck source loops IOSleep500 then g.lock,tests g.submit and hangCheck API0+hungtrue. It does not test separate per-client live,published,recovering flag in loop body. Global lock serializes this work with original g.lock users;not IPC/global hardware exclusion or wallclock bound if callback/lock does not return.",
+    "callback": "set_restart stores raw function/cookie under g.lock if it exists,before-lock path direct. No retain/owner epoch/teardown in setter. Exactcatalog has setter definition but no install caller;fixedmain627 searched patches/scripts/profiles no install/publish caller. Missing scoped producer is not universal absence or permission to install K80 callback.",
+    "error": "Without restart hook hang only increments software count. With hook optional context endFault controls its own diagnostic copy only;nonzero/zero fault does not veto subsequent recover. recover status determines failure count/noteFault versus success count/noteSuspend. Those status methods saturating increment software counters,not successful hardware stop/reset or suspend ACK. No raw unknown status manufactured.",
+    "limits": "Recover body/callback exists as source only;no actual thread/task/IRQ/clock/reset/fence/address peer executed. Borrowed raw restart cookie/context may require persistent board owner;g.lock alone does not provide it. No inferred K80 fault or authorization from published flag/API0.",
+    "decision": "No33rd restart/error-gate/cancel/reset/retry/refcount/free policy or automatic composition.32 independent UNAPPLIED/all native/device OFF. Actual K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable;no component/caller/image/wire/CPU/security expansion."
+  },
+  "qualification": "Hang-poller/recovery eligibility source only;not selected K80 thread/restart/stop capability",
+  "GPU_execution_rendering_Metal_complete": false
+}

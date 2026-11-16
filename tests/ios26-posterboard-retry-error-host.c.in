@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+// Host stand-ins test our wrappers; no Apple implementation or device execution.
+#include <assert.h>
+#include <errno.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+typedef void*id;typedef void*SEL;typedef signed char BOOL;
+#define nil NULL
+#define YES 1
+#define NO 0
+static int originalToken,plainToken,stale,errors[3],calls,strip;
+static const char*plan;static unsigned long operands[3];
+static void say(const char*s,...){(void)s;}
+static const char*pb_desc(id x,char*b,size_t n){(void)x;snprintf(b,n,"value");return b;}
+static id pb_without(id x,const char*s){(void)x;(void)s;return strip?&plainToken:nil;}
+static BOOL complete(id*e,unsigned long operand){assert(calls<(int)strlen(plan));operands[calls]=operand;int i=calls++;if(plan[i]=='0'){assert(e);*e=&errors[i];return NO;}return YES;}
+static unsigned long which(id x){return x==&originalToken?1:x==&plainToken?2:0;}
+static BOOL conform(id a,SEL b,id c,id*d){return complete(d,which(c));}
+static BOOL create(id a,SEL b,id c,BOOL d,id e,id*f){assert(d==1);return complete(f,which(e));}
+static BOOL writeData(id a,SEL b,id c,unsigned long d,id*e){return complete(e,d);}
+static BOOL purge(id a,SEL b,BOOL c,id*d){assert(c==1);return complete(d,c);}
+static BOOL update(id a,SEL b,id c,id*d){return complete(d,which(c));}
+static BOOL (*orig_url_conform)(id,SEL,id,id*)=conform;
+static BOOL (*orig_fm_create)(id,SEL,id,BOOL,id,id*)=create;
+static BOOL (*orig_data_write)(id,SEL,id,unsigned long,id*)=writeData;
+static BOOL (*orig_set_purgable)(id,SEL,BOOL,id*)=purge;
+static BOOL (*orig_url_update)(id,SEL,id,id*)=update;
+
+
+
+
+
+@WRAPPERS@
+
+int main(int argc,char**argv){assert(argc==7);int whichFunction=atoi(argv[1]);plan=argv[2];strip=atoi(argv[3]);unsigned long options=strtoul(argv[4],0,0);int caller=atoi(argv[5]),candidate=atoi(argv[6]);id initial=caller==2?&stale:nil,slot=initial;id*error=caller?&slot:NULL;BOOL ok=NO;
+ switch(whichFunction){
+ case 0:ok=pb_url_conform(nil,nil,&originalToken,error);break;
+ case 1:ok=pb_fm_create(nil,nil,nil,1,&originalToken,error);break;
+ case 2:ok=pb_data_write(nil,nil,nil,options,error);break;
+ case 3:ok=pb_set_purgable(nil,nil,1,error);break;
+ case 4:ok=pb_url_update(nil,nil,&originalToken,error);break;
+ default:return 2;
+ }
+ assert(calls==(int)strlen(plan));assert(ok==(whichFunction==3||plan[calls-1]=='1'));
+ if(candidate&&error){if(ok)assert(slot==initial);else assert(slot==&errors[calls-1]);}
+ int output=slot==&stale?-2:slot==nil?-1:slot==&errors[0]?0:slot==&errors[1]?1:slot==&errors[2]?2:-3;
+ printf("{\"ok\":%d,\"calls\":%d,\"output\":%d,\"operands\":[",ok,calls,output);for(int i=0;i<calls;++i)printf("%s%lu",i?",":"",operands[i]);puts("]}");return 0;
+}

@@ -1,0 +1,54 @@
+{
+  "candidate": "K80 iOS26 v90 guarded mapping record",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-map-record-package-v90-20261113/boot-package/boot.ZORN26-GPU-GUARDED-MAP-RECORD-V90.UNSELECTED.img",
+    "sha256": "876158203454f2d555a1324dbdfcee5620df58198c26020c61ee4694aaf68126",
+    "bytes": 11689984
+  },
+  "kernel_sha256": "3cb1119e090bb4356829579e96241270983f08167235639500a76663769f3167",
+  "artifact": {
+    "run_id": "6c29fd0790424825a539f91e4b7fb6fa",
+    "parent_run_id": "db3e3d43b18a4f9fba536280b3607f05",
+    "parent_candidate": "k80-gpu-guarded-map-record-v90-20261113",
+    "artifact_only_not_claim": true,
+    "device_access": false,
+    "candidate": "k80-gpu-guarded-map-record-package-v90-20261113"
+  },
+  "cpu_baseline": {
+    "owner_confirmed_lockscreen_kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "before_and_after": {
+      "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+      "boot_sha256": "9c674c2959074a25db38e44cc26674e397f4b4c56184f439bffd8df3f647801f",
+      "fat_sha256": "c7c9c13f75c4ecd418011d019351ad96f2cd3e75107deaa15f5223beed4d9cc9",
+      "menu_sha256": "a9d254b6658f55991b0fa2f99ffa2d83bf4ab8d3b90251d274d65d7ccb4973bf"
+    },
+    "read_only_reference": true,
+    "modified": false
+  },
+  "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-map-record-package-v90-20261113/root-trial/bundle.json",
+  "bundle_sha256": "92637dbcb24c6e2c91640580d54aca685a4216b8d083c99f11b9ea8766d9d16f",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-map-record-package-v90-20261113/root-trial/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-guarded-map-record-package-v90-20261113/root-trial/trial/one-shot.claim.json",
+  "host_checks": {
+    "fixed_builder": "passed",
+    "fixed_runner": "passed",
+    "decoder_cases": 6
+  },
+  "failure": {
+    "local_tcp_endpoint": "127.0.0.1:5039",
+    "local_socket_errno": 1,
+    "adb_or_fastboot_commands": 0,
+    "device_writes": 0,
+    "boot_attempts": 0,
+    "recovery_preflight_reached": false,
+    "scope_consumed": true
+  },
+  "root_receipt": "Existing CPU baseline install verified the 66 written root delta blocks. The fixed trial independently requires matching live GPT, root page, Data metadata and fence reads before boot.",
+  "host_transport_diagnosis": {
+    "default_execution": "localhost TCP connect returned EPERM",
+    "escalated_TCP_only_probe": "connected successfully",
+    "sent_ADB_protocol": false,
+    "device_commands": 0,
+    "scope_reused": false
+  }
+}

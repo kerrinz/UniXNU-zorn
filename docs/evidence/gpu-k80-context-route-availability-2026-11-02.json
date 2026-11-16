@@ -1,0 +1,48 @@
+{
+  "updated": "2026-11-02T21:38:37.902504+08:00",
+  "state": "K80-context-route-producer-availability",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-k80-context-route-availability/source-contract.json",
+  "functions_body_SHA_recorded": 0,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Only actual K80 context/routing/IRQ/preempt producer availability in supplied fixed-main/maintained board/exact64 catalog and retained pinned tree metadata.17 fileSHA plus corrected searches,zero new function bodies,compiles/tests.",
+    "main_board": "Fixed-main tracked source match is a host validation script naming GpuContext,not runtime owner producer. Maintained board matches are source-check scripts,UFS context takeover code or CPU-only IRQ-domain descriptors;none supplies a GPU controller lease,context bank or setPreemption runtime binding in this reviewed scope. No UFS bank allocator is adopted for GPU.",
+    "catalog": "Exact64 has setPreemption declaration/definition and internal preemptIrq calls. NativeAdrenoPublish exports native_adreno_preempt_irq forwarding under g.published/submit/try-lock gates. A comment names GpuPowerProbe.cpp;that is not an actual supplied K80 handler/caller. Library decoder attach/programMask does not establish OS IRQ controller registration. No named runtime registration producer found in corrected scope;not a wholeimage claim.",
+    "service": "Exact alternate Service initializes gpu_context_ready_ false and only reads it in conditional CP startup;no true writer in exact64 search. Explicit sheng bringup bootargs pass scalar bank/ASID/SID/slot to GMU setup,not authenticated GPU-stream owner. Neither toggling bool nor guessing bootargs is authorized. Alternate Service remains unselected.",
+    "frozen": "Existing context scalar carrier/target distinction and borrowed preempt-record owner proof are SHA provenance only. CPU current/loaded/inFlight/JobVM and per-client locks are not GPU owner/IRQ/stop acknowledgement. No generic consumer suites/body audits reopened.",
+    "decision": "Four concrete owner/producer artifacts remain missing in bounded source scope. No global absence,actual K80 failure/UAF or permanent impossibility claim. No new stub/caller/scalar transfer/IRQ/bank/lock/refcount/reset policy,33rd patch or runtime selection.32 independent UNAPPLIED/all native/device OFF;firstGPU/rendering/Metal incomplete. Next finite inventory DMA/cache/lifetime producer availability only."
+  },
+  "missing_artifacts": [
+    {
+      "id": "K80-context-stream-owner",
+      "required": "Exact authenticated GPU context-bank/ASID/SID route,allowed ranges and owner lifetime;bootargs or DT numeric IDs do not supply authority.",
+      "status": "no qualified producer in reviewed scope"
+    },
+    {
+      "id": "K80-preempt-record-owner",
+      "required": "Actual board setPreemption caller supplying retained records/SMMU-info/CPU-visible pages and exclusion/lifetime contract;no default pages or generated caller.",
+      "status": "not bound in reviewed scope"
+    },
+    {
+      "id": "K80-IRQ-controller-route",
+      "required": "Actual GPU IRQ registration/controller ownership/masking/serialization and callback linkage to native_adreno_preempt_irq;decoder attach/programMask not controller registration.",
+      "status": "not bound in reviewed scope"
+    },
+    {
+      "id": "K80-target-context-handoff",
+      "required": "Actual caller/ring registration and context intent handoff to selected Submit target;scalar intent or comments are not loaded-context acknowledgement.",
+      "status": "not bound in reviewed scope"
+    }
+  ],
+  "qualification": "Bounded context/routing producer availability only;not live GPU owner/IRQ qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

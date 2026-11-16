@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-09T16:49:15.305231+00:00",
+  "status": "actual-corrected-ADT-single-UFS-root-boot-recovered-console-stage-unqualified",
+  "scope": "single-K80-ios26-loader-bound-UFS-root300s-bounded-recovery",
+  "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/bundle.json",
+  "owner_approval": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/owner-approved.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/one-shot.claim.json",
+  "claim_consumed": true,
+  "actual_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/run.json",
+  "result": {
+    "scope": "single-K80-ios26-loader-bound-UFS-root300s-bounded-recovery",
+    "status": "recovered-protected-storage-unchanged-console-result-unqualified",
+    "GPU_started": false,
+    "root_mount_proven": false,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 85.88290625000002
+  },
+  "fastboot_output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/fastboot.txt",
+  "root_image_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "boot_sha256": "bb5b914fbaca861ddecb2d0b038b3401fcdd37e22184a181c0a670ab3bf497a4",
+  "actual_Recovery_seconds": 85.88290625000002,
+  "owner_screen_observation": "已自动回到rec，再unixnu菜单出现1s后进入黑屏+一堆代码的状态",
+  "observation_interpretation": "Menu and subsequent text were owner-observed;could be loader or verbose kernel output. No exact text,image,panic or root-mount proof obtained;85.9seconds alone is not a watchdog/panic diagnosis.",
+  "protected_captures": {
+    "Data": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-Data.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-Data.bin",
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+    },
+    "before": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-before.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-before.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "after": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-after.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-after.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "Data_metadata": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-Data_metadata.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-Data_metadata.bin",
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+    },
+    "root_first_page": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-root_first_page.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-root_first_page.bin",
+      "bytes": 4096,
+      "sha256": "9319540a488c1a0b49997c7eb3d7617922cfcde562431be3fd750e83c3eeacf7"
+    },
+    "root_before": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-root_before.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-root_before.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "root_after": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-root_after.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-root_after.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "log": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/before-log.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/trial/after-log.bin",
+      "bytes": 4096,
+      "sha256": "930b81c706c2c5542f0ee6bb54303c7fee10c5caa846728e9081d5dd683e283b"
+    }
+  },
+  "protection_limit": "Scoped GPT pair,old root manifest,Data65metadata,first rootpage,fences/log checks;not postboot full32GiB root or full Android/Data filesystem proof.",
+  "host_refusal_checks": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/host-checks.json",
+  "shared_trial_core": "UniXNU-zorn/scripts/zorn_ios26_installed_root_trial.py",
+  "generation_adapter": "UniXNU-zorn/scripts/zorn_ios26_loader_bound_root_trial.py",
+  "new_kernel_EFI_execution_proven": false,
+  "GPU_Metal_root_mount_desktop_qualified": false,
+  "current_mode": "unattended-no-phone-connected;offline-only per latest actual owner instruction",
+  "further_phone_operations": 0,
+  "full_goal_complete": false
+}

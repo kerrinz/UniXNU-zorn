@@ -1,0 +1,13 @@
+# K80 iOS26 v232：源错误模板ID
+
+目标active，严格禁止逆向、反汇编、符号化、寄存器/回溯分析。先读[v231实测](handoff-2026-11-15-k80-ios26-gpu-v231-active.md)、AGENTS。
+
+v232独立kernel-only源诊断ID候选，保留229根193e5f01/probe229/frontend226/Rust214/实际GPU后端。前一轮c0无法区分未匹配与未捕获，不再猜更多前缀。实际公开debug.c的panic_trap_to_debugger入口只增加一个静态格式模板识别调用，在va_list格式化前执行，源预处理及恢复对照通过。模板表来自固定本地公开XNU/K80源的显式panic/panic_plain/panic_with_options字符串，生成器不读任何二进制；3565模板/606源文件SHA固定，表达式/宏拼接等未解析模板保持unknown，不冒充完整覆盖。ID为原始格式模板而非调用点或根因，相同模板保留多处源位置；不读动态参数、错误数值、PC、地址、寄存器或回溯，不作符号化或二进制指令检查。第一入口CAS占用ffff，完成后发布实际ID；0未观察、fffe模板未收录、ffff尚未完成，重复入口不等待/覆盖。单63B包沿用原所有者/空闲判定/39帧119808B/单次START/未知保留，Recovery等待/复位/WDT逐字节恢复通过。全部模板实际Clookup与capture、独立JSON数值字节oracle、784进度上下文、实际sender/terminal/loop/producer ASanUBSan通过；100组实际格式捕获竞争和USB竞争TSan通过；进度getter及cache源路径保持相同并明确复用231证据。原52parser/新增83terminal边界、完整/截断capture通过；17拒绝及check-only通过。初始源文件UTF8假设、wire字段偏移、测试签名与parser占位替换错误均在离线被拒绝并保留；最终修正后实际编译/测试通过。完整kernel03fa3b82/bootb610ec14，1398输入23重编49头0undefined，FAT仅kernel变化；FD/ADT/菜单/根不变。新scope绑定kernel目录与decoder目录同一源模板表SHA；未启动232。
+
+B232：`/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v232-source-panic-format-f9fd63efaf9448ad923c58b1cfb477f5`。源码：`/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v232-source-panic-format-f9fd63efaf9448ad923c58b1cfb477f5`。kernel/USB/record为232f9fd63efaf9448ad923c58b1cfb477f5；普通probe仍22965f3efb4a587473a9caebe54d7a99aea。启动仅launch-command.json中的receiver入口，不单独执行inner、复用claim或重试。源模板ID是我们新增日志协议中的静态字面量分类，不能当作PC或调用点映射。
+
+[准备证据](evidence/k80-gpu-v232-source-panic-format-ready-2026-11-15.json)。[源码补丁](/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v232-source-panic-format-f9fd63efaf9448ad923c58b1cfb477f5/source-format232-final.patch)。
+
+
+v232已单次观测并自动回收，本段替代未启动状态：v232kernel-only单次receiver-first启动，200.115秒自动回TWRP，session73619 exit0/inner0。收到6857B、14个正常CDC帧及本轮f9fd63ef完整63B包r2/fffe/p652/vff。fffe证明实际新增源码formatter hook已取得第一入口并完成lookup，但原模板未匹配，未输出动态参数。终止census已request6/ack5/state2，registerService实际已返回；最后普通帧仍point5/ack5，证明普通3秒采样不能替代终止census。probe仅phase1/native0，无渲染结果或退出完成。实际宏预处理发现kernel/native均XNU_KERNEL_PRIVATE=1，native的panic宏会给原始字面量追加静态' @%s:%d'，当前canonical模板表未匹配该后缀，这是已证实的诊断覆盖缺口，不是本次GPU根因证明。源AST的539条IOService方法声明在仅去除编译器本地node identity后顺序/参数/virtual等一致，未见已证实ABI混用。无stderr/native丢失或解析错误；七组保护及完整BCB通过，根193e5f01未写，USB资源按源码保留到Recovery。 [证据](evidence/k80-gpu-v232-source-panic-format-observed-2026-11-15.json)。
+目标active。保持全部已消耗claim及历史输入。按实际panic_call.h和实际编译器预处理扩展固定宏后缀识别，拒绝额外字符/格式变化；ID仍只指canonical源模板，不读真实源文件名/行号参数、PC、地址、寄存器或回溯。先完成实际编译与边界检查，再独立验证。

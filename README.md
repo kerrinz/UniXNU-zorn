@@ -8,9 +8,13 @@ This repository owns the board configuration, DTS, native board services, XNU pa
 
 [Porting record](porting.toml) is the authoritative per-area status. The official site generates device documentation from the published root `board.toml` and `porting.toml`, following the [record and publication guide](https://unixnu.com/zh/porting/records#publishing-and-reuse). README is the repository entry point.
 
+As of2026-11-16,v247 has bounded same-IOSurface presentation evidence:known frame499/SID35/access fence4 and real acquire/copy,following the Metal pixel check. One run returned automatically toTWRP in332.500seconds with protection/BCB checks passing. Raw diagnostic loss36 keeps strict application incomplete;physical known-image output,full GPU desktop,FT3683 gestures and stability remain unqualified. See [current progress and build scope](docs/progress-2026-11-16-ios26.md).
+
 ## State
 
 As of 2026-10-30, the owner has confirmed a desktop, swipe-to-unlock and icon taps. Eight-core identity / timer / IPI / bound-work checks and nine mapping rounds pass; an 8 GiB XNU window, retained 8 GiB UFS-backed Data and panel brightness 64 have bound device results. Two independent touch IDs and release were observed; system multi-touch gestures remain unqualified.
+
+Historical checkpoint (2026-11-13): the CPU-rendered iOS 26 path reached the system lock screen during the bounded `b0da41e9` run, confirmed visually by the owner; the CPU kernel SHA-256 is `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`. The owner confirms that earlier GPU-branch runs were real-device attempts that failed before the system lock screen, which led to switching to CPU rendering. Those GPU attempts exercised K80 GPUCC/PLL and clock stages, a masked SMMU IRQ route, the GMU cold-clock prefix and SMMU global control, plus a read-only bank/stream census. These are staged platform-initialization results; GMU firmware/HFI startup, GPU submissions and fences, GPU rendering, Metal and GPU display remain unqualified. The latest v80 GPU candidate is fully linked offline and remains unselected; the v73 Recovery stop gate remains active. See the detailed [GPU progress record](docs/progress-2026-10-30-gpu.md).
 
 The CPU1 root-publication change passed the same-kernel 0-fail / 1-pass / 0-fail / 1-pass control and two uninstrumented layouts 16 KiB apart. This is bounded evidence for the narrow fix. A separate intermittent Apple-logo GUI failure remains unresolved. The final `c50ca7ea` observation recovered automatically, showed a lock screen, and recorded USER and SYSTEM accounting progress on all eight cores; it is not a performance or long-term stability result.
 
@@ -69,6 +73,6 @@ New code is mainly [BSD-2-Clause-Patent](LICENSE); PMGR retains its [MIT license
 
 ## GPU scope
 
-GPU-owned memory preparation and its closed diagnostic helpers are published as implemented source. Hardware GPU execution, rendering and Metal remain unqualified. Detailed research summaries are retained in [GPU progress](docs/progress-2026-10-30-gpu.md); many isolated capsules and large logs are local archives, not a runnable production driver. Historical input counts describe their own frozen runs.
+GPU-owned memory preparation and its closed diagnostic helpers are published as implemented source. The v247 fixed probe has bounded same-surface queue/acquire/copy and native-close evidence;physical known-image output,complete GPU desktop and long-term behavior remain unqualified. Detailed research summaries are retained in [GPU progress](docs/progress-2026-10-30-gpu.md); many isolated capsules and large logs are local archives, not a runnable production driver. Historical input counts describe their own frozen runs.
 
 The current stock-reflash/unixnu64 installation and owner-confirmed retained Data/touch are documented in [storage-unixnu64](docs/storage-unixnu64.md). Old userdata/slotB images must not be booted on that layout.

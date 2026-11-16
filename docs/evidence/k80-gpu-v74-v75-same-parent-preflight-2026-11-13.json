@@ -1,0 +1,92 @@
+{
+  "title": "K80 GPU v74-v75 same-parent census and early preflight",
+  "date": "2026-11-13",
+  "status": "offline source/build candidates; unselected, unpackaged, and unbooted",
+  "parent_candidate": {
+    "name": "v73-provider-census",
+    "kernel_sha256": "ee27b8d1d568ed29620314a61366b4c6a35b0ea144f6fe8a7128b5fefc5925f3"
+  },
+  "changes": [
+    {
+      "candidate": "v74",
+      "behavior": "Reports whether actual GPU and GMU provider observations both found a parent and that parent has the same native registry entry ID.",
+      "diagnostic_only": true,
+      "compile_units": [
+        {
+          "translation_unit": "ZornRootPlatform26",
+          "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-same-parent-census-v74-20261113/ZornRootPlatform26.cpp",
+          "source_sha256": "939e6051c81c84a518bada4b66b0586f1ebafcae5ead2750798d36a2bc0b78f2",
+          "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v74-same-parent-census-20261113/ZornRootPlatform26.cpo",
+          "output_sha256": "bb7cd699365c57f01fabd87b8948de4901dda8c25705c68e0c5ead3a1b1183ef",
+          "compile_exit": 0,
+          "warning_count": 0
+        },
+        {
+          "translation_unit": "ZornGen7PlatformBoardBridge26",
+          "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-same-parent-census-v74-20261113/ZornGen7PlatformBoardBridge26.cpp",
+          "source_sha256": "6fb86fd7c32b4c82488bab9d8553d5957e8ef0e2bc73d2e80aa68d3f5178caf6",
+          "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v74-same-parent-census-20261113/ZornGen7PlatformBoardBridge26.cpo",
+          "output_sha256": "c0ced2dec57403d114d7e9f1f5a25b925e9a68a70c8cbfacbe50d69e667e90d5",
+          "compile_exit": 0,
+          "warning_count": 3
+        },
+        {
+          "translation_unit": "ZornUfsOwner26",
+          "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-same-parent-census-v74-20261113/ZornUfsOwner26.cpp",
+          "source_sha256": "d96a82b4d3d9714ede0a951e6f422492388783a89b80a6f5ced65d31811590e5",
+          "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v74-same-parent-census-20261113/ZornUfsOwner26.cpo",
+          "output_sha256": "68b43a9e4dadf295220c3a55cedef7c4130169d20586b418ec476de9dcdaf1a3",
+          "compile_exit": 0,
+          "warning_count": 8
+        }
+      ],
+      "full_link": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v74-same-parent-census-20261113/full-link/kernel.ZORN26-GPU-SAME-PARENT-CENSUS-V74.UNSELECTED.macho",
+        "sha256": "e4b0ad95def6388216431ea9a0094df3d6b7e2348c13af6e0f878eecbe765dec",
+        "bytes": 30547944
+      },
+      "link_exit": 0,
+      "input_count": 1397,
+      "undefined_symbols": 0,
+      "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v74-same-parent-census-20261113/full-link/same-parent-census-link-proof.json"
+    },
+    {
+      "candidate": "v75",
+      "behavior": "GPU direct startup and authenticated-prefix scheduling now require the preceding native GPU/GMU provider census to observe a shared direct parent.",
+      "guard_callers": [
+        "scheduleDirect",
+        "scheduleAuthenticatedPrefix"
+      ],
+      "compile_exit": 0,
+      "full_link": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v75-same-parent-preflight-20261113/full-link/kernel.ZORN26-GPU-SAME-PARENT-PREFLIGHT-V75.UNSELECTED.macho",
+        "sha256": "1c5e8ed9f21510d82ae97fc067ab3b151ee44c01d4d6c0f452b202cc2be9a3e6",
+        "bytes": 30547944
+      },
+      "link_exit": 0,
+      "input_count": 1397,
+      "undefined_symbols": 0,
+      "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v75-same-parent-preflight-20261113/full-link/same-parent-preflight-link-proof.json"
+    }
+  ],
+  "ABI_review": "After adding the same-parent observation field, ZornUfsOwner26 was rebuilt with ZornRootPlatform26 and ZornGen7PlatformBoardBridge26 before the final v74 link.",
+  "reference_baseline": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "limitations": [
+    "The iOS26 root/board path still does not construct the complete ZornGen7StartupGpuInputs26 owner graph.",
+    "A real whole-GPU/GMU exclusion and scheduler authority provider remains absent; the new shared-parent census is not such authority.",
+    "The v73 fixed-runner scope stopped before boot and the device stop gate remains set; no provider census was observed on hardware.",
+    "GPU MMIO, GMU/HFI, DMA, command submission, fences, Metal rendering and GPU display remain unverified."
+  ],
+  "hardware_operations_performed": false,
+  "candidate_selected_or_packaged": false,
+  "touch_driver_work": false,
+  "next_step": "Continue from the existing root/board owner chain and implement an actual source-backed GPU/GMU exclusion owner plus lifecycle handoff; preserve the CPU lock-screen kernel and do not derive K80 hardware values from A740.",
+  "references": [
+    "https://unixnu.com/porting/gpu",
+    "https://github.com/UniXNU/Adreno740"
+  ]
+}

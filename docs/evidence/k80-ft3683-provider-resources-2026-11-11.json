@@ -1,0 +1,122 @@
+{
+  "status": "offline-exact-provider-resource-package-built-unselected",
+  "time": "2026-11-10T23:15:54.834795+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-finite-trial-6d91fa4424eb42d8822c7dee9b4caea0",
+  "retained_bus_base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/touch/ZornTouchGpioBus.h",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/source.patch",
+  "fix": "Pass the six actual retained GPIO descriptors from platform to board. Capture validates the real descriptor-owned map, and the transport uses those same retained six maps. No raw-address fallback for these writable pages. Original read-only non-GPIO handoff and GPI reads, config/idle checks, reset sequence, bit pacing and restore contract retained.",
+  "compile": [
+    {
+      "name": "ZornTouchBoard26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornTouchBoard26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd/ZornTouchBoard26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1303-ZornTouchBoard26.cpo",
+      "sha256": "e15b8a4ec91c3f5403a9aa39794cabdd9fd84eb659c480b10d6db379f954debc",
+      "warnings": 5
+    },
+    {
+      "name": "ZornTouchPlatform26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornTouchPlatform26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd/ZornTouchPlatform26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1305-ZornTouchPlatform26.cpo",
+      "sha256": "c37192a8ff44f2d06082a7a12897210a85873de773034981fc2ab2c1df53b725",
+      "warnings": 5
+    },
+    {
+      "name": "ZornFt3683Source26-shared.o",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornFt3683Source26-shared.o",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd/ZornFt3683Source26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1324-ZornFt3683Source26-shared.o",
+      "sha256": "4e67ea2782598852d95f06e1d2137083cba3ab2ebe0a940182f38b6d430b70fd",
+      "warnings": 10
+    },
+    {
+      "name": "ZornFt3683Worker26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornFt3683Worker26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd/ZornFt3683Worker26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1328-ZornFt3683Worker26.cpo",
+      "sha256": "b317d7090d2e543fa4f7c3ac67dd574bbe2923b83e787b36ed7692e30cd9a369",
+      "warnings": 5
+    },
+    {
+      "name": "ZornTouchHost26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornTouchHost26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd/ZornTouchHost26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1330-ZornTouchHost26.cpo",
+      "sha256": "3ed1b3965e93e1005d5732d252666d4f4297b32a0e5473d52d3ce4d66dca269a",
+      "warnings": 5
+    }
+  ],
+  "identity_objects": [
+    {
+      "name": "houji_recovery26.o",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/houji_recovery26.o",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-boot-f6b80efc750146c68f929f17bc2fb1bd/0-0-0-0-0-platform-board-stage-180df53490bb4965960ba02415a3e12e/houji_recovery26.c",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/0382-houji_recovery26.o",
+      "sha256": "bfb0c7547d3dab246744536d308cc1c905af2c1cf944ab47770703ec405be205",
+      "warnings": 0
+    },
+    {
+      "name": "ZornUfsOwner26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornUfsOwner26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-boot-f6b80efc750146c68f929f17bc2fb1bd/1-1-1-1-1-platform-direct-caller-184e16363d344aa693d16c6ff92973f3/ZornUfsOwner26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1230-ZornUfsOwner26.cpo",
+      "sha256": "a94f4f44aeee98f92c38e447c4c6c61e5bcccd71ff8bb9d2be0c9dfd9f0b10a8",
+      "warnings": 3
+    },
+    {
+      "name": "ZornHfsRoot26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornHfsRoot26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-boot-f6b80efc750146c68f929f17bc2fb1bd/0-0-0-0-0-platform-board-stage-180df53490bb4965960ba02415a3e12e/ZornHfsRoot26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1231-ZornHfsRoot26.cpo",
+      "sha256": "ab52dfcdae10fc49a2033139ac7838fb4040ef76b7cab1c50bd69a8880e2d81d",
+      "warnings": 0
+    },
+    {
+      "name": "ZornUfsCore26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornUfsCore26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-boot-f6b80efc750146c68f929f17bc2fb1bd/0-0-0-0-0-platform-board-stage-180df53490bb4965960ba02415a3e12e/ZornUfsCore26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1233-ZornUfsCore26.cpo",
+      "sha256": "d7d9a095af87f2ba4e3e6cdca3aa6b76e49e1540734b5eaff904fee8da36bf90",
+      "warnings": 0
+    },
+    {
+      "name": "ZornPlatformRecordStart26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornPlatformRecordStart26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-boot-f6b80efc750146c68f929f17bc2fb1bd/0-0-0-0-0-platform-board-stage-180df53490bb4965960ba02415a3e12e/ZornPlatformRecordStart26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1304-ZornPlatformRecordStart26.cpo",
+      "sha256": "a08d3a1d8b0b82eb45e17f48e1771229b197f60280f9c55ae2f936de3602be15",
+      "warnings": 0
+    },
+    {
+      "name": "ZornRootPlatform26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/ZornRootPlatform26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-boot-f6b80efc750146c68f929f17bc2fb1bd/platform/ZornRootPlatform26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-finite-trial26-6d91fa4424eb42d8822c7dee9b4caea0/full-link/inputs/1306-ZornRootPlatform26.cpo",
+      "sha256": "b69da52d797d4fb7c623346410c15cae739eff81ce902b447a2136cc231f1abf",
+      "warnings": 0
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/full-link/kernel.ZORN26-FT3683-PROVIDER-RESOURCES.UNSELECTED.macho",
+    "sha256": "9aa4ce039372fa4b8cc97de9ad86babff6d4b159d2f029dcb77b3f30450600ad",
+    "bytes": 30459208,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 11,
+    "preserved": 1386,
+    "undefined_symbols": 0
+  },
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/boot-package/verified.json",
+  "review": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/review-ft3683-provider-resources.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/boot-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "bf13c9823db3122a33e8031069e28bbf9f726bef6c17e249cf08cd761b7edb10",
+    "bytes": 11636736
+  },
+  "root_full_readback": false,
+  "device_execution": false,
+  "device_ready": false
+}

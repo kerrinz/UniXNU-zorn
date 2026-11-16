@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T16:41:04.424217+08:00",
+  "state": "Catalog149-stall-timeout-eligibility-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-stall-eligibility-contract/source-contract.json",
+  "functions_body_SHA_recorded": 6,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 timeout-to-noteStall guards/callback/error folding only.6 function hashes,parent wait unchanged;whole original Submit matches frozen13 source and independent13 diagnostic patch SHA preserved. No old recovery/preempt/fence/MMIO suites,targets or callback execution.",
+    "entry": "Both active/noJob wait timeout paths call void noteStall(observed,clock) before returning original IOReturnTimeout. It samples uint64 time if callback exists else0,computes next=observed+1,selects ring by historical ringOfFence(next) fallback0. Actual waited ring is known by wait caller but not passed here;next/ring/Job/VM association remains a separate source boundary,not a successful fence sequence or K80 failure.",
+    "epoch": "Stall fence/timeouts/stage/began/last and snapshots are module-static,not per Submit. next change resets timing/stage/snapshot metadata;no generation/provider epoch/ref retention follows. now0 suppresses staged work/snapshot checks but still affects bookkeeping. Backward/nonadvancing clocks and cross-owner serialization are not qualified.",
+    "stages": "With nonzero now,stage0+pending>=50000 advances stage1 before invalidateTlb and kick;original source calls both even if invalidate returns error. Later stage1+pending>=200000 advances3 before drainBus. Returned callback errors are ignored by original noteStall and do not replace original Timeout. These are existing source thresholds,not selected K80 timing/reset/stop policy.",
+    "lower": "kick returns NotReady if detached/poisoned;non-current ring sets restore-pending software flag rather than direct pointer write. drainBus uses original bounded polling counts and can return Success after loops without proving both ACK masks observed;write/read failures poison. No register/constants/ACK route selected,no wall-clock/stop/DMA lease inferred. Original13 private candidate only retains invalidate/kick errors plus its preempt scope;it does not compose or qualify all later callbacks.",
+    "snapshot": "Snapshot guard records requested snapshot stage before stallState;failure returns from noteStall. Successful source branch can inspect original ring/VM state and metadata before Timeout return. Not a pure timer-only/no-work API. Callback latency/nonreturn and lower owner/route failure remain external boundaries;no new snapshot/log/carrier field or memory peer.",
+    "decision": "No31st retry/reset/cancel/generation/raw-diagnostic/stop policy or automatic13/28 composition. Exact waited-ring versus inferred next/Job/VM source association must be bound before separate minimal source repair.30 independent UNAPPLIED/all native OFF;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal/rolefullcore unavailable. No component/caller/kernel/FD/candidate/query/HFI/log/carrier/wire/CPU/security expansion."
+  },
+  "qualification": "Conditional timeout-to-stall callback source only;not native recovery/ACK/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

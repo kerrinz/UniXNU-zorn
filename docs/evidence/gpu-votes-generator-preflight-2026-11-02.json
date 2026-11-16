@@ -1,0 +1,27 @@
+{
+  "source": "/Volumes/macData/projects/ios-zorn/references/sm8650-gpu-20261030/ArnoDorian123--UniXNU-ruyi/scripts/prepare-sheng-gmu-votes.py",
+  "source_sha256": "dfb330a56d990eb71ed60fd73f056fbcacca0a5533e6f011f7ee85286a6157ba",
+  "candidate_sha256": "f64e382ddf1b90c2481231f4a40888d8d0ce69cd3679f524135ff142e7ab48ff",
+  "repair": "Move unchanged commandDB input preflight before output directory/header writes;all other source bytes inverse-exact",
+  "checks": [
+    "bad-compatible",
+    "bad-reg-width",
+    "missing-no-map",
+    "bad-reservation-size"
+  ],
+  "original_reaches_intercepted_write_before_bad_DB": true,
+  "candidate_refuses_before_any_write": true,
+  "inverse_byte_equal": true,
+  "generator_prepare_not_invoked": true,
+  "policy_headers_emitted": 0,
+  "no_K80_policy_or_foreign_policy_adoption": true,
+  "driver_patch_count_remains32": true,
+  "patch_status": "independent UNAPPLIED source generator repair;not applied to reference or active build",
+  "limitation": "Not an atomic multi-file filesystem transaction;does not qualify board policy or generate K80 inputs",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "independent_apply_reverse_and_exact_restore_pass": true,
+  "checker": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-votes-generator-preflight.py",
+  "checker_sha256": "1daa755509875a17aca3d9e78ecb4795ec3ef0ffd4bc03277d0966973144f683"
+}

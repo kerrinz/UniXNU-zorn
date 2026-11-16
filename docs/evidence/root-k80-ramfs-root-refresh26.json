@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-09T13:39:20.077094+00:00",
+  "classification": "progress: independent32GiB HFSX refreshed with real K80 mandatory-RAMFS PID1/stage0,ownership/filesystem verified,new image identity bound into native root caller+ADT+complete kernel",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-ramfs-root-candidate",
+  "root_image": {
+    "status": "LOCAL_ROOT_RAMFS_HELPERS_UPDATED_VERIFIED_UNSELECTED",
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/ios26-root-ramfs.UNSELECTED.hfsx",
+    "bytes": 34359738368,
+    "sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+    "protected_source_sha256": "c86a172bfe2ab2a8e6218ad422da90840dfe05362b88822dd1d324901e23c99b",
+    "source_unchanged": true,
+    "numeric_owners_and_modes_verified": true,
+    "component_files": 69,
+    "phone_accessed": false,
+    "runtime_selected": false
+  },
+  "userland_candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/userland",
+  "helper_evidence": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-ramfs-init26.json",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.2115650177001953,
+    "inputs": 1386,
+    "replaced": 1,
+    "preserved": 1385,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/full-link/kernel.ZORN26-ramfs-root.UNSELECTED.macho",
+    "sha256": "9204ebc692a650d5ce4a65a883d1e2880fc1cd2f9e7822d220e3aeb8fb750dd8",
+    "bytes": 30262248
+  },
+  "ADT": {
+    "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/generated-ADT/kernel.root-window.UNSELECTED.adt",
+    "input_sha256": "68c94a630cb130c0d137f18445ef6e9c4a07e11fec0b101703f4161582fdfd3e",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/generated-ADT/kernel.ramfs-root.UNSELECTED.adt",
+    "output_sha256": "59db3a06fed99034bc2c2451911bde380ad17d2b7b12c5f4d0bbe24dfd52e724",
+    "root_image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/ios26-root-ramfs.UNSELECTED.hfsx",
+    "root_image_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+    "root_window": {
+      "mdev_index": 0,
+      "lun": 0,
+      "relative_byte_start": 25770852352,
+      "relative_first_lba": 6291712,
+      "blocks": 8388608,
+      "absolute_byte_start": 219395653632,
+      "absolute_first_lba": 53563392,
+      "absolute_last_lba": 61951999,
+      "bytes": 34359738368
+    },
+    "installed_or_authorized": false,
+    "boot_ready": false
+  },
+  "proposed_root_window": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/proposed-root-window.json",
+  "checks": {
+    "root_full_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+    "original_root_full_sha256_unchanged": "c86a172bfe2ab2a8e6218ad422da90840dfe05362b88822dd1d324901e23c99b",
+    "new_image_separate_inode_and_readonly": true,
+    "two_helpers_numeric_UID_GID_modes_preserved": true,
+    "actual_component_content_files": 69,
+    "actual_fsck_hfs_exit": 0,
+    "actual_fsck_catalog_extents_bitmap_metadata_checks_passed": true,
+    "own_host_image_detached": true,
+    "new_native_root_binding_TUs": 1,
+    "root_binding_changed_source": [
+      "ZornRootWindow26.h"
+    ],
+    "root_caller_other25_source_files_unchanged": true,
+    "all_other_original_ADT_bytes_unchanged": true,
+    "image_SHA_literal_in_actual_complete_kernel": true,
+    "complete_kernel_inputs": 1386,
+    "replaced_inputs": 1,
+    "preserved_inputs": 1385,
+    "undefined_symbols": 0,
+    "compile_warnings": 0,
+    "new_link_diagnostics": 0,
+    "actual_compiler_inputs": 371
+  },
+  "behavior": "First-boot writable /private/var reuses actual RAMFS+donor template through the K80 strict static init;mandatory mount/template failures stop launchd and retain state. New local image updates only the two existing helper files in place on an APFS clone;owners-on readback confirms root:wheel0755 and signatures,all69 component file hashes match and actual fsck_hfs completes successfully. The actual new whole-image digest is compiled into the native root-window caller and matched by the independent ADT;root placement/Data/log/Android bounds remain unchanged. No persistent old Data restore or target shutdown/reset path is added.",
+  "limitations": [
+    "Host disk-image filesystem operations and static target compilation/link checks only;no phone I/O,root boot,mount in target,PID1,RAMFS/GPU/Metal/touch execution.",
+    "Ad-hoc signature and host HFS verification do not qualify target code-signing policy,cache loading,RAM capacity,actual syscall or display behavior. RAMFS Data is volatile,not persistent user data.",
+    "New root/caller/kernel/ADT remain unselected;fresh FD/loader/profile/firmware/watchdog/root installation/readback scope and exact authorization still needed. No new ready/claim.",
+    "Owner no longer requires bootable17 on phone;local17 artifacts,Android and old phone Data stay protected. Earlier f73 platform scope consumed.",
+    "Initial sandbox local-image attach failed;bounded privileged host-only raw-image attachment succeeded. Historical failed attempt retained,no password/sudo or phone access."
+  ],
+  "native_or_device_execution": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/verified.json",
+  "actual_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/actual-inputs.json",
+  "local_image_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/result.json"
+}

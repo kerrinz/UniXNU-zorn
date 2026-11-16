@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-13",
+  "record_id": "f25d8ab874044570aff47738eebc3668",
+  "status": "offline per-core XNU accounting and continuous FT3683 candidate",
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-accounting26-f25d8ab874044570aff47738eebc3668/boot-package/verified.json",
+    "sha256": "b0aa124801b9f4a03d2d7a13e184fff9be0fd2ff45ecbd5b749157f5c3db7599"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-accounting26-f25d8ab874044570aff47738eebc3668/boot-package/boot.ZORN26-CPU-LOCKSCREEN-TOUCH-ACCOUNTING-UNSELECTED.img",
+    "sha256": "eb21f52fffa88c175af8f6e5563826ba3b9d0fa410e9cb47536658039eebcdc9",
+    "bytes": 11673600
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-accounting26-f25d8ab874044570aff47738eebc3668/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "2f9df214220089a2d90df2042d62ca459ba17ab70baf0050f8cf32542cc06c04",
+    "bytes": 30530760,
+    "inputs": 1397,
+    "replaced": 6,
+    "preserved": 1391,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-accounting26-f25d8ab874044570aff47738eebc3668/full-link/exact-inputs.json",
+      "sha256": "3227164686079bb911969b4eefd86dbce3bcf406c0c481015474079090f991d8"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "1305-ZornTouchPlatform26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "houji_recovery26.o"
+    ],
+    "device_access": false,
+    "platform_object_unchanged": true
+  },
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-lockscreen-touch-accounting-f25d8ab874044570aff47738eebc3668/ZornUfsOwner26.cpp",
+    "sha256": "8d50538d62c6a0943bc224981b767989444f162a5d1a315e67e62b4c0578ef64"
+  },
+  "accounting": "Eight CPU IDs sampled individually at 25 and 150 seconds after PID1 EL0 using cpu_to_processor and the linked XNU processor_info PROCESSOR_CPU_LOAD_INFO backend. Records valid-pair mask and per-core cumulative USER/SYSTEM differences. CPU indices are bounded by the machine maximum before lookup.",
+  "first_compile_refusal": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-touch-accounting26-f25d8ab874044570aff47738eebc3668/first-compile-refusal/ZornUfsOwner26.cpo.stderr",
+    "sha256": "af6339fb37e1453a7e5726d621a6616b5fea4097cb2a8d98b55945d961a08c0e"
+  },
+  "device_execution": false,
+  "decoder_controls": "Six per-core decoder controls passed using the recovered continuous touch record."
+}

@@ -1,0 +1,32 @@
+{
+  "updated": "2026-11-02T10:20:38.769151+08:00",
+  "state": "Catalog149-VM-scratch-borrowed-owner-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-vm-scratch-owner-contract/source-contract.json",
+  "unchanged_functions_provenance_only": 8,
+  "stable_validBinding_implies_visibility_guard_prerequisites": true,
+  "later_bind_returned_error_not_established_reachable": true,
+  "borrowed_arena_not_native_owner_or_stop_qualification": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "no_old_suite_or_target_reexecution": true,
+  "all26_patches_independent_UNAPPLIED": true,
+  "no_native_API_or_success_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact catalog149 VM scratch CPU-metadata ownership and real visibility predicates,starting frozen dynamic provider/TablePages and catalogVM evidence. Existing functions unchanged,8bodySHA provenance only. No new provider/kit/visibility/map/allocator/phone method executed or success arena/address fixture created. NativeAdrenoSmmuContext does not own createVm method;actual next process-VM producer is NativeAdrenoGpuContext.",
+    "borrowed_fields": "VM owns changes_ and alias_scratch_ CPU arrays. External regions/arenas/states/tablepage owners are borrowed raw pointers. attach copies region descriptions,binds private visibility,then writes each supplied arena alias_scratch pointer/capacity to VM buffer. This does not retain VM or external arena/tableowner. Genuine exclusive serialized caller and actual lifecycle are required,not established by class survival or pointer assignment.",
+    "allocation_failures": "Initial attach allocates arrays/index before writing any new arena scratch pointer. Null array/index failure calls freeTables and returnsNoMemory before region assignment/bind loop. growScratch allocates both new ranges and scratch first;first failure leaves originals,second failure deletes only new ranges. Only both success free old arrays and replace VM/arena pointers. It can transiently leave arena pointer at old array during serial method execution;without an independently permitted concurrent reader there is no concrete UAF claim or added lock/reset policy.",
+    "visibility_implication": "Stable validBinding demands nonnull tables/arena/state,nonquarantined TablePages,provider identity and successful exact provider find of root. Real provider is privately initialized by begin,findPage returns mapping only if lowerBound index<count_. Thus successful root lookup implies pageCount>0. NativeAdrenoBindSmmuVisibility receives &visibility_[i] for i0/1,then rejects only null visibility/pages,quarantine,missing provider or zero pageCount. Under unchanged exclusive serial actualTablePages owner,upfront checks already satisfy these guards,so later returned bind failure is not established reachable. Arbitrary mutation/reentrant/forged provider remains outside proof.",
+    "conditional_failure_shape": "If a later upper bind did return failure after lower arena pointer stored,original branch frees scratch and clears regions without explicitly withdrawing lower alias pointer. This is a conditional source shape,not a concretely reachable stable factory failure given predicate implication. No speculative27th cleanup/guard/leak or policy change. A real caller/concurrency contract is required before treating it as a device bug.",
+    "observe_and_poison": "After all arena pointers stored,attach marks attached and calls observe. Nonzero observation goes through fail,poisons/quarantines and keeps CPU arrays/arena borrowing intact;it does not invoke freeTables. Caller retention across returned failed attach must be examined independently. No assumption of safe stream fault/MMIO,real stop or readable failure. Success/poison flags and no objects do not attest hardware quiescence.",
+    "detach": "detach rejects poisoned/nonempty object/span state,requires attached,then clears every supplied arena scratch pointer/count before freeTables releases CPU arrays/index and clears VM bindings. freeTables itself only frees CPU storage,not an independent borrow-withdraw/stop operation. Default destructor does not automatically detach/free. Source withdrawal order is not proof real concurrent walker stopped,ASIDretired or DMA permitted to release.",
+    "consumer": "Exact83969cd8 retained Live alias_pass uses arena alias_scratch as local sort scratch;when missing/insufficient or sorted count>UINT32_MAX it uses pairwise range checks. This is CPU temporary metadata,not tablepage root/GMU backing or native mapped device memory. No packet/geometry/HFI/map-suite decoding/retest. Serial call contract is necessary;there is no new background-work/task lifetime guarantee.",
+    "decision": "No new returned visibility error reachability or ordinary allocation-failure dangling borrower established;no27th patch or unrelated target. Next inspect actual NativeAdrenoGpuContext createVm/destroyVm owning process/table/arena/VM and published failure paths,using exact producer source,not invented SmmuContext API. All26 independent UNAPPLIED remain frozen.",
+    "boundaries": "8profiles/3111+39/default42/CPUstorage/archives/consumedclaim/runrecovered preserved. VM slotwidth selected-allocation reachability,Entry exhaustion/arbitrary caller,25thinitpartial/failurepair,rolefullcore and K80owner/context/route/stop/DMA/readablefailure/firstGPU/rendering/Metal remain incomplete. All native/allocator/visibility/provider/map/cache/MMIO/phone OFF,no component/runtimecaller/FD/kernel/candidate/wire/CPU policy."
+  },
+  "qualification": "Source borrow/failure order only,no native attach/visibility/ASID/stop/DMA or GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

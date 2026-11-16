@@ -1,0 +1,39 @@
+{
+  "scope": "complete 4-byte read inside existing 64-byte CPU-header region, not full-record memory extent",
+  "original_SHA": "5b6f37902ef2894b10de900ef22d49289a449ab684eda736692ac1b943202a17",
+  "original_header_SHA": "5e04052bc0b9278747ec5cfe2456fc85b317cfae3db7debb79515909889b9828",
+  "candidate_SHA": "945ac851a29cc412409fe63c8ceb347b763f1bb32c8ebda65db91c946929a3dc",
+  "header_comment_56_corrected_to_64_from_existing_56_plus_8_store": true,
+  "three_cross_header_offsets": [
+    61,
+    62,
+    63
+  ],
+  "all_61_existing_complete_offsets_preserved_including_unaligned": true,
+  "three_original_null_or_outside_refusals_preserved": true,
+  "raw_byte_outputs": {
+    "before": "ok=1 crossing_header=3 refused=0 preserved_offsets=61 refusals=3 raw-bytes-only\n",
+    "candidate": "ok=1 crossing_header=0 refused=3 preserved_offsets=61 refusals=3 raw-bytes-only\n"
+  },
+  "three_source_mutations_refused": [
+    "old-start-only",
+    "off-by-one",
+    "new-alignment-policy"
+  ],
+  "ASan_UBSan_pass": true,
+  "new_iOS17_Preempt_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "actual_snapshot_callers_offsets": [
+    20,
+    24,
+    8,
+    4
+  ],
+  "existing_callers_not_claimed_to_trigger": true,
+  "no_actual_full_record_overrun_claimed": true,
+  "no_native_object_record_IOVA_context_switch_ACK_address_or_provider_model": true,
+  "no_writeRecord_setRecordWptr_attach_trigger_complete_cache_or_MMIO_execution": true,
+  "original_32patches_profiles_pins_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

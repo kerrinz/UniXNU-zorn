@@ -1,0 +1,62 @@
+{
+  "status": "offline-CPU-no-sampling-root-kernel-ADT-package-verified",
+  "recorded_at": "2026-11-12T01:01:37.315735+08:00",
+  "root_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-root26/root-result.json",
+    "sha256": "fb99abcb485bfba21d5dab99a126951fb348478a8aa898381df24cf2ec6f5507"
+  },
+  "delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-root26/delta.json",
+    "sha256": "ff2cac038afed00d3acd9dc717e5ef79d2a1529189d184ce05e3110f783d350e"
+  },
+  "layout_and_local_replay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-root26/layout-and-replay-result.json",
+    "sha256": "f110c068eb0863fdedcc9ecc7ea917fadfb0edaca22b16b8f92099d232de83e8"
+  },
+  "source_no_sampling_candidate": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/userland-no-sampling26/result.json",
+    "sha256": "d6d8895ae6ee41f334df2ee4a5eaff5e25e39fa2962da306623d8721bc2da7a2"
+  },
+  "root_consumer_fix": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-boot26-63f9631a54c744a598be73540dc4b541/root-consumer-fix.json",
+    "sha256": "f3425d413ce120d047755f26e92fc038b90b31ffbe44fcffd557a59d4a33c9dc"
+  },
+  "root_binding_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-boot26-63f9631a54c744a598be73540dc4b541/root-binding-check.json",
+    "sha256": "e6ce96a244849235020992fc7dbf57e6c7cd00ebb00029ed3d69a8cf8d0c3c77"
+  },
+  "kernel_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-boot26-63f9631a54c744a598be73540dc4b541/full-link/link-result.json",
+    "sha256": "e319012b21ff25afe7b9f5f1095147e85b50280092020a81bbf09727a40d2b08"
+  },
+  "ADT_binding": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-boot26-63f9631a54c744a598be73540dc4b541/adt-binding.json",
+    "sha256": "df014bf0de8521aedd3f450a575c2befa31989c2e84f4c913c93e7c5ca7132c9"
+  },
+  "boot_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-boot26-63f9631a54c744a598be73540dc4b541/boot-package/verified.json",
+    "sha256": "2a2b4dacbb909e2e6c50831d316a82aef57a0438d3e2d13b56306a0f09635c2a"
+  },
+  "census_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-boot26-63f9631a54c744a598be73540dc4b541/census-host-check.json",
+    "sha256": "ca7566704c530d654f3f7a4c6d0c856993249d2c9ba825c717688f8aa843c920"
+  },
+  "root_sha256": "3b56c850bd9416e7716094a20ea0af0c25bd767b1e94a022aff6945fcf54cd6d",
+  "previous_phone_root_sha256": "fa6b90ea04d56d308bfec97e24f12614f5060994f6a91141c2bda3672e153a9f",
+  "changed_pages": 57,
+  "write_groups": 11,
+  "patch_bytes": 466944,
+  "Data_gap_bytes": 782336,
+  "reserve_after_root_bytes": 8588886016,
+  "native_objects_replaced": 10,
+  "native_link_inputs": 1397,
+  "root_consumer_build_gap_fixed": true,
+  "root_installed": false,
+  "phone_accessed": false,
+  "GPU_startup": false,
+  "touch_startup": false,
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_userland_progress=1 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0",
+  "risk": "Only automatic userland sampler is removed. File/signature/filesystem/layout/local-replay checks pass; actual new-root loading and CPU UI require later separate reviewed delta install and bounded boot. This does not resolve selector88 or prove a lockscreen.",
+  "next_action": "Prepare independent fixed-installer review for the57-page no-sampling root delta and new exact boot cohort, with fresh Recovery/GPT/Data/fence/preimage checks. Keep original image and prior claims; do not reuse consumed installation or boot claims.",
+  "goal_complete": false
+}

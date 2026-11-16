@@ -1,0 +1,11 @@
+# Service cache callback native-status preservation
+
+Exact Service ring_publish/fence_acquire compared NativeAdrenoMemory publish/acquire IOReturn against success and returned0/1. The original native failure was discarded. Earlier Ring/VM captures explicitly recorded only their own returned callback/kit channel and could not recover that native value. No old patch is relabeled as covering this gap.
+
+An independent UNAPPLIED candidate keeps separate first native publish/acquire failures and availability in private RingCache. The value is assigned directly from the actual method return as4-byte IOReturn before the unchanged0/1 callback fold. Null cache/member paths keep returning1 without fabricating native availability. Availability0 means no recorded native failure;it does not distinguish success,skip,no attempt or a callback that never returned. This is the returned NativeAdrenoMemory API error,not every underlying provider/EFI/hardware cause. Existing caller serialization remains required;no concurrent first-writer or publication protocol is added.
+
+Each native call still occurs once with identical arguments. No new getter,owner,object/address accessor,callback invocation,wire/log field or runtime selection is introduced. No callback/cache/native/provider function runs and no synthetic returned status or successful peer is constructed. Four source controls reject a fabricated publish value,lost acquire value,first-error overwrite and changed callback ABI.
+
+One changed nonoptional real-header iOS17 Service object passes;its NativeAdrenoMemory import set matches the sealed original object inspected as metadata only. RingCache grows16->32 bytes,with native errors at16/20 and availability at24/28. Service grows3192->3208. That equal total size does not make this interchangeable with earlier CP/SMMU-cookie candidates;the private layouts differ. Future integration needs consistent owner rebuilding. All objects and existing metaclass initialization remain unlinked/unexecuted.
+
+Catalog,pins,32 original patches,8 profiles and prior Ring/VM/Service candidates remain unchanged/uncombined. This source error-channel repair does not establish coherency,untouched pages,cache completion,stop,ownership,mapping or GPU execution.

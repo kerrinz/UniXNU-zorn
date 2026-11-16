@@ -1,0 +1,78 @@
+{
+  "time": "2026-11-11T00:00:09.108062+00:00",
+  "status": "direct-ring-wait-and-submit-fence-width-checked-offline",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-width-candidate",
+  "source_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-width26/direct-fence-width.patch",
+  "link_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-wait26/full-link",
+  "compile": {
+    "name": "ZornGen7DirectClient26.cpo",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-width26/ZornGen7DirectClient26.cpo",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-width-candidate/direct-runtime/ZornGen7DirectClient26.cpp",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-wait26/full-link/inputs/1300-ZornGen7DirectClient26.cpo",
+    "sha256": "00e42681403fc929649be857e83c4d547c25354a07f732064b584116b6809c65",
+    "warnings": 0
+  },
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-width26/full-link/kernel.ZORN26-DIRECT-FENCE-WIDTH.UNSELECTED.macho",
+    "sha256": "2f9d46560103b016466ffeb8b9e0286c49b9aa2c633db99e58d9064e9aa3c463",
+    "bytes": 30407680,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "compiled_control_flow": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-width26/fence-width-disassembly.txt",
+  "width_contract": [
+    "WaitFence carries a u64 but the native ring produces nonzero u32 fence IDs. Reject an unrepresentable ID before calling the native wait.",
+    "Legacy Submit and SubmitBatch share the same dependency wait. Reject an unrepresentable nonzero dependency before observing it. A zero dependency still skips the wait.",
+    "Wire layout, timeout budgets, the existing ring validation and real retirement/resource behavior remain unchanged."
+  ],
+  "hang_detection": {
+    "pinned_reference_commit": "453d8875f815bf9dfad9035982861226a4823a6c",
+    "source": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/oneplus-sm8650-modules/vendor/qcom/opensource/graphics-kernel/adreno-gpulist.h",
+        "sha256": "08293f60e0be8b3a16ec0b800588d700f54b34d2e9e32e64aac115f05548c8f3"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/oneplus-sm8650-modules/vendor/qcom/opensource/graphics-kernel/adreno_gen7.c",
+        "sha256": "1d63fca08e1d45428b80342d3d35a8c4166ad93c74ade6d125d2b3f9f4267d5d"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/oneplus-sm8650-modules/vendor/qcom/opensource/graphics-kernel/gen7_reg.h",
+        "sha256": "2e564d7eaeec26bc30e79b1d117b86efa79603345769626157c83610fc4c051c"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate/GpuGen7Table.h",
+        "sha256": "9789c4bcc5d1ac31e07d4602940815366e2e67d1adac48a482894a330a7aa069"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate/ZornGen7HostGpuRegisters26.cpp",
+        "sha256": "8c94aabe2252dea4107b25b48b145b6f8c59e7779776a39c7aad751c14b78db9"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate/ZornGen7GpuIrq26.cpp",
+        "sha256": "f35f23d0c9570be057381e1a700b4273a573a147a7b4b2422e8560a384cd5c66"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate/direct-ring/NativeAdrenoIrq.cpp",
+        "sha256": "65c005ce535296871db1b42af7b9e203221102d5a1f9d2c91951ba7cb4a1ee04"
+      }
+    ],
+    "linked_objects": {
+      "ZornGen7HostGpuRegisters26.cpo": "944af1a9f67d8b9ce494d8540ed544808a151093ca754ffcc3c70ee66fedb61f",
+      "ZornGen7GpuIrq26.cpo": "c009f3993be9ef2c777909a1fc7b7b5642fba72c86a54a8dc1ea36a4154d3329",
+      "NativeAdrenoIrq.cpo": "94c0efe42d741aa63ddd0dbdda0446bc2c318361bbe6f0ea841748824ee741f8"
+    },
+    "finding": "Gen7.9.1 core uses 0xcfffff cycles and the existing K80 startup table writes/verifies enable plus that value. The enabled bit 23 is decoded as fatal and the IRQ owner enters the existing stop-and-mask path. This proves source composition only.",
+    "hardware_qualified": false
+  },
+  "limits": [
+    "Actual counter configuration, delivery on a stalled workload and behavior across runtime power transitions remain unobserved.",
+    "Cumulative reference kernel only. Existing corrected SMMU and finite touch packages stay separate."
+  ],
+  "phone_access": false,
+  "full_root_readback_performed": false
+}

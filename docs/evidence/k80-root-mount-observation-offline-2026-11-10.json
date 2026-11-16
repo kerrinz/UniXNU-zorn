@@ -1,0 +1,93 @@
+{
+  "status": "actual-vfs-return-zero-device-matching-record-source-compiled-linked-unselected",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874",
+  "actual_final_ARM64_proof": {
+    "kernel_sha256": "048a59efc7ba8f9867aa579ac7548c3346e0092ed5f8c1bf99e7b5a9acccaf12",
+    "actual_mount_caller_calls": [
+      {
+        "symbol": "_vfs_mountroot",
+        "instruction": 18446744005117879956
+      },
+      {
+        "symbol": "_zorn_ufs_root_mount_record26",
+        "instruction": 18446744005117880020
+      }
+    ],
+    "actual_cbz_w0_after_vfs_return_to_mount_record_block": "0xfffffff0079e2698",
+    "actual_loaded_argument_symbol": "_rootdev",
+    "record_function_calls": [
+      {
+        "symbol": "__ZN14ZornUfsOwner2610readStatusEv",
+        "instruction": 18446744005122426628
+      },
+      {
+        "symbol": "__ZN13ZornUfsCore2625persistPlatformRecordOnceERK10Hp26RecordRNS_25PlatformRecordObservationE",
+        "instruction": 18446744005122426756
+      }
+    ],
+    "source_checks": [
+      "original scoped selector",
+      "header-record selector excluded",
+      "normal CPU context",
+      "actual retained root owner",
+      "returned registered root device matches actual rootdev",
+      "same locked once-only UFS core",
+      "record error panics without retry/reset/release"
+    ],
+    "new_transport_or_binding_attempt_in_record_helper": false,
+    "record_before_IOSecureBSDRoot_and_userland": true,
+    "runtime_success_not_proven": true,
+    "phone_executed": false
+  },
+  "compiled": [
+    {
+      "name": "ZornUfsCore26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/ZornUfsCore26.cpo",
+      "sha256": "e908ffc6afdcad48573cfed3947656929b6cfee6607391acba871633715cd4cc",
+      "warnings": 0
+    },
+    {
+      "name": "ZornPlatformRecordStart26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/ZornPlatformRecordStart26.cpo",
+      "sha256": "65ab27156c1fe165c8dfc4f9a8b524c4e8b3d12c18d8960193075568edfe7a38",
+      "warnings": 0
+    },
+    {
+      "name": "ZornHfsRoot26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/ZornHfsRoot26.cpo",
+      "sha256": "d8e905341a53e70dea897ef975953f82863a0d8e4189cf90b6553c8a05205039",
+      "warnings": 0
+    },
+    {
+      "name": "houji_recovery26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/houji_recovery26.o",
+      "sha256": "6617530e9314231fedd815f76769bc7b45856f529d70aa302cc772b3a89c8e19",
+      "warnings": 0
+    },
+    {
+      "name": "ZornUfsOwner26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/ZornUfsOwner26.cpo",
+      "sha256": "17b30a4be7e72cd17160ccf63082d4d35ac6cc3a5fd93ffa7708ab739f137c41",
+      "warnings": 0
+    },
+    {
+      "name": "bsd_init",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/bsd_init.o",
+      "sha256": "8aecfc9adcb01ce57ee6e4ddb150b5902a053f9ded9f4a4688586dd2aa4d1271",
+      "warnings": 0
+    }
+  ],
+  "full_link": {
+    "exit": 0,
+    "seconds": 0.15035641600115923,
+    "inputs": 1390,
+    "replaced": 6,
+    "preserved": 1384,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "048a59efc7ba8f9867aa579ac7548c3346e0092ed5f8c1bf99e7b5a9acccaf12",
+    "bytes": 30307728
+  },
+  "scope": "Next exact packet must replace root-header selector with root-mount selector;one existing log-page record only,no new UFS initialization/binding",
+  "phone_executed": false
+}

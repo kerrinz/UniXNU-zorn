@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-09T21:48:13.301716+00:00",
+  "status": "real-native-SMMU-controller-OS-open-lifetime-connected-to-actual-runtime-PM-owner-offline",
+  "source_origin": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7SmmuRuntimePm26.cpp",
+    "source_sha256": "4eac5764f2412dc68b2c434931a0f561cec3ec77905d1bb3f4da1a5e4e834773",
+    "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-pm-provider-claim-candidate/ZornGen7SmmuRuntimePm26.cpp",
+    "copy_sha256": "363b363155e913153b9585dd1dcca0773af18bafcb80285ccb59891fb302769f",
+    "public_header_changed": false
+  },
+  "actual_references": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7SmmuRuntimePm26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/source-reference/ZornGen7SmmuRuntimePm26.cpp",
+      "sha256": "4eac5764f2412dc68b2c434931a0f561cec3ec77905d1bb3f4da1a5e4e834773"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7SmmuRuntimePm26.h",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/source-reference/ZornGen7SmmuRuntimePm26.h",
+      "sha256": "48a9949a54d1de84057b615efa36676e1231e2d79574e2df73e477b3c4c6ad58"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7PlatformMmioInputs26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/source-reference/ZornGen7PlatformMmioInputs26.cpp",
+      "sha256": "f15bdefd35982b5bc56f6a9dc7f963e8662db3087eea29725b879c023da3bd3b"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-provider-claims-candidate/ZornGen7DarwinBoardOwner.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/source-reference/ZornGen7DarwinBoardOwner.cpp",
+      "sha256": "4d346757d739a731b63e348dde1774e21760486790c80e5165db95cc4619e4a2"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/IOService.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/source-reference/IOService.cpp",
+      "sha256": "f2f13815e5e0b0e9ff9732fb9fc14dda348495ca06ef493abcc2a0bb2055f04d"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/IOKit/IOPlatformExpert.h",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/source-reference/IOPlatformExpert.h",
+      "sha256": "786664e851544fb02ae3f6ad1111e4d2293a8008f81db87138dcc823a181cb86"
+    }
+  ],
+  "compile": {
+    "exit": 0,
+    "seconds": 0.1261986249992333,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/ZornGen7SmmuRuntimePm26.cpo",
+    "sha256": "c67aae58a20557d6988ba2d0b0f4b6dd7b72a6c0cb02f7129f34fea17a93d92b",
+    "warnings": 0
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.1558528749992547,
+    "inputs": 1390,
+    "replaced": 1,
+    "preserved": 1389,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-provider-claim26/full-link/kernel.ZORN26-smmu-pm-provider-claim.UNSELECTED.macho",
+    "sha256": "5df5a34cf18ecca689ea7c570de6ebf6f9031c00f5a4b3f34e343dec3d12ab95",
+    "bytes": 30259712
+  },
+  "checks": {
+    "private_Storage_only_no_public_header_or_ABI_change": true,
+    "actual_constructor_base_class_metadata_and_PAC_dispatch_present": true,
+    "mandatory_runtime_and_suspend_callbacks_preserved": true,
+    "original_real_power_resume_suspend_calls_preserved": true,
+    "source_PM_usage_reference_timer_and_delay_algorithm_preserved": true,
+    "exact_source_reverse_replay": true,
+    "affected_TUs": 1,
+    "compiler_dependencies": 427,
+    "compile_warnings": 0,
+    "unchanged_link_warnings": 10,
+    "zero_undefined": true,
+    "actual_file_loader_parser_pass": true
+  },
+  "implementation": [
+    "Actual SMMU PM owner previously retained its real controller but never opened it. It now creates a real private IOService claimant,retains actual parent,attaches and non-seizing opens the exact IOService/IOPlatformDevice base controller. Unknown shared-open subclasses are refused instead of being called exclusive. Construction acquires this software claim before the actual timer allocation.",
+    "Actual context checks require inactive/topology/isOpen state in normal interrupt-enabled CPU context. Ownership is refreshed after independent runtime/suspend authority callbacks and after actual power transition returns. Losing the claim retains the existing reference/resources and does not publish an Active or NormallySuspended state. Actual returned power status remains recorded;no foreign error is fabricated.",
+    "All original usage counts,references,busy handling,source20ms autosuspend/deadline/cancel logic,RSC workloop exclusion,real resume/suspend operations and independent authority callbacks remain. No controller address,security/PM/stop permission,PMinit/PMstop,automatic reset/retry/release or successful callback is supplied.",
+    "Only private implementation/storage changes. Current1390-input kernel0a1bfb92 baseline replaces1/preserves1389 current RSC/clock-routing/GIC/root/provider/GPU/presenter/touch objects. New kernel5df5a34c has zero compile warnings/undefined symbols and10 identical inherited linker warnings;actual-file loader parser passes."
+  ],
+  "limits": [
+    "Real OS open/isOpen is software arbitration on this exact object,not hardware power/security/foreign-master or DMA-stop rights. Original independent runtime-use and normal-suspend authorities are still required and remain unbound at the platform entry.",
+    "All observations above are source/compiler/link/actual-file-loader evidence. No controller/open/isOpen/PM/timer/clock/RSC/MMIO/native/device execution occurred. Hard/atomic IRQ paths keep their existing independent guards;new sleepable provider queries are confined to the already normal-thread PM context.",
+    "Boot-lifetime native root claims and partial objects remain retained per the existing root lifecycle. This does not implement full driver unload or change normal per-app teardown.",
+    "Local rootef11f75a NOT installed;historical phone root remainsb56dafe8. Preserved bootc1132857 still contains4b18a29f,not new5df5a34c;no blind repack,USB,ready/scope/claim or phone operation.",
+    "Concrete hardware startup/application authority and GPU/Metal/display/FT3683 real acceptance remain incomplete. Goal ACTIVE."
+  ],
+  "native_or_device_executed": false,
+  "hardware_authority_supplied": false,
+  "goal_complete": false
+}

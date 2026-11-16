@@ -1,0 +1,59 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_TIMEOUT_QUEUE_READER_REPAIR",
+    "changed_files": [
+      "adreno_gen7_hwsched_hfi.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeout-queue-reader-20261104/timeout-queue-reader.UNAPPLIED.patch",
+    "patch_sha256": "e9ff59a89c87ebbe1549cd05bd3804f49b7509f2d180cdc3b8708aa7b45fb9cc",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeout-queue-reader-20261104/source-contract.json",
+    "checks": {
+      "source_header_SHA": "03fe8212d1a75148999f67df2044133a047501e91a234d0c1176d264428f713c",
+      "declared_layout_only": {
+        "context_header": 48,
+        "sync_header": 20,
+        "sync_entry": 24,
+        "ordinary_header": 32
+      },
+      "sync_count_stride_witness_shapes": 41,
+      "ordinary_aligned_controls": 62,
+      "wrap_capacity_scalar_controls": 57,
+      "progress_predicates_checked": 131328,
+      "source_mutations_refused": [
+        "raw-stride",
+        "zero-step",
+        "short-header",
+        "payload-count",
+        "direct-wrap-cast",
+        "lost-budget",
+        "lost-declared-bound"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "layout_compile_only_not_Linux_ABI": true,
+      "no_queue_instance_packet_stream_provider_ACK_or_native_execution": true,
+      "Linux_kernel_or_new_native_target_compiled": false,
+      "old_HFI_suites": false
+    },
+    "delta": {
+      "parent9_unchanged": true,
+      "only_changed_file": "adreno_gen7_hwsched_hfi.c",
+      "replay_byte_equal": true,
+      "independent_inodes": true
+    },
+    "Linux_reader_or_kernel_target_compiled": false,
+    "native_device_GPU_or_callback_execution": false,
+    "runtime_selection": false,
+    "coherent_snapshot_or_mapping_lease": false,
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeout-queue-reader-20261104/linux-reference",
+    "timestamp": "2026-11-03T18:09:22.394078+00:00"
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeout-queue-reader-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeout-queue-reader-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeout-queue-reader-20261104/archive.json"
+}

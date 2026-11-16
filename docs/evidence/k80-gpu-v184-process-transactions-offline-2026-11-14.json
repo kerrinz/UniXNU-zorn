@@ -1,0 +1,100 @@
+{
+  "recorded_at": "2026-11-14T19:59:15.171044+08:00",
+  "version": 184,
+  "stage": 4,
+  "status": "offline-native-process-map-unmap-and-submit-integration-probe-full-build-pending",
+  "working_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "working_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/manifest.json",
+    "sha256": "bb63e09ffe990894e9bfdcfb98188f5972fbedc7d3f005f80f71df75a0090eb1"
+  },
+  "prior_snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage3-process-window-snapshot/manifest.json",
+    "sha256": "0e1434a3d004f0556f77cebd2492030a214835fd84b33f8be3412d236324ed94"
+  },
+  "changed_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/source/ZornGen7HostRing26.cpp",
+      "sha256": "92b4fd395d5605707f7caef13e939e91d9d7294aefb4cae8870a20eb2a16d206"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/source/ZornGen7HostRing26.h",
+      "sha256": "c08efc385078c7f162ee3484a3cc5ec5f4bc5fe3c291e203e38e3c5664006624"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/source/ZornGen7SmmuDomain26.cpp",
+      "sha256": "24190c18cfcccd5bd6df0f966486436dbaedb6a00ce3b01d306ef1187bffeb83"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/source/ZornGen7SmmuDomain26.h",
+      "sha256": "fe8974a740d4006f83f4f3421921518002e76f8a37451ad93ef91962498a111e"
+    }
+  ],
+  "checks": {
+    "process-lease": {
+      "passed": true,
+      "result": "PASS actual process issuer, client exclusion, selected-context and fresh idle predicates\n107 assertions\n",
+      "source_sha256": "92b4fd395d5605707f7caef13e939e91d9d7294aefb4cae8870a20eb2a16d206",
+      "scope": "Actual Ring process transition/observation, mutation begin/end and guard methods with mock held client/OOB, metadata and hardware idle/readback failure injection. Existing actual issuer lock helpers separately tested in stage2. ASan/UBSan, no hardware qualification."
+    },
+    "process-transactions": {
+      "passed": true,
+      "result": "PASS 185 actual process bank authority and no-write refusal checks\n",
+      "source_sha256": "24190c18cfcccd5bd6df0f966486436dbaedb6a00ce3b01d306ef1187bffeb83",
+      "scope": "Actual Domain transition/observe/halt/release/fault and nested submission methods with mock retained resources, table programmer and Ring lease. Native MMIO permissions separately use actual-source access tests. Missing bank authority refuses before grant/TTBR; valid and failed actual callback paths retained. Native transition window/current-owner dispatch and legacy callback refusal paths; mocked table identity/OS, real table identity tested separately. No device qualification."
+    },
+    "client-transport": {
+      "passed": true,
+      "result": "PASS 189 actual native/legacy kernel-client transport and lifecycle checks\n",
+      "source_sha256": "92b4fd395d5605707f7caef13e939e91d9d7294aefb4cae8870a20eb2a16d206",
+      "scope": "Actual permission/transport/begin/close methods with mock IOUserClient, kernel task, issuer, OOB and process initialization; ASan/UBSan. No real client grants/process tables or device result."
+    },
+    "postcp": {
+      "passed": true,
+      "stdout": "PASS 148288 actual-source post-CP access/context checks\n",
+      "scope": "Source-extracted policy and table methods; mocked OS and sparse observer, sanitizer enabled. No hardware qualification.",
+      "sources": {
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/ZornGen7SmmuDomain26.cpp": "24190c18cfcccd5bd6df0f966486436dbaedb6a00ce3b01d306ef1187bffeb83",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/ZornGen7HostGpuTables26.cpp": "71703332963a8d315fb4bd6e77843becd3d60b2ee1e189e6266cfdfb5a689089"
+      }
+    }
+  },
+  "compilation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/compile-native-process-transactions/result.json",
+    "sha256": "c8c1f847289c652243862002a0f1e56b8d4a3f70373d91b9f0896fa33ae4d29a",
+    "units": 6
+  },
+  "inherited_method_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage4-process-transactions-snapshot/unchanged-stage3-methods.json",
+    "sha256": "e5db970501d749c9d491b22d4fd815a482d1d8743093d5fd9dc968a59d358e69"
+  },
+  "implementation": [
+    "Native map/unmap require the actual selected process/client, same kernel issuer, complete/zero-pending jobs in every process and real ring/RBBM/GX idle observations outside metadata gate before each table transaction. Success balances a process-owned lease; failure retains the lease/backing and stops, without a GMU power-off or DMA-stop claim.",
+    "Domain mutation window binds the exact process ASID, current thread and retained process under the issuer. USER invalidation/TLBSYNC only; no TTBR/TCR/LPAC writes. Native path no longer calls the legacy GMU bit30/GBIF helper. Legacy path remains unchanged.",
+    "Native submission scope records actual process and current thread under recursive gate. Existing submit invokes retireCompleted recursively; each acquisition is balanced while cross-process/thread or active table transaction is refused. Last exit clears identity. Actual fence waits stay in the inherited backend outside its submission scopes.",
+    "Ring gate admission requires the exact Domain-owned process submission token and active client/issuer, with no table lease; the original image-phase3 route remains. Client OOB close additionally requires no retained process table lease and balanced completed leases.",
+    "Current six-unit native compilation passes; existing VM/Submit, ProcessTables, HostGpuTables, Board and DirectHfi source bytes remain equal to stage3. No full link/package/client activation/hardware was performed."
+  ],
+  "remaining": [
+    "Integrate an actual bounded IOUserClient probe through original service/MACF/filter/dispatch, real BO CPU views, process maps, submitted known image/fence, output verification and normal close/ASID retirement/OOB return.",
+    "Retag candidate and add exact UART/UFS client diagnostics; rebuild complete affected header/layout/object closure with the stage3 rebuilt ProcessTables object, then full kernel/package/runner input checks.",
+    "Board publishOwnedKernelIo requires the startup gate to be unheld; callable already recognizes DirectHfi. Native startup currently retains that gate through the image return. Add a balanced, checked handoff for actual publication/probe. Current entry still ends at v183 image diagnostics.",
+    "No v184 full kernel, boot package, runner, claim or client publication selected. Stage4 is offline integration only.",
+    "General application client, Metal/shader, GPU presentation and complete FT3683/lifecycle hardware acceptance remain."
+  ],
+  "hardware": {
+    "executed": false,
+    "full_link": false,
+    "package": false,
+    "runner": false,
+    "claim": false,
+    "publication_entry_selected": false
+  },
+  "last_hardware_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v183-native-known-image-observed-2026-11-14.json",
+    "sha256": "e4da5840139e6605c693a931ebe1d812822d66c46e3cc19565800882c1f2ca70"
+  },
+  "constraints": "No disassembly/reverse engineering, phone operation, commit or push. Prior immutable snapshots and v183 consumed claim remain unchanged. Goal active.",
+  "publication_gate_check": "Inspected callable at source lines565-567 after the snapshot: this is an unheld-startup-gate requirement, not a missing DirectHfi capability. The archived record-generation script retains its earlier generic wording; current evidence corrects that wording without changing source or test claims."
+}

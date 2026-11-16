@@ -1,0 +1,64 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 GPU direct-runtime task authority forwarding v84",
+  "status": "offline full-linked kernel; not packaged, selected, booted, or tested on device",
+  "history": {
+    "earlier_gpu_real_device_tests": true,
+    "farthest_recorded_stages": [
+      "v59 GMU cold-clock/GPUCC prefix and SMMU global-control stage",
+      "v60 read-only SMMU bank/stream census"
+    ],
+    "gpu_branch_reached_lockscreen": false,
+    "cpu_reference_kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091"
+  },
+  "implementation": {
+    "source_snapshot": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-runtime-task-authority-forward-v84-20261113",
+    "changes": [
+      "DarwinBoardOwner preserves the supplied direct-runtime kernel-task and kernel-client callback functions and their original cookie while using its own cookie for the board-owned native-runtime grant.",
+      "Forwarding callbacks return not-ready if their corresponding supplied callback is absent; the board layer does not synthesize task/client success.",
+      "The existing complete root-to-StartupGpuInputs26 owner graph and its production call site are still missing, so these callbacks are not yet reachable from the maintained K80 root startup path."
+    ],
+    "source_sha256": {
+      "ZornGen7DarwinBoardOwner.cpp": "052f4d8382bf487a26dad8c8cae8df1513b7ffa93437677a0ee2f124312e6aba",
+      "ZornGen7DarwinBoardOwner.h": "b80f8d584acd2b120aeccb5e55f2c59de38088a687fbe13f3ec86fe28026d866"
+    }
+  },
+  "build": {
+    "compiler_object": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-direct-runtime-task-authority-forward-v84-20261113/compile-v1/ZornGen7DarwinBoardOwner.cpo",
+      "sha256": "c333ccb34732418d64590c1a7b17d43109a386187722300c7196dccced9b4ace",
+      "compile_exit": 0,
+      "warnings": 3,
+      "warning_messages_match_v83": true
+    },
+    "kernel_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-direct-runtime-task-authority-forward-v84-20261113/full-link-v1/kernel.ZORN26-GPU-DIRECT-RUNTIME-TASK-AUTHORITY-FORWARD-V84.UNSELECTED.macho",
+    "kernel_sha256": "25ce3a50addf09e892b48af1a8cd4b9cf82ead14a2fd73104860b18644a7313c",
+    "kernel_bytes": 30573752,
+    "link_exit": 0,
+    "link_inputs": 1397,
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "missing_inputs": 0,
+    "undefined_symbols": 0,
+    "link_warning_count": 10,
+    "link_warning_lines_match_v83": true
+  },
+  "cpu_reference": {
+    "kernel_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "device_execution": {
+    "v84_boot_attempts": 0,
+    "gpu_runtime_tested": false,
+    "candidate_unselected": true,
+    "candidate_packaged": false,
+    "new_scope_ready_or_claim_created": false,
+    "gpu_discovery_allow_boot": false
+  },
+  "limits": [
+    "v84 preserves callback wiring; it does not construct the missing root GPU input graph.",
+    "The candidate remains offline only and has not tested GMU/HFI, GPU execution, GPU fences, rendering, Metal, or display.",
+    "The historical v59/v60 GPU device attempts did occur and remain distinct from this unbooted offline candidate."
+  ]
+}

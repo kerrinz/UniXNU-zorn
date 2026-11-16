@@ -1,0 +1,34 @@
+{
+  "status": "offline-K80-SwapEnd-actual-admission-result-reference-linked",
+  "time": "2026-11-10T23:25:39.013341+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-swap-admission-c37fd6dba4104a9da20cafaa00f67a25/MiniIOMobileFramebuffer.cpp",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-console-mode-88a45659a1a843e285762bdec1ba3962/MiniIOMobileFramebuffer.cpp",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25/source.patch",
+  "behavior": "K80 SwapEnd returns kIOReturnNotReady on stopped presenter, kIOReturnTimeout on full queue past its original deadline, and kIOReturnNotFound when a nonzero layer cannot be retained. All actual surface references are collected before slot mutation. On failure, temporary references are released outside the swap lock. Zero layers remain valid.",
+  "success_scope": "Accepted into the existing presenter queue. Hardware fence, CPU copy, scanout and synchronous SwapWait are not proven by admission.",
+  "actual_object_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25/swap-admission-actual-object.txt",
+  "compile": [
+    {
+      "name": "MiniIOMobileFramebuffer.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25/MiniIOMobileFramebuffer.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-swap-admission-c37fd6dba4104a9da20cafaa00f67a25/MiniIOMobileFramebuffer.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+      "sha256": "0d8718878dc7190c13be64ae85d2d83887ad1c63d3966e343eff87526a340878",
+      "warnings": 0
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25/full-link/kernel.ZORN26-PRESENT-SWAP-ADMISSION.UNSELECTED.macho",
+    "sha256": "766efb0d93fba6e5f70f2c06f16e459bb91ddb9c3076e3310bd12825774ef35f",
+    "bytes": 30456560,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "no_device_boot_package": true,
+  "device_execution": false,
+  "full_root_readback": false
+}

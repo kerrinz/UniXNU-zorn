@@ -1,0 +1,54 @@
+{
+  "recorded_at": "2026-11-13",
+  "status": "public source review only; no code imported and no device access",
+  "target": {
+    "board": "Redmi K80 (zorn)",
+    "repository": "UniXNU-zorn",
+    "soc": "SM8650",
+    "local_source": "board.toml"
+  },
+  "references": [
+    {
+      "url": "https://unixnu.com/porting/gpu",
+      "observations": [
+        "GPU work follows platform DMA and basic display presentation.",
+        "The documented NativeAdreno/Adreno740 path is specifically the A740 kernel interface; another GPU generation needs its matching kernel backend and compiler support.",
+        "The adaptation record must bind the target's registers, interrupts, SMMU context and stream IDs, firmware, power domains, clock/voltage levels, interconnect votes, RAM reservations, and scanout layout."
+      ]
+    },
+    {
+      "url": "https://unixnu.com/devices/houji",
+      "pinned_repository_revision": "https://github.com/lonzzi/UniXNU-houji/tree/d4fb1472c86210303e36f311c07411dd486a753f",
+      "observations": [
+        "Houji is a community SM8650 port with Adreno 750, making it a same-SoC software reference for K80.",
+        "The public record reports GMU/HFI startup, memory permissions, allocation responses, HWSCHED start, and power/microcode preparation diagnostics.",
+        "The same record leaves GPU command submission, fences, and Metal UI acceleration pending."
+      ]
+    },
+    {
+      "url": "https://github.com/UniXNU/Adreno740",
+      "observations": [
+        "The public driver identifies itself as Adreno 740 and reports command execution plus scanout copy on sheng hardware.",
+        "These A740 results establish a reference architecture only; they do not supply K80/Adreno 750 hardware values or qualification."
+      ]
+    }
+  ],
+  "k80_application": {
+    "reusable": [
+      "Keep provider discovery, GMU/HFI startup, memory allocation, HWSCHED, submission, completion, and display presentation as separate evidence stages.",
+      "Continue resolving a real root/platform caller and real provider/resource lifetime before selecting GPU authority callbacks."
+    ],
+    "not_reused_without_K80_evidence": [
+      "A740 register and packet values",
+      "firmware images and signatures",
+      "stream IDs, bank assignments, and SMMU assumptions",
+      "board voltage, clock, interconnect, and power-vote policy"
+    ],
+    "current_candidate": "v73 remains a provider-census-only kernel; its fixed-runner scope stopped before boot and the device stop gate remains active.",
+    "cpu_baseline": {
+      "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+      "access": "read-only reference; unchanged"
+    },
+    "touch_driver_work": false
+  }
+}

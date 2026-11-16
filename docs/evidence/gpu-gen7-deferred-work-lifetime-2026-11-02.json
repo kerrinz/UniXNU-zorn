@@ -1,0 +1,32 @@
+{
+  "updated": "2026-11-02T07:25:38.643965+08:00",
+  "state": "Gen7-deferred-work-domains-and-teardown-gap-bound",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-deferred-work-lifetime/source-contract.json",
+  "new_source_mutations_refused": 3,
+  "global_workqueue_distinct_from_dispatcher_f2h_lockless": true,
+  "timeout_queue_read_precedes_fault_guard": true,
+  "actual_pending_work_core_cancel_and_owner_exclusion_unbound": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "no_timer_workqueue_native_ref_or_phone_execution": true,
+  "no_successpeer_new_component_caller_image_wire": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "exact OEM source domains only,not live pending work/teardown/UAF or stop/DMA proof",
+  "details": {
+    "scope": "Exact primary453d8875f815bf9dfad9035982861226a4823a6c OEM reference,not Xiaomi exact source or K80 actual configuration. New timer/work producer and teardown domains only,no packet decode/status classification or old fence provider/stop suite. Prior source erratum retained;stop candidate wholefiles not substituted as primary.",
+    "timer_producer": "_enable_hw_fence_throttle sets throttle flags/holds GPU halt then mod_timer. Timer callback kgsl_schedule_work(&hw_fence_ws) dispatches to kgsl_driver.workqueue via exact inline helper. The reference threshold/timeout constants are source policy only,not adopted as K80 timing or the existing CPU2s gate.",
+    "distinct_domains": "KGSL globalworkqueue allocated as kgsl-workqueue with WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_SYSFS differs from hwsched->worker kthread_worker,f2h_task and lockless_workqueue. adreno_hwsched_dispatcher_close destroys hwsched->worker and frees dispatcher/cache/fence/global_ctxtq resources. No explicit hw_fence_ws/globalworkqueue cancellation is visible in that function;not proof no indirect or core cleanup can occur.",
+    "worker_reads": "gen7_hwsched_hw_fence_timeout calls gen7_hwsched_process_msgq before taking fence lock and before computing/checking fault flag. Clearing throttle/abort fields or a later !fault early return does not skip that prior queue access. It then borrows defer_drawctxt/ts under lock and may report context details and invoke gen7_hwsched_fault. No buffer/context/task ref was invented or observed.",
+    "timer_cancel_sites": "Retained primary HFI file has del_timer_sync in the relevant ACK path;hwsched fault waiter path also uses del_timer_sync. These source call sites do not themselves show the queued hw_fence_ws has completed. Exact selected core timer/workqueue semantics,callback context and cancellation interaction remain unbound;no API executed and no walltime/self-deadlock claim.",
+    "teardown_bound": "Selected HFIremove only conditionally stops f2h task;master dispatcher close handles a different worker. Existing adreno suspend flushes events worker and lockless_workqueue,not the global queue used by timeout work. Module exit calls platform_driver_unregister,GMU unregister,MMUexit before kgsl_core_exit destroys the global queue. Thus module-exit destruction alone is not evidence of a per-device drain before its removal. Other helpers/external fence manager/core release inputs are not guessed.",
+    "failure_boundary": "A pending timer/work and resource teardown could require extra lifetime protection,but actual pending state,external HWfence enablement,caller exclusion/rearm ownership and core cancellation/release contract are not closed. No actual post-free callback,UAF or native failure asserted. Adding guessed del_timer_sync/cancel_work_sync while locks or callback ownership are unknown could alter behavior;no new patch/reset/retry/cleanup/leak policy added.",
+    "remaining_refs": "Timeout work and deferred kthreadwork use defer_drawctxt with different consumers. Exact setup_hw_fence_deferred_ctxt,_disable_hw_fence_throttle,gen7_defer_hw_fence_work and context get/put paths are next;do not equate a transport ACK or local flag with reference retirement. Existing upperstop/external-provider gaps remain unchanged.",
+    "checks": "3new source mutations refused:wrong queue domain,hidden pre-fault queue read,module global drain falsely before device unregister. No native component/new target/fullLinux build. No task/timer/workqueue/cancel/allocator/provider/MMIO/phone call or success task/buffer/fence model. All18 independent UNAPPLIED repairs/8profiles/3111+39/default42 and priorarchives preserved.",
+    "hardware_gap": "Catalog fullcore roleAPI/external selected Linux core config and K80 owner/context/security/route/stop/DMA/readablefailure/GPU execution remain incomplete. Workqueue drain or kthreadstop cannot be used as hardware-stop permission."
+  },
+  "all18_patches_independent_unapplied": true,
+  "GPU_execution_rendering_Metal_complete": false
+}

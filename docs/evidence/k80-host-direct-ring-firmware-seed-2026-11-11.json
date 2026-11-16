@@ -1,0 +1,42 @@
+{
+  "status": "withdrawn-unexecuted-caller-incompatible-offline-candidate",
+  "time": "2026-11-10T20:42:36.420494+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-host-firmware-seed26-470aede6ddba4281a5d2da2ef689a5f6",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-host-firmware-seed-470aede6ddba4281a5d2da2ef689a5f6",
+  "base_source_retained": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-cx-timer-de6b1002e12c4852b505e84b393878d3",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-host-firmware-seed26-470aede6ddba4281a5d2da2ef689a5f6/full-link/kernel.ZORN26-HOST-FIRMWARE-SEED.UNSELECTED.macho",
+    "sha256": "13b589b6989983caf56cd0fed26817ebb27af054e092df9eb201c8a68d4f283e",
+    "bytes": 30423264,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1395,
+    "undefined_symbols": 0
+  },
+  "compiled_native_objects": 1,
+  "other_input_objects_preserved": 1395,
+  "changed_function": "ZornGen7SeedFirmwareAssets26",
+  "actual_host_caller": "prepareRegistryStartupImpl26 -> enableHostGmuColdClocks / prepareHostHfi / startHostGmu",
+  "old_selected_callee": "seedGmuHwschedFirmware",
+  "new_selected_callee": "seedGmuFirmware",
+  "same_actual_K80_firmware_image_bound": true,
+  "existing_direct_seed_and_BootBuffers_backend_reused": true,
+  "source_initial_range_contract": "5firmware +2direct log/HFI ranges;not12 HWSCHED initial ranges",
+  "actual_compiled_undefined_symbols": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-host-firmware-seed26-470aede6ddba4281a5d2da2ef689a5f6/actual-firmware-seed-undefined-symbols.txt",
+  "actual_final_seed_definitions": [
+    "fffffff007e50d44 S __ZN20ZornGen7SmmuDomain2615seedGmuFirmwareERK25HoujiFullHostNativeMemoryR8OSObjectPKhm",
+    "fffffff007e516b0 S __ZN20ZornGen7SmmuDomain2622seedGmuHwschedFirmwareERK25HoujiFullHostNativeMemoryR8OSObjectPKhm"
+  ],
+  "HWSCHED_backend_and_previous_candidates_preserved": true,
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-host-firmware-seed26-470aede6ddba4281a5d2da2ef689a5f6/host-direct-ring-firmware-seed.patch",
+  "runtime_component_selected": false,
+  "boot_package_created": false,
+  "fresh_device_scope_created": false,
+  "device_execution": false,
+  "new_firmware_direct_ring_compatibility_qualified": false,
+  "next_action": "Retain this failed offline experiment as evidence,use v49 coherent host transport as source/link base;implement actual native SMMU global masked fault IRQ backend then bank/context ownership. No scheduler mode change inferred from HFI queue count.",
+  "withdrawn_time": "2026-11-10T20:48:37.820549+00:00",
+  "reason": "prepareHostHfi/readHostGmuVersions and host bootstrap require HwschedBuffers12range storage and17queue shared transport;hostRoute forbids scheduler async operations and implements host direct-ring control. Seed switch to7range/3queue storage makes actual consumers reject. Queue count/class names do not select HWSCHED submission.",
+  "do_not_use_as_base": true
+}

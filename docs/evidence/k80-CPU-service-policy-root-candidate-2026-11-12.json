@@ -1,0 +1,206 @@
+{
+  "status": "CPU-two-job-policy-no-machine-root-candidate-uninstalled",
+  "recorded_at": "2026-11-12T08:58:42.025714+08:00",
+  "candidate_id": "75fd3a701b4245f2988f1052ae168181",
+  "source_root_sha256": "515fa6c6a231b50556dce7353197f7c908225da8ff51f3d13eec15ee1f7daad5",
+  "root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+  "helper_protocol_run_id": "cce96d56630b4b0680fe31845102c730",
+  "service_config_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-service-policy-config26.json",
+    "sha256": "0980f6356006b7266f8c3f97270c7ca2dd04642291f629bbe0262e5b834e1fc7"
+  },
+  "injection": {
+    "status": "offline-native-no-machine-diagnostics-injection-unselected",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-service-policy-75fd3a701b4245f2988f1052ae168181/injection/src/inject26.c",
+    "source_sha256": "2e23809b2f001832b70ddc3263a54442f65a7d5ab867ee638514a863a33a683d",
+    "parent_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/userland-no-sampling26/src/inject26.c",
+    "parent_source_sha256": "efd88b0385ebaf73e04b8d6831409235543089de6c697b09d497e0dc75459cd3",
+    "binary": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/injection-no-machine-diagnostics/libredwood26-no-machine-diag.UNSELECTED.dylib",
+    "binary_sha256": "8578a5f42e928a17d2c80e57dba7a8a2916fb0ca2f987ba12be6f32bc8d253ba",
+    "native_arm64e_compile_passed": true,
+    "code_signature_verified": true,
+    "preprocessor_excludes_PosterBoard_trap_register_stack_code": true,
+    "preprocessor_excludes_automatic_thread_sampler": true,
+    "exact_registration_guard_host_controls": [
+      "native-no-registration",
+      "legacy-five-stub-calls",
+      "undefined-five-stub-calls"
+    ],
+    "host_handlers_never_installed_or_invoked": true,
+    "ASan_UBSan_passed": true,
+    "CPU_functional_injection_and_legacy_branch_preserved_verbatim": true,
+    "activation_and_setup_overrides_unchanged_not_extended": true,
+    "tbd_and_compat_source_inputs_unchanged": true,
+    "fixture_missing_headers_fixed_without_native_changes": true,
+    "fixture_failure_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/injection-no-machine-diagnostics/host-controls-initial-failed",
+    "no_executable_analysis": true,
+    "root_image_changed": false,
+    "phone_accessed": false,
+    "root_integration_required": true
+  },
+  "injection_build_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/injection-no-machine-diagnostics/compile-inputs.json",
+    "sha256": "3709f4045bc354804dcf7f327d165e3fe923ff5a1fe15d95368784d75d6ff768"
+  },
+  "injection_compile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/injection-no-machine-diagnostics/compile-command.json",
+    "sha256": "3696a6992cf16f92807fcd13aa333d39457b5fc56c034eddb031105bae225a99"
+  },
+  "injection_preprocess": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/injection-no-machine-diagnostics/preprocess-command.json",
+    "sha256": "5e44d8ec83347149b5d130a4ccc8c2eb45f7172c759a0f4e0a69e7f075395c40"
+  },
+  "injection_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/injection-no-machine-diagnostics/no-machine-diagnostics.patch",
+    "sha256": "516b595e845f505f978b5e67060319d2d6df93552986279488ff80c7454c6b5e"
+  },
+  "root": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/root-result.json",
+    "sha256": "b61c32edd84eda74c6fa5713ba37600e17f52669d32c6bc1fc99e0127acb6978"
+  },
+  "root_updates": [
+    {
+      "path": "/redwood/lib/libredwood26.dylib",
+      "sha256": "8578a5f42e928a17d2c80e57dba7a8a2916fb0ca2f987ba12be6f32bc8d253ba",
+      "previous_sha256": "46087c4708699defcdd558b18f1246b9e1c4b1a3d30ba92e3019e0a73456253d",
+      "attributes": {
+        "inode": 487744,
+        "uid": 0,
+        "gid": 0,
+        "mode": 493,
+        "nlink": 1,
+        "flags": 0
+      }
+    },
+    {
+      "path": "/System/Library/LaunchDaemons/com.apple.adid.plist",
+      "sha256": "7e366315946229fb526dd73d874c3e1c1a812e2c1fbb53544b7e1af526d59f00",
+      "previous_sha256": "efdf87264fe0b913d1783478fe9644d1c3b907ea46f4887243280449ad274783",
+      "attributes": {
+        "inode": 487907,
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "nlink": 1,
+        "flags": 0
+      }
+    },
+    {
+      "path": "/System/Library/LaunchDaemons/com.apple.identityservicesd.plist",
+      "sha256": "a2149fa8a82db62608409b093fac5214ce9cecf5367ee3d79b9fcfe84e909714",
+      "previous_sha256": "ca0b4a0dd55a1d6740f1ee9c927eb71b6922b135cbae2d64bf80fc2b24285a83",
+      "attributes": {
+        "inode": 488097,
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "nlink": 1,
+        "flags": 0
+      }
+    }
+  ],
+  "root_delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/delta.json",
+    "sha256": "1aee069c0249b29b013a104eb50c1ca36f15326762c89422df7c9fa8718df12e"
+  },
+  "layout_and_full_local_replay": {
+    "status": "new-CPU-root-layout-recomputed-and-local-delta-replay-matched",
+    "source_image": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-root26-471dfed262904668adec5471f5ad3572/ios26-root-cpu-osanalytics.UNSELECTED.hfsx",
+      "sha256": "515fa6c6a231b50556dce7353197f7c908225da8ff51f3d13eec15ee1f7daad5"
+    },
+    "candidate_image": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/ios26-root-cpu-service-policy-no-machine.UNSELECTED.hfsx",
+      "sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2"
+    },
+    "replay_image": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/ios26-root-cpu-service-policy-local-replay.UNSELECTED.hfsx",
+      "sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2"
+    },
+    "storage_descriptor": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/storage/unixnu64.json",
+      "sha256": "2ff3bbaec2e937dec1c1fc7f9222f2eb097d7e6745834b2c64e2525e0fc73d89"
+    },
+    "previous_compiled_root_window": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sbstdio-ba26b11293c1405784a075d076f657a6/native/ZornRootWindow26.h",
+      "sha256": "60a45f8c8befc87d7d5a5a4237ad333c55cd59bdc1991303fc8cdfa8c00f4adc"
+    },
+    "delta": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/delta.json",
+      "sha256": "1aee069c0249b29b013a104eb50c1ca36f15326762c89422df7c9fa8718df12e"
+    },
+    "patch": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/root-delta-old-new.bin",
+      "sha256": "d857661fbfeb0e7656dd04b51f8e907bb6a0a1c160b4ff8335b4113d0137d391"
+    },
+    "apply_delta_source": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-handle-lifetime-delta-review26/metal_root_delta_plan.py",
+      "sha256": "710ccc6519f40e722c8a2759e28becde232e04dba4af41c920d766d2a864aad5"
+    },
+    "proposed_relative_first_lba": 6291712,
+    "proposed_blocks": 8388608,
+    "partition_bytes": 68719476736,
+    "protected_windows": [
+      {
+        "name": "retained_iOS17_system",
+        "start": 0,
+        "end_exclusive": 9382658048
+      },
+      {
+        "name": "retained_Data",
+        "start": 17179869184,
+        "end_exclusive": 25770070016
+      },
+      {
+        "name": "native_log",
+        "start": 9386852352,
+        "end_exclusive": 9386856448
+      }
+    ],
+    "absolute_start": 219395653632,
+    "Data_gap_bytes": 782336,
+    "reserve_after_root_bytes": 8588886016,
+    "changed_pages": 81,
+    "write_groups": 14,
+    "max_group_pages": 61,
+    "local_readback_sha256": "ca36cfc8bc36f73389ac4d2d81dd886696a6b9afbea1f83ac0279cb00d93a37d",
+    "negative_controls": [
+      "Data-overlap",
+      "log-overlap",
+      "out-of-partition",
+      "unaligned",
+      "last-preimage-refused-before-write",
+      "first-readback-failure-stops-later-writes"
+    ],
+    "source_metadata_preserved": true,
+    "layout_change": false,
+    "phone_access": false,
+    "device_installation_authorized_by_this_file": false,
+    "device_fresh_GPT_fences_preimage_check_still_required": true,
+    "kernel_ADT_root_hash_binding_still_required": true
+  },
+  "current_installed_page_ledger": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/installed515f-ledger/layout.json",
+    "sha256": "c06bc016ae566008660afc8c6d30b6e71706a8bb646c041844c927a8d34d3311"
+  },
+  "ledger_bytes": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-policy26-75fd3a701b4245f2988f1052ae168181/root-candidate/installed515f-ledger/current-root-retained-pages.bin",
+    "sha256": "9eb294473fbfd2359448a2b88572d4b61fd38e36cdfd1fd4dbe8aed0c91521af"
+  },
+  "source_image_and_other_monitored_files_preserved": true,
+  "root_window_revalidated": true,
+  "root_image_bytes": 34359738368,
+  "diagnostic_callback_exclusion_is_not_crash_cause_fix": true,
+  "two_job_policy_hardware_effect_unverified": true,
+  "kernel_ADT_new_hash_binding_pending": true,
+  "new_installer_and_boot_scope_pending": true,
+  "root_installed": false,
+  "phone_access": false,
+  "device_ready": false,
+  "CPU_first": true,
+  "GPU_startup": false,
+  "touch_startup": false,
+  "no_disassembly_or_reverse_engineering": true,
+  "goal_complete": false,
+  "next_action": "CPU UI first. Independent75fd service root64c099f6 now fully built from immutable actually installed515f:only adid/identityservicesd plist Disabled=true plus native no-machine-diagnostics lib8578a5f4. Original CPU functional hooks/other source restored exactly after guards;PB trap functions/registration and existing thread sampler excluded in actual NativeHID arm64e preprocess,compile/signature and3 ASan/UBSan guarded registration tests pass (dummy handlers never installed/executed). Missing host fixture includes fixed/archive retained. Root-existing inodes/root UID/GID/modes/links/flags preserved,all other monitored jobs/helpers/rc/var.skel/Metal unchanged,HFS/signatures/full32GiB source+candidate hashes pass. Exact81page14group delta and full independent local replay hash64c match;Data gap782336/reserve8588886016 revalidated,no layout change,no phone access. Actual current515f ledger reconstructs5830prior+86written-13overlap=5903pages/119groups from original receipts/captured before+after;15newdelta pages alreadyknown/66need fresh exact preimage checks. Root64c UNINSTALLED;phone still515f verifiedTWRP/no active operation. Next clone current ba26 native source with fresh recordID/helpercce unchanged and bind actual root header+ADT to64c;extend stdio UIO4->16 and classify skipped transport/count/getiov/address plus first skipped native accepted/error metadata,retain32tickets/512copy/separate filtered streams and one page. Audit selected kernel legacy machine-observation gates and exclude active legacy user-register/stack diagnostics while retaining ordinary text. Recompile all affected consumers/full1397input kernel,validate dependencies/stack/native formatter/parser/capacity,package fixed WDT300/snapshot45/sample0 CPU/GPUoff/touchoff. Derive fresh81-page installer review using actual5903 ledger and exact I515 archived installer entry/runner;fresh Recovery/GPT/Data/BCB/fences/all5903retained+81preimage checks and written81 readback mandatory,new claim/no retry;then separate installed receipt/boot admission. Do not boot uninstalled64c or old machine-diagnostic515f/new stale protocol,do not touch17/Data or constant-success activation. Independent matching23G90 Setup seed/identity checks remain;two-job isolation is hypothesis,UI/SIGTRAP cause unresolved,goal active."
+}

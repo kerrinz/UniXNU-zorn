@@ -1,0 +1,84 @@
+{
+  "status": "fixed-entry-offline-candidate-validated-unapplied",
+  "time": "2026-11-10T23:21:02.992950+00:00",
+  "candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/fixed-tools-candidate",
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/boot-package/verified.json",
+  "review": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/review-ft3683-provider-resources.json",
+  "exact_fixed_entry_base_sha256": {
+    "build-zorn-debug.py": "56f307aacf1726a27075dbf25f3307c9f5f8706576a44c1cbd722e72d57ebc0f",
+    "run-zorn-debug.py": "163a8503f70012a40e7c4b607b46212d3c0334b45ada6a789f22d566d5afe944"
+  },
+  "dispatch_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-provider-resources26-f6b80efc750146c68f929f17bc2fb1bd/fixed-tools-candidate/fixed-entry.patch",
+  "candidate_files": {
+    "entry-verification.json": "c47ba7c324369fd9ce8c290ecaa5382af5ff9b577d1d9d08123612d39dd25a63",
+    "build-zorn-debug.py": "a6eae48da3b9dacac67d1c58877ca4b1fe8cb4de2162f05021e5d2dcbe53abdf",
+    "fixed-entry.patch": "a729de4ef37d2f9da4bee7f80d87f2473b32a2acd593e78a4ff65317642f65e3",
+    "parser-controls.json": "11b17692cecb0495d2d6ab97b070289640150cb9510f245acdf8e16a374bf585",
+    "zorn_ios26_ft3683_preflight.py": "c3833200bdc472ead318a86abadfa38e753ae49574757c7cf7a806b4a2be46b1",
+    "fixed-entry-bases.json": "2f50b766098fccf9eb385b6077fe1c6876afdc20e958971004e5b9c6fdc1b5fa",
+    "run-zorn-debug.py": "d9543ce4ab4b12955d24ae700bbec4c8fbc78a69e9d39b5041a44cac7ccaad61"
+  },
+  "actual_patched_fixed_entry_checks": [
+    {
+      "entry": "build-zorn-debug.py",
+      "selector": "--ios26-ft3683-image",
+      "result": {
+        "status": "FT3683 exact offline inputs matched",
+        "boot_sha256": "bf13c9823db3122a33e8031069e28bbf9f726bef6c17e249cf08cd761b7edb10",
+        "kernel_sha256": "9aa4ce039372fa4b8cc97de9ad86babff6d4b159d2f029dcb77b3f30450600ad",
+        "record_run_id": "f6b80efc750146c68f929f17bc2fb1bd",
+        "frame_limit": 64,
+        "watchdog_seconds": 90,
+        "device_ready": false,
+        "allow_boot": false,
+        "claim_created": false,
+        "phone_accessed": false,
+        "full_root_readback": false
+      },
+      "without_check_only_exit": 2
+    },
+    {
+      "entry": "run-zorn-debug.py",
+      "selector": "--ios26-ft3683-trial",
+      "result": {
+        "status": "FT3683 exact offline inputs matched",
+        "boot_sha256": "bf13c9823db3122a33e8031069e28bbf9f726bef6c17e249cf08cd761b7edb10",
+        "kernel_sha256": "9aa4ce039372fa4b8cc97de9ad86babff6d4b159d2f029dcb77b3f30450600ad",
+        "record_run_id": "f6b80efc750146c68f929f17bc2fb1bd",
+        "frame_limit": 64,
+        "watchdog_seconds": 90,
+        "device_ready": false,
+        "allow_boot": false,
+        "claim_created": false,
+        "phone_accessed": false,
+        "full_root_readback": false
+      },
+      "without_check_only_exit": 2
+    }
+  ],
+  "parser_controls": {
+    "off_device": true,
+    "synthetic_parser_controls": true,
+    "decoded_controls": [
+      "schedule_not_returned",
+      "actual_raw_failure",
+      "normal_snapshot",
+      "unavailable_raw_fields"
+    ],
+    "rejected": [
+      "stale",
+      "bad_crc",
+      "wrong_identity",
+      "unsupported",
+      "excess_frames"
+    ],
+    "device_mode_refused": true,
+    "phone_accessed": false
+  },
+  "decode_scope": "Exact current HP26 CRC/tag, optional raw fields only when returned, finite bounds, before-page freshness. Archived local pages alone cannot prove device execution or HID delivery.",
+  "old_device_scopes_preserved": true,
+  "device_ready": false,
+  "claim_created": false,
+  "phone_accessed": false,
+  "full_root_readback": false
+}

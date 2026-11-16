@@ -1,0 +1,94 @@
+{
+  "version": 196,
+  "status": "receiver-before-boot-Metal-diagnostics-ready-unbooted",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/ready-snapshot/manifest.json",
+    "sha256": "f133a7768bb26fb2dcb9434309980c6f517d721d4c036731877925f6fa36af91"
+  },
+  "changed_source": [
+    "ZornUfsOwner26.cpp",
+    "ZornUsbCdc26.c"
+  ],
+  "checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/source-retag-review.json",
+      "sha256": "127308ce7d0a4c16098f4fc3c6582b11bd818316d676d8ebd423cccfebe913f4"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/capture-regression.json",
+      "sha256": "ef62d2c6ca4abed2c4fa3405fd99fa2ca87ae644bde9326a286833f8b645226e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/full-build-review.json",
+      "sha256": "d29a1d80cfd421a41e811a0e4862243e9177810432f98176121ad3d34316bffe"
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/full-link/kernel.ZORN26-METAL196.UNSELECTED.macho",
+    "sha256": "c2ce8674fc985c038c6dc06879d24d9d02c85c681f4e723866f0837cce8c87a5",
+    "bytes": 30742792,
+    "inputs": 1398,
+    "replaced": 21,
+    "preserved": 1377,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/full-link/exact-inputs.json",
+      "sha256": "dba7f14e85180ca943ebf340a87959a80621b168a0cbca18d4dbadef65389cf9"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "houji_recovery26.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "c77d130e5fed9d46dbf9cfe7623b3cfda229304b72e6c4de7376b9e041b4fc91",
+    "application_probe_qualification": false,
+    "Metal_probe_candidate": true
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-cdc-capture-fc0d5f2856924f90b61a65b3dff845c6/boot-package/boot.ZORN26-GPU-V196-APPLICATION-UNSELECTED.img",
+    "sha256": "ce8c74f3d4d96e62871b64be66d5ecca785cdfdadaae47415d5bd69ee8a526da",
+    "bytes": 11755520
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v195-metal-discovery-trace-064848b236b64ae699127ef8aa4bde37/root-candidate/ios26-root-metal195.UNSELECTED.hfsx",
+    "sha256": "c77d130e5fed9d46dbf9cfe7623b3cfda229304b72e6c4de7376b9e041b4fc91",
+    "bytes": 34359738368
+  },
+  "trial": {
+    "scope": "single-K80-ios26-gpu-v196-metal-cdc-capture-300s-fc0d5f28",
+    "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-trial-fc0d5f2856924f90b61a65b3dff845c6/root-trial",
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v196-metal-trial-fc0d5f2856924f90b61a65b3dff845c6/root-trial/bundle.json",
+      "sha256": "c4134e1af080e757d83fee53e9b261ed9c86d48d315d570ab07dfae4cd2f30cb"
+    },
+    "capture": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-metal196-cdc.py",
+    "runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_gpu_v196_metal_trial.py",
+    "application_probe_run_id": "064848b236b64ae699127ef8aa4bde37",
+    "boot_attempted": false
+  },
+  "program_tag": "064848b236b64ae699127ef8aa4bde37",
+  "implementation": "Only source-defined boot and USB run identity changed. All native behavior, installed195probe/principal/Metal/Turnip/root retained. Existing integrated CDC wrapper starts receiver and verifies poll-start before invoking fresh fixed boot runner. Explicit launch command pins wrapper SHA; do not invoke boot entry separately.",
+  "scope": "No root writes; inherited v195source checks remain scoped to identical behavior;186 actual capture checks and full1398input/0undefined/32header checks pass for196. Exact normalMetalprobe tag0648 remains distinct from freshbootfc0d.",
+  "constraints": "No disassembly/reverse engineering. Authorized92988a43 slotA300sWDT/600sRecovery, fresh one-shot claim. Goal active; hardware diagnosis pending."
+}

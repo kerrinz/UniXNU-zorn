@@ -1,0 +1,69 @@
+{
+  "recorded_at": "2026-11-12T21:17:30+08:00",
+  "status": "recovered-fresh-PID1-userland-progression",
+  "scope": "single-K80-ios26-CPU-lsd-vfs-copylen-300s-ed2b48d3",
+  "record_id": "ed2b48d33f94481d95966074a9713cb8",
+  "prior_consumed_scope": "single-K80-ios26-CPU-lsd-vfs-300s-cbb23711",
+  "boot_sha256": "8cce968485462fd2a30e9b3c3d8d8e7b46c0ce23be7fb0824362003d1cdbfdc9",
+  "kernel_sha256": "d66f61b46b2cc25b21a1d33e022dc1b1f1dad2879297c2a34a19c0dafa9af37e",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "boot_args_unchanged": true,
+  "GPU_started": false,
+  "touch_started": false,
+  "lockscreen_proven": false,
+  "recovery": {
+    "family": "TWRP",
+    "version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid",
+    "serial": "92988a43",
+    "slot": "a",
+    "observed_seconds": 332.9159621669969,
+    "boot_attempts": 1,
+    "claim": "consumed-no-repeat"
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "protected_before_after_match": {
+    "Data": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+    "Data_metadata": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+    "root_first_page": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+    "root_before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_after": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "after": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+  },
+  "log_changed": true,
+  "diagnostic_page": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-ed2b48d33f94481d95966074a9713cb8/root-trial-cpu-lsd-vfs-copylen/trial/decoded-native-record.json",
+    "decoder_status": "Hp26-base-and-source-owned-metadata-context-valid",
+    "freshness": "before/after differ;run-ID absent before",
+    "run_id": "ed2b48d33f94481d95966074a9713cb8"
+  },
+  "lsd_vfs_observation": {
+    "first_matching_pid": 25,
+    "reservations": 512,
+    "copy_errors": 5,
+    "budget_exhausted": true,
+    "lsd_db": {"count": 1, "operations_seen": ["stat"], "native_outcomes_seen": ["ENOENT"]},
+    "containers": {"count": 6, "operations_seen": ["open_read", "mkdir", "stat"], "native_outcomes_seen": ["success", "other"]},
+    "mobile_caches_and_installation": {"count": 0},
+    "unclassified_successful_copies": 500
+  },
+  "springboard_peer": "lsd at both 45 and 150 second checkpoints",
+  "springboard_pid": 6,
+  "posterboard_pid": 72,
+  "pixel_copies": 3,
+  "vsync_port_or_callback": false,
+  "camera": {
+    "boot_console_seconds": 64.4,
+    "boot_console_visible": "Apple logo, no lockscreen or welcome screen",
+    "later_screen_seconds": 249.7,
+    "later_screen_visible": "Apple logo, no lockscreen or welcome screen",
+    "twrp_return_seconds": 396.8,
+    "twrp_return_visible": "Dark recovery-style screen; text not readable. ADB properties identify TWRP."
+  },
+  "next": "Do not reuse this consumed scope. The 512 reservation budget filled before the watched prefixes could show a complete lsd startup: 500 copied paths matched none of them, five copyinstr calls failed, and the one database stat returned ENOENT. Account for those unclassified paths and the missing database path in source before another boot."
+}

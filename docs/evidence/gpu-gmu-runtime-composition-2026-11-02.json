@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Offline private CPU owner/reservation composition and actual native dependency links, not hardware execution or new final kernel ABI.",
+  "result": {
+    "updated": "2026-11-02T00:50:34.602310+08:00",
+    "state": "private-default-OFF-CPU-backing-to-GMU-reservation-composition-maintained-native-dependencies-closed-static-only",
+    "source_profile": "UniXNU-zorn/native/gpu-owned/runtime/gmu/composition/source-profile.json",
+    "sources": {
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/composition/ZornGpuGmuRuntime.h": "f44866f76d41846aca1b214c4a6b3df54ffb8f1e440cc7dd4219e0471d4f7aab",
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/composition/ZornGpuGmuRuntime.cpp": "1de379a90c4219f956096d1b7e13719555aeadbbae311b9157ec9781ad9fdb06"
+    },
+    "new_owner": "ZornGpuGmuRuntime is a new persistent type, source-derived from the frozen CPU registry and embedding the frozen private ledger. Owns32 actual NativeAdrenoMemory objects; no live object is copied/reallocated or exposed by pointer/range accessor.",
+    "mode_semantics": "Both CPU preparation and GMU record selectors default0. Object modes00/10 rememberGmu return Disabled6,mode01 returns GmuModeMismatch9 as constant two-instruction bodies. Selected11 is compile-only and checks actual CPU attempt/raw native success/backed/prepared/nonfailed reports before reading native bytes.",
+    "status_lifetime": "Original CPU policy/prepare/copy report source bodies are unchanged except the new type name. Raw32 CPU native IOReturn remains in the original report, separate from signed64 owner/GMU adapter errors and ledger return/retention availability. Missing attempts stay unavailable; no result is filled from caller success assertions.",
+    "failure_semantics": "Only the private ledger sees the actual member address. Owner gate nests into private ledger with no callback/reverse call. Failed recording keeps owned backing; after a local index exists, later failure marks the recorded full rounded interval retained. Failure before an index exists does not claim range recording. Public local failure also reaches existing private record, without recursive locking/reset/release/native cleanup.",
+    "limits_of_observation": "Actual native byte/backing observations, selected successful recording and post-record failure paths have not executed. Native-map attempted/status/mapping complete/runtime complete stay0. CPU-owned objects/metadata do not provide actual VMA/domain/route/power/security/stop/DMA rights.",
+    "initial_policy_scope": "Existing generic kind0/host-access/no supplied mappings/4K alignment/explicit CPU width+budget/nonpool policy remains byte-bound. It cannot widen automatically to larger-alignment holes or GPU-global/secure/IPC/preallocated resources; general ledger supports full tails independently.",
+    "new_host_guards": [
+      "default-OFF",
+      "GMU-ON/CPU-OFF"
+    ],
+    "new_host_source_negatives": 2,
+    "new_static_source_corruptions_refused": 4,
+    "selected_host_link_without_native_allocator_stubs_refused": true,
+    "new_actual_object_mutations_refused": 3,
+    "independent_capsule_dependency_objects": 10,
+    "independent_maintained_owner_objects": 3,
+    "total_independent_current_iOS17_objects": 13,
+    "recursive_target_inputs": 476,
+    "remaining_kernel_imports": 23,
+    "kernel_import_name_classification": {
+      "_IOFreeData": true,
+      "_IOMalloc_internal": true,
+      "_KHEAP_DATA_BUFFERS": true,
+      "_PAGE_SHIFT_CONST": true,
+      "__ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task": true,
+      "__ZN24IOBufferMemoryDescriptor22inTaskWithPhysicalMaskEP4taskjyy": true,
+      "___stack_chk_fail": true,
+      "___stack_chk_guard": true,
+      "__disable_preemption": true,
+      "__enable_preemption": true,
+      "_bzero": true,
+      "_gPhysBase": true,
+      "_gPhysSize": true,
+      "_kernel_map": true,
+      "_kernel_task": true,
+      "_mach_absolute_time": true,
+      "_memcmp": true,
+      "_memcpy": true,
+      "_page_size": true,
+      "_phystokv": true,
+      "_pmap_cache_attributes": true,
+      "_pmap_set_cache_attributes": true,
+      "_vm_map_page_size": true
+    },
+    "baseline_binding": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/dual-system-reinstall-20261101/native-build/kernel.prelinked.macho",
+      "sha256": "e32880346be9156d0c35f2b1f49ca0bf831fa12e1d4e18d43b795e0df1896acb",
+      "large_preexisting_immutable_kernel_not_cloned": true
+    },
+    "baseline_addresses_not_transplanted": true,
+    "target_edges": {
+      "constant_OFF_mixed_refusals": {
+        "00": {
+          "RVA": 2312,
+          "constant_refusal": 6,
+          "no_native_getter_or_ledger_call": true
+        },
+        "01": {
+          "RVA": 2312,
+          "constant_refusal": 9,
+          "no_native_getter_or_ledger_call": true
+        },
+        "10": {
+          "RVA": 2884,
+          "constant_refusal": 6,
+          "no_native_getter_or_ledger_call": true
+        }
+      },
+      "selected_edge": {
+        "cpu_prepared_load_RVA": 3172,
+        "cpu_prepared_refusal_RVA": 3176,
+        "actual_native_bytes_load_RVA": 3208,
+        "observed_bytes_and_availability_store_RVA": 3212,
+        "typed_private_ledger_call_RVA": 3364,
+        "ledger_return_and_available_store_RVA": 3368,
+        "local_index_and_available_store_RVA": 3388,
+        "post_record_size_compare_RVA": 3404
+      },
+      "actual_object_mutations_refused": [
+        {
+          "name": "CPU-prepared-object-gate-erased",
+          "refused": "('prepared/native size/raw ledger result/local index changed', '0xc68')"
+        },
+        {
+          "name": "ledger-result-store-erased",
+          "refused": "('prepared/native size/raw ledger result/local index changed', '0xd28')"
+        },
+        {
+          "name": "local-index-availability-store-erased",
+          "refused": "('prepared/native size/raw ledger result/local index changed', '0xd3c')"
+        }
+      ],
+      "relocatable_RVAs_not_hardware_addresses": true,
+      "not_exhaustive_CFG_or_final_kernel_ABI": true,
+      "native_or_phone_invocation": false
+    },
+    "constinit_ABI_storage_no_initializer": true,
+    "general_regs_only": true,
+    "checker_refusals": [
+      "A NativeAdreno substring matcher misclassified the ledger remember parameter type as a native receiver import. Saved preimage/checkpoint and corrected only classifier; host/source/four owner compilation pairs were not repeated.",
+      "An initially hand-encoded forward CBZ expectation refused the actual backward prepared-gate edge. Saved preimage/refusal; signed immediate derived from observed target, no source/flags/guard relaxed."
+    ],
+    "native_getter_allocator_provider_callback_phone_calls": 0,
+    "old_source_profiles_and_both_unapplied_patches_unchanged": true,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "physical_assistance_available": false,
+    "limitations": [
+      "Fully unattended, no new device execution authorization. No phone/USB/provider/allocator/cache/getter/VM/SMMU map/unmap/SMEM/MMIO/SCM/PAS/power/clock/reset/IOVA/GPU invocation or new runtime caller/FD/kernel/device candidate. Selected code remains compile-only.",
+      "No host successful backing/allocator/mapping/address/fence/handle model. Data arithmetic and borrowed typed descriptors are not actual ownership, active context/route/stop/DMA or a hardware lease.",
+      "Keep runtime CPU/GMU recording selectors default OFF. CPU policy remains narrow generic host RAM,4K,explicit width/budget/nonpool; do not use this stage to enable GPU-global/secure/IPC/fence imports or choose OAS/IOVA.",
+      "No query/HFI/272B/ZORNGQF1/normal-log field/fragment/carrier or EFI/Darwin pointer transfer. Both native VM/GMU patches remain unapplied; old profiles/capsules and consumed claims immutable.",
+      "Only new exact preallocated provider checks, not composition host2/source4/object3/ONlink1/native13 or old ledger/extent/registry/visibility/HFI/CPU suites. Preserve all storage/CPU/default42 and failure protections; allow_boot/readback/WriteAuthorized0."
+    ],
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gmu-runtime-composition/combined-result.json",
+    "checks": "out/zorn/gpu-gmu-runtime-composition/check-result.json",
+    "edges": "out/zorn/gpu-gmu-runtime-composition/native-edge-result.json",
+    "native_dependencies": "out/zorn/gpu-gmu-runtime-composition/native-maintained-result.json",
+    "next_plan": "out/zorn/gpu-gmu-runtime-composition/next-plan.json"
+  }
+}

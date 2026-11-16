@@ -1,0 +1,29 @@
+{
+  "recorded_at": "2026-11-12T22:33:00+08:00",
+  "status": "recovered-fresh-PID1-userland-progression",
+  "scope": "single-K80-ios26-CPU-network-identity-300s-0035ea43",
+  "record_id": "0035ea43c05041e38f21c88ff8c6e1a9",
+  "boot_sha256": "4bdd47113d264ae6fbb56726951d72048e1d042e6988a34460426fa14973ee82",
+  "kernel_sha256": "dce060a80921ee7efca11e59a7ade920247905939695f4dc6bf1cd7305cb4d80",
+  "ADT_sha256": "7d0e29c1c4622df3a118be49ff7da01c6ebf8a5146d46712e260074921d9db2d",
+  "single_variable": "ADT /chosen mac-address-wifi0/bluetooth0/ethernet0 development addresses; kernel change is record identity only; root, boot args and FD unchanged",
+  "recovery_observed_seconds": 332.476,
+  "recovery_family": "TWRP",
+  "claim": "consumed-no-repeat",
+  "diagnostic_status": "Hp26-base-and-source-owned-metadata-context-valid",
+  "comparison_with_a1c0e5b7": {
+    "SpringBoard_main_thread_at_150s": {"before": "unfair-lock wait, owner in sync Mach receive to lsd (same wait as 45s)", "after": "lock wait released; main thread itself in sync Mach receive"},
+    "SpringBoard_threads_at_150s": {"before": 5, "after": 12},
+    "lsd_unclassified_file_operations_150s": {"before": 14048, "after": 94051},
+    "lsd_copy_errors": {"before": 53, "after": 1407},
+    "lsd_watched_reservations": {"before": 15, "after": 23}
+  },
+  "springboard_pid": 6,
+  "framebuffer_swaps_between_45s_and_150s": 0,
+  "vsync_port_registered": false,
+  "lockscreen_proven": false,
+  "GPU_started": false,
+  "touch_started": false,
+  "interpretation": "First trial where SpringBoard moved past the lsd-owned lock wait within the 150s checkpoint and lsd did several times more file work. Consistent with the documented MobileGestalt network-identity wait; not proof of lockscreen. The 300s window still ends before any new frame.",
+  "next": "Keep the network identity ADT. Extend the bounded observation (late checkpoint and watchdog) toward 900s with a matching host recovery deadline, and resolve the Mach peer of SpringBoard's main-thread sync receive at the late checkpoint. Requires a new reviewed runner parameter set."
+}

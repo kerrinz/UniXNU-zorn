@@ -1,0 +1,62 @@
+{
+  "recorded_at": "2026-11-12T15:19:42.948257+08:00",
+  "status": "offline-return-root-layout-and-replay-verified",
+  "source_root_sha256": "7850439114768d67395f43f2bbcaa0e15b14bd526cf05bbf7107c24fe04345bf",
+  "candidate_root_sha256": "aba734228fedd611cb50af0994074f0ddaf5fc19c3d3518e637e1742cc1650f7",
+  "root_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-return26-134c56ea528f46f8ac50dce7e3e97872/call-gated/root-candidate/root-result.json",
+    "sha256": "25bd66d6ce4c21145ca77fd1a9bcce131b3935dd180f23a4660760015da72356"
+  },
+  "delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-return26-134c56ea528f46f8ac50dce7e3e97872/call-gated/root-candidate/delta.json",
+    "sha256": "5a0fb7d6e9fe3ce4e4e54c91de5663790a7b9972ee211095ad815427c53af3d2"
+  },
+  "local_replay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-return26-134c56ea528f46f8ac50dce7e3e97872/call-gated/root-candidate/layout-and-replay-result.json",
+    "sha256": "355d14cf350daf295838a49df45f9b8ca0760604b6bfea19bd7b69299250733e"
+  },
+  "delta_payload": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-return26-134c56ea528f46f8ac50dce7e3e97872/call-gated/root-candidate/root-delta-old-new.bin",
+    "sha256": "691675654742d1f0c463a1d6afebda5d19923fbe758a32b2872e24ef930135cc"
+  },
+  "library_source_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-return26-134c56ea528f46f8ac50dce7e3e97872/call-gated/result.json",
+    "sha256": "04aee884ba5bd74edb7f714113d0b36549b4f6f0275409de0b515204e96c1a9e"
+  },
+  "updated_files": [
+    {
+      "path": "/redwood/lib/libredwood26.dylib",
+      "sha256": "d1ef67a7a4f26f2c3ffe724c901a2d5f48bd178180c845bf31adcdfeea2f1f3a",
+      "previous_sha256": "c3d2bbc4780792176970a5088cf3438aa39e9768cecef9f95280d9eb252e8aef",
+      "attributes": {
+        "inode": 487744,
+        "uid": 0,
+        "gid": 0,
+        "mode": 493,
+        "nlink": 1,
+        "flags": 0
+      }
+    }
+  ],
+  "changed_pages": 65,
+  "write_groups": 8,
+  "Data_gap_bytes": 782336,
+  "reserve_after_root_bytes": 8588886016,
+  "negative_controls": [
+    "Data-overlap",
+    "log-overlap",
+    "out-of-partition",
+    "unaligned",
+    "last-preimage-refused-before-write",
+    "first-readback-failure-stops-later-writes"
+  ],
+  "layout_change": false,
+  "source_image_hash_and_metadata_preserved": true,
+  "root_installed": false,
+  "current_phone_root_sha256": "7850439114768d67395f43f2bbcaa0e15b14bd526cf05bbf7107c24fe04345bf",
+  "native_kernel_and_ADT_rebinding_still_required": true,
+  "fresh_install_review_required": true,
+  "device_access": false,
+  "goal_complete": false,
+  "next_action": "Prepare a fresh native kernel/ADT/boot candidate for aba73422 and retain validated1216-byte log capacity/static once buffers. Consider extending ordinary source-marker mask to include both new return messages. Reconstruct installed785 cumulative retained pages from6020-page c6f ledger plus actual64 entry-install readbacks with14 overlapping pages (expected6070 unique,verify rather than assume);new delta is65 pages/8 groups. Review all old/new pages,protected GPT/Data/iOS17/log bounds,full BCB/tail and fixed source/mode checks with fresh scope/ready/claim before any installation. Prior64-page permission and consumed claims must not be reused. No phone action currently pending;phone remains verified TWRP. Goal8 remains operative;handle any actual auto-review rejection transparently without bypass."
+}

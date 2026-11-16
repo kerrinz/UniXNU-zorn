@@ -1,0 +1,78 @@
+{
+  "implementation": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-power-source.py",
+  "script_sha256": "9eef0d060387873aad53ffd878218846d92935094dbe647e365a77fbeca036b7",
+  "source_consumer_provenance": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.c",
+    "sha256": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+    "scope": "existing non-Xiaomi OEM source reads alternating GMU cells;not K80 hardware policy"
+  },
+  "source_inputs": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+      "sha256": "b082a6b8813d392b6fdb554ed46212a9b064a7399f341dd2910b06819f08f511"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.dtb",
+      "sha256": "74b702105990399697b7d38def4ab3931a5ef79e20f0a0cc8cc9fc2c865eff52"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.dtb",
+      "sha256": "4c87e7fcb971592ae7f9f34d978b45d0801bc0f6dbc911dedd7767c5fc5f2bb6"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.dtb",
+      "sha256": "ed761aa6d7e8623792c75f20693a97407974ee2445254e725ce202a8f0ffaa76"
+    }
+  ],
+  "GPU_table_lengths": [
+    [
+      12,
+      14,
+      9,
+      12
+    ],
+    [
+      13,
+      12,
+      13,
+      11
+    ],
+    [
+      12,
+      14,
+      9,
+      12
+    ],
+    [
+      13,
+      12,
+      13,
+      11
+    ]
+  ],
+  "GMU_pair_counts": [
+    [
+      2
+    ],
+    [
+      2
+    ],
+    [
+      2
+    ],
+    [
+      2
+    ]
+  ],
+  "tests": "PASS:8 corrupt-source refusals;optional bin absent retained;disabled nodes retained;source immutable;no-overwrite",
+  "missing_speed_bin_not_default0": true,
+  "all_source_variants_retained": true,
+  "source_schema_not_runtime_policy": true,
+  "generated_policy": false,
+  "hardware_qualification": false,
+  "new_driver_patches": 0,
+  "old_suites_reexecuted": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

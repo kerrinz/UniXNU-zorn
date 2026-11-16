@@ -1,0 +1,197 @@
+{
+  "recorded_at": "2026-11-14T21:04:49.734412+08:00",
+  "version": 186,
+  "stage": 1,
+  "status": "offline-direct-application-oob-transport",
+  "working_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06",
+  "working_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06",
+  "parent": {
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v185-kernel-client-info-f9db3c322f1348d5b8175f07ed5fc9a9",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v185-kernel-client-info-f9db3c322f1348d5b8175f07ed5fc9a9",
+    "source_pins_sha256": "e8a79d6526b2dc9bce40494eab81c019a8d766351031ff8555f1baba5cc40cb9",
+    "additional_source": {
+      "ZornGen7AppExecution26.h": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-kernel-client-owner-candidate/ZornGen7AppExecution26.h",
+        "sha256": "7fc61362b4879318ff08658693a0daf560b2cf1c8a378d921c3fa909ba82c0cf"
+      },
+      "ZornGen7AppExecution26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-kernel-client-owner-candidate/ZornGen7AppExecution26.cpp",
+        "sha256": "40c72635c4b25af4b2fc3d365dae2a5ed3bd495a025958e735d0d99593616c63"
+      },
+      "ZornGen7HwschedHfi26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-kernel-client-owner-candidate/ZornGen7HwschedHfi26.cpp",
+        "sha256": "358bc1f9fc7ac5afbce3e26af5b76cfd08664cb1203f7cc9addfec82fc627ebf"
+      },
+      "ZornGen7HwschedHfi26.h": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-kernel-client-owner-candidate/ZornGen7HwschedHfi26.h",
+        "sha256": "5266a276fba00216539e1fea5d8a533ab73db64466738f57b1770b06584057f1"
+      }
+    }
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/stage1-application-transport-snapshot/manifest.json",
+    "sha256": "010dbf9696c575741e19431b71b467fe49661d85879ffe981ad32fc3e85cf5a9"
+  },
+  "header_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/application-header-review.json",
+    "sha256": "3d9d0a12672e23d4091dfad744ac2e83383d3b7c9c0f4d4e55d8ceb917e71181"
+  },
+  "test": [
+    {
+      "passed": true,
+      "result": "PASS 829 actual DirectHfi application OOB assertions; provider checks run outside transport lock\n",
+      "source_sha256": "2bc72f53bce70516d98522b59099a2d22da4a17235cb0c4485caf47b22089965",
+      "execution_header_sha256": "4ee2042afd835fa441b48883180e6926675b40878fd4eea83e6b139f807bcc09",
+      "scope": "Actual three DirectHfi methods and actual per-session OobRecord; mocked OS/locks/provider/MMIO/clock, no device proof. Fresh successive sessions, exact sequence, seven MMIO boundaries, all permission checks, stale/timeout/wrong-owner, preconditions and retained failures."
+    },
+    {
+      "passed": true,
+      "result": "PASS 150 actual HostRing application transport routing assertions\n",
+      "source_sha256": "0c1727c8dd09b6d69a6b1e16fd0078beb0ad5274882afa8395e7f2b34177a0fb",
+      "scope": "Eleven actual Ring methods; mocked provider, transport, issuer and idle observation. Both real routing branches, no transport/null owner, permission identity, operation thread, release-ready and retained failure semantics; no hardware or Board authority qualification."
+    }
+  ],
+  "compilation": {
+    "passed": true,
+    "units": [
+      {
+        "unit": "ZornGen7AppExecution26",
+        "object_sha256": "4a6a115739653014dd816acb5a3bd0f9d8d31ebbbff1e75a9cfe91144946e8c5",
+        "recipe_sha256": "f5d804a9de68b071291c082f66cf43478337a33cc8aa556ded5e48cd9e51256d",
+        "warning_lines": []
+      },
+      {
+        "unit": "ZornGen7AppIo26",
+        "object_sha256": "5a1f58fa20236c1cd38762cc7587df094d3273f52ff44574f2ffa931f4cf5faf",
+        "recipe_sha256": "f6f379051833d5785a93c4643059af7e260273b6c5c173254a57304f36f4c3e9",
+        "warning_lines": []
+      },
+      {
+        "unit": "ZornGen7DarwinBoardOwner",
+        "object_sha256": "ff958841f7a57956a315e3854eed6833f824f3f58a0359eb927b530978a67d1e",
+        "recipe_sha256": "9b76fd67f0646ae91715ae57cf264d1481a140feafdfb6543f246762400a4e71",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7DirectHfi26",
+        "object_sha256": "4a89270b30dcb33f729173903ceda3dae76786e7031e9b935c0d9f1838642f39",
+        "recipe_sha256": "ee89ef6b34e791579aa27f5b5106004c5bd056190794f5ea3a691e732c61430e",
+        "warning_lines": []
+      },
+      {
+        "unit": "ZornGen7HostGpuCode26",
+        "object_sha256": "16011a5bcbface6f29152943a7e8d8f5a5089234de3d8b57f7f64358bcaafff6",
+        "recipe_sha256": "78acc8e8767d34f2a01d247c69d571d53c141a7125dd94898dbf63d44417da89",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7HostGpuRegisters26",
+        "object_sha256": "cd9b3b6b28aa0dfb38cbe766f01cea74db281a21efcc2da20b07d871d8648b25",
+        "recipe_sha256": "7693edd7649180bd2b7c732389ae28a88db4e69f12f50d9d54aa8bbc7cf7aa82",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7HostRing26",
+        "object_sha256": "2439c282e0cfb6b599eb80f6589b3afe5a97f02174a9623327838b43664b8bad",
+        "recipe_sha256": "24bd188a3f27bd01db622c8c347a149b90f160decc35e4b9e3959ee96455c53d",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/ZornGen7HostRing26.cpp:644:103: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'unsigned int' [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/ZornGen7HostRing26.cpp:865:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7HostTables26",
+        "object_sha256": "2937e2675f8a66dfb5da8689e34552be98b3f308579530b7c651cc79cfaa6479",
+        "recipe_sha256": "68b6f21d86654df34d845fd2667fbd6d2a7a0c67af8297e4f2e8f2305ab83ec0",
+        "warning_lines": []
+      },
+      {
+        "unit": "ZornGen7HwschedHfi26",
+        "object_sha256": "bea9143b8fc59e4d0364005ff96ceda3e7f28004751e8de6a2f7005478b9631a",
+        "recipe_sha256": "796aa134541b460116945ab0736be98c0a0b3635765a911e3fa62df589a6ff0a",
+        "warning_lines": []
+      },
+      {
+        "unit": "ZornGen7RegisterMaps26",
+        "object_sha256": "807e397bb2a33f3b555c7d8d4f0ea777a3bf1cd7f1337e49edc627e19855d45e",
+        "recipe_sha256": "c7e93635f711ec4e8de2af8fc7337be0da123411504c7ba1d2c2ce75af731809",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7SmmuDomain26",
+        "object_sha256": "185933539694690b0cce904bdc8911ce587f3b937ddbc8f436eeb6f6ec432bad",
+        "recipe_sha256": "e5e3901b99283d74469fb8e100da288478d9fa0513a0ee42755ac11cbc8b43f3",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/ZornGen7SmmuDomain26.cpp:395:41: warning: implicit conversion loses integer precision: 'const size_t' (aka 'const unsigned long') to 'const unsigned int' [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/ZornGen7SmmuDomain26.cpp:624:41: warning: implicit conversion loses integer precision: 'const size_t' (aka 'const unsigned long') to 'const unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7StartupOwner26",
+        "object_sha256": "eec7ea71bb896340d2a96de712db91fa087f626197d419af76e8882ec20fe721",
+        "recipe_sha256": "a92fcfbe1aa1096ec42e7b88e70afff67bc3f7de7e620c3602cc1f42fe6906fa",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      },
+      {
+        "unit": "ZornGen7ZapOwner26",
+        "object_sha256": "8bd7f405fd2822422be9c78544e8643363d5b7f81cd817bf9abebc4d312679dd",
+        "recipe_sha256": "818dcb5f0143fb87e7121c7dcc54e066f78308ccf6287bb508cd46f94426b7a7",
+        "warning_lines": [
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:86: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:115:137: warning: implicit conversion loses integer precision: 'size_t' (aka 'unsigned long') to 'uint32_t' (aka 'unsigned int') [-Wshorten-64-to-32]",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/HoujiFullHostNativeMemory.h:141:158: warning: implicit conversion loses integer precision: 'uint64_t' (aka 'unsigned long long') to 'unsigned int' [-Wshorten-64-to-32]"
+        ]
+      }
+    ],
+    "overlay_sha256": "9f9e1ffbef75fb86218b8870f05918b82ecaf35af882c62727d19489bd50f540",
+    "scope": "Affected native TUs only; application authority/publication/process integration and full build not yet complete"
+  },
+  "implementation": [
+    "Reused source-defined Gen7 OOB request/ACK/clear/GX sequence with distinct actual AppExecution OobRecord and exact transport identity; no copied kernel grant. DirectHfi retains active application until actual successful clear; failed/unknown paths stop and retain.",
+    "Per-access real application authority callbacks execute outside HFI/issuer/startup locks; busy and retained activeApp prevent competing mutation. Fresh app boot requires completed original image OOB and no kernel-client OOB attempt.",
+    "HostRing selects actual HWSCHED or DirectHfi transport for acquire/release/held/operation checks. Missing or mismatched transport fails. Existing admission, per-operation authority and issuer/idle checks remain.",
+    "AppExecution record owner pointer now stores common OSObject identity and grants DirectHfi friendship; no inserted fields or virtual method changes. All13 affected native consumers, including AppExecution/AppIo/Hwsched, rebuilt.",
+    "All existing DirectHfi function bodies and HostRing outside application transport block remain byte-identical to hardware-passed v185. Board application publication and native application permission/process integration remain unchanged/unselected."
+  ],
+  "build_correction": "First partial compile archived: legacy Hwsched recipe lacked the retained v83 fallback include directory. Added the same -idirafter input used by parent Ring; second compile of all13 affected units and actual-header audit pass.",
+  "remaining": [
+    "Implement real Board application acquire/check/release callbacks for exact task/client/resources and extend native per-access/process-table gates with those real held conditions.",
+    "Wire native application publication outside startup/issuer locks on a fresh application-only boot; kernel probe publication is mutually exclusive.",
+    "Validate real ordinary task/Mach IPC, mapping/exit, then integrate selected iOS26 Turnip/Metal/shader and presentation.",
+    "Retag diagnostic identity and compile/full-link/package/freeze a new candidate only after actual prerequisites are integrated."
+  ],
+  "hardware": {
+    "executed": false,
+    "full_link": false,
+    "package": false,
+    "runner": false,
+    "claim": false
+  },
+  "constraints": "No disassembly/reverse engineering. v185 successful baseline/source/claim untouched. Only source, compile, host tests; no application hardware proof. Goal active."
+}

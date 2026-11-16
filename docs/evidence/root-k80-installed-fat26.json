@@ -1,0 +1,67 @@
+{
+  "status": "UNSELECTED-matching-installed-UFS-root-loader-files-FAT-built-host-readback-verified",
+  "FAT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/loader-files.UNSELECTED.fat",
+    "bytes": 201326592,
+    "sha256": "bc580406f0a41c88ad75fd80db4cf6fefe49153e0bd30e9ea9188108cf894b69"
+  },
+  "files": [
+    {
+      "FAT_path": "EFI/BOOT/BOOTAA64.EFI",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/BOOT/BOOTAA64.EFI",
+      "bytes": 94720,
+      "sha256": "ff9c6d7ed60b8d93976a736422cbfd2a4200f44c9cee0e3cd3a211a7cd19ae49",
+      "readback": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/readback/00-BOOTAA64.EFI"
+    },
+    {
+      "FAT_path": "EFI/UniXNU/Drivers/DarwinBoot26.efi",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/UniXNU/Drivers/DarwinBoot26.efi",
+      "bytes": 44032,
+      "sha256": "ccae7c1d2d7934812a5668c9b33c409ae3850d21aa20999259d592a533b021d8",
+      "readback": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/readback/01-DarwinBoot26.efi"
+    },
+    {
+      "FAT_path": "EFI/UniXNU/Payloads/kernel.macho",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/UniXNU/Payloads/kernel.macho",
+      "bytes": 30281928,
+      "sha256": "0d867627c845212405f5e341bc444fe2e79feeac51b784b64879c9a68f99c266",
+      "readback": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/readback/02-kernel.macho"
+    },
+    {
+      "FAT_path": "EFI/UniXNU/Payloads/kernel.macho.adt",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/UniXNU/Payloads/kernel.macho.adt",
+      "bytes": 48192,
+      "sha256": "59db3a06fed99034bc2c2451911bde380ad17d2b7b12c5f4d0bbe24dfd52e724",
+      "readback": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/readback/03-kernel.macho.adt"
+    },
+    {
+      "FAT_path": "EFI/UniXNU/unixnu.toml",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/files/EFI/UniXNU/unixnu.toml",
+      "bytes": 512,
+      "sha256": "344e832b36c13370e2bb8fe8c7f915d95f739ca90740fbfc417f80850fcbce4c",
+      "readback": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-fat26/readback/04-unixnu.toml"
+    }
+  ],
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-terminal26/full-link/kernel.ZORN26-installed-root-artifact.UNSELECTED.macho",
+  "root_OS_image_in_FAT": false,
+  "root_OS_from_UFS": true,
+  "root_image_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300",
+  "native_HFS_selector_consumed_by": "source/kernel/zorn26-platform-build-candidate/bsd/vfs/vfs_subr.c:1219;hjrfs26_candidate refuses mockfs fallback",
+  "watchdog_mode": 1,
+  "watchdog_marker_boot_sectors": [
+    0,
+    6
+  ],
+  "FD_reference": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-fd26/SILICIUM_UEFI.ZORN26-PLATFORM.UNSELECTED.fd",
+  "temporary_fastboot_carrier_generated": false,
+  "permanent_boot_entry_installed": false,
+  "phone_OR_native_executed_by_build": false,
+  "boot_ready": false,
+  "pending": [
+    "successful complete actual root installation/readback",
+    "fresh exact root-boot scope and full independent input/BCB/Recovery guards",
+    "actual persistent boot entry policy and backing",
+    "persistent iOS26 Data path remains separate;current /private/var uses RAMFS"
+  ]
+}

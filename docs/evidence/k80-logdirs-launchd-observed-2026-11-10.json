@@ -1,0 +1,105 @@
+{
+  "time": "2026-11-10T13:37:09.790123+00:00",
+  "status": "actual-stock-launchd-main-and-four-core-service-processes-observed-after-RAMFS-template-fix",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/root-trial-logdirs/trial/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-RAMFS-logdirs-launchd-CPU300s-v20",
+    "status": "recovered-fresh-PID1-userland-progression",
+    "GPU_started": false,
+    "root_mount_proven": true,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 333.1939818749961,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "PID1_image_activation_proven": true,
+    "user_mode_instructions_proven": true,
+    "log_changed": true,
+    "native_writer_readback_success_proven": false,
+    "actual_userland_progress": {
+      "entries": 552525,
+      "returns": 552450,
+      "entered": 368,
+      "returned": 75,
+      "error": 0,
+      "exec_object": 3,
+      "exec_phase": 0,
+      "exec_result": 0,
+      "stock_main": 1,
+      "exit_seen": 0,
+      "exit_namespace": 0,
+      "exit_code": 0,
+      "exit_status": 0,
+      "services": 15
+    },
+    "syscall_dispatch_return_observed": true,
+    "lockscreen_proven": false
+  },
+  "record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/root-trial-logdirs/trial/decoded-native-record.json",
+  "stock_launchd_main_proven": true,
+  "actual_service_process_presence_at90s": {
+    "notifyd": true,
+    "backboardd": true,
+    "runningboardd": true,
+    "lsd": true,
+    "SpringBoard": false
+  },
+  "RAMFS_preparation_gate_passed": "Existing unchanged init enters stock launchd only after mandatory RAMFS preparation returns success;actual exec_object3/result0 and accepted initproc_spawned marker1 now prove that path was crossed.",
+  "fix": {
+    "template_only_added_bytes": 90,
+    "missing_runtime_directories": [
+      "/private/var/db/diagnostics/timesync",
+      "/private/var/db/uuidtext"
+    ],
+    "existing_init_reused_unchanged": true,
+    "producer_fix": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-logdirs-fix26/producer-fix.json",
+    "actual_root_delta_installation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/logdirs-delta-e8a69c138a1a4bd2b8ae2146ca7d550f/run/result.json",
+    "root_expected_host_sha256": "6e46fbc832239eebd1bd63a4a248845cebd1200af9f5aef5eba4c69af7deb127",
+    "device_verification": "64changed4KiBpages read back;protected metadata/fences unchanged. No full new-image device readback,as owner requested."
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/full-link/kernel.ZORN26-LOGDIRS-ROOT.UNSELECTED.macho",
+    "sha256": "f8176652b1bfa5b32fe0cccce683ba15512d41017a78b2efd289ca634c3e4620",
+    "bytes": 30385696,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 6,
+    "preserved": 1390,
+    "undefined_symbols": 0
+  },
+  "boot_packet": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/root-package-userland/verified.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/root-trial-logdirs/trial/one-shot.claim.json",
+  "scope_consumed_no_repeat": true,
+  "camera": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-logdirs-boot26-0551535d07db45dca3a495a0d8252969/root-trial-logdirs/camera/logdirs-live.json",
+  "limits": [
+    "Service process presence is not service health or GUI readiness. SpringBoard was absent from the90s sample;not a claim about the entire300s window.",
+    "Camera console output is not legible enough to qualify a lockscreen;no current lockscreen/desktop proof.",
+    "GPU startup was not selected;GMU/HFI/GPU execution,Metal rendering/presentation and touch remain unqualified.",
+    "Only the last dispatch return error is available;do not claim all552450returns succeeded.",
+    "7captured protected sets do not prove whole Android/filesystem equality. Native writer self-readback success is not independently encoded."
+  ],
+  "next_action": "Core userland now reaches stock launchd and four service processes. Resume the real managed RSC initialization/CPU-PM/GIC/runtime path and GMU/HFI/direct-ring bring-up using existing K80/houji implementations;retain HWSCHED. Connect actual GPU service/display readiness for the graphical session. No more broad userland diagnostic expansion or whole-image readbacks without a concrete new need;subsequent writes verify changed pages and protected metadata only."
+}

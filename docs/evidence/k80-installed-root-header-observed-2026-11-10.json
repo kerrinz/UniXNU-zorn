@@ -1,0 +1,85 @@
+{
+  "status": "actual-installed-UFS-HFSX-header-read-matched-fresh-record",
+  "time": "2026-11-10T04:13:32.009288+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt-normal26-64a0d15d09734ed08043d3832a8982a4",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt-normal26-64a0d15d09734ed08043d3832a8982a4/root-trial-imported-dt/trial/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-imported-DT-root300s-v6",
+    "status": "recovered-fresh-root-header-milestone",
+    "GPU_started": false,
+    "root_mount_proven": false,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 332.94007854200026,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "root_header_milestone_proven": true,
+    "log_changed": true,
+    "native_writer_readback_success_proven": false
+  },
+  "actual_record": {
+    "status": "existing-Hp26-record-byte-envelope-valid",
+    "run_id": "64a0d15d09734ed08043d3832a8982a4",
+    "text": "K80 IOS26 root attach reached; actual UFS HFSX header matched; mdev publication not yet attempted; GPU not started",
+    "freshness": "before/after local pages differ; artifact tag absent before",
+    "matches_root_header_milestone": true,
+    "can_support_fresh_trial_when_bound_to_actual_capture_and_bundle": true,
+    "standalone_inspection_proves_native_or_device_execution": false,
+    "GPU_execution_proven": false,
+    "root_or_desktop_proven": false,
+    "native_writer_readback_success_proven": false
+  },
+  "scope_claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt-normal26-64a0d15d09734ed08043d3832a8982a4/root-trial-imported-dt/trial/one-shot.claim.json",
+  "claim_consumed_no_repeat": true,
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.15591420800046762,
+    "inputs": 1390,
+    "replaced": 5,
+    "preserved": 1385,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt-normal26-64a0d15d09734ed08043d3832a8982a4/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "3a3dbb1fe3b20ae68535309b84bfab0f070f27bbd87d98fd2f2de993d923de90",
+    "bytes": 30321760
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt-normal26-64a0d15d09734ed08043d3832a8982a4/root-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "ece43a4dbdbe03a161243a4a7f4596f8d4baf904665dc0a3e1211a958e00d91f",
+    "bytes": 11587584
+  },
+  "actual_CFG": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-imported-dt-normal26-64a0d15d09734ed08043d3832a8982a4/actual-root-input-publication-link.json",
+  "input_fix": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-root-imported-dt-fix26.json",
+  "interpretation": "Actual root CPU staging and once-only UFS path reaches read/match of installed EF11 HFSX header;record is before mdev publication.332.94s Recovery return is not filesystem/userland proof.",
+  "limits": [
+    "root mount still unproved",
+    "desktop/Metal/GPU/touch unproved",
+    "native writer self-readbackACK unproved",
+    "captured protected ranges unchanged does not prove all filesystem contents"
+  ],
+  "next_mounted_observation_candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874",
+  "next_mounted_observation_link_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-mounted26-f5deedc5decb4a379b49af888612c874/actual-mounted-root-link-proof.json",
+  "next_mounted_observation_target_executed": false
+}

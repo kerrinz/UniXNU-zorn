@@ -1,0 +1,55 @@
+{
+  "recorded_at": "2026-11-13",
+  "status": "offline root-first-page pin provenance reconciliation; device stop gate remains active",
+  "device_accessed_during_review": false,
+  "finding": "The v73 predevice-004 first-page mismatch is explained by a stale expected-page pin. Its archived expected page is the 2026-11-10 page (9d188737...). The bytes read by the 2026-11-13 Recovery preflight (be93aab9...) exactly match both before/after pages captured by two later CPU-only runs on 2026-11-12.",
+  "comparison": {
+    "old_expected_page": {
+      "evidence": "docs/evidence/k80-platform-board-stage-observed-2026-11-10.json",
+      "evidence_sha256": "6ed2c3e903d6ea836eabfc7a00e4223c1d5da6b5c7063e266099ad0df5f7e545",
+      "page_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v73-provider-census-20261113/root-trial-provider-census-v73-predevice-004/archive/root_first_page-source-root-first-page.bin",
+      "page_sha256": "9d18873705562ead9d5b10da6a8a51692e4361f312246367fdcbe4175aa2e05d",
+      "bytes": 4096
+    },
+    "later_cpu_observation_1": {
+      "evidence": "docs/evidence/k80-CPU-posterboard-passive-observed-2026-11-12.json",
+      "evidence_sha256": "85085f8bd5e21d67fb6ae497c2e689d1cc10a0a4f93574450deb1068982e6255",
+      "recorded_at": "2026-11-12T17:17:00.886981+08:00",
+      "before_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "after_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "bytes": 4096
+    },
+    "later_cpu_observation_2": {
+      "evidence": "docs/evidence/k80-CPU-ui-display-wait-observed-2026-11-12.json",
+      "evidence_sha256": "dd59cee12647169e4998cf68cd14e2eafa01fcb55a09a029006f4a0767738028",
+      "recorded_at": "2026-11-12T18:21:41.362643+08:00",
+      "before_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "after_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "bytes": 4096
+    },
+    "v73_recovery_observation": {
+      "evidence": "docs/evidence/k80-gpu-v73-provider-census-recovery-stop-2026-11-13.json",
+      "evidence_sha256": "5c78fd4934bd80cfe066e066bbba89b4bb1872dc4396a3388c5d373740781b8e",
+      "read_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v73-provider-census-20261113/root-trial-provider-census-v73-predevice-004/trial/command-025.stdout",
+      "read_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700",
+      "bytes": 4096,
+      "partition_relative_lba": 6291712
+    }
+  },
+  "conclusion": {
+    "page_pin_provenance_reconciled": true,
+    "interpretation": "The mismatch is consistent with the preflight bundle pinning an older root page. The v73 read matches the latest two recorded CPU-run pre/post images, so these records do not indicate a new page change during the v73 attempt.",
+    "current_device_state_requalified": false,
+    "root_before_after_fence_comparison_reached": false,
+    "stop_device_operations": true,
+    "next_device_scope_must": "Use a newly bounded fixed-runner scope with a fresh Recovery read of the current full-page protections and a pin derived from reconciled current evidence. The previous one-shot scope remains consumed; do not clear its stop gate or reuse it.",
+    "gpu_provider_census_observed": false,
+    "gpu_or_touch_started": false,
+    "device_writes_or_boots": false
+  },
+  "cpu_lockscreen_baseline": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "modified_or_replaced": false
+  }
+}

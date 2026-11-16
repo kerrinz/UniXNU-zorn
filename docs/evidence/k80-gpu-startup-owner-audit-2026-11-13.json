@@ -1,0 +1,59 @@
+{
+  "recorded_at": "2026-11-13",
+  "status": "offline startup and SMMU ownership audit for v66",
+  "candidate": "v66-current-integrated-qtb-peer-stream-gate-gmu-idle-gbif-halt",
+  "candidate_kernel": {
+    "path": "out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/full-link/kernel.ZORN26-CURRENT-INTEGRATED-GMU-IDLE-GBIF-HALT-V66.UNSELECTED.macho",
+    "sha256": "10ea8283561553eb6a5d77adb98dbe04ddfb7b17aa207e0066bdfdaa8da471fd",
+    "selected": false,
+    "packaged": false,
+    "booted": false
+  },
+  "linked_ios26_startup_objects": [
+    {
+      "object": "1306-ZornRootPlatform26.cpo",
+      "sha256": "0e3d54f7a430883c04924d958105edfbddb1c3ebf971be358c52dab23c1d1a5f",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-root-entry-candidate/ZornRootPlatform26.cpp",
+      "source_sha256": "e3e3ee985f2073c772f74656843d15f1e4d265f67aa11bc104e6bb5132bb3ec4",
+      "observed_behavior": "Validates the selected K80 root identity and stages ZornRootStartup26::RootInputs. It does not prepare the GPU board stage or construct ZornGen7StartupGpuInputs26."
+    },
+    {
+      "object": "1312-ZornGen7PlatformBoardBridge26.cpo",
+      "sha256": "82d6969a70cf5cc41888f6f234367c3e87f3bfb77f64ad56347dbd8dd1096e65",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/rsc-bootcpu-boot-9b28aa61a5934a1990eb984f6280f411/platform/ZornGen7PlatformBoardBridge26.cpp",
+      "source_sha256": "d467ebe7da57301ce59b7fb834cbac8dfe86582d75e69cc3132add2154e3659d",
+      "observed_behavior": "Accepts an already-constructed ZornGen7StartupGpuInputs26 and forwards it to ZornGen7StartupOwner26. It validates ownership references but does not create callbacks or numeric authority values."
+    }
+  ],
+  "available_but_unselected_direct_bridge": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-direct-caller-184e16363d344aa693d16c6ff92973f3/ZornGen7PlatformBoardBridge26.cpp",
+    "source_sha256": "733a798fa8b75be6eca75bfdfb384cba859c380894db3f0c37584393bb5d3bed",
+    "observed_behavior": "Has a stage-specific direct schedule bridge for caller-supplied GPU inputs. It does not instantiate the input owner."
+  },
+  "candidate_smmu_owners": [
+    {
+      "source": "out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/ZornGen7SmmuTablePages26.cpp",
+      "sha256": "bcb2eb61d6e54afdfdc6d484eca39ef35928a67f45942487ca7f0dca480d85fb",
+      "observed_behavior": "Retains page descriptors and mappings and separates never-installed retirement from post-context-use retirement."
+    },
+    {
+      "source": "out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/ZornGen7HostGpuTables26.cpp",
+      "sha256": "6f543dbbe1845befbf2545e0904d4b6baf3a5275d7ff65796f0f63edb49eed65",
+      "observed_behavior": "Owns prepared host/process tables, process ASID bookkeeping and VM attachment under its retained gate."
+    },
+    {
+      "source": "out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/direct-runtime/ZornGen7DirectVm26.cpp",
+      "sha256": "500340827fa928e57e84bcd025d3376fb0b8b12e21dcb2159593364f9423a1ca",
+      "observed_behavior": "Implements serialized kernel-owned BO mapping transactions; comments require an independent all-master quiesce lease and the class is not an OS-published runtime by itself."
+    }
+  ],
+  "conclusion": {
+    "table_and_map_implementation_present_in_candidate": true,
+    "real_gpu_gmu_exclusion_provider_present": false,
+    "maintained_root_caller_constructs_gpu_authorities": false,
+    "runtime_selected_or_device_qualified": false,
+    "next_step": "Implement a concrete GPU/GMU exclusion owner backed by actual K80 provider/resource lifetimes, then connect it and the existing SMMU owner to the maintained root startup path. Preserve the fixed Recovery watchdog."
+  },
+  "no_disassembly_or_reverse_engineering": true,
+  "touch_driver_work": false
+}

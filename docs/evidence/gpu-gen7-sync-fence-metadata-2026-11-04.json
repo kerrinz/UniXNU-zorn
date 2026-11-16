@@ -1,0 +1,50 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_STRING_TERMINATOR_AND_SYNC_INPUT_CURSOR_REPAIRS",
+    "timestamp": "2026-11-03T18:38:29.852967+00:00",
+    "changed_files": [
+      "kgsl.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-fence-metadata-20261104/metadata-termination.UNAPPLIED.patch",
+    "patch_sha256": "dc57023a17940e9bf980d1f781996e888eca7abdde5338e9486a8eb080d7fa79",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-fence-metadata-20261104/source-contract.json",
+    "checks": {
+      "shorter_string_witnesses": 63,
+      "maximum_length_boundary": 1,
+      "zero_length_noop_and_embedded_nul_controls": true,
+      "source_mutations_refused": [
+        "missing-terminator",
+        "maximum-only",
+        "off-by-one"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "all_other_source_bytes_unchanged": true,
+      "Linux_native_device_allocator_or_callback_execution": false,
+      "old_suites_run": false,
+      "sync_list_source_mutations_refused": [
+        "skip-cursor",
+        "wrong-record-size",
+        "double-advance"
+      ],
+      "combined_delta_replay_byte_equal": true,
+      "only_two_function_bodies_changed": true,
+      "no_new_lookup_or_cache_call": true,
+      "no_native_ids_entries_addresses_or_provider_model": true
+    },
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-fence-metadata-20261104/linux-reference",
+    "runtime_selection": false,
+    "Linux_kernel_or_native_target_compiled": false,
+    "GPU_native_device_or_callback_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-fence-metadata-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-fence-metadata-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-sync-fence-metadata-20261104/archive.json"
+}

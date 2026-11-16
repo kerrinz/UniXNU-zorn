@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-09T17:11:25.746396+00:00",
+  "status": "independent-process-table-preparation-implemented-compiled-and-full-linked-unselected",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-preparation-candidate",
+  "source_files": {
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-preparation-candidate/ZornGen7ProcessTables26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/source-archive/ZornGen7ProcessTables26.h",
+      "sha256": "08158074427b22266642a71ed37953fa7c3dda11e712fb14bf066d5e12d2e5af"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-preparation-candidate/ZornGen7HostGpuTables26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/source-archive/ZornGen7HostGpuTables26.cpp",
+      "sha256": "f653a14b74db1cb74bf69890da1812326e13f0f60952edd72204ccb2af48bf94"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-preparation-candidate/ZornGen7ProcessTables26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/source-archive/ZornGen7ProcessTables26.cpp",
+      "sha256": "50b0cc44e54a504f792c85a4e32caba19530c36843af83ed0a7e22f5e1d9880a"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-preparation-candidate/ZornGen7SmmuDomain26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/source-archive/ZornGen7SmmuDomain26.cpp",
+      "sha256": "692e231c2da6497b1a22262e94df63e50af283fd12be05a06efa501d3392c37e"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-preparation-candidate/ZornGen7HostGpuTables26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/source-archive/ZornGen7HostGpuTables26.h",
+      "sha256": "90473b90e4f36e32b2985eac08641572bce473271b4c75f6d4a13ab6a7d79573"
+    }
+  },
+  "implementation": "Private HostGpuTables factory validates existing held kernel BOs and actual-probe bound IAS;allocates independent real table-page owner/root via current NativeAdrenoMemory;copies exact parent kernel ranges and retains actual parent;uses original LivePrepare/SeedInactive/Audit and real publication callback;preserves every partial on failure. No ASID choice,context installation or app exposure.",
+  "new_entry": "ZornGen7HostGpuTables26::prepareProcessTables",
+  "actual_factory_disassembly": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/actual-factory.disassembly.txt",
+  "affected_TUs": [
+    "ZornGen7HostGpuTables26",
+    "ZornGen7ProcessTables26",
+    "ZornGen7SmmuDomain26"
+  ],
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.15406475000008868,
+    "inputs": 1387,
+    "replaced": 2,
+    "preserved": 1384,
+    "added": 1,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/full-link-r2/kernel.ZORN26-process-table-preparation.UNSELECTED.macho",
+    "sha256": "74e7b8bc518369857c43e0ba07693ea474093d39213b2c9872cb261b946cf61d",
+    "bytes": 30298296
+  },
+  "actual_build_version": "Mach-O IOS26 minos,SDK27;CPU16KiB ABI remains current build",
+  "zero_undefined": true,
+  "inherited_compile_warning_lines": 6,
+  "compile_warning_scope": "Three pre-existing narrow conversions in unchanged HoujiFullHostNativeMemory.h,reported from each of2TUs;new class TU has none. Not suppressed or falsely called zero-warning.",
+  "link_diagnostics_identical_to_parent": true,
+  "inherited_link_warning_lines": 10,
+  "actual_header_closure": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/actual-header-source-closure.json",
+  "new_kernel_PAC_structure_check": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-preparation26/pac-preflight.stdout",
+  "PAC_check_scope": "Original loader actual new kernel+correctedADT,validation-only NULL loaded/signer,ASanUBSan clean;not authentication or hardware success",
+  "all_native_allocator_cache_mapper_callbacks_executed": false,
+  "target_or_phone_executed": false,
+  "published_app_service": false,
+  "ordinary_app_VM_isolation_qualified": false,
+  "constructor_scope": "CPU-only table preparation;not a complete per-process VM. Never-installed child retirement,ASID ownership,activation/switching,submission binding and application caller are still incomplete. Existing kernel-only IO endpoint stays gated.",
+  "original_source_and_boot_preserved": true,
+  "full_goal_complete": false,
+  "mode": "unattended-no-phone-connected-offline-only"
+}

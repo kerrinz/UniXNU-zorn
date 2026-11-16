@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T18:28:23.268841+08:00",
+  "state": "Catalog149-closed-owner-port-reference-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-closed-owner-roots-contract/source-contract.json",
+  "functions_body_SHA_recorded": 9,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all31_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Selected iOS17 closed/death/owner queues and port/object references versus exact149 retained-live free only.9bodySHA/full source identities,no old suites/targets/native callbacks.",
+    "owner_queue": "registerOwner stores task and uc pointers in two linked queues under owners lock;no task_reference/client retain in this registration body. noMoreSenders removes both queue links/frees owner records and clears owners pointers under same lock. Queue presence/removal is not a page owner or standalone retained task/client reference.",
+    "port": "withObjectAndType creates MachPort and taggedRetains object. noMoreSendersForObject temporarily retains object,checks mscount;when eligible removes connection owner records and port/hash association,then drops collection-tagged hold and temporary hold. Stale mscount can defer destruction. Source noMoreSenders is not guaranteed final object free or a successful GPU stop.",
+    "death": "iokit_client_died calls noMoreSendersForObject;only eligible result enters clientDied under client RW write lock. Base clientDied calls clientClose only if sharedInstance or CAS closed0to1. Thus previously closed nonshared object can suppress teardown callback while port ownership is separately withdrawn. No actual device connection/event or active endpoint inferred.",
+    "task": "task_terminate_phase2 removes task and uc owner links,temporarily retains uc only when owner queue becomes empty,builds local dead list,then outside owners lock calls clientDied only if shared or not closed and releases temporary hold. Existing closed bit may skip this callback;remaining registry/IPC/module refs are separate.",
+    "free": "IOUserClient free releases mappings/filter metadata,asserts owner links gone and destroys locks before superclass free. Exact AGX free drops views and deletes core only if !live_. This does not prove raw core/VM pages have a root after final client destruction,nor final destruction happens in observed K80 state. Existing registry bidirectional/partial-link proof remains provenance only.",
+    "decision": "No32nd callback retry/reset/force terminate/free/refcount/security policy. Source roots and conditional suppression recorded,not actual leak/UAF/K80 object lifetime or DMA completion.31 independent UNAPPLIED/all native/device OFF;no component/caller/image/query/HFI/log/carrier/wire/CPU policy. Hardware owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable."
+  },
+  "qualification": "Conditional closed/death/object-reference source only;not actual active port/final destruction",
+  "GPU_execution_rendering_Metal_complete": false
+}

@@ -1,0 +1,60 @@
+{
+  "status": "TOUCH_ROLLOVER_PRESERVES_CONTINUING_IDENTITIES_SOURCE_COMPILED_LINKED",
+  "source": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/ZornTouchFrameEvent26.cpp",
+    "source_sha256": "ef1ef8a3242bc45336c0c8774a23a90739b5fa503b44ccfa0a391917efffb0f7",
+    "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-rollover-candidate/ZornTouchFrameEvent26.cpp",
+    "copy_sha256": "7436d4379a80da4032617c3cf729559f3cdcbbb110ca954eadc14bb7683f01ce",
+    "private_helper": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-rollover-candidate/ZornTouchRollover26.h",
+    "private_helper_sha256": "5b24fae2de0d4a95c31e082ddec954679984cbc9ff216c5c638a270b318dc09a",
+    "public_header_changed": false
+  },
+  "delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-rollover26/source-delta.patch",
+  "compiler_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-rollover26/compiler-inputs.json",
+  "public_header_ABI_or_sensor_geometry_changed": false,
+  "implementation": "At collection overflow,first dispatch continuing current contacts plus only genuinely lifted old identities;then current contacts based on continuing snapshot. Both collections remain <=10;surviving contacts are never synthesized as lifted/new. Original <=10 single collection path,edges,timestamps,validation,event allocation/failure clear and actual synchronous dispatch contracts preserved.",
+  "pure_relative_metadata_controls": {
+    "relative_contact_controls": 20240,
+    "rollover_shapes": 8800,
+    "sensor_HID_or_provider_executed": false
+  },
+  "host_sanitizers": "ASan+UBSan;zero diagnostics",
+  "legacy_empty_continuing_control": {
+    "exit": -6,
+    "expected_refusal": true,
+    "not_a_target_event_execution": true
+  },
+  "sensor_HID_provider_or_device_model_executed": false,
+  "compile": {
+    "exit": 0,
+    "seconds": 0.10638650000328198,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-rollover26/ZornTouchFrameEvent26.o",
+    "sha256": "beba13074ca9ccb6b7288c4ea243037d4a998bb05bc49e4331463a53cc72255f",
+    "warnings": 0
+  },
+  "link": {
+    "exit": 0,
+    "seconds": 0.14845833300205413,
+    "inputs": 1390,
+    "replaced": 1,
+    "preserved": 1389,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-rollover26/full-link/kernel.ZORN26-touch-rollover.UNSELECTED.macho",
+    "sha256": "bec7f5451581b69ce0a90cd03383da24c80a6ca0f81085e27cd18dc1ff5da60d",
+    "bytes": 30249128
+  },
+  "actual_loader_parser": {
+    "arguments": [
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-loader-bound-root-trial26-20261110/offline-pac-preflight/actual-pac-consumer",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-rollover26/full-link/kernel.ZORN26-touch-rollover.UNSELECTED.macho",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-root-integration26/kernel.current-metal-root.UNSELECTED.adt",
+      "1"
+    ],
+    "exit": 0
+  },
+  "link_warnings_byte_identical_to_previous": true,
+  "iOS_HID_native_or_phone_executed": false,
+  "hardware_multitouch_qualified": false,
+  "GPU_execution_qualified": false,
+  "device_ready": false
+}

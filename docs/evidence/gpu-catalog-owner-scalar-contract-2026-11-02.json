@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T17:38:28.950514+08:00",
+  "state": "Catalog149-numeric-owner-scalar-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-owner-scalar-contract/source-contract.json",
+  "functions_body_SHA_recorded": 8,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all31_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 numeric nextOwner/Job.owner lifetime and actual caller/control-flow source only.8 function hashes,unchanged packet/SDK/Submit bodies provenance only,no old suites/targets.",
+    "producer": "nextOwner stores int32 PID into scalar next_owner_ default0. Sole exactcatalog setter call is UserClient submit after client/queue/wait/buffer checks,used/context intent before lower submit. proc_selfpid selected source returns proc_getpid(current_proc()),not stored connection task or retained process reference. Poller/direct invocation execution-context identity is separate;no actual PID value assumed.",
+    "handoff": "Lower submit validates/retire/allocates/holds/commits before Job metadata handoff. On reached accepted path job.owner=next_owner_ then next_owner_=0. Earlier returned errors do not consume/reset scalar. Next real UserClient submit overwrites it before calling lower again;direct lower callers can bypass setter,so no universal one-shot-per-call or stale PID fault assertion.",
+    "callers": "Published generic submit dispatch uses g.lock around live core dispatch,covering setter and lower handoff on that path;direct core/alternate wrappers do not automatically inherit it. Published startup checkCpSwitch calls shared Submit directly with priority intent and no nextOwner. Startup ordering and owner default are not proof all direct callers/reset paths share a universal contract. Existing roleAPI compile gap stays unqualified.",
+    "consumer": "Exact Job.owner reads occur in existing release timeline packing only;not VM selection,page hold/retire permission,queue authorization or process refcount. release reaches timeline after original retirement/acquire checks then clears Job. Numeric owner conveys neither task/client lifetime nor hardware route/context/stopDMA lease. No log/wire schema decoded or changed.",
+    "decision": "No32nd guessed PID reset/generation/default owner/refcount/priority/security policy. Current caller serialization and numeric metadata facts do not establish a reproduced race or K80 identity bug.31 independent UNAPPLIED/no composition;all native/role/process queries/submit/provider/MMIO/phone OFF. GPU/rendering/Metal and K80 ownership/context/route/stop/DMA/readablefailure remain unavailable."
+  },
+  "qualification": "Numeric process metadata source only;not retained task/client/page or GPU ownership",
+  "GPU_execution_rendering_Metal_complete": false
+}

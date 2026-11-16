@@ -1,0 +1,11 @@
+--- a/ZornApplicationObservation26.inc
++++ b/ZornApplicationObservation26.inc
+@@ -79,7 +79,7 @@
+  if(unique==appObservation.reportUnique && unique){
+   if(error)++appObservation.copyErrors;
+   else if(text && bytes>0 && bytes<sizeof(appObservation.text)){
+-   constexpr char prefix[]="ZORN193MTL run=65f3efb4a587473a9caebe54d7a99aea ";
++   constexpr char prefix[]="ZORN193MTL run=c0bed9d9c79d4aeca33d0ad509f2984d ";
+    bool valid=bytes>=sizeof(prefix) && !memcmp(text,prefix,sizeof(prefix)-1) && text[bytes-1]=='\n';
+    for(uint32_t i=0;i+1<bytes && valid;++i)if(text[i]<32 || text[i]>126)valid=false;
+    if(valid){

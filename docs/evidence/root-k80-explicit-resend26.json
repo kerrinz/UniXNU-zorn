@@ -1,0 +1,187 @@
+{
+  "date": "2026-11-09T15:52:42.652512+00:00",
+  "status": "actual-32GiB-UFS-root-resend-flush-and-complete-readback-verified",
+  "actual_owner_approval": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/owner-approved.json",
+  "scope": "K80-persistent-iOS26-explicit-full-resend-v4",
+  "manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/manifest.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/one-shot.claim.json",
+  "actual_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/result.json",
+  "actual_run_result": {
+    "scope": "K80-persistent-iOS26-explicit-full-resend-v4",
+    "phase": "root-installed-full-readback-verified",
+    "installed": true,
+    "writes_attempted": true,
+    "booted": false,
+    "retries": 0,
+    "target_preimage": "owner-waived",
+    "readback": {
+      "bytes": 34359738368,
+      "sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592"
+    },
+    "protected_metadata_and_fences_unchanged": true,
+    "persistent_boot_entry_installed": false,
+    "system_boot_qualified": false
+  },
+  "host_wait_regression": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/host-completion-wait-check/result.json",
+  "actual_host_backend": "NATIVE/private5039/SDK37.0.1",
+  "actual_host_status": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/private-host-server-status.txt",
+  "same_run_host_sample": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/host-private-adb.sample.txt",
+  "same_run_read_only_observations": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/same-run-observations",
+  "transfer_interpretation": "All source bytes entering host ADB pipe did not alone establish USB/UFS completion;actual write child later returned0 and complete readback began. One read-only process observation timed out20s without signalling writer;host sample showed native USB activity and19.5GiB footprint,not target flush or durability proof.",
+  "root_image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-root-refresh26/ios26-root-ramfs.UNSELECTED.hfsx",
+  "expected_image_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "exact_partition": "/dev/block/by-name/unixnu",
+  "relative_first_lba": 6291712,
+  "blocks": 8388608,
+  "image_bytes": 34359738368,
+  "phone_OS_full_backup": false,
+  "immutable_prior_image_archive_reused": true,
+  "protection_responses": {
+    "primary_GPT": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-010.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-010.stdout",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967",
+        "bytes": 24576
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-027.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-027.stdout",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967",
+        "bytes": 24576
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-044.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-044.stdout",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967",
+        "bytes": 24576
+      }
+    ],
+    "backup_GPT": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-011.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-011.stdout",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054",
+        "bytes": 20480
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-028.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-028.stdout",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054",
+        "bytes": 20480
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-045.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-045.stdout",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054",
+        "bytes": 20480
+      }
+    ],
+    "root_manifest": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-012.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-012.stdout",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-029.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-029.stdout",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-046.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-046.stdout",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+        "bytes": 4096
+      }
+    ],
+    "Data": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-013.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-013.stdout",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+        "bytes": 266240
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-030.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-030.stdout",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+        "bytes": 266240
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-047.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-047.stdout",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+        "bytes": 266240
+      }
+    ],
+    "before": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-014.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-014.stdout",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-031.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-031.stdout",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-048.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-048.stdout",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "bytes": 4096
+      }
+    ],
+    "after": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-015.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-015.stdout",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-032.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-032.stdout",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-049.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-049.stdout",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "bytes": 4096
+      }
+    ],
+    "log": [
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-016.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-016.stdout",
+        "sha256": "930b81c706c2c5542f0ee6bb54303c7fee10c5caa846728e9081d5dd683e283b",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-033.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-033.stdout",
+        "sha256": "930b81c706c2c5542f0ee6bb54303c7fee10c5caa846728e9081d5dd683e283b",
+        "bytes": 4096
+      },
+      {
+        "command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/command-050.json",
+        "response": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/explicit-resend-fa16eca8a2414de48cf9adb82ef6f70f/run/capture-050.stdout",
+        "sha256": "930b81c706c2c5542f0ee6bb54303c7fee10c5caa846728e9081d5dd683e283b",
+        "bytes": 4096
+      }
+    ]
+  },
+  "protection_qualification": "Exact captured GPT pair,old root manifest,65-block Data metadata,log and2 window fences;not full old Data/Android filesystem or power-loss durability proof",
+  "new_iOS_kernel_executed": false,
+  "GPU_Metal_or_touch_executed": false,
+  "iOS26_root_mount_or_desktop_qualified": false,
+  "permanent_boot_entry_installed": false,
+  "full_goal_complete": false
+}

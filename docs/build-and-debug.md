@@ -107,3 +107,22 @@ log     3c5015fc70dbbd510459cc6a73bfc14167b02a6ba5811a9cd0f978ef72e9c508
 ## 2026-10-30 当前结果
 
 两次3a桌面、CPU1窄发布对照、两布局及c50最终观察见 [非GPU最新摘要](progress-2026-10-30-non-gpu.md)。上文带日期的“待验收”保留原构建背景；当前 CPU1 有有界窄修正证据，偶发苹果标志原因仍未定。本文命令是已有调试配置入口，不授权在暂停期间构建或启动；旧c50唯一观察轮已消耗，不重复执行。
+## Dedicated resource-observation diagnostic
+
+The fixed offline `--gpu-resource-observation-image --os 17` entry packages the
+source-bound selected diagnostic FD and exact retained unixnu64 kernel/FAT.
+It has no automatic boot option. The dedicated diagnostic terminates before
+payload; it is not a CPU/GUI trial or GPU activation.
+
+`run-zorn-debug.py --gpu-resource-observation-trial` requires a new exact-image
+admission and explicit execution decision. It refuses the pending admission,
+old media scopes and consumed claims before USB. Its one-shot claim precedes
+any device query. The original independent watchdog1/fresh full-page recovery
+BCB and600-second Recovery budget remain required, with no bootstrap or retry.
+
+The observation only locates Clock/RPMh/CommandDB and queries resource IDs/GCD
+metadata. Providers may allocate bookkeeping or block. The policy backend
+remains unavailable; this is not permission for clock/power/SCM/PAS/MMIO or GPU
+execution. See the [source evidence](evidence/gpu-resource-observation-candidate-2026-11-01.json)
+for the full candidate, exact scope, offline checks and concrete execution
+proposal. No additional phone execution is authorized by this documentation.

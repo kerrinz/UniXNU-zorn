@@ -1,0 +1,37 @@
+{
+  "status": "offline-compiled-reference-linked-unselected",
+  "time": "2026-11-10T22:41:55.928025+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-icc-before-smmu-context-793bdf7340dc43ad995c9c6d0d9e3e3e",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-secure-stream-exclusion-649daf030146480fa155e84b056bb4c5",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/source.patch",
+  "actual_full_caller": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-icc-before-smmu-context-793bdf7340dc43ad995c9c6d0d9e3e3e/ZornGen7StartupOwner26.cpp",
+  "icc_source": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-icc-rpmh-inputs-20261106/drivers/interconnect/qcom/icc-rpmh.c",
+  "tbu_prerequisite": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-icc-before-smmu-context-793bdf7340dc43ad995c9c6d0d9e3e3e/ZornGen7IccInputs26.cpp",
+  "fix": "Run actual ICC input/initial-vote/QoS steps after domain probe and before SMMU endpoint/context/controller setup. QTB power requires already configured QoS on that same ICC owner. Existing authority gate, backend selection, stop behavior and host IRQ/bootstrap ordering retained.",
+  "compile": [
+    {
+      "name": "ZornGen7RegistryStartup26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/ZornGen7RegistryStartup26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-icc-before-smmu-context-793bdf7340dc43ad995c9c6d0d9e3e3e/ZornGen7RegistryStartup26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-secure-stream-exclusion26-649daf030146480fa155e84b056bb4c5/full-link/inputs/1392-ZornGen7RegistryStartup26.cpo",
+      "sha256": "1482e62c2cec0bf7698d290d8fd85ed3697a34788d5f74a0dc96df4efbbbda1e",
+      "warnings": 3
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/kernel.ZORN26-ICC-BEFORE-SMMU-CONTEXT.UNSELECTED.macho",
+    "sha256": "e7a38b6ea362b62ad42ffabf280df73869676453bbf55c8263225b76816b0bcf",
+    "bytes": 30455752,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "native_cold_or_active_controller_route_completed": false,
+  "corrected_cfgprobe_scope_changed": false,
+  "native_execution": false,
+  "device_execution": false,
+  "whole_image_readback": false
+}

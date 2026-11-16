@@ -1,0 +1,40 @@
+{
+  "status": "GPUCC-actual-completed-result-observer-offline-built-not-driver-fix",
+  "time": "2026-11-10T17:10:27.328860+00:00",
+  "failure_reference": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-clock-prefix-GPUCC-partial-observed26.json",
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/source-selection.json",
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/completed-GPUCC-observer.patch",
+  "native_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/compile-result.json",
+  "identity_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/identity-compile-result.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/full-link/kernel.ZORN26-GPUCC-DETAIL.UNSELECTED.macho",
+    "sha256": "da36226efd784b6c0df455e1e5de89d94cd10377de50a71bc5da6329bf941bf7",
+    "bytes": 30391232,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/root-package-gpucc-detail/verified.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/root-package-gpucc-detail/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "eb9aa92b518d982a5e00fb7708d87ba8150c20548be8c02f15b8a65edd973def",
+    "bytes": 11616256
+  },
+  "existing_result_method": "ZornGen7StartupOwner26::copyCompletedResult",
+  "actual_aggregate_DWARF_bytes": 3872,
+  "CPU_snapshot_trivially_copyable_compile_checked": true,
+  "resource_pointers_logged": false,
+  "native_headers_or_class_layout_changed": false,
+  "clock_driver_logic_changed": false,
+  "phone_or_native_executed": false,
+  "scope_or_claim_created": false,
+  "GPUCC_issue_fixed": false,
+  "full_root_readback_performed": false,
+  "next_action": "v35real failure still open (GPUCC prefix returned incomplete). New independent GPUCC-detail candidate6dd61fde4ab3487f8c3ea8323c724ecb now compiled7objects/1396-linked/packaged:kernelda36226e,booteb9aa92b. It reuses existing StartupOwner::copyCompletedResult through same real RootPlatform ownership/composition gate plus native bridge,not a hardware implementation or new grant. Copies actual completed plain aggregate (3872B per actual DWARF) into short-lived normal CPU IOMalloc storage,extracts small GPUCC scalar result then frees only CPU copy. No private headers/layout changed;only bridge+6identity objects,actual initialization sequence unchanged. New Hp26 scoped text K80 gpucc includes copied/returned/admitted/probe_called/probe assessment/native_prefix_returned,PLL0/1 called/native_sequence/source_return_available/signed source_return,cxo/demet/limiter flags,proxy_called/assessment/classes_returned/forward-return-available/signed-return/native_sequence,done. Next bind exact NEW v36 fixed scope/decoder using current persistent binder helpers;only copied+returned fields are qualified,probe/proxy enums only when corresponding called,raw only when return_available;preserve unknowns and partials. No fabricated errno or PLL success;old actual v35 message must not qualify detailed result. Driver itself unchanged since v35;this diagnostic is solely to resolve actual GPUCC failure,not claimed implementation progress. Need original inputs/freshIDs/claim/WDT1/90s/600/verifiedTWRP/rootDataRO/single logpage/no full-root readback. No rerun old v35;no policy guesses/fetch/old suite. RoleAPI/OS/SDK/pins unchanged. First try actual detailed capture;fix only exact supported contradiction afterward.",
+  "compile_corrections": [
+    "Added actual existing core/source-review include path for imported completed-result declaration.",
+    "Kept native StartupOwner header in existing native platform bridge to preserve original RootPlatform OSPtr include policy;no SDK/stub/OS change."
+  ]
+}

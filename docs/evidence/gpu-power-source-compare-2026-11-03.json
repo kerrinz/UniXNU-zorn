@@ -1,0 +1,67 @@
+{
+  "real_source_count": 4,
+  "distinct_raw_identities": 4,
+  "comparison_summary": {
+    "same_property_bytes_count": 154,
+    "different_or_missing_property_count": 267
+  },
+  "source_node_count": 59,
+  "new_refusals": [
+    {
+      "case": "duplicate-id",
+      "error": "duplicate explicit source id"
+    },
+    {
+      "case": "duplicate-raw-identity",
+      "error": "duplicate raw source identity;not distinct base inputs"
+    },
+    {
+      "case": "wrong-raw-sha",
+      "error": "raw source SHA mismatch"
+    },
+    {
+      "case": "wrong-graph-sha",
+      "error": "source graph JSON bound/SHA mismatch"
+    },
+    {
+      "case": "relative-source-path",
+      "error": "source paths must be absolute"
+    },
+    {
+      "case": "extra-field",
+      "error": "source requires exact id/path/independent SHA fields"
+    },
+    {
+      "case": "one-source",
+      "error": "explicit source count must be2..16"
+    },
+    {
+      "case": "invalid-raw-source",
+      "error": "invalid raw source: FDT header is truncated"
+    },
+    {
+      "case": "duplicate-JSON-key",
+      "error": "duplicate JSON key"
+    },
+    {
+      "case": "wrong-manifest-SHA",
+      "error": "input manifest bound/SHA mismatch"
+    }
+  ],
+  "pure_missing_empty_unknown_identity_cases_pass": true,
+  "child_no_write_or_process": true,
+  "source_inputs_unchanged": true,
+  "headers": 0,
+  "prepare_audit_formatter_executed": false,
+  "old_suites_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/compare-zorn-gpu-power-sources.py": "cf8c4c7376b5756769422cc85a8813d1938f18b5375661704c6fc227c0a5d03a",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-power-source-compare.py": "deadb28ad32508c41a4ba730bd4fb66323e293d853a6dfc965f707913b02b640"
+  },
+  "header_scope_approval_received": false,
+  "scope": "All explicit raw source identities retained;property-byte comparison only,not policy equivalence or hardware progress"
+}

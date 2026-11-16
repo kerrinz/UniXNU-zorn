@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "scope": "Actual current native import/visibility source contract and isolated unpublished retention repair; no native mapping or hardware qualification.",
+  "result": {
+    "updated": "2026-11-01T22:45:01.444413+08:00",
+    "state": "actual-GMU-import-lifetime-bound-legacy-layout-excluded-isolated-mapping-retention-repair-compiled",
+    "actual_inputs": 314,
+    "new_independent_native_objects": 4,
+    "source_semantic_refusals": 4,
+    "wrong_VM_handle_width_compile_refused": true,
+    "VM_map_partial_failure_can_hold_refs_without_returned_handle": true,
+    "legacy_allocator_incompatible_with_K80_Gen7_adoption": {
+      "source": "a6xx fixed layout,6 backing objects/5 mapped payloads",
+      "HFI_default_bytes": 16384,
+      "Gen7_known_HFI_backing_bytes": 73728,
+      "permissions": "fixed RW data vs per-request Gen7 attributes; no shared domain/VMA lease inferred",
+      "cleanup": "original map rollback ignored native unmap status then erased handles"
+    },
+    "native_prepare_visibility_boundary": {
+      "preparation_requires_contiguous_retained_native_table_pool": true,
+      "takes_real_device_ref_after_publication": true,
+      "does_not_supply_context_route_power_security_stop": true,
+      "callback_collapses_raw_IOReturn_to_binary_int": true,
+      "callback_success_not_hardware_ownership": true
+    },
+    "isolated_mapping_repair": {
+      "poisoned_VM_skips_rollback": true,
+      "failed_unmap_keeps_handle_and_raw_status": true,
+      "first_map_error_return_unchanged": true,
+      "no_retry_release_after_uncertain_failure": true,
+      "stop_cleanup_after_first_failure": true,
+      "private_cleanup_status_valid_only_where_attempt_mask_set": true,
+      "upstream_patch_applied": false,
+      "allocation_rollback_and_legacy_geometry_not_repaired_or_authorized": true
+    },
+    "pinned_reference": "453d8875f815bf9dfad9035982861226a4823a6c, not Xiaomi exact stock",
+    "objects": {
+      "gmu-original": {
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoGmuMemory.cpp",
+        "sha256": "cbcf4a58686df761b1626c263c6478e2434904e8ad8ff6aeac33b48d04130ef1",
+        "independent_raw_SHA_equal": true,
+        "imports": [
+          "__ZN14NativeAdrenoVm3mapEP18NativeAdrenoMemoryjyjjjPy",
+          "__ZN14NativeAdrenoVm5unmapEy",
+          "__ZN18NativeAdrenoMemory7releaseEv",
+          "__ZN18NativeAdrenoMemory8allocateEmjbmb"
+        ]
+      },
+      "gmu-retained-candidate": {
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-import-contract/NativeAdrenoGmuMemory.cpp",
+        "sha256": "c7e3764f239bff118dc1a310afbfe1b5d3d5dbf4155380c4332328f2e75c1733",
+        "independent_raw_SHA_equal": true,
+        "imports": [
+          "__ZN14NativeAdrenoVm3mapEP18NativeAdrenoMemoryjyjjjPy",
+          "__ZN14NativeAdrenoVm5unmapEy",
+          "__ZN18NativeAdrenoMemory7releaseEv",
+          "__ZN18NativeAdrenoMemory8allocateEmjbmb"
+        ]
+      },
+      "smmu-visibility-original": {
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoSmmuMemory.cpp",
+        "sha256": "18cb9d9cbaf6f98f28d0296f638833e4330c74beec8894f6dd9c4748b16c9240",
+        "independent_raw_SHA_equal": true,
+        "imports": [
+          "_ArmSmmu4KLiveAudit",
+          "_ArmSmmu4KLivePrepare",
+          "__ZN18NativeAdrenoMemory13holdForDeviceEv",
+          "__ZN18NativeAdrenoMemory16publishForDeviceEmmbb"
+        ]
+      }
+    },
+    "ABI_object_sha256": "c8be65cac40c33c86ca7f54610818948963b3ccad26c474e58838f5e11253f82",
+    "no_host_success_address_handle_or_map_model": true,
+    "no_native_provider_phone_calls": true,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "new_query_HFI_log_codec": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "remaining_gaps": [
+      "Actual native context/stream/normal-thread caller and genuine power/security/stop/route rights",
+      "Gen7-specific VMA reservation/alignment/permissions and failure-retention adapter, not this legacy allocator",
+      "Exact raw cache-publication error provenance through ArmSmmu4KLiveVisibility callback",
+      "Current NativeAdrenoVm private ABI/final-kernel integration and physical behavior unqualified"
+    ]
+  },
+  "source_recipe": "UniXNU-zorn/scripts/check-zorn-gmu-import-contract.py",
+  "source_recipe_sha256": "daceedc1b1f7c52673431c8c2e7c4533a007d22126b9e6c675f48cd4d53c30ca",
+  "local_unapplied_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-import-contract/mapping-retention.UNAPPLIED.patch",
+  "local_native_check": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-import-contract/check-result.json",
+  "local_ABI_check": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-import-contract/abi-result.json"
+}

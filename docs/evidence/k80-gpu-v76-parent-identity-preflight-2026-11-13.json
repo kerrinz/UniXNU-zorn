@@ -1,0 +1,43 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 v76 GPU/GMU parent identity preflight",
+  "status": "OFFLINE_FULL_LINKED_UNSELECTED; not packaged or booted",
+  "ancestor": {
+    "candidate": "v75 same-parent preflight",
+    "kernel_sha256": "1c5e8ed9f21510d82ae97fc067ab3b151ee44c01d4d6c0f452b202cc2be9a3e6"
+  },
+  "change": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-parent-identity-preflight-v76-20261113/ZornGen7PlatformBoardBridge26.cpp",
+    "source_sha256": "6e381173b2e904fcf2a92824d90efcac62d9ea0d53e8b9bddbaece5bc05a886c",
+    "behavior": "gpuGmuShareParentObserved is true only when both native observations positively report registry entry, IOService, and provider parent; all entry and parent registry IDs are nonzero; GPU and GMU entry IDs differ; and parent IDs match.",
+    "scope": "Diagnostic preflight only. It does not provide MMIO, startup, all-master quiescence, scheduler ownership, SMMU/DMA, or direct runtime authority."
+  },
+  "build": {
+    "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v76-parent-identity-preflight-20261113/ZornGen7PlatformBoardBridge26.cpo",
+    "object_sha256": "b50cb73ad7eb71033d80a2bab2c775177cfa3f481815fdd5dfd237b6d6c0ab40",
+    "compile_exit": 0,
+    "compiler_warning_count": 3,
+    "warning_review": "Three existing narrowing warnings from the selected HoujiFullHostNativeMemory include chain; compared v74/v76 stderr differs only in source directory path.",
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v76-parent-identity-preflight-20261113/full-link/kernel.ZORN26-GPU-PARENT-IDENTITY-PREFLIGHT-V76.UNSELECTED.macho",
+    "kernel_sha256": "3d632b05ba71a168dc4dbb5c014d106526706a58ddfb42e06e82ef20e9bb3405",
+    "bytes": 30547960,
+    "link_exit": 0,
+    "input_count": 1397,
+    "undefined_symbol_lines": 0
+  },
+  "cpu_lock_screen_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "device_operations_performed": false,
+  "candidate_selected_packaged_or_booted": false,
+  "GPU_MMIO_DMA_submission_fences_Metal_or_GPU_display": false,
+  "touch_driver_work": false,
+  "active_device_gate": "The existing v73 fixed-runner Recovery stop gate remains active after the protected root first-page pin mismatch; this offline candidate does not clear that gate.",
+  "remaining_owner_gap": {
+    "root_constructs_complete_ZornGen7StartupGpuInputs26": false,
+    "real_current_all_master_GPU_GMU_scheduler_quiescence_owner": false,
+    "next_step": "Continue source-backed root/board owner construction and determine a real all-master scheduler/quiescence lease producer; retain fail-closed refusal until that owner exists."
+  }
+}

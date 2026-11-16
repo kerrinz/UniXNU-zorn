@@ -1,0 +1,50 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_FAULT_STRIDE_AND_BULK_STATUS_REPAIRS",
+    "timestamp": "2026-11-03T18:46:17.524355+00:00",
+    "changed_files": [
+      "kgsl.c"
+    ],
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-fault-stride-width-20261104/source-contract.json",
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-fault-stride-width-20261104/fault-stride-width.UNAPPLIED.patch",
+    "patch_sha256": "00072190c44f9245dbb7457dc08182dba77f3f4d06bf973b8f659633f2540561",
+    "checks": {
+      "relative_integer_witnesses": 3,
+      "ordinary_stride_controls": 200,
+      "zero_one_index_controls": 2,
+      "source_mutations_refused": [
+        "input-late-cast",
+        "output-late-cast",
+        "output-narrow"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "no_fault_base_address_pointer_provider_or_native_model": true,
+      "Linux_native_device_callback_or_usercopy_execution": false,
+      "old_suites_run": false,
+      "bulk_source_mutations_refused": [
+        "discard-status",
+        "last-error",
+        "skip-later-cleanup"
+      ],
+      "combined_delta_replay_byte_equal": true,
+      "only_two_bodies_changed": true,
+      "all_cache_calls_and_puts_preserved": true,
+      "no_synthetic_native_status_or_cache_provider_model": true
+    },
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-fault-stride-width-20261104/linux-reference",
+    "runtime_selection": false,
+    "Linux_kernel_or_native_target_compiled": false,
+    "GPU_native_device_or_callback_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-fault-stride-width-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-fault-stride-width-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-fault-stride-width-20261104/archive.json"
+}

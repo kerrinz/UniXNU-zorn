@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "updated": "2026-11-01T23:37:53.867873+08:00",
+  "kind": "source",
+  "scope": "Offline native table preparation and persistent visibility composition only.",
+  "result": {
+    "updated": "2026-11-01T23:37:53.867873+08:00",
+    "state": "default-OFF-native-table-prepare-persistent-visibility-composition-source-target-complete-unselected",
+    "source_profile": "UniXNU-zorn/native/gpu-owned/runtime/visibility/source-profile.json",
+    "sources": {
+      "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTablePreparation.h": "e59197f4850f607b6c232eb6c0703344cfbc1989e994b7cd5f329b05b68a99d0",
+      "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTablePreparation.cpp": "66b3e97d4030d3f63ccba88a5ee5b3be23db6c43e68c5d0e439ca3cf3350cd44",
+      "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.h": "f972953ad3f6c7fe67278340165a6c1080dd473858e8b98308a9ae1c298ea998",
+      "UniXNU-zorn/native/gpu-owned/runtime/visibility/ZornGpuTableVisibility.cpp": "b6a6f16a031e9619c83aafaa33a66cb0147801a5483c590438e9f4c2eb9737d0"
+    },
+    "mode_guard": "Actual out-of-line publisher selectedMode body precedes any native preparation; OFF/mixed modes refuse. Software configuration only, not hardware eligibility.",
+    "status_provenance": "Raw32 NativeAdrenoPrepareSmmuMemory API return and availability stored before adapter/bind checks; API itself folds some internal errors. Legacy callback stays private; only a successful persistent publisher bind exports member callback.",
+    "failure_retention": "Native error or later binding/output failure poisons state and quarantines retained table; never releases references, retries, resets or destructor-cleans. Native success0 is preserved separately from later adapter failure.",
+    "alias_review": "Initial local composition omitted explicit owner/pool exclusion. Corrected capsule adds whole-context, native-object and callback-output separation; preliminary objects/results remain archived as preliminary only. Valid stable typed objects and exclusive lifetime are still prerequisites.",
+    "host_scope": "Four compile combinations run refusal-only paths. Forbidden native-entry traps never entered. No successful allocator/preparation/publication/address/handle model.",
+    "new_host_negatives": [
+      {
+        "name": "mode-gate-removed",
+        "returncode": -6
+      },
+      {
+        "name": "OFF-success-forged",
+        "returncode": -6
+      }
+    ],
+    "new_static_source_refusals": 4,
+    "new_object_mutations_refused": 2,
+    "corrected_independent_objects": 5,
+    "maintained_independent_objects": 4,
+    "total_same_path_independent_raw_SHA_objects": 9,
+    "recursive_inputs": 300,
+    "actual_selected_graph_imports": [
+      "_ArmSmmu4KLiveAudit",
+      "_ArmSmmu4KLivePrepare",
+      "__ZN18NativeAdrenoMemory13holdForDeviceEv",
+      "__ZN18NativeAdrenoMemory16publishForDeviceEmmbb",
+      "___stack_chk_fail",
+      "___stack_chk_guard"
+    ],
+    "actual_mode_raw_store_bind_edges": {
+      "mode_call_RVA": 536,
+      "native_prepare_RVA": 1368,
+      "persistent_bind_RVA": 1536,
+      "guard_RVA": 548,
+      "raw_store_RVA": 1372
+    },
+    "constinit_no_initializer": true,
+    "promoted_sources_byte_identical_independent_inodes": true,
+    "old_profiles_unchanged": true,
+    "register_allocation_refusal": "Explicit alias guard changed compiler register allocation. Saved checker preimage/refusal, inspected exact new stp w26,w0,[x20,#0x78] and preceding w26=1; corrected checker only. Production source/flags not relaxed.",
+    "native_success_or_failure_backend_executed": false,
+    "callback_executed": false,
+    "phone_operations": false,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "limitations": [
+      "No allocator, preparation, publisher, callback, cache, NativeVm map/unmap, device/provider, USB, SMEM, MMIO, SCM/PAS, power/clock/reset, SMMU/IOVA or GPU invocation; no new runtime caller/FD/kernel/device candidate.",
+      "No repeat of completed composition host2/static4/object2/native9 or prior publisher/getter/DAL/CPU/HFI/startup suites. Reuse frozen provenance, check only a real new component.",
+      "The real NativePrepare API can fold ArmSmmu statuses and can publish/hold references; current raw capture preserves that API return, not erased underlying errors. All selected native success and post-call failure paths remain unexecuted.",
+      "Use current iOS17 recipes/types, keep both composition macros default OFF and all old profiles/capsules/claims immutable. Geometry and device references are not hardware ownership. No preEBS/Darwin pointer transfer.",
+      "No query/HFI/272B/ZORNGQF1/normal-log field, fragment or carrier change. Legacy GMU patch remains unapplied/unselected. Storage/CPU/default42 and failure protections persist."
+    ],
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-visibility-composition/combined-result.json",
+    "checks": "out/zorn/gpu-visibility-composition/corrected/check-result.json",
+    "native_graph": "out/zorn/gpu-visibility-composition/corrected/native-graph-result.json",
+    "maintained": "out/zorn/gpu-visibility-composition/maintained-result.json",
+    "next_plan": "out/zorn/gpu-visibility-composition/next-plan.json"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-tx-status26-ea96734eeca948eebd64c904955db4cc/boot-package/boot.ZORN26-USB-CDC-TX-STATUS-UNSELECTED.img",
+    "sha256": "031545fe48bdf683a31321a380e0483446b227447384dab3034213c6ba99cde7",
+    "bytes": 11677696
+  },
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-tx-status26-ea96734eeca948eebd64c904955db4cc/cdc-tx-inputs.json",
+    "sha256": "167173e337bf12fd006b176aba9cf6b05a147f4e33747ece4be4b9b973af957a"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-tx-status26-ea96734eeca948eebd64c904955db4cc/root-trial/trial/run.json",
+    "sha256": "0015e210e773aa6b21c816e68dedc8b3b6d29fd78a5bb36f9339c697cd5cff36"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-tx-status26-ea96734eeca948eebd64c904955db4cc/root-trial/trial/cdc-capture.json",
+    "sha256": "810170347b0ec41039247aff55c39a03207b561f871900455b3dadd4b219c9d6"
+  },
+  "before": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-tx-status26-ea96734eeca948eebd64c904955db4cc/root-trial/trial/before-log.bin",
+    "sha256": "7e8188a64134d4fa7ba45aab38409648e546648705259b58374e3cccbf62a1cb"
+  },
+  "after": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-tx-status26-ea96734eeca948eebd64c904955db4cc/root-trial/trial/after-log.bin",
+    "sha256": "b3aefc99f1bfdb03719871c5c570b3b8a5585ba28fb6c8ea6090369c87af7994"
+  },
+  "decoded": {
+    "run_id": "ea96734eeca948eebd64c904955db4cc",
+    "text": "K80 CDC preflight: result=10 power=f822f800 clocks=00000001 core=33313130 hw=4020400a gctl=00102001 dctl=10f00000 dsts=00d2bb64 id=4c017e6b/60000047/00005111 scr0=002d0406 matches=1 route=00000004 cb=0001f000/000000e0/00000001 tx=9 cdc=0/0/0/4",
+    "freshness": "before and after differ; tag absent before",
+    "result": "identity route",
+    "stream_matches": 1,
+    "tx_status": 9,
+    "registers": {
+      "power": 4163041280,
+      "clocks": 1,
+      "core": 858861872,
+      "hardware": 1075855370,
+      "gctl": 1056769,
+      "dctl": 284164096,
+      "dsts": 13810532,
+      "id0": 1275166315,
+      "id1": 1610612807,
+      "id2": 20753,
+      "scr0": 2950150,
+      "route": 4,
+      "cbar": 126976,
+      "sctlr": 224,
+      "cba2r": 1
+    },
+    "cdc_state": {
+      "events": 0,
+      "setups": 0,
+      "completed": 0,
+      "flags": 4
+    }
+  },
+  "seconds_to_twrp": 332.7452367079968,
+  "protected_sample_sha256": {
+    "Data.bin": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+    "Data_metadata.bin": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+    "after.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "before.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_after.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_before.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_first_page.bin": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+  },
+  "failure": "DCTL.CSFTRST remained set after 500 ms before event DMA programming",
+  "marker_received": false
+}

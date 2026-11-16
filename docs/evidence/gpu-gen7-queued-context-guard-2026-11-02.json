@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T07:40:04.119169+08:00",
+  "state": "Gen7-queued-context-local-NULL-guard-unapplied",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-queued-context-guard/source-contract.json",
+  "new_source_mutations_refused": 3,
+  "new20th_patch_sha256": "8b67dcd93c95f538ca8238686676dadac5eb97feffb3ba94843b37d167f16f2e",
+  "all_nonnull_flow_and_other_source_inverse_byte_identical": true,
+  "independent_original_review_matches": true,
+  "no_ref_queue_cancel_retry_or_fault_policy_added": true,
+  "new_native_targets": 0,
+  "complete_Linux_driver_not_compiled": true,
+  "no_queue_refcount_thread_callback_native_or_phone_execution": true,
+  "no_successpeer_new_component_caller_image_wire": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "isolated exact OEM callback-local refusal,not acceptedqueue/nonNULLlifetime/nativeABI or hardware qualification",
+  "details": {
+    "scope": "Fixed exact primary453d8875f815bf9dfad9035982861226a4823a6c OEM reference,not Xiaomi exact/K80 hardware source. New ACK-enqueue versus callback-reload only. No packet decode/change,queue wire/carrier or old HFI/status/stop suite. Standalone20th candidate starts original primary,not19th/18th repair composition.",
+    "enqueue": "process_hw_fence_ack checks threshold state and copies defer_drawctxt presence under hw_fence.lock. It unlocks,del_timer_sync,then if copied pointer nonnull calls kthread_init_work and kthread_queue_work on adreno_dev->hwsched.worker. The returned queue value is discarded;the context pointer/ts is not passed as a per-work retained snapshot. No accepted/completed/retired status is manufactured.",
+    "reload": "gen7_defer_hw_fence_work later reloads shared pointer/ts under hw_fence.lock,releases it and originally immediately dereferences drawctxt->base.device before acquiring hwsched/device mutexes. Enqueue-time presence and later reload are distinct checks;earlier presence is not a lifetime/null guarantee. No independent queued reference or generation was added.",
+    "same_owner_source": "adreno_hwsched_init creates hwsched->worker and initializes hwsched->work;trigger schedules dispatcher work on that worker;ACK schedules defer work to the same field. Dispatcher work takes hwsched mutex and fault helper takes device mutex before selected reset callback. These are module pointer/call facts,not proof of actual core single-thread/requeue execution or live timing.",
+    "concrete_clear_path": "Selected reset_replay calls HFIstop,whose source explicitly drains message queue and may call the ACK enqueue path. Later reset recovery reaches gen7_hwsched_disable_hw_fence_throttle,which processes/drops setup reference and calls _disable to clear shared pointer/ts. A later callback invocation that reloads this NULL field originally dereferences NULL. This conditional module state is sufficient for a local refusal guard;no particular K80 pending work,queue acceptance,interleaving or crash asserted.",
+    "repair": "20th queued-context-null.UNAPPLIED.patch inserts only if(!drawctxt)return after fence spin_unlock and before first dereference/higher mutex lock. No lock remains acquired on that branch and no processing/ref decrement/activecountput is invented for an absent shared context. Callback is void;earlyreturn is not native SUCCESS or completion evidence. Inverse substitution restores every byte including all nonnull behavior.",
+    "preserved_gaps": "Nonnull pointer lifetime,sole setup ref transfer,arbitrary setup replacement,cancel/reinit/requeue return semantics and raw core queue implementation remain unknown.19th protects diagnostic reader only and remains separate;20th is not an independent reference or full queued-worker lifetime repair. Neither supplies hardware/IRQ/DMA/power/route/stop rights.",
+    "checks": "3new actual source mutation refusals:missingguard,guardafterdereference and invented fault sideeffect for emptycontext. One new independent original review check/apply matches candidate;inverse exact. No success task/context/address/refcount/queue model,full Linux driver build,new native component/target or queue/thread/IRQ/provider/MMIO/phone execution.",
+    "next_input": "Need exact dispatcher software GPU-halt get/put and admission checks to bound whether further submissions can replace setup while throttled;those are software counters/gates,not hardware halted/retired evidence. Do not fill core kref/workqueue/kthread/devres or external HWfence manager gaps with assumed constants or successful peers.",
+    "preservation": "All20 patches independent UNAPPLIED,old8profiles/3111+39/default42/CPU/storage/claims/parentarchives preserved. Catalog fullcore roleAPI and K80 owner/context/security/route/stop/DMA/readablefailure/firstGPU/rendering/Metal incomplete."
+  },
+  "patches_independent_unapplied": 20,
+  "GPU_execution_rendering_Metal_complete": false
+}

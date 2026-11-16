@@ -1,0 +1,89 @@
+{
+  "version": 191,
+  "status": "window-local-return-diagnostic-ready-unbooted",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v191-window-return-trace-7c7ca6b31e7245d38ef65c0905c5b144/ready-snapshot/manifest.json",
+    "sha256": "00558560656c74c2359ceb63915b80f5ae92ca38a204cb2e6c6a8ced98461409"
+  },
+  "changed_source": [
+    "ZornGen7SmmuDomain26.cpp",
+    "ZornUfsOwner26.cpp",
+    "ZornUsbCdc26.c"
+  ],
+  "parent_source_unchanged": true,
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v191-window-return-trace-7c7ca6b31e7245d38ef65c0905c5b144/full-link/kernel.ZORN26-APPLICATION191.UNSELECTED.macho",
+    "sha256": "a682e4912aaa1840b5ff5aa9043db6f7405191361b539d174c072778f04aed06",
+    "bytes": 30742232,
+    "inputs": 1398,
+    "replaced": 21,
+    "preserved": 1377,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v191-window-return-trace-7c7ca6b31e7245d38ef65c0905c5b144/full-link/exact-inputs.json",
+      "sha256": "712475c4f281057acd0e54b175630f0e498d55e4f8b9496bd953b2490b489fa5"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "houji_recovery26.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "application_probe_qualification": true
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v191-window-return-trace-7c7ca6b31e7245d38ef65c0905c5b144/boot-package/boot.ZORN26-GPU-V191-APPLICATION-UNSELECTED.img",
+    "sha256": "397e29b12dd1db5825e57748a5283f314ac4550d26d909d8fe12cba5717cfab4",
+    "bytes": 11751424
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/ios26-root-gpu-application186.UNSELECTED.hfsx",
+    "sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "bytes": 34359738368
+  },
+  "trial": {
+    "scope": "single-K80-ios26-gpu-v191-window-return-300s-7c7ca6b3",
+    "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v191-application-trial-7c7ca6b31e7245d38ef65c0905c5b144/root-trial",
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v191-application-trial-7c7ca6b31e7245d38ef65c0905c5b144/root-trial/bundle.json",
+      "sha256": "73e71bc0f5fb5bab0ba4b2b752ffd6946d267a5709b3705e7c97171448665fb6"
+    },
+    "capture": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-application191-cdc.py",
+    "runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_gpu_v191_application_trial.py",
+    "application_probe_run_id": "d55c2bab3d6d436386ca54c7b6a74f06",
+    "boot_attempted": false
+  },
+  "checks": [
+    "512 actual helper predicate combinations under ASan/UBSan preserve native calls/order/return/window state and optional local reason.35 actual Domain Prepare paths preserve raw/cleanup/order and return actual failed reason.",
+    "233 capture checks; stage61 detail53..59 names refused source predicate, success detail0. No inferred intermediate event mask.",
+    "1398 exact inputs/21 replacements/1377 retained/0undefined,32 shared-header resolutions checked."
+  ],
+  "diagnostic": [
+    "Source forked from hardware-observed v189, not unobserved v190. Helper only writes optional local failedPredicate, no Ring/observer callback. Only actual Domain Prepare requests result and forwards stage61.",
+    "No new hardware action, permission change, reset, retry or cleanup. v190 early return cause remains unknown; this narrows diagnostic scope without claiming a behavioral fix.",
+    "Signed installed root4d636/d55 program retained, new7c7c boot identity. Only FAT kernel changes."
+  ],
+  "remaining": "One authorized300sWDT/600sRecovery trial; root cause/source repair then app image/normalclose, Metal/render/presentation/fullFT3683 pending.",
+  "constraints": "No disassembly/reverse engineering; preserve Android/iOS17/Data/history; goal active"
+}

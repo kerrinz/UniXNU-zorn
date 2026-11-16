@@ -1,0 +1,87 @@
+{
+  "new_stdout_sources": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.gpu.json",
+      "sha256": "541b036cf81499492ea38345a8c68dfa1fcdfc55f2a35bcfcb381e18cd2f11c8",
+      "gpu_tables": 4,
+      "gmu_pairs": 2,
+      "verified_nodes": 84
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.gpu.json",
+      "sha256": "b2cf39281de27e8695c943d8f77bfd64941c157140e02f087ee62552ba458f0e",
+      "gpu_tables": 4,
+      "gmu_pairs": 2,
+      "verified_nodes": 86
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.gpu.json",
+      "sha256": "cbdeba65f4d646342d615f927b9a66530c2ee4787429a9ff0ba457f21887b10a",
+      "gpu_tables": 4,
+      "gmu_pairs": 2,
+      "verified_nodes": 84
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.gpu.json",
+      "sha256": "ab4cc0500909dd1dc14e330cdfbca858b18476722d69acd69316fa1eb483e0d9",
+      "gpu_tables": 4,
+      "gmu_pairs": 2,
+      "verified_nodes": 86
+    }
+  ],
+  "new_refusals": [
+    {
+      "case": "mutually-exclusive-output",
+      "error": "read-zorn-gpu-power-source.py: error: argument --out: not allowed with argument --stdout"
+    },
+    {
+      "case": "missing-graph",
+      "error": "read-zorn-gpu-power-source.py: error: --stdout requires --graph-json and --graph-sha256"
+    },
+    {
+      "case": "missing-graph-sha",
+      "error": "read-zorn-gpu-power-source.py: error: --stdout requires --graph-json and --graph-sha256"
+    },
+    {
+      "case": "wrong-raw-sha",
+      "error": "read-zorn-gpu-power-source.py: error: source SHA mismatch"
+    },
+    {
+      "case": "wrong-graph-sha",
+      "error": "read-zorn-gpu-power-source.py: error: source graph JSON bound/SHA mismatch"
+    },
+    {
+      "case": "out-with-graph",
+      "error": "read-zorn-gpu-power-source.py: error: graph verification arguments require --stdout"
+    },
+    {
+      "case": "trimmed-graph",
+      "error": "read-zorn-gpu-power-source.py: error: declared node set differs from raw source dependency closure"
+    },
+    {
+      "case": "forged-reference",
+      "error": "read-zorn-gpu-power-source.py: error: graph references differ from raw source"
+    },
+    {
+      "case": "declared-raw-sha",
+      "error": "read-zorn-gpu-power-source.py: error: graph original DTB identity mismatch"
+    }
+  ],
+  "child_no_write_or_process": true,
+  "legacy_out_shape_preserved": true,
+  "legacy_out_exclusive": true,
+  "input_SHA_unchanged": true,
+  "policy_headers_emitted": 0,
+  "prepare_audit_formatter_executed": false,
+  "old_suites_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-power-source.py": "8e15bbef1f754f2808f5ffeeff76bdd0a707f5d8f77a136cec621f3d7929361b",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-power-source-stdout.py": "8f1582c0222f49303e758cc4b89be30b31604e56b9d128205751ebc62d509fdf"
+  },
+  "header_scope_approval_received": false,
+  "scope": "Read-only raw K80 source tables plus verified graph provenance;not generator schema acceptance or hardware qualification"
+}

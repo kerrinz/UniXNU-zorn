@@ -1,0 +1,80 @@
+{
+  "status": "CURRENT_CUMULATIVE_KERNEL_REACHES_NATIVE_PLATFORM_WITH_HISTORICAL_PLATFORM_ADT",
+  "date": "2026-11-10T00:58:08.096750+00:00",
+  "experiment_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-adt-isolation26-c469842be4e54e2da5c2f6b5e445e037/experiment-plan.json",
+  "link": {
+    "exit": 0,
+    "seconds": 0.15399737500047195,
+    "inputs": 1390,
+    "replaced": 2,
+    "preserved": 1388,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-adt-isolation26-c469842be4e54e2da5c2f6b5e445e037/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "206bb2c940b0cf9b75ffa095569ef901988a0dbf1a23619bd54bae89a6d93a29",
+    "bytes": 30303280
+  },
+  "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-adt-isolation26-c469842be4e54e2da5c2f6b5e445e037/fixed-entry/candidate-bundle.json",
+  "verification": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-adt-isolation26-c469842be4e54e2da5c2f6b5e445e037/offline-package/verified.json",
+  "object_comparison": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-adt-isolation26-c469842be4e54e2da5c2f6b5e445e037/object-comparison.json",
+  "GIC_translation_comparison": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-adt-isolation26-c469842be4e54e2da5c2f6b5e445e037/GIC-translation-comparison.json",
+  "actual_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/c469842be4e54e2da5c2f6b5e445e037/run/run.json",
+    "scope": "single-K80-ios26-platform20s-one-log-record-dual-recovery-v2",
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "boot_sha256": "c3d86b92a384c02e39e25611cce2798e5f391df2e29a213efebc9001806d8776",
+    "status": "recovered-native-platform-milestone-record",
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 53.35655779100125,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "log_changed": true,
+    "kernel_record_available": true,
+    "platform_entry_proven": true,
+    "GPU_execution_proven": false,
+    "native_writer_readback_success_proven": false,
+    "root_or_desktop_proven": false,
+    "terminal_observer": "native-one-page-Hp26-artifact-record",
+    "note": "Only the recorded platform worker/UFS milestone is eligible; no GPU,root,terminal-reset completion or native readback ACK inferred"
+  },
+  "actual_decoded_record": {
+    "status": "existing-Hp26-record-byte-envelope-valid",
+    "run_id": "c469842be4e54e2da5c2f6b5e445e037",
+    "text": "K80 IOS26 native platform worker reached; UFS initialized; original GPT pair matched before write; GPU not started",
+    "freshness": "before/after local pages differ; artifact tag absent before",
+    "matches_platform_worker_milestone": true,
+    "can_support_fresh_trial_when_bound_to_actual_capture_and_bundle": true,
+    "standalone_inspection_proves_native_or_device_execution": false,
+    "GPU_execution_proven": false,
+    "root_or_desktop_proven": false,
+    "native_writer_readback_success_proven": false
+  },
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/c469842be4e54e2da5c2f6b5e445e037/one-shot.claim.json",
+  "claim_reusable": false,
+  "conclusion": "Current cumulative source kernel can reach its platform worker/UFS milestone with known-platform ADT. Expanded currentADT trial did not produce a fresh record. Narrow subsequent investigation to ADT/startup interaction;fresh identity rebuild/layout differences prevent claiming a uniquely proven offending property.",
+  "GPU_or_root_or_desktop_or_native_readback_ACK_qualified": false,
+  "next": "Inspect actual consumers of expanded ADT root identity,arm-io resource nodes and native graph before choosing another controlled change;no blind same-image retry."
+}

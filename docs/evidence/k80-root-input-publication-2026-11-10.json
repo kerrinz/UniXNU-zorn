@@ -1,0 +1,159 @@
+{
+  "status": "ACTUAL_ROOT_CPU_STAGING_DEPENDENCY_IMPLEMENTED_BOUNDED_TRIAL_ROOT_UNQUALIFIED",
+  "time": "2026-11-10T03:26:47.846838+00:00",
+  "root_only_control": {
+    "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-only26-c35f647610834687bb531578cabfe281/root-trial-only/trial/run.json",
+    "result": {
+      "scope": "single-K80-ios26-root-only-no-presenter-touch300s-v4",
+      "status": "recovered-protected-storage-unchanged-root-unqualified",
+      "GPU_started": false,
+      "root_mount_proven": false,
+      "desktop_proven": false,
+      "boot_attempts": 1,
+      "recovery_identity_before": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      },
+      "BCB": {
+        "tail_preserved": true,
+        "full_page_readback": true,
+        "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+        "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+      },
+      "fastboot_returned_success": true,
+      "recovery_observed_seconds": 118.55103520800185,
+      "recovery_identity_after": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      },
+      "root_header_milestone_proven": false,
+      "log_changed": false,
+      "native_writer_readback_success_proven": false,
+      "native_record_refusal": "record identity differs"
+    }
+  },
+  "source_contract": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/root-input-publication-d374c206609148deb21c6072df533bc9",
+    "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-only26-c35f647610834687bb531578cabfe281/full-link",
+    "prior": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-only26-c35f647610834687bb531578cabfe281",
+    "source_contract": "BSD md branch only waits100ms forIOBSD filesystem resource,not K80 input staging;absent staged owner returns immediately before original md-not-configured panic. Explicit selectedK80 md0 now waits for actual CPU staging publication,then uses unchanged once-only owner prepare/bind. Other md/non-K80 paths unchanged.",
+    "new_wait": "One30s bounded CPU dependency wait,matching existing framework default filesystem/root-service bound;not a hardware operation retry or timeout replacement. Overall600s/WDT1 unchanged.",
+    "not_proven": "This race exists in source ordering;not yet asserted cause of previous hardware failures."
+  },
+  "source_deltas": [
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/root-platform-publication.delta",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/BSD-root-dependency.delta"
+  ],
+  "actual_source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/source-manifest.json",
+  "actual_dependency_closure": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/identity-header-closure.json",
+  "compile_result": [
+    {
+      "name": "ZornUfsCore26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/ZornUfsCore26.cpo",
+      "sha256": "f284fbca8cf20848856bba51ad4b86c9075a8cc5e181a5c9f16374a4402bc0db",
+      "warnings": 0
+    },
+    {
+      "name": "ZornPlatformRecordStart26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/ZornPlatformRecordStart26.cpo",
+      "sha256": "1702bef6aaf40bea44dfa88edf15256295f69287bd4098eb29e5f9da7a0cc30e",
+      "warnings": 0
+    },
+    {
+      "name": "ZornHfsRoot26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/ZornHfsRoot26.cpo",
+      "sha256": "9825d8ead0dc485f77220752a3c16aa029b234ad059f9bbee8fc0336a74d1c3e",
+      "warnings": 0
+    },
+    {
+      "name": "houji_recovery26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/houji_recovery26.o",
+      "sha256": "8767d627c163a7f0b48454c9b9a1f36b826bb9814402f041e31188e1068ab0cf",
+      "warnings": 0
+    },
+    {
+      "name": "ZornRootPlatform26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/ZornRootPlatform26.cpo",
+      "sha256": "ebcde36712a4c208a4d8fb149e94f8c6c8f11c97a8797ce7acc549638f29e5c3",
+      "warnings": 0
+    },
+    {
+      "name": "IOKitBSDInit-K80",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/IOKitBSDInit-K80.cpo",
+      "sha256": "3681fb956241aaaa7c66aa3f14f8a4781b37ca4bcb93e3b2645efae68f28f842",
+      "warnings": 0
+    }
+  ],
+  "full_link": {
+    "exit": 0,
+    "seconds": 0.1573525419953512,
+    "inputs": 1390,
+    "replaced": 6,
+    "preserved": 1384,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "59fffce2e798c39b369d6c05c02938e0616de618beb97e0fa81673d7dd394030",
+    "bytes": 30320400
+  },
+  "actual_final_CFG_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/actual-root-input-publication-link.json",
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/root-package/verified.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/root-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "f7034c853b52a63d7b2e5592e3728caa02119bb08ebc27e764288810938c9c14",
+    "bytes": 11587584
+  },
+  "actual_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/root-trial-publication/trial/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-root-input-publication300s-v5",
+    "status": "recovered-protected-storage-unchanged-root-unqualified",
+    "GPU_started": false,
+    "root_mount_proven": false,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 139.146941084,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "root_header_milestone_proven": false,
+    "log_changed": false,
+    "native_writer_readback_success_proven": false,
+    "native_record_refusal": "record identity differs"
+  },
+  "scope_claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-publication26-d374c206609148deb21c6072df533bc9/root-trial-publication/trial/one-shot.claim.json",
+  "scope_consumed_no_repeat": true,
+  "interpretation": "Disabling optional CPU presenter/touch did not restore root milestone. Source lacked a staging dependency before md lookup:existing100ms IOBSD filesystem wait does not wait for K80 root owner. Added real CPU staged publication plus one bounded30s matching wait for explicit selectedK80 md0;actual owner prepare/bind remains once-only. New trial recovered139.1469s with protected data and unchanged3b2d log;no precise runtime failure or causal fix inferred.",
+  "limits": "CPU staging signal is not a successful UFS initialization,hardware grant,root mount,desktop,Metal,touch or GPU claim. Recovery timing alone does not prove wait/publisher execution. Old EF11 full32GiB installation/readback remains separate. No OS/root/Data rewrite or native hardware retry.",
+  "fallback_checker_correction": "Initial distance-only check and conservative CFG without outlined panic no-return recognition were rejected;actual final CFG now accounts for verified direct-panic cold helpers and proves wait dominates attach for the selected path."
+}

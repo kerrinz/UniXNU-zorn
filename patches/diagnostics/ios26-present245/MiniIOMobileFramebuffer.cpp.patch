@@ -1,0 +1,40 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -56,6 +56,9 @@
+ #include "arm/HoujiPresent26.h"
+ #if defined(ZORN_IOS26)
+ #include "ZornGen7Present26.h"
++#include "ZornPresentTrace245.h"
++static ZornPresentTrace245 zornPresentTrace245;
++extern "C" int zorn26_present_snapshot245(uint32_t (&out)[16]){return zornPresentTrace245.snapshot(out)?1:0;}
+ #include "ZornFramebufferProgress26.h"
+ #include "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-posterboard-passive-cc9fbb3b86364db19e8f2ec90256040b/native/ZornThreadCensus26.h"
+ #include "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-ui-display-wait-a8a0024426064618b83f7124e3fb0a06/ZornUIDisplayWait26.h"
+@@ -1400,7 +1403,26 @@
+ #endif
+                     break;
+                 }
+-            if (readable) { show(swap, surfaces); completed = true; }
++            if (readable) {
++#if defined(ZORN_IOS26)
++                uint32_t tail=0,retired=0;
++                const bool ledger=lease.gpu() && zorn_gen7_present_ledger245(&tail,&retired);
++                uint32_t count=0,firstSid=0;
++                for(unsigned i=0;i<SWAP_LAYERS;++i)if(surfaces[i]){if(!count)firstSid=surfaces[i]->sid;++count;}
++                const uint64_t before=__atomic_load_n(&houji26Presents,__ATOMIC_ACQUIRE);
++#endif
++                show(swap, surfaces); completed = true;
++#if defined(ZORN_IOS26)
++                const uint64_t after=__atomic_load_n(&houji26Presents,__ATOMIC_ACQUIRE);
++                // Schema,frame,producer,lease,tail,completed,surfaces,first SID,
++                // all-surface acquire passed,pixel-copy counter advanced,ledger valid,
++                // counter before/after low words,width,height,reserved.
++                const uint32_t record[16]={1,swapWord(swap,SWAP_ID),producerFence,lease.gpu()?2u:1u,
++                    tail,retired,count,firstSid,lease.gpu()?1u:0u,after>before?1u:0u,ledger?1u:0u,
++                    uint32_t(before),uint32_t(after),fWidth,fHeight,0};
++                zornPresentTrace245.publish(record);
++#endif
++            }
+         } /* Drop the issuer gate before sleeping, surface destruction or allocator work. */
+ #if defined(ZORN_IOS26)
+         if(terminal){

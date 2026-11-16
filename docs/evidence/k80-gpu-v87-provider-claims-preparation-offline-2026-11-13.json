@@ -1,0 +1,97 @@
+{
+  "candidate": "K80 iOS26 GPU provider-claim preparation prefix v87",
+  "date": "2026-11-13",
+  "scope": "offline candidate only",
+  "base_candidate": "K80 GPU provider/resource preparation prefix v86",
+  "change": {
+    "boot_arguments": [
+      "zorn26_gpu_cpu_memory_prep=1",
+      "zorn26_gpu_provider_resources_prep=1",
+      "zorn26_gpu_provider_claims_prep=1"
+    ],
+    "default_without_arguments": "no added GPU provider preparation or provider claim",
+    "provider_resolution": "uses prepareRegistryProviders with the actual retained native DT root; reports both lookup results and actual GPU/GMU resource retention",
+    "claim": "calls prepareGpuProviderClaims only after ResourcesRetainedCpuOnly and all four required descriptors are retained",
+    "claim_semantics": "real base-class IOService opens on the exact retained GPU/GMU provider pair; the owner rechecks identities and held-open state",
+    "source_reason": "prepareGpuProviderClaims requires registryResolutionReady; preparePlatformProviders does not set that flag, so v87 uses the registry-owned path",
+    "does_not_prove": "all-master GPU/GMU quiescence, DMA stop, MMIO permission, power, SMMU/IRQ readiness, GMU/GPU start, or submission",
+    "root_startup_gpu_inputs_connected": false,
+    "root_direct_runtime_invoked": false
+  },
+  "source": {
+    "root_platform": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-provider-claim-preparation-prefix-v87-20261113/ZornRootPlatform26.cpp",
+      "sha256": "ea41ec555b861d51fd847e56c698ec8c0d934115d49e857898660b0a5a684218"
+    },
+    "board_bridge": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-provider-claim-preparation-prefix-v87-20261113/ZornGen7PlatformBoardBridge26.cpp",
+      "sha256": "96c0b7916b44c4f84d0f9bb7b3080944073d08cedbc0afad73c645930d2044d5"
+    },
+    "board_status_header": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-provider-claim-preparation-prefix-v87-20261113/ZornGen7PlatformBoardStart26.h",
+      "sha256": "ed60602d36c7f5718bc2aa505e3444ac793ea83a9d1baaf51c6d8ca824cfdbb5"
+    },
+    "reused_inactive_owner_implementation": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7InactiveOwner26.cpp",
+      "sha256": "9b083b2b5c244ce4309259d84e3777ed6aaeaf95b5f5ca787df11d9c20828373"
+    },
+    "reused_inactive_owner_header": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-runtime-task-authority-forward-v84-20261113/ZornGen7InactiveOwner26.h",
+      "sha256": "6c73bb9710291261640d3ef94a7f657d8784eb6dadee1cdeabdd593e2eeeb17f"
+    }
+  },
+  "compile": {
+    "recipe": "retained iOS 26.6.2 / 23G90 K80 kernel recipe",
+    "root_platform": {
+      "exit": 0,
+      "warning_count": 3,
+      "object_sha256": "18893928f2b4cbbf7d5124830411308fda006cc51148e14e192dd0801680d925"
+    },
+    "board_bridge": {
+      "exit": 0,
+      "warning_count": 3,
+      "object_sha256": "fb68b0fd4d931fa07a8c5710aacc87afaae15cb5fada8e2ddae421434beac833"
+    },
+    "warning_source": "Existing narrowing conversions in HoujiFullHostNativeMemory.h"
+  },
+  "full_link": {
+    "directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-claim-preparation-prefix-v87-20261113/full-link-v1",
+    "command_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-claim-preparation-prefix-v87-20261113/full-link-v1/link-command.json",
+    "replaced_inputs": [
+      "ZornRootPlatform26.cpo",
+      "ZornGen7PlatformBoardBridge26.cpo"
+    ],
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "total_inputs": 1397,
+    "missing_inputs": 0,
+    "link_exit": 0,
+    "linker_warning_count": 10,
+    "warning_lines_match_v86": true,
+    "nm_undefined_exit": 0,
+    "undefined_symbol_lines": 0,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-claim-preparation-prefix-v87-20261113/full-link-v1/kernel.ZORN26-GPU-PROVIDER-CLAIMS-PREP-V87.UNSELECTED.macho",
+      "bytes": 30573856,
+      "sha256": "4e7a315af3339f184bf57e5066bc22a375c40189f37bf3a12dfd3dd33a394b49"
+    }
+  },
+  "cpu_lockscreen_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "bytes": 30531000,
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "expected_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "changed_by_this_candidate": false,
+    "sha256_rechecked_read_only": true
+  },
+  "hardware": {
+    "device_accessed": false,
+    "installed": false,
+    "booted": false,
+    "gpu_started": false,
+    "gpu_submission_or_render_observed": false,
+    "gpu_discovery_allow_boot": false
+  },
+  "remaining_gate": "The root still does not construct the complete ZornGen7StartupGpuInputs26 actual authority/ownership graph, including the external MMIO OperationGuard producer and all-master GPU/GMU quiescence owner. Finish those and pass the offline link before a bounded hardware trial.",
+  "touch_driver_work": "paused"
+}

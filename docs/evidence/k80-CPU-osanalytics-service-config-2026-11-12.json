@@ -1,0 +1,62 @@
+{
+  "status": "CPU-osanalytics-demand-service-config-staged-uninstalled",
+  "recorded_at": "2026-11-12T06:40:41.191014+08:00",
+  "candidate": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-service-config26-471dfed262904668adec5471f5ad3572/result.json",
+    "sha256": "d2443de334803a7c0e899f3a9b5d453bdee844660638e6fbe2c6e5a72af49c03"
+  },
+  "comparison": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-log-context26-d567f31361d346ed95af71053a676a23/diagnostic-service-config-readonly-escalated/result.json",
+    "sha256": "073b0a2819771daa9a3c4e519fc66c6581967a86b8d563bdd7a7d79c7c521b3e"
+  },
+  "overlay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-osanalytics-service-471dfed262904668adec5471f5ad3572/root-overlay/System/Library/LaunchDaemons/com.apple.osanalytics.osanalyticshelper.plist",
+    "sha256": "dd49065df1b19f6687896fd9334389a7d885ce24e1a82d26c8858db037d2ec28",
+    "mode": "0644"
+  },
+  "stock_job": {
+    "path": "/System/Library/LaunchDaemons/com.apple.osanalytics.osanalyticshelper.plist",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-log-context26-d567f31361d346ed95af71053a676a23/diagnostic-service-config-readonly-escalated/stock-SystemOS23G90-com.apple.osanalytics.osanalyticshelper.plist",
+    "sha256": "1fb032b66e28427e7849726599dc8541cbb7b9655ec5ebc1337ba8ff977792a6"
+  },
+  "program_metadata": {
+    "path": "/System/Library/CoreServices/osanalyticshelper",
+    "present": true,
+    "bytes": 244816,
+    "mode": "0o755",
+    "uid": 501,
+    "gid": 20,
+    "content_read": false,
+    "ownership_scope": "Default host mount view;UID/GID are not raw HFS ownership proof"
+  },
+  "findings": {
+    "installed_local_root_missing_osanalytics_helper_job": true,
+    "installed_local_root_launchd_xpc_configuration_absent": true,
+    "ReportCrash_analyticsd_diagnosticd_logd_jobs_present": true,
+    "stock23G90_has_server_and_agent_jobs": true,
+    "server_program_already_present_in_current_local_root": true
+  },
+  "configuration_change": {
+    "restored": "Stock-derived local demand Mach services with exact program arguments",
+    "removed": [
+      "LaunchEvents",
+      "RemoteServices"
+    ],
+    "no_guessed_keys_arguments_or_success_overrides": true,
+    "agent_init_job_not_staged": true
+  },
+  "limitations": {
+    "no_executable_content_read": true,
+    "no_machine_state_or_IPC_payload_analysis": true,
+    "configuration_gap_does_not_prove_SpringBoard_crash_cause": true,
+    "service_start_and_report_generation_require_runtime_verification": true,
+    "host_mount_UID_GID_not_raw_filesystem_ownership_proof": true
+  },
+  "root_image_modified": false,
+  "root_installed": false,
+  "kernel_changed": false,
+  "phone_access": false,
+  "device_ready": false,
+  "goal_complete": false,
+  "next_action": "Compose independently cloned1763 root with this single demand-service plist,keep helpercce/binary/CPU libraries/rc/var.skel unchanged,validate new-file root ownership and HFS signature/layout/delta/full local replay,then bind kernel/ADT to new hash. Add exact osanalyticshelper lifecycle scalar observer if needed to distinguish service activation from full report/message generation. Independent installer/single boot scopes remain required;no unchanged general.log retry,no executable/IPC payload analysis,GPU/touch deferred."
+}

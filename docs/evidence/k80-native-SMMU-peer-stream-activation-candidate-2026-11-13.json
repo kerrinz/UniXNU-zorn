@@ -1,0 +1,80 @@
+{
+  "title": "K80 iOS26 native SMMU peer-aware GPU stream activation candidate",
+  "recorded_at": "2026-11-13",
+  "status": "source-only-candidate-full-linked-unselected",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "os": "iOS 26.6.2 (23G90)",
+    "hardware": "K80 / Adreno 750v2 Gen7.9.1"
+  },
+  "basis": {
+    "native_bank_allocator_record": "docs/evidence/k80-native-SMMU-bank-lease-candidate-2026-11-13.json",
+    "native_bank_allocator_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-bank-lease-v61-439f6b3d19c94a8f8729bc55b6df6d21/ZornGen7SmmuDomain26.cpp",
+    "native_bank_allocator_source_sha256": "2e1cce92f621e6b40d7c922c3b432461ab65f5c16c7b66e4b6905b88fec42ed9",
+    "stream_source_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-readonly-census-v60-06a3d3fbe6124d6e9f1cd2fada451e95",
+    "peer_activation_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-owned-stream-pair26/source.patch",
+    "peer_activation_patch_sha256": "cdf43559aeb6947694ca205b28811484b3a00b2b08b762fd16787a91e1efd79d",
+    "exact_rebased_source_and_commands": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-bank-peer-stream-v62-711b3ae6b30cad0e/source-manifest.json"
+  },
+  "implementation": {
+    "source_directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-bank-peer-stream-v62-711b3ae6b30cad0e",
+    "patched_source_sha256": {
+      "ZornGen7SmmuDomain26.cpp": "a7e6ba5ed32ba9d485551bd7ab238797abdf9b17930302eb35f6c531733c1379",
+      "ZornGen7SmmuStream26.cpp": "27459ea8ab5010e68ecf453bf8563512e9fc2637d45395b9b71448af10ecf2aa",
+      "ZornGen7SmmuStream26.h": "8755793eceb6d07d79f581105dcfa88a79deb98727b17b1f817670c3fcce960d"
+    },
+    "changes": [
+      "Preserves the v61 native reserveActual bank allocation checks and in-memory reservation ledger.",
+      "Adds activatePreparedWithPeer to validate the exact peer stream slot and admit only its captured-to-prepared or prepared-to-active transition while re-reading all stream groups.",
+      "Uses peer-aware activation for the two GPU SMMU endpoints so the second endpoint recognizes the first endpoint's expected S2CR transition. GMU activation remains on its existing single-endpoint path."
+    ],
+    "external_stream_authority_unchanged": true,
+    "touch_source_changed": false
+  },
+  "build_validation": {
+    "compile": [
+      {
+        "translation_unit": "ZornGen7SmmuDomain26.cpp",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-bank-peer-stream-v62-711b3ae6b30cad0e/ZornGen7SmmuDomain26.cpo",
+        "object_bytes": 602536,
+        "object_sha256": "abe70addd0db9fa0f21fb2fb088b8d34fb8bb4cd2d102d665b3867ced63d4dd9",
+        "warnings": 3,
+        "warning_origin": "Existing HoujiFullHostNativeMemory.h size conversions; same warning set as v61."
+      },
+      {
+        "translation_unit": "ZornGen7SmmuStream26.cpp",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-bank-peer-stream-v62-711b3ae6b30cad0e/ZornGen7SmmuStream26.cpo",
+        "object_bytes": 198016,
+        "object_sha256": "dd92280c445ae783fe4f43e60df52d83474de938b999a0e1fb2ead3f22df9a86",
+        "warnings": 0
+      }
+    ],
+    "full_link": {
+      "exit_code": 0,
+      "input_count": 1396,
+      "filelist_inputs": 1317,
+      "replaced_inputs": 2,
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-bank-peer-stream-v62-711b3ae6b30cad0e/full-link/kernel.ZORN26-NATIVE-SMMU-BANK-PEER-STREAM-V62.UNSELECTED.macho",
+      "output_bytes": 30469376,
+      "output_sha256": "ef1ddd65877c285d207aad27c3069369a4844bc6f511e5ef38ee00a40fcfa984",
+      "undefined_symbols": 0,
+      "linker_warnings": 10,
+      "linker_warnings_match_v61_baseline": true
+    },
+    "packaged": false,
+    "booted": false,
+    "device_accessed": false,
+    "runtime_selected": false
+  },
+  "qualification_limits": [
+    "Peer-aware slot validation fixes the driver's two-GPU-stream table transition; it is not a producer-quiescence lease.",
+    "The actual acquireActualStream provider is still required to serialize the full effective match set and establish real GPU/GMU quiescence or fault control.",
+    "The actual GPU startup owner factory is still not connected to the direct-ring platform call path.",
+    "No SMMU mapping, DMA, GMU firmware/HFI, GPU execution, fence, Metal or display result is established by this offline link."
+  ],
+  "next_step": "Bind an actual K80 GPU and GMU producer gate to the complete effective stream match set, establish independent SMMU mapping ownership, and connect the real startup owner to direct-ring before preparing a device trial."
+}

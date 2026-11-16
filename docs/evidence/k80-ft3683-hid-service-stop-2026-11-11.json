@@ -1,0 +1,88 @@
+{
+  "status": "offline-compiled-reference-linked-unselected",
+  "time": "2026-11-10T23:04:03.534101+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-continuous-candidate",
+  "event_service_base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/source.patch",
+  "fix": "HID stop closes frame admission across threads. Worker checks that admission at thread launch and around each read-and-submit and exits at the next observed stop. In-flight bus calls may return with their resources retained. A stopped HID service receives no additional release dispatch from the tail.",
+  "existing_contract": "Finite and continuous pacing unchanged. When the service accepts frames, the existing release/report path remains. No drain, bus teardown, pin restore, retry or delivery ACK is inferred.",
+  "touch_ADT": {
+    "base_package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/root-package-smmu-pm-claim-reuse/verified.json",
+    "base_ADT": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/root-package-smmu-pm-claim-reuse/inputs/ADT-kernel.logdirs-root.UNSELECTED.adt",
+    "base_ADT_sha256": "3ff5fc7e4ffcee66277ace679f5a2d3dbcaa636115facd23210dc52959893302",
+    "root_digest": "6e46fbc832239eebd1bd63a4a248845cebd1200af9f5aef5eba4c69af7deb127",
+    "known_touch_ADT": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-platform-entry26/generated-ADT-final/kernel.touch-resources.UNSELECTED.adt",
+    "existing_touch_node_and_parent_cell_translation_match": true,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/kernel.touch-resources.UNSELECTED.adt",
+    "output_sha256": "3ff5fc7e4ffcee66277ace679f5a2d3dbcaa636115facd23210dc52959893302",
+    "already_present_producer_refusal": "Existing touch node must not be replaced",
+    "device_ready": false
+  },
+  "compile": [
+    {
+      "name": "ZornTouchBoard26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/ZornTouchBoard26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542/ZornTouchBoard26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/inputs/1303-ZornTouchBoard26.cpo",
+      "sha256": "17324519fc1cc9fab69d76f64b3a83329933582d5fe7906e5be98bb9d74962b8",
+      "warnings": 5
+    },
+    {
+      "name": "ZornTouchPlatform26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/ZornTouchPlatform26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542/ZornTouchPlatform26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/inputs/1305-ZornTouchPlatform26.cpo",
+      "sha256": "0eae84da8788d6ef759e5679f2516bec26a7e53523f0ebc3988cf81caf1ddc47",
+      "warnings": 5
+    },
+    {
+      "name": "ZornFt3683Source26-shared.o",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/ZornFt3683Source26-shared.o",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542/ZornFt3683Source26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/inputs/1324-ZornFt3683Source26-shared.o",
+      "sha256": "68dfd8f08cd9eede6be4a33e109b7ae0e3006751443d5d661108a8fce32a68e5",
+      "warnings": 10
+    },
+    {
+      "name": "ZornTouchEventService26-final.o",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/ZornTouchEventService26-final.o",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542/ZornTouchEventService26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/inputs/1325-ZornTouchEventService26-final.o",
+      "sha256": "b720e58196706e6ab431fc4c0966dab32350c7e3b61b632ebccbe9b1e4a17efc",
+      "warnings": 0
+    },
+    {
+      "name": "ZornFt3683Worker26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/ZornFt3683Worker26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542/ZornFt3683Worker26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/inputs/1328-ZornFt3683Worker26.cpo",
+      "sha256": "7da1cf8220957a6136f6bd9f2968f598e19e5d522de12f91482b6ab5251927f4",
+      "warnings": 5
+    },
+    {
+      "name": "ZornTouchHost26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/ZornTouchHost26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-service-stop-8a414e7ff8264dd2aee689dd5a539542/ZornTouchHost26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/inputs/1330-ZornTouchHost26.cpo",
+      "sha256": "f8f05f51cbde499cbcb39b9e52d61d44311822c4cacd466390dd7d409ff614a1",
+      "warnings": 5
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-service-stop26-8a414e7ff8264dd2aee689dd5a539542/full-link/kernel.ZORN26-TOUCH-SERVICE-STOP.UNSELECTED.macho",
+    "sha256": "49adc581b7491a1826e78e6c4ef5722f4e73071849b4f94f26fc7d5cfa3714fc",
+    "bytes": 30450432,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 6,
+    "preserved": 1391,
+    "undefined_symbols": 0
+  },
+  "full_GPU_authority_production": "Actual platform bridge forwards incoming authority callbacks. This build does not claim an implementation for the full hardware grant set.",
+  "native_execution": false,
+  "device_execution": false,
+  "whole_image_readback": false,
+  "device_ready": false
+}

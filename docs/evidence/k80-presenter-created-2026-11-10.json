@@ -1,0 +1,49 @@
+{
+  "status": "actual-CPU-presenter-created-after-loader-mode-fix",
+  "date": "2026-11-10T05:47:49.136253+00:00",
+  "scope": "single-K80-ios26-presenter-console-mode300s-v13",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-console-mode26-edc84fa6df1c48bc95515cc6b1df19f1/root-trial-presenter-console-mode/trial/run.json",
+  "kernel_sha256": "6b30b1f4658c4c34dd8c2c65ce0a33470ee8fa0571ef02e903be93db8c54163f",
+  "boot_sha256": "fe40fb90ebb0313b74abcc72745e8f1c8577dba5de4c9d31c7a4e4d9335476ee",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/presenter-console-mode-edc84fa6df1c48bc95515cc6b1df19f1",
+  "mode_change": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-console-mode26-edc84fa6df1c48bc95515cc6b1df19f1/console-mode.delta",
+  "previous_refusal_evidence": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-presenter-console-mode-mismatch26.json",
+  "actual_returns": {
+    "schedule_raw": 0,
+    "status_returned": true,
+    "submitted": true,
+    "handle_returned": true,
+    "creation_returned": true,
+    "creation_raw": 0,
+    "refusal_mask": 0
+  },
+  "source_boundary": "Factory returned success only after actual console metadata/extent/page-alias checks,real framebuffer init/attach/start and publishDisplayNode returned. This is software creation,not hardware scanout ACK.",
+  "PID1_EL0_proven": true,
+  "CPU_presenter_creation_proven": true,
+  "physical_display_proven": false,
+  "desktop_proven": false,
+  "GPU_execution_proven": false,
+  "touch_proven": false,
+  "recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_seconds": 333.0273808330021,
+  "protected_pages": {
+    "root_first_page.bin": true,
+    "before.bin": true,
+    "root_after.bin": true,
+    "after.bin": true,
+    "Data.bin": true,
+    "root_before.bin": true,
+    "Data_metadata.bin": true
+  },
+  "camera_summary": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-console-mode26-edc84fa6df1c48bc95515cc6b1df19f1/root-trial-presenter-console-mode/camera-capture-summary.json",
+  "camera_observation": "35s and240s frames inspected: purple-white column-like pattern on dark phone screen,no readable normal UI confirmed. Cause not established.",
+  "next_action": "Use actual created CPU presenter and existing framebuffer path for a bounded known CPU image or real swap observation;verify physical pixels before inferring desktop. Keep independent GPU direct-ring/native authority work and touch qualification incomplete;no prior scope replay or root reinstall."
+}

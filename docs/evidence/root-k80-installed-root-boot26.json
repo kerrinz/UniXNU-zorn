@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-09T16:04:36.581482+00:00",
+  "status": "matching-complete-installed-UFS-root-carrier-and-fixed-root-trial-entry-prepared-offline",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-boot26-20261109/boot.ZORN26-INSTALLED-UFS-ROOT.UNSELECTED.img",
+    "sha256": "5a4431773133876d2b2ca597392877afee4e7f2ddb1c2ddda8f55c1c2ba82781",
+    "bytes": 11563008
+  },
+  "kernel_SHA256": "0d867627c845212405f5e341bc444fe2e79feeac51b784b64879c9a68f99c266",
+  "root_SHA256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "actual_installed_root_readback": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-explicit-root-resend26.json",
+  "image_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-boot26-20261109/verified.json",
+  "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-trial26-20261110/bundle.json",
+  "scope_review": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-trial26-20261110/compatibility-decision.json",
+  "host_checks": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-trial26-20261110/host-checks.json",
+  "new_sources": [
+    "UniXNU-zorn/scripts/zorn_ios26_installed_root_image.py",
+    "UniXNU-zorn/scripts/zorn_ios26_installed_root_trial.py"
+  ],
+  "fixed_build_command": [
+    "python3",
+    "UniXNU-zorn/scripts/build-zorn-debug.py",
+    "--ios26-installed-root-image",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-boot26-20261109"
+  ],
+  "check_command": [
+    "python3",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/run-zorn-debug.py",
+    "--ios26-installed-root-trial",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-trial26-20261110/bundle.json",
+    "--check-only"
+  ],
+  "scope": "single-K80-ios26-installed-UFS-root300s-bounded-recovery",
+  "trial_seconds": 300,
+  "overall_seconds": 600,
+  "UFS_root_read_only": true,
+  "root_OS_in_RAM": false,
+  "kernel_loader_delivery": "Existing reviewed fastboot-only carrier;requires explicit owner decision,not a permanent boot entry",
+  "persistent_boot_entry_installed": false,
+  "phone_accessed": false,
+  "owner_scope_approval_pending": true,
+  "claim_created": false,
+  "root_mount_desktop_GPU_or_touch_hardware_qualified": false,
+  "observation_limit": "Current candidate has RAM/console panic text only;Recovery and unchanged storage cannot prove HFS mount,userland or desktop. No success record invented."
+}

@@ -1,0 +1,59 @@
+{
+  "status": "offline-K80-qsmmuv500-nonsecure-cfg-probe-built-packaged-device-blocked",
+  "time": "2026-11-10T21:48:02.044272+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-cfgprobe-7063c40a7a194d5a86fa7b6b9f156e79",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/full-link/kernel.ZORN26-NATIVE-SMMU-CFGPROBE.UNSELECTED.macho",
+    "sha256": "09108ba0ef4a04dc153938a870146ff4fefa9024cf3e73b96b43ab916da38454",
+    "bytes": 30427128,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 40,
+    "preserved": 1356,
+    "undefined_symbols": 0
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/root-package-native-smmu-cfgprobe/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "8900d6f3577e5bdeb05e2b001cdb5c65b19671c35bf1d06e4bbdbcc2e694a28f",
+    "bytes": 11624448
+  },
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/native-smmu-cfgprobe.patch",
+  "primary_source": {
+    "arm-smmu.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu.c",
+      "sha256": "2cbba16819120e420aa0c770affe2a3439f794c14ed1582647dd101131082524"
+    },
+    "arm-smmu-impl.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-impl.c",
+      "sha256": "90a299b1dd1dd14773d843e8318868e11c7a25b0f742abc599d0c1ecca0d113c"
+    },
+    "arm-smmu-qcom.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c",
+      "sha256": "17897f264124133ae29d09d5461005bad8ea9e262a3b81ca4c5946508ec50ede"
+    },
+    "arm-smmu.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu.h",
+      "sha256": "ad504868b094ccaf4ee5d5c1b5ced20aca4390ec3be2200d03d23dff5518c1d3"
+    },
+    "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9"
+  },
+  "source_selection_chain": "arm_smmu_impl_init returns qsmmuv500_impl_init before genericqcom;actual adreno compatible selects qsmmuv500_adreno_impl.cfg_probe;cfg_probe runs after actual ID capability decoding.",
+  "actual_implementation": "Retained actual PM/controller/client/maps/startup gate;one NS sACR0x10 read,clear CACHE_LOCK26 only,store,readback;stop retained if cache lock remains. Other observed bits preserved in written value. No fabricated grant callback.",
+  "Linux_warning_Darwin_compatibility": "Linux WARN_ON lock remains;candidate explicitly stops this attempt rather than claiming configuration complete.",
+  "controller_software_arbitration_integrated": true,
+  "header_dependent_objects_recompiled": 34,
+  "identity_objects_recompiled": 6,
+  "private_log_byte_envelope_unchanged": true,
+  "private_new_fields": "actual RMW return flags/before/after;512B text within existing544B envelope",
+  "text_capacity_check": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/private-text-capacity.json",
+  "check_only_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/fixed-build-check.stdout",
+  "automatic_approval_rejection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/automatic-approval-rejection.json",
+  "scope": "single-K80-ios26-native-SMMU-cfg-probe90s-v55",
+  "device_executed": false,
+  "claim_created": false,
+  "hardware_configuration_proven": false,
+  "whole_image_readback": false,
+  "no_context_stream_global_reset_translation_firmware_or_GPU": true,
+  "latest_actual_hardware": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-native-SMMU-bootCPU-IRQ26.json"
+}

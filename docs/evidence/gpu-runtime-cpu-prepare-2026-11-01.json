@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope": "New default-OFF CPU backing source/policy/target annotation only; no native allocation or hardware qualification.",
+  "result": {
+    "updated": "2026-11-01T22:11:23.815055+08:00",
+    "state": "default-OFF-one-attempt-native-CPU-backing-source-implemented-selected-object-only",
+    "sources": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-cpu-prepare/ZornGpuRuntimeBackings.h": "451f7afc0638503d3ad419e9b977192a18c3e253ec58d4152ab3e04eaea1988b",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-cpu-prepare/ZornGpuRuntimeBackings.cpp": "10ae58a24f10550dd13e4dc1f0d14b8957a88f22d45c5ffceb30a6e95b72b420"
+    },
+    "CPU_scope": "Generic kind0, host-accessible flags only, no supplied mapping/host handle,4KiB alignment; explicit output width/contiguity/per-backing and aggregate logical budgets bounded256MiB. This is local CPU policy, not original firmware policy or SMMU qualification.",
+    "native_error_width": 32,
+    "adapter_error_width": 64,
+    "cleanup_status_available": 0,
+    "one_native_attempt_before_call_recorded": true,
+    "failed_budget_objects_retained_without_release_retry": true,
+    "native_raw_success_not_overwritten_by_postcheck_failure": true,
+    "default_OFF_object": {
+      "sha256": "b2bf57298c08d103831e2f9f2fef6b69ad02b79cfdb9f3613370aac5dc0dbe99",
+      "imports": [
+        "_ZGPlanMemAlloc",
+        "_memcmp",
+        "_memcpy"
+      ],
+      "independent_raw_SHA_equal": true
+    },
+    "selected_compile_only_object": {
+      "sha256": "e6e95fc800f72f3cbe42c6c20f05d8c157b48dc09d811de27fd892d5a20e9465",
+      "imports": [
+        "_ZGPlanMemAlloc",
+        "__ZN18NativeAdrenoMemory8allocateEmjbmb",
+        "_memcmp",
+        "_memcpy"
+      ],
+      "independent_raw_SHA_equal": true
+    },
+    "selected_native_execution": false,
+    "new_host_policy_mutations_refused": 2,
+    "new_native_ON_host_link_refused_without_allocator_stubs": true,
+    "recursive_target_inputs": 284,
+    "persistent_storage_no_initializer": true,
+    "new_query_HFI_log_formats": false,
+    "new_runtime_caller_FD_kernel_candidate": false,
+    "phone_native_allocator_calls": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "limitations": [
+      "Selected native branch was only compiled/disassembled, not executed or tested with a successful allocator double.",
+      "IOKit allocation and existing cache helper may block; holding the registry entry gate across the call is not a wall-time guarantee. A future caller needs normal-thread context and independent protection.",
+      "Masked backed/attempted/status and cpu_prepared refer only to CPU native state. No GPU/GMU mapping, shared ownership, fence or success host handle is produced.",
+      "Logical retained-budget accounting excludes unknown IOKit auxiliary overhead. No implicit failed-allocation cleanup status is invented.",
+      "Native allocator source/body and final kernel virtual-call qualification remain separate next work."
+    ]
+  },
+  "source_recipe": "UniXNU-zorn/scripts/check-zorn-runtime-cpu-prepare.py",
+  "source_recipe_sha256": "a1a035e3b2af80152c7797999ebaa24250fdd7ae39ab8c244ba34391cedd3da6"
+}

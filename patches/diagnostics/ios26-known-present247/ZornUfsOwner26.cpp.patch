@@ -1,0 +1,41 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -1,4 +1,5 @@
+ #include "ZornPresentTrace245.h"
++#include "ZornKnownPresent247.h"
+ extern "C" void zorn26_native_known_image_observation(unsigned (&)[32]);
+ extern "C" void zorn26_native_kernel_client_observation(unsigned (&)[40]);
+ 
+@@ -540,7 +541,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC ff97459cd92747f1bb1f1cd163e2a6b0 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC c0bed9d9c79d4aeca33d0ad509f2984d %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -929,7 +930,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"ff97459cd92747f1bb1f1cd163e2a6b0",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"c0bed9d9c79d4aeca33d0ad509f2984d",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -945,6 +946,14 @@
+         const int n=snprintf(line+size-2,cap-(size-2),
+             ",dp=%u/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x\r\n",
+             available,dp[0],dp[1],dp[2],dp[3],dp[4],dp[5],dp[6],dp[7],dp[8],dp[9],dp[10],dp[11],dp[12],dp[13],dp[14],dp[15]);
++        if(n<0 || unsigned(n)>=cap-(size-2))return 0;
++        size+=unsigned(n)-2;
++    }
++    if(size>=2){
++        uint32_t kp[16]{};const unsigned available=zorn26_known_present_snapshot247(kp)?1u:0u;
++        const int n=snprintf(line+size-2,cap-(size-2),
++            ",kp=%u/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x\r\n",
++            available,kp[0],kp[1],kp[2],kp[3],kp[4],kp[5],kp[6],kp[7],kp[8],kp[9],kp[10],kp[11],kp[12],kp[13],kp[14],kp[15]);
+         if(n<0 || unsigned(n)>=cap-(size-2))return 0;
+         size+=unsigned(n)-2;
+     }

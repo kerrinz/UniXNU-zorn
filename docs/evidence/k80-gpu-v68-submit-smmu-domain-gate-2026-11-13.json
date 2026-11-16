@@ -1,0 +1,268 @@
+{
+  "recorded_at": "2026-11-12T23:04:14Z",
+  "status": "offline-full-link-unselected",
+  "candidate": {
+    "id": "v68-submit-smmu-domain-gate",
+    "parent": "v67-runtime-smmu-gbif-lease",
+    "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113",
+    "build": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113",
+    "kernel_sha256": "4356f205fb9cc1d6c91a7a998cc0cdefefd9ca22ccb98ab4cdd8036ace75236f"
+  },
+  "source_changes": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7SmmuDomain26.cpp",
+      "parent_sha256": "61dea964181a37f7ef9e022cc782c9b0996f489efa7f7bda79363f1579144277",
+      "sha256": "d9af0db85cf612191acf3dff8af2fa2d09ebd9bc731fc4cc27b90d3ff4323ac9"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7SmmuDomain26.h",
+      "parent_sha256": "f227942fb9026be6d8deb62b3779942e0c83f0cb3ea945e6344049803ae54f60",
+      "sha256": "feefa223d95cfc28eba6ad9b424c29942762c62815a1e4efdf0acfe555c868bb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/direct-runtime/ZornGen7DirectSubmit26.cpp",
+      "parent_sha256": "f6f3489b1bef190ae9293ee403989325f54bb29d32956794116f0b237f8b60b1",
+      "sha256": "ecae680e4b44d8da47a4c7bd77658f8542d01cc4c88dceef580a0483141cc128"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/direct-runtime/ZornGen7DirectVm26.cpp",
+      "parent_sha256": "a593b5f76c5d24c5aecca50537efe1165d16d0327ec2d19ed8503045b2e2e076",
+      "sha256": "a850a59412f971bbb256f28f11a2a8cf2c4acb9c7390cb9e8b1545d00734dd9f"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/direct-runtime/ZornGen7DirectVm26.h",
+      "parent_sha256": "97ad9f68ec568b290dbd5867c638aa408549273e325707cf56546ffadffee211",
+      "sha256": "8cea697a1a2709502af21f1868307a7502b9eaf063866dac80d6bde23b4a3b98"
+    }
+  ],
+  "change_summary": "Direct ring submission and successful-fence resource retirement now enter the retained SMMU Domain lock and validate the live route. Fence waits remain outside the lock. The host runtime VM and process-private VM use separate callbacks into the same domain gate.",
+  "source_audit": {
+    "vm_attach_requires_begin_and_end_submission_callbacks": true,
+    "runtime_and_process_route_initializers_bind_domain_gate_callbacks": true,
+    "submit_acquires_domain_gate_before_validation_and_reference_publication": true,
+    "completed_fence_retirement_runs_under_domain_gate": true,
+    "fence_wait_completes_before_retirement_gate_is_taken": true
+  },
+  "compile": {
+    "translation_unit_count": 8,
+    "translation_units": [
+      {
+        "translation_unit": "ZornGen7RegisterMaps26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7RegisterMaps26.cpp",
+        "source_sha256": "9db849eb3086fdc8f094fabe184b7b79e826fd2071559618dfc33445519212ca",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7RegisterMaps26.command.json",
+        "command_sha256": "429071bde5a4620528f9d1437d8e4940c72f40ef30a39c04595e64b8c583e847",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7RegisterMaps26.cpo",
+        "object_sha256": "5f0c489f857f560b5f4db028bbc5e20d37b83c3e03040bd4546736272d9c81f6",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1245-ZornGen7RegisterMaps26.cpo",
+        "link_input_sha256": "5f0c489f857f560b5f4db028bbc5e20d37b83c3e03040bd4546736272d9c81f6",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7RegisterMaps26.command.stderr",
+        "warning_count": 3
+      },
+      {
+        "translation_unit": "ZornGen7SmmuDomain26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7SmmuDomain26.cpp",
+        "source_sha256": "d9af0db85cf612191acf3dff8af2fa2d09ebd9bc731fc4cc27b90d3ff4323ac9",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7SmmuDomain26.command.json",
+        "command_sha256": "fc9959f6451846588ce749a7a4abd04cbe7a781992a49154527fe23ef71e4020",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7SmmuDomain26.cpo",
+        "object_sha256": "b7bfaf70a6ee646ea8ca7f65ee33fe271c7a3a190e01ea7c21e678b2a8568c07",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/ZornGen7SmmuDomain26.cpo",
+        "link_input_sha256": "b7bfaf70a6ee646ea8ca7f65ee33fe271c7a3a190e01ea7c21e678b2a8568c07",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7SmmuDomain26.command.stderr",
+        "warning_count": 3
+      },
+      {
+        "translation_unit": "ZornGen7HostGpuTables26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostGpuTables26.cpp",
+        "source_sha256": "6f543dbbe1845befbf2545e0904d4b6baf3a5275d7ff65796f0f63edb49eed65",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostGpuTables26.command.json",
+        "command_sha256": "1a77c8ba97ae29cbcc6fe44d60edecf7b7afcd30c33f07a1d18b9d8def1f46ec",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostGpuTables26.cpo",
+        "object_sha256": "73a67800a37001dac0c0601d44fb80f5c322de422b1596ac5baf00ac21bd249f",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1290-ZornGen7HostGpuTables26.cpo",
+        "link_input_sha256": "73a67800a37001dac0c0601d44fb80f5c322de422b1596ac5baf00ac21bd249f",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostGpuTables26.command.stderr",
+        "warning_count": 3
+      },
+      {
+        "translation_unit": "ZornGen7HostRing26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostRing26.cpp",
+        "source_sha256": "e7d26938f28abb3aa125e2a5c9cc3a7d1fcbbc651232dc77dc43f538742445b3",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostRing26.command.json",
+        "command_sha256": "81c853ed5676b438cb73099274e09c5b24eedb2bea4641a27621b9a670017491",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostRing26.cpo",
+        "object_sha256": "9adf9e4e7ce6251ff4b1eba430b69eaad65b947323cd7417639e72f3be03b982",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1295-ZornGen7HostRing26.cpo",
+        "link_input_sha256": "9adf9e4e7ce6251ff4b1eba430b69eaad65b947323cd7417639e72f3be03b982",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7HostRing26.command.stderr",
+        "warning_count": 3
+      },
+      {
+        "translation_unit": "direct-runtime/ZornGen7DirectVm26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/direct-runtime/ZornGen7DirectVm26.cpp",
+        "source_sha256": "a850a59412f971bbb256f28f11a2a8cf2c4acb9c7390cb9e8b1545d00734dd9f",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectVm26.command.json",
+        "command_sha256": "91dfc2164abdae3a67e7a087f7da678cc6c1a53f74e2850d95c3bed183428e26",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectVm26.cpo",
+        "object_sha256": "7cdfd33509e75c745688606c7ff3aaff019aa83e982148d2705ad2c76a4541a6",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1297-ZornGen7DirectVm26.cpo",
+        "link_input_sha256": "7cdfd33509e75c745688606c7ff3aaff019aa83e982148d2705ad2c76a4541a6",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectVm26.command.stderr",
+        "warning_count": 0
+      },
+      {
+        "translation_unit": "direct-runtime/ZornGen7DirectSubmit26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/direct-runtime/ZornGen7DirectSubmit26.cpp",
+        "source_sha256": "ecae680e4b44d8da47a4c7bd77658f8542d01cc4c88dceef580a0483141cc128",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectSubmit26.command.json",
+        "command_sha256": "e0aaee8a88e04a4e0129f4d9c733af67989a6ac70ee12fdda845cc8eb40902a3",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectSubmit26.cpo",
+        "object_sha256": "7af62437bf361493f9be9d682f4a4617c3018a529a06166fe44bcc602595c491",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1299-ZornGen7DirectSubmit26.cpo",
+        "link_input_sha256": "7af62437bf361493f9be9d682f4a4617c3018a529a06166fe44bcc602595c491",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectSubmit26.command.stderr",
+        "warning_count": 0
+      },
+      {
+        "translation_unit": "direct-runtime/ZornGen7DirectClient26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/direct-runtime/ZornGen7DirectClient26.cpp",
+        "source_sha256": "46e647532e97fc431ba4b4f42ab916e4914c22ab653133dc902067f3176acaaf",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectClient26.command.json",
+        "command_sha256": "75c31bd63e1c6114e39db9cb30e2e86a601ed1b65a1240dc58a80550f0c5457f",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectClient26.cpo",
+        "object_sha256": "49b25652b8f0447728151042250c06d03ec328011c692c97d12c390609e75cdf",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1300-ZornGen7DirectClient26.cpo",
+        "link_input_sha256": "49b25652b8f0447728151042250c06d03ec328011c692c97d12c390609e75cdf",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7DirectClient26.command.stderr",
+        "warning_count": 0
+      },
+      {
+        "translation_unit": "ZornGen7ProcessTables26.cpp",
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7ProcessTables26.cpp",
+        "source_sha256": "50b0cc44e54a504f792c85a4e32caba19530c36843af83ed0a7e22f5e1d9880a",
+        "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7ProcessTables26.command.json",
+        "command_sha256": "7261f7093b4b11865b3fa229450a96d40e09e2c712834efe3e8cbf95c9272794",
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7ProcessTables26.cpo",
+        "object_sha256": "3191c99ee540926dbbbdc494a9106620991a79e67c5b37054a5f5ad2911103ec",
+        "link_input": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1307-ZornGen7ProcessTables26.cpo",
+        "link_input_sha256": "3191c99ee540926dbbbdc494a9106620991a79e67c5b37054a5f5ad2911103ec",
+        "stderr": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/ZornGen7ProcessTables26.command.stderr",
+        "warning_count": 0
+      }
+    ]
+  },
+  "full_link": {
+    "candidate": "v68-submit-smmu-domain-gate",
+    "exit_code": 0,
+    "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/link-command.json",
+    "filelist_sha256": "b607090130f4998f48b12ba9a31c6ff464cdfe1ef3dac16cb81169d0a2e186e4",
+    "filelist_entries": 1318,
+    "direct_inputs": 79,
+    "total_inputs": 1397,
+    "missing_inputs": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/kernel.ZORN26-CURRENT-INTEGRATED-GMU-IDLE-GBIF-HALT-V68.UNSELECTED.macho",
+    "output_exists": true,
+    "output_bytes": 30508872,
+    "output_sha256": "4356f205fb9cc1d6c91a7a998cc0cdefefd9ca22ccb98ab4cdd8036ace75236f",
+    "map_exists": true,
+    "map_bytes": 10813094,
+    "stdout_bytes": 0,
+    "stderr_bytes": 803,
+    "warnings": [
+      "ld: warning: -segment_order should list all segments, __PRELINK_TEXT is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_INFO is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_TEXT_EXEC is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_DATA is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_DATA_CONST is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LLVM_COV is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LINKEDIT is missing",
+      "ld: warning: -segment_order should list all segments, __LINKINFO is missing",
+      "ld: warning: -segment_order of __LINKEDIT is ignored, the segment must be ordered last",
+      "ld: warning: -sectalign reduces alignment of __DATA,__bss from 16384 to 4096"
+    ],
+    "undefined_symbols": 0,
+    "nm_exit_code": 0,
+    "replaced_objects": 8
+  },
+  "prelink_check": {
+    "candidate": "v68-submit-smmu-domain-gate",
+    "filelist": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/link.filelist",
+    "filelist_entries": 1318,
+    "direct_inputs": 79,
+    "total_inputs": 1397,
+    "unique_inputs": 1397,
+    "missing_inputs": [],
+    "output": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/kernel.ZORN26-CURRENT-INTEGRATED-GMU-IDLE-GBIF-HALT-V68.UNSELECTED.macho",
+    "map_path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/kernel.map",
+    "filelist_sha256": "b607090130f4998f48b12ba9a31c6ff464cdfe1ef3dac16cb81169d0a2e186e4",
+    "status": "passed"
+  },
+  "comparison_to_parent": {
+    "linker_stderr_byte_identical_to_v67": true,
+    "linker_warning_count": 10,
+    "replaced_translation_units": 8,
+    "inputs": 1397,
+    "compile_diagnostics_identical_after_candidate_path_normalization": true,
+    "compile_warning_counts": {
+      "three_warnings_each": [
+        "ZornGen7RegisterMaps26.cpp",
+        "ZornGen7SmmuDomain26.cpp",
+        "ZornGen7HostGpuTables26.cpp",
+        "ZornGen7HostRing26.cpp"
+      ],
+      "zero_warnings_each": [
+        "direct-runtime/ZornGen7DirectVm26.cpp",
+        "direct-runtime/ZornGen7DirectSubmit26.cpp",
+        "direct-runtime/ZornGen7DirectClient26.cpp",
+        "ZornGen7ProcessTables26.cpp"
+      ]
+    }
+  },
+  "qualification": {
+    "candidate_selected": false,
+    "package_created": false,
+    "booted": false,
+    "phone_or_partition_accessed": false,
+    "gpu_execution_proven": false,
+    "dma_completion_proven": false,
+    "metal_rendering_proven": false,
+    "gpu_display_output_proven": false,
+    "ft3683_source_changed": false,
+    "ft3683_work": "paused",
+    "no_disassembly_or_reverse_engineering": true,
+    "android_data_root_boot_partition_and_gpt_modified": false
+  },
+  "cpu_lock_screen_milestone": "docs/evidence/k80-CPU-keystore-retag-observed-2026-11-13.json",
+  "cpu_record_limit": "Owner visual confirmation; runner lockscreen_proven=false; no camera frame saved.",
+  "startup_owner_recheck": {
+    "linked_objects": [
+      {
+        "object": "1306-ZornRootPlatform26.cpo",
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1306-ZornRootPlatform26.cpo",
+        "sha256": "0e3d54f7a430883c04924d958105edfbddb1c3ebf971be358c52dab23c1d1a5f",
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-root-entry-candidate/ZornRootPlatform26.cpp",
+        "source_sha256": "e3e3ee985f2073c772f74656843d15f1e4d265f67aa11bc104e6bb5132bb3ec4"
+      },
+      {
+        "object": "1312-ZornGen7PlatformBoardBridge26.cpo",
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v68-submit-smmu-gate-20261113/full-link/inputs/1312-ZornGen7PlatformBoardBridge26.cpo",
+        "sha256": "82d6969a70cf5cc41888f6f234367c3e87f3bfb77f64ad56347dbd8dd1096e65",
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/rsc-bootcpu-boot-9b28aa61a5934a1990eb984f6280f411/platform/ZornGen7PlatformBoardBridge26.cpp",
+        "source_sha256": "d467ebe7da57301ce59b7fb834cbac8dfe86582d75e69cc3132add2154e3659d"
+      }
+    ],
+    "root_behavior": "The root entry stages only ZornRootStartup26::RootInputs; it does not construct the GPU board stage or ZornGen7StartupGpuInputs26.",
+    "board_bridge_behavior": "The linked bridge accepts and forwards caller-created ZornGen7StartupGpuInputs26; it does not create callback owners or hardware authority values.",
+    "authority_provider_search": "The linked root entry and linked board bridge contain no construction of GPU authority callback tables. StartupOwner requires non-null caller-owned GPU start, GPU MMU, and native runtime callbacks; constructing those inputs remains the next source task.",
+    "startup_gpu_authority_construction_complete": false
+  }
+}

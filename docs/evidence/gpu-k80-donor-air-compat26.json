@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-09T22:01:17.186695+00:00",
+  "status": "actual-iOS26-CoreImage-QuartzCore-donor-AIR-decode-and-specialization-verified-on-host-CPU",
+  "classification": "offline validation progress,not a product patch or hardware result",
+  "input": {
+    "root_image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-root-integration26/ios26-root-current-metal.UNSELECTED.hfsx",
+    "root_image_verified_sha256": "ef11f75a2d1349cd20b341a4474f8dcdb99a2674709721557ec6fb7303a4a608",
+    "donor": "iPhone18,1 iOS26.6.2 23G90",
+    "files": [
+      {
+        "root_relative": "System/Library/Frameworks/CoreImage.framework/CoreImage.metallib",
+        "source_mount": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/mount/System/Library/Frameworks/CoreImage.framework/CoreImage.metallib",
+        "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/inputs/CoreImage.framework-CoreImage.metallib",
+        "bytes": 47310,
+        "sha256": "23c970ff8573664f250b80b36eeb0820a7d13b293d315a94c82a4cce7381090b",
+        "magic": "4d544c42"
+      },
+      {
+        "root_relative": "System/Library/Frameworks/CoreImage.framework/default.metallib",
+        "source_mount": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/mount/System/Library/Frameworks/CoreImage.framework/default.metallib",
+        "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/inputs/CoreImage.framework-default.metallib",
+        "bytes": 390636,
+        "sha256": "1103bc22650bf6a83b1b8f5aed91b4ab6fe1e45d1e990daf2c54e9c024a92bd4",
+        "magic": "4d544c42"
+      },
+      {
+        "root_relative": "System/Library/Frameworks/QuartzCore.framework/default.metallib",
+        "source_mount": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/mount/System/Library/Frameworks/QuartzCore.framework/default.metallib",
+        "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/inputs/QuartzCore.framework-default.metallib",
+        "bytes": 9009456,
+        "sha256": "d9a69a4a8ebc6ec7eb0ba8b85e71a0b1543aa6684d1b60439588150c16525d93",
+        "magic": "cafebabe"
+      }
+    ],
+    "phone_accessed": false
+  },
+  "locked_runtime_identity": "3486f0413be9ea3e231869495c8f5be9",
+  "same_as_current_PAC_bridge_AIR_source": true,
+  "same_locked_vendor_dependency_versions": true,
+  "summary": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/inputs/CoreImage.framework-CoreImage.metallib",
+      "counts": {
+        "decoded": 75,
+        "specialized": 0,
+        "exported_nonentry_skips": 75,
+        "caller_constant_skips": 0
+      }
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/inputs/CoreImage.framework-default.metallib",
+      "counts": {
+        "decoded": 60,
+        "specialized": 57,
+        "exported_nonentry_skips": 0,
+        "caller_constant_skips": 3
+      }
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-donor-air-compat26/inputs/QuartzCore.framework-default.metallib",
+      "counts": {
+        "decoded": 189,
+        "specialized": 183,
+        "exported_nonentry_skips": 0,
+        "caller_constant_skips": 6
+      }
+    }
+  ],
+  "checks": {
+    "actual_donor_functions_decoded_and_IR_ABI_verified": 324,
+    "actual_no_caller_constant_entries_specialized": 240,
+    "exported_linked_functions_not_entry_skipped": 75,
+    "real_caller_constant_required_entries_skipped": 9,
+    "decode_refusals": 0,
+    "specialization_refusals_in_admitted_subset": 0,
+    "actual_source_archive_files": 115,
+    "host_binary_dependencies": [
+      "/usr/lib/libSystem.B.dylib",
+      "/usr/lib/libiconv.2.dylib"
+    ],
+    "GPU_Metal_Vulkan_or_IOKit_runtime_linked": false,
+    "offline_Cargo_vendor_only": true,
+    "host_image_readonly_and_detached": true
+  },
+  "behavior": [
+    "Three actual files copied byte-for-byte from current independent32GiB iOS26.6.2 23G90 root:CoreImage exported library,CoreImage default compute library,QuartzCore universal library. Original real bridge air_slice function is extracted unchanged to select actual QuartzCore AIR64 slice;no forged metallib,packet,provider,handle or device input.",
+    "Standalone host executable uses only the actual locked metal2vulkan-air source and matching vendor packages already used by current arm64e PAC bridge. Complete assembled Rust source identity3486f0413be9ea3e231869495c8f5be9 matches exact upstream lock. No ash/Metal/Vulkan runtime dependency or physical device object is instantiated.",
+    "All324 real functions pass container HASH,bitcode decode,typed IR and AIR metadata ABI checks. Phase2 specializes240 actual entry points with no declared caller constants through the same public AIR canonicalizer.75 exported non-entry functions and9 entries needing actual caller constants are explicitly skipped without fabricated0/default input values.",
+    "Original runtime/PAC Rust/Metal/Turnip/kernel/profile/SDK/pins remain unchanged;no product recompile or blind boot repack. Host checker sources,binaries,commands,results,real inputs and compiler source closure retained independently."
+  ],
+  "limits": [
+    "Host AIR decode/canonicalization is not whole Metal pipeline creation,SPIR-V emission/validation,Turnip NIR/Adreno ISA compilation,driver/device discovery,rendering/fence/cache or presentation execution.",
+    "No arbitrary target Vulkan capabilities,device limits,resource geometry,caller constants,linked dynamic functions or successful provider values supplied. Exported/linkage/constants-dependent paths are not qualified by this result.",
+    "Exact host source/dependency match is not arm64e/PAC execution or all target ABI qualification;host CLI runs ordinary CPU code,not the iOS bridge binary. Actual host CPU parser execution is explicitly recorded.",
+    "Host xcrun metal reports missing Metal Toolchain. No component downloaded and no Xcode/SDK/OS/toolchain changed. Existing real donor shaders permit this bounded validation without manufacturing authored AIR as Apple output.",
+    "No file write to root image,phone query,USB,scope/ready/claim or target Metal/Rust/GPU execution. Local rootef11f75a NOT installed;phone historicalb56;current kernel5df5a34c preserved and bootc1132857 remains4b18a29f.",
+    "GPU startup/application hardware authority and complete GPU/Metal/display/FT3683 acceptance remain incomplete;goal ACTIVE."
+  ],
+  "host_CPU_AIR_parser_and_canonicalizer_executed": true,
+  "target_iOS_or_phone_executed": false,
+  "product_source_patch": false,
+  "goal_complete": false,
+  "porting_revision_scope": {
+    "revision": "624bab3918de5b978e1101517abca2b4fa426565",
+    "meaning": "exact upstream runtime/AIR source revision;standalone host harness is local uncommitted source bound by actual-source-manifest hashes,not claimed part of that commit"
+  }
+}

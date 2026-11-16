@@ -1,0 +1,103 @@
+{
+  "status": "CPU-SpringBoard-ordinary-stderr-offline-candidate-verified",
+  "recorded_at": "2026-11-12T01:51:53.132141+08:00",
+  "mode": "unattended-phone-connected",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4",
+  "based_on_hardware_evidence": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-SpringBoard-lifecycle-observed26.json",
+  "native_link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/full-link/kernel.ZORN26-CURRENT-ROOT-USERLAND-CONTROL.UNSELECTED.macho",
+    "sha256": "92a948a410354590363d26c40655c3b426b31781cc4fcccc32fe3f9900a070f1",
+    "bytes": 30466144,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 13,
+    "preserved": 1384,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/boot-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "bfed3b5220f3deb5cebc4d420f1279a53c1ebe895e844a662da77816995f9d12",
+    "bytes": 11644928
+  },
+  "root_sha256": "3b56c850bd9416e7716094a20ea0af0c25bd767b1e94a022aff6945fcf54cd6d",
+  "root_unchanged": true,
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/SpringBoard-stderr.patch",
+    "sha256": "e51ab0019bba36c1170f4c544b141c88f49158da05757949531612f5b6cc1300"
+  },
+  "baseline": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/sys_generic-baseline-proof.json",
+    "sha256": "bbe2c06ebb2371ddf24753f9710201099f1f47ff0540c1f90373650f356708ac"
+  },
+  "host_regression": {
+    "exact_backend_and_adapter_ASan_UBSan_passed": true,
+    "wrong_identity_FD_native_error_flags_length_refused": true,
+    "copy_failure_and_address_overflow_preserve_native_result": true,
+    "copy_budget": 32,
+    "bytes_per_copy_max": 48,
+    "busy_snapshot_and_no_spin": true,
+    "concurrent_threads": 32,
+    "parser_positive_cases": 4,
+    "parser_negative_cases": 7,
+    "native_execution": false,
+    "device_access": false,
+    "limitations": [
+      "Only scalar successful ordinary write(fd2);writev and other log channels unobserved.",
+      "Best-effort copy of user-supplied stderr buffer after native completion can race user buffer modification.",
+      "Truncation to48-byte tail per observed write and32-copy budget;absence does not prove no diagnostics."
+    ]
+  },
+  "host_regression_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/stderr-host-check.json",
+    "sha256": "4c563ecbd12a5b3cf04a0c3b69dfbbf8136a6a1a806610ab72f1c6a101802f48"
+  },
+  "parser": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/inspect-userland-sb-stderr26.py",
+    "sha256": "0405742f77999330cdf53fe6464bce8e9d5f8a78e2d51d12d073f7dbd2c6adc0"
+  },
+  "source_inputs": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4/kern_exec.c",
+      "sha256": "20800b1b7cc0832b029624c862ee3fd47d1466e48c2fe7f5c152d74cf2a2db76"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4/ZornSBLifecycle26.h",
+      "sha256": "367a1ffb7a97bf5bd5f84856322456c5f6e70c9a65fdadb37d8d68f6ed98fb21"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4/ZornSBLifecycleBackend26.inc",
+      "sha256": "76eadbe63e14bd8d1674dadfe2276486f4ca9c49e40a3739137a8aaddf28deeb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4/sys_generic.c",
+      "sha256": "20bceaa0e4cc9ed39f8996a68361d7f32f645d4180953bbe37aaba5a8ae040da"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4/ZornSBStderrAdapter26.inc",
+      "sha256": "3c68b47cfbfa91c13c524f664a2f44815178ade8c8f3d9dfaa105b52bd5b87a5"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-stderr-50e6a1f40a944a5189085416166c4ee4/1-1-1-1-1-platform-direct-caller-184e16363d344aa693d16c6ff92973f3/ZornUfsOwner26.cpp",
+      "sha256": "e573f7a825610cbe93017e2ea893314395dd30c5c08c3d7183a0785ff2f0e75e"
+    }
+  ],
+  "observed_scope": "First exact-path SpringBoard process uniqueid only;ordinary successful scalar write(fd2),flags0. At most32 bounded readonly postwrite copies,48-byte tail each;last48 observed bytes retained. Native return/error/control flow preserved.",
+  "publication": "No spin;copyin outside atomic try-lock;busy snapshot explicit. Raw bytes encoded as hex in existing45s/one4096-byte record,oversized text refused.",
+  "limitations": [
+    "Only scalar successful ordinary write(fd2);writev and other log channels unobserved.",
+    "Best-effort copy of user-supplied stderr buffer after native completion can race user buffer modification.",
+    "Truncation to48-byte tail per observed write and32-copy budget;absence does not prove no diagnostics."
+  ],
+  "no_disassembly_or_executable_analysis": true,
+  "diagnostic_user_buffer_read": "Only the buffer explicitly supplied for a successful stderr write;no registers,stacks or arbitrary user memory inspected.",
+  "GPU_startup": false,
+  "touch_startup": false,
+  "device_accessed": false,
+  "device_ready": false,
+  "scope_or_claim_created": false,
+  "lockscreen_proven": false,
+  "first_frame_proven": false,
+  "next_action": "CPU UI first: bind the bounded SpringBoard stderr candidate/parser and exact installed-root receipt to a new independent fixed-runner scope;validate source/input closure and refusal controls before one Recovery-return observation. Existing consumed claims cannot be reused. GPU activation deferred.",
+  "goal_complete": false
+}

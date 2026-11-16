@@ -1,0 +1,48 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 v79 live GPU/GMU open-client preflight",
+  "status": "OFFLINE_FULL_LINKED_UNSELECTED; not packaged or booted",
+  "ancestor": {
+    "candidate": "v78 live provider-state revalidation",
+    "kernel_sha256": "702fed167fad11f04e87efe71b3ae8798e77c1ccde9b137892f9bf1c0592136e"
+  },
+  "change": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-live-open-client-preflight-v79-20261113/ZornRootPlatform26.cpp",
+    "source_sha256": "5855268cac76fdf6b361008cab5cc07e0d11f7d309b51c86b50e552926467aeb",
+    "behavior": "Before the direct GPU preparation slot is claimed, refuse startup if the current board-stage snapshot shows any IOKit client has the concrete GPU or GMU service open. Existing v78 identity, class-name, open/inactive-state, and live-state revalidation still applies.",
+    "scope": "This is a best-effort software-owner conflict filter at preflight time. It is not a provider seize/stop operation, a synchronized exclusion against later opens, an all-master scheduler lease, proof of idle firmware/DMA, or GPU startup authority."
+  },
+  "build": {
+    "compile_exit": 0,
+    "compiler_warning_count": 0,
+    "object_sha256": "7b6155d6e458d4f00b747510772d8c1069dc9d24fa8f88f16cb5c2d76300e782",
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v79-live-open-client-preflight-20261113/full-link/kernel.ZORN26-GPU-OPEN-CLIENT-PREFLIGHT-V79.UNSELECTED.macho",
+    "kernel_sha256": "2cd877cb6dedfdde966fcd209096259251127d77ccc49f70be5dcf3497952c61",
+    "bytes": 30548320,
+    "link_exit": 0,
+    "input_count": 1397,
+    "filelist_input_count": 1318,
+    "direct_input_count": 79,
+    "missing_input_count": 0,
+    "undefined_symbol_lines": 0,
+    "nm_undefined_exit": 0,
+    "link_warning_count": 10,
+    "link_warnings_match_v78": true
+  },
+  "cpu_lock_screen_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "device_operations_performed": false,
+  "candidate_selected_packaged_or_booted": false,
+  "GMU_firmware_or_HFI_started": false,
+  "GPU_execution_submission_fences_Metal_or_GPU_display": false,
+  "touch_driver_work": false,
+  "active_device_gate": "The existing v73 fixed-runner Recovery stop gate remains active; v79 does not clear or bypass it.",
+  "remaining_owner_gap": {
+    "root_constructs_complete_ZornGen7StartupGpuInputs26": false,
+    "real_current_all_master_GPU_GMU_scheduler_quiescence_owner": false,
+    "next_step": "Continue building the real root/board startup owner graph. The observed no-open-client filter is not an owner lease; direct hardware startup must remain fail-closed until actual authority callbacks and exclusive GPU/GMU quiescence are provided."
+  }
+}

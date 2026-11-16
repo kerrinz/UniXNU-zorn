@@ -1,0 +1,29 @@
+{
+  "scope": "partial raw IRQ result availability,source/compile only",
+  "original_SHA": "65c005ce535296871db1b42af7b9e203221102d5a1f9d2c91951ba7cb4a1ee04",
+  "original_header_SHA": "c117f3462603574bf7a922b31105a5f0d59da1bcd1d8f108106c1304c07fc1f4",
+  "candidate_SHA": "59927502c81fda4795b16e0ce6c476d6f8b75dccd81fc6da61556aa805349c89",
+  "before_status_read_lost_on_clear_or_barrier_failure": true,
+  "before_cp_status_lost_on_protect_failure": true,
+  "after_only_successfully_returned_read_fields_published": true,
+  "availability_zero_is_unknown_not_zero_status_or_ACK": true,
+  "decode_marker_only_at_original_success_end": true,
+  "callback_order_primary_returns_poison_and_mask_unchanged": true,
+  "source_corruptions_refused": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "report_bytes_before": 20,
+  "report_bytes_after": 24,
+  "consistent_future_consumers_rebuild_required": true,
+  "changed_Irq_and_POD_layout_iOS17_objects_pass": true,
+  "no_host_callback_readback_IRQ_or_native_execution": true,
+  "no_synthetic_success_peer_or_return_value_model": true,
+  "no_wire_log_mask_route_owner_or_runtime_selection_change": true,
+  "preallocated_GMU_IRQ_HFI_domains_not_combined": true,
+  "programMask_existing_optional_output_review_no_new_fix": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

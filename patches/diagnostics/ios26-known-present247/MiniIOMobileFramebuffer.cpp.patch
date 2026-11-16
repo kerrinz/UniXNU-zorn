@@ -1,0 +1,78 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -57,6 +57,9 @@
+ #if defined(ZORN_IOS26)
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
++#include "ZornKnownPresent247.h"
++static ZornKnownPresent247 zornKnownPresent247;
++extern "C" int zorn26_known_present_snapshot247(uint32_t (&out)[16]) {return zornKnownPresent247.trace.snapshot(out)?1:0;}
+ #include "ZornSurfaceBacking246.h"
+ static ZornPresentTrace245 zornPresentTrace245;
+ extern "C" int zorn26_present_snapshot245(uint32_t (&out)[16]){return zornPresentTrace245.snapshot(out)?1:0;}
+@@ -1420,8 +1423,9 @@
+                 // counter before/after low words,width,height,reserved.
+                 const uint32_t record[16]={2,swapWord(swap,SWAP_ID),producerFence,lease.gpu()?2u:1u,
+                     tail,retired,count,firstSid,lease.gpu()?1u:0u,after>before?1u:0u,ledger?1u:0u,
+-                    uint32_t(before),uint32_t(after),fWidth,fHeight,count?zorn_surface_fence246(firstSid):0};
++                    uint32_t(before),uint32_t(after),fWidth,fHeight,count && lease.gpu()?zorn_surface_fence246(firstSid):0};
+                 zornPresentTrace245.publish(record);
++                zornKnownPresent247.complete(record);
+ #endif
+             }
+         } /* Drop the issuer gate before sleeping, surface destruction or allocator work. */
+@@ -2094,6 +2098,45 @@
+ 	}
+ 
+ 	switch (selector) {
++#if defined(ZORN_IOS26)
++    // Opt-in board test API uses the actual queue and only source-defined scalars.
++    case ZornKnownPresentSubmit247: {
++        unsigned enabled=0;
++        if(!PE_parse_boot_argn("zorn26_software_accelerator",&enabled,sizeof(enabled)) || !ZornKnownPresentMode247(enabled))return kIOReturnUnsupported;
++        if(args->scalarInputCount!=1 || args->scalarOutputCount!=1 || args->structureInputSize || args->structureOutputSize ||
++            !in || !out || !in[0] || in[0]>UINT32_MAX)return kIOReturnBadArgument;
++        const uint32_t sid=uint32_t(in[0]);MiniIOSurface *held=MiniIOSurfaceCopy(sid);
++        if(!held)return kIOReturnNotFound;
++        // The bounded known-image probe is exactly one32x32 packed RGBA layer.
++        // Original present() repeats full storage bounds/hold validation.
++        const bool valid=held->info.width==32 && held->info.height==32 && held->info.bytesPerRow==128 &&
++            held->info.bytesPerElement==4 && held->info.planeCount==0 && held->info.pixelFormat==FOURCC('R','G','B','A');
++        if(!valid){MiniIOSurfaceDrop(held);return kIOReturnUnsupported;}
++        const uint32_t frame=OSIncrementAtomic(&fOwner->fSwapID)+1;
++        if(!zornKnownPresent247.arm(frame,sid)){MiniIOSurfaceDrop(held);return kIOReturnBusy;}
++        uint8_t swap[SWAP_SIZE]={};
++        auto word=[&](unsigned at,uint32_t value){memcpy(swap+at,&value,sizeof(value));};
++        word(SWAP_ID,frame);word(SWAP_SURFACE(0),sid);word(SWAP_ENABLED(0),1);
++        word(SWAP_SOURCE(0)+8,32);word(SWAP_SOURCE(0)+12,32);
++        word(SWAP_DEST(0)+8,fOwner->fWidth);word(SWAP_DEST(0)+12,fOwner->fHeight);
++        word(SWAP_LAYERS_SET,1);word(SWAP_LAYERS_CLEARED,14);
++        const IOReturn raw=fOwner->present(swap);
++        if(raw!=kIOReturnSuccess)zornKnownPresent247.cancel(frame,sid);
++        MiniIOSurfaceDrop(held); // Original queue owns its own hold after success.
++        if(raw==kIOReturnSuccess){out[0]=frame;args->scalarOutputCount=1;}
++        return raw;
++    }
++    case ZornKnownPresentQuery247: {
++        unsigned enabled=0;
++        if(!PE_parse_boot_argn("zorn26_software_accelerator",&enabled,sizeof(enabled)) || !ZornKnownPresentMode247(enabled))return kIOReturnUnsupported;
++        if(args->scalarInputCount!=2 || args->scalarOutputCount!=16 || args->structureInputSize || args->structureOutputSize ||
++            !in || !out || !in[0] || !in[1] || in[0]>UINT32_MAX || in[1]>UINT32_MAX)return kIOReturnBadArgument;
++        uint32_t record[16];
++        if(!zornKnownPresent247.query(uint32_t(in[0]),uint32_t(in[1]),record))return kIOReturnNotReady;
++        for(unsigned i=0;i<16;++i)out[i]=record[i];args->scalarOutputCount=16;
++        return kIOReturnSuccess;
++    }
++#endif
+ 	case kFBMethodGetDisplaySize:                   /* out: width, height */
+ 		if (args->scalarOutputCount < 2) {
+ 			return kIOReturnBadArgument;
+@@ -2699,7 +2742,7 @@
+     if(!fb->start(&provider))return kIOReturnNotReady;
+     publishDisplayNode();
+     unsigned software=0;
+-    if(PE_parse_boot_argn("zorn26_software_accelerator",&software,sizeof(software)) && software==1){
++    if(PE_parse_boot_argn("zorn26_software_accelerator",&software,sizeof(software)) && ZornSoftwareSelected247(software)){
+         // The CPU-only menu selects the inherited service without the Metal
+         // properties, even if a legacy property opt-in was also supplied.
+         const bool submitted=publishAccelerator(&provider,false);

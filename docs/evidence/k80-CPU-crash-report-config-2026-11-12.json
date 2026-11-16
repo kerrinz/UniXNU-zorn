@@ -1,0 +1,59 @@
+{
+  "status": "CPU-standard-crash-report-launch-config-staged-unselected",
+  "recorded_at": "2026-11-12T02:10:39.945945+08:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-crash-report-config-00a78ef1b60347a8a9e524d319a602ca",
+  "overlay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-crash-report-config-00a78ef1b60347a8a9e524d319a602ca/root-overlay/System/Library/LaunchDaemons/com.apple.ReportCrash.plist",
+    "sha256": "95c1378a932585c9ddbaec3646c1e9b051ec38bf523a0c0df69d509c9bb7184c"
+  },
+  "configuration_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/stock-crash-plist-readonly/1-com.apple.ReportCrash.plist",
+    "sha256": "95c1378a932585c9ddbaec3646c1e9b051ec38bf523a0c0df69d509c9bb7184c"
+  },
+  "stock_configuration_report": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/stock-crash-plist-readonly/result.json",
+    "sha256": "9bb32e1206da1db4c4abdd33e4ef47fb6abffbbf61c5f8faf150d45f072df444"
+  },
+  "stock_configuration_matches_embedded_job": true,
+  "stock_SystemVersion": {
+    "BuildID": "546F0FD8-A6AB-11F1-A185-96CC9135BFAC",
+    "ProductBuildVersion": "23G90",
+    "ProductCopyright": "1983-2026 Apple Inc.",
+    "ProductName": "iPhone OS",
+    "ProductVersion": "26.6.2",
+    "SystemImageID": "099710FF-6A3B-4A9D-B181-09D94DE2603F"
+  },
+  "donor_image_sha256_scope": "Previously verified decryption manifest value;this read checked size and unchanged inode/mtime/size/mode,not a new full image hash.",
+  "local_readonly_root_configuration": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/read-only-crash-runtime-config/result.json",
+    "sha256": "6a3ed431507b690bc1145ef93263fae1103a881fb22c8a68a985d051f26b3ccb"
+  },
+  "commands": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/read-only-crash-runtime-config/commands.json",
+    "sha256": "a1841cb2a5936415fafc59f0c43a037fcf14402165fe3738c618d23898433006"
+  },
+  "findings": {
+    "ReportCrash_file_metadata_present": true,
+    "ReportCrash_job_absent_from_checked_LaunchDaemons_and_LaunchAgents": true,
+    "logd_RunAtLoad_and_KeepAlive_configured": true,
+    "log_command_absent": true,
+    "RAMFS_template_contains_CrashReporter_directory": true,
+    "root_configuration_does_not_prove_runtime_reporter_or_logd_state": true,
+    "checked_launchd_xpc_plist_and_disabled_variant_absent": true
+  },
+  "minimal_configuration_change": "Restore exact original ReportCrash launch job,including source-stock ExceptionServer service;no guessed keys or arguments.",
+  "risk": "Enabling the standard reporter adds process/exception handling and volatile report writes;it may alter timing and resource use. Must stay on RAMFS and retain watchdog. Configuration gap is a diagnostic gap,not proven cause of SpringBoard SIGTRAP.",
+  "regression": "Binary plist copy hash equals the original;decoded standalone and embedded23G90 jobs match. Existing RAMFS init source uses the actual var template and no retained Data restore. Root composition,normal report message extraction and native validation remain required.",
+  "phone_accessed": false,
+  "root_image_modified": false,
+  "root_installed": false,
+  "device_ready": false,
+  "GPU_startup": false,
+  "no_disassembly_or_executable_analysis": true,
+  "next_action": "CPU UI first: compose independent root with the exact stock23G90 ReportCrash launch plist and a bounded ordinary crash-report message collector;preserve native failure behavior and all old images. Validate RAMFS-only reporting,full local root delta/replay/layout and actual kernel/ADT binding before any separately reviewed installer/single-boot scope. No guessed activation interface or selector88;GPU activation deferred.",
+  "goal_complete": false,
+  "current_root_embedded_xpc_config_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-stderr26-50e6a1f40a944a5189085416166c4ee4/read-only-xpc-config/result.json",
+    "sha256": "ce133afaea3a718ab5029eb49ddf031104e3f14152f4b09878896cb27305eeeb"
+  }
+}

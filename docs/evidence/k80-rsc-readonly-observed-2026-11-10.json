@@ -1,0 +1,127 @@
+{
+  "status": "single-captured-CommandDB-binding-and-RSC-readonly-trial-verified-Recovery",
+  "date": "2026-11-10T12:12:02.138335+00:00",
+  "scope": "single-K80-ios26-captured-CommandDB-RSC-readonly-CPU300s-v18",
+  "run_id": "3c09951091f0496385b4559392dbc475",
+  "kernel_sha256": "f30fde490c089673f989a761310fc78d3f45622914a60f7493d53d1f9e64cb33",
+  "boot_sha256": "2a8a67411001ab50879606a8e176b4b6e9d16df9cfe9e4cca19d183ae2b40cb1",
+  "review": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/review.json",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/trial/run.json",
+  "decoded_native_record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/trial/decoded-native-record.json",
+  "native_record_text": "K80 RSC: b=7/00000000/00000000/00000000/3 sub=1/00000000 cf=3fff in=00000000 mk=00000000 cp=00000000 cl=00000000 bd=00000000 dc=0 v=00000001 bytes=131072 dn=173 r=1/00000000 rf=7ff op=00000000 p=00000000 rev=00030200 cfg=800c8104 sol=04010100 ie=00000001 is=00000000 id=2 off=d00 mt=8 nc=16 ch=1 n=8 am=00000007 sr=000000ff cr=000000ff er=000000ff busy=00000000; EL0 PID1; GPU not started",
+  "source_packet_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/verification.json",
+  "parser_and_fixed_runner_checks": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/runner-host-check.json",
+  "claim_consumed_no_repeat": true,
+  "automatic_verified_Recovery_return_seconds": 332.3742380839976,
+  "actual_Recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "actual_Recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "protected_captures": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/protected-capture-comparison.json",
+  "protected_capture_sets": 7,
+  "root_mount_and_PID1_EL0_entry_proven": true,
+  "captured_CommandDB_binding_observed": true,
+  "actual_captured_CommandDB_returns": {
+    "submission_returned": true,
+    "submission_raw": 0,
+    "intent_returned": true,
+    "intent_raw": 0,
+    "construction_returned": true,
+    "construction_raw": 0,
+    "capture_returned": true,
+    "capture_raw": 0,
+    "claim_returned": true,
+    "claim_raw": 0,
+    "mapping_returned": true,
+    "mapping_accepted": true,
+    "copy_returned": true,
+    "decoder_returned": true,
+    "decoder_raw": 0,
+    "header_observed": true,
+    "observed_version": 1,
+    "private_bytes": 131072,
+    "entry_count": 173,
+    "reader_returned": true,
+    "binding_returned": true,
+    "binding_raw": 0,
+    "private_capture_origin": true,
+    "data_ready": true
+  },
+  "RSC_register_reads_observed": true,
+  "actual_RSC_read_returns": {
+    "creation_returned": true,
+    "creation_raw": 0,
+    "operation_returned": true,
+    "operation_raw": 0,
+    "provider_returned": true,
+    "provider_raw": 0,
+    "provider_opened": true,
+    "descriptor_observed": true,
+    "mapping_returned": true,
+    "mapping_accepted": true,
+    "revision": 197120,
+    "configuration": 2148303108,
+    "solver": 67174656,
+    "observed_irq_enable": 1,
+    "observed_irq_status": 0,
+    "drv_id": 2,
+    "TCS_offset": 3328,
+    "maximum_TCS_from_configuration": 8,
+    "commands_per_TCS_from_configuration": 16,
+    "channel_count": 1,
+    "TCS_count": 8,
+    "active_mask_from_native_cells": 7,
+    "status_read_mask": 255,
+    "control_read_mask": 255,
+    "command_enable_read_mask": 255,
+    "observed_zero_TCS_status_mask": 0
+  },
+  "native_record_refusal": null,
+  "camera": [
+    {
+      "report": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/camera/rsc-late.json",
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/camera/rsc-late.jpg",
+      "seconds_since_fastboot": 348.33411717414856,
+      "interpretation": "TWRP Recovery UI/keypad visible after automatic return;not an iOS lockscreen,no passcode interaction."
+    },
+    {
+      "report": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/camera/rsc-live.json",
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-capture26-3c09951091f0496385b4559392dbc475/root-trial-rsc-readonly/camera/rsc-live.jpg",
+      "seconds_since_fastboot": 122.68200302124023,
+      "interpretation": "Landscape handset with unreadable console-like text;owner clarification is black background/white boot text. No legible error or iOS lockscreen/desktop proof."
+    }
+  ],
+  "limits": [
+    "All actual register/data values are this exact kernel/epoch observation only. Do not replay them as current state or turn zero-status mask/provider open into cold/power/security/PM/IRQ authority.",
+    "No TCS register programming,masked native RSC IRQ registration/enable,RPMh vote,GMU/HFI or GPU execution was selected. Hardware IRQ-enable register content is an observation,not our IRQ enable result.",
+    "Protected captures cover only the listed metadata/fences/sets;not complete Android/Data/filesystem contents.",
+    "The native writer/readback completion is not independently logged;do not claim dual SUCCESS.",
+    "TWRP keypad is Recovery UI,not iOS lockscreen/SpringBoard. GPU/Metal/presentation/touch acceptance remains incomplete.",
+    "Scope is closed and claim consumed;no repeat/boot retry."
+  ],
+  "RSC_controller_initialized_proven": false,
+  "RSC_cold_PM_IRQ_or_GPU_ready_proven": false,
+  "native_writer_readback_success_proven": false,
+  "GPU_executed": false,
+  "full_goal_complete": false
+}

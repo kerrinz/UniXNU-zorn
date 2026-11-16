@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "scope": "Isolated native CPU registry source/host/new iOS17 object and relocatable checks; no allocation, runtime or hardware qualification.",
+  "result": {
+    "updated": "2026-11-01T22:01:23.787437+08:00",
+    "state": "isolated32-real-native-object-registry-implemented-and-ios17-compiled-allocation-off",
+    "new_native_sources": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-backing-registry/ZornGpuRuntimeBackings.h": "ef08dff0912d0ee4581aedbbe646a8ee717634f243d6ff28260e5b1642abf026",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-backing-registry/ZornGpuRuntimeBackings.cpp": "f5af36c22953088a66e8caf180662fb8bc545ca92103445ae557ea0ad40ab3d5"
+    },
+    "persistent_real_NativeAdrenoMemory_objects": 32,
+    "host": "32 real default native objects; duplicate/conflict/retained/raw64/full/alias/zero native availability checks passed; no allocation/address model",
+    "new_actual_source_mutations_refused": 3,
+    "native_registry_raw_SHA": "d2440c295a3f85ef969bb494e7c1fe4a98401e6e1b69786983e5da0d16033410",
+    "native_decoder_dependency_raw_SHA": "71409d19a2707374153e7722a45cdffe211f0598dee28dac365e35a306528324",
+    "two_new_target_objects_independent_raw_SHA_equal": true,
+    "constinit_persistent_storage_no_initializer": true,
+    "native_recursive_inputs": 410,
+    "native_relocatable_imports": [
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_memcmp",
+      "_memcpy"
+    ],
+    "no_provider_method_called_or_imported_by_registry": true,
+    "metadata_reserved_retained_unknown_masks_not_native_allocation_evidence": true,
+    "adapter_error_signed64_first_error_retained_not_native_status": true,
+    "native_attempted_allocated_status_available_runtime_complete": 0,
+    "new_wire_or_decoder_logic": false,
+    "default_OFF_no_runtime_entry": true,
+    "new_FD_kernel_candidate": false,
+    "phone_calls": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "limitations": [
+      "Standalone compile/readable object checks only, not final kernel ABI/FD or hardware rights.",
+      "Host uses only IOReturn/kIOReturnSuccess scalar shim with actual current NativeAdrenoMemory class; no allocator/object/address success double.",
+      "Requirement input must be a stable byte-identical existing planner output; stricter duplicate policy compares all original request words except header.",
+      "Atomic entry protects local mutation; not hardware ownership, arbitrary caller/address authentication or wall-time proof.",
+      "Unchanged C recipe retains stack guards and warned about an unused missing libsa include search directory; every actually used dependency is bound.",
+      "Initial host scalar-header refusal and initial link checker refusal of ordinary stack guards retained; production source/flags/guards were not weakened."
+    ]
+  },
+  "source_recipe": "UniXNU-zorn/scripts/check-zorn-runtime-backing-registry.py",
+  "source_recipe_sha256": "2eddbfef746ff1963b114a2f490876aca7b888be3f1e7c71a16b50bdd484b6e7",
+  "local_native_link_recipe": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-backing-registry/link-new-dependency.py"
+}

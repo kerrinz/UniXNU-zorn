@@ -1,0 +1,31 @@
+{
+  "scope": "pure extracted size-preflight predicate only;allocate/objects never executed",
+  "original_SHA": "54cc3b8749ea157a3918711a386756385f1594036e67094ac14ff4367b9da17b",
+  "header_SHA": "1503c70ce53d097ff1b58dc9e529afb8a25c4a9d0d37add454365672d7527fa3",
+  "candidate_SHA": "584faf650b6797533ef60e0a778bb2b31cad1af5e02a48bff5fc51b4898c7ceb",
+  "three_invalid_aligned_uint64_tuples_accepted_before_refused_after": true,
+  "three_inbudget_boundary_controls_preserved": true,
+  "host_outputs": {
+    "before": "PASS=1 overflow_tuples_refused=0 overflow_tuples_accepted=3 exact_plus_page_and_below_preserved=3 no-native-call\n",
+    "candidate": "PASS=1 overflow_tuples_refused=3 overflow_tuples_accepted=0 exact_plus_page_and_below_preserved=3 no-native-call\n"
+  },
+  "ASan_UBSan_pass": true,
+  "default_callers_not_claimed_to_hit_overflow": true,
+  "public_size_input_range_contract_repaired": true,
+  "only_preallocation_size_guard_changed": true,
+  "new_candidate_iOS17_object_pass": true,
+  "object_SHA": "2d9f5978667cec07dbfba9f9281ace95862bdbeb6ce285ba887bc6a744aff7ba",
+  "object_not_linked_or_executed": true,
+  "no_native_object_getter_allocator_provider_or_address_model": true,
+  "existing_layout_constants_not_K80_policy": true,
+  "catalog_original_patches_and_profiles_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "review_document_SHA": "771912a24e46e03b7001c4c61499b010a5e08674942c38ec7bcc37e93cf9c3e9",
+  "callback_SIZE_MAX_investigation_closed_no_patch": true,
+  "callback_review": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-size-sum-contract-20261103/callback-offset-review.md",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-size-sum-contract-20261103/gmu-size-sum.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

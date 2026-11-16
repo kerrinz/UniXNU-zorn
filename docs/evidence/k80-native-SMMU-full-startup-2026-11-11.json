@@ -1,0 +1,344 @@
+{
+  "status": "offline-compiled-reference-linked-unselected",
+  "time": "2026-11-10T22:57:51.520640+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-icc-before-smmu-context-793bdf7340dc43ad995c9c6d0d9e3e3e",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/source.patch",
+  "changed_sources": [
+    "ZornGen7DarwinBoardOwner.cpp",
+    "ZornGen7DarwinBoardOwner.h",
+    "ZornGen7InactiveOwner26.cpp",
+    "ZornGen7InactiveOwner26.h",
+    "ZornGen7RegisterMaps26.cpp",
+    "ZornGen7RegisterMaps26.h",
+    "ZornGen7RegistryStartup26.cpp",
+    "ZornGen7SmmuDomain26.cpp",
+    "ZornGen7SmmuDomain26.h",
+    "ZornGen7SmmuFaultIrq26.cpp",
+    "ZornGen7SmmuFaultIrq26.h",
+    "ZornGen7SmmuRuntimePm26.cpp",
+    "ZornGen7SmmuRuntimePm26.h"
+  ],
+  "dependent_translation_units": 37,
+  "verified_candidate_header_paths": true,
+  "source_selector": "zorn26_native_smmu_full=1, only the full route with native clock owner; absent from deployed probe/config",
+  "startup_flow": "Native CX and SMMU power resume, retained PM claim and readonly hardware ID probe, early ICC/QoS, native GMU cold clocks/AHB, authorized CX timer, checked masked global IRQ, actual CR0 active/cold dispatch, bank reservations and existing context/stream stages.",
+  "authorities": "Preserve map/access/observer, runtime admission, actual global SPI, active fault control, cold whole-controller, bank, stream and fresh timer grants. No authority derived from the Linux or device-tree descriptions or the PM claim.",
+  "active_path": "Existing enabled controller: global fault control plus checked arm with no TBU halt. State is reread before writes.",
+  "cold_path": "Disabled controller only: existing TBU vote and QTB fence, independent cold-controller grant, existing initialization/readback/IRQ arm and normal QTB resume. No fallback, reset or retry on failure.",
+  "compile": [
+    {
+      "name": "ZornUfsOwner26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornUfsOwner26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/native-smmu-cfgprobe-boot-7063c40a7a194d5a86fa7b6b9f156e79/1-1-1-1-1-platform-direct-caller-184e16363d344aa693d16c6ff92973f3/ZornUfsOwner26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1230-ZornUfsOwner26.cpo",
+      "sha256": "7471ab645bc056d19d18201ef4ce74328254e70996523939bf7ff0a77738ee3f",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7PreparedRuntime26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7PreparedRuntime26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7PreparedRuntime26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1235-ZornGen7PreparedRuntime26.cpo",
+      "sha256": "2ed4121ce4f373d2e1f02a9a023d7ea774ea750b9a79c0176150ed7c7538ddc4",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7CxGdscNodes26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CxGdscNodes26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CxGdscNodes26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1237-ZornGen7CxGdscNodes26.cpo",
+      "sha256": "46021472f75df579d0a989898c4bf77bbed199620958bd87b15db085dd9edda0",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7RegisterMaps26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RegisterMaps26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RegisterMaps26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1245-ZornGen7RegisterMaps26.cpo",
+      "sha256": "03be062b0575ce28cfc82bde7c85a69812444dabd2bd3c70b308ea728d1f4074",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7SmmuRuntimePm26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7SmmuRuntimePm26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7SmmuRuntimePm26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1246-ZornGen7SmmuRuntimePm26.cpo",
+      "sha256": "7485271315ff28668fc15a864e45be8beb1590280e399fa9a155c1d181bcb6a2",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7SmmuDomain26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7SmmuDomain26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7SmmuDomain26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1250-ZornGen7SmmuDomain26.cpo",
+      "sha256": "d537c86840f0b5d9646af9ce7bf0c6f0113bb426bef1855a51256ce774046f86",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7SmmuFaultIrq26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7SmmuFaultIrq26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7SmmuFaultIrq26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1256-ZornGen7SmmuFaultIrq26.cpo",
+      "sha256": "c43ceddeee3cc8e587a75a508b561508b60b8fc256252203df1b3642d1ddd2cb",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7GmuIrq26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7GmuIrq26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7GmuIrq26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1270-ZornGen7GmuIrq26.cpo",
+      "sha256": "08cc760b39542947922214b6865167d9fdea7149e930aed169070870810cc64a",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7DirectHfi26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7DirectHfi26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7DirectHfi26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1271-ZornGen7DirectHfi26.cpo",
+      "sha256": "f16ebdd3796272ac730e675f329a2f1090845988e34fd95f9997c5df2c42fb0b",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7HwschedHfi26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HwschedHfi26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HwschedHfi26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1279-ZornGen7HwschedHfi26.cpo",
+      "sha256": "b54baae293197e4155ada78f898aa0db8549151726341a371b3211ca696644bc",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7StartupOwner26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7StartupOwner26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7StartupOwner26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1287-ZornGen7StartupOwner26.cpo",
+      "sha256": "d50a3ab6d12b91fdd7110c06d444bce031637917f31643fb6b5a649ea7c22747",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7StockIdentity26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7StockIdentity26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7StockIdentity26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1288-ZornGen7StockIdentity26.cpo",
+      "sha256": "0801ad6ee265980e2961e2ca7a4d34d7eacd945f468330e2371375879735c2fc",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7HostGpuCode26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostGpuCode26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostGpuCode26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1291-ZornGen7HostGpuCode26.cpo",
+      "sha256": "506f31a6ef68c3cadf9e53520da3f770d284ef286a01c4e95b16c1fc1770ce0c",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7HostGpuRegisters26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostGpuRegisters26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostGpuRegisters26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1292-ZornGen7HostGpuRegisters26.cpo",
+      "sha256": "944af1a9f67d8b9ce494d8540ed544808a151093ca754ffcc3c70ee66fedb61f",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7GpuIrq26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7GpuIrq26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7GpuIrq26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1293-ZornGen7GpuIrq26.cpo",
+      "sha256": "c009f3993be9ef2c777909a1fc7b7b5642fba72c86a54a8dc1ea36a4154d3329",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7HostRing26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostRing26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7HostRing26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1295-ZornGen7HostRing26.cpo",
+      "sha256": "fa4f7813222d420620add37b10ba5cd7cd79fe1bf9ebc6c55e1289927004fc45",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7ZapOwner26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ZapOwner26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ZapOwner26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1296-ZornGen7ZapOwner26.cpo",
+      "sha256": "31a16944992bf7299b42b8c2c1cd16e1bceb39033deb2c4d32881f945fadb0e7",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7AppExecution26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7AppExecution26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7AppExecution26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1309-ZornGen7AppExecution26.cpo",
+      "sha256": "1934d6c1312591c953f9e1a3470bc06407af124b495b2e4b569c254e4c6354a7",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7NativeBoardStage26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7NativeBoardStage26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7NativeBoardStage26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1311-ZornGen7NativeBoardStage26.cpo",
+      "sha256": "458e4208d4143c1c65b916b2db47a731b87e9fb77815b33c7aeb642e47b1975d",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7PlatformBoardBridge26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7PlatformBoardBridge26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-cfgprobe26-7063c40a7a194d5a86fa7b6b9f156e79/affected-source/ZornGen7PlatformBoardBridge26.cpo/ZornGen7PlatformBoardBridge26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1312-ZornGen7PlatformBoardBridge26.cpo",
+      "sha256": "00771815a88baadef9977a7485904450ef407002478ef183613979964bf32e89",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7CommandDbResources26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CommandDbResources26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CommandDbResources26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1314-ZornGen7CommandDbResources26.cpo",
+      "sha256": "c176f5d5fa99af8bf0310b2f848cd4bdb080f6544a07224f0b89b2602449bf1d",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7RscControllerOwner26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscControllerOwner26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscControllerOwner26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1316-ZornGen7RscControllerOwner26.cpo",
+      "sha256": "430fc8cd3b8a3cf88732d983253e9bc715396facf6a8fb44384efc516b555542",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7QtbFence26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7QtbFence26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7QtbFence26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1317-ZornGen7QtbFence26.cpo",
+      "sha256": "d547b02181ed4d41530760d5a7c43625ad2672a6deb50424d8e57ad6daf8190d",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7InactiveOwner26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7InactiveOwner26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7InactiveOwner26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1322-ZornGen7InactiveOwner26.cpo",
+      "sha256": "ad8200c775e64d45f9b3bde16a8a6ceca3923327ac785307fe2294ab161ec776",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7FirmwareAssets26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7FirmwareAssets26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7FirmwareAssets26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1323-ZornGen7FirmwareAssets26.cpo",
+      "sha256": "a3f1f30b16da5d01e46c327bc3eab92aeb390d1af255e45da858bd87baa3900e",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7BoardInputs26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7BoardInputs26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7BoardInputs26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1327-ZornGen7BoardInputs26.cpo",
+      "sha256": "3667574043a7c31c8767505ea49fad94ba2b8899b23d68b0b7c04286e5e69ea6",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7MmioCallbacks26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7MmioCallbacks26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7MmioCallbacks26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1331-ZornGen7MmioCallbacks26.cpo",
+      "sha256": "d35ccf5a56cae4f2c1d58edff84b8f72d3194275702661269bab8ae64c7c2f17",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7DarwinBoardOwner.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7DarwinBoardOwner.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7DarwinBoardOwner.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1374-ZornGen7DarwinBoardOwner.cpo",
+      "sha256": "5f779209fa242a16c759bf0881efe6913125c6cd10ef4931490beebe1b021c17",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7ClockResources26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ClockResources26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ClockResources26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1384-ZornGen7ClockResources26.cpo",
+      "sha256": "752ff1372b9c732601a654eeed70b38caec78695d546bac6cced22ac164253fa",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7CommandDbSnapshot26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CommandDbSnapshot26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CommandDbSnapshot26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1385-ZornGen7CommandDbSnapshot26.cpo",
+      "sha256": "9cb85b54487df0268d226827514632ffdc73da7878c686e188e7377338782b10",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7RscRuntime26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscRuntime26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscRuntime26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1386-ZornGen7RscRuntime26.cpo",
+      "sha256": "41d0973f949e6ff5c0cff3b432c27488b4a0199abae905233e91416e06e22b4b",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7RscProbe26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscProbe26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscProbe26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1388-ZornGen7RscProbe26.cpo",
+      "sha256": "88c4e6f1929625541ba0caa983ff514c7cb81beb68c4e750a439baa056865dbc",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7RscRegistry26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscRegistry26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RscRegistry26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1390-ZornGen7RscRegistry26.cpo",
+      "sha256": "71687966e73556c5b1ba2e0404d7732fe7fadd0c997935ddb61c756246a9e059",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7CommandDbRegion26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CommandDbRegion26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7CommandDbRegion26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1391-ZornGen7CommandDbRegion26.cpo",
+      "sha256": "566d813466cfa36da1cb1c09973c99979ab05fae1e1e71b9266b51092171da4b",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7RegistryStartup26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RegistryStartup26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7RegistryStartup26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1392-ZornGen7RegistryStartup26.cpo",
+      "sha256": "d6feada5f2219557cbfa6475d57492b8362a07122ddb81c85769b834da4a20c2",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7ArcNodes26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ArcNodes26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ArcNodes26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1393-ZornGen7ArcNodes26.cpo",
+      "sha256": "7dbb0b7083ebc2ea53157793722e34597fd35ba683884e97f3bfe632f57f5d0b",
+      "warnings": 0
+    },
+    {
+      "name": "ZornGen7ClockNodes26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ClockNodes26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/ZornGen7ClockNodes26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-icc-before-smmu-context26-793bdf7340dc43ad995c9c6d0d9e3e3e/full-link/inputs/1394-ZornGen7ClockNodes26.cpo",
+      "sha256": "2ca72147e423cab80bcd793a58e448242a0489c9d5b95c0ccfd508cbd2c01745",
+      "warnings": 0
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/full-link/kernel.ZORN26-NATIVE-SMMU-FULL-STARTUP.UNSELECTED.macho",
+    "sha256": "cea68faf7d5a60f137ab294b50132fec4f91464a305136ea2d9229d706ec557c",
+    "bytes": 30462200,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 37,
+    "preserved": 1360,
+    "undefined_symbols": 0
+  },
+  "symbol_check": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-full-authorized26-2e1bd4b9aa7b4179916dcbe3cbdead0b/linked-smmu-startup-symbols.txt",
+  "native_execution": false,
+  "device_execution": false,
+  "whole_image_readback": false,
+  "corrected_cfgprobe_scope_changed": false,
+  "full_startup_authority_producer_verified_on_hardware": false
+}

@@ -1,0 +1,44 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_LEGACY_ALIGNMENT_UNIT_REPAIR",
+    "timestamp": "2026-11-03T19:26:00.181736+00:00",
+    "changed_files": [
+      "kgsl.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/legacy-align-unit.UNAPPLIED.patch",
+    "patch_sha256": "aeef8ab49580f6d04e3b69992fa763eccc7ccc7e6fcfba1162ab6778c9118eda",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/source-contract.json",
+    "checks": {
+      "unit_mismatch_witness": true,
+      "affected_length_controls": 3,
+      "unchanged_higher_branch_controls": 5,
+      "below_threshold_control": true,
+      "source_mutations_refused": [
+        "old-unit",
+        "wrong-threshold",
+        "wrong-exponent"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "one_existing_macro_argument_changed": true,
+      "no_new_threshold_K80_geometry_or_runtime_selection": true,
+      "Linux_native_device_allocator_getter_map_or_callback_execution": false,
+      "no_entry_buffer_address_handle_or_provider_model": true,
+      "old_suites_run": false
+    },
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/linux-reference",
+    "runtime_selection": false,
+    "Linux_kernel_or_native_target_compiled": false,
+    "GPU_native_device_or_callback_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/archive.json"
+}

@@ -1,0 +1,43 @@
+{
+  "updated": "2026-11-02T10:34:24.206207+08:00",
+  "state": "Catalog149-private-process-VM-owner-registry-unapplied",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-process-vm-owner/source-contract.json",
+  "new_source_mutations_refused": 5,
+  "new_actual_object_mutations_refused": 2,
+  "new_current_iOS17_independent_pairs": 3,
+  "new_union_inputs": 390,
+  "per_object_inputs": [
+    343,
+    343,
+    378
+  ],
+  "sealed_original_Publish_inputs": 378,
+  "new_driver_patches": 1,
+  "patch_count": 27,
+  "ProcessVm_bytes_before": 1008,
+  "ProcessVm_bytes_after": 1016,
+  "GpuContext_bytes_before": 10520,
+  "GpuContext_bytes_after": 10528,
+  "Publish_bytes_unchanged": 280,
+  "all27_patches_independent_UNAPPLIED": true,
+  "no_native_API_or_success_owner_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact catalog149 NativeAdrenoGpuContext/ProcessVm and actual published mount/failed-open/close/checkCpSwitch source. Frozen scratch/Entry/release/dynamic direct evidence read and SHA bound;legacy GpuContext has no createVm/destroyVm,so no old ABI/policy proof transferred.27th candidate is isolated from all26 parents and actual repository/submodule. No board constants/OS/profile/caller selection changed.",
+    "construction": "createVm starts outputNULL,checks ready/switching,selects an unmarked software ASID except kernel,then new ProcessVm. It prepares dynamic table owner/arena/state,sets configASID and detached context metadata,attaches VM with keepStreamsOnFailure,then maps existing11 shared kernel buffers. It sets ProcessVm attached only after attach0. ASID bitmap,asid_ and live_vms update only on complete construction0. These are source inputs/software counts,not K80 bank/ASID/route/power or DMA rights.",
+    "concrete_owner_loss": "On returned failure,createVm may unmap/detach/release and delete only if all cleanup accepted. If VM poisoned or any cleanup fails,it deliberately keeps allocated object/backing but returns status with outNULL;original sole ProcessVm pointer is local and lost. Actual failed-open mount may receive a successful ProcessVm,then ignore failed destroyVm and let localspace disappear;checkCpSwitch has another local-space cleanup failure. Native ref counts/backing retention do not keep a discoverable C++ allocation owner. This is conditional source loss of CPU owner roots,not observed K80 UAF/native failure or safe release permission.",
+    "failure_paths": "VM attach reaches real stream/table observation;returned observation error poisons and retains scratch/tables. Map also has existing returned error/poison paths;construction cleanup may itself fail. These actual nonzero API branches select owner-loss exits without assuming stable visibility bind failure or creating a successful hardware/error peer. Whether such failures occur on K80 remains unavailable. Comments explicitly require poisoned VM keeps memory and destroy failure keeps object for good;candidate enforces this existing retention intent,not a new quarantine/free/retry design.",
+    "repair": "Private typed ProcessVm owner_next_ and GpuContext process_vms_ root. Each new nonnull object links once before any prepare/attach/map call. The two existing successful delete sites unlink exact node first using private pointer-to-link helper,then execute original delete. No new delete/allocator/native cleanup/reset/retry/ASID action,return/counter or public accessor/wire. Failed exits do not withdraw root. Failed-open/check local pointer loss therefore leaves ProcessVm reachable from actual GpuContext while that owner remains alive. This is C++ allocation ownership,not OSObject retain or hardware quarantine lease.",
+    "unchanged_domains": "Full inverse restores original two files byte-for-byte outside private owner bookkeeping. Original output/status/partial unmap and cleanup order,keepStreamsOnFailure,bitmap/live counter updates and class defaults preserved. ASID is still marked only on success;failed private config can contain chosen numeric ASID without marking bitmap. Candidate does not attest safe reuse,reserve failed ASID,normalizecounts or fix unrelated secondary error availability. Destroy still sets attached false before table release and can refuse subsequent retry;we do not change that policy.",
+    "published_callers": "Normal mount/core operations and clientClose use source g.lock;failedscope newly opened core has no BOs/used range and releaseAll skips wait for unscoped-unused state by original code. No failure policy generalized from arbitrary standalone/reentrant/concurrent caller. Successful mount transfers space to member;failed close retains live/core/space,while failed-open may drop local pointer. Existing checkCpSwitch can execute real submission/MMIO and was only read,never called or treated as inert bookkeeping.",
+    "parent_owner_limit": "Registry assumes actual parent GpuContext survives and serialized intact list. Actual board wrapper stores context in static board_gpu_context and inspected catalog has no delete of it,but publisher g.context remains raw borrowed pointer and active K80 producer is unbound. Default parent destructor does not free registry or grant safe teardown. No successful owner/address peer or runtime iteration/recovery interface exposed. Parent/provider lifetime and ASID exclusion beyond bound source are explicit next work,not solved by node storage.",
+    "source_checks": "5new source mutations refused:missing root before prepare,unlink dropping preceding nodes,clean-delete left linked,destroy-delete left linked,and failed-create prematurely unlinked. Independent original two-file review check/apply equals compiled candidate;inverse entire original bytes.2actual Mach-O mutations remove emitted owner-root registration or successful-destroy unlink store;both refused. Actual pointer link before first prepare and both unlink-before-delete paths verified,without executing native object methods.",
+    "target": "3fresh currentiOS17 independent rawSHA pairs:original GpuContext baseline first compiled for this new owner target,candidate GpuContext,and affected whole Publish with coherent candidate header.343/343/378 per-object inputs;390union. No original Publish recompile:sealed378inputs/currentSHA/object/import names checked. GpuContext candidate/original imports same;affected Publish imports equal sealed original. ProcessVm1008->1016,owner_next1008;GpuContext10520->10528,root10520;existingprefix/Publish280 unchanged. Actual board allocation10528 and head zero store emitted. This requires future wholeowner rebuild,not new finalkernel/vtable/AppleABI/component execution. No rolefullcore failure retry or flags/SDK/import guard relaxation.",
+    "remaining": "All27 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/archives/consumedclaim/recoveredrun preserved.25thinitpartial/failurepairunknown,26thpreallocguard frozen. All native/processVM/ASID/table/provider/allocator/cache/map/MMIO/phone APIs OFF,no new runtimecaller/component/FD/kernel/candidate/wire/CPU import policy. Real owner/context/route/stop/DMA/readablefailure/firstGPU/rendering/Metal/rolefullcore/core/externalmanager remain incomplete."
+  },
+  "qualification": "Isolated source/type/actual object ownership evidence only;not parent/provider lifetime/ASIDlease/finalkernel/AppleABI/stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

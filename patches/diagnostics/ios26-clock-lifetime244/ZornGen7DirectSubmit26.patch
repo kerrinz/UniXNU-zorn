@@ -1,0 +1,16 @@
+--- /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v185-kernel-client-info-f9db3c322f1348d5b8175f07ed5fc9a9/direct-runtime/ZornGen7DirectSubmit26.cpp
++++ /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7DirectSubmit26.cpp
+@@ -4,11 +4,11 @@
+ #include <IOKit/IOLib.h>
+ // Optional board clock: host checks without a published driver collect no
+ // timings. Observations never change submission, references or cache policy.
+-extern "C" uint64_t (*zorn_direct_vm_now_us)(void);
++extern "C" uint64_t zorn_direct_vm_now_us(void);
+ extern "C" {volatile uint64_t zorn_direct_submit_cost[12];}
+ /* Accepted jobs, total IBs, largest batch, jobs with more than 16 IBs. */
+ extern "C" {volatile uint64_t zorn_direct_submit_batches[4];}
+-static uint64_t submitDiagNow(void) {return zorn_direct_vm_now_us?zorn_direct_vm_now_us():0;}
++static uint64_t submitDiagNow(void) {return zorn_direct_vm_now_us();}
+ static void submitDiagRecord(unsigned slot,uint64_t began) {
+     if(!began)return;
+     const uint64_t end=submitDiagNow();if(end<began)return;

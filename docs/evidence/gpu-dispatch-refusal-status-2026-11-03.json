@@ -1,0 +1,66 @@
+{
+  "early_status": {
+    "scope": "early dispatch refusal vs existing Tally result dataflow; source and extracted guard compile only",
+    "original_SHA": "62bbc219026cb7a31d307de6aa21c3f4e2700ffde922e22219dca45ed06cebe7",
+    "candidate_SHA": "cd62989e5d01eff4adf091167c901f2c956a368aadc8de4c084e7f8e4398b5c1",
+    "three_early_failure_traces": [
+      {
+        "predicate": "if(expected_in==SIZE_MAX || expected_out==SIZE_MAX)",
+        "returned_symbol": "kIOReturnUnsupported",
+        "before_recorded_symbol": "kIOReturnSuccess",
+        "after_recorded_symbol": "kIOReturnUnsupported"
+      },
+      {
+        "predicate": "if(input_size!=expected_in || output_size!=expected_out)",
+        "returned_symbol": "kIOReturnBadArgument",
+        "before_recorded_symbol": "kIOReturnSuccess",
+        "after_recorded_symbol": "kIOReturnBadArgument"
+      },
+      {
+        "predicate": "if((expected_in && !input) || (expected_out && !output))",
+        "returned_symbol": "kIOReturnBadArgument",
+        "before_recorded_symbol": "kIOReturnSuccess",
+        "after_recorded_symbol": "kIOReturnBadArgument"
+      }
+    ],
+    "three_source_mutations_refused": [
+      0,
+      1,
+      2
+    ],
+    "only_three_status_assignments_changed": true,
+    "caller_return_codes_and_existing_stats_fields_unchanged": true,
+    "accepted_dispatch_clock_and_output_behavior_unchanged": true,
+    "extracted_guard_iOS17_object_pass": true,
+    "whole_UserClient_compilation_not_attempted_due_frozen_role_API": true,
+    "no_native_object_dispatch_externalMethod_clock_callback_or_provider_execution": true,
+    "no_wire_log_field_or_runtime_selection_change": true,
+    "catalog_pins_32patches_profiles_unchanged": true,
+    "hardware_qualification": false,
+    "device_operations": false
+  },
+  "map_diagnostics": {
+    "scope": "independent closed-client BoMap failure diagnostic null-VM source path",
+    "original_SHA": "62bbc219026cb7a31d307de6aa21c3f4e2700ffde922e22219dca45ed06cebe7",
+    "candidate_SHA": "d4850ba775d24be5b0e04bf7721cf875ab98ae9d9242dce07c18bbdcfc6aabf2",
+    "closed_client_vm_null_source_path": true,
+    "mapBo_NotReady_before_lookup": true,
+    "failure_block_previous_two_queries_unconditional": true,
+    "candidate_queries_both_guarded_by_vm_presence": true,
+    "no_fabricated_zero_counts": "unavailable VM skips only existing span/object diagnostic stores; prior row retained, not asserted fresh",
+    "return_status_and_other_existing_diagnostic_fields_unchanged": true,
+    "not_combined_with_early_status_candidate": true,
+    "source_only_no_live_crash_reproduction": true,
+    "no_whole_UserClient_compile_due_frozen_role_API": true,
+    "no_dispatch_mapBo_getter_native_object_or_provider_execution": true,
+    "hardware_qualification": false,
+    "three_source_corruptions_refused": [
+      "removed-guard",
+      "wrong-polarity",
+      "invented-count"
+    ]
+  },
+  "two_independent_UNAPPLIED_candidates_not_combined": true,
+  "no_device_operations": true,
+  "hardware_qualification": false
+}

@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-09T11:44:37.785360+00:00",
+  "classification": "hardware-stage-specific: exact fresh K80 iOS26 native platform/UFS/GPT-read milestone record captured;bounded return to verified OrangeFox;no GPU/root/desktop/native-readback-ACK qualification",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/run.json",
+  "decoded": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/decoded-native-record.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/one-shot.claim.json",
+  "scope_consumed_no_repeat": true,
+  "boot_sha256": "f73bd420207fa1c6ff731a56acec335c75dc2cf2f6897838f45e57e31756e167",
+  "kernel_sha256": "49ebea4e4df9f899df2f68c1314845cb86fa579e8770da7de1894373a1832ee3",
+  "record_tag": "87cc293d79744672bfe0d3feb6cc1079",
+  "one_fastboot_boot": true,
+  "BCB_tail_preserved_full_page_readback": true,
+  "recovery_observed_seconds": 53.317247792030685,
+  "fresh_record_CRC_tag_text_bound_to_actual_before_after_capture_and_exact_bundle": true,
+  "native_platform_worker_milestone_proven": true,
+  "protection_reads": {
+    "primary_GPT": {
+      "captures": [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/read-001-sda-0-6.bin",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/read-010-sda-0-6.bin"
+      ],
+      "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967",
+      "matched_pinned_before_and_after": true
+    },
+    "backup_GPT": {
+      "captures": [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/read-002-sda-64049147-5.bin",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/read-011-sda-64049147-5.bin"
+      ],
+      "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054",
+      "matched_pinned_before_and_after": true
+    },
+    "root_manifest": {
+      "captures": [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/read-003-unixnu-0-1.bin",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/read-012-unixnu-0-1.bin"
+      ],
+      "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+      "matched_pinned_before_and_after": true
+    },
+    "Data": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/before-Data.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/after-Data.bin",
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+      "equal": true
+    },
+    "before": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/before-before.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/after-before.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "equal": true
+    },
+    "after": {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/before-after.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/run/after-after.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "equal": true
+    }
+  },
+  "actual_device_commands": 81,
+  "archive_files": 218,
+  "capture_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/capture-manifest.json",
+  "GPU_execution_proven": false,
+  "native_writer_readback_success_proven": false,
+  "root_or_desktop_proven": false,
+  "all_eight_CPUs_or_full_RAM_proven_by_this_record": false,
+  "full_filesystem_or_marker_content_proven": false,
+  "persistent_GPU_power_security_SMMU_IOVA_or_DMA_rights_granted": false,
+  "further_device_operations_authorized": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/trials/87cc293d79744672bfe0d3feb6cc1079/verified-trial.json",
+  "verification_level": "device-stage-specific-exact-artifact",
+  "tested_commit": null,
+  "tested_commit_note": "Uncommitted candidate bound by exact artifact hashes and independent immutable source/build/capture manifests; no commit-qualified porting-record grade is claimed.",
+  "actual_user_authorization": "K80已连接，在rec，我允许你进行真机验证",
+  "authorization_scope": "Previously reviewed single-K80-ios26-platform20s-one-log-record, now consumed-no-repeat; no broader GPU or later trial permission",
+  "exact_review_and_command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-fixed-platform-record-entry26/compatibility-decision.json",
+  "UI_candidate_kernel_not_executed": "a075e1a4666cc056b2086db9f8e550a7242a79c6e0e7f3a8aacef54a3c54d644"
+}

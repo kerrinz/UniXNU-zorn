@@ -1,0 +1,87 @@
+{
+  "version": 194,
+  "status": "recovered-normal-Metal-discovery-returns-nil-before-client-open",
+  "ready": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v194-metal-early-log-ready-2026-11-15.json",
+    "sha256": "a54d905c64926ccd2fc0b453a17e03c9cc402e51b3c103bf70dbb5b2c55f0936"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v194-metal-trial-b6c9f2f4d15241039f099d51ac0b9916/root-trial/trial/run.json",
+    "sha256": "064899cdec362f1fa4ee2679673d974436b1cf720b9784266582871893f9ad66"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v194-metal-trial-b6c9f2f4d15241039f099d51ac0b9916/root-trial/trial/cdc-capture.json",
+    "sha256": "b1619405dc12761c156af0e58ef1beb7bf99b8de534394d336d6732517cd6d55"
+  },
+  "raw": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v194-metal-trial-b6c9f2f4d15241039f099d51ac0b9916/root-trial/trial/cdc.raw",
+    "sha256": "c7c4d62891467a60f6fae63a0f1291c6652ec556256cc7d0bbe71569020de284"
+  },
+  "recovery_seconds": 332.84335758403176,
+  "protection_pairs": [
+    "before-Data.bin",
+    "before-Data_metadata.bin",
+    "before-after.bin",
+    "before-before.bin",
+    "before-root_after.bin",
+    "before-root_before.bin",
+    "before-root_first_page.bin"
+  ],
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "application": {
+    "published": true,
+    "program_identity": {
+      "unique": 10,
+      "pid": 10
+    },
+    "raw_stderr": "",
+    "raw_stderr_dropped": 0,
+    "complete": false,
+    "render_complete": false,
+    "native_teardown_complete": false,
+    "native": {
+      "unique": 0,
+      "pid": 0,
+      "flags": 0,
+      "calls": 0,
+      "method": 0,
+      "raw": 0,
+      "close_returned": 0,
+      "close_raw": 0,
+      "attempts": 3,
+      "copy_errors": 0,
+      "lines": 3,
+      "bytes": 151,
+      "dropped": 0
+    },
+    "sessions": [],
+    "session_rejected": 0,
+    "report_terminal": 0,
+    "report": {
+      "phase": 3,
+      "flags": 1,
+      "status": -1,
+      "code": 1,
+      "service": 4294967884,
+      "device": 0,
+      "crc": 0,
+      "first_bad": 4294967295,
+      "ticks": 3862470566
+    },
+    "error": null,
+    "reasons": [
+      "Metal-render-not-complete",
+      "native-teardown-not-complete"
+    ]
+  },
+  "bytes": 2118,
+  "known_image_complete": true,
+  "finding": "Actual ordinary probePID10/unique10 executes, discovers exactGPU serviceID0x10000024c, then normalMTLCreateSystemDefaultDevice returnsnil.3complete program writes,0copy errors/drops,rawstderr empty;no nativeclientadmission/preparation. This rules out failure beforeprobe main/service lookup for this run; does not identify why Metal or plugin returnednil. No shader/Turnip draw reached.",
+  "next": "Source-based bounded principal plugin entry/pre-open prerequisite logs and normal Foundation bundle load diagnostics; retain normal Metal discovery as the qualification path. No reverse engineering or changes to native GPU grants.",
+  "constraints": "One authorized temporary boot; Recovery332.84s/protections pass. Installed193root unchanged; consumedb6c9 claim neverreused; goal active."
+}

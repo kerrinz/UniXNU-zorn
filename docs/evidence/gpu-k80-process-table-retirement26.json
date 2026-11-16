@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-09T17:15:42.240023+00:00",
+  "status": "never-installed-process-table-normal-retirement-implemented-offline",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate",
+  "files": {
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7ProcessTables26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7ProcessTables26.h",
+      "sha256": "08158074427b22266642a71ed37953fa7c3dda11e712fb14bf066d5e12d2e5af"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7HostGpuTables26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7HostGpuTables26.cpp",
+      "sha256": "d5b67a8424106491810c8e014b84149095430b3d794d6b3fb25cca75263f4379"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7SmmuTablePages26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7SmmuTablePages26.h",
+      "sha256": "4490208cd2cd3c8730219a8ceb30e072099496748227453b6755ac34c8fea3db"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7ProcessTables26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7ProcessTables26.cpp",
+      "sha256": "50b0cc44e54a504f792c85a4e32caba19530c36843af83ed0a7e22f5e1d9880a"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7SmmuTablePages26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7SmmuTablePages26.cpp",
+      "sha256": "7207dbc15104f1ad731f5ce86a55cdb430b5433b4fcb5c7ada99bfeda78fec3d"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7SmmuDomain26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7SmmuDomain26.cpp",
+      "sha256": "692e231c2da6497b1a22262e94df63e50af283fd12be05a06efa501d3392c37e"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-table-retirement-candidate/ZornGen7HostGpuTables26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/source-archive/ZornGen7HostGpuTables26.h",
+      "sha256": "28c47b88e72b7ad087e5f68490d979a76c4a601378d870981559e832000ebd95"
+    }
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.1581703329998163,
+    "inputs": 1387,
+    "replaced": 3,
+    "preserved": 1383,
+    "added": 1,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/full-link-r2/kernel.ZORN26-process-table-retirement.UNSELECTED.macho",
+    "sha256": "2011c7afb18345756c40fcf1f45ef8037c31b6c590df24b8bb85d79b3cdc8dc3",
+    "bytes": 30297376
+  },
+  "semantics": "Only the private CPU-only child can authorize retirement before any page allocation. Child has no root export/installation API. Successful graph audit,creator identity,gate,normal thread,unpoisoned/no-context state and one actual page hold required. Revoke all page callbacks before any retirement;drop real holds and release real descriptors;first actual failure keeps remaining ownership and prevents replay. Only complete success frees table/page/range metadata and actual creator/parent pins.",
+  "scope_limit": "Never-installed table lifetime only. Not an installed VM unmap,quiesce,DMA-stop proof or fence. Future activation must revoke this path BEFORE root exposure or hardware installation;active VM retirement still needs genuine completion/TLB conditions.",
+  "affected_objects": [
+    "ZornGen7HostGpuTables26",
+    "ZornGen7ProcessTables26",
+    "ZornGen7SmmuDomain26",
+    "ZornGen7SmmuTablePages26"
+  ],
+  "NativeAdrenoMemory_ABI_changed": false,
+  "table_owner_public_class_layout_changed": false,
+  "opaque_Storage_only_changed": true,
+  "zero_undefined": true,
+  "inherited_compile_warnings": 6,
+  "link_warnings_same_as_parent": true,
+  "PAC_structure_check": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-table-retirement26/PAC-check.stdout",
+  "Native_allocator_release_cache_mapper_or_target_executed": false,
+  "phone_accessed": false,
+  "process_context_ASID_activation_and_app_client_complete": false,
+  "goal_complete": false
+}

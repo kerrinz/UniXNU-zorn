@@ -1,0 +1,141 @@
+{
+  "real_source_bindings": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.gpu.json",
+      "json_sha256": "541b036cf81499492ea38345a8c68dfa1fcdfc55f2a35bcfcb381e18cd2f11c8",
+      "raw_dtb_sha256": "b082a6b8813d392b6fdb554ed46212a9b064a7399f341dd2910b06819f08f511",
+      "declared_nodes": 84,
+      "resolution_complete": false
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.gpu.json",
+      "json_sha256": "b2cf39281de27e8695c943d8f77bfd64941c157140e02f087ee62552ba458f0e",
+      "raw_dtb_sha256": "74b702105990399697b7d38def4ab3931a5ef79e20f0a0cc8cc9fc2c865eff52",
+      "declared_nodes": 86,
+      "resolution_complete": false
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.gpu.json",
+      "json_sha256": "cbdeba65f4d646342d615f927b9a66530c2ee4787429a9ff0ba457f21887b10a",
+      "raw_dtb_sha256": "4c87e7fcb971592ae7f9f34d978b45d0801bc0f6dbc911dedd7767c5fc5f2bb6",
+      "declared_nodes": 84,
+      "resolution_complete": false
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.gpu.json",
+      "json_sha256": "ab4cc0500909dd1dc14e330cdfbca858b18476722d69acd69316fa1eb483e0d9",
+      "raw_dtb_sha256": "ed761aa6d7e8623792c75f20693a97407974ee2445254e725ce202a8f0ffaa76",
+      "declared_nodes": 86,
+      "resolution_complete": false
+    }
+  ],
+  "new_graph_refusals": [
+    {
+      "case": "wrong-provider",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    },
+    {
+      "case": "changed-argument",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    },
+    {
+      "case": "missing-edge",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    },
+    {
+      "case": "extra-edge",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    },
+    {
+      "case": "wrong-property",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    },
+    {
+      "case": "boolean-argument",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    },
+    {
+      "case": "invented-unresolved",
+      "error": "declared references differ from raw cells: /soc/clock-controller@100000"
+    }
+  ],
+  "new_raw_cell_cases": [
+    {
+      "case": "known-prefix-unknown-tail",
+      "passed": true
+    },
+    {
+      "case": "missing-arity-preserves-entire-tail",
+      "passed": true
+    },
+    {
+      "case": "truncated",
+      "error": "truncated raw reference arguments"
+    },
+    {
+      "case": "unaligned",
+      "error": "reference/provider requires aligned 32-bit cells"
+    },
+    {
+      "case": "multi-cell-arity",
+      "error": "invalid raw provider arity"
+    },
+    {
+      "case": "duplicate-handle",
+      "error": "ambiguous/reserved raw phandle"
+    },
+    {
+      "case": "reserved-handle",
+      "error": "ambiguous/reserved raw phandle"
+    },
+    {
+      "case": "multi-supply",
+      "error": "supply reference requires exactly one cell"
+    }
+  ],
+  "child_no_write_or_process": true,
+  "headers": 0,
+  "prepare_audit_formatter_executed": false,
+  "old_suites_reexecuted": false,
+  "driver_patches": 32,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/verify-zorn-gpu-reference-source.py": "3a1ef70cc9fab4981c8608dd549e5568b5fbe803c9dded035d511989d485e446",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-reference-source.py": "60cb58616f84867663758446e1ea6aae0838ad97736ac0c20ca400e9cfd6085b",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect-zorn-gpu-dt-inputs.py": "c79263afa0178525e0341b4547bf8e18147d692853fc42d68163383dbe56f999",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-dt-missing-arity.py": "16afde363270745f4c8673688921bc337b18a6491ae1136b7203eeedcee43776"
+  },
+  "producer_regression": {
+    "new_cases": [
+      {
+        "case": "previous-missing-arity-error",
+        "error": "provider: #clock-cells requires one cell"
+      },
+      {
+        "case": "missing-arity-preserved",
+        "reference": {
+          "property": "clocks",
+          "unresolved_phandle": 11,
+          "unresolved_tail_cells": [
+            11,
+            7,
+            99,
+            8
+          ],
+          "reason": "provider/arity unavailable; no argument boundaries inferred"
+        }
+      },
+      {
+        "case": "malformed-present-arity-still-refused",
+        "passed": true
+      }
+    ],
+    "only_CPU_source_fixture": true,
+    "headers": 0,
+    "native": false
+  },
+  "coverage": "declared node references only;root/closure/variant/hardware ownership not attested",
+  "header_scope_approval_received": false
+}

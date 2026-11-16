@@ -1,0 +1,91 @@
+{
+  "candidate": "K80 iOS26 GPU provider/resource preparation prefix v86",
+  "date": "2026-11-13",
+  "scope": "offline candidate only",
+  "base_candidate": "K80 GPU optional CPU-memory preparation prefix v85",
+  "source": {
+    "root_platform": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-provider-resources-preparation-prefix-v86-20261113/ZornRootPlatform26.cpp",
+      "sha256": "2c1f4af19d5055baac98293f45482f6d1850c6c4e360e6a5710b0cf737ed0d47"
+    },
+    "board_bridge": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-provider-resources-preparation-prefix-v86-20261113/ZornGen7PlatformBoardBridge26.cpp",
+      "sha256": "96c0b7916b44c4f84d0f9bb7b3080944073d08cedbc0afad73c645930d2044d5"
+    },
+    "board_status_header": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-provider-resources-preparation-prefix-v86-20261113/ZornGen7PlatformBoardStart26.h",
+      "sha256": "a2b7b11f5660597161ab46593075193cabd41b7f299bed68f4c16ced945b59a3"
+    }
+  },
+  "change": {
+    "boot_arguments": [
+      "zorn26_gpu_cpu_memory_prep=1",
+      "zorn26_gpu_provider_resources_prep=1"
+    ],
+    "default_without_arguments": "existing CPU-rendered startup has no added provider preparation",
+    "second_stage_requires_exact_value_one": true,
+    "requires_successful_board_stage": true,
+    "requires_successful_cpu_memory_preparation": true,
+    "requires_both_retained_gpu_gmu_device_tree_nodes": true,
+    "calls": "ZornGen7InactiveOwner26::preparePlatformProviders using the actual retained GPU and GMU nodes",
+    "reports_actual_partial_owner_state": true,
+    "reports_provider_reuse_nub_lifecycle_resource_counts_and_retained_descriptor_mask": true,
+    "does_not_map_mmio_or_start_gpu": true,
+    "does_not_create_smmu_irq_dma_power_or_submission_authority": true,
+    "root_direct_runtime_invoked": false
+  },
+  "compile": {
+    "recipe": "v85 retained iOS 26.6.2 / 23G90 K80 kernel recipe",
+    "root_platform": {
+      "exit": 0,
+      "warning_count": 3,
+      "object_sha256": "3bde3a02ce510bcc8b1c3e5168e048ad5625d4152e5d96c77edc1ab83671911b"
+    },
+    "board_bridge": {
+      "exit": 0,
+      "warning_count": 3,
+      "object_sha256": "77a7a1defec8cd73ad2dd535644942db5d08aecfcdfee1592019fbe085dc3bb4"
+    },
+    "warning_source": "Existing narrowing conversions in HoujiFullHostNativeMemory.h"
+  },
+  "full_link": {
+    "directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-resources-preparation-prefix-v86-20261113/full-link-v1",
+    "command_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-resources-preparation-prefix-v86-20261113/full-link-v1/link-command.json",
+    "replaced_inputs": [
+      "ZornRootPlatform26.cpo",
+      "ZornGen7PlatformBoardBridge26.cpo"
+    ],
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "total_inputs": 1397,
+    "missing_inputs": 0,
+    "link_exit": 0,
+    "linker_warning_count": 10,
+    "warning_lines_match_v85": true,
+    "nm_undefined_exit": 0,
+    "undefined_symbol_lines": 0,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-resources-preparation-prefix-v86-20261113/full-link-v1/kernel.ZORN26-GPU-PROVIDER-RESOURCES-PREP-V86.UNSELECTED.macho",
+      "bytes": 30573856,
+      "sha256": "554934e25d96e32209153e3646cfe6157ee504470335125685f89c307ab1e49e"
+    }
+  },
+  "cpu_lockscreen_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "bytes": 30531000,
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "expected_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "changed_by_this_candidate": false,
+    "sha256_rechecked_read_only": true
+  },
+  "hardware": {
+    "device_accessed": false,
+    "installed": false,
+    "booted": false,
+    "gpu_started": false,
+    "gpu_submission_or_render_observed": false,
+    "gpu_discovery_allow_boot": false
+  },
+  "remaining_gate": "The K80 root still has not assembled the complete ZornGen7StartupGpuInputs26 authority/ownership graph or an all-master GPU/GMU quiescence owner. Complete those and pass the offline full-link gates before a bounded device trial.",
+  "touch_driver_work": "paused"
+}

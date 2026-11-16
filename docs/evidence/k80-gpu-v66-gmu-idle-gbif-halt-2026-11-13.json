@@ -1,0 +1,153 @@
+{
+  "recorded_at": "2026-11-13",
+  "status": "K80 iOS26 Gen7.9.1 GMU idle and GBIF halt integration; source-built and full-linked offline candidate v66",
+  "candidate": "v66-current-integrated-qtb-peer-stream-gate-gmu-idle-gbif-halt",
+  "parent_candidate": "v65-current-integrated-qtb-peer-stream-gate",
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113",
+    "top_level_files": 170,
+    "total_files": 205,
+    "changed_from_v65": [
+      {
+        "path": "ZornGen7RegisterMaps26.cpp",
+        "sha256": "2543e688532d65e095a05d6d71108656b3b3c1198f2df1413a91005369bdcbf9",
+        "bytes": 80288
+      },
+      {
+        "path": "ZornGen7RegisterMaps26.h",
+        "sha256": "020430dd3abc2f4e5f2a11230c240a6a7ca0f0a2bb8d47ee28a679eb22f56a46",
+        "bytes": 11182
+      },
+      {
+        "path": "ZornGen7SmmuDomain26.cpp",
+        "sha256": "bef2517109c496497ba8468a5c5885f95f6e82754772e6390416501e7f3fa5a8",
+        "bytes": 122635
+      }
+    ],
+    "copy_isolated": true
+  },
+  "upstream_source": {
+    "repository": "OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650",
+    "commit": "453d8875f815bf9dfad9035982861226a4823a6c",
+    "snapshot_root": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/oneplus-sm8650-modules",
+    "files": {
+      "vendor/qcom/opensource/graphics-kernel/adreno_gen7_gmu.c": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+      "vendor/qcom/opensource/graphics-kernel/gen7_reg.h": "2e564d7eaeec26bc30e79b1d117b86efa79603345769626157c83610fc4c051c",
+      "vendor/qcom/opensource/graphics-kernel/adreno.h": "15636117455bf216da1ad48224ce3af666417f7e5d0606aecdd265c9fae26151"
+    },
+    "registers": {
+      "GEN7_GPU_GMU_AO_GPU_CX_BUSY_STATUS": "0x23b0c",
+      "GEN7_GPU_GMU_AO_GPU_CX_BUSY_STATUS2": "0x23b0d",
+      "GEN7_GBIF_HALT": "0x3c45",
+      "GEN7_GBIF_HALT_ACK": "0x3c46",
+      "client_halt_mask": "bit 0",
+      "arb_halt_mask": "bit 1",
+      "ignored_gmu_busy_mask": "bit 30",
+      "idle_timeout_ms": 100,
+      "halt_ack_poll_interval_us": 100,
+      "halt_ack_timeout_us": 100000
+    }
+  },
+  "implementation": {
+    "ordering": "After successful acquireExclusiveGpuMmuStart and before QTB/context/stream changes, poll GMU busy until zero while ignoring bit 30; request client halt and wait ACK bit 0; request arbitration halt and wait ACK bit 1. Keep GBIF halted during SMMU/QTB programming. After QTB resume, power release and context/stream verification, recheck GMU idle, clear GBIF halt, and verify both ACK bits clear. If release or its observation is uncertain, reassert arbitration halt and verify it before returning failure. Every poll uses a bounded 1000 reads with 100 microsecond delay; failed stages retain mappings/resources and the candidate stops.",
+    "access": "All MMIO uses retained K80 descriptors/maps and existing admitAccess/observeAccess operation guard. Mapping extents do not grant access. Result telemetry is in a separate getter so the prior Result layout and virtual ABI remain unchanged.",
+    "source_failure_behavior": "Unlike the upstream gen7_halt_gbif helper, this implementation does not overwrite the client-halt result, continue after a failed ACK, or unconditionally clear the halt."
+  },
+  "compile": {
+    "translation_units_recompiled": 2,
+    "succeeded": 2,
+    "failed": 0,
+    "warning_occurrences": 6,
+    "translation_units": [
+      {
+        "translation_unit": "ZornGen7RegisterMaps26.cpp",
+        "exit_code": 0,
+        "source_sha256": "2543e688532d65e095a05d6d71108656b3b3c1198f2df1413a91005369bdcbf9",
+        "object_sha256": "888d6ecf41ca1921824c501130ff874472e101633e03889096221c7de9bb957c",
+        "warnings": 3,
+        "baseline_warnings": 3,
+        "warning_text_unchanged_from_v65": true
+      },
+      {
+        "translation_unit": "ZornGen7SmmuDomain26.cpp",
+        "exit_code": 0,
+        "source_sha256": "bef2517109c496497ba8468a5c5885f95f6e82754772e6390416501e7f3fa5a8",
+        "object_sha256": "f796792b23613ec109533be131d4592c897b29951526cbc2d3b2d2322a9c1a48",
+        "warnings": 3,
+        "baseline_warnings": 3,
+        "warning_text_unchanged_from_v65": true
+      }
+    ],
+    "baseline_warning_text_unchanged": true
+  },
+  "full_link": {
+    "result": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/full-link/link-result.json",
+    "command": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/full-link/link-command.json",
+    "input_manifest": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/full-link/input-manifest.json",
+    "input_count": 1397,
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "missing_inputs": 0,
+    "exit_code": 0,
+    "undefined_symbols": 0,
+    "nm_exit_code": 0,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/full-link/kernel.ZORN26-CURRENT-INTEGRATED-GMU-IDLE-GBIF-HALT-V66.UNSELECTED.macho",
+      "bytes": 30510184,
+      "sha256": "10ea8283561553eb6a5d77adb98dbe04ddfb7b17aa207e0066bdfdaa8da471fd"
+    },
+    "map": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/full-link/kernel.map",
+      "bytes": 10815250,
+      "sha256": "77b1fb70879fc7383091a108cf2f4cbefd4c48e5691d0e57c038fe7b5c901a6e"
+    },
+    "linker_warnings": 10,
+    "warning_details": [
+      "ld: warning: -segment_order should list all segments, __PRELINK_TEXT is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_INFO is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_TEXT_EXEC is missing",
+      "ld: warning: -segment_order should list all segments, __PRELINK_DATA is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_DATA_CONST is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LLVM_COV is missing",
+      "ld: warning: -segment_order should list all segments, __PLK_LINKEDIT is missing",
+      "ld: warning: -segment_order should list all segments, __LINKINFO is missing",
+      "ld: warning: -segment_order of __LINKEDIT is ignored, the segment must be ordered last",
+      "ld: warning: -sectalign reduces alignment of __DATA,__bss from 16384 to 4096"
+    ]
+  },
+  "qualification": {
+    "selected": false,
+    "packaged": false,
+    "booted": false,
+    "phone_access": false,
+    "gpu_execution": false,
+    "metal_or_display_gpu_rendering": false,
+    "touch_driver_work": false,
+    "cpu_lockscreen_milestone": "docs/evidence/k80-CPU-keystore-retag-observed-2026-11-13.json",
+    "candidate_smmu_mapping_owners_present": true,
+    "candidate_smmu_mapping_owners": [
+      {
+        "path": "out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/ZornGen7SmmuTablePages26.cpp",
+        "sha256": "bcb2eb61d6e54afdfdc6d484eca39ef35928a67f45942487ca7f0dca480d85fb",
+        "role": "Retained native table-page descriptor/CPU mapping owner with explicit never-installed and post-context-use retirement paths."
+      },
+      {
+        "path": "out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/ZornGen7HostGpuTables26.cpp",
+        "sha256": "6f543dbbe1845befbf2545e0904d4b6baf3a5275d7ff65796f0f63edb49eed65",
+        "role": "Host and process table ownership, context preparation, process ASID accounting and Direct VM attach/detach under the retained owner gate."
+      },
+      {
+        "path": "out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-qtb-peer-stream-gate-v66-gmu-idle-gbif-halt-20261113/direct-runtime/ZornGen7DirectVm26.cpp",
+        "sha256": "500340827fa928e57e84bcd025d3376fb0b8b12e21dcb2159593364f9423a1ca",
+        "role": "Kernel-owned BO map/unmap transactions with retained memory references and page-table updates."
+      }
+    ],
+    "remaining_source_gaps": [
+      "The actual root-platform object in the linked candidate only stages root inputs; no maintained OS/board startup caller constructs the real ZornGen7StartupGpuInputs26 authority set.",
+      "A real whole-GPU/GMU exclusion and scheduler lease provider is absent. Existing table/map owners are not yet attached to an active platform/device lifecycle, and the GMU/GBIF hardware stop remains a guarded operation rather than an OS-level scheduler lease.",
+      "No device/runtime readback validates the GMU/GBIF sequence or GPU DMA; candidate remains offline and unselected."
+    ],
+    "startup_owner_audit": "docs/evidence/k80-gpu-startup-owner-audit-2026-11-13.json",
+    "next_action": "Implement the real GPU/GMU exclusion provider and connect the existing SMMU table/map owners through the maintained OS/board startup owner while keeping touch paused. The device is authorized for later exact-candidate trials; no trial is useful until this call path, candidate packaging, and automatic recovery binding are concrete."
+  }
+}

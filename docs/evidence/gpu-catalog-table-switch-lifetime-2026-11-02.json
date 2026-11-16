@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T10:55:29.329843+08:00",
+  "state": "Catalog149-table-cookie-and-VM-withdrawal-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-table-switch-lifetime/source-contract.json",
+  "new_current_table_methods": 3,
+  "legacy_methods_absent": true,
+  "current_methods_unchanged_provenance_only": true,
+  "table_scalar_not_hardware_or_refhold": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "no_old_suite_or_target_reexecution": true,
+  "all27_patches_independent_UNAPPLIED": true,
+  "no_native_API_or_success_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 Submit table switching/raw VM lifetime and Ring scalar producers,against actual published clientClose then GpuContext destroyVm. Three table methods are absent from frozen legacy Submit;current original equals27th coherent-source copy. Current/legacy source/fullSHA bound and old native refretention/recovery/WPTR proofs read as distinct unselected candidates,no mechanical composition or old suite rerun.",
+    "roles": "Submit member vm_ is default/kernel VM,table_vm_ is raw pointer to VM expected after queued work. submit(vm,...) declares a same-named local vm_ for that job;it does not reassign default member. write_table_ is IOReturn32 callback and table_cookie_ is caller-supplied raw pointer. Actual publisher passes lambda to GpuContext::writeTtbr0 with parent global pointer;not a refcounted owner.27th registry separately keeps ProcessVm CPU allocation reachable while parent lives.",
+    "set": "setTableSwitching checks attached/notpoisoned,mode<=2,required writer for nonzero mode and no outstanding jobs before assigning any new callback/cookie/tableVM. It resets table_vm_ to default;mode2 additionally tableInstalled(default root) on Ring0. Returned0 is software configuration,not a hardware write or table switch. API permits mode0/nullwriter but actual bound publisher chooses1or2;no disable/reconfiguration policy invented from generic API.",
+    "mode1": "useVm returns0 without write if mode0 or same table_vm. Otherwise CPU mode requires clock,waitAll0,then actual writer(parentcookie,new root). Nonzero callback poisons before updating table_vm_;0 increments existing scalar counter then updates pointer. Wait success may be immediate when no active jobs;it does not independently mean genuine idle/DMAstop. No native callback or wait executed.",
+    "mode2": "useVm calls Ring0 useTable root then updates table_vm_ and returns0 before ring submission/commit. Ring useTable accepts nonzero different TTBR scalar,sets table_pending and reset_pending. No C++ VM retain and no register/packet execution occurs in these inline scalar methods. Later submit can fail;cached intent/table_vm therefore do not prove accepted switch or completed command. tableInstalled unconditionally stores root and clears pending;table returns that scalar,not bank readback.",
+    "forget": "forgetVm rejects unattached/poisoned/null/default victim,waitsAll first,then may return0 without callback if neither table_vm points victim nor mode2 Ring0 scalar equals its ttbr0. Otherwise actual writer restores default root;nonzero poisons and leaves tracked pointer. Only returning0 branch after writer updates Ring0 installed scalar in mode2 and sets table_vm_ to default. This withdraws one raw C++ tracking pointer in valid serial source,not all hardware/preempt/SMMU state or native mappings.",
+    "destroy_caller": "Actual published clientClose calls releaseAll,then forgetVm,then destroyVm only if each original status0. Nonzero prevents downstream destruction and keeps live/core/space;27th private root also preserves failures otherwise losing localspace. Failed-open process never submitted has separate destroy path;source comment is not a DMA certificate. ASID/page release policy untouched. No parent/process pointer is safe solely because wait/job counts or forget0 succeeded.",
+    "returned_domain": "Actual GpuContext writeTtbr0 gates ready/switched then folds exact lower kit nonzero to IOReturnIOError. Under stable publisher getter+enableSwitching preconditions,gateNotReady is not established reachable;lower status detail already folded. Submit callback nonzero returns poisonIOError. A generic custom writer or absent writer can differ,but they are not invented real peers. No new28th diagnostic field justified merely by this fold;native raw/ACK/cleanup availability remains unknown where not supplied.",
+    "residual_lifetime": "Existing Ring0 scalar checks do not by themselves cover every preemption record/SMMU-info page or in-flight switch. Actual setPreemption/driveSwitch also write per-ring scalar TTBR/ASID into borrowed CPU pages;next narrow source contract must bind those writes and their return types against pending jobs/table_vm. Board Preempt IRQ producer/provider epoch remains unbound;no reuse/stop/free permission inferred. We do not decode/rewrite packets,choose ringmode,or add refcount/cancel/reset/retry policy.",
+    "decision": "No new concretely reachable missing raw-pointer withdrawal in the bound normal serial forget/destroy status gates. No28th patch/new target/success VM/address model. Missing actual K80 producer,global serialization,preempt-flight/retirement and hardware context/route/stop/DMA remain explicit.27 independent candidates stay UNAPPLIED;old scalar/type/class checks only provenance.",
+    "preservation": "27patches/8profiles/3111+39/default42/CPUstorage/172+13closeout/parentarchives/full64 primary and390 frozen inputs preserved. All native/table switch/callback/wait/preempt/provider/allocator/cache/map/MMIO/phone OFF,no component/runtimecaller/FD/kernel/candidate/wire/CPU policy. FirstGPU/rendering/Metal,rolefullcore/core/externalmanager unavailable."
+  },
+  "qualification": "Exact source mode/raw-pointer withdrawal only,not native callback/SMMU/readback/IRQ/stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

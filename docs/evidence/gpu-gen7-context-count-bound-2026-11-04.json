@@ -1,0 +1,62 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_CONTEXT_BOUND_AND_HISTORY_METADATA_REPAIRS",
+    "timestamp": "2026-11-03T19:18:48.980620+00:00",
+    "changed_files": [
+      "kgsl.c"
+    ],
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-context-count-bound-20261104/source-contract.json",
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-context-count-bound-20261104/context-count-bound.UNAPPLIED.patch",
+    "patch_sha256": "2d157fab65f1a9baf1862c94f267c9fe75662ace1af879a08331aed776f89f69",
+    "checks": {
+      "existing_limit": 200,
+      "one_boundary_witness": true,
+      "unchanged_below_limit_controls": 200,
+      "above_limit_control": true,
+      "source_mutations_refused": [
+        "old-off-by-one",
+        "allow-extra",
+        "reject-too-soon"
+      ],
+      "source_predicates_only": true,
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "one_existing_comparison_only": true,
+      "no_context_ID_atomic_allocator_provider_or_success_model": true,
+      "Linux_native_device_or_callback_execution": false,
+      "old_suites_run": false,
+      "history_index_pairs": 262144,
+      "history_source_mutations_refused": [
+        "skip-oldest",
+        "skip-decrement",
+        "wrong-wrap"
+      ],
+      "combined_delta_replay_byte_equal": true,
+      "no_history_entry_address_fault_or_provider_model": true,
+      "only_two_function_bodies_changed": true,
+      "purge_length_conservation_pairs": 32640,
+      "purge_source_mutations_refused": [
+        "keep-old-byte-count",
+        "add-byte-count",
+        "drop-subtrahend"
+      ],
+      "final_delta_replay_byte_equal": true,
+      "only_three_function_bodies_changed": true,
+      "no_GPU_address_range_or_mapping_model": true
+    },
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-context-count-bound-20261104/linux-reference",
+    "runtime_selection": false,
+    "Linux_kernel_or_native_target_compiled": false,
+    "GPU_native_device_or_callback_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-context-count-bound-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-context-count-bound-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-context-count-bound-20261104/archive.json"
+}

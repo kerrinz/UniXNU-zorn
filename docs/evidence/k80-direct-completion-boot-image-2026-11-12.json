@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-11-12T22:12:00+08:00",
+  "status": "unselected direct-completion boot image packaged, not booted",
+  "boot_sha256": "c65446594ad15ef3640df300132a53589adee70059caefe4fb3b5dd196ed4182",
+  "kernel_sha256": "6042f85fd088fe203100dd7ab8d9c682f3a0950978bb5d6eac14c4dd86e716d9",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "changed_FAT_members": ["EFI/UniXNU/Payloads/kernel.macho"],
+  "device_ready": false,
+  "phone_executed": false,
+  "reason_not_booted": "This is the first boot image of the direct-ring completion kernel. Its startup does not show that GPU submission and DMA stay idle, so it is not admitted to a phone trial.",
+  "lsd_schemes_plist": "No local template for /private/var/db/lsd/com.apple.lsdschemes.plist. Installed root unchanged.",
+  "ft3683_current_candidate_root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+  "ft3683_note": "The existing FT3683 power boot package is bound to a different root than the installed 227ba639 image."
+}

@@ -1,0 +1,76 @@
+{
+  "version": 243,
+  "date": "2026-11-16",
+  "status": "offline-full-kernel-not-device-ready",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v243-release-stage-38367112517a40e2acc6353195823ac1",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v243-release-stage-38367112517a40e2acc6353195823ac1",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v243-release-stage-38367112517a40e2acc6353195823ac1/full-link/kernel.ZORN26-METAL243.UNSELECTED.macho",
+    "sha256": "c238ba443b923b800058ae6e0dbe46f89acc08750e4c1f7b094804fba6e8c75b",
+    "bytes": 30985280,
+    "inputs": 1398,
+    "replaced": 24,
+    "preserved": 1374,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v243-release-stage-38367112517a40e2acc6353195823ac1/full-link/exact-inputs.json",
+      "sha256": "db22e05c8eec5345a1b79bd56fba3fda4ff1d7071f3e1f62fda28df004e6ebed"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "IOUserClient.cpo",
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "debug.o",
+      "houji_recovery26.o",
+      "pe_init.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "193e5f01df3b0481412a980f4e7c562401762af53ffe2ea051fee11b66f5fc0e",
+    "application_probe_qualification": false,
+    "Metal_probe_candidate": true
+  },
+  "change": "Use existing native_adreno_trace_stage:100 before actual releaseAll;one scalar dump at terminal. No new backend/control/return/cleanup changes.",
+  "checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v243-release-stage-38367112517a40e2acc6353195823ac1/release-source-host/result.json",
+      "sha256": "d7ce936816f062364aa7e3e30228ae2fd77c7798864c144e18390e31fcc21c2b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v243-release-stage-38367112517a40e2acc6353195823ac1/full-build-review.json",
+      "sha256": "edf6acd15ac5e67f97a3f1643cbfd7988731fc76a17ab943792f85c41b7257d8"
+    }
+  ],
+  "hardware_access": false,
+  "remaining": [
+    "Review all selected trace writers,tag/type/return convention and diagnostic-only uses",
+    "Finish complete terminal composition and source/identity review with explicit unchanged test scopes",
+    "Strict new RELEASE243 decoder/capture and truncation/identity/CRC/duplicate boundaries through actual receiver",
+    "Build full isolated readback-verified boot package and new fixed scope/ready/claim/negative/PTY/check-only before phone"
+  ],
+  "limits": [
+    "Globally shared volatile diagnostic is best-effort,not ordered/session-safe;no concurrency-safety claim",
+    "Only selected verified source stage meanings labelled,unknown values stay unknown",
+    "Source entry sentinel is not GPU completion or native success",
+    "No hardware or root cause claim"
+  ]
+}

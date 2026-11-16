@@ -1,0 +1,46 @@
+{
+  "version": 186,
+  "stage": 6,
+  "status": "offline-native-application-publication-selected",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/stage6-application-publication-snapshot/manifest.json",
+    "sha256": "5ce5a63d01c0e79a2622eaa11cf80c1bf66eb14e2192155f7941c746454381f8"
+  },
+  "native_compile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/compile-application-publication/result.json",
+    "sha256": "80f25adb71030c5323c395220308a4fa4ba1e4b56b972a55e52377a04711bee1"
+  },
+  "cdc_compile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/compile-publication-cdc-r2/result.json",
+    "sha256": "d68dd20c3202787649c711b72e34dfb666b6e63f1e4699a318417e9fe09b079d"
+  },
+  "regression": {
+    "passed": true,
+    "result": "PASS 36 actual startup handoff lock, owner and publication failure assertions\n",
+    "source_sha256": "d04edac7809d2f476bb4aa77de93d38fb3622ccdb0d5c13985de406d3b17a4e9",
+    "scope": "Actual Board startup call site extracted with mock retained owners/gates. Nested held lock refuses publication without changing depth; failure always restores entry lock and drops only temporary call references. No hardware qualification."
+  },
+  "dependency_repair": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/parent-dependency-repair/result.json",
+    "sha256": "5bb21b2587f72fa0f471604c8083a7897dc60b73c64323e57924bfe5c4e21264"
+  },
+  "implementation": [
+    "Native Board startup now calls actual InactiveOwner.publishHostApplicationIo outside startup lock after known-image completion. Board supplies actual application authority; mutually exclusive kernel-client publication/probe not invoked.",
+    "Qualification AppIo TU compiled with ZORN_GEN7_APP_PROBE186=1 to omit automatic Metal discovery properties while preserving ordinary exact-class IOServiceOpen. Normal builds retain existing Metal discovery. Retained old root plugin must not claim exclusive qualification session.",
+    "Application publication uses distinct milestones87/88 and atomic returned-bit plus actual IOReturn; CDC ap field only reports publication. Historical kc field restricted to85/86. No ordinary-task GPU success inferred.",
+    "13 native TUs plus UfsOwner compile; actual extracted startup lock/owner/health/failure path passes36 ASan/UBSan assertions. Failed first CDC compile retained; declaration moved after type includes. Existing3 inherited memory-width warnings remain.",
+    "First CDC recipe only redirected first repeated -MF and overwrote one parent dependency file. Misdirected file archived and parent dependency regenerated using exact parent source/recipe with dependency-only compiler; parent object unchanged. Original dependency hash unavailable, so regenerated file is not relabeled historical evidence. All output flag occurrences now redirected; all13 publication TU output paths verified inside new archive."
+  ],
+  "remaining": [
+    "Capture actual ordinary-task result/CRC/close output and native application lifetime/OOB observations; bounded wait after publication before one-shot CDC report.",
+    "Replace inherited v185 run/USB diagnostic identity, bind new root4d636e89 in kernel/ADT, full-link every affected object with qualification define, package/freeze and current fixed-runner checks.",
+    "Apply reviewed exact root delta only through fresh authorized bounded protocol; actual signature/admission/mappings/cache/GPU image/close require hardware. No v186 boot/device operation yet.",
+    "Metal/shader/presentation/fullFT3683 remain required; goal active."
+  ],
+  "hardware": {
+    "executed": false,
+    "boot_package_created": false,
+    "root_installed": false
+  },
+  "constraints": "No disassembly/reverse engineering; source/native compilation and mocked host regression only."
+}

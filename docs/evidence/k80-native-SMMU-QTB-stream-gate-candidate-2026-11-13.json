@@ -1,0 +1,136 @@
+{
+  "title": "K80 iOS 26 native SMMU QTB halt and peer-stream gate candidate",
+  "recorded_at": "2026-11-13",
+  "status": "source-only-candidate-full-linked-unselected",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "os": "iOS 26.6.2 (23G90)",
+    "hardware": "Redmi K80 / Adreno 750v2 Gen7.9.1"
+  },
+  "candidate": "gpu-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83",
+  "parent_candidate": "gpu-native-qtb-power-bank-peer-v63-f38d4a1d89988f20",
+  "base": {
+    "candidate": "gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515",
+    "kernel_sha256": "f91cb468f41868513e65ed87a1baa9a86432a77efbd64d13b4da2a7c0b520d49"
+  },
+  "source": {
+    "directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83",
+    "changed_files": {
+      "ZornGen7DarwinBoardOwner.cpp": "7cb3b1e3a4b0089d467978e86f50acb334e228f67ec9d414fac797e30195bf32",
+      "ZornGen7QtbFence26.cpp": "7691838071308596d8beec4ea1f5c78132a6c44f78ed768e38897a9aaad4ba3b",
+      "ZornGen7QtbFence26.h": "8ee777561af820febd98035e14afa62f581a4dc53af79a1c2af9b207e80d64a9",
+      "ZornGen7SmmuDomain26.cpp": "fd8fd7af6ca2463da4e9194f68b28ffd88ad68bffb8189e5f62dfe8f003e77b3",
+      "ZornGen7SmmuDomain26.h": "8a2d88f67c8b8112a51c73718060c17e8bc472be853495f4d8fec4d16adc2310"
+    },
+    "build_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/source-manifest.json"
+  },
+  "gate_sequence": [
+    "Require the existing whole-GPU MMU start callback and re-read the global PRR before changing SMMU state.",
+    "Validate the actual gpu-qtb DT resource at physical 0x3de8000, the exact stream range 0..0x3ff, two ports, and both parsed GPU stream IDs.",
+    "Acquire and poll the GPU QTB TBU halt ACK while holding the required TBU power vote.",
+    "Program and read back both SMMU contexts, ACTLRs, global PRR, and peer-aware stream entries with QTB halted.",
+    "Recheck both context/stream paths, then resume QTB, synchronize writes, lower the power vote, and publish MMU-ready."
+  ],
+  "source_audit": {
+    "qtb_semantics": "The upstream QTB FENCEACK is a TBU transaction fence. The audited Qualcomm implementation uses it around an IOVA-to-physical query; it is not a GMU scheduler stop or a GPU producer quiescence lease.",
+    "upstream_qtb_source": "references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c",
+    "producer_stop": "The separate acquireExclusiveGpuMmuStart callback remains mandatory, but no concrete in-tree platform callback/provider or direct-ring startup caller was found. The candidate fails closed if the callback is absent.",
+    "candidate_internal_start_path": "StartupOwner -> InactiveOwner -> DarwinBoardOwner -> SMMU Domain; this path is inside the unselected candidate and does not itself establish a production OS/board caller.",
+    "mapping_owner": "Independent actual SMMU mapping/page-table ownership remains required."
+  },
+  "build": {
+    "directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83",
+    "compile": [
+      {
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/ZornGen7DarwinBoardOwner.cpo",
+        "object_bytes": 879152,
+        "object_sha256": "15311e4a0d402083e566edef701484ff0757311b12aefb2f218e1f1e9e0fa88a",
+        "stderr_bytes": 0,
+        "warnings": 0,
+        "translation_unit": "ZornGen7DarwinBoardOwner.cpp"
+      },
+      {
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/ZornGen7QtbFence26.cpo",
+        "object_bytes": 318288,
+        "object_sha256": "50f74ba9fadc964f5fe1100be707e091ab3044e539dcf1f3f161879eef89f2cc",
+        "stderr_bytes": 0,
+        "warnings": 0,
+        "translation_unit": "ZornGen7QtbFence26.cpp"
+      },
+      {
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/ZornGen7SmmuDomain26.cpo",
+        "object_bytes": 632808,
+        "object_sha256": "653601800403dbcfdd34890f0866dd61578926ed1558fa8944f10ad276b96f61",
+        "stderr_bytes": 2108,
+        "warnings": 3,
+        "warning_set": "same HoujiFullHostNativeMemory.h precision/narrowing warning set as the QTB power/resume base",
+        "translation_unit": "ZornGen7SmmuDomain26.cpp"
+      },
+      {
+        "exit_code": 0,
+        "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/ZornGen7SmmuStream26.cpo",
+        "object_bytes": 197960,
+        "object_sha256": "25c5bccd9e65c59a4f55d2d39205b6075945b8369fb0406faf29c7eea69e3080",
+        "stderr_bytes": 0,
+        "warnings": 0,
+        "reused_from_candidate": "gpu-native-qtb-power-bank-peer-v63-f38d4a1d89988f20",
+        "translation_unit": "ZornGen7SmmuStream26.cpp"
+      }
+    ],
+    "full_link": {
+      "exit_code": 0,
+      "linker_argument_count": 154,
+      "total_inputs": 1397,
+      "base_filelist_inputs": 1318,
+      "direct_inputs": 79,
+      "replaced_filelist_inputs": [
+        "1250-ZornGen7SmmuDomain26.cpo",
+        "1257-ZornGen7SmmuStream26.cpo",
+        "1317-ZornGen7QtbFence26.cpo"
+      ],
+      "replaced_direct_inputs": [
+        "ZornGen7DarwinBoardOwner.cpo"
+      ],
+      "other_direct_inputs_preserved": 78,
+      "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/full-link/kernel.ZORN26-NATIVE-QTB-POWER-BANK-PEER-STREAM-GATE-V64.UNSELECTED.macho",
+      "kernel_bytes": 30463480,
+      "kernel_sha256": "56f47655483b7e228ee7427117f694318aa72cde0d1e74eca6d20026eb2cdaeb",
+      "filelist_sha256": "b431bf918d8a824e114bf7e8b4aac019d446c01f075975016c4e2fd27a37c3a4",
+      "linker_stderr_bytes": 803,
+      "linker_warnings": 10,
+      "linker_stderr_sha256": "74fb40e052dd7e4b349b43f1e0d9b0560244edfa4848d2a6812e0b2053b6442c",
+      "linker_stderr_byte_identical_to_base": true,
+      "undefined_check": {
+        "command": [
+          "/usr/bin/nm",
+          "-u",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/full-link/kernel.ZORN26-NATIVE-QTB-POWER-BANK-PEER-STREAM-GATE-V64.UNSELECTED.macho"
+        ],
+        "exit_code": 0,
+        "undefined_symbol_count": 0,
+        "stderr": "",
+        "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-stream-gate-v64-449b188b4b410a83/full-link/undefined-symbols.txt",
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "latest_hardware_gpu_evidence": "docs/evidence/k80-native-SMMU-readonly-bank-stream-census-observed-2026-11-13.json (v60; no candidate context/stream write or GPU execution)",
+  "qualification_limits": [
+    "The whole-GPU/GMU producer-stop callback is external and currently has no concrete provider or production call site.",
+    "The actual direct-ring OS/board path does not yet construct and schedule ZornGen7StartupGpuInputs26.",
+    "Independent SMMU mapping/page-table ownership is not established.",
+    "No package, boot, device access, runtime selection, register write, DMA, SMMU translation, GMU/HFI firmware execution, GPU execution, fence retirement, Metal rendering, or touch change is established."
+  ],
+  "touch_source_changed": false,
+  "packaged": false,
+  "booted": false,
+  "device_accessed": false,
+  "runtime_selected": false,
+  "full_goal_complete": false,
+  "next_action": "Implement a real K80 GPU+GMU stop/ownership provider across the full effective stream match set, establish independent mapping ownership, and connect the actual direct-ring startup caller before any hardware trial."
+}

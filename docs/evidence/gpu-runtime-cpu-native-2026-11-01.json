@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "scope": "Current iOS17 source/SDK dependency closure and static used ABI/baseline comparison; no native/hardware or matching published verification level.",
+  "result": {
+    "updated": "2026-11-01T22:30:25.807755+08:00",
+    "state": "selected-CPU-backing-native-dependencies-and-used-ABI-closed-statically-maintained-source-unselected",
+    "independently_compiled_raw_SHA_equal_objects": 8,
+    "base_objects": {
+      "registry": {
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-cpu-prepare/ZornGpuRuntimeBackings.cpp",
+        "source_sha256": "10ae58a24f10550dd13e4dc1f0d14b8957a88f22d45c5ffceb30a6e95b72b420",
+        "object_sha256": "e6e95fc800f72f3cbe42c6c20f05d8c157b48dc09d811de27fd892d5a20e9465",
+        "independent_raw_SHA_equal": true
+      },
+      "memory": {
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.cpp",
+        "source_sha256": "37363469c9e1f1e200b368e0bfdb80111722861792411090f3cef67506c9adef",
+        "object_sha256": "172bcaf8044a8e2d6c09a0d7b31b0cc1932df2a8b17441ee7398899ed77ebeae",
+        "independent_raw_SHA_equal": true
+      },
+      "cpu": {
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoCpu.cpp",
+        "source_sha256": "b22d613d1c8a73e33ef1ccaf02e0e5096a96c7a7c08ec911dea7b6df4e5e0515",
+        "object_sha256": "b120c4fa56ce6ab4d575ad608525e2dd2a9ea5f3a47f93fb60ae582a4f92ebe6",
+        "independent_raw_SHA_equal": true
+      },
+      "planner": {
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/startup-contract/ZornGpuStartupPlan.c",
+        "source_sha256": "e6b5076ef44bd8681138a1a71ac68fa8f070bdfc91b904e294d6e734e531512c",
+        "object_sha256": "71409d19a2707374153e7722a45cdffe211f0598dee28dac365e35a306528324",
+        "independent_raw_SHA_equal": true
+      },
+      "buffer-vtable": {
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/Kernel/IOBufferMemoryDescriptor.cpp",
+        "source_sha256": "606d18527db26310912b88d8c1ce29cfa853d9b7e6914c837a8c5ecdcd5869a4",
+        "object_sha256": "f880fe7ecafdcbf8b3deaee8e46c50941bc376d4de448ab72074bcea639b888e",
+        "independent_raw_SHA_equal": true
+      },
+      "descriptor-vtable": {
+        "source": "/Volumes/macData/projects/ios-zorn/UniXNU/out/zorn/tree/.cache/xnu-work/iokit/Kernel/IOMemoryDescriptor.cpp",
+        "source_sha256": "2b5e4018ceac19bdf1031d0aaeb36d2f7e2140431f5dde779db61dda7409a093",
+        "object_sha256": "19ace057fa84d4c362ae21f29a03fc441837f19a7c45c6b0ef12b2a6272a4288",
+        "independent_raw_SHA_equal": true
+      }
+    },
+    "maintained_path_objects": {
+      "maintained-registry": {
+        "sha256": "b32e403fc509f9b54ff813b3fac41a4f8a8ffe1a13ba258d2ba4e3f0d55a91cd",
+        "independent_raw_SHA_equal": true
+      },
+      "maintained-planner": {
+        "sha256": "4bfea32b261dafc0e5085e08335997ef6a21c2ecb7f5df4478e834c1aa9149dd",
+        "independent_raw_SHA_equal": true
+      }
+    },
+    "actual_recursive_inputs": 533,
+    "component_kernel_imports": [
+      "_IOFreeData",
+      "_IOMalloc_internal",
+      "_KHEAP_DATA_BUFFERS",
+      "_PAGE_SHIFT_CONST",
+      "__ZN18IOMemoryDescriptor16withAddressRangeEyyjP4task",
+      "__ZN24IOBufferMemoryDescriptor22inTaskWithPhysicalMaskEP4taskjyy",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "__disable_preemption",
+      "__enable_preemption",
+      "_bzero",
+      "_gPhysBase",
+      "_gPhysSize",
+      "_kernel_map",
+      "_kernel_task",
+      "_mach_absolute_time",
+      "_memcmp",
+      "_memcpy",
+      "_page_size",
+      "_phystokv",
+      "_pmap_cache_attributes",
+      "_pmap_set_cache_attributes",
+      "_vm_map_page_size"
+    ],
+    "all23_import_names_present_in_retained_e328_baseline": true,
+    "fresh_IOBuffer_IOMemory_vtable_entries": [
+      44,
+      37
+    ],
+    "used_typed_method_slots": {
+      "prepare": {
+        "slot": 27,
+        "byte_offset": 216,
+        "target": "__ZN25IOGeneralMemoryDescriptor7prepareEj"
+      },
+      "complete": {
+        "slot": 28,
+        "byte_offset": 224,
+        "target": "__ZN25IOGeneralMemoryDescriptor8completeEj"
+      },
+      "bytes": {
+        "slot": 41,
+        "byte_offset": 328,
+        "target": "__ZN24IOBufferMemoryDescriptor14getBytesNoCopyEv"
+      },
+      "length": {
+        "slot": 22,
+        "byte_offset": 176,
+        "target": "__ZNK18IOMemoryDescriptor9getLengthEv"
+      },
+      "segment": {
+        "slot": 19,
+        "byte_offset": 152,
+        "target": "__ZN25IOGeneralMemoryDescriptor18getPhysicalSegmentEyPyj"
+      },
+      "release": {
+        "slot": 5,
+        "byte_offset": 40,
+        "target": "__ZNK8OSObject7releaseEv"
+      }
+    },
+    "actual_allocate_release_virtual_calls_checked": 10,
+    "caller_allocate_pooled_false_and_raw_native_status_store_checked": true,
+    "new_object_mutations_refused": 3,
+    "new_wrong_IOReturn_width_compile_refused": true,
+    "constinit_and_new_component_no_initializer": true,
+    "maintained_sources_promoted_byte_identical_independent_inodes": 4,
+    "existing_parent_source_profile_unchanged": true,
+    "normal_native_calls_default_OFF": true,
+    "source_selects_no_component_or_runtime_caller": true,
+    "baseline_comparison_not_current_final_kernel_qualification": true,
+    "no_native_allocator_provider_phone_invocation": true,
+    "no_new_FD_kernel_device_candidate": true,
+    "no_wire_log_HFI_changes": true,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "limits": [
+      "Fresh native sources/SDK objects and e328 vtable/import-name comparison only. No baseline addresses are transplanted and no new full-kernel ABI/readiness is claimed.",
+      "Entire allocator/CPU source objects include unselected pool/WC/import code; this does not authorize or select those paths. New prepare caller passes pooled=false.",
+      "Underlying failed allocator may clean up its unpublished allocation; its secondary cleanup status is unknown. Registry preserves original native status and quarantines its retained object.",
+      "IOKit helpers/cache statistics can block or retry; future invocation needs a real normal-thread caller, independent WDT and readable failure protection.",
+      "Actual mapping/domain/stop/shared ownership/fence/memstore and GPU execution remain unqualified. Existing kernel helpers cannot be duplicated into a future final image without canonical source/link selection checks."
+    ],
+    "retained_refusal": "First ABI checker expected the wrong scaled STP immediate. Corrected to exact stp w24,w0,[x23,#4] after disassembly; original source/object/flags unchanged."
+  },
+  "source_recipe": "UniXNU-zorn/scripts/check-zorn-runtime-cpu-native.py",
+  "source_recipe_sha256": "3d725b86c323e3cbc8a3c44150abef96686ae2c6544076d4c610b09d6616f465",
+  "local_ABI_recipe": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-cpu-native-closure/audit-abi.py",
+  "local_virtual_call_recipe": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-cpu-native-closure/audit-virtual-calls.py",
+  "local_promotion_recipe": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-runtime-cpu-native-closure/promote-source.py"
+}

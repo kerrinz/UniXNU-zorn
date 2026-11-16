@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-09T19:51:36.738373+00:00",
+  "status": "actual-drawable-presentation-success-condition-fixed-offline",
+  "build": {
+    "status": "drawable-presentation-requires-actual-successful-command-completion-source-fixed-offline",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-present-completion-candidate/NativeBridgeMetalFrontend.mm",
+    "source_sha256": "cca41fcd41239a9d5f9bd709905e3e6cc7cc566958fdd7f18466c28a8c9e9b10",
+    "plugin": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/NativeAdrenoMetal.bundle/NativeAdrenoMetal",
+    "plugin_sha256": "695ad3ad1f0d702153466587a14f6098c1d1883f06b5a1a8041cad2bc3ac7e55",
+    "turnip_sha256": "968d8669661486a18dd9bbf8e8a771908ad3049b18c7dc0a7e708e85073318f1",
+    "prior_bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-app-service26-r2/NativeAdrenoMetal.bundle",
+    "replaced_link_inputs": 1,
+    "installed": false,
+    "target_executed": false,
+    "hardware_present_qualified": false
+  },
+  "sources": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-present-completion-candidate/NativeBridgeMetalFrontend.mm",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/source-archive/00-NativeBridgeMetalFrontend.mm",
+      "sha256": "cca41fcd41239a9d5f9bd709905e3e6cc7cc566958fdd7f18466c28a8c9e9b10"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal/NativeBridgeMetalFrontend.mm",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/source-archive/01-NativeBridgeMetalFrontend.mm",
+      "sha256": "10b69ee09489364d23157b602039e11d1e7a30e0607f784838c45430f008b1f9"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-presenter-copy-candidate/MiniIOMobileFramebuffer.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/source-archive/02-MiniIOMobileFramebuffer.cpp",
+      "sha256": "687a40e878e0f64a965986e0372f57722ef78d5f90cdadcc60f353573ab0e572"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/RedwoodGPU.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/source-archive/03-RedwoodGPU.cpp",
+      "sha256": "d946787ea9f4a0cc8659aae799bec54e9eee93e45fad4e62daa64905e96043e9"
+    },
+    {
+      "source": "/private/tmp/build-metal-present-completion26.py",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/source-archive/04-build-metal-present-completion26.py",
+      "sha256": "0d4e1c11b495d11b62fe10c82559e8464582304f644ec4bf795c366b17be903f"
+    },
+    {
+      "source": "/private/tmp/checkpoint-metal-present-completion26.py",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/source-archive/05-checkpoint-metal-present-completion26.py",
+      "sha256": "f049d92b1698d05b3544fd42e7e8a2e5eab3368a254aaf73855f69d24168b7d9"
+    }
+  ],
+  "compiler_dependencies": 1348,
+  "new_undefined_imports": 0,
+  "compiler_warnings": 0,
+  "linker_warnings": 0,
+  "implementation": [
+    "Real NBCommandBuffer local/runtime refusal reaches finish and executes completed handlers with Error status;both presentDrawable handlers previously called present/presentAtTime unconditionally,despite comment requiring GPU-written drawable",
+    "Both actual presentation callbacks now require actual commandBuffer.status==MTLCommandBufferStatusCompleted;successful rendering preserves original present/time argument,failed command still delivers all ordinary completion callbacks without announcing a ready drawable",
+    "Existing nmb runtime status/real completion path reused;no invented fence value/success,no retry/reset/clock/geometry/cache/timeout or API/wire change",
+    "Already disabled earlyOn path remains unchanged;no nominal reopening or new early-completion policy",
+    "New actual frontend compiled;only frontend link input replaced,exact plugin/PAC Rust/PM4 inputs and Turnip968d8669 preserved independently. New bundle695ad3ad locally signed/verified,arm64e/iOS26 minos/SDK27 and unchanged imports checked"
+  ],
+  "limits": [
+    "Direct IOSurface/CoreAnimation framebuffer path still skips old GPU wait in iOS26 and new direct-ring submit does not currently record its surface completion;this is not a complete render-to-display fence fix",
+    "Legacy MiniIOSurfaceDrawn uses RedwoodGPU rather than the new native ring;simply re-enabling it cannot prove new GPU work complete. Actual per-import surface ownership/fence association must be implemented",
+    "Concrete continuous application execution authority and platform selection remain unbound;automatic Metal enumeration,concurrent clients and end-to-end presentation unverified",
+    "No ObjC callback/present/command/API/Metal/Rust/native/GPU/phone executed;host compiler/linker/signing and Mach-O inspection only",
+    "No fabricated valid drawable/IOSurface/provider/handle or successful fence scenario tested;source control-flow and actual compiler/link evidence only"
+  ],
+  "installed": false,
+  "component_runtime_selected": false,
+  "hardware_present_qualified": false,
+  "target_or_phone_executed": false,
+  "goal_complete": false
+}

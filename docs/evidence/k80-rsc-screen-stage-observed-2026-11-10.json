@@ -1,0 +1,56 @@
+{
+  "status": "actual-CPU-console-stage-trial-recovered-no-visible-marker-or-fresh-page",
+  "time": "2026-11-10T15:52:20.407293+00:00",
+  "scope": "single-K80-ios26-RSC-CPU-console-stages90s-v28",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/root-trial-rsc-screen-stage/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/root-trial-rsc-screen-stage/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/full-link/kernel.ZORN26-RSC-SCREEN-STAGE.UNSELECTED.macho",
+    "sha256": "17498ccd8667c31e354d689cdd4170e383a38b563fad7da89b05b24f9aa4d090",
+    "bytes": 30395632,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 10,
+    "preserved": 1386,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/root-package-rsc-screen-stage/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "62478b0b871e657d07765dc18f026101c4224029498a8b50e62e7b57d541aa94",
+    "bytes": 11612160
+  },
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-screen-stage-9463ec1b0ae14ee6905827c08490908e",
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/source-selection.json",
+  "compilation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/compile-result.json",
+  "identity_compilation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/identity-compile-result.json",
+  "stage_map": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/stage-markers.json",
+  "camera45": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/root-trial-rsc-screen-stage/camera/rsc-stage45s.json",
+  "cameraLate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-screen-stage26-9463ec1b0ae14ee6905827c08490908e/root-trial-rsc-screen-stage/camera/rsc-stage-late.json",
+  "camera_observation": "45s frame blank/reflective;no readable checkpoint/console/GUI;95s frame shows Recovery;not a diagnosed display defect.",
+  "record_changed": false,
+  "fresh_stage_record_observed": false,
+  "failure_stage": "unlocalized;screen marker visibility is itself unqualified",
+  "recovery_seconds": 88.24742016699747,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "full_root_readback_performed": false,
+  "scope_consumed_no_repeat": true,
+  "full_runtime_or_GPU_or_lockscreen_proven": false,
+  "next_action": "v28 CPU console stage experiment recovered TWRP88.247s but45s camera shows a blank/reflective screen with no readable marker;late frame shows Recovery. No new terminal page. Do not infer a precise runtime stage or GPU/display failure from this. The terminal observer currently synchronously obtains board/composition status before it can write,so it can itself wait behind the in-flight operation. Reuse the already-owned UFS PID1 EL0 worker and one original4KiB record once at25s to sample a source-coupled atomic RAM checkpoint without taking GPU/board/workloop status gates. Stage hooks do no I/O;no extra pages,provider/owner grants,or fake completion. Keep masked-only enable/clocks/GMU/GPU OFF,read-only root/Data,no whole-root readback. Compile only changed identity TUs/freshIDs,inherit unchanged native objects;one fresh bounded trial if exact bundle closes."
+}

@@ -1,0 +1,52 @@
+{
+  "time": "2026-11-10T23:37:37.364265+00:00",
+  "status": "metal-minimum-duration-drawable-command-path-built-offline",
+  "build": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-minimum-duration-candidate/NativeBridgeMetalFrontend.mm",
+    "source_sha256": "e83a65ac7e561f93e908b14a1fa3ecc7e1220931cdcd1ae4b356ebab269bdb78",
+    "plugin": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/NativeAdrenoMetal.bundle/NativeAdrenoMetal",
+    "plugin_sha256": "8b9c8b8b3ef1dbfbfeda98ee19db0c19df7da41daf93cbce7477a0e7ffe6f2f7",
+    "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/NativeAdrenoMetal.bundle",
+    "previous_bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/NativeAdrenoMetal.bundle",
+    "turnip_sha256": "968d8669661486a18dd9bbf8e8a771908ad3049b18c7dc0a7e708e85073318f1",
+    "linked_inputs": 4,
+    "replaced_link_inputs": 1,
+    "installed": false,
+    "target_executed": false
+  },
+  "source_delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/source-delta.patch",
+  "SDK_headers": [
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLCommandBuffer.h",
+      "sha256": "d84dda866f07ffc37ce68e3c635177373cdefa419fc1f64c766442ed81966895"
+    },
+    {
+      "path": "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS27.0.sdk/System/Library/Frameworks/Metal.framework/Headers/MTLDrawable.h",
+      "sha256": "6ded45a7ca00e7ff0e8cfbe9799aedc0d84bcb65c35c679da2eadf0c5e777eaa"
+    }
+  ],
+  "implementation": "NBCommandBuffer now implements the SDK minimum-duration selector. It reuses the successful completion handler path, preserving the original CFTimeInterval and calling the drawable native timing method only after command status Completed.",
+  "link_checks": {
+    "architecture": "arm64e",
+    "platform": "iOS",
+    "deployment": "26.0",
+    "sdk": "27.0",
+    "signature_verified": true,
+    "undefined_import_name_set_unchanged": true,
+    "warnings": 0,
+    "exact_link_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/exact-link-inputs.json",
+    "commands": [
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/frontend-command.json",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/link-command.json"
+    ],
+    "method_symbols": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/drawable-method-symbols.txt",
+    "binary_completion_branch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-minimum-duration26/drawable-disassembly.txt"
+  },
+  "limits": [
+    "23G90 application use of the selector and CoreAnimation timing are not observed.",
+    "Requires actual command completion and a real drawable. No runtime discovery, drawable presentation, physical scanout, or application GPU execution verified.",
+    "Independent frontend candidate only. The installed root and previous overlay records remain separate."
+  ],
+  "phone_access": false,
+  "full_root_readback_performed": false
+}

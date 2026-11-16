@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T16:18:33.280235+08:00",
+  "state": "Catalog149-VM-time-hook-diagnostic-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-vm-clock-contract/source-contract.json",
+  "functions_body_SHA_recorded": 8,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 VM time callback installations and all local PhaseClock uses only.8 function hashes,dispatch parent unchanged;VM/cache/Submit/SDK bodies provenance only,no old suites/targets/native calls or clock-value model.",
+    "install": "VM global callback starts null. Alternate Service probe sets vm_clock_us before advertisesAdreno check,so original source installation precedes matching success. vm_clock_us calls KernelTime now_us with null cookie/non-null local output and returns value. That helper checks cookie/output,converts mach_absolute_time nanoseconds to microseconds;no native time/read/clock-status execution or K80 provider epoch claimed.",
+    "borrow": "Each core dispatch writes static borrowed vm_clock and installs global lambda before schema validation. Lambda returns callback time only when clock+now_us nonnull else0. Published g.clock is a by-value static-state copy of supplied clock;its cookie is still borrowed and lifetime/caller rights not supplied by struct copy. Alternate null clock may leave installed lambda returning0. No atomic/per-owner/timebase contract assumed.",
+    "readers": "PhaseClock initializes last/began from global;lap updates phase elapsed accumulator,elapsed returns unsigned difference or0,done increments/counts bytes/max elapsed. All recorded NativeAdrenoVm uses feed phase/kind diagnostic accumulators at map/unmap milestones. No use of this hook in timeout selection,route admission,release/retire permission or returned map status found in exact source scope.",
+    "boundary": "A callback change/null/timebase shift across samples may make diagnostics zero/stale/wrapped unsigned differences;this is conditional timing-quality source,not reproduced race/hardware fault. Phase counter/0/time return is not accepted mapping,completed PTE retirement or stop/DMA. Separate transaction/cache/SMMU providers retain their frozen error and ownership gaps.",
+    "decision": "No31st diagnostic atomic/lock/ref/generation/reset/default-time/retry/error policy required from these elapsed-only uses.30 independent UNAPPLIED/all native OFF;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal/rolefullcore unavailable. No alternate selection/component/caller/kernel/FD/candidate/query/HFI/log/carrier/wire/CPU/security expansion."
+  },
+  "qualification": "VM elapsed diagnostic callback source only;not native clock/timeout/map/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

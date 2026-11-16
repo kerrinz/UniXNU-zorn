@@ -1,0 +1,27 @@
+{
+  "status": "actual-CommandDB-to-host-vote-tables-and-HLOS-ICC-connected-compiled-linked-unexecuted",
+  "date": "2026-11-10T09:41:35.290461+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-commanddb-host-a24260d8cbb14c70b9628ede0359b1d0",
+  "native_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/shared/commanddb-host-a24260d8cbb14c70b9628ede0359b1d0/k80",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-host26-a24260d8cbb14c70b9628ede0359b1d0",
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-host26-a24260d8cbb14c70b9628ede0359b1d0/verification.json",
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-host26-a24260d8cbb14c70b9628ede0359b1d0/full-link/kernel.ZORN26-CommandDB-HOST.UNSELECTED.macho",
+  "sha256": "35f49b58ccd0fd3d56caf5bec246ab4ea554afd9b92d83fa178cc4ce5177df01",
+  "bytes": 30330416,
+  "inputs": 1394,
+  "replaced": 63,
+  "preserved": 1331,
+  "undefined_symbols": 0,
+  "implementation": [
+    "Selected HostVoteData26 uses explicitly tagged resource inputs. Actual AUX length describes each rail;actual immutable full AUX is copied into persistent table-owned storage,without imposing regulator32-byte/even-length policy on the existing host algorithm.",
+    "Host BCM consumes the original7-byte prefix;ICC BCM consumes8bytes and retains its original unique/nonzero-address admission and normalization. Stable standalone is read from the actual header;matching count comes from the same bounded decoded data.",
+    "Address lookup retains zero-address not-found semantics. AUX-only lookup independently permits real zero-address metadata as Linux aux lookup does;regulator/XO/ICC consumers retain their own original address checks.",
+    "Actual resource owner connects to host-table and ICC owner factories,which retain real owners and preserve gate/source-tree/RSC/clock checks. Original strict snapshot paths remain separate."
+  ],
+  "limitations": [
+    "Full board and startup caller still need to bind/select this resource route and publish dependencies in actual sequence.",
+    "No voltage/bandwidth request,clock,GMU,HFI,GPU,Metal or phone execution has been performed for this candidate."
+  ],
+  "GPU_or_phone_execution": false,
+  "full_goal_complete": false
+}

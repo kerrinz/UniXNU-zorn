@@ -1,0 +1,30 @@
+{
+  "status": "explicit-CPU-read-intent-lifetime-object-compiled-unintegrated",
+  "date": "2026-11-10T10:34:09.851477+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/commanddb-read-intent-3227ad08c58147ff88a372830bb7d0b9",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-read-intent26-3227ad08c58147ff88a372830bb7d0b9",
+  "compile": {
+    "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-read-intent26-3227ad08c58147ff88a372830bb7d0b9/ZornGen7CommandDbReadIntent26.cpo",
+    "sha256": "f3efbef9eb2eedaf470ddf6fdd959b5730cfa102025e1048369f09f36b3b2bfe",
+    "warnings": 0,
+    "status": "CPU-intent-object-compiled-not-a-firmware-read-grant",
+    "linked": false,
+    "native_or_phone_executed": false
+  },
+  "implementation": [
+    "Actual OSObject retains its platform/code owner and creating kernel thread;normal CPU context and explicit opt-in selector are required.",
+    "Single kernel factory attempt and same-thread single read-intent claim verify the actual sole descriptor,source physical extent,length and contiguous metadata.",
+    "Normal CPU-only final release drops owned refs/lock/thread;no mapping,DMA resource or hardware release/reset/retry exists."
+  ],
+  "boundary": [
+    "This is not ZornGen7CommandDbReadAuthority26 and cannot establish original firmware stability/cache alias/security conditions.",
+    "Boot selector expresses future exact trial intent only,not an authentication token or successful hardware access.",
+    "No actual reader,clock,resource-ready binding,complete kernel link,phone operation or runtime component selection occurred."
+  ],
+  "capture_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-recovery-commanddb-mount-review26/actual-capture/result.json",
+    "finding": "Actual Recovery resource/AUX export is useful reference data but explicitly not a raw global snapshot or Darwin/hardware authority;not replayed as current data."
+  },
+  "initial_failure": "Added actual IOPlatformExpert definition to make the real platform/base-class comparison type-correct;initial source/compiler diagnostic retained.",
+  "full_goal_complete": false
+}

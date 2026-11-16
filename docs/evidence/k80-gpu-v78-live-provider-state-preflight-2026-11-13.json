@@ -1,0 +1,50 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 v78 GPU live provider-state revalidation",
+  "status": "OFFLINE_FULL_LINKED_UNSELECTED; not packaged or booted",
+  "ancestor": {
+    "candidate": "v77 live GPU/GMU parent identity revalidation",
+    "kernel_sha256": "be07e1184cab37dfc52b3ccc004c247f55e5c61d1d3a3b67cbc8937962cb483d"
+  },
+  "change": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-live-provider-state-v78-20261113/ZornRootPlatform26.cpp",
+    "source_sha256": "4222c9014d372bedc51003838df8566ef3a43716d13a9e3f9c312ae17231fac4",
+    "paired_header": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-live-provider-state-v78-20261113/ZornGen7PlatformBoardStart26.h",
+    "paired_header_sha256": "79b9dace9854fa3896ea5be96f4324fe1ace7bbc2e680157d8c0a5102587a4a6",
+    "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v78-live-provider-state-20261113/ZornRootPlatform26.cpo",
+    "object_sha256": "bd87dde96f640b83774ccdc92703bcb71a699e9c1eaa4819f4568d79d944c5bc",
+    "behavior": "Immediately before direct preparation claims its one-shot slot, resolve the live arm-io/gpu and arm-io/gmu entries. In addition to v77 entry and provider IDs, require the current service and parent class names and open/inactive states to match the positive observation captured by the current board stage. Any missing or changed state refuses preparation.",
+    "scope": "This is a live snapshot consistency check only. It does not lock providers, exclude scheduler or hardware masters, grant startup/MMIO/SMMU/DMA authority, or provide the missing startup input owner."
+  },
+  "build": {
+    "compile_exit": 0,
+    "compiler_warning_count": 0,
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v78-live-provider-state-20261113/full-link/kernel.ZORN26-GPU-LIVE-PARENT-IDENTITY-V78.UNSELECTED.macho",
+    "kernel_sha256": "702fed167fad11f04e87efe71b3ae8798e77c1ccde9b137892f9bf1c0592136e",
+    "bytes": 30548320,
+    "link_exit": 0,
+    "input_count": 1397,
+    "filelist_input_count": 1318,
+    "direct_input_count": 79,
+    "missing_input_count": 0,
+    "undefined_symbol_lines": 0,
+    "link_warning_count": 10,
+    "link_warnings_match_v77": true
+  },
+  "cpu_lock_screen_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "device_operations_performed": false,
+  "candidate_selected_packaged_or_booted": false,
+  "GPU_MMIO_DMA_submission_fences_Metal_or_GPU_display": false,
+  "touch_driver_work": false,
+  "active_device_gate": "The existing v73 fixed-runner Recovery stop gate remains active. This offline candidate does not clear or bypass it.",
+  "remaining_owner_gap": {
+    "root_constructs_complete_ZornGen7StartupGpuInputs26": false,
+    "real_current_all_master_GPU_GMU_scheduler_quiescence_owner": false,
+    "next_step": "Continue source-backed GPU/board owner construction and determine a real all-master GPU/GMU scheduler-quiescence provider. Keep direct startup fail-closed until that owner and its full callback lifetimes are connected to the maintained root."
+  },
+  "no_disassembly_or_reverse_engineering": true
+}

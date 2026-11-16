@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Conditional private bitmap init repair and actual selected XNU UBSan static binding/visibility correction",
+  "result": {
+    "updated": "2026-11-02T04:13:22.446818+08:00",
+    "state": "owned-bitmap-private-init-repair-and-real-UBSan-static-binding-unapplied",
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-owned-bitmap-init/owned-bitmap-init.UNAPPLIED.patch",
+    "patch_sha256": "0d2d01009fd30de9d6367465eee14408cdc71bd6197c20e56d99d96c393f419f",
+    "patch_unapplied": true,
+    "conditional_source_interleaving_not_observed_K80_failure": true,
+    "only_private_pointer_publication_sticky_incomplete_fallback_changed": true,
+    "all_public_error_cache_cleanup_bodies_and_header_class80_unchanged": true,
+    "new_source_mutations_refused": 3,
+    "new_actual_object_mutations_refused": 3,
+    "fresh_current_iOS17_independent_object_pairs": 2,
+    "fresh_recursive_inputs": 395,
+    "explicitly_reused_sealed_objects": 3,
+    "sealed_dependency_inputs": 413,
+    "actual_dependency_union": 530,
+    "no_old_object_freshness_claim": true,
+    "real_selected_UBSan_handler_BRK_not_stub": true,
+    "negate_private_binding_in_new_component_only": true,
+    "existing_source_build_UBSan_object_matches_fresh_SHA": true,
+    "external_imports": 33,
+    "not_in_retained_global_symbol_set": [
+      "_native_pmap_user_mappings",
+      "_sysctl_register_oid_early"
+    ],
+    "all_symbol_table_has_private_negate_and_early_sysctl": true,
+    "pmap_diagnostic_not_found_in_all_symbol_table": true,
+    "global_filter_erratum_saved_old_proofs_unchanged": true,
+    "no_private_address_copied_or_callable_lease": true,
+    "no_finalkernel_Apple_ABI_startup_or_hardware_qualification": true,
+    "no_native_allocator_lock_cache_provider_phone_or_host_success_peer_calls": true,
+    "no_component_runtimecaller_selection_FD_kernel_devicecandidate_wire": true,
+    "physical_assistance_available": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "limitations": [
+      "Fully unattended physical_assistance_available=false;no new exact device authorization;all native/lock-runtime/provider/allocator/cache/phone paths OFF.",
+      "Initialization publication and sticky skipped-note fallback only. No actual concurrency/lifetime/hardware-stop proof. Public native error and cleanup semantics unchanged;no new component/caller selection or executable image.",
+      "Fresh actual full XNU UBSan object is source evidence,not a stub or safe duplicate runtime for the retained kernel. Private/local symbol presence does not itself establish accepted import ABI or permission to call addresses.",
+      "Prior global-only scans omitted local symbols. New erratum is separate;old reports/SHAs remain frozen. No sanitizer/guard weakening,forced unresolved,public export fabrication or address transplantation.",
+      "No new wire/codec/carrier,HFI/query fields or EFI/Darwin pointers. All old source profiles/baselines/claims protected;GPU execution/rendering/Metal still absent."
+    ]
+  },
+  "artifacts": {
+    "contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-owned-bitmap-init/source-contract.json",
+    "compile": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-owned-bitmap-init/compile-result.json",
+    "target": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-owned-bitmap-init/target-audit.json",
+    "symbol_visibility": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-owned-bitmap-init/all-symbol-visibility-check.json",
+    "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-owned-bitmap-init/next-plan.json"
+  }
+}

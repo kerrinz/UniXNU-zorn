@@ -1,0 +1,45 @@
+--- a/direct-runtime/ZornGen7DirectVm26.cpp
++++ b/direct-runtime/ZornGen7DirectVm26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornSurfaceBacking246.h"
+ /* SPDX-License-Identifier: MIT */
+ #include "ZornGen7DirectVm26.h"
+ #include "ZornGen7DirectVm26Alias.h"
+@@ -332,6 +333,15 @@
+     clock.lap(0,3);
+     insert(spans,upper);record->mapped_spans=spans;result_.completed_spans=spans;
+     clock.lap(0,4);clock.done(0,memory->bytes());
++    if(memory->imported()) {
++        ZornSurfaceBacking246 backing{memory,memory->bytes(),[](void *p,uint64_t at,uint64_t *pa,uint64_t *n)->bool {
++            const auto &memory=*static_cast<NativeAdrenoMemory *>(p);
++            for(size_t i=0;i<memory.spanCount();++i){const auto &s=memory.spans()[i];
++                if(at>=s.offset && at-s.offset<s.bytes){*pa=s.physical+(at-s.offset);*n=s.bytes-(at-s.offset);return true;}}
++            return false;
++        }};unsigned match=ZornSurfaceInvalid246;
++        record->surface246=zorn_surface_copy_backing246(backing,&match);
++    }
+     record->handle=next_handle_++;*handle=record->handle;result_.complete=true;return kIOReturnSuccess;
+ }
+ IOReturn ZornGen7DirectVm26::unmap(uint64_t handle)
+@@ -384,6 +394,7 @@
+     clock.lap(1,4);
+     if(record->memory->retireAfterQuiescence()!=kIOReturnSuccess)return fail(ZornSmmuSparse4KStateMismatch);
+     clock.lap(1,5);clock.done(1,record->memory->bytes());
++    if(record->surface246)zorn_surface_drop246(record->surface246);
+     *record={};--objects_;result_.complete=true;return kIOReturnSuccess;
+ }
+ IOReturn ZornGen7DirectVm26::describe(uint64_t handle,uint64_t *iova,size_t *bytes,
+@@ -569,3 +580,13 @@
+     // seed backing/table lifetime belongs to the parent and actual creator.
+     freeMetadata();attached_=false;return kIOReturnSuccess;
+ }
++
++// Only DirectSubmit calls after a real job completion,all import cache acquires
++// and successful namespace retirement. Writable mapping means accessible,not
++// proof the GPU wrote these pixels. Zero fence never creates an observation.
++void ZornGen7DirectVm26::noteSurfaceCompletion246(uint32_t fence)
++{
++    if(!fence || !attached_ || poisoned_)return;
++    for(size_t i=0;mappings_ && i<ZornGen7DirectVm26MaxObjects;++i){const auto &m=mappings_[i];
++        if(m.surface246 && m.memory && (m.permissions&ZornSmmuSparse4KWrite))zorn_surface_completed246(m.surface246,fence);}
++}

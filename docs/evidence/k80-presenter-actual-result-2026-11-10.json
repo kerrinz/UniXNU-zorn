@@ -1,0 +1,43 @@
+{
+  "status": "actual-presenter-unsupported-return-recovered",
+  "date": "2026-11-10T05:24:34.733487+00:00",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-result26-235612a1dca540bbb1025f28754159a9/root-trial-presenter-result/trial/run.json",
+  "scope": "single-K80-ios26-presenter-actual-result300s-v11",
+  "recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_seconds": 332.92959616699954,
+  "actual_presenter_returns": {
+    "schedule_raw": 0,
+    "status_returned": true,
+    "submitted": true,
+    "handle_returned": true,
+    "creation_returned": true,
+    "creation_raw": 3758097095
+  },
+  "creation_error": "0xe00002c7 kIOReturnUnsupported",
+  "source_implication": "In exact linked ZornCreateBootPresenter26 this return occurs in pre-allocation console metadata/extent checks; current record cannot identify which conjunct failed. Do not relax guards or guess framebuffer geometry.",
+  "PID1_EL0_proven": true,
+  "presenter_creation_proven": false,
+  "desktop_proven": false,
+  "GPU_execution_proven": false,
+  "protected_page_comparisons": {
+    "Data.bin": true,
+    "Data_metadata.bin": true,
+    "after.bin": true,
+    "before.bin": true,
+    "root_after.bin": true,
+    "root_before.bin": true,
+    "root_first_page.bin": true
+  },
+  "camera_summary": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-result26-235612a1dca540bbb1025f28754159a9/root-trial-presenter-result/camera-capture-summary.json",
+  "camera_observation": "240s image inspected: purple/white columns on dark phone screen, no readable text or normal UI confirmed. Does not identify cause or prove GPU.",
+  "prior_CPU_composition_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/root-trial-CPU-presenter/trial/run.json",
+  "next_action": "Trace exact boot console producer against preserved metadata/extent checks; obtain actual failed field before any compatibility change. Preserve one-shot scopes; no replay or root reinstall."
+}

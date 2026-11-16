@@ -1,0 +1,107 @@
+{
+  "status": "independent-real-CPU-framebuffer-startup-composition-built-unselected",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854",
+  "compile": [
+    {
+      "name": "ZornUfsCore26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/ZornUfsCore26.cpo",
+      "sha256": "59ceb7627331c59252661a3d1ecf7870c40ab4fbf7c68f269ddc4f06d157cbd2",
+      "warnings": 0
+    },
+    {
+      "name": "ZornPlatformRecordStart26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/ZornPlatformRecordStart26.cpo",
+      "sha256": "024fbb7acb24feef21616af8120f86e4a494ff29b14eb035822aa794c36dfdac",
+      "warnings": 0
+    },
+    {
+      "name": "ZornHfsRoot26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/ZornHfsRoot26.cpo",
+      "sha256": "08e74c35e3362f38294b5872d788f8ae0c7458854390786a1e3246998a8da19f",
+      "warnings": 0
+    },
+    {
+      "name": "houji_recovery26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/houji_recovery26.o",
+      "sha256": "14b9de1a015796901854769bcf75f6fb97f9eb2d97aa343c4c576b35ee48e761",
+      "warnings": 0
+    },
+    {
+      "name": "ZornUfsOwner26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/ZornUfsOwner26.cpo",
+      "sha256": "cfc8b81ca4eb362a7104a5d4ff31b26609fce2bf4fa8701b92649508a210c558",
+      "warnings": 0
+    }
+  ],
+  "link": {
+    "exit": 0,
+    "seconds": 0.1578739160031546,
+    "inputs": 1390,
+    "replaced": 5,
+    "preserved": 1385,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "1d5c5f9f904de9772c0a91ed310bcf025f7609d58d47ea28e13d118b9a99a982",
+    "bytes": 30316400
+  },
+  "actual_presenter_link_proof": {
+    "kernel_sha256": "1d5c5f9f904de9772c0a91ed310bcf025f7609d58d47ea28e13d118b9a99a982",
+    "actual_root_start_call": {
+      "symbol": "__Z26zorn26_root_platform_startP9IOService",
+      "instruction": 18446744005120950968
+    },
+    "actual_presenter_call": {
+      "symbol": "_zorn26_cpu_presenter_start",
+      "instruction": 18446744005120951032
+    },
+    "actual_startup_schedule_call": {
+      "symbol": "__ZN22ZornPresenterStartup2617createAndScheduleER9IOServiceRPS_",
+      "instruction": 18446744005123247940
+    },
+    "actual_worker_factory_calls": [
+      {
+        "symbol": "_ZornCreateBootPresenter26",
+        "instruction": 18446744005124028488
+      },
+      {
+        "symbol": "_lck_mtx_lock",
+        "instruction": 18446744005124028500
+      },
+      {
+        "symbol": "_lck_mtx_unlock",
+        "instruction": 18446744005124028520
+      },
+      {
+        "symbol": "_current_thread",
+        "instruction": 18446744005124028524
+      },
+      {
+        "symbol": "_thread_terminate",
+        "instruction": 18446744005124028528
+      },
+      {
+        "symbol": "_panic",
+        "instruction": 18446744005124028556
+      }
+    ],
+    "actual_framebuffer_input": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+      "sha256": "e2ea2175400ef71e7f441ad0d154ff27e654dc3a381a6b9c08a218b64b46c10a",
+      "bytes": 483832,
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+      "replacement": null
+    },
+    "source_implementation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-presenter-terminal-candidate/MiniIOMobileFramebuffer.cpp",
+    "actual_K80_CPU_framebuffer_object_matches_existing_terminal_candidate": true,
+    "framebuffer_object_Dada_imports_absent": true,
+    "new_geometry_cache_panel_or_gpu_policy": false,
+    "physical_presenter_or_display_registration_proven": false,
+    "EL0_marker_not_a_display_success_record": true,
+    "native_or_device_executed": false
+  },
+  "EL0_regression_proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/actual-EL0-link-proof.json",
+  "packet": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/root-package-cpu/verified.json",
+  "initial_inaccurate_title_packet_preserved_unselected": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-CPU-presenter26-e7ac99827d6e4647ba9aad47b7e6b854/root-package/verified.json",
+  "scope": "Existing actual K80 CPU framebuffer owner/compositor,boot framebuffer inputs and original geometry/cache path. New independent menu enables CPU presenter;GPU/touch remain OFF. EL0 log is regression evidence only,not display creation/pixels/scanout proof.",
+  "native_or_device_executed": false
+}

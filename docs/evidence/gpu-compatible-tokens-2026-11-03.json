@@ -1,0 +1,79 @@
+{
+  "paired": {
+    "scope": "exact complete compatible property tokens; two independent UNAPPLIED source candidates",
+    "components": [
+      {
+        "kind": "gmu",
+        "name": "NativeAdrenoGmuService.cpp",
+        "needle": "qcom,adreno-gmu",
+        "original_SHA": "431c6709c95053a9033e3ec68d9788231fa8b7b892f5650a48e504a4288a6eaa",
+        "candidate_SHA": "26da128f73adfe52cc0945e1a4c4e620ec6cd0e255bb4b4417c6ea8f0da69cef"
+      },
+      {
+        "kind": "gpu",
+        "name": "NativeAdrenoService.cpp",
+        "needle": "qcom,adreno",
+        "original_SHA": "65331246929103a23edac795d9f84b50a28cbd3639aaad2a90f9b9aa9bde7c2c",
+        "candidate_SHA": "df539660095b65c0497541b5c3c7624cf295dd576e3ccac634feb41b1f41692c"
+      }
+    ],
+    "property_cases": 21,
+    "seven_original_false_matches_refused": true,
+    "actual_gmu_token_previously_matched_GPU_needle": true,
+    "pure_property_host_output": "ok=1 cases=21 before_false_matches=7 property-bytes-only\n",
+    "source_mutations_refused": [
+      "gmu:substring-restored",
+      "gmu:length-check-lost",
+      "gmu:terminator-check-lost",
+      "gpu:substring-restored",
+      "gpu:length-check-lost",
+      "gpu:terminator-check-lost"
+    ],
+    "ASan_UBSan_pass": true,
+    "new_GMU_and_GPU_Service_iOS17_objects_pass": true,
+    "objects_not_linked_or_executed": true,
+    "matching_token_must_be_terminated_but_full_list_validity_not_claimed": true,
+    "original_needles_scores_start_bodies_and_class_layouts_unchanged": true,
+    "no_provider_getProperty_probe_start_map_callback_native_or_success_peer_execution": true,
+    "no_new_component_runtimecaller_or_policy_selection": true,
+    "catalog_pins_32patches_profiles_unchanged": true,
+    "hardware_qualification": false,
+    "device_operations": false
+  },
+  "smmu_extension": {
+    "scope": "exact complete compatible property tokens; two independent UNAPPLIED source candidates",
+    "components": [
+      {
+        "kind": "smmu",
+        "name": "NativeAdrenoSmmuService.cpp",
+        "needle": "qcom,adreno-smmu",
+        "original_SHA": "7f0b5d3883ffd520ce8631c1d7e1764cde5cad6727a6b86fb5b8aba10e881cab",
+        "candidate_SHA": "87a5bcf3b9c0b74b9d96840c34cfa979e940eb8de108b5dab9d405c00b71c235"
+      }
+    ],
+    "property_cases": 10,
+    "original_false_matches_refused": 3,
+    "actual_gmu_token_previously_matched_GPU_needle": false,
+    "pure_property_host_output": "ok=1 cases=10 before_false_matches=3 property-bytes-only\n",
+    "source_mutations_refused": [
+      "smmu:substring-restored",
+      "smmu:length-check-lost",
+      "smmu:terminator-check-lost"
+    ],
+    "ASan_UBSan_pass": true,
+    "selected_new_Service_iOS17_objects_pass": true,
+    "component_selection_for_checker_only": "smmu",
+    "objects_not_linked_or_executed": true,
+    "matching_token_must_be_terminated_but_full_list_validity_not_claimed": true,
+    "original_needles_scores_start_bodies_and_class_layouts_unchanged": true,
+    "no_provider_getProperty_probe_start_map_callback_native_or_success_peer_execution": true,
+    "no_new_component_runtimecaller_or_policy_selection": true,
+    "catalog_pins_32patches_profiles_unchanged": true,
+    "hardware_qualification": false,
+    "device_operations": false
+  },
+  "three_independent_UNAPPLIED_patches_not_composed": true,
+  "second_extension_only_new_SMMU_checks_and_target": "GMU/GPU tests and objects not rerun",
+  "hardware_qualification": false,
+  "device_operations": false
+}

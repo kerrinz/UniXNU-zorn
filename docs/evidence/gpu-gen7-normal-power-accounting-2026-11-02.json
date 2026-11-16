@@ -1,0 +1,32 @@
+{
+  "updated": "2026-11-02T08:37:41.861919+08:00",
+  "state": "Gen7-normal-dispatcher-power-accounting-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-normal-power-accounting/source-contract.json",
+  "new_source_mutations_refused": 4,
+  "first_inflight_reuses_prior_dispatcher_count_by_source_order": true,
+  "no_mechanical_recurring_acquisition_patch": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "complete_Linux_not_compiled": true,
+  "all23_patches_independent_UNAPPLIED": true,
+  "no_native_counter_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "exact reference source ownership/accounting only,no runtime/native powerlease/DMA or GPU execution qualification",
+  "details": {
+    "scope": "Fixed453d8875 OEM exact reference selected normal hwsched dispatcher,not Xiaomi exact/K80 runtime power provider. No dormant recurring,composed candidate wholefiles,packet encoding,old halt/type/stop suites or counter-success models.",
+    "selected_call_chain": "gen7_hwsched_ops.submit_drawobj is actual gen7_hwsched_submit_drawobj. Within retained primary,hwsched_sendcmd is called from hwsched_sendcmds,then hwsched_handle_jobs_list/handle_jobs/issuecmds,issued by adreno_hwsched_work. Work takes hwsched->mutex,then sendcmd takes device->mutex around inflight/power transitions. do_fault runs under worker mutex and takes device mutex before reset/snapshot -> actual gen7 reset_replay -> adreno_hwsched_replay. This is a source caller/lock chain,not actual core queue execution,global arbitrary-caller serialization or runtime owner qualification.",
+    "first_inflight_reuse": "Worker retires command-list objects before issuing more and only calls hwsched_power_down after issue when final inflight==0. retire_drawobj_list decrements inflight without clearing POWER. Therefore last-object retirement can produce transient inflight0/POWERset before next sendcmd. Next increment to1 skips get because POWERalreadyset:the existing dispatcher-held count is reused. This is permitted by actual source order,not an unacquired recurring vote bug. No fresh bool-acquired-here repair is justified by this case.",
+    "get_failure": "sendcmd allocates list node before taking device mutex;abort/detached exit before inflight increment. First inflight without POWER calls actual get;nonzero rolls inflight back and exits without setPOWER/put. The successful get branch sets POWER only after get returned0. Actual lower int/void domain already bound in prior evidence,not retested or promoted to a native power lease.",
+    "callback_failure": "Callback nonzero with inflight1 puts once and clears POWER,then decrements inflight and returns original ret;the count can have been newly acquired or retained from previous command. Subsequent worker power_down tests the cleared marker and does not put again. Failure with inflight>1 only decrements current increment,keeps POWER for surviving inflight commands. This source convention does not prove lower callback error means no publication,or that void put actually decremented;no stop/DMA release policy adopted.",
+    "normal_success_and_retire": "Successful regular dispatch links obj->drawobj to cmd_list,retaining preexisting drawobj ownership by source convention;large command adds an extra reference. Later retire_drawobj_list only removes/frees node and decrements after drawobj_retired returnedtrue. The latter may depend on timestamps/sync and helper-side destruction;Linux software predicates are not GPU/DMA completion proofs. Specialized expired-marker branch is nested inside is_cmdobj(CMDOBJ bit),while ordinary MARKER type is distinct;no new reachable counter/UAF defect claimed from a generic branch shape without exact batch type producer.",
+    "powerdown": "hwsched_power_down takes device mutex,clears ACTIVE/completes idle_gate,and only if POWERset calls voidput then clears POWER. No raw put result is available. Source count marker and idle_gate are software state,not hardware quiescence or IRQ/DMA lease. Only one direct power_down call found in this exact retained dispatcher worker,not a global full-kernel caller absence proof.",
+    "idle_and_reset": "Gen7 idle_check independently takes device mutex;checks active_cnt/time/submit_now and then invokes existing gen7_hwsched_power_off. It does not test/clear dispatcher POWER or decrement inflight. Previously documented upper/lower stop errors/voidsuspend/readablefailure remain unresolved,no stop suite repeated. Reset/replay removes software-retired list entries/decrements but does not clear POWER;callback errors were the separate21st diagnostic candidate,not automatically composed here. Boot/reset/IRQ/timer/config/core semantics unbound and no such APIs executed.",
+    "error_folding_next": "sendcmds on error destroys for -ENOENT or attempts requeue;requeue failure may overwrite ret. This is only a new owner/error locator;do not infer new cleanup policy. The next independent item must bind actual normal batch partial enqueue/return and ioctl destruction,including exact input types/timestamps and EPROTO transfer semantics before any repair.",
+    "checks": "4new source mutations refused:failed get decrement removed,multi-inflight error releases POWER,duplicate powerdown put,and powerdown inserted before issue. Source syntax/ordering only,no executable counter timeline or success object/task/refcount peer. No new patch/native component/target/full Linux build,no old suites repeated.",
+    "remaining": "All23 independent UNAPPLIED patches/8profiles/3111+39/default42/CPUstorage/parentarchives/consumed claims preserved. Actual K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal and catalog taskrole/fullcore remain incomplete. All native/provider/count/callback/allocator/MMIO/phone calls OFF."
+  },
+  "GPU_execution_rendering_Metal_complete": false
+}

@@ -1,0 +1,55 @@
+{
+  "scope": "source/data-layout evidence of persistent service SMMU cookie repair;no native execution",
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-service-dependencies/Adreno740/NativeAdrenoService.cpp": "65331246929103a23edac795d9f84b50a28cbd3639aaad2a90f9b9aa9bde7c2c",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-service-dependencies/Adreno740/NativeAdrenoGmuContext.cpp": "0ed3348b09a9ecac01651beaa7d53b3e225d14413c10b5dfb5bc36a98912fda1",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-service-dependencies/Adreno740/NativeAdrenoSmmuContext.cpp": "183df8450e60c355f90eef689f85bd44061f5a36e42920819420fa5d447a3039",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-service-dependencies/Adreno740/NativeAdrenoSmmuContext.h": "e901a6c357c7dc9807e8ddd40c8487c8264655af1cbc815f0aa3527ed0a4b5d1",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-service-dependencies/Adreno740/NativeAdrenoVm.cpp": "bd37a1bf356d59c7232583f1094f61b41ead988efdef6487e5d7975c7a4dfc0e",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-service-dependencies/Adreno740/NativeAdrenoVm.h": "fe1db135e2384e86890d0b81e99b3b5e388c565e85a784559a4486b34926af0f"
+  },
+  "original_SHA": "65331246929103a23edac795d9f84b50a28cbd3639aaad2a90f9b9aa9bde7c2c",
+  "candidate_SHA": "92f36639bb3dc461a903ce9f6a233d46ae0546d5baea77cd54c3a81f537f163e",
+  "source_witness": "automatic window address copied through ArmSmmu4KIo into persistent smmu_.io_ and vm_.io_",
+  "old_GPU_CP_cookie_patches_not_composed": true,
+  "previous_smmu_service_reference_patch_not_composed": true,
+  "only_typed_cookie_storage_changed": true,
+  "four_new_source_corruptions_refused": [
+    {
+      "name": "automatic-owner-restored",
+      "refused": "no automatic cookie owner"
+    },
+    {
+      "name": "null-cookie",
+      "refused": "copied io must point at persistent window"
+    },
+    {
+      "name": "member-removed",
+      "refused": "cookie must be an owned service member"
+    },
+    {
+      "name": "borrow-before-initialize",
+      "refused": "initialize before borrowing"
+    }
+  ],
+  "candidate_iOS17_object_pass": true,
+  "original_historical_Service_bytes": 3192,
+  "candidate_Service_bytes": 3208,
+  "new_member_offset": 3192,
+  "new_member_bytes": 16,
+  "private_layout_requires_consistent_rebuild": true,
+  "object_SHA": "4c548fd0486606f42dbb1badcbb68371f46af196411b265fb79ad8bca4ca434f",
+  "target_object_not_linked_or_executed": true,
+  "metaclass_initializer_unexecuted": true,
+  "catalog_and_profiles_unchanged": true,
+  "role_API_and_fullcore_unchanged": true,
+  "no_native_object_or_success_peer_or_address_model": true,
+  "mapping_ownership_and_quiescence_not_solved": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "review_document_SHA": "af46c70915c453b7c5034353901e1f80402d5430f82f4cb3eb58ff5370aedfb8",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-service-smmu-cookie-20261103/service-smmu-cookie.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

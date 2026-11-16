@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-09T14:01:03.798978+00:00",
+  "status": "persistent-UFS-root-installer-source-and-exact-host-inputs-checked-device-install-not-started",
+  "owner_authorization": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/owner-authorization.json",
+  "owner_latest_phone_state": "Android",
+  "new_persistent_install_authorized": true,
+  "temporary_RAM_OS_route_rejected": true,
+  "installed": false,
+  "phone_writes": 0,
+  "root_partition_reads": 0,
+  "actual_metadata_commands": 5,
+  "first_host_transport_gate_mistake_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/preflight-53b76659b0ce4ad18f350b5dc988655c/run/result.json",
+  "latest_actual_Recovery_gate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/preflight-f05565d50af84a0b92cd10bac8cb64d5/run/result.json",
+  "actual_latest_ro_orangefox_boot": "",
+  "no_further_USB_after_identity_gate": true,
+  "source": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_root_install.py",
+  "fixed_runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/run-zorn-debug.py",
+  "manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-persistent-install26/root-install.manifest.json",
+  "host_checks": {
+    "syntax": "passed",
+    "exact_current_root_input_checked": true,
+    "check_mode_exit": 0,
+    "scope_refusals": [
+      "serial",
+      "partition",
+      "relative_first_lba",
+      "automatic_boot",
+      "root_in_RAM",
+      "boot_partition_writes"
+    ],
+    "installer_executed_on_phone": false,
+    "USB_calls_in_checks": 0
+  },
+  "root_in_RAM": false,
+  "ADT_RAMDisk_slots_absent": true,
+  "ADT_root_digest_matches_image": true,
+  "disk_root_image_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "exact_root_window": {
+    "partition": "/dev/block/by-name/unixnu",
+    "relative_first_lba": 6291712,
+    "blocks": 8388608,
+    "bytes": 34359738368
+  },
+  "installer_behavior": [
+    "requires exact OrangeFox/serial/product/slot/GPT/Data/unmounted partition",
+    "complete compressed target preimage retained and independently rehashed before write;space reserve4GiB;no source/log/baseline cleanup",
+    "single exact-window write followed by full32GiB readback hash and protected metadata/fence comparisons",
+    "no boot,flash of boot partitions,slot change,mount,Data reset,reboot or retry;unknown write state stops later device operations"
+  ],
+  "execution_ready": false,
+  "limitations": [
+    "source/host checks only;installer transfer/backup/write/readback path has not executed on phone",
+    "current phone is Android;do not bootstrap/reboot or relax actual OrangeFox requirement",
+    "current boot packer is explicitly fastboot-boot-only and kernel retains bounded trial terminal;neither is a production persistent boot entry",
+    "current root candidate has RAMFS /private/var;this is distinct from its persistent OS root and does not provide persistent iOS26 Data",
+    "fresh full32GiB preimage size/host capacity and actual Recovery dd flags not established;no target contents assumed empty"
+  ],
+  "goal_complete": false
+}

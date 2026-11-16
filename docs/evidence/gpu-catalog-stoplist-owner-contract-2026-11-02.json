@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T14:29:44.467121+08:00",
+  "state": "Catalog149-selected-stoplist-workloop-owner-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-stoplist-owner-contract/source-contract.json",
+  "functions_body_SHA_recorded": 9,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Selected iOS17 terminateWorker/list/workloop source for exact19ef client;9 new body hashes,7 termination+4 collection/scheduling parent hashes provenance only. No native execution/fetch/old suite/target.",
+    "queue": "Frozen scheduleStop appends client and provider to parallel OSArrays under gJobsLock;array successful insertion retains object. Worker gets entries while those lists still contain them,drops gJobsLock around actionStop,and only removes stop-list entries after callback and attempted freeList insertion. Thus list roots cover callback on stable successful enqueue domain;no global all-producer/reentrancy or hardware lease claim.",
+    "handoff": "Worker allocates local phase2/didPhase2 arrays and OSSet freeList before processing;any null returns without processing. On stop and finalize paths attempts freeList insertion before removing global list roots;outside gJobsLock after work loop releases freeList and local arrays. OSSet members is OSPtr OSArray,init assigns owned array,setObject rejects duplicates or forwards to array. Successful insertion holds object;duplicatefalse can mean already held. Other insertion failures/unchecked parallel-list results are not normalized or proven impossible;no successful allocation/count/cleanup model or failure recipe invented.",
+    "workloop": "Exact Presenter and client classes have no getWorkLoop override,nor selected IOUserClient declaration/implementation;selected IOService getWorkLoop recurses through getProvider or returns null. _workLoopAction asks supplied service for workloop,retains returned workloop around synchronous runAction,else invokes action directly. actionStop is called with provider Presenter as service,not client. Presenter IOLock gate is not a workloop producer. Real parent/provider chain and lookup lifetime remain unbound;no workloop/target/address peer or automatic IPC exclusion.",
+    "erratum": "Exact Presenter DOES override inline handleOpen,handleClose,handleIsOpen. These manage raw owner under IOService open/close arbitration;prior client capsule default base handle bodies are comparative provenance,not actual virtual dispatch. Same raw-owner conclusion remains but applicable callee is corrected here without modifying old archives/tests. No extra retain in these inline bodies.",
+    "exclusion": "Stop-list references hold CPU objects across action callbacks in the stated insertion domain. They do not serialize arbitrary IPC actions,unlocking waitSwap mapping,borrowed original display or provider withdrawal. No reproduced race/UAF,universal stop/free safety or successful DMA retirement inferred.",
+    "decision": "No31st retain/free/cancel/generation/reset/retry/termination/workloop policy or component/caller selection.30 independent UNAPPLIED/all native/provider/refcount/thread/MMIO/phone OFF. K80 actual provider/owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable;no wire decode/display/CPU/mode/security change."
+  },
+  "qualification": "Conditional CPU collection/workloop references only;not IPC exclusion/provider epoch/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

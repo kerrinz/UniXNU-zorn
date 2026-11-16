@@ -1,0 +1,98 @@
+{
+  "time": "2026-11-10T13:07:59.297134+00:00",
+  "status": "actual-userland-dispatch-returns-and-mandatory-RAMFS-preparation-blocker-observed",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-userland-progress26-46297ca0667b4680b6defd1aeeba1cf5/root-trial-userland/trial/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-PID1-userland-progression-CPU300s-v19",
+    "status": "recovered-fresh-PID1-userland-progression",
+    "GPU_started": false,
+    "root_mount_proven": true,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 332.3019342079933,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "PID1_image_activation_proven": true,
+    "user_mode_instructions_proven": true,
+    "log_changed": true,
+    "native_writer_readback_success_proven": false,
+    "actual_userland_progress": {
+      "entries": 1502,
+      "returns": 1501,
+      "entered": 93,
+      "returned": 93,
+      "error": 0,
+      "exec_object": 2,
+      "exec_phase": 0,
+      "exec_result": 0,
+      "stock_main": 0,
+      "exit_seen": 0,
+      "exit_namespace": 0,
+      "exit_code": 0,
+      "exit_status": 0,
+      "services": 0
+    },
+    "syscall_dispatch_return_observed": true,
+    "lockscreen_proven": false
+  },
+  "record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-userland-progress26-46297ca0667b4680b6defd1aeeba1cf5/root-trial-userland/trial/decoded-native-record.json",
+  "scope_consumed_no_repeat": true,
+  "protected_captures": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-userland-progress26-46297ca0667b4680b6defd1aeeba1cf5/root-trial-userland/protected-capture-comparison.json",
+  "protected_capture_sets_unchanged": 7,
+  "owner_screen": {
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-userland-progress26-46297ca0667b4680b6defd1aeeba1cf5/root-trial-userland/owner-readable-screen.jpg",
+    "sha256": "9bdbe420f45e80c8de1f07fb2a31c5e33522f460bb1f6ad878ccdfeeb51fa2ce",
+    "provenance": "Owner-provided readable screen in this conversation;photo has no nonce and is not standalone exact-kernel qualification. Its181directories/62files and failed-preparation message match the selected template/source and native userland state.",
+    "visible_lines": [
+      "[ OK] mount a memory filesystem on /private/var",
+      "181 directories, 62 files",
+      "[FAIL] create the directories of the data volume",
+      "K80: mandatory RAMFS Data preparation failed; launchd not started"
+    ]
+  },
+  "finding": "PID1 dispatch returned1501 times;last entered/returned syscall93 has raw error0. Stock-main marker0,critical-exit marker0,selected service-presence mask0. Existing init deliberately waits in usleep after mandatory Data preparation fails;not evidence of a dead kernel or GPU-caused hang.",
+  "source_cause": "Actual244-record Data template supplies diagnostics parent but neither diagnostics/timesync nor uuidtext. Existing init opens .migrated markers in both missing parents,then refuses launchd.",
+  "fix": {
+    "status": "local-independent-HFSX-template-fix-verified-not-installed",
+    "plan": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-logdirs-fix26/plan.json",
+    "local_update": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-logdirs-fix26/local-update.json",
+    "delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-logdirs-fix26/delta.json",
+    "root_sha256": "6e46fbc832239eebd1bd63a4a248845cebd1200af9f5aef5eba4c69af7deb127",
+    "changed_blocks": 64,
+    "changed_bytes": 262144,
+    "template_added_bytes": 90,
+    "existing_init_reused_unchanged": true,
+    "ownership_inode_mode_preserved": true
+  },
+  "limits": [
+    "No stock launchd/SpringBoard/lockscreen proof. No GPU execution.",
+    "Only last dispatch return error is recorded;do not claim all1501calls succeeded.",
+    "Protected captured sets do not establish whole Android/filesystem content equality.",
+    "Native writer self-readback success is not independently captured in its own record.",
+    "Corrected root image is local only;phone still has ef11f75a root."
+  ],
+  "next_action": "Bind the corrected root into matching native root headers/ADT/kernel and prepare an exact bounded installation update. Reuse existing Recovery/install transport;prefer the derived64-page/256KiB root-only delta over a32GiB rewrite,with all old-page preimages checked before writes and complete final root readback. Then one fresh bounded CPU boot to verify mandatory RAMFS preparation and launchd progression. Keep RSC PM/runtime work retained;do not claim GPU or lockscreen completion."
+}

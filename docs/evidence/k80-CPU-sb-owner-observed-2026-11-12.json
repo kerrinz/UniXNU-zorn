@@ -1,0 +1,653 @@
+{
+  "recorded_at": "2026-11-12T18:52:24.690522+08:00",
+  "status": "recovered-fresh-PID1-userland-progression",
+  "scope": "single-K80-ios26-CPU-sb-owner-300s-fdf5d453",
+  "record_id": "fdf5d4531bff44d2804dc5eb3385c88a",
+  "boot_sha256": "c92b467722d61fe6694700a4fcaa0b54297514d0ebfd9378e098bd90e59c5ca7",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_userland_progress=1 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0",
+  "same_bootargs_as_previous_control": true,
+  "kernel_source_delta": "Bounded scheduler samples of the native same-task ulock admission owner, with first-thread wait generation rechecked.",
+  "springboard_first_thread_ulock": {
+    "at_45_seconds": {
+      "generation": 11,
+      "operation": "unfair-lock",
+      "opcode": 2,
+      "timed": false,
+      "owner_at_wait_admission": "same-task"
+    },
+    "at_150_seconds": {
+      "generation": 11,
+      "operation": "unfair-lock",
+      "opcode": 2,
+      "timed": false,
+      "owner_at_wait_admission": "same-task"
+    },
+    "same_accepted_wait_at_both_checkpoints": true,
+    "source": "Native waitq admission and live first-thread scheduler state.",
+    "owner_relation_sampled_at_admission_only": true,
+    "wait_address_and_thread_ID_not_exported": true
+  },
+  "springboard_admission_lock_owner": {
+    "at_45_seconds": {
+      "state": "waiting",
+      "wait_hint": 2,
+      "sync_mach_receive": true
+    },
+    "at_150_seconds": {
+      "state": "waiting",
+      "wait_hint": 2,
+      "sync_mach_receive": true
+    },
+    "maximum_threads_examined": 32,
+    "wait_generation_rechecked": true,
+    "owner_identity_is_resolved_at_wait_admission": true,
+    "owner_thread_ID_not_exported": true
+  },
+  "source_selection": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/source-selection.json",
+    "sha256": "d157e87ee03b128d816b1531384b166e74e028d5f1f7d616af62c7a827190fab"
+  },
+  "compiler_and_wire_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/offline-sb-owner-verification.json",
+    "sha256": "fc0297052ef3cea03c2ef6a41c78f9ceede91423c8ea2125f2eb0489a1ebbf88"
+  },
+  "formatter": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/sb-owner-formatter-check.json",
+    "sha256": "d2664dd144d1c530bcda761c1bfcfa53d93f4550848f9c6c34c38cc7c37c67d5"
+  },
+  "owner": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/sb-owner-native-check.json",
+    "sha256": "7d858989cdd42b7c0542bd58a0f954e2356eac1e1ee3ce95cf1c1333d5188843"
+  },
+  "full_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/full-link/link-result.json",
+    "sha256": "ee35218411cb3a6bbfc39697da0687911017ebb0ffe20445bee9988ef76e56b3"
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/boot-package/verified.json",
+    "sha256": "40cdd0b984d2d577bdb73ca0d0c4c66e8cb3cc131923d4ee4a70c4108a51f70d"
+  },
+  "boot_plan": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/device-plan.json",
+    "sha256": "23090f49ed86225ea2ba2488132573c3fb1e0df2cdcfb503800dae45ad5466ff"
+  },
+  "boot_bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/bundle.json",
+    "sha256": "5dcca99dc839cd06e818333abde4eb11a6e42cef09e3b11015917c2749be436e"
+  },
+  "runner_refusals": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/runner-sb-owner-mode-check.json",
+    "sha256": "475218110f4f5d07813a42eb5e16e9a211d64f4a9f80c1162f7460f36a520f84"
+  },
+  "earlier_install_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-passive-delta-review26-cc9fbb3b/admission/run/result.json",
+    "sha256": "b3e1a4deb21fcbd473a65e74035c1db844ba5a4898d215c5caa2820c839eaac1"
+  },
+  "new_root_write": false,
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/one-shot.claim.json",
+    "sha256": "96c61b68a6a89a136fef59b3b411e06d85b87de6a97f86522ff401026de7fc81"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/run.json",
+    "sha256": "01aa019edbd7adee9397f2c69d16e9d6c6e5ebd416e73378dc4157ac75b58288"
+  },
+  "protected_captures_equal": {
+    "Data": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      }
+    },
+    "Data_metadata": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      }
+    },
+    "after": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "before": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "root_after": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "root_before": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "root_first_page": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/before-root_first_page.bin",
+        "sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-root_first_page.bin",
+        "sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+      }
+    }
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "recovery_seconds": 332.9124641249946,
+  "camera_observations": [
+    {
+      "image": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/camera/live-early.jpg",
+        "sha256": "ba0fe97d5f832930d64f6397cdf9a8318443d13cdb44f332aab17cf9962ed13a"
+      },
+      "approximate_seconds_after_fastboot": 44.5315055847168,
+      "visual_observation": "Dark console-like display with dense pale text, unreadable in the capture. The owner identified this pattern as white text on a black background."
+    },
+    {
+      "image": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/camera/live-middle.jpg",
+        "sha256": "1de2a024591da47d45471031264288830799de3cc2472f7687961d896415088a"
+      },
+      "approximate_seconds_after_fastboot": 165.44004607200623,
+      "visual_observation": "Apple logo on a dark display. No lockscreen or welcome screen visible."
+    },
+    {
+      "image": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/camera/live-late.jpg",
+        "sha256": "0385f763098dc395b67529678781f1009725eed63e5f8d614f9606e39f45f7cf"
+      },
+      "approximate_seconds_after_fastboot": 287.43634366989136,
+      "visual_observation": "Apple logo on a dark display. No lockscreen or welcome screen visible."
+    }
+  ],
+  "visual_lockscreen_confirmed": false,
+  "visual_welcome_confirmed": false,
+  "diagnostic_page": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/after-log.bin",
+    "sha256": "9318b3a000a43691992001fcf9b4dff26f1429a80f277264d01093f7ae66ad62"
+  },
+  "decoded": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-owner26-fdf5d4531bff44d2804dc5eb3385c88a/root-trial-cpu-sb-owner/trial/decoded-native-record.json",
+    "sha256": "5584bc12f93f56600c04f21cef5028020eabc471fd5c7a9c7968689f614819f2"
+  },
+  "native_record_refusal": null,
+  "actual_userland_progress": {
+    "entries": 938260,
+    "returns": 938178,
+    "stock_main": 1,
+    "error": 0,
+    "SpringBoard_lifecycle": {
+      "first_pid": 5,
+      "exit_state": 0,
+      "exit_status": null,
+      "exit_namespace": null,
+      "exit_code": null,
+      "first_process_only": true,
+      "activation_and_spawn_results_not_in_scope": true
+    },
+    "PosterBoard_standard_output": {
+      "reservations": 11,
+      "reservation_drops": 0,
+      "native_write_errors": [
+        0,
+        0
+      ],
+      "zero_returns": [
+        0,
+        0
+      ],
+      "metadata_or_transport_skips": [
+        0,
+        0
+      ],
+      "invalid_accepts": [
+        0,
+        0
+      ],
+      "gap_marks": [
+        0,
+        0
+      ],
+      "multi_iov_preparations": [
+        0,
+        2
+      ],
+      "metadata": [
+        {
+          "skip_counts": {
+            "unsupported file type": 0,
+            "UIO vector count outside 1..16": 0,
+            "UIO metadata retrieval error": 0,
+            "UIO address range overflow": 0
+          },
+          "last_preparation_iov_count": 0,
+          "first_skipped_write_state": 0,
+          "first_skipped_native_write": null,
+          "scalar_metadata_only": true,
+          "snapshot_not_atomic_with_counters": true
+        },
+        {
+          "skip_counts": {
+            "unsupported file type": 0,
+            "UIO vector count outside 1..16": 0,
+            "UIO metadata retrieval error": 0,
+            "UIO address range overflow": 0
+          },
+          "last_preparation_iov_count": 1,
+          "first_skipped_write_state": 0,
+          "first_skipped_native_write": null,
+          "scalar_metadata_only": true,
+          "snapshot_not_atomic_with_counters": true
+        }
+      ],
+      "stdout": {
+        "probes": 0,
+        "successful_native_write_observations": 0,
+        "copy_errors": 0,
+        "contention_drops": 0,
+        "snapshot_busy": false,
+        "metadata_or_accept_skips": 0,
+        "priority": 0,
+        "message_bytes": 0,
+        "message": "",
+        "message_truncated": false,
+        "native_bytes_with_successful_copy": 0,
+        "assembled_history_bytes": 0,
+        "history_bytes_recorded": 0,
+        "history": "",
+        "source_history_truncated": false,
+        "history_record_clipped": false,
+        "hex_redactions": 0,
+        "denied_machine_lines": 0,
+        "partial_line": false,
+        "overflow_lines": 0,
+        "history_selection": "tail_of_retained_history",
+        "retained_source_prefix_omitted_bytes": 0
+      },
+      "stderr": {
+        "probes": 11,
+        "successful_native_write_observations": 11,
+        "copy_errors": 0,
+        "contention_drops": 0,
+        "snapshot_busy": false,
+        "metadata_or_accept_skips": 0,
+        "priority": 3,
+        "message_bytes": 80,
+        "message": "1970-01-01 00:01:21.-882 PosterBoard[69:733] HOUJI KEYBOARD v18: OS gate refused",
+        "message_truncated": false,
+        "native_bytes_with_successful_copy": 1216,
+        "assembled_history_bytes": 1216,
+        "history_bytes_recorded": 1216,
+        "history": "redwood26: loaded into PosterBoard (pid 69)\nredwood26: PosterBoard: watching its poster setup (all three steps)\n1970-01-01 00:01:21.-995 PosterBoard[69:733] HOUJI KEYBOARD v18: loaded in PosterBoard pid=69\n1970-01-01 00:01:21.-882 PosterBoard[69:733] HOUJI KEYBOARD v18: OS gate refused\nPB build enter\nredwood26: PosterBoard: file:///var/mobile/Library/Application%20Support/PRBPosterExtensionDataStore/59/ does not conform to {     NSURLFileProtectionKey = NSURLFileProtectionNone;     NSURLIsReadableKey = 1; }; without the protection class: conforms\nredwood26: PosterBoard: file:///var/mobile/Library/Application%20Support/PRBPosterExtensionDataStore/59/Extensions/ does not conform to {     NSURLFileProtectionKey = NSURLFileProtectionNone;     NSURLIsReadableKey = 1; }; without the protection class: conforms\nredwood26: PosterBoard: file:///var/mobile/Library/Application%20Support/PRBPosterExtensionDataStore/59/GalleryCache/ does not conform to {     NSURLFileProtectionKey = NSURLFileProtectionNone;     NSURLIsReadableKey = 1; }; without the protection class: conforms\nredwood26: PosterBoard: migrate file:///var/mobile/Library/Application%20Support/ from 59 to 61: done\nPB report enter\nPB report no setup\n",
+        "source_history_truncated": false,
+        "history_record_clipped": false,
+        "hex_redactions": 0,
+        "denied_machine_lines": 0,
+        "partial_line": false,
+        "overflow_lines": 0,
+        "history_selection": "tail_of_retained_history",
+        "retained_source_prefix_omitted_bytes": 0
+      },
+      "first_process_uniqueid_only": true,
+      "ordinary_POSIX_fd1_fd2_output_only": true,
+      "target_program": "/Applications/PosterBoard.app/PosterBoard",
+      "first_successful_image_only": true,
+      "reexec_and_exit_withdraw_eligibility": true,
+      "socket_payloads_excluded": true,
+      "post_native_copy_best_effort": true,
+      "keyword_priority_not_crash_cause": true,
+      "snapshot_channels_and_route_not_transactional": true,
+      "earlier_file_preparation_failures_and_positioned_writes_not_observed": true
+    },
+    "framebuffer": {
+      "backboard_swap_end_calls": 2,
+      "queued_swaps_all_clients": 2,
+      "pixel_copies_all_clients": 2,
+      "backboard_first_frame": {
+        "vsync_port_registered": false,
+        "vsync_callback_registered": false,
+        "vsync_timer_armed": false,
+        "vsync_timer_fired": false,
+        "vsync_notification_enqueued": false,
+        "vsync_send_failed": false,
+        "vsync_no_send_right": false,
+        "default_surface_requested": true,
+        "default_surface_right_returned": true,
+        "swap_begin_requested": true
+      }
+    },
+    "early_checkpoint": {
+      "nominal_seconds_after_worker_start": 45,
+      "first_SpringBoard_pid": 5,
+      "first_SpringBoard_exit_state": 0,
+      "backboard_swap_end_calls": 2,
+      "queued_swaps_all_clients": 2,
+      "pixel_copies_all_clients": 2,
+      "backboard_first_frame": {
+        "vsync_port_registered": false,
+        "vsync_callback_registered": false,
+        "vsync_timer_armed": false,
+        "vsync_timer_fired": false,
+        "vsync_notification_enqueued": false,
+        "vsync_send_failed": false,
+        "vsync_no_send_right": false,
+        "default_surface_requested": true,
+        "default_surface_right_returned": true,
+        "swap_begin_requested": true
+      }
+    },
+    "late_checkpoint_nominal_seconds_after_worker_start": 150,
+    "framebuffer_change_between_checkpoints": {
+      "backboard_swap_end_calls": 0,
+      "queued_swaps_all_clients": 0,
+      "pixel_copies_all_clients": 0
+    },
+    "PosterBoard_source_markers": {
+      "raw_bits": 3,
+      "build_entry_text_observed": true,
+      "delayed_report_entry_text_observed": true,
+      "delayed_report_create_text_observed": false,
+      "build_return_text_observed": false,
+      "delayed_report_call_return_text_observed": false,
+      "exact_complete_sanitized_lines_only": true,
+      "observation_is_not_original_call_completion": true,
+      "marker_and_lifecycle_snapshots_not_atomic": true
+    },
+    "PosterBoard_lifecycle": {
+      "exact_exec_path_attempts": 1,
+      "first_pid": 69,
+      "activation_state": 2,
+      "activation_result": 0,
+      "spawn_state": 2,
+      "spawn_result": 0,
+      "exit_state": 0,
+      "exit_status": null,
+      "exit_namespace": null,
+      "exit_code": null,
+      "first_process_only": true,
+      "application_or_Mach_service_ready_proven": false
+    },
+    "UI_wait_checkpoints": {
+      "at_45_seconds": {
+        "SpringBoard": {
+          "process": "first activated SpringBoard",
+          "pid": 5,
+          "image_sampled": true,
+          "task_active": true,
+          "total": 7,
+          "sampled": 7,
+          "runnable": 0,
+          "waiting": 7,
+          "port_receive": 2,
+          "other": 0,
+          "truncated": false,
+          "wait_hint_mask": 33796,
+          "user_lock_observed": true,
+          "semaphore_observed": false,
+          "workloop_sync_wait_observed": false,
+          "first_thread": {
+            "observed": true,
+            "waiting": true,
+            "wait_hint": 10,
+            "sync_mach_receive": false,
+            "first_retained_thread_is_main_thread_proxy": true
+          }
+        },
+        "BackBoard": {
+          "process": "first successful framebuffer client",
+          "pid": 10,
+          "image_sampled": true,
+          "task_active": true,
+          "total": 9,
+          "sampled": 9,
+          "runnable": 0,
+          "waiting": 9,
+          "port_receive": 5,
+          "other": 0,
+          "truncated": false,
+          "wait_hint_mask": 33796,
+          "user_lock_observed": true,
+          "semaphore_observed": false,
+          "workloop_sync_wait_observed": false,
+          "first_thread": {
+            "observed": true,
+            "waiting": true,
+            "wait_hint": 2,
+            "sync_mach_receive": false,
+            "first_retained_thread_is_main_thread_proxy": true
+          }
+        },
+        "native_backboard_returns": {
+          "first_swap_end": {
+            "state": "returned",
+            "raw_return": 0
+          },
+          "first_iosurface_init": {
+            "state": "returned",
+            "raw_return": 0,
+            "input_bytes": 0,
+            "output_bytes": 40
+          },
+          "first_iosurface_create": {
+            "state": "returned",
+            "raw_return": 0
+          },
+          "first_framebuffer_unsupported_selector": 88,
+          "observations_accumulate_from_boot": true,
+          "selector_observation_identifies_unimplemented_case_only": true
+        }
+      },
+      "at_150_seconds": {
+        "SpringBoard": {
+          "process": "first activated SpringBoard",
+          "pid": 5,
+          "image_sampled": true,
+          "task_active": true,
+          "total": 5,
+          "sampled": 5,
+          "runnable": 0,
+          "waiting": 5,
+          "port_receive": 2,
+          "other": 0,
+          "truncated": false,
+          "wait_hint_mask": 33796,
+          "user_lock_observed": true,
+          "semaphore_observed": false,
+          "workloop_sync_wait_observed": false,
+          "first_thread": {
+            "observed": true,
+            "waiting": true,
+            "wait_hint": 10,
+            "sync_mach_receive": false,
+            "first_retained_thread_is_main_thread_proxy": true
+          }
+        },
+        "BackBoard": {
+          "process": "first successful framebuffer client",
+          "pid": 10,
+          "image_sampled": true,
+          "task_active": true,
+          "total": 7,
+          "sampled": 7,
+          "runnable": 0,
+          "waiting": 7,
+          "port_receive": 5,
+          "other": 0,
+          "truncated": false,
+          "wait_hint_mask": 33796,
+          "user_lock_observed": true,
+          "semaphore_observed": false,
+          "workloop_sync_wait_observed": false,
+          "first_thread": {
+            "observed": true,
+            "waiting": true,
+            "wait_hint": 2,
+            "sync_mach_receive": false,
+            "first_retained_thread_is_main_thread_proxy": true
+          }
+        },
+        "native_backboard_returns": {
+          "first_swap_end": {
+            "state": "returned",
+            "raw_return": 0
+          },
+          "first_iosurface_init": {
+            "state": "returned",
+            "raw_return": 0,
+            "input_bytes": 0,
+            "output_bytes": 40
+          },
+          "first_iosurface_create": {
+            "state": "returned",
+            "raw_return": 0
+          },
+          "first_framebuffer_unsupported_selector": 88,
+          "observations_accumulate_from_boot": true,
+          "selector_observation_identifies_unimplemented_case_only": true
+        }
+      },
+      "snapshots_are_sequential": true,
+      "stack_registers_task_memory_and_IPC_payloads_excluded": true,
+      "native_returns_match_by_backboardd_name": true
+    },
+    "SpringBoard_first_thread_ulock": {
+      "at_45_seconds": {
+        "generation": 11,
+        "operation": "unfair-lock",
+        "opcode": 2,
+        "timed": false,
+        "owner_at_wait_admission": "same-task"
+      },
+      "at_150_seconds": {
+        "generation": 11,
+        "operation": "unfair-lock",
+        "opcode": 2,
+        "timed": false,
+        "owner_at_wait_admission": "same-task"
+      },
+      "same_accepted_wait_at_both_checkpoints": true,
+      "source": "Native waitq admission and live first-thread scheduler state.",
+      "owner_relation_sampled_at_admission_only": true,
+      "wait_address_and_thread_ID_not_exported": true
+    },
+    "SpringBoard_admission_lock_owner": {
+      "at_45_seconds": {
+        "state": "waiting",
+        "wait_hint": 2,
+        "sync_mach_receive": true
+      },
+      "at_150_seconds": {
+        "state": "waiting",
+        "wait_hint": 2,
+        "sync_mach_receive": true
+      },
+      "maximum_threads_examined": 32,
+      "wait_generation_rechecked": true,
+      "owner_identity_is_resolved_at_wait_admission": true,
+      "owner_thread_ID_not_exported": true
+    },
+    "SpringBoard_wallpaper_observation": {
+      "kernel_wallpaper_disabled": true,
+      "bootarg_reads": 8,
+      "native_read_reply_with_option": true,
+      "native_read_reply_without_option": false,
+      "native_read_reply_length_unconfirmed": false,
+      "first_native_read_error": null,
+      "additional_reads_seen": true,
+      "source_marker_mask": 0,
+      "prewarm_asked": false,
+      "prewarm_callback": false,
+      "prewarm_main_queue": false,
+      "prewarm_class_missing": false,
+      "wallpaper_callback_entered": false,
+      "default_wallpaper_request_returned": false,
+      "default_wallpaper_method_missing": false,
+      "native_read_scope": "Final OID/handler return before syscall size copyout.",
+      "source_marker_scope": "Complete source-owned lines from accepted scalar stderr writes.",
+      "scoped_to_first_successfully_activated_SpringBoard": true
+    },
+    "PosterBoard_passive_report": {
+      "no_setup_seen": true,
+      "setup_entry_seen": false,
+      "setup_return_seen": false,
+      "complete_messages": [
+        "PB report no setup"
+      ]
+    }
+  },
+  "comparisons": {
+    "control": {
+      "posterboard_attempts": 1,
+      "posterboard_pid": 69,
+      "posterboard_stderr_record_bytes": 1216,
+      "springboard_pid": 5,
+      "springboard_exit_state": 0,
+      "vsync_port": false,
+      "vsync_callback": false,
+      "copies_45_seconds": 2,
+      "copies_150_seconds": 2
+    },
+    "previous_ulock_control": {
+      "posterboard_attempts": 1,
+      "posterboard_pid": 72,
+      "posterboard_stderr_record_bytes": 1216,
+      "springboard_pid": 6,
+      "springboard_exit_state": 0,
+      "vsync_port": false,
+      "vsync_callback": false,
+      "copies_45_seconds": 2,
+      "copies_150_seconds": 2
+    },
+    "previous_evidence": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-CPU-sb-ulock-observed-2026-11-12.json",
+      "sha256": "b63735f7f837161490776b18cbe2d024975a15917af38c61b2e7f9fa6ea0c4d0"
+    }
+  },
+  "comparison_scope": "Two single temporary CPU boots on the same root and arguments. The ulock sequence is per first observed SpringBoard thread and identifies a native wait admission. The owner relation is sampled at wait admission. The first retained task thread is a proxy for the main thread. The owner sampled is the owner resolved at wait admission. Scheduler states are sequential, and the waiter generation is rechecked across the owner sample.",
+  "archive_space_reclaimed": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/consumed-ios26-link-map-compression-sb-owner-20261112.json",
+    "sha256": "7bf6adc73b63df5c7fd098ce8cd74c35809e0e8f62892bf31777c9a8cbf4a73f"
+  },
+  "GPU_started": false,
+  "touch_started": false,
+  "goal_complete": false,
+  "next_action": "At both checkpoints the first retained SpringBoard thread was in the same accepted untimed UL_UNFAIR_LOCK wait. The admission-time owner was found in the same task and sampled in MACH64_RCV_SYNC_WAIT at both checkpoints. The waiter generation survived both owner samples. Next, reuse the live XNU special-reply-port linkage to classify its synchronous receive peer. Retain the reply port only while a validated blocked receive owns it, drop the scheduler lock before taking the port lock, and use the existing destination reference and receiver-task lookup under their native locks. Publish only endpoint class or an allowlisted process identity. The two scheduler samples do not establish that the owner is in the same receive operation, and do not identify the peer or prove a deadlock."
+}

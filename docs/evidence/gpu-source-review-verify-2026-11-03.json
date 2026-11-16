@@ -1,0 +1,135 @@
+{
+  "one_existing_artifact_readonly_verification": {
+    "source_review_integrity_verified": true,
+    "recompiled": false,
+    "executed": false,
+    "original_source_reconstructed": true,
+    "raw_streams_match_anchored_receipt": true,
+    "object_review": {
+      "sections": [
+        {
+          "name": "__text",
+          "segment": "__TEXT",
+          "offset": 392,
+          "bytes": 0,
+          "relocations": 0
+        },
+        {
+          "name": "__const",
+          "segment": "__TEXT",
+          "offset": 392,
+          "bytes": 167116,
+          "relocations": 0
+        }
+      ],
+      "symbols": [
+        {
+          "name": "ltmp0",
+          "section": 1
+        },
+        {
+          "name": "ltmp1",
+          "section": 2
+        },
+        {
+          "name": "__ZL12review_image",
+          "section": 2
+        }
+      ],
+      "undefined_symbols": 0,
+      "external_exports": 0,
+      "relocations": 0,
+      "instruction_bytes": 0,
+      "compiled_source_bytes": 167116,
+      "iOS_min_version": "17.0",
+      "no_SDK_imports": true
+    },
+    "scope": "source artifact integrity only;not trusted compiler execution or GPU hardware qualification",
+    "generated_policy": false,
+    "hardware_qualification": false,
+    "native_execution": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "new_refusal_cases": [
+    {
+      "case": "header-self-signed",
+      "self_signed_receipt_recomputed": true,
+      "error": "artifact differs from original-source reconstruction: UnselectedSourceTables.h"
+    },
+    {
+      "case": "model-self-signed",
+      "self_signed_receipt_recomputed": true,
+      "error": "artifact differs from original-source reconstruction: source-layout-data.json"
+    },
+    {
+      "case": "object-self-signed",
+      "self_signed_receipt_recomputed": true,
+      "error": "compiled source-data bytes differ from raw reviewed model"
+    },
+    {
+      "case": "raw-stream-tamper",
+      "self_signed_receipt_recomputed": false,
+      "error": "raw stream content mismatch: compile-0.stderr"
+    },
+    {
+      "case": "failed-event-history",
+      "self_signed_receipt_recomputed": false,
+      "error": "build event sequence is incomplete or failed"
+    },
+    {
+      "case": "authority-flag",
+      "self_signed_receipt_recomputed": true,
+      "error": "review scope flag differs: hardware_qualification"
+    },
+    {
+      "case": "foreign-target-command",
+      "self_signed_receipt_recomputed": true,
+      "error": "compile command or failure state differs"
+    },
+    {
+      "case": "truncated-object-self-signed",
+      "self_signed_receipt_recomputed": true,
+      "error": "invalid command bounds"
+    },
+    {
+      "case": "duplicate-receipt-key",
+      "self_signed_receipt_recomputed": true,
+      "error": "duplicate review JSON key"
+    },
+    {
+      "case": "redirected-stream-name",
+      "self_signed_receipt_recomputed": true,
+      "error": "raw stream filename mismatch"
+    },
+    {
+      "case": "wrong-independent-anchor",
+      "error": "independent review receipt SHA mismatch"
+    },
+    {
+      "case": "missing-independent-anchor",
+      "error": "build-zorn-source-data-review.py: error: --verify-only requires independently retained --receipt-sha256"
+    },
+    {
+      "case": "verify-execute-mutually-exclusive",
+      "error": "build-zorn-source-data-review.py: error: argument --execute: not allowed with argument --verify-only"
+    }
+  ],
+  "child_no_writes_or_processes": true,
+  "original_artifacts_unchanged": true,
+  "no_rebuild_compile_or_native_execution": true,
+  "independent_anchor_required": true,
+  "original_source_bodies_not_self_signed_status_prove_data_integrity": true,
+  "hardware_qualification": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/build-zorn-source-data-review.py": "8d70643d9de405db9f349e76b28ff8a6c5231e7bd9102c9493b9cb36ef02f9e2",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-source-review-verify.py": "b506022aeda503909ca93cf2d066e55a06c6a81c11c6a20790dda9a9d727a725"
+  },
+  "scope": "New explicit read-only source artifact integrity path;not compiler execution attestation or hardware qualification",
+  "header_scope_approval_received": true
+}

@@ -1,0 +1,50 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_TIMELINE_ERROR_COUNT_AND_BIND_INPUT_INIT",
+    "timestamp": "2026-11-03T18:27:12.696751+00:00",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeline-error-count-20261104/source-contract.json",
+    "checks": {
+      "source_mutations_refused": [
+        "stale-published-count",
+        "keep-one-entry",
+        "skip-count-clear"
+      ],
+      "scalar_cardinality_projections": 3,
+      "unchanged_normal_count_controls": 256,
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "delta_replay_byte_equal": true,
+      "parent9_unchanged": true,
+      "cleanup_calls_and_refcount_operations_unchanged": true,
+      "source_path_conditional_not_core_error_injection": true,
+      "Linux_native_device_callback_or_model_execution": false,
+      "old_suites_run": false,
+      "bind_source_mutations_refused": [
+        "missing-bind-init",
+        "partial-bind-init",
+        "uninitialized-bind-tail"
+      ],
+      "bind_raw_prefix_canaries": 33,
+      "combined_delta_replay_byte_equal": true,
+      "only_two_function_bodies_changed": true,
+      "no_new_allocator_copy_callback_put_or_release_call": true
+    },
+    "changed_files": [
+      "kgsl_drawobj.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeline-error-count-20261104/timeline-error-count.UNAPPLIED.patch",
+    "patch_sha256": "855a3ccd480a02ee869a223e59c57140b8c9bb46c6c7c0c3e24914c75263763a",
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeline-error-count-20261104/linux-reference",
+    "runtime_selection": false,
+    "Linux_kernel_or_native_target_compiled": false,
+    "GPU_native_device_or_callback_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeline-error-count-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeline-error-count-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-timeline-error-count-20261104/archive.json"
+}

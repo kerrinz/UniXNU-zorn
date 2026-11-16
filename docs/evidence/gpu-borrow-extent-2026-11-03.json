@@ -1,0 +1,26 @@
+{
+  "scope": "public borrow interval representability preflight only",
+  "original_SHA": "130928e5d862d61660ad54af25c363e5477fc6c4d41f3386daf3c8b2f4d1040b",
+  "candidate_SHA": "8c5da65fcc23f1048d263569f6c9f8f4facbc82daf7cfa9b4aac9667ada272f3",
+  "two_integer_interval_overflow_witnesses": true,
+  "six_integer_controls_preserved": true,
+  "scalar_output": "ok=1 old_unbounded_pairs=2 bounded_refusals=2 controls=6 integer-only\n",
+  "source_mutations_refused": [
+    "removed",
+    "missing-physical-bound",
+    "endpoint-off-by-one"
+  ],
+  "ASan_UBSan_pass": true,
+  "new_NativeMemory_iOS17_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "only_new_extent_guard_before_allocation_and_bzero": true,
+  "no_descriptor_backing_state_publication_reorder": true,
+  "no_borrow_bzero_allocator_getter_prepare_cache_native_or_provider_execution": true,
+  "no_mapped_buffer_physical_address_owner_or_success_peer_model": true,
+  "no_retained_exact_caller_found": true,
+  "not_actual_K80_fault_or_mapping_qualification": true,
+  "no_new_OAS_IOVA_or_policy_selection": true,
+  "catalog_pins_32patches_profiles_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

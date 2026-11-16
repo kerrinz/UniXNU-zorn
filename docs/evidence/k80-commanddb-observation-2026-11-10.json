@@ -1,0 +1,28 @@
+{
+  "status": "separately-typed-CommandDB-CPU-observation-path-compiled-linked-unexecuted",
+  "date": "2026-11-10T10:39:47.687612+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-commanddb-observation-a8b3eddd18e84117bcd7f7e2c7d58682",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-observation26-a8b3eddd18e84117bcd7f7e2c7d58682",
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-observation26-a8b3eddd18e84117bcd7f7e2c7d58682/verification.json",
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-observation26-a8b3eddd18e84117bcd7f7e2c7d58682/full-link/kernel.ZORN26-CommandDB-OBSERVATION.UNSELECTED.macho",
+  "sha256": "832509f7305d52c0aa9b702648b632a3fceca6a69a12d4f8b003972aa998a513",
+  "bytes": 30348272,
+  "inputs": 1395,
+  "added": 1,
+  "replaced": 4,
+  "preserved": 1390,
+  "undefined_symbols": 0,
+  "implementation": [
+    "Explicit observation factory retains the actual read-intent owner;original strict callback still applies to original strict/resource paths.",
+    "Observed intent admission has separate returned/raw fields. It is not recorded as stable-read authority and does not promise firmware stability,WB alias safety or hardware grants.",
+    "Real provider/descriptor/extent/managed-VM exclusion,readonly WB map and private byte copy are shared. Existing bounded C decoder examines the actual private copy and returns typed observation metadata only.",
+    "Observed regions are rejected by live resource/snapshot paths before capture;the observation method never binds a clock owner or publishes commandDbReady."
+  ],
+  "limitations": [
+    "Root worker/controller still needs an explicit observation-mode connection and a reviewed fresh trial packet before any execution.",
+    "No mapping,physical read,decoder,target/native/phone execution or runtime selection occurred.",
+    "This source-contract observation does not close independent live firmware stability or subsequent RSC/power/security/SMMU requirements."
+  ],
+  "GPU_or_phone_execution": false,
+  "full_goal_complete": false
+}

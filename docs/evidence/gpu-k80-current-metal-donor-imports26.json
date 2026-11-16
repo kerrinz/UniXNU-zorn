@@ -1,0 +1,52 @@
+{
+  "status": "CURRENT_METAL_APPLE_REQUIRED_IMPORTS_RESOLVE_IN_RETAINED_DONOR_EXPORTS",
+  "result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-metal-donor-imports26/verified.json",
+  "inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-metal-donor-imports26/input-manifest.json",
+  "actual_Apple_dyld_info_comparison": true,
+  "changed_bindings": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-metal-donor-imports26/changed-imports.json",
+  "donor": "iPhone18,1 iOS26.6.2/23G90",
+  "build_target": "arm64e iOS26.0,SDK27.0;SDK version is not runtime version",
+  "current_binaries": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/NativeAdrenoMetal.bundle/NativeAdrenoMetal",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-metal-donor-imports26/inputs/NativeAdrenoMetal",
+      "sha256": "695ad3ad1f0d702153466587a14f6098c1d1883f06b5a1a8041cad2bc3ac7e55",
+      "bytes": 22838384
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/metal-present-completion26/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-metal-donor-imports26/inputs/libvulkan_freedreno.dylib",
+      "sha256": "968d8669661486a18dd9bbf8e8a771908ad3049b18c7dc0a7e708e85073318f1",
+      "bytes": 18112648
+    }
+  ],
+  "summary": [
+    {
+      "binary": "NativeAdrenoMetal",
+      "imports": 426,
+      "by_status": {
+        "static-symbol-present": 426
+      }
+    },
+    {
+      "binary": "libvulkan_freedreno.dylib",
+      "imports": 5849,
+      "by_status": {
+        "runtime-flat-weak-lookup-unqualified": 5571,
+        "static-symbol-present": 278
+      }
+    }
+  ],
+  "required_symbols_unresolved": 0,
+  "fresh_cache_query": false,
+  "retained_donor_export_bytes_consumed": true,
+  "hardware_or_Metal_API_executed": false,
+  "phone_access": false,
+  "remaining_limits": [
+    "flat weak runtime coalescing not qualified",
+    "not actual dyld loading,ObjC selector/semantic/layout ABI or PAC execution",
+    "no Vulkan device properties invented;SPIRV lowering not attempted without actual profile",
+    "per-surface CoreAnimation producer/fence correspondence not yet complete",
+    "GPU startup and continuous physical authority callbacks not qualified"
+  ]
+}

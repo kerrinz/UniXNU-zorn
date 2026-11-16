@@ -1,0 +1,45 @@
+{
+  "scope": "unselected freestanding C file-layout core;not full driver/native provider/startup build",
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/source-review/ZornCommandDbFile.c": "538d051348ac3159c6641e30db073c2714a4e3c16d44b8b5c5aced0110c973f2",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/gpu-owned/source-review/ZornCommandDbFile.h": "7bcae239ddff0a8062274c1e9e2c6bc7018eead1c6c4a4a5f1e0d3f984c2f588",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-commanddb-file-core.py": "435fd0766130f4bb3f6f2d6c4b2e478e0f584287d45cf1a40ba5e731d529251e"
+  },
+  "new_valid_cases": 4,
+  "new_refusal_cases": 17,
+  "failure_outputs_unchanged": true,
+  "ASan_UBSan_pass": true,
+  "ios17_arm64_object_build_pass": true,
+  "object_minimum_OS": "17.0",
+  "target_object_executed": false,
+  "compiler_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+  "host_output": "raw-two-records-and-no-qualification=1\nshort-file status=1 expected=1 unchanged=1\nfile-budget status=1 expected=1 unchanged=1\ncapacity-budget status=1 expected=1 unchanged=1\nnull-input status=1 expected=1 unchanged=1\ncapacity status=6 expected=6 unchanged=1\nmagic status=3 expected=3 unchanged=1\nELF status=3 expected=3 unchanged=1\nDTB status=3 expected=3 unchanged=1\nrecord-extent status=4 expected=4 unchanged=1\naux-base status=4 expected=4 unchanged=1\nlate-aux-extent status=4 expected=4 unchanged=1\nrow-budget status=5 expected=5 unchanged=1\naggregate-budget status=5 expected=5 unchanged=1\nPASS=1 valid=4 refusals=17 no-native-or-target-execution\n",
+  "old_suites_rerun": false,
+  "component_or_runtime_caller_selected": false,
+  "generated_board_policy": false,
+  "snapshot_or_version_qualified": false,
+  "device_operations": false,
+  "maintained_readme_sha256": "7d776313f9eb975345ce25cb0492e3c18f01369f75bdc7329000726348aac5c3",
+  "initial_harness_warning_failure_retained": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-commanddb-freestanding-core-20261103/events.json",
+  "initial_core_source_had_no_reported_warning": true,
+  "initial_failure_reason": "harness enum-to-int signedness under strict -Wconversion/-Wsign-conversion;fixed harness types,not warning flags",
+  "raw_capture_available": false,
+  "independent_expected_version_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "actual_object_symbol_review": {
+    "exports": [
+      "_ZornCommandDbDecodeFile"
+    ],
+    "undefined_symbols": [
+      "___stack_chk_fail",
+      "___stack_chk_guard"
+    ],
+    "compiler_stack_protection_preserved": true,
+    "no_ShEng_or_role_or_platform_provider_imports": true,
+    "linked_kernel_ABI_qualified": false,
+    "target_object_executed": false,
+    "initial_audit_assumption": "An initial allowlist of memcpy/memset was incorrect;actual clang emits stack-protection imports.No compiler flags were changed to suppress them."
+  }
+}

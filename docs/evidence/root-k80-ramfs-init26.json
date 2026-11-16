@@ -1,0 +1,144 @@
+{
+  "date": "2026-11-09T13:29:13.984634+00:00",
+  "classification": "progress: K80 RAMFS first-boot PID1/stage0 candidate reuses actual reference path with mandatory Data failure gating,no persistent restore or local shutdown/reset",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/userland-k80-ramfs-candidate",
+  "userland_candidate": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/userland",
+  "signed_binaries": [
+    {
+      "name": "init",
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/init",
+      "sign_command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/init"
+      ],
+      "sha256": "dd35962848fa16c8ec112a1efa7fd11fe1ffba298985ecea56b5605f71047715",
+      "bytes": 51584,
+      "checks": [
+        {
+          "command": [
+            "/usr/bin/codesign",
+            "--verify",
+            "--strict",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/init"
+          ],
+          "exit": 0
+        },
+        {
+          "command": [
+            "/opt/homebrew/opt/llvm/bin/llvm-nm",
+            "--undefined-only",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/init"
+          ],
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "name": "launchd",
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/launchd",
+      "sign_command": [
+        "/usr/bin/codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/launchd"
+      ],
+      "sha256": "bf6e7cc558f4de10f3bc70b3150775b171f26d291d13ced9497f09c1febd96bf",
+      "bytes": 33680,
+      "checks": [
+        {
+          "command": [
+            "/usr/bin/codesign",
+            "--verify",
+            "--strict",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/launchd"
+          ],
+          "exit": 0
+        },
+        {
+          "command": [
+            "/opt/homebrew/opt/llvm/bin/llvm-nm",
+            "--undefined-only",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/launchd"
+          ],
+          "exit": 0
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "changed_source_files": [
+      "src/houji-stage0.c",
+      "src/init.c"
+    ],
+    "unchanged_libmini_source_files": 3,
+    "source_files": 5,
+    "changed_binaries": 2,
+    "compile_warnings": 0,
+    "undefined_symbols": 0,
+    "static_MachO_checks": [
+      {
+        "name": "init",
+        "arm64e": true,
+        "LC_UNIXTHREAD": true,
+        "dynamic_libraries": 0,
+        "undefined_symbols": 0,
+        "build_version_commands": [],
+        "deployment_from_actual_compile_command": "iOS26.0 SDK27.0",
+        "qualification": "Freestanding static binary has no embedded OS/minos guarantee when no version command;no target execution"
+      },
+      {
+        "name": "launchd",
+        "arm64e": true,
+        "LC_UNIXTHREAD": true,
+        "dynamic_libraries": 0,
+        "undefined_symbols": 0,
+        "build_version_commands": [],
+        "deployment_from_actual_compile_command": "iOS26.0 SDK27.0",
+        "qualification": "Freestanding static binary has no embedded OS/minos guarantee when no version command;no target execution"
+      }
+    ],
+    "mandatory_RAMFS_failure_excludes_template_and_launchd": true,
+    "actual_Data_template_directories": 181,
+    "actual_Data_template_files": 62,
+    "actual_Data_template_links": 1,
+    "actual_userland_stage_files": 69,
+    "unchanged_Data_and_injection_stage_files": 67,
+    "original_sources_assets_unchanged_and_independent_inodes": true,
+    "actual_kernel_ramfs_backend": {
+      "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/full-link/kernel.ZORN26-root-platform-entry.UNSELECTED.macho",
+      "symbols": [
+        "fffffff007775704 s _ramfs_mount",
+        "fffffff00804d0d0 D _ramfs_vfsops",
+        "fffffff0072bcb00 S _ramfs_vnodeop_opv_desc"
+      ],
+      "target_executed": false,
+      "kernel_sha256": "e1e1fc2b9cabfd7348a928bb412778f9c98044fb24fc20434791e54378ac098a",
+      "actual_object": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/full-link/inputs/0499-0499-0499-0499-0499-0499-0499-0499-0499-0499-0499-0404-ramfs.o",
+        "sha256": "01e2f1e8630a4b020f292188604da819382973030df4c52e1628ee267e3c04da",
+        "bytes": 176776,
+        "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-resources26/full-link/inputs/0499-0499-0499-0499-0499-0499-0499-0499-0499-0499-0404-ramfs.o",
+        "replacement": null,
+        "added": false
+      }
+    },
+    "runtime_or_host_mock_API_tests_executed": false
+  },
+  "behavior": "K80 first-boot helper reuses real RAMFS mount plus original donor UID/mode/template population. Mandatory mount/complete template read/link/file/directory failures prevent launchd and wait without local reset/shutdown. Empty,oversized or late-error template read refuses rather than accepting a partial prefix. Persistent restore is omitted in K80 PID1;stage0 failed exec also waits for separately armed bounded Recovery. Original reference and libmini remain unchanged. Only init and stage0 change in an independently cloned69-file userland component;actual kernel contains the native RAMFS mount/vfsops backend.",
+  "limitations": [
+    "All checks are offline target compilation,ad-hoc signature/static MachO and actual source/template/static CFG checks;no syscall/mount/VM/PID1/ObjC/native/device execution.",
+    "Fresh volatile RAMFS is for initial iOS26 bring-up;does not provide persistent user data or qualify memory capacity/long-running behavior. Retained phone Data is unused and not assumed compatible.",
+    "New helpers are staged,not installed into the existing32GiB root image. That image and its bound root-window header/ADT/cohort remain unchanged;refresh image,hash,binding and complete boot inputs before any activation.",
+    "No new phone installation/read/boot authorization or ready/claim. Prior f73 scope remains consumed;full GPU/Metal/display/touch acceptance incomplete."
+  ],
+  "native_or_device_execution": false,
+  "root_image_modified": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/verified.json",
+  "actual_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/actual-inputs.json",
+  "compiled_failure_CFG": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ramfs-init26/compiled-failure-CFG.json"
+}

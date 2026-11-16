@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "scope": "implemented source and local host/actual-firmware-build evidence; no device execution or published matching source commit",
+  "storage_profile": "unixnu64",
+  "identity": {
+    "name": "unixnu",
+    "ordinal": 35,
+    "first_lba": 47271680,
+    "last_lba": 64048895,
+    "unique_guid": "b279731f-ccad-4ef5-a8b7-e7440cd08de3",
+    "type_guid": "0fc63daf-8483-4772-8e79-3d69d8477de4",
+    "attributes": 0,
+    "log_relative_lba": 2291712,
+    "log_absolute_lba": 49563392
+  },
+  "maintained_source": "uefi-zorn/Platforms/Xiaomi/zornPkg/Library/ZornGpuCheckpointLib",
+  "source_sha256": {
+    "ZornCheckpointReadOnly.cpp": "5172b5a43d3cf73d87b83fac6dc1728deb11f84cf96d70e84fe6c369d5c61628",
+    "ZornCheckpointBootLifetime.h": "836317911f668abdda8f6bb9557fb4996255f1f4bd850fb509cde4d5ae517590",
+    "ZornCheckpointUfsPathPins.h": "5b1ced127f74438620b9026d4c32665c49b90496b4da9cc44e89633697519fc3",
+    "ZornCheckpointReadOnly.h": "a9b34ef9c5c68daf7a063d255840b917e554e7ea0961283ed7e61c6b7862db1b",
+    "ZornCheckpointIdentity.c": "01f55ca51a91a8c80fd11fdef3d93dbd4a35b0dfd961fd35adf9d14bcf58d0c5",
+    "README.md": "43ef672c474eec8855b7fa1fb9ae84834989e5d6192d091b366df678ed70cc3c",
+    "test-unixnu64.cpp": "4a6162ab8e83dc57ec279c70f3f40d27ab80677387034ed365f7f0d6fc5e97f2",
+    "ZornCheckpointDiscovery.cpp": "ccb527c7194e9dd16759df1703b3d85ed3466ee36ad096f099e680ebf928c1e8",
+    "ZornCheckpointStoragePins.h": "a062a3cd03406d0a69473c8d73168910664ceb06f8811f10e709942362a6f622",
+    "ZornCheckpointBootLifetime.cpp": "1cd332477e14114fcc2cccc755ff3808ec65eadbc9f7708ee6a27e88cfba4056",
+    "ZornCheckpointDiscovery.h": "3091532a9730af24aad122e930af3dc7e5e90e364d7704e6ad5997f9c6f93b95",
+    "ZornCheckpointIdentity.h": "084b88f18edb5f0e8b030d236f6f769b0e4bce46ccd0a6ca583f169dadcc137a",
+    "ZornGpuCheckpointLib.inf": "7df41cc9786c832852bb3802992d3f79dc5eb8a1014cb643ac896f6d33159077"
+  },
+  "host_checks": {
+    "new_profile_refusals": 58,
+    "default_off_native_calls": 0,
+    "host_GPT_reads": 4,
+    "host_CRCs": 4,
+    "media_writes": 0,
+    "native_device_calls": 0
+  },
+  "compiled_source_mutations_refused": 4,
+  "target_independent_objects": 4,
+  "target_report_sizes": [
+    1888,
+    160,
+    88,
+    104,
+    48
+  ],
+  "noentry_PE_mutations_refused": 7,
+  "full_FD": "85d6758145a138ed45ff57ee5c42768dcc09c7e9e17ad883cb36d23c1d77488f",
+  "full_module": "917901372fdc71fa3d51c18f59211a560c37e6cdcc21e8c2f02dc3623e6e1d59",
+  "full_FD_extracted_module_equal": true,
+  "full_FD_independent_objects": 12,
+  "full_FD_PE_mutations_refused": 8,
+  "closed_boot_sha256": "428f8e6686e958c060f5b88d1dda627f754b872e6747a3fd7072335d040b4791",
+  "kernel_sha256": "e32880346be9156d0c35f2b1f49ca0bf831fa12e1d4e18d43b795e0df1896acb",
+  "kernel_reused_exactly": true,
+  "payload_reused_exactly": true,
+  "currentstart_newly_assembled_in_this_stage": false,
+  "normal_native_caller_FALSE": true,
+  "all_diagnostic_native_macros_zero": true,
+  "commit_returns_DISABLED": true,
+  "prior_normal_wire_formats_unchanged": true,
+  "phone_operations": false,
+  "GPU_executed": false,
+  "native_GPU_invoked": false,
+  "WriteAuthorized": 0,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "limits": [
+    "New UEFI storage profile has no device qualification; archived GPT and host doubles are not ownership.",
+    "No GPU power/security/stop/SMMU/DMA/firmware execution, rendering, Metal or new CPU/GUI/memory trial.",
+    "Closed image is not an operational qualification candidate or boot lease."
+  ],
+  "local_raw_evidence": [
+    "out/zorn/gpu-unixnu64-checkpoint-20261101/host-03/result.json",
+    "out/zorn/gpu-unixnu64-checkpoint-20261101/final-audit-result.json",
+    "out/zorn/gpu-unixnu64-closed-firmware/fd-audit.json",
+    "out/zorn/gpu-unixnu64-closed-firmware/image-audit.json"
+  ],
+  "archive_inputs": 3105,
+  "archive_files": 4531
+}

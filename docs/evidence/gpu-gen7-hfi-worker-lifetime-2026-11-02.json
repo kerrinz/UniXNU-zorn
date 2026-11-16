@@ -1,0 +1,31 @@
+{
+  "updated": "2026-11-02T07:14:29.889472+08:00",
+  "state": "Gen7-HFI-worker-error-pointer-guard-unapplied",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-hfi-worker-lifetime/source-contract.json",
+  "new_source_mutations_refused": 3,
+  "new18th_patch_sha256": "f1e37698af773e831825e5a0c94f976fbff7824cce9229531424ab5bcceb42cf",
+  "only_one_condition_changed_inverse_all_other_bytes_equal": true,
+  "independent_review_check_apply_matches": true,
+  "new_native_targets": 0,
+  "complete_Linux_driver_not_compiled": true,
+  "no_thread_IRQ_callback_native_or_phone_execution": true,
+  "no_successpeer_new_component_caller_image_wire": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "isolated reference source guard,not applied/native ABI/runtime or hardware proof",
+  "details": {
+    "scope": "Fixed453d8875f815bf9dfad9035982861226a4823a6c OEM reference module,not Xiaomi exact source or K80 native driver. New producer/worker lifecycle only;no packet codec/queue retirement/IRQ status classifier changes or old tests. All original/candidate/native/thread/IRQ/provider/MMIO/phone calls OFF.",
+    "producer": "Selected hfi_probe calls kgsl_request_irq(gmu->pdev,\"hfi\",gen7_hwsched_hfi_handler,adreno_dev). Actual helper returns negative lookup/request status or IRQ number after disable_irq. It uses devm_request_irq IRQF_TRIGGER_HIGH with GMU pdev as managed owner and adreno_dev as borrowed cookie. These need not be the same device object. Core request/enable/disable/devres implementation/config remain unbound;registration return is not a controller lease or proof callback never ran.",
+    "initialization_order": "Probe initializes mask/locks/lists/waitqueues/work/timer only after the IRQ helper returns nonnegative. The helper requests before disable;whether an interrupt can arrive in that interval depends on missing selected core/hardware state. No race occurrence,callback delivery or cleanup remedy is asserted. Common gen7_gmu_irq_enable/disable separately manipulates host IRQs plus hardware masks/clears;neither is executed or replaced here.",
+    "worker_creation": "Worker is not created in probe:gen7_hwsched_first_boot -> gen7_hwsched_gmu_init -> gen7_hwsched_hfi_init follows memory initialization. hfi_init allocates missing bigIB/optional recurring/HFI resources,then if f2h_task IS_ERR_OR_NULL stores kthread_run return. Sched_set_fifo is called only on !IS_ERR;PTR_ERR_OR_ZERO returns failure while leaving the stored error pointer. No failure number,allocation result or actual task was fabricated.",
+    "reachable_source_error": "A kthread_run result which this exact function classifies IS_ERR is retained and returned as failure. A later registered gen7_gmu_unbind reaches selected gen7_hwsched_hfi_remove;its original nonnull-only test passes that encoded error pointer to kthread_stop. This is a concrete conditional source error-handling path,not evidence K80 allocation failed,teardown occurred or a particular core panic/UAF happened. No new failure injection/success task peer or assumed kernel version.",
+    "repair": "Independent18th worker-error-pointer.UNAPPLIED.patch changes only original remove condition to !IS_ERR_OR_NULL(f2h_task),using the same field/macro family already used by producer. NULL still skips;known encoded error now skips;valid-task stop call stays identical. Error pointer and original init error remain intact. No pointer clear,reset,retry,release,quarantine,new state/report/accessor/wire or callorder policy. All other source byte-identical after inverse substitution.",
+    "remaining_worker_lifetime": "Successful task pointer remains after original stop call;repeated remove/task reference ownership and exact stop return/wakeup/synchronization require selected core contract and real owner. Patch does not repair/authorize repeated stop or concurrency. hfi_f2h_main borrows adreno_dev/gmu,wait predicate reads queues and trace.md->hostptr;workerstop is not hardware IRQ/DMA retirement. Buffer producer and release-before-workerstop order remain next exact inputs.",
+    "checks": "3 new source mutation refusals and one fresh independent original source-review check/apply matched candidate byte-for-byte. No new native component so no unrelated iOS17 object/data target or complete Linux build. No macro encoding/ABI/kernel runtime qualification claimed. Original upstream and old17patches remain unchanged and independent;not composed with them.",
+    "boundary": "Exact external core workspace revision/config,component/devres/kthread/IRQ release are still unbound from prior4 metadata7930B. No unrelated core/headers/stubs/addressbinding/guards changed. Catalog fullcore roleAPI and actual K80 caller/context/ownership/route/power/stop/DMA/readablefailure/GPU execution remain incomplete."
+  },
+  "patches_independent_unapplied": 18,
+  "GPU_execution_rendering_Metal_complete": false
+}

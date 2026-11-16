@@ -1,0 +1,66 @@
+{
+  "real_diagnostics": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.gpu.json",
+      "diagnostic_rows": 54,
+      "unselected_tables": 4,
+      "entry_rows": 47,
+      "pure_error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.gpu.json",
+      "diagnostic_rows": 56,
+      "unselected_tables": 4,
+      "entry_rows": 49,
+      "pure_error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-020b6a68.gpu.json",
+      "diagnostic_rows": 54,
+      "unselected_tables": 4,
+      "entry_rows": 47,
+      "pure_error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-021467b6.gpu.json",
+      "diagnostic_rows": 56,
+      "unselected_tables": 4,
+      "entry_rows": 49,
+      "pure_error": "Unsupported multi-SKU/bin source;no variant selection permitted"
+    }
+  ],
+  "new_refusals": [
+    {
+      "case": "wrong-raw-sha",
+      "error": "raw source SHA mismatch"
+    },
+    {
+      "case": "wrong-graph-sha",
+      "error": "source graph JSON bound/SHA mismatch"
+    },
+    {
+      "case": "trimmed-graph",
+      "error": "declared node set differs from raw source dependency closure"
+    },
+    {
+      "case": "forged-property",
+      "error": "declared property set/bytes differ from raw source: /soc/clock-controller@100000"
+    }
+  ],
+  "missing_empty_unknown_preserved": true,
+  "child_no_write_or_process": true,
+  "pure_AST_only": true,
+  "policy_headers_emitted": 0,
+  "prepare_audit_formatter_executed": false,
+  "old_suites_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/diagnose-zorn-gpu-source-schema.py": "5c6ebb26356f2f77c5b2f652b8da995d1a48b90a371c8b1165a3281d5dd45126",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-source-schema-diagnostics.py": "72f852532598f2769192ee4c3d61328fc4ad7564f9b47e64882188e1e2d6dbe8"
+  },
+  "header_scope_approval_received": false,
+  "scope": "Structured source mismatch diagnostics;fixed pure schema refusal preserved,no source conversion or prepare permission"
+}

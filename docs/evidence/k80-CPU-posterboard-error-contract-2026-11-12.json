@@ -1,0 +1,61 @@
+{
+  "status": "offline-success-result-error-outparam-contract-fixed",
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-error-contract26-856aa8f4e5c64727ab1f1fdc0272091a/inject26.c",
+    "sha256": "b619dd4c614dad25f0e73cfd8a8d87194241ef00148dc50738d9213a0ce2269a"
+  },
+  "parent_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-entry-library26-fe46b6a23a6c4b67b7bebbb4c1ba10c5/inject26.c",
+    "sha256": "192557e92278f66d415c0230899a0d3bb71013aea1ebbd137182a540ca7eb18b"
+  },
+  "source_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-error-contract26-856aa8f4e5c64727ab1f1fdc0272091a/source.patch",
+    "sha256": "a6dc1f068a16b414317a6f7c8358c08ce8f29c27c152b5e0f4455e84b70eb7a1"
+  },
+  "library": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-error-contract26-856aa8f4e5c64727ab1f1fdc0272091a/libredwood26-error-contract.UNSELECTED.dylib",
+    "sha256": "5c2af38069bf6182c87ba5be9fa1d552663eeb07bd58752fe540bb49a82b54b2"
+  },
+  "wrappers": [
+    "pb_store_for_provider",
+    "pb_create_dynamic",
+    "pb_migrate",
+    "pb_build",
+    "pb_fm_create",
+    "pb_data_write",
+    "pb_fm_copy",
+    "pb_url_update"
+  ],
+  "host_regression": [
+    {
+      "variant": "baseline",
+      "wrappers": 8,
+      "cases": 40,
+      "stale_success_error_described_by_first_four": true,
+      "native_calls_and_results_preserved": true
+    },
+    {
+      "variant": "candidate",
+      "wrappers": 8,
+      "cases": 40,
+      "stale_success_error_described_by_first_four": false,
+      "native_calls_and_results_preserved": true
+    }
+  ],
+  "exact_source_restored_after_reversing_eight_error_read_guards": true,
+  "public_contract": "Inspect NSError only after the direct method return indicates failure",
+  "public_source": "https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ErrorHandlingCocoa/CreateCustomizeNSError/CreateCustomizeNSError.html",
+  "pending_three_entry_marker_installation_unchanged": true,
+  "service_policy_unchanged": true,
+  "private_API_added": false,
+  "root_image_created": false,
+  "phone_access": false,
+  "boot_cause_proven": false,
+  "recorded_at": "2026-11-12T13:47:15.942604+08:00",
+  "candidate_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-posterboard-error-contract26-856aa8f4e5c64727ab1f1fdc0272091a/result.json",
+    "sha256": "3a0feb4ae732c9dcff22f2fb73680ec5b54ab891b2157fd3e19cfc1f90b4d0a0"
+  },
+  "cause_scope": "A source-level NSError result-contract defect is reproduced in our wrappers. No claim that it caused the current iOS26 Apple-logo stall.",
+  "pending_installation_scope": "K80-persistent-iOS26-CPU-posterboard-entry-52a24c78"
+}

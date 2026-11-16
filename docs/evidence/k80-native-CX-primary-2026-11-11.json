@@ -1,0 +1,137 @@
+{
+  "status": "actual-native-CX-primary-wait-and-regulator-prefix-returned-recovered",
+  "time": "2026-11-10T18:21:57.847386+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-cx-primary-78d434d4971e4f38b37b89aba8681751",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-cx-primary26-78d434d4971e4f38b37b89aba8681751/native-CX-primary-prefix.patch",
+  "source_inputs": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/shared/commanddb-startup-17b66afcb9924316bbdc78d08a762ba8/k80/runtime/startup/ZornGen7CxGdscRegisterEnable.cpp",
+      "sha256": "e8ebdf4b02210c9a1f38cba69a970c96ef86321531b3186a346b1316cb546e31"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/shared/commanddb-startup-17b66afcb9924316bbdc78d08a762ba8/k80/runtime/startup/ZornGen7SmmuControllerPower.cpp",
+      "sha256": "cc44dc6c6cac94c5518fd4da3f3b9a50634c3ab1014dd67c77a215b20139567b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/oneplus-sm8650-modules/vendor/qcom/opensource/graphics-kernel/kgsl_pwrctrl.c",
+      "sha256": "e50ab30332d5d99972c1d98bd65d7610f4a4255fd995694d6cc73cee0aeb80ab"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/oneplus-sm8650-modules/vendor/qcom/opensource/graphics-kernel/adreno_gen7_gmu.c",
+      "sha256": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851"
+    }
+  ],
+  "source_contract": "Existing Completion::waitAndEnablePrimary requires actual startup gate and owned completion/regulator core;uses native wait only when needed,then real RegulatorCore::enablePrimary parent supply/GDSC provider. Does not reference SmmuRuntimePm. ControllerPower::resumeLocked itself requires cx.primary_held,so primary acquisition precedes actual SMMU resume. New captured caller requires original resources,real maps,completion and RSC forward;old full-path smmu_pm_ready admission unchanged. No PM callback or dummy PM object supplied.",
+  "native_recompiled": 27,
+  "identity_recompiled": 6,
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-cx-primary26-78d434d4971e4f38b37b89aba8681751/full-link/kernel.ZORN26-NATIVE-CX-PRIMARY.UNSELECTED.macho",
+    "sha256": "62de127e645710838bbac0198a9bef017cf6643ff02e653dbf28aa4fc27c9d68",
+    "bytes": 30400488,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 33,
+    "preserved": 1363,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-cx-primary26-78d434d4971e4f38b37b89aba8681751/root-package-native-cx-primary/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "bd93732522d6209c69f45acaf2d83493ad14f7c2f4d0bc6c8eb89ac9a8d97ce4",
+    "bytes": 11616256
+  },
+  "scope": "single-K80-ios26-native-CX-primary-enable90s-v41",
+  "actual_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-cx-primary26-78d434d4971e4f38b37b89aba8681751/root-trial-native-cx-primary/trial/run.json",
+  "hardware_result_pending": false,
+  "full_root_readback": false,
+  "root_Data_readonly": true,
+  "SMMU_translation_or_GMU_GPU_selected": false,
+  "TLB_hint_or_flush_selected": false,
+  "actual_clock_domain": {
+    "gpucc": {
+      "returned": true,
+      "complete": true
+    },
+    "graph": {
+      "returned": true,
+      "assessment": 6,
+      "hardware_constructed": 29,
+      "namespace_records": 3,
+      "cores_registered": 29,
+      "complete": true
+    },
+    "list": {
+      "returned": true,
+      "assessment": 3,
+      "raw_available": true,
+      "raw": 6,
+      "entries_returned": 6
+    },
+    "hub": {
+      "returned": true,
+      "raw": 0
+    },
+    "ddr": {
+      "returned": true,
+      "raw": 0
+    },
+    "core_inputs": {
+      "returned": true,
+      "raw": 0
+    },
+    "cx_probe": {
+      "returned": true,
+      "attempted": true,
+      "configuration_store_returned": true,
+      "retain_update_returned": false,
+      "native_prefix_returned": true
+    },
+    "cx_core": {
+      "returned": true,
+      "raw": 0
+    },
+    "completion": {
+      "returned": true,
+      "registered": true
+    },
+    "smmu_power_resources": {
+      "returned": true,
+      "raw": 0
+    },
+    "CPU_register_mappings": {
+      "returned": true,
+      "raw": 0
+    },
+    "CX_primary": {
+      "returned": true,
+      "wait_assessment": 1,
+      "wait_raw_available": false,
+      "wait_raw": null,
+      "regulator_disposition": 0,
+      "regulator_domain": 2,
+      "regulator_raw_available": true,
+      "regulator_raw": 0
+    }
+  },
+  "CX_primary_prefix_complete": true,
+  "recovery_seconds": 122.90918245899957,
+  "verified_recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_captures_unchanged": {
+    "Data": 266240,
+    "Data_metadata": 266240,
+    "before": 4096,
+    "after": 4096,
+    "root_before": 4096,
+    "root_after": 4096,
+    "root_first_page": 4096
+  },
+  "scope_consumed_no_repeat": true,
+  "qualification": "Actual completion assessment Completed1 with no native wait return (initial completion already satisfied). Actual regulator disposition Complete0/domainPlatform32,raw_status_available=true,raw_status=0. Native GDSC probe retain-update=false was captured this epoch;the shared primary-enable code checks actual hardware status when the provider logical enabled cell is false. This is CX primary source-prefix completion,not SMMU power/global initialization/translation,GMU/HFI/GPU/Metal/presentation/touch acceptance. No synthetic wait0 or callback grant supplied."
+}

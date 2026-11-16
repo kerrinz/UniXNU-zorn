@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Offline CPU-only Gen7 supplied reservation quarantine bookkeeping, no real native backing/mapping qualification.",
+  "result": {
+    "updated": "2026-11-02T00:23:43.281847+08:00",
+    "state": "bounded-gen7-supplied-reservation-quarantine-ledger-maintained-unselected-no-native-calls",
+    "sources": {
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/reservations/ZornGpuGmuReservations.h": "e80aaeaa6fd087437a905e8f8adc2d6c402ed7360dc759c0e7c59774d0c81be9",
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/reservations/ZornGpuGmuReservations.cpp": "f53efe0fd933247bc5dc12603297d0ed84905f4ba0678d205915e8544e2eb818"
+    },
+    "source_profile": "UniXNU-zorn/native/gpu-owned/runtime/gmu/reservations/source-profile.json",
+    "semantics": [
+      "Fixed32 private entries hold borrowed actual NativeAdrenoMemory pointers, canonical existing decoded request, supplied start/backing/reservation bytes and validated extent. No object methods are called or pointer/address accessors returned.",
+      "All overlap checks use full reservation length including the unbacked tail. Supplied GMU-space32 bounds/VA alignment are checked without selecting a start; CPU pointer alias checks are a separate address space.",
+      "Key is kind+GMU request handle. Except a valid message-header change, changed raw request, descriptor or range refuses. Same descriptor/overlapping CPU descriptor object under another key refuses. Capacity32 and integer/metadata/output aliases refuse.",
+      "Local failure preserves the first signed64 adapter error and keeps the entire reservation recorded. Duplicate failed retries refuse, no reset/release APIs exist and destructor calls no native cleanup.",
+      "A ledger slot/index is CPU metadata, never a device/HFI handle. Summary/copyFailure expose no pointer/range. Native attempted/status available/mapping complete/runtime complete remain0 and all recorded native status is unknown.",
+      "The ledger does not acquire references, validate native backing, quarantine hardware or prevent an external caller from releasing it. The real owner must actually retain descriptor/backing/range for the ledger lifetime. No hardware lease follows from caller input or range checks."
+    ],
+    "host_scope": "Tests seed only CPU integer-interval metadata with deliberately unbacked real NativeAdrenoMemory class objects. Scalar IOReturn shim only, no object/allocator/provider success doubles. Metadata indexes are not successful device addresses; no address is selected or output and no native method runs.",
+    "new_actual_source_corruptions_refused": 4,
+    "new_reset_release_API_compile_refusals": 2,
+    "independent_current_iOS17_objects": 5,
+    "recursive_target_inputs": 416,
+    "remaining_link_imports": [
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_memcmp",
+      "_memcpy"
+    ],
+    "constinit_storage_no_initializer": true,
+    "general_regs_only": true,
+    "old_profiles_and_capsules_unchanged": true,
+    "native_methods_provider_or_phone_calls": 0,
+    "no_generated_addresses_or_native_observation": true,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "limits": [
+      "Fully unattended and no new device execution authorization. No native allocation/cache/provider/VM/SMMU map/unmap or native getter/method execution, USB/phone/SMEM/MMIO/SCM/PAS/power/clock/reset/IOVA/GPU operations. Selected code is compile-only.",
+      "A supplied range/index and typed native object are not real reservation, device reference, context/route/VMA/domain/permissions/stop/DMA proof. No address selection/export, HFI hosthandle/ACK or successful allocator/mapping/address model.",
+      "Do not repeat new ledger4 source/2 absent-API/5 independent-target or prior extent/map-retention/visibility/HFI/CPU suites. Only actual new internal composition checks.",
+      "No query/HFI/272B/ZORNGQF1/normal-log field/fragment/carrier or EFI/Darwin pointer change; both unapplied native VM/GMU patches stay unapplied. No live VM layout change or whole-kernel qualification.",
+      "All default42/storage/CPU/baseline/old-claim protections persist. Actual memory ownership and readable-failure gaps remain, allow_boot/readback/WriteAuthorized0."
+    ],
+    "physical_assistance_available": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gen7-reservation-ledger/combined-result.json",
+    "checks": "out/zorn/gpu-gen7-reservation-ledger/check-result.json",
+    "maintained": "out/zorn/gpu-gen7-reservation-ledger/maintained-result.json",
+    "next_plan": "out/zorn/gpu-gen7-reservation-ledger/next-plan.json"
+  }
+}

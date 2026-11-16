@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "scope": "Static selected-consumer/source/header/target ABI boundary; no native hardware-info invocation or published matching verification level.",
+  "result": {
+    "recorded_at": "2026-11-01T21:02:43.162295+08:00",
+    "state": "clock-hardware-info-consumer-bound-typed-DAL-boundary-explicit",
+    "bootstrap_GUID": "ae37b942-457f-4c91-a196-d9669fd347a3",
+    "bootstrap_LocateProtocol_slot": 320,
+    "bootstrap_init_slot": 8,
+    "attach_service_offset": 208,
+    "attach_device_literal": 33554543,
+    "attach_version_literal": 65536,
+    "filter_double_indirect_slots": [
+      112,
+      88
+    ],
+    "cache_version_init_slot": 72,
+    "cache_version_scalar_RVA": 219472,
+    "cache_version_is_UINT32_FILE_zero_not_live_observation": true,
+    "query_status_ignored_and_stack_outputs_not_initialized_in_consumer": true,
+    "attach_failure_can_feed_zero_into_cache": true,
+    "public_EFI_ChipInfo_not_a_substitute": true,
+    "SDK_nominal_public_ID_family_counts": [
+      401,
+      102
+    ],
+    "raw_consumer_sentinels": [
+      658,
+      659
+    ],
+    "counts_not_used_as_private_validation_limits": true,
+    "selected_existing_build_blob_binding": {
+      "rows": [
+        {
+          "name": "DALSYSDxe",
+          "source_blob": "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.efi",
+          "source_blob_sha256": "295f1465f9f9679fdb4e6188e6d71db1486ea3bc4003447af40b72d088ecb96d",
+          "existing_selected_build_section": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/Build/zornGpuPrepare/DEBUG_CLANGPDB/FV/Ffs/8E9BD160-B184-11DF-94E2-0800200C9A66DALSys/8E9BD160-B184-11DF-94E2-0800200C9A66SEC2.1.pe32",
+          "section_sha256": "64d37e0d4c38ee12031ba8a9e1e275466cecde588b3e90c9de35f03342d19a7c",
+          "existing_independent_archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/archive/Build/zornGpuPrepare/DEBUG_CLANGPDB/FV/Ffs/8E9BD160-B184-11DF-94E2-0800200C9A66DALSys/8E9BD160-B184-11DF-94E2-0800200C9A66SEC2.1.pe32",
+          "byte_equal_after_existing4B_section_header": true,
+          "case_alias_samefile_checked": true,
+          "module_extraction_performed": false,
+          "bootstrap_GUID_byte_present": true,
+          "public_EFI_ChipInfo_GUID_byte_present": false
+        },
+        {
+          "name": "ChipInfoDxe",
+          "source_blob": "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.efi",
+          "source_blob_sha256": "38c7c0d036ff9e9fc0700983874bca910d87b2d853e22dd6c1d542a8757a5185",
+          "existing_selected_build_section": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/Build/zornGpuPrepare/DEBUG_CLANGPDB/FV/Ffs/10E193DF-9966-44E7-B17C-59DD831E20FCChipInfo/10E193DF-9966-44E7-B17C-59DD831E20FCSEC2.1.pe32",
+          "section_sha256": "bfb3a8f3463d1df5bf3215e692add4a72d95b0750cd47c921e45809c1849baf7",
+          "existing_independent_archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/archive/Build/zornGpuPrepare/DEBUG_CLANGPDB/FV/Ffs/10E193DF-9966-44E7-B17C-59DD831E20FCChipInfo/10E193DF-9966-44E7-B17C-59DD831E20FCSEC2.1.pe32",
+          "byte_equal_after_existing4B_section_header": true,
+          "case_alias_samefile_checked": true,
+          "module_extraction_performed": false,
+          "bootstrap_GUID_byte_present": true,
+          "public_EFI_ChipInfo_GUID_byte_present": false
+        }
+      ],
+      "scope": "Existing generated sections compared in place against archived bytes/source blobs. No FD parser/module extraction, deployment or live-provider attestation."
+    },
+    "provider_semantic_mutations_refused": 7,
+    "public_target_layout": [
+      8,
+      8,
+      4,
+      4,
+      4,
+      8,
+      24,
+      48,
+      65541,
+      401,
+      102,
+      184
+    ],
+    "actual_recipe_LTO_object_raw_SHA_independent_equal": true,
+    "inspection_COFF_timestamp_retained": 1793537760,
+    "wrong_public_to_indirect_slot_compile_refusals": 2,
+    "final_data_PE_mutations_refused": 3,
+    "recursive_target_inputs": 50,
+    "data_only_NOENTRY_code_bytes": 0,
+    "no_call_wrappers_or_DAL_request_invented": true,
+    "hardware_eligibility_prepared": false,
+    "source_recipe": "/Volumes/macData/projects/ios-zorn/uefi-zorn/scripts/check-zorn-clock-hardware-info.py",
+    "source_recipe_sha256": "d78644516de7022ad234272cfe58e154d9a94ef88e2e6584e0f629a4b5d30e0a",
+    "new_FD_kernel_or_device_candidate": false,
+    "provider_or_phone_invoked": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "retained_refusals": [
+      "Annotation checker initially expected one rdata block; actual fdata-sections COMDAT yielded96B and16B, checker corrected with source/flags unchanged.",
+      "An exact-string FFS/Ffs archive lookup refused; samefile/inode plus raw SHA and independent archive bytes later verified the alias without changing a manifest."
+    ],
+    "native_contract_boundary": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/contract-boundary.json"
+  },
+  "source_recipe": "uefi-zorn/scripts/check-zorn-clock-hardware-info.py",
+  "source_recipe_sha256": "d78644516de7022ad234272cfe58e154d9a94ef88e2e6584e0f629a4b5d30e0a",
+  "private_DAL_handle_or_callable_not_invented": true,
+  "public_EFI_header_not_a_substitute": true,
+  "hardware_info_availability_and_eligibility_unproven": true,
+  "local_provider_result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/provider-result.json",
+  "local_selected_blob_binding": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/selected-blob-binding.json",
+  "local_contract_boundary": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/contract-boundary.json",
+  "local_target": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/target-result.json",
+  "local_final_static_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/final-audit-result.json"
+}

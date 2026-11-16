@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T16:28:51.200154+08:00",
+  "state": "Catalog149-RingClock-wait-control-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-ring-clock-control-contract/source-contract.json",
+  "functions_body_SHA_recorded": 8,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 actual RingClock fence wait control source,distinct from VM elapsed-only hook.8 function hashes,3 old fence-method hashes provenance verified only,no old suites/targets/native clock/fence/IRQ/address peers.",
+    "type": "RingClock stores borrowed cookie,uint64 now_us callback and optional int idle callback. now_us has no availability/error return channel;zero is a time sample,not failed/successful hardware status. Service ring_now wraps KernelTime with null cookie/local output,stack clock has null idle. Published copies supplied struct to static g.clock but cookie remains borrowed;actual K80 producer/epoch/idle semantics not bound.",
+    "ring": "Wait/observe initialize observed,refuse unattached/poisoned and invalid fence. Each loop acquires fence cache then checks fence value before missing-clock/deadline/idle checks. Thus timeout0 or null clock can still inspect current fence;missing clock only times out if pending. Cache failure or value beyond issued domain poisons;observe does not advance completed_ while wait sets it on passing fence. No API0 as stop/DMA lease.",
+    "deadline": "Start and subsequent now samples are microseconds;timeout_us is uint32 and subtraction unsigned64. If pending,elapsed>=timeout returns timeout;nonzero idle result also folds to fence timeout,raw callback int not exposed here. Backward/nonadvancing clock behavior and callback nonreturning latency are not bounded by this code. Finite timeout parameter alone is not hardware monotonic guarantee or bounded native execution;no successful constant-clock/fence model or retry policy invented.",
+    "submit": "Submit observe maps ring poison/argument/timeout to existing IOReturn domains. Submit wait selects active Job ring or historical lookup,then on timeout counts/notifies noteStall and returns Timeout;passed active job may release refs. waitAll loops outstanding jobs and supplies same timeout anew to each wait,so it is not one total wall deadline or preempt-flight/DMA stop proof. Previous history/wrap/active28th guard gaps remain independent.",
+    "borrow": "Ring wait invokes callbacks synchronously and does not store clock pointer in this body. Submit timeout noteStall and caller-owned clock functions may add work;actual provider/latency/serialization must be source-bound. Do not infer optional idle callback0 equals IRQ arrival/retirement or that elapsed VM hook controls these loops.",
+    "decision": "No31st raw-idle diagnostic/clock/timeout/reset/retry/stop policy without actual producer/error contract.30 independent UNAPPLIED/all native OFF;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal/rolefullcore unavailable. No component/caller/kernel/FD/candidate/query/HFI/log/carrier/wire/CPU/security expansion."
+  },
+  "qualification": "Static RingClock timeout/callback control only;not native bounded execution/fence/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

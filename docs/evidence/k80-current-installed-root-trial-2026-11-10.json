@@ -1,0 +1,78 @@
+{
+  "status": "CURRENT_INSTALLED_UFS_ROOT_TRIAL_RETURNED_PROTECTED_BUT_ROOT_HEADER_UNQUALIFIED",
+  "time": "2026-11-10T02:16:14.008615+00:00",
+  "installation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-current-root-installation26.json",
+  "actual_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/root-trial-host-admitted/trial/run.json",
+  "actual_result": {
+    "scope": "single-K80-ios26-current-UFS-root300s-header-record-dual-recovery-host-admitted-v2",
+    "status": "recovered-protected-storage-unchanged-root-unqualified",
+    "GPU_started": false,
+    "root_mount_proven": false,
+    "desktop_proven": false,
+    "boot_attempts": 1,
+    "recovery_identity_before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "fastboot_returned_success": true,
+    "recovery_observed_seconds": 118.72564345799765,
+    "recovery_identity_after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "root_header_milestone_proven": false,
+    "log_changed": false,
+    "native_writer_readback_success_proven": false,
+    "native_record_refusal": "record identity differs"
+  },
+  "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/root-trial-host-admitted/bundle.json",
+  "admission": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/root-trial-host-admitted/admission.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/root-trial-host-admitted/trial/one-shot.claim.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/root-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "1b00729c89b23371b81c80d8e23f4fe94763d3417fd5a90eef023896f7a22593",
+    "bytes": 11583488
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.24039975000050617,
+    "inputs": 1390,
+    "replaced": 4,
+    "preserved": 1386,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "c651af0d29ab91f065fc0786658809ace7fb7d1eefee95a38b211642dd68b907",
+    "bytes": 30306128
+  },
+  "ADT": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-root-integration26/kernel.current-metal-root.UNSELECTED.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/root-package/inputs/ADT-kernel.current-metal-root.UNSELECTED.adt",
+    "sha256": "f28ced9ddcadd720bb8a3cc5e0c38e7dc1e9022fcfccf49d7da5ee0d1766bbf1",
+    "bytes": 48276
+  },
+  "root_sha256": "ef11f75a2d1349cd20b341a4474f8dcdb99a2674709721557ec6fb7303a4a608",
+  "host_failure_before_USB_preserved": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-root-observation26-3e5b20c18e8c458ea1b91f5fbec05f54/host-pre-USB-failure-resolution.json",
+  "old_host_claim_consumed_never_reused": true,
+  "actual_hardware_boot_attempts": 1,
+  "actual_native_header_milestone_proven": false,
+  "full_root_mount_or_desktop_proven": false,
+  "GPU_execution_proven": false,
+  "qualification_limits": "Fastboot success and118.7256s verified TWRP return do not prove native root execution. Log byte-identical,retains prior418398 tag. Before root first page matches actual EF11 source;full32GiB installation hash is a separate prior complete readback. No phone retries.",
+  "finite_source_followup": "Actual final GenericARMPE BL calls root platform start;actual IOFindBSDRoot calls root attach;attach calls prepare thenbind. Exact current ADT/root SHA/window/native compatible and host HFSX header match current source admission. No missing-call/header fix is fabricated. Next trace actual root creator resource/staging and initializer consumers/provenance before choosing a fresh changed experiment."
+}

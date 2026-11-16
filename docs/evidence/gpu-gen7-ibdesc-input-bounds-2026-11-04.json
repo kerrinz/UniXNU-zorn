@@ -1,0 +1,64 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_IBDESC_INPUT_BOUNDS_REPAIR",
+    "reference": "retained exact OEM453d8875 source; no Xiaomi installed-kernel/K80 runtime qualification",
+    "new_source_guards": 2,
+    "changed_files": [
+      "kgsl_drawobj.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-ibdesc-input-bounds-20261104/ibdesc-input-bounds.UNAPPLIED.patch",
+    "patch_sha256": "b79b269f3fca948e4413e9e436388665291000b2b3059d1de3de72214dfb2ae0",
+    "normal_queue_review": {
+      "scope": "normal queue count only; prior recurring fix not transplanted",
+      "callers": [
+        "kgsl_ioctl_rb_issueibcmds",
+        "kgsl_ioctl_submit_commands",
+        "kgsl_ioctl_gpu_command",
+        "kgsl_ioctl_gpu_aux_command"
+      ],
+      "constructor": "retained kgsl_drawobj_cmd_create uses kzalloc; retained list builders do not increment numibs",
+      "count_path": "each inspected ioctl creates fresh objects and invokes ftbl queue once; ordinary failure destroys objects, EPROTO follows existing transfer convention. Dispatcher retries/replay do not reenter public queue count loop in inspected sources.",
+      "new_reachable_recount_gap": false,
+      "patch_test_or_target_added_for_this_review": false,
+      "limits": "retained module paths only; no universal external/core/config/lifetime guarantee"
+    },
+    "scope_notes": {
+      "variable_record_stride": "add_cmdlist/add_memlist pass declared size to copy_struct_from_user but advance by sizeof(obj). Exact accepted-size core contract is not retained; no ABI stride repair or runtime fault is claimed, no tests/target added for this observation.",
+      "signed_count_scope": "actual retained ioctl counts are bounded/nonnegative; negative count repair is public module helper input contract only, not a demonstrated K80 caller fault.",
+      "word_count_scope": "uint64 word-byte conversion on wide native-sized inputs; no installed Linux ABI/config or successful descriptor/mapping model is inferred."
+    },
+    "checks": {
+      "negative_signed_count_witnesses": 2,
+      "marker_count_ignore_preserved": true,
+      "word_byte_conversion_overflow_witnesses": 3,
+      "representable_word_controls": 3,
+      "source_mutations_refused": [
+        "negative-count-restored",
+        "word-overflow-restored",
+        "unchecked-conversion"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "native_helper_copy_allocator_or_command_object_execution": false,
+      "Linux_kernel_build": false,
+      "old_suites": false
+    },
+    "delta_replay_byte_equal": true,
+    "parent9_sources_unchanged": true,
+    "word_count_guard_precedes_ctrl_mutation_and_profiling_or_allocation": true,
+    "Linux_kernel_or_native_target_compiled": false,
+    "native_helpers_objects_copy_allocators_providers_or_device_execution": false,
+    "runtime_selection": false,
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "timestamp": "2026-11-03T17:37:10.446309+00:00",
+    "MARKER_count_ignore_preserved": true,
+    "nonnegative_list_counts_and_representable_word_counts_unchanged": true
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-ibdesc-input-bounds-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-ibdesc-input-bounds-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-ibdesc-input-bounds-20261104/archive.json"
+}

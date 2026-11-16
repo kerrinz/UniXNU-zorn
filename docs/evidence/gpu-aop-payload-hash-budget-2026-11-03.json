@@ -1,0 +1,61 @@
+{
+  "scope": "new aggregate hashing-work repair;not firmware or target execution",
+  "new_refusals": [
+    {
+      "case": "before-accepted-amplified-input",
+      "error": "aggregate program payload hashing exceeds offline work budget",
+      "payload_hash_calls": 0
+    },
+    {
+      "case": "one-byte-over-work-budget",
+      "error": "aggregate program payload hashing exceeds offline work budget",
+      "payload_hash_calls": 0
+    },
+    {
+      "case": "late-program-extent-before-first-hash",
+      "error": "program file extent outside supplied source",
+      "payload_hash_calls": 0
+    }
+  ],
+  "exact_64MiB_payload_work_pass": true,
+  "two_changed_real_sources": [
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/zorn_images_OS3.0.9.0.WOKCNXM_16.0/images/aop.mbn",
+      "source_sha256": "99c42ab41cf00caa1c3d9a43f84a54531791fe1bfffdfb5ad7c6c1dff3c5dffb",
+      "output_identical": true,
+      "payload_bytes_hashed": 319424,
+      "no_source_authentication_or_DB_eligibility": true
+    },
+    {
+      "input": "/Volumes/macData/projects/ios-zorn/zorn_images_OS3.0.9.0.WOKCNXM_16.0/images/aop_devcfg.mbn",
+      "source_sha256": "3ac23872cccfae26ffe66d6b7d0d74328fae7f8aa105493d35f7be8c915ecdf8",
+      "output_identical": true,
+      "payload_bytes_hashed": 14330,
+      "no_source_authentication_or_DB_eligibility": true
+    }
+  ],
+  "guarded_CLI_exit2": true,
+  "source_sha256": "d5564eb76b3b73bc84564d8eeb84d709e9bf59f61aa47b69025d438e82ab0547",
+  "old_malformed_suite_or_driver_targets_rerun": false,
+  "native_or_device_execution": false,
+  "hardware_qualification": false,
+  "before_reproduction": {
+    "source_bytes": 1048576,
+    "program_rows": 128,
+    "payload_bytes_hashed": 134217728,
+    "before_container_accepted": true,
+    "actual_hashes_not_stubbed": true,
+    "issue": "Repeated bounded PH extents amplify total hashing beyond input byte bound;4096rows*64MiB could hash256GiB",
+    "synthetic_source_not_firmware_execution": true,
+    "source_sha256": "3dea6af4787f222717e242f759ad398a6572c5294fcfcf59b8918f0e6f627f6d"
+  },
+  "source_files": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect-zorn-aop-source-kind.py": "d5564eb76b3b73bc84564d8eeb84d709e9bf59f61aa47b69025d438e82ab0547",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-aop-hash-budget.py": "10befbbc9900cf37a1162fb12aa69dfc45fb36d535b13fba3d83aea741839560",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-aop-payload-hash-budget-20261103/inspector-preimage.py.txt": "3dea6af4787f222717e242f759ad398a6572c5294fcfcf59b8918f0e6f627f6d"
+  },
+  "aggregate_payload_work_bytes": 67108864,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

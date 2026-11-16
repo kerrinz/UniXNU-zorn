@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Offline exact Gen7 preallocated owner/type gaps and independent supplied AO scalar classifier only.",
+  "result": {
+    "updated": "2026-11-02T01:21:08.220279+08:00",
+    "state": "preallocated-Gen7-owner-type-contract-gap-bound-AO-scalar-classifier-maintained-no-native-provider",
+    "source_pins": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/adreno_hwsched.c": "e62f222be34aea46326aedf2c9f256c1f1f61f6302d3cf8e9a6a5efbe72dd19e",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/adreno_hwsched.h": "e3c017d175c935d80aae64dc2f260a8df5e061e49829098746670d501aecc42f",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/kgsl_device.h": "cde953a4e4eae7108a10cf092d41e57d390b2f8fe45524fa5ca1eedf7f5b71f9",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/msm_kgsl.h": "0509a1a38c99d4b0dde881069eea0475b77f07ab250cbe0a02cfc8a7984ed00b",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/kgsl.c": "21f8f7ba8556f4bea965ac4c811843b26c8a59508b912b7a5cdfb9791c9d7da5",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/kgsl.h": "91719fae474726bef4fbfa4e0bd78ce41ff651f808f04000c55a8bda2f9ac4fe",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/stock/kgsl_gmu_core.h": "560027dfe9af8a56cab6db4fbb08597c470abf722686675f138235b71181e8ca",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.c": "306930a131d0fa3bc3cc3873dbfaf205b6bd5a4243f55a74cced411c08de6782",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno.c": "7610fc36f8a482f4a09a3d332c3ebb7505a8540281bf770f8e7b2f0d21346799",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.c": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.h": "f3353b4f2f671fcbcd9d875340fc837dd68d6f780d26ad162967089320814649",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoRing.h": "0811915d30b72a15855714527c4c3f3657ba448597a528c30174765c19b32cda",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoRing.cpp": "dc2c71b8225ec034b800e01d107939fa7d8a8b5335a2337323c016c9e5fc083e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoSubmit.h": "03e41ee4afb6bc6ff1970ac298f93cb0add8b49ac300a14fcffef17fd91bd841",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoSubmit.cpp": "568c1d317ad6a59c012840e96bc2d1d3b7930e8c60743cf0d6546fb067339546",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoGmuContext.h": "ba483ae025cdb82e7bd346c608a92ef854c76e15876658c7958bdcb93a9a203e",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoIrq.h": "c117f3462603574bf7a922b31105a5f0d59da1bcd1d8f108106c1304c07fc1f4",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoIrq.cpp": "65c005ce535296871db1b42af7b9e203221102d5a1f9d2c91951ba7cb4a1ee04"
+    },
+    "new_primary_files": 6,
+    "reference_revision": "453d8875f815bf9dfad9035982861226a4823a6c; reference not Xiaomi exact stock source",
+    "preallocated_findings": [
+      "get_mem_alloc_entry excludes HW_FENCE from ordinary GMU-only allocation even without GFX_ACC. MEMSTORE uses the preallocated switch only in the GPU-access branch. Returned entry sizes/addresses come from existing descriptors, not request-sized fresh generic CPU allocation.",
+      "HW-fence registration requires feature support, context queues and no existing enabled flag. External registration supplies its descriptor. KGSL assigns device_addr to its physaddr field and uses external size/virtual_addr before SG setup; that assignment is not native PA/IOVA proof.",
+      "Registration is void; null/error client handle logs and returns unavailable. SG setup failure deregisters/clears the descriptor; successful setup creates the cache and sets the flag. Deregistration calls external deregister then frees SG/clears metadata/cache/flag without retaining a manager result in this function. No native success/release result is inferred.",
+      "An exact unsupported-feature branch passes opaque hw_fence.handle to adreno_hwsched_deregister_hw_fence, whose declared parameter and implementation require adreno_device*. The isolated one-line patch passes adreno_dev. It is unapplied; no phone fault or original Linux C compile failure is claimed. C++ port compile rejects the wrong void* owner type.",
+      "MEMSTORE allocation is device-global during adreno probe, with optional APRIV-derived privilege. Removal closes dispatcher then platform removal reaches kgsl_free_globals. The global-free implementation and actual native stop/DMA release conditions are still outside this bound contract.",
+      "KGSL plain UAPI record is40B with EOP offset8; current NativeRing CP timestamp goes to fence_iova+4. These layouts/providers are distinct; no existing native ring fence is imported as either full memstore or external HW_FENCE queue."
+    ],
+    "native_provider_gap": {
+      "native_preallocated_resource_adapter_created": false,
+      "HW_FENCE": "Requires actual msm_hw_fence_register(HW_FENCE_CLIENT_ID_CTX0,&mem_descriptor) client, external device_addr/size/virtual_addr and SG import. Public exact API/header and native Darwin provider not bound. Actual manager/device-address meaning, client/queue/ref/peer lifetime and deregistration result remain unavailable.",
+      "MEMSTORE": "Device-global kgsl_allocate_global at adreno probe; size is Linux PAGE_SIZE*8, not8 XNU pages or a verified current fixed size. UAPI plain40B record has SOP0/EOP8; context/ring offsets depend on its own array. Actual kgsl_free_globals body/complete native release proof not bound.",
+      "native_comparison": "NativeAdrenoRing/Submit provide CP timestamp/ring job completion, not the external HW-fence client/TxRx descriptor or complete per-context KGSL memstore. NativeGmuContext is legacy fixed-buffer source, not this provider.",
+      "all_addresses_handles_fences_and_native_status_unavailable": true
+    },
+    "wrong_owner_patch": {
+      "path": "wrong-deregister-owner.UNAPPLIED.patch",
+      "sha256": "41980dc8fd3d2dc6c30433f8ac99885916207b73b188403589eaa13f6b9271ef",
+      "applied": false
+    },
+    "independent_platform_progress": "Implemented a real pure CPU classifier of supplied Gen7 GMU AO status, after binding source masks/handler. It preserves raw32, watchdog0/AHB-fence3/host-AHB5 and every unhandled bit including named RSCC1/DBD4. AHB-fence3 requests separate auxiliary status, never invents it. It neither reads/clears a register nor implements an IRQ handler, NMI, watchdog action, HW-fence/CP completion or ownership.",
+    "AO_sources": {
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/irq-status/ZornGpuGmuAoStatus.h": "b6d9356962e8aafbd98c7d77cea3a71a63d89bd1e038272fe3f5870b28848522",
+      "UniXNU-zorn/native/gpu-owned/runtime/gmu/irq-status/ZornGpuGmuAoStatus.c": "75948e9e340d7d3819469911135f3586dab0df4500dbc04613c19431caee6d12"
+    },
+    "AO_source_profile": "UniXNU-zorn/native/gpu-owned/runtime/gmu/irq-status/source-profile.json",
+    "new_preallocated_semantic_corruptions_refused": 4,
+    "new_CXX_wrong_owner_port_compile_refused": 1,
+    "new_AO_actual_source_corruptions_refused": 3,
+    "new_actual_AO_object_corruptions_refused": 2,
+    "independent_current_iOS17_objects": 3,
+    "recursive_target_inputs": 383,
+    "ABI_data_only_no_callable_provider": true,
+    "code_generator_AO_raw_unknown_auxiliary_stores_checked": {
+      "raw32_pair_store_RVA": 44,
+      "unknown_mask_complement_0x29_RVA": 48,
+      "unknown32_and_auxiliary_needed_store_RVA": 60
+    },
+    "old_source_profiles_and_capsules_unchanged": true,
+    "network_limits": "Web cache/search had no content. Exact installed Linux include-path raw URL404 and actual pinned provider include listing did not bind the public msm_hw_fence API header; no unknown structure/prototype was invented.",
+    "native_IRQ_MMIO_getter_allocator_provider_callback_phone_calls": 0,
+    "no_successful_allocation_address_handle_fence_model": true,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "limitations": [
+      "Fully unattended, physical_assistance_available=false, no new device execution authorization. No phone/USB/native getter/allocator/provider/cache/IRQ callback/MMIO/ack/mask/NMI/SCM/PAS/power/clock/reset/SMMU/VM/IOVA/GPU invocation; no runtime caller/FD/kernel/device candidate.",
+      "HW_FENCE requires a real external client registration, descriptor and Tx/Rx peer lifetime. MEMSTORE is a device-global resource with context/ring records; neither native CP timestamp fence nor software fence/transport ACK substitutes. Native borrowed-resource adapter remains absent.",
+      "Public msm_hw_fence API header/selected kernel provider contract and Native Darwin counterpart are not bound. Do not invent its typedef/return type, treat device_addr as proven PA/IOVA, or supply a fake registered handle/queue/fence. Linux teardown is not native stop/release proof.",
+      "Only new HFI IRQ-domain source/status checks, no repeat preallocated4/C++port1/AOsource3/object2/native3 or prior composition/ledger/extent/HFI packet/CPU suites. Both old native repairs and new reference-owner patch remain unapplied; old profiles/capsules/default42 unchanged.",
+      "No query/HFI/272B/ZORNGQF1/normal-log field/fragment/carrier, EFI/Darwin pointer handoff or CPU policy expansion. Pure supplied-status classification is not native observation, IRQ_HANDLED, queue completion or ownership. allow_boot/readback/WriteAuthorized0."
+    ],
+    "physical_assistance_available": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gen7-preallocated-providers/combined-result.json",
+    "checks": "out/zorn/gpu-gen7-preallocated-providers/check-result.json",
+    "maintained": "out/zorn/gpu-gen7-preallocated-providers/maintained-result.json",
+    "provider_gap": "out/zorn/gpu-gen7-preallocated-providers/native-provider-gap.json",
+    "next_plan": "out/zorn/gpu-gen7-preallocated-providers/next-plan.json"
+  }
+}

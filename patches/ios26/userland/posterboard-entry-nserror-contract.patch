@@ -1,0 +1,173 @@
+--- a/src/inject26.c
++++ b/src/inject26.c
+@@ -1040,7 +1040,7 @@
+ 	char a[200], b[600];
+ 	id local = nil;
+ 	id result = orig_store_for_provider(self, sel, identifier, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	id e = (result == nil) ? (error != NULL ? *error : local) : nil;
+ 
+ 	if (pb_tracing || (result == nil && failures++ < 20)) {
+ 		say("redwood: PosterBoard: the store of extension %s: %s%s%s\n", pb_desc(identifier, a, sizeof(a)),
+@@ -1069,7 +1069,7 @@
+ 	char a[200], b[600];
+ 	id local = nil;
+ 	id result = orig_create_dynamic(self, sel, identifier, role, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	id e = (result == nil) ? (error != NULL ? *error : local) : nil;
+ 
+ 	say("redwood: PosterBoard: dynamic descriptor %s made: %s%s%s\n", pb_desc(identifier, a, sizeof(a)),
+ 	    result != nil ? "yes" : "NO", e != nil ? ", error " : "", e != nil ? pb_desc(e, b, sizeof(b)) : "");
+@@ -1229,7 +1229,7 @@
+ 	char a[300], b[1200];
+ 	id local = nil;
+ 	BOOL ok = orig_migrate(self, sel, url, from, to, cleanup, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	id e = (!ok) ? (error != NULL ? *error : local) : nil;
+ 
+ 	say("redwood: PosterBoard: migrate %s from %lu to %lu: %s%s%s\n", pb_desc(url, a, sizeof(a)), from, to,
+ 	    ok ? "done" : "FAILED", e != nil ? ", error " : "", e != nil ? pb_desc(e, b, sizeof(b)) : "");
+@@ -1245,7 +1245,7 @@
+ 	id local = nil;
+ 	say("PB build enter\n");
+ 	id store = orig_build(self, sel, url, assertions, monitor, observer, migrated, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	id e = (store == nil) ? (error != NULL ? *error : local) : nil;
+ 
+ 	say("redwood: PosterBoard: build data store at %s (migrated %d): %s%s%s\n", pb_desc(url, a, sizeof(a)),
+ 	    (int)migrated, store != nil ? "made" : "NONE", e != nil ? ", error " : "", e != nil ? pb_desc(e, b, sizeof(b)) : "");
+@@ -1289,7 +1289,7 @@
+ {
+ 	char a[300], b[600];
+ 	id local = nil;
+-	BOOL ok = orig_url_conform(self, sel, values, error != NULL ? error : &local);
++	BOOL ok = orig_url_conform(self, sel, values, &local);
+ 
+ 	if (!ok) {
+ 		id plain = pb_without(values, "NSURLFileProtectionKey");
+@@ -1302,9 +1302,9 @@
+ 			say("redwood: PosterBoard: %s does not conform to %s; without the protection class: %s\n",
+ 			    pb_desc(self, a, sizeof(a)), pb_desc(values, b, sizeof(b)), ok ? "conforms" : "STILL NOT");
+ 		}
+-		if (ok && error != NULL) {
+-			*error = nil;
+-		}
++	}
++	if (!ok && error != NULL) {
++		*error = local;
+ 	}
+ 	return ok;
+ }
+@@ -1314,8 +1314,8 @@
+ {
+ 	char a[300], b[300], c[900];
+ 	id local = nil;
+-	BOOL ok = orig_fm_create(self, sel, url, intermediate, attributes, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	BOOL ok = orig_fm_create(self, sel, url, intermediate, attributes, &local);
++	id e = (!ok) ? (local) : nil;
+ 
+ 	if (!ok) {
+ 		say("redwood: PosterBoard: mkdir %s (attributes %s) FAILED: %s\n", pb_desc(url, a, sizeof(a)),
+@@ -1324,10 +1324,13 @@
+ 		id plain = pb_without(attributes, "NSFileProtectionKey");
+ 		if (plain != nil) {
+ 			local = nil;
+-			ok = orig_fm_create(self, sel, url, intermediate, plain, error != NULL ? error : &local);
++			ok = orig_fm_create(self, sel, url, intermediate, plain, &local);
+ 			say("redwood: PosterBoard: mkdir %s without NSFileProtectionKey: %s\n", pb_desc(url, a, sizeof(a)),
+ 			    ok ? "made" : "FAILED again");
+ 		}
++	}
++	if (!ok && error != NULL) {
++		*error = local;
+ 	}
+ 	return ok;
+ }
+@@ -1347,23 +1350,26 @@
+ {
+ 	char a[300], c[900];
+ 	id local = nil;
+-	BOOL ok = orig_data_write(self, sel, url, options, error != NULL ? error : &local);
++	BOOL ok = orig_data_write(self, sel, url, options, &local);
+ 	int saved = errno;
+-	id e = error != NULL ? *error : local;
++	id e = (!ok) ? (local) : nil;
+ 
+ 	if (!ok) {
+ 		say("redwood: PosterBoard: write %s (options %#lx) FAILED, errno %d: %s\n", pb_desc(url, a, sizeof(a)), options,
+ 		    saved, pb_desc(e, c, sizeof(c)));
+ 		if (options & 0xf0000000ul) {
+ 			local = nil;
+-			ok = orig_data_write(self, sel, url, options & ~0xf0000000ul, error != NULL ? error : &local);
++			ok = orig_data_write(self, sel, url, options & ~0xf0000000ul, &local);
+ 			say("redwood: PosterBoard: ... without the protection class: %s\n", ok ? "written" : "FAILED again");
+ 		}
+ 		if (!ok && (options & 1ul)) {
+ 			local = nil;
+-			ok = orig_data_write(self, sel, url, options & ~0xf0000001ul, error != NULL ? error : &local);
++			ok = orig_data_write(self, sel, url, options & ~0xf0000001ul, &local);
+ 			say("redwood: PosterBoard: ... and not atomically: %s\n", ok ? "written" : "FAILED again");
+ 		}
++	}
++	if (!ok && error != NULL) {
++		*error = local;
+ 	}
+ 	return ok;
+ }
+@@ -1454,16 +1460,16 @@
+ 	static int said;
+ 	char a[300];
+ 	id local = nil;
+-	BOOL ok = orig_set_purgable(self, sel, purgable, error != NULL ? error : &local);
++	BOOL ok = orig_set_purgable(self, sel, purgable, &local);
+ 
+ 	if (!ok) {
+ 		if (said++ < 3) {
+ 			say("redwood: PosterBoard: %s cannot be marked purgeable here (no APFS): taken as done\n", pb_desc(self, a, sizeof(a)));
+ 		}
+-		if (error != NULL) {
+-			*error = nil;
+-		}
+ 		ok = YES;
++	}
++	if (!ok && error != NULL) {
++		*error = local;
+ 	}
+ 	return ok;
+ }
+@@ -1474,7 +1480,7 @@
+ 	char a[300], b[300], c[900];
+ 	id local = nil;
+ 	BOOL ok = orig_fm_copy(self, sel, from, to, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	id e = (!ok) ? (error != NULL ? *error : local) : nil;
+ 
+ 	if (!ok) {
+ 		say("redwood: PosterBoard: copy %s -> %s FAILED: %s\n", pb_desc(from, a, sizeof(a)), pb_desc(to, b, sizeof(b)),
+@@ -1488,8 +1494,8 @@
+ {
+ 	char a[300], b[400], c[900];
+ 	id local = nil;
+-	BOOL ok = orig_url_update(self, sel, values, error != NULL ? error : &local);
+-	id e = error != NULL ? *error : local;
++	BOOL ok = orig_url_update(self, sel, values, &local);
++	id e = (!ok) ? (local) : nil;
+ 
+ 	if (!ok) {
+ 		say("redwood: PosterBoard: resource values %s on %s FAILED: %s\n", pb_desc(values, b, sizeof(b)),
+@@ -1497,10 +1503,13 @@
+ 		id plain = pb_without(values, "NSURLFileProtectionKey");
+ 		if (plain != nil) {
+ 			local = nil;
+-			ok = orig_url_update(self, sel, plain, error != NULL ? error : &local);
++			ok = orig_url_update(self, sel, plain, &local);
+ 			say("redwood: PosterBoard: resource values on %s without NSURLFileProtectionKey: %s\n",
+ 			    pb_desc(self, a, sizeof(a)), ok ? "set" : "FAILED again");
+ 		}
++	}
++	if (!ok && error != NULL) {
++		*error = local;
+ 	}
+ 	return ok;
+ }

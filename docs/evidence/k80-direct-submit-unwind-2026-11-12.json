@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-12T16:53:40.151791+08:00",
+  "status": "direct-ring-submit-rollback-source-fix-native-full-link-host-verified",
+  "root_cause": "On a failed IB hold, the prior submitter ignored rollback refusals and counted them as retired. The caller could continue while an unreleased prefix still held references.",
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-submit-unwind-candidate/ZornGen7DirectSubmit26.cpp",
+    "sha256": "32d925f2a8d855502d6a8994d4c590d32c4431e52b9a63c3a262d494012be030"
+  },
+  "base_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-prefix-candidate/direct-runtime/ZornGen7DirectSubmit26.cpp",
+    "sha256": "edb39188424368144fc39fceb7f90382ec4bfea81ce2ff7333a40e199e03771c"
+  },
+  "source_delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-submit-unwind26/direct-submit-unwind.patch",
+    "sha256": "eee0f07270b4825bc24d7269d0d613dbcb075fc84fd27ec58984e442bceeb8e5"
+  },
+  "behavior": "Unpublished holds roll back from the last acquired reference. A rollback refusal retains the outstanding prefix in the job, leaves the fence zero, and poisons the submitter. Uncertain namespace cancellation and ring commits retain the entire affected job.",
+  "normal_behavior": "A successful unwind returns the original failure and permits subsequent submissions. The success path uses the actual ring fence.",
+  "risk": "An ownership inconsistency now makes this submitter unavailable until the existing independent recovery path. No attempt is made to release a reference whose retirement was refused.",
+  "compile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-submit-unwind26/compile-result.json",
+    "sha256": "ab2ca1cdf6a997274804f5c0942c5558f23cf46ff27e85031d3ec9dbdcd9dca1"
+  },
+  "full_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-submit-unwind26/full-link/link-result.json",
+    "sha256": "7e1557010163d494c0e00587720186e7fa6791afc9655e5ad4e6d1e13ef2ee6c"
+  },
+  "host_fault_injection": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-submit-unwind26/submit-unwind-host-check.json",
+    "sha256": "7f4325bf7224f3816554a52ee5f8813c7f052349a91223bd2ec0a15ec3a4eed4"
+  },
+  "inherited_link_warnings_unchanged": true,
+  "physical_GPU_or_phone_executed": false,
+  "selected": false,
+  "goal_complete": false
+}

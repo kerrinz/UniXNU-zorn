@@ -1,0 +1,12 @@
+# UserClient refusal-path source repairs
+
+The exact Service externalMethod table checks selectors 1..14 and publishes exact ABI input/output lengths. Core dispatch independently checks known selector, exact lengths and required non-null input/output before copying wire bytes. Each reply copy is guarded by method success. BoImport is deliberately unsupported here. This limited review did not find a new wire-size or failed-output-copy defect. Client attachment remains unsupported on the retained Service path; no user connection or device execution was enabled.
+
+Two separate UNAPPLIED source candidates address actual refusal-path defects:
+
+* Three early dispatch validation returns bypass tally_result assignment. The destructor reads its initial kIOReturnSuccess, so its existing failure counter/status field falsely records success for unsupported selectors within the stats range, wrong lengths and missing required buffers. The first candidate assigns the exact returned IOReturn to tally_result on those three returns. It preserves return values, accepted dispatch, clock operations and existing stats fields. Three original/candidate definition-use traces and three source mutations pass. Only the extracted guard block compiled against actual iOS17 headers; it was not executed.
+* Closed clients have vm_ null. mapBo returns NotReady before lookup when not open, but dispatch's map-failure diagnostics then unconditionally query vm_->spanCount/objectCount. The second candidate guards just these two existing stores with vm_ presence. Missing VM leaves that prior diagnostic row untouched; it does not synthesize zero counts or assert fresh validity. Return status and all other fields are unchanged. Three source controls pass. This is a source-confirmed null-reference path, not a live crash reproduction.
+
+The candidates are independent and not composed. No client object, externalMethod/dispatch/mapBo, VM getter, clock callback, provider or native operation was executed or modeled. The entire UserClient translation unit still meets the frozen missing role-API boundary and was not compiled again; no stub, SDK swap or role substitution was used. The extracted guard object cannot qualify the full UserClient or kernel ABI.
+
+Catalog/pins, original 32 driver patches, eight profiles, runtime/component selection, public ABI, wire/log/carrier layouts and hardware state remain unchanged. No new hardware qualification follows from these source repairs.

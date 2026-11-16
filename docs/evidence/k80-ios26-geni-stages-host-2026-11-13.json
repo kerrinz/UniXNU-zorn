@@ -1,0 +1,37 @@
+{
+  "status": "host-verified, device not run",
+  "run_id": "715f7756f9ae4a48aebca7878af76aa7",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-geni-stages26-715f7756f9ae4a48aebca7878af76aa7/boot-package/boot.ZORN26-GENI-STAGES-UNSELECTED.img",
+    "sha256": "9f4f4652da0c3f82011a16b0905fe27b692684bc2c45e9fd98398bb6715020ae",
+    "bytes": 11673600
+  },
+  "kernel_sha256": "e723153ec30cf4c16b7487e6902bb130285da633d8112a7cdf036c10efa6b31c",
+  "package_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-geni-stages26-715f7756f9ae4a48aebca7878af76aa7/boot-package/verified.json",
+  "staged_source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-geni-stages26-715f7756f9ae4a48aebca7878af76aa7/staged-geni-inputs.json",
+  "markers": [
+    "root-prepare",
+    "root-registered",
+    "pid1-worker",
+    "TX snapshot"
+  ],
+  "checks": [
+    "ASan/UBSan MMIO simulation: disabled or interrupt context, repeated stage, nested call, mapping reuse, GIC owner change, bounded timeout and no later writes",
+    "Pinned full link with zero undefined symbols, all four marker formats present in the linked kernel",
+    "FAT member readback, packed image hash, unchanged CPU baseline root/ADT/FD and independent watchdog markers"
+  ],
+  "device_executed": false,
+  "wire_received": false,
+  "host_test_command_from_device_repository": "clang++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined -I<build>/geni-stage-host-stubs -Inative/serial <build>/geni-stage-host.cpp -o /tmp/zorn-geni-stage-host && /tmp/zorn-geni-stage-host && /tmp/zorn-geni-stage-host route",
+  "capture_host_validation": {
+    "bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-geni-stages26-715f7756f9ae4a48aebca7878af76aa7/root-trial/bundle.json",
+    "bundle_sha256": "36335f079403af0a307f988bced00d2afc02bfdf91ec23a1a81cde1aa197168e",
+    "replay": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-geni-stages26-715f7756f9ae4a48aebca7878af76aa7/check-geni-stages-capture.py",
+    "orchestration": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-geni-stages26-715f7756f9ae4a48aebca7878af76aa7/check-geni-stages-orchestration.py",
+    "historical_ufs_pages": true,
+    "synthetic_serial_bytes": true,
+    "negative_replay_cases": 11,
+    "admission_created": false,
+    "claim_created": false
+  }
+}

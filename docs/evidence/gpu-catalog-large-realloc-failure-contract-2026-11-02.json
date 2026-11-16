@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T14:49:03.474468+08:00",
+  "state": "Catalog149-selected-large-realloc-failure-oldentry-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-large-realloc-failure-contract/source-contract.json",
+  "functions_body_SHA_recorded": 3,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Existing selected iOS17 kmem_realloc_guard grow failure/old-entry source for container large-to-large caller.3 new function hashes,7 typed lower hashes provenance only. No VM/allocator/page/address call or successful model,old suites,targets,fetch or configuration change.",
+    "entry": "Argument flags/atomicity guard assertions and invalid-size cases can assert/panic. Null old address delegates alloc;zero new size frees and returns zero address;same-rounded-size path may return old address. Current container use is nonzero grow,not a zero-size release policy. None is GPU/stop/DMA status.",
+    "early_grow": "Grow prepares page_list then locates new entry. If either returned status is nonzero,kmr retains that status/zero address;kmem_free_guard(old) is called only if KMR_REALLOCF. Any prepared page_list is freed before return. Actual container krealloc_large has FREEOLD but no REALLOCF,so these early returned failures preserve old allocation. FREEOLD does not alias REALLOCF/NOFAIL/NOPAGEWAIT in selected header.",
+    "pages": "vm_page_alloc_list may wait after no page. Without NOFAIL,after a failed grab it can return ResourceShortage when wired/free-target unavailable budget or requested count exceeds remaining max_mem budget;NOPAGEWAIT/lowmem have other shortage branches. On failure it frees its local partial list rather than publishing it;NOFAIL failure panics. These are exact source conditions,not proof this K80 collection reaches them or successful page/count peers.",
+    "space": "vm_map_find_space rejects zero size,creates entry then asks locate-space under map lock. Returned locate failure unlocks/disposes new entry before return;success publishes entry and leaves map locked. Lower entry-create/locate/policy panic or return details remain outside this source boundary;do not treat all VM failures recoverable.",
+    "later": "After early resources succeed,old-entry lookup/guard/object/pager/size invariants can panic;KOBJECT transition may wait for quiescence. Success grow moves/populates then reaches FREEOLD mapping removal;regular-object path rewires and asserts success. These later operations are not a uniform returned-error rollback path. Do not infer ignored removal status means safe PTE/stop/DMA or invent forced cleanup.",
+    "decision": "Caller only consumes zero/nonzero address and folds VM raw status into its existing allocation result;no new diagnostic fields or error policy. No31st rollback/free/retry/reset/clamp/refcount policy.30 independent UNAPPLIED/all native OFF;K80 provider/owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable. No component/caller/image/wire/display/CPU/security changes."
+  },
+  "qualification": "Selected grow early failure old-entry source only;not actual K80 OOM/page/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

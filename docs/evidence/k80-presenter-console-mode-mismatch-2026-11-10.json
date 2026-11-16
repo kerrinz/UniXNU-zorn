@@ -1,0 +1,45 @@
+{
+  "status": "actual-factory-mode-admission-mismatch-proven",
+  "date": "2026-11-10T05:38:34.676700+00:00",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-refusal26-7cc44a8170dc42d3b3eae7ae5b001e71/root-trial-presenter-refusal/trial/run.json",
+  "kernel_sha256": "812aacce3674d79a8f9f0713864494f89baba37455e42bffb53c3f9915972632",
+  "scope": "single-K80-ios26-presenter-refusal300s-v12",
+  "recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_seconds": 332.70948879200296,
+  "actual_returns": {
+    "schedule_raw": 0,
+    "status_returned": true,
+    "submitted": true,
+    "handle_returned": true,
+    "creation_returned": true,
+    "creation_raw": 3758097095,
+    "refusal_mask": 1
+  },
+  "meaning": "Only first-group bit0 failed: boot.v_display!=1. Other first-group predicates returned false. Later second-group extent/range/alias checks were not executed,not qualified by this observation.",
+  "selected_loader_SHA256": "ccae7c1d2d7934812a5668c9b33c409ae3850d21aa20999259d592a533b021d8",
+  "loader_build_receipt": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/loader26-reference/verified.json",
+  "loader_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/loader-reference/DarwinBootPkg/Driver/DarwinBoot.c",
+  "loader_source_sha256": "a863a7507103aac89f34e6d260bbaa4ebea7cfdb4966219b3bd36e15ab58f1a8",
+  "actual_menu_verbose_flag": true,
+  "producer_contract": "DarwinBoot.c ReadBootVideo then DarwinBootVerbose(CommandLine) sets Video[1]=0. ARM PE uses v_display to select text/graphics mode; initialize_screen still maps 32-bit pixels.",
+  "next_fix": "Accept only producer-supported mode0/1 in real factory; retain every remaining extent/alias check,not choose geometry or remove mapping checks.",
+  "protected_pages": {
+    "root_first_page.bin": true,
+    "before.bin": true,
+    "root_after.bin": true,
+    "after.bin": true,
+    "Data.bin": true,
+    "root_before.bin": true,
+    "Data_metadata.bin": true
+  },
+  "presenter_created": false,
+  "physical_display_or_GPU_proven": false
+}

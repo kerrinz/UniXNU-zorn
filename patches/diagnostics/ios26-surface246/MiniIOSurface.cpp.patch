@@ -1,0 +1,74 @@
+--- a/MiniIOSurface.cpp
++++ b/MiniIOSurface.cpp
+@@ -87,7 +87,9 @@
+ 
+ #define kSurfaceLockReadOnly    1u
+ 
++#include "ZornSurfaceBacking246.h"
+ #define MINISURF_TABLE_SIZE     16384
++static uint32_t zornSurfaceFence246[MINISURF_TABLE_SIZE];
+ #define MINISURF_MAX_DIMENSION  16384
+ #define MINISURF_MAX_ALLOC      (512u << 20)
+ #define MINISURF_ROW_ALIGN      64
+@@ -787,6 +789,7 @@
+ 		return;
+ 	}
+ 	gSurfaceTable[s->sid] = NULL;
++    zornSurfaceFence246[s->sid]=0;
+ 	gSurfaceCount--;
+ 	gSurfaceBytes -= s->info.allocSize;
+ 	s->release();
+@@ -807,6 +810,53 @@
+ 	}
+ 	IOLockUnlock(gSurfaceLock);
+ 	return s;
++}
++
++// The caller owns already-prepared imported spans for this synchronous call.
++// No task address or untrusted SID is used to grant a surface reference.
++extern "C" void *zorn_surface_copy_backing246(const ZornSurfaceBacking246 &backing,unsigned *status)
++{
++    if(!status)return nullptr;*status=ZornSurfaceInvalid246;
++    if(!backing.segment || !backing.bytes)return nullptr;
++    *status=ZornSurfaceUnavailable246;
++    if(!gSurfaceLock || !IOLockTryLock(gSurfaceLock))return nullptr;
++    unsigned budget=32768;MiniIOSurface *found=nullptr;bool ambiguous=false;
++    for(unsigned sid=1;sid<MINISURF_TABLE_SIZE;++sid) {
++        auto *surface=gSurfaceTable[sid];
++        if(!surface || surface->info.allocSize!=backing.bytes)continue;
++        struct View {IOMemoryDescriptor *memory;uint64_t offset;} view{
++            surface->client?surface->client:surface->memory,surface->client?0u:uint64_t(PAGE_SIZE)};
++        if(!view.memory || view.offset>view.memory->getLength() ||
++            backing.bytes>view.memory->getLength()-view.offset)continue;
++        ZornSurfaceBacking246 pixels{&view,backing.bytes,[](void *p,uint64_t at,uint64_t *pa,uint64_t *n)->bool {
++            auto &v=*static_cast<View *>(p);IOByteCount length=0;
++            *pa=v.memory->getPhysicalSegment(v.offset+at,&length,kIOMemoryMapperNone);*n=length;return *pa && *n;
++        }};
++        if(ZornSurfaceSameBacking246(backing,pixels,budget)) {
++            if(found && found!=surface){ambiguous=true;break;}found=surface;
++        }
++        if(!budget){IOLockUnlock(gSurfaceLock);return nullptr;}
++    }
++    if(ambiguous){*status=ZornSurfaceAmbiguous246;found=nullptr;}
++    else if(found){surfaceHold(found);*status=ZornSurfaceMatched246;}
++    else *status=ZornSurfaceNone246;
++    IOLockUnlock(gSurfaceLock);return found;
++}
++extern "C" void zorn_surface_drop246(void *surface)
++{MiniIOSurfaceDrop(static_cast<MiniIOSurface *>(surface));}
++extern "C" void zorn_surface_completed246(void *token,uint32_t fence)
++{
++    if(!token || !fence || !gSurfaceLock || !IOLockTryLock(gSurfaceLock))return;
++    auto *s=static_cast<MiniIOSurface *>(token);
++    if(s->sid && s->sid<MINISURF_TABLE_SIZE && gSurfaceTable[s->sid]==s && fence>zornSurfaceFence246[s->sid])
++        zornSurfaceFence246[s->sid]=fence;
++    IOLockUnlock(gSurfaceLock);
++}
++extern "C" uint32_t zorn_surface_fence246(uint32_t sid)
++{
++    if(!gSurfaceLock || !sid || sid>=MINISURF_TABLE_SIZE || !IOLockTryLock(gSurfaceLock))return 0;
++    const uint32_t fence=gSurfaceTable[sid]?zornSurfaceFence246[sid]:0;
++    IOLockUnlock(gSurfaceLock);return fence;
+ }
+ 
+ /* How many surfaces there are and how much (wired) memory they hold: for the kernel's memory report. */

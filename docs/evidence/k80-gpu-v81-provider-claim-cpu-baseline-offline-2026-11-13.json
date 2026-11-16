@@ -1,0 +1,76 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 v81 CPU-lockscreen-base GPU/GMU provider-claim package",
+  "status": "offline full-linked and packaged; unselected and not booted",
+  "device": "92988a43/zorn/slot a",
+  "historical_device_gpu_work": {
+    "owner_confirmed_real_device_trials": true,
+    "farthest_recorded_stages": [
+      "v59 GMU cold-clock/GPUCC prefix and SMMU global-control stage",
+      "v60 read-only SMMU bank/stream census"
+    ],
+    "did_not_reach": [
+      "iOS system lockscreen on the GPU branch",
+      "GMU firmware/HFI startup",
+      "GPU job submission or fence completion",
+      "GPU rendering, Metal, or GPU display"
+    ],
+    "later_cpu_baseline": "The owner visually confirmed the CPU-rendered iOS26 lockscreen in the bounded b0da41e9 run."
+  },
+  "cpu_reference": {
+    "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "kernel_unchanged": true,
+    "boot_package_unchanged": true,
+    "root_image_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e"
+  },
+  "candidate_build": {
+    "run_id": "de2d98d27c34481383402ca5a83b16ca",
+    "parent_candidate": "k80-gpu-provider-claim-owner-v80-20261113",
+    "parent_kernel_sha256": "51a390fffa4cf329cef74d89752b6b72b98a12d8f6169b59cd9c9b5d525af310",
+    "change_from_parent": "Only the ZornPlatformRecordStart26 object was recompiled with a fresh artifact identity tag.",
+    "kernel_sha256": "5b803527c084ba30989ee010141e127bd45328b6029592f0f0819172a2db6a6f",
+    "kernel_bytes": 30549080,
+    "link_inputs": 1397,
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "missing_inputs": 0,
+    "undefined_symbols": 0,
+    "inherited_link_warnings": 10,
+    "link_diagnostics_byte_identical_to_v80": true,
+    "detailed_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-provider-claim-cpu-baseline-v81-20261113/verified.json"
+  },
+  "package": {
+    "boot_sha256": "d1df60c65701d5054868d7eb37d6502cfc0391fdc882a061c33ce66eba464eca",
+    "fat_sha256": "8db1c52961fb1e35e0c3f55367f266f8cdb5e72f46be66aa5172da29a6ced46e",
+    "adt_sha256": "7d0e29c1c4622df3a118be49ff7da01c6ebf8a5146d46712e260074921d9db2d",
+    "fd_sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "boot_arguments": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_userland_progress=1 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0 zorn26_gpu_board_stage=1 zorn26_gpu_board_record=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1",
+    "cpu_presenter_selected": true,
+    "gpu_board_stage_and_provider_claim_selected": true,
+    "gmu_firmware_or_hfi_startup_selected": false,
+    "gpu_submission_or_dma_selected": false,
+    "touch_startup_selected": false,
+    "root_adt_and_fd_reused_from_cpu_package": true,
+    "changed_fat_members": [
+      "EFI/UniXNU/Payloads/kernel.macho",
+      "EFI/UniXNU/unixnu.toml"
+    ],
+    "all_five_fat_members_read_back": true,
+    "both_watchdog_markers_present": true,
+    "compressed_shim_fd_fat_closure_verified": true
+  },
+  "device_execution": {
+    "boot_attempts": 0,
+    "device_access": false,
+    "new_scope_created": false,
+    "ready_admission_or_claim_created": false,
+    "v73_stop_gate_active": true,
+    "current_device_state_requalified": false
+  },
+  "limits": [
+    "The IOKit provider claim excludes competing clients only; it is not all-master hardware quiescence or proof of DMA idle.",
+    "The maintained root still does not construct the complete ZornGen7StartupGpuInputs26 authority graph.",
+    "GMU firmware/HFI, GPU jobs/fences, rendering, Metal, and GPU presentation are not qualified.",
+    "The CPU baseline remains the reference and this package has not demonstrated a lockscreen or GPU result."
+  ]
+}

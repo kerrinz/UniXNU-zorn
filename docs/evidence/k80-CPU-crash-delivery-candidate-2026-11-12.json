@@ -1,0 +1,118 @@
+{
+  "status": "CPU-native-crash-delivery-candidate-built-host-access-preflight-failed-before-any-phone-command",
+  "recorded_at": "2026-11-12T03:57:50.786330+08:00",
+  "source_stage": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/source-stage.json",
+    "sha256": "475b72e69f554b6bf650ba1e3a4dfea0a576bdc9a030c8e7d4ff6c563612a48e"
+  },
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-crash-delivery-8749f37cf3bc4059a891ec7576f04473/native",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473",
+  "record_id": "8749f37cf3bc4059a891ec7576f04473",
+  "helper_protocol_run_id": "cfce615b97d340f3aac992a6b38adfff",
+  "installed_root_sha256": "55cf33b108c209a8fbafcc4ad16f2ac3bb39e0645ee9688c0a34908b0a1fccc5",
+  "root_and_installed_helper_unchanged": true,
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/full-link/kernel.ZORN26-CURRENT-ROOT-USERLAND-CONTROL.UNSELECTED.macho",
+    "sha256": "4f1be3bd60702e2c79e862986217c2bdd70cb3f80dc05cbd2755f5c0deb62ddf",
+    "bytes": 30475752,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 13,
+    "preserved": 1384,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/boot-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "679a5d65fff1cc517cf23b8c075e708a57634ca394afa7fc24d91332f0198255",
+    "bytes": 11649024
+  },
+  "observations": {
+    "first_SpringBoard": [
+      "exit reason flags",
+      "current process and corpse source flags",
+      "native task_exception_notify entry and result",
+      "source corpse request decision",
+      "native task_mark_corpse entry and result"
+    ],
+    "first_ReportCrash": [
+      "exact kernel-copied exec path and uniqueid",
+      "activation attempts and first result",
+      "first process raw exit",
+      "bounded ordinary scalar fd2 write outcomes",
+      "64-byte stderr tail from at most32 attempts"
+    ]
+  },
+  "behavior": {
+    "native_return_values_and_control_flow_preserved": true,
+    "no_executable_thread_register_or_stack_analysis": true,
+    "source_calls_only": true,
+    "first_process_only": true,
+    "stderr_best_effort_postwrite_copy": true,
+    "writev_and_other_channels_not_captured": true,
+    "no_filesystem_outcome_observation_yet": true,
+    "no_report_message_text_in_this_record": true
+  },
+  "host_checks": {
+    "delivery": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/delivery-host-check.json",
+      "sha256": "438029b2ff349d56e23d6beb1fe5d3223519164d05002a0d20ba210aed7e7f3b"
+    },
+    "formatter_decoder": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/delivery-parser-host-check.json",
+      "sha256": "58640e1a077cbb860e30ada589eceda8ba31fa7537cc9dcd62b58b0bce89e30b"
+    },
+    "root_consumer": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/RootPlatform-dependency-proof.json",
+      "sha256": "02c2b29ef43498ffe5253bb01ea62e02d5b937cb9d5290a8d2ef9c019835f7ae"
+    },
+    "runner": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/runner-crash-delivery-host-check.json",
+      "sha256": "71949d7f493b7bf08950e2df32475ba68d140c4045922d521d12a4435b9fb4b9"
+    },
+    "mode": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/runner-crash-delivery-mode-check.json",
+      "sha256": "935ae1a3bd42b7c7b08202b560c74a227700d0caa0e92e1d6a116165ad2e9420"
+    }
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/boot-package/verified-installed-root.json",
+    "sha256": "218bbe2c6f22c6746b431ba1c43c27cf94004b57a5839b10a397cd717ee5286b"
+  },
+  "bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/bundle.json",
+    "sha256": "07535c6b1c501c701aa6f23927f43662ba322934c9c58a714d9070a5fd935d8c"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/admission.json",
+    "sha256": "20cc34c178e86d12e1baebb3d625e2455de346cc4426780985fbcfc5df2d8eb6"
+  },
+  "device_plan": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/device-plan.json",
+    "sha256": "2f5d067e7e90db7f8f7336e49b78194569368f61d51be5e896fffefca8f2166e"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/one-shot.claim.json",
+    "sha256": "86c2ea24ad27d8a4b6bfcc12efd1f5aa981c81525090fc46b6ce72fae2f27a58"
+  },
+  "host_failure_run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/run.json",
+    "sha256": "e1e600f2d9aa22a94a7f98ddd5d75e8987c4a71cc670a1e520f8685b97e8004f"
+  },
+  "host_only_escalated_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-access-check.json",
+    "sha256": "6c4d3e0eb8f5dbfd788b34657d4255aa744846f0115a459a1936c5de028ab46b"
+  },
+  "boot_attempts": 0,
+  "phone_transport_commands": 0,
+  "device_write": false,
+  "firmware_boot_attempted": false,
+  "native_execution_qualified": false,
+  "lockscreen_proven": false,
+  "GPU_startup": false,
+  "touch_startup": false,
+  "claim_consumed": true,
+  "claim_reusable": false,
+  "stop_device_operations_retained": true,
+  "goal_complete": false,
+  "next_action": "CPU UI first. Kernel4f1be3bd/boot679a5d65 is linked and host-checked but never sent to phone: consumed8749 delivery scope stopped at sandbox-denied127.0.0.1:5039 socket before any transport command,boot_attempts0. Exact host-only escalated socket check passes with no ADB or phone commands. Preserve original claim/run and stop_device_operations until a separately reviewed fixed read-only pre-USB-host-failure Recovery/protection check proves current state. Then prepare a distinct,unconsumed scope/ready/claim for this physically unbooted candidate;do not reuse failed admission or auto retry. No hardware nonreturn was observed. Keep installed root55cf and helper protocolcfce unchanged. Actual native exception notification/corpse mark and first ReportCrash ordinary stderr remain to observe; no guessed SpringBoard activation/framebuffer interface fix,disassembly or binary analysis. GPU deferred;offline source work remains authorized."
+}

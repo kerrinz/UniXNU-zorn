@@ -1,0 +1,58 @@
+{
+  "status": "UNSELECTED-installed-disk-root-bounded-watchdog-source-object-and-full-link-checked",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-installed-root-watchdog-candidate",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.18790793418884277,
+    "inputs": 1386,
+    "replaced": 1,
+    "preserved": 1385,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-watchdog26/full-link/kernel.ZORN26-installed-root-validation.UNSELECTED.macho",
+    "sha256": "0cd6693904710ee69ef1d038ca3857d104bf786618bc310b371e319da0002a1f",
+    "bytes": 30275440
+  },
+  "build_version": [
+    [
+      2,
+      1703936,
+      1769472
+    ]
+  ],
+  "zero_undefined": true,
+  "zero_compile_warnings": true,
+  "new_linker_diagnostics": 0,
+  "inherited_linker_warning_lines": 10,
+  "headers_and_public_function_ABI_unchanged": true,
+  "original_platform_mode_seconds": [
+    1,
+    30
+  ],
+  "new_mode_seconds": [
+    30,
+    300
+  ],
+  "new_mode_required_args": [
+    "zorn26_installed_root_trial=1",
+    "zorn26_root=1",
+    "rd=md0",
+    "zorn_wdt=1",
+    "zorn26_prearmed_recovery=1",
+    "zorn26_trial_seconds=300"
+  ],
+  "new_mode_rejects_loader_RAMDisk_slots": true,
+  "legacy_selector_and_installed_root_selector_mutually_exclusive": true,
+  "watchdog": "same45s bark/55s bite;new disk validation worker pets at10s only before absolute deadline;real status failure -> original prearmed Recovery reset,no retry",
+  "compiled_worker_evidence": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-installed-root-watchdog26/deadline-worker.actual-disassembly.txt",
+  "compiled_path_observation": "zero pet interval branches directly to IOSleep;counter bound dominates PET;nonzero raw PET status exits through reset;no PET after deadline",
+  "source_files": {
+    "ZornPlatformTrial26.h": "1109b1de72d1f0db63145a5ed49cdc84cacd0e2bd503dd72d8c991ec8502615d",
+    "ZornPlatformTrial26.c": "7a2e9be987ac2543264f18ff6a7da7d51e862aac857f60e68387dfc064edd118"
+  },
+  "new_native_or_phone_execution": false,
+  "production_persistent_boot_entry": false,
+  "new_boot_packet_or_device_scope_ready": false,
+  "installed_root_hardware_qualified": false,
+  "GPU_hardware_qualified": false,
+  "verification_assumption_corrected": "Initial host assertion incorrectly expected no linker warnings;compared actual baseline and retained exactly its10 lines;no relink or warning suppression."
+}

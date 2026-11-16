@@ -1,0 +1,57 @@
+{
+  "time": "2026-11-10T23:52:30.669579+00:00",
+  "status": "direct-ring-zero-timeout-fence-poll-return-preserved-offline",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-poll-candidate",
+  "source_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-poll26/direct-fence-poll.patch",
+  "link_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-contact-history26/full-link",
+  "compile": {
+    "name": "ZornGen7HostRing26.cpo",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-poll26/ZornGen7HostRing26.cpo",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-poll-candidate/ZornGen7HostRing26.cpp",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-contact-history26/full-link/inputs/1295-ZornGen7HostRing26.cpo",
+    "sha256": "abd90288bec62b017a493631b29f7eead8dd8b8da0214f98c5731bf700c3a90c",
+    "warnings": 3
+  },
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-poll26/full-link/kernel.ZORN26-DIRECT-FENCE-POLL.UNSELECTED.macho",
+    "sha256": "482345b02976ab75ca1760508fe112d7f8e11acb8851839a811f254a119c6d6c",
+    "bytes": 30406136,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "compiled_control_flow": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-poll26/fence-poll-disassembly.txt",
+  "source_contract": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/graphics/turnip/src/freedreno/vulkan/tu_knl_darwin.cc",
+      "sha256": "7bca2f6fa1590d51adc6be9d1a2bd8f263b09b7eed14ecefe05cc2ae1aebae86"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/common/gpu/metal-abi/NativeAdrenoABI.h",
+      "sha256": "0a37fb621488b410e2f1206a161e5d537313c2eed7e27bd9c46817c09d81bc13"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/common/gpu/native-a750/NativeAdrenoRing.cpp",
+      "sha256": "d2cd0fac524ca3fee35810762662adbc3031b933501df5514576c0316ec71405"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-smmu-full-authorized-2e1bd4b9aa7b4179916dcbe3cbdead0b/direct-runtime/ZornGen7DirectSubmit26.cpp",
+      "sha256": "f6f3489b1bef190ae9293ee403989325f54bb29d32956794116f0b237f8b60b1"
+    }
+  ],
+  "findings": [
+    "Turnip retirement collection issues WaitFence with timeout_ns=0 and consumes kIOReturnTimeout as VK_TIMEOUT to keep the outstanding BO.",
+    "The native ring already performs a single acquisition for zero timeout. The two enclosing kernel dispatch paths previously stopped the runtime on that ordinary pending result.",
+    "Process dispatch forwards pending only for the exact zero-timeout WaitFence result after existing execution and poison checks. Application finish carries that status only within the matched operation, then clears it. Fault/poison/health handling, real fence retirement, all resource ownership, and nonzero timeout stop handling remain as before."
+  ],
+  "limits": [
+    "Nonzero bounded wait expiration still needs to be distinguished from a lower guard/idle refusal. No new timeout or hangcheck policy was selected.",
+    "Independent uninstalled cumulative reference link. Corrected SMMU cfg probe remains a separate candidate with its existing device review restriction.",
+    "No native or phone execution, application GPU qualification, or full image readback."
+  ],
+  "phone_access": false,
+  "full_root_readback_performed": false
+}

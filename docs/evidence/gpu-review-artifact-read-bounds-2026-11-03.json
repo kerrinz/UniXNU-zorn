@@ -1,0 +1,131 @@
+{
+  "scope": "independent UNAPPLIED verify-only local artifact read budgets",
+  "original_SHA": "8d70643d9de405db9f349e76b28ff8a6c5231e7bd9102c9493b9cb36ef02f9e2",
+  "candidate_SHA": "9e975150331a32438f29ac5ee521707a296a92bdc81ec25bfefa1210282faf5b",
+  "original_builder_unchanged": true,
+  "old_artifacts_unchanged": true,
+  "one_changed_path_readonly_equivalence": true,
+  "five_actual_before_after_refusals": [
+    {
+      "case": "receipt",
+      "original_error": "review result reader bound",
+      "candidate_error": "review artifact reader bound: result.json",
+      "before": [
+        {
+          "name": "result.json",
+          "requested": -1,
+          "returned": 16781312
+        }
+      ],
+      "after": [
+        {
+          "name": "result.json",
+          "requested": 16777217,
+          "returned": 16777217
+        }
+      ]
+    },
+    {
+      "case": "source-body",
+      "original_error": "artifact differs from original-source reconstruction: UnselectedSourceTables.h",
+      "candidate_error": "review artifact reader bound: UnselectedSourceTables.h",
+      "before": [
+        {
+          "name": "UnselectedSourceTables.h",
+          "requested": -1,
+          "returned": 420485
+        }
+      ],
+      "after": [
+        {
+          "name": "UnselectedSourceTables.h",
+          "requested": 416390,
+          "returned": 416390
+        }
+      ]
+    },
+    {
+      "case": "object",
+      "original_error": "artifact receipt SHA mismatch: isolated-source-data.o",
+      "candidate_error": "review artifact reader bound: isolated-source-data.o",
+      "before": [
+        {
+          "name": "isolated-source-data.o",
+          "requested": -1,
+          "returned": 16781312
+        }
+      ],
+      "after": [
+        {
+          "name": "isolated-source-data.o",
+          "requested": 16777217,
+          "returned": 16777217
+        }
+      ]
+    },
+    {
+      "case": "raw-stream",
+      "original_error": "raw stream content mismatch: compile-0.stderr",
+      "candidate_error": "review artifact reader bound: compile-0.stderr",
+      "before": [
+        {
+          "name": "compile-0.stderr",
+          "requested": -1,
+          "returned": 16781312
+        }
+      ],
+      "after": [
+        {
+          "name": "compile-0.stderr",
+          "requested": 1,
+          "returned": 1
+        }
+      ]
+    },
+    {
+      "case": "events",
+      "original_error": "Expecting value: line 1 column 1 (char 0)",
+      "candidate_error": "review artifact reader bound: build-events.jsonl",
+      "before": [
+        {
+          "name": "build-events.jsonl",
+          "requested": -1,
+          "returned": 1052672
+        }
+      ],
+      "after": [
+        {
+          "name": "build-events.jsonl",
+          "requested": 1048577,
+          "returned": 1048577
+        }
+      ]
+    }
+  ],
+  "three_invalid_stream_metadata_refused_before_read": [
+    "negative",
+    "bool",
+    "too-large"
+  ],
+  "exact_16MiB_receipt_boundary_pass": true,
+  "raw_nonUTF8_NUL_preserved": true,
+  "budgets": {
+    "receipt": 16777216,
+    "object": 16777216,
+    "events": 1048576,
+    "stdout_stderr": 8388608,
+    "combined_log": 16777216,
+    "source_bodies": "exact reconstructed byte lengths",
+    "streams": "anchored nonnegative byte count,within explicit cap"
+  },
+  "guarded_no_write_process": true,
+  "no_compile_or_old_suite": true,
+  "hardware_qualification": false,
+  "native_execution": false,
+  "device_operations": false,
+  "review_document_SHA": "c523274b6422a1e4454a2107db0334debca5beeb78b4b2bb37ee086a417d6061",
+  "independent_UNAPPLIED_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-review-artifact-read-bounds-20261103/review-artifact-bounds.UNAPPLIED.patch",
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

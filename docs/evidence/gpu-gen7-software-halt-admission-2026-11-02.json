@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T08:01:38.140725+08:00",
+  "state": "Gen7-software-halt-admission-and-replay-exceptions-bound",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-software-halt-admission/source-contract.json",
+  "new_source_mutations_refused": 4,
+  "exact_header_primary_SHA_verified": true,
+  "normal_gate_not_universal_replay_gate": true,
+  "no_single_deferred_owner_or_hardware_stop_proof": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "no_software_halt_submit_refcount_native_or_phone_execution": true,
+  "no_successpeer_new_component_caller_image_wire": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "exact OEM software admission source,not accepted work/unique owner/native ABI or hardware stop/DMA proof",
+  "details": {
+    "scope": "Fixed exact primary453d8875f815bf9dfad9035982861226a4823a6c OEM source,not Xiaomi exact/K80 running policy. Existing adreno.h fullSHA15636117455bf216da1ad48224ce3af666417f7e5d0606aecdd265c9fae26151 matches its archived primary;unlike retained stop C candidates this header was not modified. No new source fetch/core selection/native component or execution.",
+    "counter": "adreno_get_gpu_halt calls atomic_inc(&adreno_dev->halt). put uses atomic_dec_if_positive and WARN on returnednegative;read uses rmb/atomic_read;clear sets0 and wmb. Counter has no reason/owner/epoch token and no register/queue/IRQ access. A positive count is software admission state,not physical GPU halted;0 is not DMA retirement,power/security readiness or a provider lease. Actual selected Linux atomic/WARN config/runtime not executed/bound.",
+    "normal_admission": "hwsched_sendcmd first allocates command metadata and takes device mutex/adjusts scheduling,then _abort_submission reads halt/fault after barrier. If set it returns-EBUSY via original cleanup before inflight increment/submit callback. Thus source gate is not an allocator-free operation and not an immutable hardware capability check. hwsched_sendcmds may requeue returned errors;no retry policy altered or exercised.",
+    "mid_command": "Hardware-fence throttle sets SLEEP/MAX flags and gets softwarehalt,then arms timer. _disable clears pointer/ts and flags under fence lock;only if MAX was set does it put softwarehalt and trigger/wake. The gate is checked per normal draw submission,not between every fence inside an already-admitted callback. Existing state ownership and global counter balance cannot be inferred from one boolean pair.",
+    "submit_exceptions": "Inspected actual hwsched_ops->submit_drawobj call sites are normal sendcmd and direct adreno_hwsched_replay. Replay calls callback without _abort_submission/adreno_gpu_halt gate and discards its int result. Recurring send helper has its own halt/fault entry check,while replay also discards its return. A universal all-submit admission guarantee is therefore not present in this module source. No new gate added that could obstruct intended recovery replay.",
+    "setup": "Actual process_hw_fence_queue checks MAX and calls setup under fence lock. setup first gets a contextref,then unconditionally overwrites defer_drawctxt/ts and calls gen7_hwsched_active_count_get without checking its int return. It does not compare an existing deferred owner or put a replaced reference. Normal halt may limit later normal submissions,but cannot alone prove no replacement via replay/already-admitted work. Do not claim an actual leak/overwrite occurred without relevant pending-fence/source-owner conditions.",
+    "activecount_domain": "gen7_hwsched_active_count_get requires device mutex,can reject PMsuspend or propagate boot error,and increments active_cnt only on0. This is distinct from halt counter and contextkref. Setup ignoring that API return does not make activecount availability/power ownership a fact. Stable caller conditions may exclude some failures;no speculative balance repair or raw SUCCESS value invented.",
+    "other_owners": "Known hwsched_idle and PMsuspend/resume also take/release softwarehalt. idle drops device mutex to flush/wait and later puts halt/retriggers even on waiterror. These are existing reference paths,not new idle/stop tests or bounded hardware shutdown evidence. No global ownership balance proof from inspected subset or absent call of clearhelper.",
+    "decision": "No single-owner/generation/refcount/cancel/retry/reset/admission policy invented. A softwarehalt gate is not sufficient justification to repair setup replacement,or to gate all replay calls. No21st patch;18th/19th/20th remain independent UNAPPLIED with their explicit limits. Next binds returned replay callback API status and current private ownership state without changing recovery behavior.",
+    "checks": "4 new source mutation refusals:missing atomicincrement,missing normal gate,falsely gated replay and fabricated setup single-owner guard. Source-only,no successful admission/task/refcount/submit model or new native target/full Linux build. Old queued/context/deferred/buffer/allocator/HFI/status/CPU/VM/Submit/stop suites not rerun.",
+    "remaining": "External HWfence manager/core queue/kref/devres and catalog fullcore roleAPI remain unbound. K80 owner/context/power/security/route/stop/DMA/readablefailure/firstGPU/rendering/Metal incomplete;all phone/native/provider operations OFF."
+  },
+  "all20_patches_independent_unapplied": true,
+  "GPU_execution_rendering_Metal_complete": false
+}

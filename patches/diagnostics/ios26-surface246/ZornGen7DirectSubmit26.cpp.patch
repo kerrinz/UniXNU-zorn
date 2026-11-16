@@ -1,0 +1,10 @@
+--- a/direct-runtime/ZornGen7DirectSubmit26.cpp
++++ b/direct-runtime/ZornGen7DirectSubmit26.cpp
+@@ -84,6 +84,7 @@
+     if(status)return poison();
+     if(vm_->acquireImported())return poison();
+     if(vm_->retireSubmissionResourcesAfterCompletion())return poison();
++    vm_->noteSurfaceCompletion246(job.fence);
+     // NativeRing rejects sequence wrap. Publish only this actual retired
+     // fence after its GPU result and imported-memory visibility succeeded.
+     if(job.fence>present_->retiredFence)present_->retiredFence=job.fence;

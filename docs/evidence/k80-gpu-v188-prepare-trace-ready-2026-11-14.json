@@ -1,0 +1,98 @@
+{
+  "version": 188,
+  "status": "bounded-application-preparation-diagnostics-built-ready-unbooted",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-prepare-trace-864d745159824ae5a059e99c246302c1/ready-snapshot/manifest.json",
+    "sha256": "242d08b54716286e55d7ab168cf63e65db201f8f8345e47fe572bb533f032ca2"
+  },
+  "changed_source": [
+    "ZornApplicationObservation26.h",
+    "ZornApplicationObservation26.inc",
+    "ZornGen7HostRing26.cpp",
+    "ZornUfsOwner26.cpp",
+    "ZornUsbCdc26.c"
+  ],
+  "parent_source_unchanged": true,
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-prepare-trace-864d745159824ae5a059e99c246302c1/full-link/kernel.ZORN26-APPLICATION188.UNSELECTED.macho",
+    "sha256": "751651bae3caf0319af0b4af8b8506f72c1f07391dee1d0621701f971c2748c6",
+    "bytes": 30742320,
+    "inputs": 1398,
+    "replaced": 21,
+    "preserved": 1377,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-prepare-trace-864d745159824ae5a059e99c246302c1/full-link/exact-inputs.json",
+      "sha256": "c8abff14aa2ed5e6fd3c6029d9a8b4e51124f674883e96532c5c0704552c3b3c"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "houji_recovery26.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "application_probe_qualification": true
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-prepare-trace-864d745159824ae5a059e99c246302c1/boot-package/boot.ZORN26-GPU-V188-APPLICATION-UNSELECTED.img",
+    "sha256": "f693862ebfb5c7f8f10cb8a760708f90fdee61df3a0542c13e5902e62c3660ab",
+    "bytes": 11755520
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/root-candidate-r2/ios26-root-gpu-application186.UNSELECTED.hfsx",
+    "sha256": "4d636e89dd1f4b22539e682e00b3d304f9612f71d4d17bfe26b5482e33f04167",
+    "bytes": 34359738368
+  },
+  "trial": {
+    "scope": "single-K80-ios26-gpu-v188-prepare-trace-300s-864d7451",
+    "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-trial-864d745159824ae5a059e99c246302c1/root-trial",
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-trial-864d745159824ae5a059e99c246302c1/root-trial/bundle.json",
+      "sha256": "ba14f5b4b29853a348f90982641227d69f0d2e706f7e15b72cbb11c74c2adbca"
+    },
+    "capture": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-application188-cdc.py",
+    "runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_gpu_v188_application_trial.py",
+    "application_probe_run_id": "d55c2bab3d6d436386ca54c7b6a74f06",
+    "boot_attempted": false
+  },
+  "diagnostic": [
+    "First nonzero prepare result latched with stage/detail; later outer returns cannot overwrite it. Same admitted client identity, try-lock only,128-event cap,64-bit stage mask. Diagnostic loss remains visible.",
+    "Exact actual open/begin-operation/transition/quiesce sequence observed. Ring guard and idle raw results retain their own integer semantics; outer IOReturn remains unchanged. No new register read/write, retry, free, queue/clock/MMU action.",
+    "Native AppIo/Ring/Ufs/sys_generic all resolve changed observation header and are rebuilt. CDC adds bounded ax; actual Ufs frame5696B (+32), not whole-call-stack proof.",
+    "1398 exact inputs,21 replaced,1377 retained,0undefined. Root4d636/signed d55 program unchanged; fresh boot/USB tag864d. Only FATkernel changes; ADT/menu/FD/loaders/shim unchanged."
+  ],
+  "checks": [
+    "Actual first-failure/foreign-identity/bounds/contention/success observer checks pass.",
+    "12 actual before/after quiesce branches retain native call order and raw returns; precise diagnostic first stage verified under ASan/UBSan.",
+    "20 actual updated observer checks and76 actual clientClose assertions pass; copied historical observer script initially retained parent path, corrected before new qualification.",
+    "208 capture cases and actual source formatter/base64/63-byte USB producer pass. Fixtures are not hardware evidence."
+  ],
+  "remaining": "Run fresh authorized300sWDT/600sRecovery trial to identify inner failure. No GPU functional change/ordinary application image/Metal/display/fullFT3683 acceptance.",
+  "constraints": "No disassembly/reverse engineering, Android/iOS17/Data/history preserved; goal active.",
+  "parent_test_path_incident": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v188-application-prepare-trace-864d745159824ae5a059e99c246302c1/parent-observer-path-incident.json",
+    "sha256": "76f43cd7f5f6942c45bd50f05485ab34f9be88da59ca4acf1531ad960f99aaf4",
+    "archived_sources_and_reports_byte_identical": true
+  }
+}

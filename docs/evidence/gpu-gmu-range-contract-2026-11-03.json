@@ -1,0 +1,48 @@
+{
+  "scope": "isolated exact two integer helpers only;no validator/runtime or target compilation",
+  "primary_sha256": "d61daa0b10038314922400daf6288a957e973043e171f986f5f226f2dff2de09",
+  "helpers_sha256": "e8945432f6ba3d08ea735654f4b0b6677bbf1c0704dfca5b2eb1ba34772ba7fb",
+  "extent_boundary_cases": 12,
+  "overlap_boundary_pairs": 10,
+  "both_order_assertions": 20,
+  "empty_range_counterexample": {
+    "inputs": [
+      16,
+      0,
+      15,
+      2
+    ],
+    "observed": true,
+    "reachable_through_validate": false,
+    "reason": "validate requires all5 memory extents and firmware extent nonzero before overlap;no patch warranted for out-of-domain use"
+  },
+  "static_validator_review": {
+    "executes_sha256_callback": true,
+    "validator_compiled_or_executed": false,
+    "generated_policy_header_used": false,
+    "owner_or_coherency_proven": false
+  },
+  "sanitizers_pass": true,
+  "primary_source_unchanged": true,
+  "compiler_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+  "no_source_patch_required": true,
+  "selected_startup_compiled": false,
+  "hardware_qualification": false,
+  "native_or_device_execution": false,
+  "generated_policy": false,
+  "checker_sha256": "2997d9d71f99978089ce02df70e1228ece232499f02eee6e86905185f374112e",
+  "header_sha256": "551fb5cc0a7b6d547ab1f9d9dfa6be2b602b291f5a6d6b278ca2d5a64e164b24",
+  "static_owner_contract": {
+    "source_header_requires_exclusive_device_and_stream_owner": true,
+    "virtual_extents_do_not_prove_physical_alias_isolation": true,
+    "coherent_pinned_memory_and_generated_firmware_policy_required": true,
+    "hash_callback_performs_real_operation": true,
+    "resource_retain_set_before_validation": true,
+    "post_mutation_failure_attempts_reset_and_poisons": true,
+    "verified_reset_not_release_permission": true,
+    "none_of_these_preconditions_acquired_or_executed": true
+  },
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

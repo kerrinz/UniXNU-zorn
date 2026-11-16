@@ -1,0 +1,103 @@
+{
+  "recorded_at": "2026-11-14T18:58:29.808844+08:00",
+  "version": 184,
+  "status": "offline-native-client-transport-stage1-in-progress",
+  "working_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "working_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "parent": {
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v183-native-known-image-21b1c43bfd3d4c0cb9312e89b1a958b6",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v183-native-known-image-21b1c43bfd3d4c0cb9312e89b1a958b6",
+    "source_pins_sha256": "309d00f940c532f7d5306fa67f9d495bb399bc83861e8f2060d981117f3627ee"
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/manifest.json",
+    "sha256": "82596065725ab50b2dae2e14113b31f3aacdef05aeffd313273b1a4eda577cde"
+  },
+  "snapshot_sources_immutable_for_this_record": true,
+  "sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/source/ZornGen7DirectHfi26.cpp",
+      "sha256": "09b06aa06306e7b4021247d6fd2ea86461aa638074bb7a0002f1cfd034c87778"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/source/ZornGen7DirectHfi26.h",
+      "sha256": "f41f4ebd160ac3f0b89b3219f56bb1531107eedefa9098dacb7b86adcf98a05b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/source/ZornGen7HostRing26.cpp",
+      "sha256": "9979bd80b3c31ffb1c553fa172138c5ff7de1729377378f568d17b878b6ff67e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/source/ZornGen7HostRing26.h",
+      "sha256": "41e22b57456f0e9c27c49b04132990ebbf3d16935a694347739b49a1f79b7677"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/source/ZornGen7SmmuDomain26.cpp",
+      "sha256": "5b5a851800b0cbc77987a244d5bff115177c82f95fff262469319d45e2d37844"
+    }
+  ],
+  "source_provenance": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/client-oob-source-inputs.json",
+    "sha256": "842a61f630d11988415237b21d3c2990f88fdce9536551ec1a0998d7c7bd244e"
+  },
+  "compilation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/compile-native-image/result.json",
+    "sha256": "e3d5e4541030c0d6a79b11f404b3becdca8280884092a0b40e44d5961c639e59"
+  },
+  "checks": {
+    "client-oob": {
+      "passed": true,
+      "result": "PASS: 182 actual DirectHfi kernel-client OOB checks; source request/ACK/clear, owner loss, finite waits, lock boundaries and no retry verified\n",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/ZornGen7DirectHfi26.cpp",
+      "source_sha256": "09b06aa06306e7b4021247d6fd2ea86461aa638074bb7a0002f1cfd034c87778",
+      "scope": "Actual client methods and distinct OOB state extracted; completed-image owner/flags and actual finite request/ACK/clear checked; mock native IO/owner/clock only, ASan/UBSan. No hardware qualification."
+    },
+    "client-transport": {
+      "passed": true,
+      "result": "PASS 106 actual native/legacy kernel-client transport and lifecycle checks\n",
+      "source_sha256": "9979bd80b3c31ffb1c553fa172138c5ff7de1729377378f568d17b878b6ff67e",
+      "scope": "Actual permission/transport/begin/close methods with mock IOUserClient, kernel task, issuer, OOB and process initialization; ASan/UBSan. No real client grants/process tables or device result."
+    },
+    "process-authority": {
+      "passed": true,
+      "result": "PASS 32 actual process bank authority and no-write refusal checks\n",
+      "source_sha256": "5b5a851800b0cbc77987a244d5bff115177c82f95fff262469319d45e2d37844",
+      "scope": "Actual transitionHostProcessTables with mock retained resources/table programmer. Missing bank authority refuses before grant/TTBR; valid and failed actual callback paths retained. No native process authority or device qualification."
+    },
+    "task-oob": {
+      "passed": true,
+      "result": "PASS: 162 actual DirectHfi kernel-task OOB checks; source request/ACK/clear, owner loss, finite waits, lock boundaries and no retry verified\n",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/ZornGen7DirectHfi26.cpp",
+      "source_sha256": "09b06aa06306e7b4021247d6fd2ea86461aa638074bb7a0002f1cfd034c87778",
+      "scope": "Actual candidate methods and kernel OOB storage extracted; mock native IO/owner/clock only, ASan/UBSan. No hardware qualification."
+    },
+    "direct-oob": {
+      "passed": true,
+      "stdout": "PASS: 52 actual DirectHfi OOB checks; one clear, no early/failure/retry write, locks and retained owner checked\n",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/ZornGen7DirectHfi26.cpp",
+      "sha256": "09b06aa06306e7b4021247d6fd2ea86461aa638074bb7a0002f1cfd034c87778",
+      "scope": "actual extracted methods with mocked native IO/owner boundaries, ASan/UBSan; not hardware"
+    }
+  },
+  "implemented": [
+    "Distinct DirectHfi client OOB state uses original request/ACK/clear/GX flow; same actual ring must first have a fully completed image OOB release.",
+    "HostRing client permission/held/release and begin/close select the retained DirectHfi or legacy HWSCHED transport. Wrong transport and failed acquisition/release retain actual connection and terminal state.",
+    "Per-process bank selection now refuses missing acquireActualBank before marking a grant attempt or writing TTBR; normal source callback and raw failure behavior remain tested."
+  ],
+  "remaining": [
+    "Native board acquire/check/release client callbacks must be bound to actual IOUserClient, task and retained GPU/GMU resources; currently absent, so public native client activation remains refused.",
+    "Track actual current issuer ownership across process prepare/select/dispatch/close; preserve released issuer around foreign grant calls and waits.",
+    "Implement genuine native process bank/ASID and exact TTBR0 authorization, selected-process read windows and map/unmap transactions; current task-only USER-ASID rules are insufficient.",
+    "Audit exact selected ProcessTables/DirectIo/DirectClient/Submit/VM object-source and header provenance before linking the native client chain.",
+    "Only after the above, add source-backed kernel-client probe and transport diagnostics, retag candidate identity, run relevant host checks, then generate full artifact.",
+    "v183 known-image hardware test still awaits explicit confirmation after automatic review rejection. Keep the frozen v183 bundle unchanged; do not launch v184 to bypass that rejection."
+  ],
+  "hardware": {
+    "executed": false,
+    "full_link": false,
+    "package": false,
+    "claim": false,
+    "source_identity_note": "Working source currently inherits the parent v183 diagnostic tag; there is no v184 boot package or runner."
+  },
+  "constraints": "No disassembly/reverse engineering, no phone operation, no HWSCHED activation, no invented bank grants or DMA-stop evidence; v182 is still latest actual run and full goal remains active."
+}

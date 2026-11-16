@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T21:00:03.075332+08:00",
+  "state": "Catalog149-UPL-failure-output-owner-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-upl-error-output-contract/source-contract.json",
+  "functions_body_SHA_recorded": 5,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Actual selected iOS17 UPL request failure/output ownership at wireVirtual calls only.5bodySHA/full selected-source identities;unchanged VM/SDK/cache source provenance,no old suites/targets/pair rerun.",
+    "wrappers": "memory_object_iopl_request validates flags/named-entry rights/range/type before object reference and lower vm_object request. Early errors do not initialize UPL output. Copyout requires read right;non-copyout requires read+write and insufficient named-entry rights returns InvalidRight,not universal raw ProtectionFailure2. vm_map_create_upl similarly has early errors without output writes,then original map/object/recursive branches and reference balancing.",
+    "lower": "vm_object_iopl_request early flag/address errors return before creating UPL. Later creates local UPL and publishes *upl_ptr before all page work succeeds. Its return_err unwinds original processed/deferred page wiring/activity/locks,then upl_destroy(local),finishes work context and returns error. It does not set caller outputnull afterward. Failed output can therefore be untouched or refer to destroyed local object;not a live owner to abort again.",
+    "caller": "wireVirtual checks lower error before reading/appending current block and jumps to saved-list abort. This matches not dereferencing or double-cleaning failed current output. Saved successful blocks remain separate from locally destroyed failed request. Source current-local-not-explicitly-aborted is not a proven leak;no33rd blind abort/deallocate/null guard.",
+    "limits": "Lower cleanup can wait/panic and page metadata may retain original side effects;source return error is not universal final page-free/stopDMA proof. Request QueryObjectType success without UPL is an original special branch,not imported as an executed successful peer or claimed wireVirtual flag. Actual import persistent-versus-map branch/caller permission state remains to bind.",
+    "decision": "No new complete/unwire/free/retry/refcount/abort policy or fabricated successful task/UPL/page/address peer.32 independent UNAPPLIED/no composition and all native/device OFF;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable. No component/caller/image/query/HFI/log/carrier/wire/CPU/security expansion."
+  },
+  "qualification": "Returned-error UPL output ownership source only;not successful allocation/free or stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

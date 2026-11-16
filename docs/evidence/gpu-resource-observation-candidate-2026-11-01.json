@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "scope": "implemented source/local validation, uncommitted matching inputs; no new device or published verification-level claim",
+  "result": {
+    "updated": "2026-11-01T19:46:40.809904+08:00",
+    "offline_complete": true,
+    "scope": "single-unixnu64-UEFI-resource-observation-terminal-before-payload",
+    "boot_sha256": "a315c9bbbb0c7edd905ffc34090f69891662dce7f57049db4d822a3b956136ed",
+    "fd_sha256": "735670933a9c075720f1c3abd08474b78fc21a99fb18aa8e1935e78708372a11",
+    "module_sha256": "1faac92ca70c5d649126e27bdd5de03204845dcfda36060d9b00c49eccf9ab2b",
+    "kernel_sha256": "e32880346be9156d0c35f2b1f49ca0bf831fa12e1d4e18d43b795e0df1896acb",
+    "firmware_objects": 559,
+    "current_inputs": 3111,
+    "firmware_archive_files": 7683,
+    "independent_actual_module_objects": 20,
+    "new_query_path_PE_mutations_refused": 7,
+    "new_native_commit_PE_mutations_refused": 4,
+    "new_scope_host_controls": {
+      "new_scope_refusals": 25,
+      "valid_synthetic_new_scope": 1,
+      "old_762a_and57_scopes_refused": true,
+      "noentry_annotation_refused_as_operational": true,
+      "processes": 0,
+      "USB_calls": 0,
+      "no_common_transport_suite_rerun": true,
+      "synthetic_host_only": true
+    },
+    "shared_protection_functions_AST_identical": {
+      "claim_once": "byte-independent AST identical",
+      "Transport": "byte-independent AST identical",
+      "recovery": "byte-independent AST identical",
+      "fresh_bcb": "byte-independent AST identical",
+      "getvar": "byte-independent AST identical"
+    },
+    "currentstart_new_independent_object_matches": true,
+    "kernel_retained_payload_reused_exactly": true,
+    "actual_entry_selected": true,
+    "not_noentry_annotation": true,
+    "terminal_before_payload": true,
+    "query_backend_policy_missing_intentional": true,
+    "phone_operations": false,
+    "native_resource_query_executed": false,
+    "native_GPU_invoked": false,
+    "WriteAuthorized": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "device_permission_pending": true
+  },
+  "source_recipe": "uefi-zorn/scripts/stage-zorn-resource-observation.py",
+  "source_recipe_sha256": "c6e0d16fa458b932ed162d9712eaaed4c80047cee6b552d9b8dadefd2697cfdb",
+  "firmware_builder": "uefi-zorn/scripts/build-zorn-firmware.py --gpu-resource-observation-candidate",
+  "image_builder": "UniXNU-zorn/scripts/build-zorn-debug.py --gpu-resource-observation-image --os 17",
+  "runtime_entry": "UniXNU-zorn/scripts/run-zorn-debug.py --gpu-resource-observation-trial",
+  "native_observation_limits": {
+    "LocateProtocol_max": 3,
+    "protocols": [
+      "Clock",
+      "RPMh",
+      "CommandDB"
+    ],
+    "clock_resource_ID_lookups_max": 3,
+    "lookups": [
+      "CX power-domain ID",
+      "GMU clock ID",
+      "HUB_CX_INT clock ID"
+    ],
+    "GCD_GetMemorySpaceDescriptor_max": 16,
+    "GCD_existing_declared_span": [
+      "0x9b09a000",
+      "0x9b09c000"
+    ],
+    "physical_dereference": false,
+    "provider_bookkeeping": "Clock lookup can allocate24B bookkeeping and traverse an unbounded provider list; native calls may block. Counts do not bound wall-clock time.",
+    "backend_policy": "Existing missing vote/rate/variant policy stays unavailable, even if resource lookups succeed."
+  },
+  "normal_default_off_source_join_preserved": true,
+  "actual_candidate_entry_is_nonzero": true,
+  "normal_wire_unchanged": true,
+  "prior_762a_claim_consumed": true,
+  "preflight": "Actual candidate closure checked with temporary hypothetical host-only approval files removed afterward; pending operational admission refuses. No processes, USB calls or claim.",
+  "local_activation_proposal": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/activation-proposal.json",
+  "local_bundle": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/trial-bundle.json",
+  "local_result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/offline-result.json",
+  "local_FD_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/fd-audit.json",
+  "local_image_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/image-audit.json",
+  "local_preflight": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-resource-observation-candidate/candidate-admission-preflight.json"
+}

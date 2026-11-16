@@ -1,0 +1,57 @@
+{
+  "status": "offline-fix-real-native-PM-double-exclusive-open-mainline-and-corrected-probe-linked",
+  "time": "2026-11-10T22:29:54.167328+00:00",
+  "mainline_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-pm-claim-reuse-mainline-5983b29715ae41c583183f148b52454c",
+  "probe_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-pm-claim-reuse-probe-d2def68b81e94b74a8aa6c84460afe42",
+  "mainline_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-mainline26-5983b29715ae41c583183f148b52454c",
+  "probe_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42",
+  "kernels": {
+    "mainline": {
+      "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-mainline26-5983b29715ae41c583183f148b52454c/full-link/kernel.ZORN26-SMMU-PM-CLAIM-REUSE-MAINLINE.UNSELECTED.macho",
+      "sha256": "f7fe2e53fb5582af9dfc5aed56c9e48e83dc26ca2547c7c0b6124d2440373eda",
+      "bytes": 30462144,
+      "inputs": 1397,
+      "added": 0,
+      "replaced": 1,
+      "preserved": 1396,
+      "undefined_symbols": 0
+    },
+    "probe": {
+      "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/full-link/kernel.ZORN26-SMMU-PM-CLAIM-REUSE-PROBE.UNSELECTED.macho",
+      "sha256": "01ab92a467a8535f9feb98f9e15c2a465b2b2660b88eef593d9f72ea8c5fe70d",
+      "bytes": 30433480,
+      "inputs": 1396,
+      "added": 0,
+      "replaced": 7,
+      "preserved": 1389,
+      "undefined_symbols": 0
+    }
+  },
+  "source_patch": [
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-mainline26-5983b29715ae41c583183f148b52454c/smmu-pm-claim-reuse.patch",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/smmu-pm-claim-reuse.patch"
+  ],
+  "base_XNU_IOService_handleOpen": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/IOService.cpp",
+    "sha256": "f2f13815e5e0b0e9ff9732fb9fc14dda348495ca06ef493abcc2a0bb2055f04d",
+    "behavior": "non-seizing open succeeds only when __owner null"
+  },
+  "actual_existing_PM_client": "resumeNativeSmmuPower creates/opens one real client;createNativeHeld retains same controller/client/parent and actual live ControllerPower reference.",
+  "bug": "v54 arbitration edit requested a second distinct non-seizing client for the exact already-open SMMU controller. It would refuse before the actual ID probe and cfg probe. Not an observed hardware failure.",
+  "fix": "Domain reuses existing PM-held exclusive OS client by calling actual pm.nativeHeldFor(same controller,same startup gate). That private check revalidates original claim,active reference/usage/real RSC context. No second open,close,seize or new authority grant;retain actual PM use via existing resumeAndGet.",
+  "actual_object_checks": [
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-mainline26-5983b29715ae41c583183f148b52454c/domain-undefined-calls.txt",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/domain-undefined-calls.txt"
+  ],
+  "external_bank_cold_stream_authority_unchanged": true,
+  "no_hardware_permission_from_PM_claim": true,
+  "prior_v55_withdrawal": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/withdrawn-v55-source-regression.json",
+  "corrected_offline_review": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-probe26-d2def68b81e94b74a8aa6c84460afe42/review-corrected-cfg-probe.json",
+  "FAT_parser_and_EL0_link_pass": true,
+  "old_probe_execution_never_occurred": true,
+  "device_execution": false,
+  "new_admission_claim_or_boot_attempt": false,
+  "whole_image_readback": false,
+  "latest_actual_hardware": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-native-SMMU-bootCPU-IRQ26.json",
+  "full_goal_complete": false
+}

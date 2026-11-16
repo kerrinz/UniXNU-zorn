@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T13:18:41.991819+08:00",
+  "state": "Catalog149-registry-bidirectional-owner-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-registry-owner-contract/source-contract.json",
+  "functions_body_SHA_recorded": 8,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Selected iOS17 registry parent/child links and service attach/detach behind exact149 newUserClient refusal. Frozen handler-cleared/creating-ref/published-owner read.8 function bodySHA records;no old SDK init/close/map/VM/release suites or targets.",
+    "references": "makeLink stores peer in OSArray either setObject or withObjects. Actual OSArray setObject resets shared slot with OSRetain;removeObject moves old reference into local shared storage then destruction releases it. Successful child-parent and parent-child entries therefore hold references in both directions. Dropping creating reference alone does not remove either relation or prove child destructor ran. A retained registry child is not native GPU owner or task/page/stop lease.",
+    "partial": "attachToParent creates parent link then combines child link and callback results with ret &=,without transactional rollback in this body. Returned false is not proof of no partial link mutation. makeLink/setObject failure and duplicate links have distinct states;no failed-allocation/corrupt provider model fabricated. Selected IOService attach refuses inactive provider before normal link attempt,otherwise arbitration/wait/callback behavior applies. Actual runtime branch/caller conditions are not supplied.",
+    "withdrawal": "detachFromParent takes temporary parent retain under registry WLOCK,breaks local link,breaks parent child link when present,unlocks,invokes matching callback then releases temporary parent ref. breakLink removes OSArray element and empty table entry. This is concrete relation-ref withdrawal,not a join with all external retainers,OSUserClient IPC calls or device DMA. Object deletion cannot be inferred without remaining refs/lifetime.",
+    "service_side_effects": "IOService detach also manipulates matching lists,arbitrates busy/provider state,removes inactive meta/platform actions and may schedule provider terminate phase2/finalize or wake detach waiters. It is not inert bookkeeping. Thus a blind detach/terminate cleanup on every catalog refusal would require the actual class/provider lifecycle contract. No such policy added.",
+    "catalog_consequence": "Exact catalog post-attach unsupported/cap/mount refusal releases creating ref but does not uniformly unlink successful or partial registry relations. It can leave a CPU owner relation conditional on actual links;not a K80 observed leak,UAF or hardware failure. Source output remains null on refusal;late caller handler cannot be assumed to own cleanup. Further exact failed-client/provider termination contract needed before separate minimal repair;no31st free/ref resurrection/retry/reset policy.",
+    "preservation": "All30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/oldinputs/archives preserved. No success registry/provider/client/address peer,new component/caller/FD/kernel/candidate/wire/CPU policy or sandbox grant change. All native/registry/attach/detach/terminate/refcount/provider/MMIO/phone OFF. K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unqualified."
+  },
+  "qualification": "Registry relation-reference source only;not unconditional cleanup/destruction,provider termination/stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

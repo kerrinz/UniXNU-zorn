@@ -1,0 +1,75 @@
+{
+  "recorded_at": "2026-11-13",
+  "purpose": "Resolve the v73 fixed-runner Recovery stop caused by stale host pins before preparing any later GPU branch trial.",
+  "device": "92988a43/zorn/slot a",
+  "prior_gpu_hardware_history": {
+    "v59_and_v60_were_real_device_runs": true,
+    "gpu_branch_reached_lockscreen": false,
+    "gpu_rendering_or_metal_observed": false,
+    "later_cpu_lockscreen_baseline": "b0da41e9"
+  },
+  "failed_readonly_requalifications": [
+    {
+      "scope": "single-K80-ios26-GPU-v73-root-page-requalification-readonly-20261113",
+      "result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v73-recovery-requalify-readonly-20261113-01/result.json",
+      "commands": 25,
+      "boots": 0,
+      "device_writes": 0,
+      "partition_writes": false,
+      "outcome": "Stopped by the new script's incorrect Data-header LBA mapping. It treated relative LBA 4194303 as Data_header; that block is the zero-filled guard immediately before Data."
+    },
+    {
+      "scope": "single-K80-ios26-GPU-v73-corrected-offset-recovery-requalification-readonly-20261113",
+      "result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v73-offset-recovery-requalify-readonly-20261113-02/result.json",
+      "commands": 28,
+      "boots": 0,
+      "device_writes": 0,
+      "partition_writes": false,
+      "outcome": "Corrected Data_header to relative LBA 4194304, then stopped because the script incorrectly expected the current diagnostic log page to equal the CPU run's older page."
+    }
+  ],
+  "successful_readonly_requalification": {
+    "scope": "single-K80-ios26-GPU-v73-corrected-offset-known-log-recovery-requalification-readonly-20261113",
+    "result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v73-offset-log-recovery-requalify-readonly-20261113-03/result.json",
+    "status": "fresh-Recovery-protections-verified",
+    "recovery_identity": "TWRP 3.7.1_16 property identity",
+    "commands": 54,
+    "protected_ranges": 9,
+    "boots": 0,
+    "device_writes": 0,
+    "partition_writes": false,
+    "primary_GPT_root_manifest_Data_metadata_and_root_fences_match_cpu_before_and_after": true,
+    "full_BCB_page_stable": true,
+    "BCB_tail_preserved": true,
+    "native_log_matches_known_v60_device_capture": true,
+    "corrected_page_roles": {
+      "Data_header_relative_lba": 4194304,
+      "Data_header_sha256": "e4ce50884e09f6d376d428e2e8f7bc05da0448e1afd7a5ba0749cbe92d12f99d",
+      "pre_Data_guard_relative_lba": 4194303,
+      "pre_Data_guard_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "root_first_page_sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+    },
+    "stop_gate_cleared_after_checks": true
+  },
+  "host_gate_after_requalification": {
+    "stop_device_operations": false,
+    "stop_device_reason": null,
+    "active_run": null,
+    "runner_session": null,
+    "gpu_discovery_allow_boot": false,
+    "requalification_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v73-offset-log-recovery-requalify-readonly-20261113-03/result.json"
+  },
+  "cpu_reference": {
+    "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "kernel_unchanged": true,
+    "boot_package_unchanged": true
+  },
+  "gpu_qualification": {
+    "v81_boot_attempts": 0,
+    "gmu_firmware_or_hfi_started": false,
+    "gpu_submission_or_dma_started": false,
+    "rendering_metal_or_gpu_display_qualified": false,
+    "provider_claim_is_all_master_quiescence": false
+  },
+  "next_action": "Continue offline source-backed construction of actual K80 root/board GPU startup inputs and a genuine GPU/GMU all-master quiescence owner. Before any later bounded device trial, create a new exact fixed-runner scope and repeat fresh full Recovery protection reads."
+}

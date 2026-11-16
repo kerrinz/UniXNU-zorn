@@ -1,0 +1,33 @@
+{
+  "status": "platform-owned-prepared-direct-ring-caller-compiled-full-linked-unexecuted",
+  "date": "2026-11-10T07:41:44.592471+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-direct-caller26-184e16363d344aa693d16c6ff92973f3",
+  "source_selection": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-direct-caller-184e16363d344aa693d16c6ff92973f3",
+    "firmware_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-prepared-direct-ring-f8ae835a9a8646a2906b27dee4c50e26",
+    "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-board-stage-180df53490bb4965960ba02415a3e12e",
+    "prior": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-board-stage26-180df53490bb4965960ba02415a3e12e",
+    "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-prepared-direct-ring26-f8ae835a9a8646a2906b27dee4c50e26/full-link"
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-direct-caller26-184e16363d344aa693d16c6ff92973f3/full-link/kernel.ZORN26-platform-direct-caller.UNSELECTED.macho",
+    "sha256": "e63e5ccedf15136d10816138ea67e94a86ea2cc7ce5380fee34e1915b7156780",
+    "bytes": 30332760,
+    "inputs": 1392,
+    "replaced": 4,
+    "preserved": 1388,
+    "undefined_symbols": 0
+  },
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-direct-caller26-184e16363d344aa693d16c6ff92973f3/actual-platform-direct-call-proof.json",
+  "implementation": [
+    "Actual existing root platform retains callback/code storage and all returned partial startup state before scheduling.",
+    "Ready status and atomic one-attempt gate precede native composition lock and real prepared-stage scheduling.",
+    "Raw-IOKit bridge binds real platform/root and its existing empty GPU-import collection ownership,forwards every real hardware callback and scalar input unchanged,and dispatches to the four existing direct-ring milestones.",
+    "No automatic invocation is installed without actual complete callback producers;thread submission is not hardware success."
+  ],
+  "runtime_scope": "Offline candidate only;v15 remains the latest device-proven CPU board stage.",
+  "GPU_or_phone_execution": false,
+  "hardware_authority_producers_complete": false,
+  "full_goal_complete": false,
+  "next_action": "Implement actual complete hardware-authority producers in the retained K80 platform context,then invoke its prepared direct-ring caller. Preserve v15 CPU-stage proof and do not rerun preparation-only validation."
+}

@@ -1,0 +1,130 @@
+{
+  "recorded_at": "2026-11-14T19:21:31.293936+08:00",
+  "version": 184,
+  "stage": 2,
+  "status": "offline-native-client-authority-and-issuer-integration-process-tables-pending",
+  "working_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "working_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a",
+  "prior_snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/manifest.json",
+    "sha256": "82596065725ab50b2dae2e14113b31f3aacdef05aeffd313273b1a4eda577cde"
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage2-client-authority-snapshot/manifest.json",
+    "sha256": "16312208ca62a7c1dbab8d6df31ffb03d1dde6becc55296e58d8cfa9cc4fdffe"
+  },
+  "changed_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage2-client-authority-snapshot/source/ZornGen7DarwinBoardOwner.cpp",
+      "sha256": "86807030947ab6d4e692be6578552bdb3253e323d8da13f98429ffd0b79a09a2"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage2-client-authority-snapshot/source/ZornGen7HostRing26.cpp",
+      "sha256": "937d046ab376168ff486f45c89434247d88ce375e48960119c5c7f7def54c774"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage2-client-authority-snapshot/source/ZornGen7HostRing26.h",
+      "sha256": "f14b55d2ae58d1eedec7d39029e5024390e5eed80d42284a14918bb7b23e83d1"
+    }
+  ],
+  "compilation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage2-client-authority-snapshot/compile-native-image/result.json",
+    "sha256": "bd7dc025f435205907d96d734f368c14b6ef063f64ea1048495685532c611a5d"
+  },
+  "checks": {
+    "client-board": {
+      "passed": true,
+      "result": "PASS 133 actual native board client grant/check/release checks\n",
+      "source_sha256": "86807030947ab6d4e692be6578552bdb3253e323d8da13f98429ffd0b79a09a2",
+      "scope": "Actual native board client callbacks and health method; retained resource/Ring binding mocks, ASan/UBSan. No hardware or native process authority qualification."
+    },
+    "client-transport": {
+      "passed": true,
+      "result": "PASS 185 actual native/legacy kernel-client transport and lifecycle checks\n",
+      "source_sha256": "937d046ab376168ff486f45c89434247d88ce375e48960119c5c7f7def54c774",
+      "scope": "Actual permission/transport/begin/close methods with mock IOUserClient, kernel task, issuer, OOB and process initialization; ASan/UBSan. No real client grants/process tables or device result."
+    },
+    "issuer-ownership": {
+      "passed": true,
+      "result": "PASS actual issuer helpers under contention; observer thread never owns lease; all unlocks clear ownership\n",
+      "source_sha256": "937d046ab376168ff486f45c89434247d88ce375e48960119c5c7f7def54c774",
+      "all_existing_lock_bodies_checked": 28,
+      "checked_methods": [
+        "IOReturn ZornGen7HostRing26::runKnownImage(",
+        "IOReturn ZornGen7HostRing26::copyKnownImageToConsole(",
+        "IOReturn ZornGen7HostRing26::publishKernelIo(",
+        "IOReturn ZornGen7HostRing26::beginKernelIo(",
+        "IOReturn ZornGen7HostRing26::dispatchKernelIo(",
+        "IOReturn ZornGen7HostRing26::kernelIoLeases(",
+        "IOReturn ZornGen7HostRing26::copyKernelIoView(",
+        "IOReturn ZornGen7HostRing26::closeKernelIoBase(",
+        "IOReturn ZornGen7HostRing26::transitionProcessTables(",
+        "IOReturn ZornGen7HostRing26::openProcessClient(",
+        "IOReturn ZornGen7HostRing26::dispatchProcessClient(",
+        "IOReturn ZornGen7HostRing26::closeProcessClient(",
+        "IOReturn ZornGen7HostRing26::initializeKernelProcess(",
+        "IOReturn ZornGen7HostRing26::closeKernelIo(",
+        "IOReturn ZornGen7HostRing26::prepareApplicationExecution(",
+        "IOReturn ZornGen7HostRing26::checkApplicationExecution(",
+        "IOReturn ZornGen7HostRing26::closeApplicationExecution(",
+        "IOReturn ZornGen7HostRing26::acquireApplicationOob(",
+        "IOReturn ZornGen7HostRing26::releaseApplicationOob(",
+        "IOReturn ZornGen7HostRing26::beginApplicationOperation(",
+        "IOReturn ZornGen7HostRing26::finishApplicationOperation(",
+        "IOReturn ZornGen7HostRing26::openApplicationProcess(",
+        "IOReturn ZornGen7HostRing26::applicationIoLeases(",
+        "IOReturn ZornGen7HostRing26::copyApplicationIoView(",
+        "IOReturn ZornGen7HostRing26::publishApplicationIo(",
+        "uint32_t ZornGen7HostRing26::capturePresentationFence(",
+        "int ZornGen7HostRing26::beginPresentation(",
+        "void ZornGen7HostRing26::endPresentation("
+      ],
+      "scope": "Actual issuer helper methods with two real contending host threads and a non-owning observer. Source equality proves old lock-using methods, including image/application/presentation, change only lock helpers plus client foreign-grant token maintenance. No hardware ownership claim."
+    }
+  },
+  "unchanged_inherited_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/client-oob-regression.json",
+      "sha256": "e8a05e69d7dbffaad60c7d88c56b916e765225bc8e390b4fa02235ad3b14b797"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/task-oob-regression.json",
+      "sha256": "63346933bff2a00d67518fb77a91a27d2349bb39034913e799860fbd46b4a369"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/direct-oob-regression.json",
+      "sha256": "f9a312ac445b83f715c5e6d494851f971e5a602a7f8250585015bba67c52fcba"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v184-native-client-runtime-f0805d11a6f24fb49633534b8f76504a/stage1-client-transport-snapshot/process-authority-regression.json",
+      "sha256": "a55b918d5a4e9d3859a63a5103113f9e1a20989c5c38b0f98188cce1daa6aeda"
+    }
+  ],
+  "unchanged_check_basis": "DirectHfi and SmmuDomain implementation bytes equal stage1; those tests were not rerun or relabeled as new stage2 runs. Ring/Board changes were tested and compiled against current source.",
+  "implementation": [
+    "All28 existing issuer-lock method bodies preserve operations, replacing actual lock/unlock with helpers that record and clear current-thread ownership. Two real host threads and a non-owner observer exercise contention.",
+    "Actual Ring client identity requires kernel task, correct current issuer or the exact foreign-grant thread, completed image/fence/unmap/OOB prerequisites, no poisoned state and exact open/close phase.",
+    "Board native client grant/check/release callbacks bind the retained client identity, actual GPU/GMU resource pair, provider/runtime-PM/MMU/IRQ/RSC health and distinct OOB epoch. Callbacks are connected only for the native transport.",
+    "Board caches identity without owning an extra reference; actual Ring retains before the foreign grant and releases after successful close. Uncertain close retains the real client.",
+    "Native release permission requires process removal, completed fences, zero pending resources and current issuer. It does not claim returned OOB store or hardware stop."
+  ],
+  "remaining": [
+    "Native process ASID ownership and exact TTBR0 selection/restoration authorization are still missing. The explicit missing-callback refusal remains; do not substitute initial bank authority.",
+    "Add native selected-process read windows and owned map/unmap transactions with current issuer proof; current image-only post-CP window cannot authorize process operations.",
+    "Audit selected ProcessTables/DirectIo/DirectClient backend objects and header/source provenance, then prepare a real kernel-client probe and full new build/diagnostics.",
+    "Metal/shader/GPU display integration and complete FT3683/client lifecycle qualification remain."
+  ],
+  "hardware": {
+    "executed": false,
+    "full_link": false,
+    "package": false,
+    "runner": false,
+    "claim": false,
+    "publication_entry_selected": false
+  },
+  "last_hardware_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v183-native-known-image-observed-2026-11-14.json",
+    "sha256": "e4da5840139e6605c693a931ebe1d812822d66c46e3cc19565800882c1f2ca70"
+  },
+  "constraints": "No disassembly/reverse engineering or phone operation. v183 full input archive and consumed claim remain unchanged. Goal active."
+}

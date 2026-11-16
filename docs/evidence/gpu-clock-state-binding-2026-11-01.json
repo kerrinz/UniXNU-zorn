@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "scope": "Implemented staged source/local static validation, uncommitted matching inputs; no native getter/device execution or published verification-level claim.",
+  "result": {
+    "recorded_at": "2026-11-01T20:38:21.340107+08:00",
+    "state": "clock-state-used-methods-and-inert-request-offline-complete",
+    "provider": {
+      "sha256": "53c18b9e1569cebbcb9837c1d773cc5e836fb7e902df7c29b27b485a13d4fdfc",
+      "slots": {
+        "IsClockEnabled": 32,
+        "GetClockFreqHz": 56
+      },
+      "wrappers": {
+        "IsClockEnabled": 5540,
+        "GetClockFreqHz": 5736
+      },
+      "handlers": {
+        "IsClockEnabled": 25136,
+        "GetClockFreqHz": 25948
+      },
+      "output_bytes": {
+        "IsClockEnabled": 1,
+        "GetClockFreqHz": 4
+      },
+      "mode_success_can_leave_output_unwritten": true,
+      "IsClockEnabled_may_modify_backend_and_read_MMIO": true,
+      "IsClockEnabled_false_can_mean_missing_callback": true,
+      "GetClockFreqHz_cached_selected_plan_not_measured_or_running": true,
+      "provider_semantic_mutants_refused": 7,
+      "actual_new_provider_invocation": false
+    },
+    "host": {
+      "synthetic_noncallable_requests": 4,
+      "focused_refusals": 14,
+      "actual_closed_capture_refused": true,
+      "native_calls": 0
+    },
+    "source_mutations_refused": 2,
+    "request_bytes": 256,
+    "InvokeAllowed_offset": 208,
+    "request_invoke_attempted_native_status_output_owner_runtime_all_zero": true,
+    "real_closed_capture_refused": true,
+    "actual_LTO_objects_independent_raw_equal": 4,
+    "nonLTO_ABI_inspection": {
+      "first_sha256": "e47a6296a3f8579124be1069f48f1b84d61dbf57d11e2ca48225e43506fef86f",
+      "second_sha256": "66c201ab1ec8d9632e5204bdfc748431c88ca74ec77f2bdfb94e80123577ec24",
+      "COFF_timestamps": [
+        1793536403,
+        1793536508
+      ],
+      "all_other_bytes_equal": true,
+      "raw_equality_not_claimed": true,
+      "metadata_equivalence_not_claimed": true
+    },
+    "original_ABI_object_matching_target_receipt": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-state-observation-binding/first-distinct-output-metadata-refusal/ABI-original.obj",
+      "sha256": "459992e65d6602fb30a369a64c53688c5ace1ac6f8a0f26f32178c9220b3ddfa"
+    },
+    "recursive_target_inputs": 54,
+    "actual_SDK_libraries": 26,
+    "parent_selected_module_archive_excluded": true,
+    "NOENTRY_only": true,
+    "final_PE_mutants_refused": 6,
+    "image_sha256": "d02574f403353e937347dd0c5ab21fec7935ec11f596695058a1d650e29619df",
+    "independent_link_sha256": "09410795cd3ab133c1c818d76e4b7f4a1e80db3c91b39d71f84cefeac34e91cd",
+    "new_FD_kernel_or_candidate": false,
+    "native_getter_invoked": false,
+    "phone_operations": false,
+    "WriteAuthorized": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "source_recipe": "/Volumes/macData/projects/ios-zorn/uefi-zorn/scripts/stage-zorn-clock-state.py",
+    "source_recipe_sha256": "be164d2e1b3d51e7962b639bf839fe09846c08fc298883454332d9b0855461f3",
+    "retained_refusals": [
+      "AST reader initially lacked Path in globals; no native execution.",
+      "Target string.h declaration missing; reused exact previous CRT declarations, no pass stubs.",
+      "New annotation static_assert messages added for the actual default C++ language, production flags unchanged.",
+      "Distinct output-name and later non-LTO COFF timestamp raw mismatches were refused, not normalized. Four LTO objects were separately compared raw; non-LTO inspection timestamps and both hashes remain explicit."
+    ],
+    "scope": "Static source/provider/type/link evidence only. No new native query, power/security/stop/SMMU/IOVA/DMA rights or GPU execution."
+  },
+  "source_recipe": "uefi-zorn/scripts/stage-zorn-clock-state.py",
+  "source_recipe_sha256": "be164d2e1b3d51e7962b639bf839fe09846c08fc298883454332d9b0855461f3",
+  "real_closed_capture_is_refusal_only": true,
+  "noncallable_request_bytes": 256,
+  "query272_and_all_existing_wire_unchanged": true,
+  "no_canonical_module_FD_kernel_selection": true,
+  "local_provider_result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-state-observation-binding/provider-result.json",
+  "local_target_result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-state-observation-binding/target-result.json",
+  "local_final_link_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-state-observation-binding/final-audit-result.json",
+  "local_next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-state-observation-binding/next-plan.json"
+}

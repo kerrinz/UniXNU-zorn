@@ -1,0 +1,53 @@
+{
+  "recorded_at": "2026-11-12T20:43:36.266801+08:00",
+  "status": "copyinstr length-output fix compiled host-checked fully linked and packaged",
+  "scope": "Offline iOS26 CPU diagnostic candidate for Redmi K80 92988a43/zorn/slot a",
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-CPU-lsd-vfs-observed-2026-11-12.json",
+    "sha256": "7497ae98bff1dd0e7b4bd50573525f75ecd8c6ca6c4d65c90fac2e78bb24f1b5"
+  },
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "boot_sha256": "8cce968485462fd2a30e9b3c3d8d8e7b46c0ce23be7fb0824362003d1cdbfdc9",
+  "prior_failure": "The observer passed a null output-length pointer to copyinstr. The selected ARM64 implementation dereferences that pointer at function entry. The device returned to TWRP in 139.196 seconds and the diagnostic page did not change.",
+  "source_fix": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-lsd-vfs-ed2b48d33f94481d95966074a9713cb8/ZornLSDVfsAdapter26.inc",
+    "sha256": "fe42a1e0b6ab14b281dd0098cc7d7694b290fa9f8ba7f83b25897ffb6afe12c8"
+  },
+  "copyinstr_implementation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/osfmk/arm64/copyio.c",
+    "sha256": "3be70427aebd03f130de44ca06db5adcbf16a9576fa43b9ccc47a50f29930456"
+  },
+  "ubsan_control": {
+    "result": "PASS, the stale null-pointer call is rejected by the host sanitizer",
+    "stderr": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-ed2b48d33f94481d95966074a9713cb8/lsd-vfs-native-rejected-host.stderr",
+      "sha256": "c7da4551d3fd599cf23f7a617abfe7b121cf0831bb8a23e2a8cbd844e7de5778"
+    }
+  },
+  "candidate_host_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-ed2b48d33f94481d95966074a9713cb8/lsd-vfs-host-check.json",
+    "sha256": "e1114bd3b0a3849be2860bab4cab69ece9832d008ae82237a846f4bf05eafcbc"
+  },
+  "native_stack_budget": {
+    "zorn_userland_progress_worker26": 6176
+  },
+  "compile_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-ed2b48d33f94481d95966074a9713cb8/compile-result.json",
+    "sha256": "a327a70cdf9e011ff4cae25672b7b07c3a0bd325da4387ad8c2948f5f6ef3946"
+  },
+  "link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-ed2b48d33f94481d95966074a9713cb8/full-link/link-result.json",
+    "sha256": "4eee4773e70a8b18520be0238b92ec552c575f3231696cfa031ecaeec87d4797"
+  },
+  "boot_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-ed2b48d33f94481d95966074a9713cb8/boot-package/verified.json",
+    "sha256": "882437280bd73b5d04bf6db09c40b16c65514759b3c3dfabc814a05d7206ce7b"
+  },
+  "same_installed_root_and_boot_arguments": true,
+  "changed_FAT_members": [
+    "EFI/UniXNU/Payloads/kernel.macho"
+  ],
+  "candidate_device_ready": false,
+  "candidate_booted": false,
+  "next": "Integrate the corrected observer proof into a fresh fixed-runner scope and complete its no-device preflight. Then use the one-shot protected CPU trial and verify the recovery outcome and diagnostic page."
+}

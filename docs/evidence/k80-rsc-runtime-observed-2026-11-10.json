@@ -1,0 +1,107 @@
+{
+  "status": "actual-K80-RSC-PM-hold-returned-masked-GIC-attach-refused-recovered",
+  "date": "2026-11-10T14:22:45.694512+00:00",
+  "scope": "single-K80-ios26-managed-RSC-CPU-PM-IRQ-runtime300s-v21",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/full-link-runtime-trial/kernel.ZORN26-RSC-RUNTIME.UNSELECTED.macho",
+    "sha256": "2657dabd90a05506aa990e4a54a58fd28194ff77838a804cad343259712ee765",
+    "bytes": 30405792,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 14,
+    "preserved": 1382,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-package-rsc-runtime/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "ffbb502de5c5b5d0c43005396b520c84325e7eee125e562bc8a5390eac0f5eaa",
+    "bytes": 11612160
+  },
+  "raw_record": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-log.bin",
+  "decoded": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/decoded-native-record.json",
+  "actual_RSC_runtime": {
+    "board_raw": 0,
+    "binding_returned": true,
+    "binding_raw": 0,
+    "readonly_creation_returned": true,
+    "readonly_creation_raw": 0,
+    "status_copied": true,
+    "operation_returned": true,
+    "operation_raw": 3758097098,
+    "cpu_power_returned": true,
+    "cpu_power_raw": 0,
+    "probe_factory_returned": false,
+    "probe_factory_raw": null,
+    "mapped": false,
+    "fresh_idle_checked": false,
+    "IRQ_mask_readback": false,
+    "runtime_inputs_prepared": false,
+    "initialized_channels": 0,
+    "runtime_install_returned": false,
+    "runtime_install_raw": null
+  },
+  "actual_failure": "kIOReturnIOError0xe00002ca from masked GIC attach,not CPU-power hold or RSC runtime",
+  "recovery_seconds": 332.9449106250104,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_captures": [
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-root_first_page.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-root_first_page.bin",
+      "bytes": 4096,
+      "sha256": "4920ebf755453100202299f5fe9f1c19ac378ca5c2d95cc6eb2c69b4c1453b77"
+    },
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-before.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-before.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-root_after.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-root_after.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-after.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-after.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-Data.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-Data.bin",
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+    },
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-root_before.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-root_before.bin",
+      "bytes": 4096,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "before": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/before-Data_metadata.bin",
+      "after": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-runtime26-2fd0646bb77b499d813dbf06d1b5d731/root-trial-rsc-runtime/trial/after-Data_metadata.bin",
+      "bytes": 266240,
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+    }
+  ],
+  "protected_captures_unchanged": true,
+  "full_root_readback_performed": false,
+  "new_whole_root_device_hash_proven": false,
+  "GMU_GPU_or_Metal_started": false,
+  "lockscreen_proven": false,
+  "scope_consumed_no_repeat": true,
+  "caveat": "Only recorded aggregate attach refusal is observed;the exact failed GIC readback and actual DS state were not recorded."
+}

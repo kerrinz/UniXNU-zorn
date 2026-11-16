@@ -1,0 +1,75 @@
+{
+  "status": "actual-real-workloop-RSC-disabled-install-observed-recovered",
+  "time": "2026-11-10T16:42:54.766309+00:00",
+  "scope": "single-K80-ios26-RSC-real-workloop-disabled-install90s-v33",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/root-trial-rsc-workloop-fix/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/root-trial-rsc-workloop-fix/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/full-link/kernel.ZORN26-RSC-WORKLOOP-FIX.UNSELECTED.macho",
+    "sha256": "22c36c284a0b06e004fe7866a6b94ac20dec1dcc8299235d80ed94947f56ac12",
+    "bytes": 30396080,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/root-package-rsc-workloop-fix/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "3f1974eae05bd27d45d93efe9567d5762ffa8e725704ee70e084b6de7f172bb0",
+    "bytes": 11612160
+  },
+  "source_fix": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-rsc-workloop-producer-fix26.json",
+  "actual_masked_RSC": {
+    "status_copied": true,
+    "cpu_power_returned": true,
+    "cpu_power_raw": 0,
+    "attach_returned": true,
+    "attach_raw": 0,
+    "requested_route": 0,
+    "actual_route": 0,
+    "probe_factory_returned": true,
+    "probe_factory_raw": 0,
+    "preparation_flags": 15,
+    "parent_runtime_call_returned": true,
+    "parent_runtime_raw": 3758097112,
+    "runtime_object_constructed": true,
+    "installation_returned": true,
+    "installation_assessment": 3,
+    "disabled_source_installed": true,
+    "enable_returned": false,
+    "forward_allowed": false,
+    "operation_returned": true,
+    "operation_raw": 3758097112
+  },
+  "disabled_event_source_installation_proven": true,
+  "full_RSC_runtime_enabled": false,
+  "IRQ_delivery_proven": false,
+  "native_writer_readback_success_proven": false,
+  "software_NotReady": "Intentional disabled-install-only boundary before enable/bind,not hardware errno.",
+  "recovery_seconds": 122.74701412500008,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "full_root_readback_performed": false,
+  "scope_consumed_no_repeat": true,
+  "GPU_or_Metal_or_lockscreen_or_touch_proven": false,
+  "host_SDK37_start_command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/root-trial-rsc-workloop-fix/trial/command-001.json",
+  "host_daemon_scope": "Exact SDK37 --one-device92988a43 private5039 after claim;no device bootstrap/retry.",
+  "next_action": "Real workloop producer fix v33 hardware return observed:PM0/GIC0/Probe factory0,actual mapping/fresh idle/IRQ-mask readback/runtime-input flags15,real runtime constructed,disabled event source installed (assessment3),no enable/forward. Exact fresh page,verified TWRP122.747s,7protected sets unchanged,no full-root readback. Selected masked-only boundary returns software NotReady intentionally;not hardware error. Continue normal RSC enableInstalled and bindToClockOwner using unchanged compiled driver source:NEW fresh identity6objects/kernel/package/scope v34,remove only zorn26_rsc_masked_runtime=1,keep clocks/domain/GMU/GPU OFF. Derive decoder/full-runtime qualification from actual enableReturned+forwardAllowed and raw0/flags15/actual dependency returns;do not leave hardcoded full_runtime=false from v33. No extra isolation diagnostics or old tests. Scope must bind current1396 exact inputs,FD/ADT/FAT/root;fresh claim before firstUSB,90s/600/WDT1/fullBCB and original logpage/protection. SDK37 private5039 one-device host starter now proven recordedcommand001 in v33;keep fixed helper bounds. Old v33 claim consumed/no-repeat. Host init guards and power/IRQ evidence are per epoch,not persistent leases. Goal full GPU/Metal/display/FT3683 remains incomplete."
+}

@@ -1,0 +1,293 @@
+{
+  "status": "CPU-SpringBoard-first-process-SIGTRAP-observed-no-lockscreen",
+  "recorded_at": "2026-11-12T01:42:07.857639+08:00",
+  "mode": "unattended-phone-connected",
+  "priority": "CPU-rendered lockscreen/system UI first;GPU activation deferred",
+  "scope": "single-K80-ios26-CPU-SpringBoard-lifecycle-300s-afed6c22",
+  "boot_sha256": "a39c5625a5f7c2621d654d64ba40109a2f3c5672d7bc4ff889978245ee68fcbe",
+  "kernel_sha256": "75e13f22a7f2f4529637f2f754435e8398106fb92a826722dbef18f27775f278",
+  "root_sha256": "3b56c850bd9416e7716094a20ea0af0c25bd767b1e94a022aff6945fcf54cd6d",
+  "raw_run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/run.json",
+    "sha256": "f62a6ad32f6f3d246e5fbdd9aa431c5e1ffdf9cc77c9eb4f9354de02ad50ad82"
+  },
+  "decoded": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/decoded-native-record.json",
+    "sha256": "759ade967e8df0d34144d72c4cee356c936bd4b8f5ac07a4e8ef7b937f47e58d"
+  },
+  "log": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-log.bin",
+    "sha256": "268405f9553d611cfeac981c18e641bf49710b91264dbdfef6c3cb78c24f38e7"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/one-shot.claim.json",
+    "sha256": "49604c6297186df7bd3fc9cdca284e6b4b8d02042cb72106b103f943fabd2091"
+  },
+  "bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/bundle.json",
+    "sha256": "f7b89566c4705bd7e0ced4c769edbb7686617443295e7865d27ea34ea5fa1f23"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/admission.json",
+    "sha256": "f4a4e6de99d83b9b838d64288d1aa800b0d3afbae6ea36d725e1a9d31273b6d9"
+  },
+  "host_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/lifecycle-host-check.json",
+    "sha256": "83c1f45acff75b8dbeb5190426fc7d297ef26158e3ebdb694feb5fb3776f6e8a"
+  },
+  "runner_negative_controls": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/runner-sb-lifecycle-host-check.json",
+    "sha256": "65d1c1d1803c0e71504d045d14fbec54646b0350ece237b4e5fd5402c6b834d7"
+  },
+  "recovery": {
+    "before": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "after": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "seconds": 332.8309258329973
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "protected_ranges": [
+    {
+      "name": "Data",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "equal": true
+    },
+    {
+      "name": "Data_metadata",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "equal": true
+    },
+    {
+      "name": "after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "root_after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "root_before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "root_first_page",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/before-root_first_page.bin",
+        "sha256": "27e4a9f44cd41a07493e73d443eb8ac2985eacbf9aa366cd0032659c94666973"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/trial/after-root_first_page.bin",
+        "sha256": "27e4a9f44cd41a07493e73d443eb8ac2985eacbf9aa366cd0032659c94666973"
+      },
+      "equal": true
+    }
+  ],
+  "actual_userland_progress": {
+    "entries": 179216,
+    "returns": 179187,
+    "entered": 368,
+    "returned": 75,
+    "error": 0,
+    "exec_object": 3,
+    "exec_phase": 0,
+    "exec_result": 0,
+    "stock_main": 1,
+    "exit_seen": 0,
+    "exit_namespace": 0,
+    "exit_code": 0,
+    "exit_status": 0,
+    "services": 15,
+    "cpu_presenter": {
+      "schedule_return": 0,
+      "creation_return": 0
+    },
+    "framebuffer": {
+      "backboard_opens": 1,
+      "backboard_starts": 1,
+      "backboard_swap_end_calls": 0,
+      "first_backboard_swap_end_return": null,
+      "queued_swaps_all_clients": 0,
+      "pixel_copies_all_clients": 0,
+      "backboard_first_frame": {
+        "vsync_port_registered": false,
+        "vsync_callback_registered": false,
+        "vsync_timer_armed": false,
+        "vsync_timer_fired": false,
+        "vsync_notification_enqueued": false,
+        "vsync_send_failed": false,
+        "vsync_no_send_right": false,
+        "default_surface_requested": false,
+        "default_surface_right_returned": false,
+        "swap_begin_requested": false
+      },
+      "iosurface": {
+        "backboard_client_starts": 1,
+        "first_backboard_create_state": "not-entered",
+        "first_backboard_create_return": null,
+        "first_backboard_init": {
+          "state": "returned",
+          "return": 0,
+          "input_bytes": 0,
+          "output_bytes": 40
+        }
+      },
+      "first_backboard_unsupported_selector": 88,
+      "thread_census": {
+        "backboardd": {
+          "present": true,
+          "active": true,
+          "total": 11,
+          "sampled": 11,
+          "runnable": 0,
+          "waiting": 11,
+          "port_receive": 5,
+          "truncated": false,
+          "wait_hints": 33796
+        },
+        "runningboardd": {
+          "present": true,
+          "active": true,
+          "total": 9,
+          "sampled": 9,
+          "runnable": 0,
+          "waiting": 9,
+          "port_receive": 3,
+          "truncated": false,
+          "wait_hints": 32772
+        },
+        "simultaneous_snapshot": false,
+        "stacks_or_user_memory_read": false
+      },
+      "software_accelerator_submission": "submitted"
+    },
+    "SpringBoard_lifecycle": {
+      "activation_attempts": 4,
+      "first_pid": 5,
+      "activation_state": 2,
+      "activation_result": 0,
+      "spawn_state": 2,
+      "spawn_result": 0,
+      "exit_state": 2,
+      "exit_status": 5,
+      "exit_namespace": 2,
+      "exit_code": 5,
+      "first_process_only": true,
+      "does_not_prove_user_instruction_execution": true
+    }
+  },
+  "interpretation": {
+    "first_SpringBoard_native_activation_and_spawn_return": 0,
+    "first_SpringBoard_terminating_signal": {
+      "number": 5,
+      "name": "SIGTRAP",
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/sys/signal.h",
+        "sha256": "2efb1aca5abdfa6f9e8bad155f2db319fdca1a029400cad1558e4df981d6eeea"
+      },
+      "source_line": 88
+    },
+    "exit_namespace": {
+      "number": 2,
+      "name": "OS_REASON_SIGNAL",
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/sys/reason.h",
+        "sha256": "8dc6b5266fe2c21b6ddb6cc97ac2ef0f972bc400038f409a3a70ebf42ba157ce"
+      },
+      "source_line": 146
+    },
+    "matching_activation_attempts_at45s": 4,
+    "later_attempt_results": "unobserved;first-process-only lifecycle instrumentation",
+    "cause_of_SIGTRAP": "unknown;signal alone does not identify an assertion,library,caller or instruction",
+    "framebuffer_selector88_causality": "unproven"
+  },
+  "camera": {
+    "record": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/camera/cpu-sb-lifecycle-screen.json",
+      "sha256": "21d82644794ba6e3473050249fe63fac6ee9183a7562e499a55f8b1e534a37c0"
+    },
+    "image": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/root-trial-sb-lifecycle/camera/cpu-sb-lifecycle-screen.jpg",
+      "sha256": "fb638d7183b35556c43fd05ed869d905c2603564dae8450955eb2490aa693ce5"
+    },
+    "interpretation": "Owner corrects this camera appearance to black background with white text;image text is not reliably readable;no lockscreen observed."
+  },
+  "GPU_startup": false,
+  "touch_startup": false,
+  "lockscreen_proven": false,
+  "first_frame_proven": false,
+  "no_disassembly_or_executable_analysis": true,
+  "native_failure_behavior_preserved": true,
+  "claim_consumed_no_retry": true,
+  "next_action": "CPU UI first: diagnose the first SpringBoard SIGTRAP using bounded ordinary runtime diagnostics and public source;preserve native failure behavior,no disassembly or guessed framebuffer selector88 semantics. GPU activation deferred.",
+  "goal_complete": false
+}

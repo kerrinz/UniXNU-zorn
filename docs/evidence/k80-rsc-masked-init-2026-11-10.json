@@ -1,0 +1,66 @@
+{
+  "time": "2026-11-10T12:33:00.160522+00:00",
+  "status": "real-native-RSC-masked-IRQ-reservation-and-event-source-adoption-implemented-offline",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-init-72e3e856a02340beb2972ac360f5ffe5",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-owner-f54dcf7d48b74557ab27ab3d6dd9a581",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-init26-72e3e856a02340beb2972ac360f5ffe5",
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-init26-72e3e856a02340beb2972ac360f5ffe5/source-selection.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-init26-72e3e856a02340beb2972ac360f5ffe5/full-link/kernel.ZORN26-RSC-MASKED-INIT.UNSELECTED.macho",
+    "sha256": "955e082855c38981ee41749fb6367899bac95900bb8e05c18fa5fa636b81053c",
+    "bytes": 30387736,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "implementation": [
+    "The actual retained RSC owner can acquire its source-defined SPI through the real checked masked GIC backend on its original worker,after readonly preparation. No legacy cold/security/PM callback is fabricated.",
+    "Actual attach return and returned bit are retained separately from readonly status; failed registration stays retained and cannot be reused.",
+    "The real event source adopts the same masked registration without a second attach. Managed adoption remains PM-pending state5; actual disable is supported,enable requires independent ready state2 and therefore refuses this incomplete managed phase.",
+    "The captured CommandDB worker has an explicit separate zorn26_rsc_irq_reserve selection. Existing packages,readonly trial and consumed claims unchanged.",
+    "Action pointer publication uses release/acquire; referenced targets and registration context remain retained."
+  ],
+  "validation": {
+    "affected_objects": 7,
+    "full_link_undefined": 0,
+    "actual_emitted_calls_checked": true,
+    "detail": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-init26-72e3e856a02340beb2972ac360f5ffe5/source-check-result.json",
+    "compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-masked-init26-72e3e856a02340beb2972ac360f5ffe5/compile-result.json",
+    "native_device_executed": false
+  },
+  "files": [
+    {
+      "file": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-init-72e3e856a02340beb2972ac360f5ffe5/ZornGen7RscProvider26.cpp",
+      "sha256": "1047c8d501b955b7a0485c8af955f4015658e60f7c0d372c8e897f7ac36381cb",
+      "prior_sha256": "a3c42800d7792cef6bd8bd3ebe7021f9dce6814a422209d0685df562e9fabfbb"
+    },
+    {
+      "file": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-init-72e3e856a02340beb2972ac360f5ffe5/ZornGen7RscControllerOwner26.h",
+      "sha256": "7d08c25e6b1f85fd5d86afb1b58393df187628845af714ecccef38e6d965ec34",
+      "prior_sha256": "5284054e504bf991817e63805ab8bedef9b5c420bc24532250da264cf018c0c7"
+    },
+    {
+      "file": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-init-72e3e856a02340beb2972ac360f5ffe5/ZornGen7RscProvider26.h",
+      "sha256": "26faa5a228e6589370481375474c436af0e1f02de17d85c6761aa1bbd325397f",
+      "prior_sha256": "45cf47d8a19b349bc01304b3f675fc1ba05d42841c32ee64f0192babdaf7221c"
+    },
+    {
+      "file": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-init-72e3e856a02340beb2972ac360f5ffe5/ZornGen7StartupOwner26.cpp",
+      "sha256": "627e6080ce5f7c332ac2ef898501c2e49dd9aa7ca929640210f6f99394943554",
+      "prior_sha256": "26e72286673240e1158d36af66f66a315c43c07dc420aa4647d09301fec0437e"
+    },
+    {
+      "file": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-masked-init-72e3e856a02340beb2972ac360f5ffe5/ZornGen7RscControllerOwner26.cpp",
+      "sha256": "fcc50baa0e5a4fcf2702b6723ccb510ac44eee966e8e45693271f668e4270073",
+      "prior_sha256": "fd6713516695e52d6f7835d66dcb5506f8f800f986c9a85f9ab6ed96ffd80064"
+    }
+  ],
+  "limits": [
+    "CPU-cluster PM/quiesce and managed runtime programming are not connected;this is not complete RSC initialization.",
+    "No new phone package/scope/claim/ready or hardware permission. Existing fixed v18 scope remains consumed.",
+    "No GMU/HFI/GPU rendering,Metal,SpringBoard or lockscreen evidence. PID1 EL0 syscall entry remains the last proven userland milestone;not syscall/dyld/launchd service completion."
+  ],
+  "next_action": "Implement the missing actual CPU-cluster PM/quiesce coordination and managed RSC runtime preparation using existing source bodies. In parallel isolate actual PID1 syscall/dyld/launchd progression from GPU readiness;do not infer a specific failure from blurred console images. Prefer implementation over added source assertions."
+}

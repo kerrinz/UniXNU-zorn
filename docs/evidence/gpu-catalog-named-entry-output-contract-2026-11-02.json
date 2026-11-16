@@ -1,0 +1,26 @@
+{
+  "updated": "2026-11-02T21:18:52.451357+08:00",
+  "state": "Catalog149-named-entry-failure-output-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-named-entry-output-contract/source-contract.json",
+  "functions_body_SHA_recorded": 7,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Actual selected iOS17 named-entry creation returned-error/output ownership for exact149 fresh one user virtual range only.7bodySHA/fullSHA;4 unchanged parent bodies provenance only,no old suites/targets/32nd pair rerun.",
+    "route": "Exact importRange gives nonnull task/one range/direction/MapperNone/Persistent,without pageable named-create/COW/reuse/mask/share options. memoryReferenceCreate therefore requests user-map existing-object entry with USE_DATA_ADDR and null parent. mach_make_memory_entry_internal reaches parent_entry-null extraction branch. Other named-create/parent/VM-copy special cases are frozen provenance,not substituted caller policy.",
+    "error": "This branch validates range/map first,then may resolve pending write COW before extraction;a returned error does not prove no VM side effects. vm_map_copy_extract validates,allocates local copy and calls remap extraction;on nonzero discards local copy and returns before assigning caller copy_result. mach_make propagates extraction error before allocating/publishing entry handle. Protection failures after successful copy extraction discard that copy before returning. Error output is not a live named entry to release,not universally initialized null.",
+    "publication": "Selected mach_memory_entry_allocate allocates named-entry metadata with WAITOK/ZERO/NOFAIL and writes output port via ipc_kobject_alloc_port. In actual existing-object branch,handle publication is after returned-error checks and branch then fills metadata/size and returns Success. This source does not promise bounded allocation or successful execution;no port/page peer instantiated.",
+    "upper": "memoryReferenceCreate tests nonzero before consuming current entry. Accepted entries already appended have count tracked;misaligned rejected successful current entry drops its send right. On returned error it sets ref count then frees accumulated entry references,sets local ref null and publishes *reference before returning error. Fresh persistent init collapses error to false/factory-null,plain fallback is separate from later prepare raw2. This closes this bounded returned-error ownership question,not every allocation-failure/panic or page-release invariant.",
+    "limits": "No all-alias/physical-page-free/stopDMA/security grant or K80 bank/owner/route inference. Unchanged metadata growth and lower resource allocation bodies are not newly qualified. No33rd abort/free/retry/refcount/rights policy or composition;32 independent UNAPPLIED and all native/import/entry/UPL/provider/MMIO/phone OFF. Actual GPU/rendering/Metal remain unavailable."
+  },
+  "qualification": "Selected named-entry returned-error output source only;not successful port/page ownership or stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

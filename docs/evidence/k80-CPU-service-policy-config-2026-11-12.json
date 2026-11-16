@@ -1,0 +1,105 @@
+{
+  "status": "CPU-two-job-service-policy-config-overlay-uninstalled",
+  "recorded_at": "2026-11-12T08:45:37.466249+08:00",
+  "candidate_id": "75fd3a701b4245f2988f1052ae168181",
+  "source_root_sha256": "515fa6c6a231b50556dce7353197f7c908225da8ff51f3d13eec15ee1f7daad5",
+  "source_root_unchanged": true,
+  "helper_protocol_run_id": "cce96d56630b4b0680fe31845102c730",
+  "comparison": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sbstdio26-ba26b11293c1405784a075d076f657a6/ios17-vs-ios26-service-policy-readonly/result.json",
+    "sha256": "bbdb5cb5b2c4b6a5c2609d8f3693799ace9c61de483071f83801d7bfc1a026de"
+  },
+  "ios17_policy_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/startup-policy/BootWatchdogPolicy.c",
+    "sha256": "a6586ca21b8851713c4d62081387109e5e4f6b5f85d2b6d1cb78acb630e75c12"
+  },
+  "ios17_policy_host_hardware_file_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/gui-upstream-lite-policy-checks.json",
+    "sha256": "6aa1a81b32fcea664a59ba413056eabc0321eaad35936ad6cf16c97976075bd0"
+  },
+  "official_documents": [
+    {
+      "url": "https://unixnu.com/zh/guide/skip-setup",
+      "read_at": "2026-11-12T08:45:37.464599+08:00",
+      "finding": "Board-specific disable-jobs;identityservicesd/locationd examples. Current sheng27 lite1 keeps icon service with explicit renderer environment;lite2 removes it at cost of real icons. Setup seed/build and ADT identity must match target,do not copy17 build numbers."
+    },
+    {
+      "url": "https://unixnu.com/drivers/qcom-dwc3",
+      "read_at": "2026-11-12T08:45:37.465034+08:00",
+      "finding": "Sheng iPadOS27 record keeps fairplayd.A2 and adid disabled;both enabled prevented SpringBoard completion. This is a board/OS-specific precedent,not a K80 iOS26 causal result."
+    },
+    {
+      "url": "https://unixnu.com/zh/xnu/boot-arguments",
+      "read_at": "2026-11-12T08:45:37.465450+08:00",
+      "finding": "Rebuild/repack after arguments;driver/kernel must implement the requested parameter. Current26 source search found no old sheng-lite/disable-jobs implementation in selected native/source tree;do not append17 flags as if active."
+    },
+    {
+      "url": "https://unixnu.com/zh/devices/venus",
+      "read_at": "2026-11-12T08:45:37.465850+08:00",
+      "finding": "CPU UI has service dependencies including AppleKeyStore state/events;page says AKS-only phone result stillSIGTRAP/SWAP0. Do not disable UI dependencies or assume AKS alone fixes this K80."
+    }
+  ],
+  "selected_changes": [
+    {
+      "label": "com.apple.adid",
+      "root_path": "/System/Library/LaunchDaemons/com.apple.adid.plist",
+      "original": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sbstdio26-ba26b11293c1405784a075d076f657a6/ios17-vs-ios26-service-policy-readonly/System_Library_LaunchDaemons_com.apple.adid.plist",
+        "sha256": "efdf87264fe0b913d1783478fe9644d1c3b907ea46f4887243280449ad274783"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-service-policy-75fd3a701b4245f2988f1052ae168181/root-overlay/System/Library/LaunchDaemons/com.apple.adid.plist",
+        "sha256": "7e366315946229fb526dd73d874c3e1c1a812e2c1fbb53544b7e1af526d59f00"
+      },
+      "changed_fields": [
+        "Disabled"
+      ],
+      "old_Disabled": null,
+      "new_Disabled": true,
+      "ProgramArguments_and_MachServices_preserved": true
+    },
+    {
+      "label": "com.apple.identityservicesd",
+      "root_path": "/System/Library/LaunchDaemons/com.apple.identityservicesd.plist",
+      "original": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sbstdio26-ba26b11293c1405784a075d076f657a6/ios17-vs-ios26-service-policy-readonly/System_Library_LaunchDaemons_com.apple.identityservicesd.plist",
+        "sha256": "ca0b4a0dd55a1d6740f1ee9c927eb71b6922b135cbae2d64bf80fc2b24285a83"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-service-policy-75fd3a701b4245f2988f1052ae168181/root-overlay/System/Library/LaunchDaemons/com.apple.identityservicesd.plist",
+        "sha256": "a2149fa8a82db62608409b093fac5214ce9cecf5367ee3d79b9fcfe84e909714"
+      },
+      "changed_fields": [
+        "Disabled"
+      ],
+      "old_Disabled": null,
+      "new_Disabled": true,
+      "ProgramArguments_and_MachServices_preserved": true
+    }
+  ],
+  "critical_UI_jobs_retained": [
+    "com.apple.SpringBoard",
+    "com.apple.backboardd",
+    "com.apple.runningboardd",
+    "com.apple.iconservices.iconservicesagent",
+    "com.apple.notifyd",
+    "com.apple.cfprefsd.xpc.daemon"
+  ],
+  "interpretation": {
+    "ios17_lite_disabled_labels": 22,
+    "ios26_absent_among_lite": 8,
+    "ios26_demand_available_among_lite": 14,
+    "configuration_only_not_runtime_activation": true,
+    "fairplayd_job_already_absent": true,
+    "adid_alone_not_proven_cause": true,
+    "two_job_policy_is_controlled_hypothesis": true,
+    "legacy17_kernel_policy_not_mechanically_reused": true
+  },
+  "root_image_generated": false,
+  "root_installed": false,
+  "phone_access": false,
+  "retained_Data_modified": false,
+  "no_disassembly_or_reverse_engineering": true,
+  "goal_complete": false,
+  "next_action": "CPU UI first. User requested official documentation and noted local17 disabled services. Read current official skip-setup/boot-arguments/QcomDwc3 pages and compare actual readonly515f root to retained local17 lite22 policy. Eight17-lite labels lack packaged26 jobs,14 remain configured demand-capable;no runtime activation proof. fairplayd.A2 already absent,adid and identityservicesd present without Disabled. Stage only Disabled=true for these2 existing exact jobs;preserve arguments/MachServices and all critical UI jobs. Source/config overlay only,no root image/write/phone access,new hypothesis not a trap fix. Before future boot,complete mandatory source exclusion of legacy PB register/stack trap handler,build/sign/test independent injection,compose independent515f clone with exact2plist+library changes,verify actual ownership/HFS/signatures/full delta replay/root window/current cumulative retained-page map/RootPlatform+ADT hash/newkernel and separately reviewed installer+boot scopes. Extend normal stdio4-to16 with explicit skip categories after one skipped native write;preserve helpercce/CPU/GPUoff/touchoff. Independently inspect existing Setup preference seed values and23G90 identity against official procedure without changing retained Data or using activation-success stubs. Do not blindly import all17 disabledlabels or undocumented private-interface overrides;goal active."
+}

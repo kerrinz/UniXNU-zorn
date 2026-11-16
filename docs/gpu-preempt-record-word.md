@@ -1,0 +1,9 @@
+# Complete-word bounds in preemption CPU header
+
+The exact writer stores an8-byte BV read-pointer field at offset56, so its CPU-aware header occupies64 bytes. Two retained header comments incorrectly said56; the independent candidate corrects them to64 without changing any field or packet layout.
+
+recordWord guarded only byte_offset<64, then read four bytes. Offsets61..63 therefore crossed the same64-byte CPU-header region it was attempting to bound. The candidate requires byte_offset<=64-sizeof(uint32_t). It preserves every complete offset0..60, including unaligned reads; it adds no alignment policy. Existing snapshot callers use20,24,8,4 and are unaffected. Full preemption records are much larger; this is a header-region bound defect, not a claim that those callers overrun an actual whole GPU record allocation.
+
+An isolated67-byte raw array contains64 header bytes and3 canary bytes with no GPU values or addresses. Extracted original get32/recordWord includes the canary bytes at61..63; repaired code refuses those offsets. All61 complete offsets and null/64/UINT32_MAX refusals remain the same. ASan/UBSan, three source controls and one changed real-header iOS17 Preempt object pass. No native Preempt/ring,record IOVA,successful context/switch/ACK/provider or mapped-memory model is constructed. writeRecord/writeSmmuInfo/setRecordWptr,attach/trigger/complete and all callbacks/cache/MMIO remain unexecuted. The target object is unlinked and unexecuted.
+
+The writer guards reject null required inputs before stores, setRecordWptr changes only the existing4-byte field, and writeSmmuInfo writes its fixed28-byte prefix. No additional transactional failure gap was identified in those specific source bodies; no actual address/version/ASID validity or K80 record policy is inferred. Old preempt/table producer failures remain independently recorded and uncombined. Catalog/pins,32patches,eight profiles,wire/log/carrier and runtime selections are unchanged.

@@ -1,0 +1,57 @@
+{
+  "time": "2026-11-10T23:34:04.797287+00:00",
+  "status": "K80-iOS26-CPU-framebuffer-store-completion-candidate-compiled-and-reference-linked",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-swap-admission-c37fd6dba4104a9da20cafaa00f67a25",
+  "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25/full-link",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-store-completion-98943c6418c94577939817e85c17f4b6",
+  "source_sha256": "1769b51511c382ec42d05ac2c01a0414ab5ec4fa7f8c40df12b57c02984dd1cc",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-store-completion26-98943c6418c94577939817e85c17f4b6/present-store-completion.patch",
+  "houji_reference": {
+    "checkout": "98bc0960f96076de8e8d16efcfb0c0603b166b85",
+    "source_commit": "41f234c0e9bc73eb96bac6e011cac0811d40816e",
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-houji/kernel/overlay/iokit/Kernel/arm/SweetFramebuffer.cpp",
+    "git_blob": "aa02e43ab48965f47ef037063b5d2fb0390ec741",
+    "reuse": "Complete framebuffer stores with dsb sy before CPU retirement. K80 executes row jobs on multiple CPUs, so each writer drains its stores."
+  },
+  "change": [
+    "A row worker completes its stores before decrementing the existing busy count.",
+    "The presenter completes its own stores before the counter increment and before returning to release the existing issuer lease.",
+    "The existing CPU-copies counter advances only if a layer actually draws to the panel or a clear writes pixels. Fully clipped layers skip drawing, and an empty swap does not increment the counter. The existing processed-swap statistics remain separate."
+  ],
+  "compile": {
+    "name": "MiniIOMobileFramebuffer.cpo",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-store-completion26-98943c6418c94577939817e85c17f4b6/MiniIOMobileFramebuffer.cpo",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/present-store-completion-98943c6418c94577939817e85c17f4b6/MiniIOMobileFramebuffer.cpp",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-swap-admission26-c37fd6dba4104a9da20cafaa00f67a25/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+    "sha256": "17249c77c5b86f21fa4a836810f579cdb2b462380f44423ebc0a97c48dd29b35",
+    "warnings": 0
+  },
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-store-completion26-98943c6418c94577939817e85c17f4b6/full-link/kernel.ZORN26-PRESENT-STORE-COMPLETION.UNSELECTED.macho",
+    "sha256": "a7c86df85b9e9641e38322367be9eee239ccde77a4d8161b02d5aadc76db5248",
+    "bytes": 30459224,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "binary_evidence": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-store-completion26-98943c6418c94577939817e85c17f4b6/completion-disassembly.txt",
+  "SwapWait": {
+    "donor_23G90_export_catalog": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/donor-link-check26/donor-exports.tsv",
+    "exports": [
+      "_IOMobileFramebufferSwapSignal",
+      "_IOMobileFramebufferSwapWait",
+      "_IOMobileFramebufferSwapWaitWithTimeout"
+    ],
+    "body_checked": false,
+    "host_attach": "Read-only local SystemOS attach failed with device not configured. No donor implementation bytes were inspected.",
+    "scope": "Houji source explicitly describes the three-scalar contract from iOS16 build 20H392. Exact iOS26 selector arguments and timeout semantics remain unverified. The existing selector implementation was left in place."
+  },
+  "candidate_selected": false,
+  "phone_access": false,
+  "full_root_readback_performed": false,
+  "limits": [
+    "No physical panel scanout, GPU fence retirement, Metal draw, lockscreen, or FT3683 proof. The counter concerns CPU writes only."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "status": "K80-cross-board-GPU-initialization-calls-isolated-compiled-linked-unexecuted",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/legacy-gpu-init-isolation-03b40d5d37794b7b9391f6a573a9eeb6/redwood_input.c",
+  "original_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/dev/redwood_input.c",
+  "source_sha256": "51ff64304b0d86d31bf5323dd76c8b9508157a92c8859332a79130f2a0a39dcd",
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-legacy-gpu-init-isolation26-03b40d5d37794b7b9391f6a573a9eeb6/full-link/kernel.ZORN26-legacy-gpu-init-isolated.UNSELECTED.macho",
+  "kernel_sha256": "f7b26810f7e59077d8458e76568963b451571b5be55ee401e9747806256e3f31",
+  "inputs": 1392,
+  "replaced": 1,
+  "preserved": 1391,
+  "undefined_symbols": 0,
+  "compile_warnings": 0,
+  "old_driver_objects_removed": false,
+  "old_driver_symbols_or_stub_replacements": false,
+  "new_stop_or_DVFS_policy": false,
+  "device_or_GPU_execution": false,
+  "all_foreign_SCM_excluded": false,
+  "remaining": "Legacy RedwoodGPU user-client/CPU governor/loader-return references remain;do not treat two init-call removal as complete SCM exclusion or delete them mechanically.",
+  "date": "2026-11-10T07:55:05.852452+00:00",
+  "failed_object_removal_attempt": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-foreign-gpu-input-isolation26-6a3a53c7d1f741099859c33ce740da43/link-result.json",
+  "actual_SMC_instruction_sites": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-platform-direct-caller26-184e16363d344aa693d16c6ff92973f3/full-kernel-smc-call-sites.txt",
+  "previous_exported_C_symbols_preserved": true,
+  "exact_removed_undefined_references": [
+    "_hakios_dada_gpu_init",
+    "_redwood_adreno_init"
+  ],
+  "added_undefined_references": [],
+  "old_native_claims_not_upgraded": true,
+  "full_goal_complete": false,
+  "next_action": "Finish source-backed isolation of the legacy RedwoodGPU service/user-client creation route and classify remaining real SCM callers before implementing the K80 exclusive SCM producer. Preserve real K80 direct-ring entry and v15 CPU-board proof;do not remove dependency objects or supply stubs mechanically."
+}

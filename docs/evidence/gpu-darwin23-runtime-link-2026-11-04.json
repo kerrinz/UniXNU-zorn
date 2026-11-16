@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-04T14:31:01.205350+00:00",
+  "scope": "Unselected offline compilation and relocatable-link evidence; not final kernel or device qualification",
+  "result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-darwin23-runtime-link-20261104/result.json",
+  "result_sha256": "878f506480946c636cd9185022f62c314e4f36ff2ca17cbe44a7270950f8ead9",
+  "new_target_units": [
+    "NativeGOPPresenter.cpp",
+    "ubsan_minimal.c"
+  ],
+  "source_edits": 0,
+  "linked_objects": 41,
+  "archived_actual_inputs": 423,
+  "late_initializer_text_unchanged": true,
+  "class_bindings_generated": false,
+  "runtime_selected": false,
+  "device_io": false,
+  "limitations": [
+    "GOP uses strict -Wall -Wextra -Werror, no diagnostics; UBSan preserves actual selected kernel recipe (not -Werror); raw warnings retained, including absent unused libsa include directory, cross-enum operation and four sysctl startup function casts. No warning flags relaxed and no stub added.",
+    "Original IOAcceleratorES bindings and sysctl_register_oid_early absent from retained kernel symbol table. Whole UBSan object also defines existing _ubsan_traps; reference aggregate cannot be grafted into the retained kernel. Requires actual final kernel relink, not a duplicate/synthetic replacement.",
+    "No exact original audit candidate/runtime-parent evidence at directly referenced paths; old address recipe not applied.",
+    "K80 board startup rules/votes/CommandDB and Darwin ownership remain unresolved; no change to conditional startup compilation scope."
+  ]
+}

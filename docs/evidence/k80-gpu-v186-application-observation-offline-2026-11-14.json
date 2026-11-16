@@ -1,0 +1,41 @@
+{
+  "version": 186,
+  "stage": 7,
+  "status": "offline-admitted-application-output-and-native-close-observation",
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/stage7-application-observation-snapshot/manifest.json",
+    "sha256": "1862020c9cd491e9d8dcf8ce483604b20750568aaf39470fc28e27cbab85c800"
+  },
+  "compile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/compile-application-observation/result.json",
+    "sha256": "0de4d86a45cdf4984d4d08f4ad5d2e8d815bb3e7f9e41c58c01eebbea09fa61f"
+  },
+  "observer_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/application-observation-regression.json",
+    "sha256": "4b1a78024b8a8f9b64183235c97d168f6628b8b259b0756c562ccc280c6e33f4"
+  },
+  "close_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v186-direct-application-runtime-d55c2bab3d6d436386ca54c7b6a74f06/application-close-observation-regression.json",
+    "sha256": "6cb76fde21ee418ba9d61b03fbd68aecb27d2497d83000accbab04559e6445a8"
+  },
+  "implementation": [
+    "AppIo binds the first actually admitted client pointer and its real BSD process uniqueID/PID after existing service/client admission. No entitlement or native access decision is supplied by diagnostics.",
+    "Actual prepareExecution/acquireOob/openProcess and close views/process/OOB/execution returns update observation flags. Last dispatched method and raw return, explicit closeReturned/closeRaw are captured without modifying native returns or lifetime rules.",
+    "Actual selected sys_generic scalar write calls a bounded adapter after native write: only fd2, full successful write under384 bytes, no flags, exact admitted process uniqueID, at most32 copyin attempts. Complete printable lines with exact ZORN186APP run prefix are retained; malformed/multiline/foreign/partial output ignored. Snapshot includes attempted/copy-error/dropped counts, raw text remains application-reported evidence.",
+    "A nonblocking atomic try-lock protects the small fixed record; contention drops diagnostics, never waits or changes GPU results. First identity retained after close for final user report; no later client replaces it.",
+    "After successful publication88, CDC polls snapshot up to60s and waits500ms after observed close for final user output; no GPU work/retry/reset in observer. au numerical record plus base64 at text appended to existing4096B bounded report. Independent300s watchdog unchanged.",
+    "Native AppIo/UfsOwner/sys_generic compile.20 observer/adapter identity, bounds, malformed and contention assertions plus76 actual close-flow assertions pass ASan/UBSan. All compiler output flags point to independent archive. Compiler stack report: CDC5664B, caller1712B; not a complete runtime stack or timing qualification."
+  ],
+  "remaining": [
+    "Full-build integration must replace actual sys_generic.o and AppIo object as well as all previous changed application objects, include observation headers, retain qualification define ZORN_GEN7_APP_PROBE186=1, and check undefined symbols.",
+    "Retag inherited v185 diagnostic identity/USB string, bind exact root4d636e89 in kernel/ADT, full-link/package/freeze with fresh runner scope/ready/claim and reviewed root-delta preimages.",
+    "Probe uses stderr stdio. Hardware must establish actual admitted execution and delivery of complete report lines; unsupported/partial writes are explicitly not success. Failed admission before identity binding has no captured user result and remains a diagnostic limitation.",
+    "Actual image/fence/Mach mapping/cache/close and bounded Recovery still need same-build hardware evidence. Metal/render/presentation/full FT3683 remain required."
+  ],
+  "hardware": {
+    "executed": false,
+    "root_installed": false,
+    "boot_package_created": false
+  },
+  "constraints": "Only local/public source, native compile and mocked host tests. No disassembly/reverse engineering; no phone operation; goal active."
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "scope": "Static pinned dynamic allocation/lifetime consumer contract; not native backing or hardware qualification.",
+  "result": {
+    "state": "dynamic-backing-consumer-ownership-contract-bound-native-provider-not-yet-implemented",
+    "inputs": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.c": "306930a131d0fa3bc3cc3873dbfaf205b6bd5a4243f55a74cced411c08de6782",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.h": "2aad7f0d5f3f1961e0e063cc119ee340820ee35527147f785690bcc7dd8cd896",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.c": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.h": "8137491b5ef2657eb362a4f41cf2c2b8d8cb747fc93d7a63e453194d7c3288cc",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoMemory.cpp": "37363469c9e1f1e200b368e0bfdb80111722861792411090f3cef67506c9adef"
+    },
+    "reference_revision": "453d8875f815bf9dfad9035982861226a4823a6c; reference not Xiaomi exact stock source",
+    "registry_capacity": 32,
+    "duplicate_key": [
+      "mem_kind",
+      "gmu_mem_handle"
+    ],
+    "duplicate_size_flags_align_revalidation_in_reference": false,
+    "minimum_native_changes": [
+      "Reject key reuse with changed size/flags/align; explicit local stricter policy, not an OEM claim.",
+      "Persistent real NativeAdrenoMemory ownership per attempted allocation including uncounted/failed slots. Preserve raw allocation/import/gate errors separately; do not erase failure descriptor or retry.",
+      "Separate CPU backing from GPU-global/GMU-import/IPC/preallocated fence/memstore; no PA-as-IOVA, no invented domain or translation lease.",
+      "GMU import failure after GPU allocation must remain retained/quarantined; destructor must not release it.",
+      "HOST_INIT zeroing requires actual stopped/exclusive lifetime; reset is not free. Completion of HFI transport or ACK does not retire backing."
+    ],
+    "native_API": "Current upstream NativeAdrenoMemory::allocate/release/quarantine getters; no pool reservation, WC policy or device hold is selected.",
+    "missing_native_contracts": [
+      "Runtime consumer/caller serialization/epoch ownership",
+      "Actual GMU domain and GPU VA import rights",
+      "Preallocated HW_FENCE/MEMSTORE providers",
+      "Per-kind physical backing suitability and true stop/release proof"
+    ],
+    "new_semantic_refusals": [
+      {
+        "name": "key-handle",
+        "refused": "duplicate key"
+      },
+      {
+        "name": "entry-count",
+        "refused": "allocation branch hfi->mem_alloc_entries++;"
+      },
+      {
+        "name": "success-handle",
+        "refused": "success handle publication"
+      },
+      {
+        "name": "reset-size",
+        "refused": "reset lifetime"
+      }
+    ],
+    "host_success_allocator_or_address_model": false,
+    "decoder_or_HFI_reply_changed": false,
+    "new_native_component_or_target": false,
+    "phone_or_provider_calls": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "source_recipe": "UniXNU-zorn/scripts/check-zorn-dynamic-backing.py",
+  "source_recipe_sha256": "1a24b17d1e7c1b5a28f650c1a0e89cdac53e928d77b73efaa1a3ffe3dde3137a"
+}

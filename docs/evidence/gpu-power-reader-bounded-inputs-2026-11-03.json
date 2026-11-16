@@ -1,0 +1,152 @@
+{
+  "power_reader": {
+    "scope": "isolated UNAPPLIED power-source CLI input bounds;no policy selection",
+    "original_SHA": "8e15bbef1f754f2808f5ffeeff76bdd0a707f5d8f77a136cec621f3d7929361b",
+    "original_unchanged": true,
+    "candidate_SHA": "34249890a030176a62c57c202ef288b8990ab4c8ac33685ee50680558edc5e83",
+    "before_DTB_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-dtb.bin",
+        "requested": -1,
+        "returned": 16785408
+      }
+    ],
+    "after_DTB_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-dtb.bin",
+        "requested": 16777217,
+        "returned": 16777217
+      }
+    ],
+    "before_graph_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+        "requested": -1,
+        "returned": 593130
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-graph.json",
+        "requested": -1,
+        "returned": 16785408
+      }
+    ],
+    "after_graph_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+        "requested": 16777217,
+        "returned": 593130
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-graph.json",
+        "requested": 16777217,
+        "returned": 16777217
+      }
+    ],
+    "exact_and_plus_one_boundary_pass": true,
+    "legacy_oversize_creates_no_output": true,
+    "legacy_success_output_bytes_identical": true,
+    "two_real_stdout_equivalences": [
+      {
+        "source_id": "fdt-01f95000.gpu",
+        "stdout_bytes_identical": true
+      },
+      {
+        "source_id": "fdt-02025cea.gpu",
+        "stdout_bytes_identical": true
+      }
+    ],
+    "two_candidate_pin_refusals_before_input_read": true,
+    "new_legacy_dependency_requirement": "strict candidate graph/provenance/parser pins checked before input;not runtime qualification",
+    "guarded_stdout_paths_no_write_process": true,
+    "legacy_success_writes_fresh_host_outputs_only": true,
+    "candidate_graph_SHA": "a15a3d2e783502b8b04be382f002773f1d430499596928c0befeccdf5a3471c1",
+    "candidate_provenance_SHA": "c891f57db12ccc72ddfb9041f224983e4db5eae9c10a77afb09117587793569a",
+    "hardware_qualification": false,
+    "native_execution": false,
+    "device_operations": false
+  },
+  "emitter_collector": {
+    "original_unchanged": true,
+    "original_SHA": "97596eec625720faf6eff1860f9af6aad7146cc0c56a99d3daf995202ec05b5a",
+    "candidate_SHA": "3bdfcce3de4d3bdf81b4425eed7c872f76a3bfddf543be5936cb0ff110f67b0d",
+    "candidate_reader_SHA": "34249890a030176a62c57c202ef288b8990ab4c8ac33685ee50680558edc5e83",
+    "all_four_source_model_identical": true,
+    "model_SHA": "6fa214f5ade49ec779a079d22371fc537c4d15df181f8cd1707b73633377a397",
+    "counts": {
+      "sources": 4,
+      "nodes": 340,
+      "properties": 2298,
+      "optional_fields": 1392,
+      "tables": 16,
+      "entries": 192,
+      "gmu_tables": 4,
+      "gmu_pairs": 8,
+      "text_bytes": 71952,
+      "property_bytes": 16724
+    },
+    "eight_actual_source_reads_bounded": true,
+    "refusals": [
+      {
+        "input": "dtb",
+        "before_trace": [
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-dtb.bin",
+            "requested": -1,
+            "returned": 16785408
+          }
+        ],
+        "after_trace": [
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-dtb.bin",
+            "requested": 16777217,
+            "returned": 16777217
+          }
+        ],
+        "no_partial_model": true
+      },
+      {
+        "input": "graph_json",
+        "before_trace": [
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+            "requested": -1,
+            "returned": 593130
+          },
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-graph.json",
+            "requested": -1,
+            "returned": 16785408
+          }
+        ],
+        "after_trace": [
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+            "requested": 16777217,
+            "returned": 593130
+          },
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-power-reader-bounded-inputs-20261103/oversized-graph.json",
+            "requested": 16777217,
+            "returned": 16777217
+          }
+        ],
+        "no_partial_model": true
+      }
+    ],
+    "strict_reader_pin_before_inputs": true,
+    "no_header_render_emit_or_compile": true,
+    "no_approval_manifest_changed": true,
+    "guarded_no_write_process": true,
+    "hardware_qualification": false,
+    "native_execution": false,
+    "device_operations": false
+  },
+  "review_document_SHA": "bdf80ef6789c51b6da9bf6bb9b35b9f9549df5fc82b7cfa2bee790067f5d2184",
+  "original_pinned_chain_unchanged": true,
+  "old_suites_or_targets_rerun": false,
+  "native_execution": false,
+  "device_operations": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

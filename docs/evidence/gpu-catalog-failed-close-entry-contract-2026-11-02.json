@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T18:18:13.614848+08:00",
+  "state": "Catalog149-failed-close-entry-eligibility-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-failed-close-entry-contract/source-contract.json",
+  "functions_body_SHA_recorded": 9,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all31_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 AGX retained-live failed close method eligibility versus selected iOS17 close wrapper only.9bodySHA/full source identities,no old suites/targets/native IPC/view/provider calls.",
+    "outer_close": "is_io_service_close checks sharedInstance or CAS closed0to1 before IPC write-enter/clientClose/write-exit. It discards clientClose IOReturn and returns Success. Nonshared subsequent call with closed1 skips callback;shared path differs. Base clientDied uses same CAS before callback. Thus AGX returned failure is not necessarily visible at external close or retried by same wrapper. No closed reset/retry policy added.",
+    "driver": "AGX clientClose failure leaves live_/core_/space_ while views were dropped and mailbox owner withdrawn. Generic runCore dispatch checks live_ and uses core under g.lock;externalMethod body has no separate failed-close/closed flag check. Selected callExternalMethod chooses IPC lock then virtual dispatch,without closed test in that body. These body predicates do not prove the connection port survives or later calls reach it.",
+    "views": "Mailbox type additionally requires gMailboxOwner==this,so withdrawal removes that source eligibility. Scanout uses live_/handoffOnly and external getter availability. BO cached/backing route uses original view cache then live core memoryForToken,whose leases/unreleasable flags are separate. releaseAll may have cleared leases only on entries visited before error;no universal remapping success/denial claimed.",
+    "publication": "dropViews withdraws descriptor slots under g.lock then existing mapping removal/release outside lock. It is not a retained-live-to-closed transaction and does not supply stopDMA or page retirement. Exact partial-close facts stand independently of frozen16/17/30th;none composed or run.",
+    "limits": "Conditional same-object method body eligibility is separate from actual IPC endpoint/task death/security/defaultLocking/owner lifetime. No success client/task/map/address peer,post-close invocation/race/UAF/K80 fault reproduced. Do not infer all methods succeed when VM is poisoned or external close Success means teardown finished.",
+    "decision": "No32nd closed-state/retry/terminate/free/refcount/security policy.31 independent UNAPPLIED/all native OFF;K80 ownership/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable. No new caller/component/image/query/HFI/log/carrier/wire/CPU policy."
+  },
+  "qualification": "Conditional failed-close method-body/IPC-source eligibility only;not active port or successful teardown",
+  "GPU_execution_rendering_Metal_complete": false
+}

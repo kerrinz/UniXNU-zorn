@@ -1,0 +1,30 @@
+{
+  "updated": "2026-11-02T09:50:49.851543+08:00",
+  "state": "Catalog149-failure-backoff-paired-state-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-failure-backoff-contract/source-contract.json",
+  "new_paired_metadata_source_binding": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "no_mutation_suite_reexecution": true,
+  "all25_patches_independent_UNAPPLIED": true,
+  "selected_contiguous_rejection_does_not_preclude_failure_metadata_write": true,
+  "pair_concurrency_and_hardware_time_unqualified": true,
+  "no_native_API_success_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "identity": "Exact catalog149 factory and actual published/core caller files checked against source pins;frozen25th initialization and previous system factory/published-owner proof read first. No source substitutions or runtime selection. Function-static failure pair is separate from initialization values fixed only by25th candidate.",
+    "state_domain": "failedBytes is size_t threshold initialized0;failedAt is uint64 initialized0. Expiry checks failedBytes && now-failedAt>=backoff and only clears failedBytes. Attempt gate uses failedBytes as a size threshold. After a failed contiguous attempt,failedBytes becomes bytes only when empty or the new size is smaller;failedAt is assigned now on every failure,including one that leaves the minimum size unchanged. Thus timestamp is last failed attempt,not necessarily the attempt that established minimum threshold. Clearing timestamp,resetting both,changing comparison or updating time only for a new minimum would change source policy.",
+    "reachability": "Actual source can take the optional attempt for nonzero configured contigKiB and sizes meeting threshold and<=128KiB;published noncontiguous BO preparation can reach it even though request.contiguous is false. Selected SDK rejects this nil-task nonpageable constructor,so a failed attempt and pair writes do not require successful contiguous allocation. Configured bootarg,active K80 boardcaller and actual invocation remain unbound;unselected catalog or zero hint does not establish observed failure. At hint0 initialpair is zero and that failure writer is not selected. We do not enable bootarg or fabricate a request/descriptor/clock result.",
+    "overlap": "Actual outside-g.lock producer and separate per-instance IPC gates allow conditional source overlap;core fallback sharing same statics is not excluded by core lock. Original plain pair is not a synchronized transaction. Minimum-size check/write,unconditional timestamp assignment and expiry size clear can interleave;independent atomic loads/stores would still not establish a coherent pair or stop an expiry based on an older snapshot. No execution or concrete K80 counter/timing outcome inferred.",
+    "time_boundary": "now is captured once before an optional attempt and reused when recording failure,not completion time. uint64 subtraction is unsigned;overlap can pair a captured earlier now with a different later timestamp. Source uses wraparound subtraction and does not return timing status. No signed-clamp/wallclock/retry model,5-second hardware guarantee or actual scheduling outcome asserted. Existing time helper provenance unchanged and not retested.",
+    "repair_decision": "Concrete unsynchronized source state is recorded;intended pair linearization/ownership under overlapping prepared requests is not specified by a separate owner contract. Adding a global lock,generation,packed pair,clamp/reset,retry or changing last/min semantics would introduce policy beyond this binding. No26th patch or speculative per-field-atomic repair. Independent25th initialization publication remains partial and UNAPPLIED,not a whole-factory concurrency claim.",
+    "new_binding_checks": "Full source pins and exact original factory-body SHA recorded;failure-related statements equal25th candidate after only published snapshot local names normalize. All actual failure writers and expiry threshold statements scoped to factory. No new native component or changed driver/type requires a target;no mutation/control/ABI/old SDK/suite rerun or successful allocator/backoff concurrency fixture.",
+    "next_real_producer": "Independent actual published BoAlloc preallocation offer is next:typed NativeAdrenoSystemPages stack owner,request validation versus early prepare,offer bind/withdraw under g.lock,allocBo/allocateSystem consumption and default rejection cleanup. Compare exact functions with frozen owner/release proofs first;unchanged bodies provenance only. No assumed safe task,global serialization or memory lease.",
+    "boundaries": "All25 independent patches,8profiles,3111+39/default42/CPUstorage/parentarchives frozen. Unsupported contiguous branch stays unavailable;no kernel_task substitution,allocator/cache/import policy expansion,global lock or driver selection. No native/time/atomic/factory/descriptor/prepare/discard/provider/phone execution or new component/runtimecaller/FD/kernel/candidate/wire. Actual owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal,catalog rolefullcore/core/externalmanager remain incomplete."
+  },
+  "qualification": "Exact source/state binding only;no whole factory concurrency/backoff timing or native owner/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

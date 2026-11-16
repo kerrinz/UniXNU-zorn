@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-13",
+  "candidate": "v100",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v100-gmu-clocks-8359aa2d16cf4b609c534c968dcc2047/boot-package/boot.ZORN26-GPU-V100-GMU-CLOCKS-UNSELECTED.img",
+    "sha256": "84dcdfdd264127b68d800a5e4eadc0e4910d38d6034b13448db34d8623f40d8b",
+    "bytes": 11685888
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v100-gmu-clocks-8359aa2d16cf4b609c534c968dcc2047/boot-package/verified.json",
+    "sha256": "384a398733ca08be56a09892eb2364b9a94d3e013b70c0ea86e85d9d92be6d21"
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v100-gmu-clocks-8359aa2d16cf4b609c534c968dcc2047/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "sha256": "345215573af14c0c197fd98444e5aea987ebb0524234d5c6461d89c0d64d126c",
+    "bytes": 30574792,
+    "inputs": 1397,
+    "replaced": 19,
+    "preserved": 1378,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v100-gmu-clocks-8359aa2d16cf4b609c534c968dcc2047/full-link/exact-inputs.json",
+      "sha256": "336c5961f7c79a8963a695249832a8f038d5d35b16cd40ff686d9607b3177dd8"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "1245-ZornGen7RegisterMaps26.cpo",
+      "1246-ZornGen7SmmuRuntimePm26.cpo",
+      "1250-ZornGen7SmmuDomain26.cpo",
+      "1256-ZornGen7SmmuFaultIrq26.cpo",
+      "1257-ZornGen7SmmuStream26.cpo",
+      "1272-ZornGen7IccInputs26.cpo",
+      "1287-ZornGen7StartupOwner26.cpo",
+      "1305-ZornTouchPlatform26.cpo",
+      "1306-ZornRootPlatform26.cpo",
+      "1311-ZornGen7NativeBoardStage26.cpo",
+      "1312-ZornGen7PlatformBoardBridge26.cpo",
+      "1317-ZornGen7QtbFence26.cpo",
+      "1322-ZornGen7InactiveOwner26.cpo",
+      "1374-ZornGen7DarwinBoardOwner.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "houji_recovery26.o"
+    ],
+    "device_access": false,
+    "platform_root_contract_rebuilt": true
+  },
+  "args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1",
+  "scope_bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v100-gmu-clocks-8359aa2d16cf4b609c534c968dcc2047/root-trial/bundle.json",
+    "sha256": "fba963481171f2184e7b5af3480d9c2bdf3b974353915666363a549886e827b8"
+  },
+  "status": "complete host build and package with exact fixed-runner inputs"
+}

@@ -1,0 +1,85 @@
+{
+  "status": "actual-PID1-EL0-BSD-entry-observer-source-built-unselected",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae",
+  "source_selection": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/root-EL0-entry-748eea25b5e84433a9d095f8d50947ae",
+    "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac/full-link",
+    "prior": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-init26-3027f9f1fd594afb91eb87d3bc1dd4ac",
+    "scope": "Actual BSD syscall entry tests PID1 and real64bit EL0 saved mode;not syscall completion. Existing ready owner/rootdev match and UFS core,atomic once-only write. Earlier header/mount/image records excluded,no new transport or retry;no user pointers/arguments/PC recorded."
+  },
+  "compile": [
+    {
+      "name": "ZornUfsCore26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/ZornUfsCore26.cpo",
+      "sha256": "b0600b2d90b8cfba189fcfef2a49c770fb71ff1969727ec9f758393ac2c5ed7f",
+      "warnings": 0
+    },
+    {
+      "name": "ZornPlatformRecordStart26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/ZornPlatformRecordStart26.cpo",
+      "sha256": "b841b748db67e854ffc214281578bd85b30274fec7ede0a2bd90de4f49882c91",
+      "warnings": 0
+    },
+    {
+      "name": "ZornHfsRoot26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/ZornHfsRoot26.cpo",
+      "sha256": "a029089f2935dbe8d0a95ea10e2d477c1a20e6efaa37e4e0868c09509c3d9628",
+      "warnings": 0
+    },
+    {
+      "name": "houji_recovery26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/houji_recovery26.o",
+      "sha256": "0df9cc81a45e591921105472558f302b88a43495d497912ef779e25e4b2bb05c",
+      "warnings": 0
+    },
+    {
+      "name": "ZornUfsOwner26",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/ZornUfsOwner26.cpo",
+      "sha256": "77b701557a609159f237945b828203fcd1e839bd227be6cfdf1d4ac92b0777ac",
+      "warnings": 0
+    },
+    {
+      "name": "systemcalls",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/systemcalls.o",
+      "sha256": "e52bd690f69e2517e1538af01722c53b59478879efbd2ac5aa2065279f49b8b2",
+      "warnings": 0
+    }
+  ],
+  "link": {
+    "exit": 0,
+    "seconds": 0.15564716600056272,
+    "inputs": 1390,
+    "replaced": 6,
+    "preserved": 1384,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "f200a5b3bb48e192ae7f401e123843a7dbf2509cca7875eb68f8a32a602e976f",
+    "bytes": 30311104
+  },
+  "actual_machine_guard": {
+    "kernel_sha256": "f200a5b3bb48e192ae7f401e123843a7dbf2509cca7875eb68f8a32a602e976f",
+    "actual_calls": [
+      {
+        "symbol": "_proc_pid",
+        "instruction": 18446744005120019004
+      },
+      {
+        "symbol": "_zorn_ufs_root_EL0_record26",
+        "instruction": 18446744005120019056
+      }
+    ],
+    "actual_PID1_guard": true,
+    "actual_saved_state_64_flavor_guard": 21,
+    "actual_EL0_mode_mask_must_be_zero": 31,
+    "all_three_failed_guards_skip_record_call": true,
+    "actual_argument_symbol": "_rootdev",
+    "registered_root_match_and_source_atomic_once_gate": true,
+    "no_user_pointer_argument_or_PC_recorded": true,
+    "new_transport_initialization_or_binding": false,
+    "syscall_completion_or_launchd_services_proven": false,
+    "phone_executed": false
+  },
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-EL0-entry26-748eea25b5e84433a9d095f8d50947ae/root-package/verified.json",
+  "device_executed": false,
+  "not_a_userland_or_GPU_success_receipt": true
+}

@@ -1,0 +1,219 @@
+{
+  "status": "CPU-osanalytics-demand-service-root-installed-readback-verified",
+  "recorded_at": "2026-11-12T07:08:24.826793+08:00",
+  "scope": "K80-persistent-iOS26-CPU-osanalytics-delta-471dfed2",
+  "root_sha256": "515fa6c6a231b50556dce7353197f7c908225da8ff51f3d13eec15ee1f7daad5",
+  "previous_root_sha256": "176355f5ca17520b69014abc73bdf3b937455277425c7a1c810de689f2b9cad1",
+  "actual_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/result.json",
+    "sha256": "a5e8cb0cdd9b41bf4f095ee5b348074fd1d5b2f6b86d990b7c519cbd6752fbe1"
+  },
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/review-inputs.json",
+    "sha256": "34ca1815b312d4f96062377fa77e89e3246e8dd2a0dd9f51041f802cbda67f6e"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/admission.json",
+    "sha256": "b44c28d7308e2101c179edc2404129d21f5792855759e60a2ef57e1cf838a4d5"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/one-shot.claim.json",
+    "sha256": "67d32e745b4d61dce5c5038a0ae8d21a8bdd7e0bbbf878fcecc24d4d0b517873"
+  },
+  "installer_runner_snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/installer-run-zorn-debug.py",
+    "sha256": "130b67f87c3d9c4b734f270f2aa32ed8e56c80bb80dfb5ae4aca57181dc761c9"
+  },
+  "installer_entry_snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/installer-root-entry.py",
+    "sha256": "c556c433139d27150ce2d93553ea6e3fb3576b4b9dd9c2e0343528039d89c4e6"
+  },
+  "host_source_BCB_controls": {
+    "passed": true,
+    "new_groups": 15,
+    "new_pages": 86,
+    "retained_pages": 5830,
+    "retained_groups": 117,
+    "source_and_BCB_refusals": [
+      "new-root-digest",
+      "GPU-selected",
+      "delta-page-hash",
+      "retained-latest-receipt",
+      "previous-claim-reusable",
+      "previous-review-lineage",
+      "previous-runner-lineage",
+      "misc-short",
+      "misc-tail",
+      "misc-command"
+    ],
+    "legacy_install_scope_parameters_unchanged": true,
+    "phone_accessed": false
+  },
+  "host_mode_controls": {
+    "mode": "unattended-phone-connected",
+    "refused_controls": [
+      "attended-mode",
+      "wrong-root",
+      "active-run",
+      "stop-state",
+      "boot-enabled",
+      "wrong-admission"
+    ],
+    "new_pages": 86,
+    "retained_pages": 5830,
+    "no_device_transport_executed": true
+  },
+  "actual_prior_page_verification": {
+    "pages": 5830,
+    "groups": 117,
+    "bytes": 23879680,
+    "sha256": "c52e5d44bbf7b1e2394ad3e0ff3d7eab524462a6edc9aa49f652d1041d6525d9",
+    "capture": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/prior-root-changed-pages.before.bin",
+      "sha256": "c52e5d44bbf7b1e2394ad3e0ff3d7eab524462a6edc9aa49f652d1041d6525d9"
+    },
+    "source_cohort": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/prior-root-readback-layout.json",
+      "sha256": "8e6931717a2b8f66594bf6ad2f11731819c94ad432ca630fff6f38c36c6013c8"
+    }
+  },
+  "new_written_page_readback": {
+    "scope": "written4KiB-root-pages-only",
+    "blocks": 86,
+    "bytes": 352256,
+    "sha256": "e90e567c8087f224f9263145d26fbe5cc9be85c485012c1222af303a252b0f64"
+  },
+  "new_groups": 15,
+  "all_new_preimages_checked_before_any_write": true,
+  "all_actual_group_preimages_and_readbacks_equal_local_delta": true,
+  "protected": [
+    {
+      "name": "Data",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/Data.before.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/Data.after.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "equal": true
+    },
+    {
+      "name": "after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/after.before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/after.after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "backup_GPT",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/backup_GPT.before.bin",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/backup_GPT.after.bin",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054"
+      },
+      "equal": true
+    },
+    {
+      "name": "before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/before.before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/before.after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "log",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/log.before.bin",
+        "sha256": "9155a27f948db10aee5120e3e65b4a9f7b012ef9d6580972c65275b35506e78c"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/log.after.bin",
+        "sha256": "9155a27f948db10aee5120e3e65b4a9f7b012ef9d6580972c65275b35506e78c"
+      },
+      "equal": true
+    },
+    {
+      "name": "misc",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/misc.before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/misc.after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "equal": true
+    },
+    {
+      "name": "primary_GPT",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/primary_GPT.before.bin",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/primary_GPT.after.bin",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967"
+      },
+      "equal": true
+    },
+    {
+      "name": "root_manifest",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/root_manifest.before.bin",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osanalytics-delta-review26-471dfed2/admission/run/root_manifest.after.bin",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d"
+      },
+      "equal": true
+    }
+  ],
+  "recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "helper_protocol_run_id": "cce96d56630b4b0680fe31845102c730",
+  "helper_binary_unchanged": true,
+  "stock_derived_local_demand_service_plist_only": true,
+  "installed": true,
+  "booted_by_installer": false,
+  "full_phone_root_readback": false,
+  "claim_consumed_no_repeat": true,
+  "layout_changed": false,
+  "GPU_or_touch_started": false,
+  "service_runtime_and_report_generation_qualified": false,
+  "lockscreen_proven": false,
+  "no_disassembly_or_reverse_engineering": true,
+  "goal_complete": false,
+  "next_action": "Fresh separately reviewed single471dfed2 boot on installed515f,with same helpercce,CPU selected,GPU/touch off,300s watchdog/600s recovery deadline;observe osanalyticshelper first exec activation/exit and full selected ordinary report message. No replay of any consumed install or boot claim."
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Offline pinned OEM map failure contract and unapplied current-native cache-error retention repair only.",
+  "result": {
+    "updated": "2026-11-02T00:08:57.617040+08:00",
+    "state": "exact-reference-lower-map-error-contract-bound-isolated-native-cache-error-retention-repair-compiled",
+    "reference_revision": "453d8875f815bf9dfad9035982861226a4823a6c; OEM reference, not Xiaomi exact stock source",
+    "primary_sources": {
+      "primary-fetch.json": {
+        "url": "https://raw.githubusercontent.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650/453d8875f815bf9dfad9035982861226a4823a6c/vendor/qcom/opensource/graphics-kernel/kgsl_gmu_core.c",
+        "reference_revision": "453d8875f815bf9dfad9035982861226a4823a6c",
+        "reference_not_Xiaomi_exact_source": true,
+        "web_fetch": "Cache miss; no content returned",
+        "sandbox_attempt": {
+          "url": "https://raw.githubusercontent.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650/453d8875f815bf9dfad9035982861226a4823a6c/vendor/qcom/opensource/graphics-kernel/kgsl_gmu_core.c",
+          "reference_revision": "453d8875f815bf9dfad9035982861226a4823a6c",
+          "reference_not_Xiaomi_exact_source": true,
+          "web_fetch": "Cache miss; no content returned",
+          "error": "URLError(gaierror(8, 'nodename nor servname provided, or not known'))"
+        },
+        "status": 200,
+        "final_url": "https://raw.githubusercontent.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650/453d8875f815bf9dfad9035982861226a4823a6c/vendor/qcom/opensource/graphics-kernel/kgsl_gmu_core.c",
+        "bytes": 9427,
+        "sha256": "af4a5b04f2aef2536434f4cb07d2c928a40fd528786bafc365a7a7299958eb34"
+      },
+      "kgsl_mmu.h.fetch.json": {
+        "url": "https://raw.githubusercontent.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650/453d8875f815bf9dfad9035982861226a4823a6c/vendor/qcom/opensource/graphics-kernel/kgsl_mmu.h",
+        "requested_because": "new exact helper calls kgsl_mmu_map_sg, not direct iommu_map_sg; follow only its actual definition",
+        "reference_not_Xiaomi_exact_source": true,
+        "status": 200,
+        "bytes": 13696,
+        "sha256": "e823b0e9dbcda345c83e5ee0a34011f7c03d0697683a906bd8d89865abb99604"
+      },
+      "kgsl_mmu.c.fetch.json": {
+        "url": "https://raw.githubusercontent.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650/453d8875f815bf9dfad9035982861226a4823a6c/vendor/qcom/opensource/graphics-kernel/kgsl_mmu.c",
+        "requested_because": "pinned header supplies exact prototype only; bind its implementation/cleanup before native retention logic",
+        "reference_not_Xiaomi_exact_source": true,
+        "status": 200,
+        "bytes": 17656,
+        "sha256": "a0ef9422cc24d350f91a182ff8fba3c990ab6e8d1b24836284b755990cdb1ce9"
+      }
+    },
+    "source_pins": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-map-retention/kgsl_gmu_core.c": "af4a5b04f2aef2536434f4cb07d2c928a40fd528786bafc365a7a7299958eb34",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-map-retention/kgsl_mmu.h": "e823b0e9dbcda345c83e5ee0a34011f7c03d0697683a906bd8d89865abb99604",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-map-retention/kgsl_mmu.c": "a0ef9422cc24d350f91a182ff8fba3c990ab6e8d1b24836284b755990cdb1ce9",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoVm.h": "da9bfcef9d5b7231d0143b853cf9de4535df0f749bb0023e2f052bb7823db6fa",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/drivers/NativeAdreno/NativeAdrenoVm.cpp": "2b8af29039d900d171a2b07649898be7c967651440e5910678fd80ab98ec863b",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno_gen7_gmu.c": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851"
+    },
+    "findings": [
+      "Exact gmu_core_map_memdesc body never writes memdesc->gmuaddr. It passes only domain/address/scatterlist/count/attrs to kgsl_mmu_map_sg; temporary SG construction failure returns its original error without attempting a map. The new source closes the prior descriptor-mutation unknown at this layer.",
+      "The dynamic caller reserved local addr but on failure looks up md->gmuaddr. The lower helper does not set that field; for an initially different value this is not the attempted reservation address. No actual failed phone mapping is claimed; this is a reference-source mismatch.",
+      "The core function preserves a negative mapper result, converts zero to -ENOMEM and folds any positive byte count to0 without comparing against memdesc->size. It exposes no mapped byte count or cleanup return and invokes no explicit unmap in this body.",
+      "The exact kgsl_mmu wrapper forwards to iommu_map_sg with GFP_KERNEL for kernel>=6.2, otherwise the five-argument form. The selected Linux core implementation/configuration and real rollback behavior remain unbound; failure must not authorize native release.",
+      "Current NativeAdrenoVm map records a real device reference and mapping metadata before cache publication. A cache publication failure is folded by fail(ArmSmmu4KIoError) to generic IOReturnIOError, losing the raw native publication status in its previous result. Source-only repair captures that first raw32 cache error in separate persistent private metadata before fail.",
+      "The repair does not change the outward mapping return, retry/cleanup/poisoning behavior or hardware permissions. Its separate persistent field survives ordinary result_ clearing, so a later operation cannot erase the original error. Only map-publication errors are covered; no universal native error capture is claimed."
+    ],
+    "repair": {
+      "patch": "native-cache-error-retention.UNAPPLIED.patch",
+      "sha256": "2f63e6677b94ec9e56f7fcef466e02afd34b9057ede054aec3bc5c9c67a79f81",
+      "upstream_applied": false,
+      "native_layout_changed_only_in_isolated_candidate": true,
+      "report_private_not_wire": true,
+      "not_final_kernel_ABI": true
+    },
+    "host_scope": "Only the byte-bound exact GPL reference function body runs negative/zero-map/SG-construction failure paths with scalar failure diagnostics. No successful SG allocator, map, address or handle model; no Darwin native method is run. Host projection is not Linux struct/layout or native ABI proof.",
+    "new_error_only_reference_host_negatives": 2,
+    "new_native_source_refusals": 2,
+    "new_native_object_corruptions_refused": 2,
+    "new_wrong_raw_width_compile_refused": 1,
+    "independent_current_iOS17_objects": 3,
+    "recursive_target_inputs": 311,
+    "actual_native_edge": {
+      "typed_publish_call_RVA": 6252,
+      "raw_w0_preserved_in_x8_RVA": 6256,
+      "error_only_branch_RVA": 6264,
+      "available_guard_RVA": 6272,
+      "raw32_and_available_store_RVA": 6280,
+      "store": "stp w8,w9,[x0,#0xf8],w9=1;availability at+4"
+    },
+    "no_initializer": true,
+    "native_API_allocator_VM_provider_callback_phone_calls": 0,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gen7-map-retention/combined-result.json",
+    "checks": "out/zorn/gpu-gen7-map-retention/check-result.json",
+    "object_edges": "out/zorn/gpu-gen7-map-retention/native-edge-result.json",
+    "next_plan": "out/zorn/gpu-gen7-map-retention/next-plan.json"
+  }
+}

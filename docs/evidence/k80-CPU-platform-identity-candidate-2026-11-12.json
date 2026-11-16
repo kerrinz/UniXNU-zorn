@@ -1,0 +1,487 @@
+{
+  "status": "CPU-public-platform-identity-and-normalized-write-observation-candidate",
+  "recorded_at": "2026-11-12T09:51:57.185606+08:00",
+  "record_id": "b45096798bcf46acaf4f1ce3290c0b16",
+  "helper_protocol_run_id": "cce96d56630b4b0680fe31845102c730",
+  "root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+  "root_unchanged": true,
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-service-policy-observed26.json",
+    "sha256": "ae4737385c49f9f056f2657ac154e2eb7b54a2e415ef8eba0b5200eeba5fc95f"
+  },
+  "installed_root_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-service-policy-root-installed26.json",
+    "sha256": "a1807ce8f8e1883b752b6e5166668537dfaeaacf69ff62e5ba8bb386e8b51987"
+  },
+  "maintained_identity_tool": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/prepare-zorn-ios26-platform-identity.py",
+    "sha256": "da14f7eaf5ec8eacf44b51344059a9cfb642d6b86905d37b7a9245b146e79c81"
+  },
+  "identity_profile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-boot26-204e22356d9640b894aa89694272df5a/documented-platform-identity.toml",
+    "sha256": "413a04ffaa2c16616961d7970c8b4d10a1937f694872d185806f8dd53d8ff0b7"
+  },
+  "identity_source_origin": {
+    "reference": "/Volumes/macData/projects/ios-zorn/UniXNU/profiles/os/ipados-26.5.2-23F84/profile.toml",
+    "sha256": "3c1737cc10872767a170e3944690fe9626005ba28994cb5a9216862c43bfc538",
+    "only_four_public_status_properties_used": true,
+    "no_iPad_model_IPSW_Apple_hardware_or_prelink_inputs_imported": true,
+    "official_reference": "https://unixnu.com/zh/guide/mobilegestalt"
+  },
+  "identity_producer": {
+    "added_properties": [
+      "certificate-production-status",
+      "effective-production-status-ap",
+      "certificate-security-mode",
+      "effective-security-mode-sep"
+    ],
+    "chosen_u32": {
+      "certificate-production-status": 0,
+      "effective-production-status-ap": 0,
+      "certificate-security-mode": 1,
+      "effective-security-mode-sep": 1
+    },
+    "original_ADT_restored_exactly_after_removing_additions": true,
+    "existing_root_model_product_buttons_and_hardware_preserved": true,
+    "input_sha256": "9c68b0f6b1dcba58e86b5cee7f05c38763360174d382ced42953ad50e3b8cafb",
+    "output_sha256": "f2f455d14aabd347a93c9158a77153de628f589f2379f1ce084c04610397689a",
+    "root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+    "native_or_phone_executed": false,
+    "runtime_identity_or_activation_success_proven": false,
+    "profile_sha256": "413a04ffaa2c16616961d7970c8b4d10a1937f694872d185806f8dd53d8ff0b7",
+    "source_sha256": "da14f7eaf5ec8eacf44b51344059a9cfb642d6b86905d37b7a9245b146e79c81",
+    "public_reference": "https://unixnu.com/zh/guide/mobilegestalt"
+  },
+  "identity_host_controls": {
+    "result": "PASS",
+    "actual_cli_producer_used": true,
+    "actual_parent_ADT": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-boot26-204e22356d9640b894aa89694272df5a/kernel.cpu-service-policy.UNSELECTED.adt",
+    "original_ADT_restored_exactly": true,
+    "added_bytes": 160,
+    "refused_controls": [
+      "changed-input-hash",
+      "wrong-root",
+      "short-root",
+      "wrong-build",
+      "wrong-product",
+      "bool-format",
+      "extra-top-level",
+      "extra-property",
+      "wrong-value",
+      "bool-property",
+      "wrong-property-type",
+      "already-complete",
+      "wrong-ADT-model",
+      "wrong-board",
+      "conflicting-existing-status",
+      "wrong-status-width"
+    ],
+    "already_correct_partial_input_adds_only_missing": true,
+    "public_profiles_17_26_27_agree": true,
+    "only_four_chosen_u32_properties": true,
+    "no_native_or_phone_execution": true
+  },
+  "native_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/sys_generic.c",
+      "sha256": "b5e439ea06ced2bc391d8f63224d1d9656b7fbe447b53ed563a18837979a2059"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutAdapter26.inc",
+      "sha256": "b49c7edddddbc807cd080052c8033582a613e8dbf120561e9bd27c53abd33e7b"
+    }
+  ],
+  "placement_host_checks": {
+    "result": "PASS",
+    "modes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "actual_public_uio_residual_calculation_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/kern/kern_subr.c",
+    "actual_native_fp_writev_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/sys_generic.c",
+    "old_placement_reproduces_zero_active_count_with92native_bytes": true,
+    "new_placement_captures92bytes": true,
+    "native_residual_error_excludes_observer": true,
+    "scalar_vector_leading_empty_partial_error_signal_no_observer_socket_flags_budget_controls": true,
+    "original_native_source_restored_exactly": true,
+    "only_ephemeral_typed_observer_context": true,
+    "no_hardware_backend_stub_added": true,
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "device_access": false
+  },
+  "stdio_regressions": {
+    "result": "PASS",
+    "modes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "workers": 64,
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "scalar_and_vector_shared_path_source_restored_exactly": true,
+    "first_process_uniqueid_only": true,
+    "stdout_stderr_separate": true,
+    "socket_payloads_excluded": true,
+    "pre_native_UIO_metadata_post_native_successful_accepted_bytes": true,
+    "ephemeral_addresses_only": true,
+    "budget": 32,
+    "iov_max": 16,
+    "copy_max": 512,
+    "history_record_cap": 256,
+    "message_record_cap": 127,
+    "copy_drop_gap_prevents_cross_gap_line_join": true,
+    "original_line_assembler_reused_with_only_named_target_and_gap_deltas": true,
+    "helper_protocol_unchanged": true,
+    "root_unchanged": true,
+    "skip_categories": 4,
+    "first_skipped_native_metadata_publication_tested": true,
+    "device_access": false
+  },
+  "native_formatter_decoder_checks": {
+    "result": "PASS",
+    "native_source_formatter": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/1-1-1-1-1-platform-direct-caller-184e16363d344aa693d16c6ff92973f3/ZornUfsOwner26.cpp",
+    "native_formatter_sha256": "c8cf4ca2ca4e75094829526620acd095c1b4df5f189f8e736b2889cb2c2600a7",
+    "decoder_sha256": "3df48eac4889dcd04e3bf6f370dca91c3035ff4b2c38a7781a54f678898e0e7a",
+    "actual_formatter_to_context_CRC_decoder_cases": [
+      {
+        "mode": 0,
+        "base_bytes": 101,
+        "context_payload_bytes": 207
+      },
+      {
+        "mode": 1,
+        "base_bytes": 101,
+        "context_payload_bytes": 268
+      },
+      {
+        "mode": 2,
+        "base_bytes": 101,
+        "context_payload_bytes": 260
+      },
+      {
+        "mode": 3,
+        "base_bytes": 101,
+        "context_payload_bytes": 313
+      },
+      {
+        "mode": 4,
+        "base_bytes": 101,
+        "context_payload_bytes": 207
+      },
+      {
+        "mode": 5,
+        "base_bytes": 101,
+        "context_payload_bytes": 207
+      },
+      {
+        "mode": 6,
+        "base_bytes": 102,
+        "context_payload_bytes": 1859
+      },
+      {
+        "mode": 7,
+        "base_bytes": 101,
+        "context_payload_bytes": 235
+      },
+      {
+        "mode": 8,
+        "base_bytes": 220,
+        "context_payload_bytes": 1985
+      },
+      {
+        "mode": 9,
+        "base_bytes": 101,
+        "context_payload_bytes": 219
+      },
+      {
+        "mode": 10,
+        "base_bytes": 101,
+        "context_payload_bytes": 210
+      },
+      {
+        "mode": 11,
+        "base_bytes": 101,
+        "context_payload_bytes": 746
+      },
+      {
+        "mode": 12,
+        "base_bytes": 101,
+        "context_payload_bytes": 208
+      },
+      {
+        "mode": 13,
+        "base_bytes": 101,
+        "context_payload_bytes": 209
+      },
+      {
+        "mode": 14,
+        "base_bytes": 101,
+        "context_payload_bytes": 252
+      },
+      {
+        "mode": 15,
+        "base_bytes": 101,
+        "context_payload_bytes": 228
+      }
+    ],
+    "semantic_refusals": 43,
+    "wire_refusals": 12,
+    "source_owned_metadata_JSON_only_not_IPC_payload": true,
+    "both256byte_histories_and_full127byte_selected_messages_fit": true,
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "device_access": false
+  },
+  "actual_native_binding": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/observer-native-binding-proof.json",
+    "sha256": "1cb1c763d2278b45d7b7d234fac62f559d6166fca2bc1f393de56b2bac0ab111"
+  },
+  "actual_root_binding": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/RootPlatform-dependency-proof.json",
+    "sha256": "46c98ac4e528cb2f7da8b376807e293454d493e6315c5485ea89956c8ed13040"
+  },
+  "compiler_stack": {
+    "result": "PASS",
+    "objects_byte_identical": true,
+    "selected_frames": [
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/1-1-1-1-1-platform-direct-caller-184e16363d344aa693d16c6ff92973f3/ZornUfsOwner26.cpp:245:_ZL31zorn_userland_progress_worker26Pvi\t9024\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel1Backend26.inc:8:zorn26_sbout1_reserve\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel1Backend26.inc:14:zorn26_sbout1_path_result\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel1Backend26.inc:21:zorn26_sbout1_skip\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel1Backend26.inc:59:zorn26_sbout1_commit\t96\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel1Backend26.inc:32:zorn26_sbout1_publish_line\t1120\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel1Backend26.inc:84:zorn26_sbout1_snapshot\t32\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel2Backend26.inc:8:zorn26_sbout2_reserve\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel2Backend26.inc:14:zorn26_sbout2_path_result\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel2Backend26.inc:21:zorn26_sbout2_skip\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel2Backend26.inc:59:zorn26_sbout2_commit\t96\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel2Backend26.inc:32:zorn26_sbout2_publish_line\t1120\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutChannel2Backend26.inc:84:zorn26_sbout2_snapshot\t32\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:9:zorn26_sbout_reserve\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:15:zorn26_sbout_skip\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:16:zorn26_sbout_iov_seen\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:17:zorn26_sbout_meta_end\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:22:zorn26_sbout_multi\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:23:zorn26_sbout_result\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:30:zorn26_sbout_invalid\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:31:zorn26_sbout_commit\t0\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/ZornSBOutBackend26.inc:32:zorn26_sbout_snapshot\t2400\tstatic"
+    ],
+    "compiler_diagnostics_only_not_binary_inspection": true,
+    "shared_write_frames": [
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/sys_generic.c:586:fp_writev\t128\tstatic",
+      "source/os/ios26/cpu-platform-fix-b45096798bcf46acaf4f1ce3290c0b16/native/sys_generic.c:665:writev_internal\t1088\tstatic"
+    ],
+    "whole_stack_qualification": false
+  },
+  "machine_diagnostics_remain_excluded": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/native-proof/machine-diag-preprocess.json",
+    "sha256": "c334093e60e702fa0403ceb23bfaae1a62012e938c054e76e9b19082544b5dc3"
+  },
+  "ADT": {
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/kernel.platform-fix.UNSELECTED.adt",
+    "output_sha256": "f2f455d14aabd347a93c9158a77153de628f589f2379f1ce084c04610397689a",
+    "root_sha256": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+    "root_unchanged": true,
+    "parent_adt": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-boot26-204e22356d9640b894aa89694272df5a/kernel.cpu-service-policy.UNSELECTED.adt",
+    "only_four_documented_chosen_u32_properties_added": true,
+    "identity_producer_receipt": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-boot26-204e22356d9640b894aa89694272df5a/documented-platform-identity-adt/receipt.json",
+    "identity_host_checks": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-service-boot26-204e22356d9640b894aa89694272df5a/documented-platform-identity-host-check.json"
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/full-link/kernel.ZORN26-CURRENT-ROOT-USERLAND-CONTROL.UNSELECTED.macho",
+    "sha256": "01f2eae5dbd64d6e3854256d55d52faec45d23d5fab19fcc8a2fff946da66aeb",
+    "bytes": 30496336,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 16,
+    "preserved": 1381,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/boot-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "f2cb17588d38aaa530ca26f81ab56254e5592c8e6237137963d655dc961d27b9",
+    "bytes": 11661312
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/boot-package/verified-installed-root.json",
+    "sha256": "094cd67e7dafe70aa17c96a2beed8754469473a0454b670fce211ec9d492280c"
+  },
+  "scope": {
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/root-trial-platform-identity/bundle.json",
+      "sha256": "a619a8920b71ccdb1b398d084d17cae4f929896a9aa45e3fec4683f5c221127a"
+    },
+    "admission": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/root-trial-platform-identity/admission.json",
+      "sha256": "1250c9378ce63d0ea5cc32a5039f6a1d226a83e0334db2fa66a8153e20e60c74"
+    },
+    "plan": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/root-trial-platform-identity/device-plan.json",
+      "sha256": "043d8cab90d055f6e5592f3add8fcc0fd2c384cd713993f40b330d66df2d91b4"
+    },
+    "proof_controls": {
+      "canonical_bundle": true,
+      "proof_refusals": [
+        "actual_PID1_guard",
+        "registered_root_match_and_source_atomic_once_gate",
+        "CPU_presenter_selected",
+        "CPU_presenter_source_path_preserved",
+        "framebuffer_counts_and_stages_in_existing_record",
+        "SpringBoard_kernel_lifecycle_correlated_by_uniqueid",
+        "collector_only_ordinary_error_fields",
+        "collector_RAMFS_gate_implemented",
+        "collector_helper_uniqueid_runid_first_target_checked",
+        "collector_input_data_owned",
+        "actual_root_consumer_recompiled_and_bound",
+        "native_HID_userland_sampler_compiled_out",
+        "root_installed_receipt_bound",
+        "final_gpt_read_and_existing_log_share_transport_lock",
+        "single_existing_log_write_no_retry",
+        "stdio_first_process_uniqueid_gate",
+        "stdio_shared_scalar_vector_path_native_preserved",
+        "stdio_stdout_stderr_separate",
+        "stdio_socket_payloads_excluded",
+        "stdio_pre_native_UIO_metadata_ephemeral",
+        "stdio_post_native_successful_accepted_bytes_only",
+        "stdio_native_error_and_fileproc_drop_preserved",
+        "stdio_gap_marks_prevent_cross_gap_join",
+        "stdio_line_assembler_source_reused",
+        "stdio_machine_rows_excluded_hex_redacted",
+        "stdio_host_checks",
+        "stdio_actual_formatter_CRC_decoder_checks",
+        "stdio_actual_native_dependencies_checked",
+        "stdio_record_omissions_explicit",
+        "platform_single_CDB_and_lock_sequence_preserved",
+        "platform_legacy_zero_tail_preserved",
+        "platform_actual_selected_IO_source_host_checked",
+        "source_owned_metadata_JSON_only",
+        "helper_protocol_unchanged",
+        "stdio_first_skip_native_metadata_scalar_only",
+        "stdio_skip_classification_host_checked",
+        "project_machine_diag_excluded_native_preprocessor",
+        "project_machine_diag_inert_callbacks_host_checked",
+        "userland_machine_diag_excluded",
+        "two_existing_job_Disabled_only",
+        "service_policy_root_delta_receipt_bound",
+        "source_root_lineage_preserved",
+        "installed_root_unchanged",
+        "stdio_preparation_after_native_residual_calculation",
+        "stdio_actual_native_calculation_placement_host_checked",
+        "documented_chosen_status_overlay_source_checked",
+        "documented_chosen_status_only_four_u32",
+        "documented_chosen_overlay_hardware_unchanged",
+        "root_image_and_helper_unchanged",
+        "root_sha256",
+        "record_id",
+        "checkpoint_delay_ms",
+        "existing_record_relative_lba",
+        "record_pages",
+        "stdio_shared_reservations",
+        "stdio_iov_max",
+        "stdio_copy_bytes",
+        "stdio_history_record_cap",
+        "stdio_selected_message_cap",
+        "platform_base_record_bytes",
+        "platform_context_record_bytes",
+        "platform_context_record_offset",
+        "platform_page_bytes",
+        "stdio_skip_reasons",
+        "documented_chosen_status_count",
+        "noncanonical-path"
+      ],
+      "legacy_scope_inputs_and_root_lineages_unchanged": true,
+      "device_access": false
+    },
+    "mode_controls": {
+      "refusals": [
+        "active-run",
+        "device-stop",
+        "offline-mode",
+        "wrong-root",
+        "attended-mode",
+        "boot-enabled"
+      ],
+      "transport_calls": 0
+    },
+    "cohort_controls": {
+      "result": "PASS",
+      "refusals": [
+        "stale-source-root-in-package",
+        "uninstalled-package",
+        "old86-page-receipt",
+        "changed-install-claim"
+      ],
+      "device_access": false
+    }
+  },
+  "limits": [
+    "Adds only four documented virtual platform identity attributes;does not assert actual K80 efuse state,activation success or a proven SIGTRAP cause. No private method replacement or new activation success stub.",
+    "Native original residual calculation/error return precedes observer;original fo_write/count/error/signals/fp_drop/control restored exactly after removing only diagnostic changes. Typed optional scope exists only on current stack;dofilewrite passesNULL.",
+    "Ordinary firstSB fd1/fd2 vnode/pipe only;socket payloads,positioned writes,earlier file preparation and failed native residual calculation excluded. Same32tickets/16vectors/512tailcopy and metadata/line filtering limits.",
+    "Root64c/helpercce/library/two Disabled jobs/var.skel unchanged;no root/Data/Android/boot-partition write or new installation scope.",
+    "Compiler owner9024/snapshot2400/publish1120/fpwrite128/sharedwrite1088 are selected compiler frames,not whole-stack qualification.",
+    "New full1397-input kernel has16replacements/no undefined;actual selected source recompiles/dependencies and CRC/tag parser pass. This is not hardware/lockscreen qualification.",
+    "Camera unavailable on prior204e trial;no alternate camera or visual claim. Public ADT model/product/buttons/hardware/loader zero slots remain unchanged."
+  ],
+  "device_access": false,
+  "hardware_result_included": false,
+  "lockscreen_proven": false,
+  "goal_complete": false,
+  "next_action": "Single b450 CPU public-platform-identity/normalized-output boot candidate ready on unchanged installed64c/helpercce. Public documented4chosen u32 values0/0/1/1 added via official typed_properties;actual parent restored byte-for-byte after removing160addedbytes,16refusals. Native fp_writev performs original uio_calculateresid_user before stdio prepare and fo_write;18actual public-source sanitizer modes reproduce old0active/92native skip and new92capture,scalar/vector/error/partial/socket/nativecalls source restored.34adapter regressions/16formatter states/55refusals/native binding pass. Kernel01f2eae5/bootf2cb1758 bound actual81-page receipt,root unchanged,root/helper/source preserved,no machine diagnostics.66proof+4rootcohort+6mode refusals;new fixed scope,WDT300/host600,sample0,GPU/touch off. Only hardware can establish platform status effect,ordinary firstSB text/exit/frame/VSync/Recovery;no retry204e,no new root install/private interface or reverse engineering."
+}

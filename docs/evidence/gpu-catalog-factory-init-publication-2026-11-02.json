@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T09:47:18.231314+08:00",
+  "state": "Catalog149-factory-initialization-publication-unapplied",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-factory-init-publication/source-contract.json",
+  "new_source_mutations_refused": 4,
+  "new_actual_object_mutations_refused": 2,
+  "new_current_iOS17_object_pairs": 1,
+  "recursive_inputs": 328,
+  "new_driver_patches": 1,
+  "patch_count": 25,
+  "failedBytes_failedAt_still_unqualified": true,
+  "imports_equal_sealed_parent": true,
+  "no_new_initializer_or_atomic_runtime_helper": true,
+  "all25_patches_independent_UNAPPLIED": true,
+  "no_native_API_or_success_model_or_phone_execution": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "identity": "Exact catalog Adreno740149ef6d8 NativeAdrenoMemory.cpp and NativeAdrenoPublish.cpp versus selected current iOS17 IOUserClient and actual PE/ARM time conversion implementations;all complete file SHA pinned. Parent system factory and published-owner contracts read first. Source overlap is conditional evidence,not an observed K80 race.",
+    "shared_storage": "systemDescriptor has function-static contigKiB uint32 sentinelMAX,backoff uint64 zero sentinel,failedBytes size_t and failedAt uint64. Immutable contigMax is distinct. Zero/constant initialization itself needs no new C++ runtime guard. Original helper calls write directly into statics:contigKiB is first set0 then parsed;backoff conversion writes output during conversion. Concurrent initialization may observe transitional data or have unsynchronized writes.",
+    "actual_call_gates": "Published BoAlloc takes g.lock briefly for boLimit,unlocks,prepares system pages outside it,and later reacquires for live/core dispatch. Actual allocateSystem fallback can call the same factory inside the core lock. AGXDeviceUserClient is newly constructed per open;selected IOUserClient external-call IPC locking is per instance,choosing read/write/none from that client properties. It does not serialize all connections or the outside-lock producer against core fallback. No new runtimecaller or active K80 selection inferred.",
+    "actual_helper_inputs": "Selected PE parser scans PE_boot_args CommandLine using local cursors and writes caller output. Selected ARM nanoseconds_to_absolutetime converts through rtclock_sec_divisor and writes caller output in stages. Candidate passes only stack parsed/converted values,then publishes with atomic CAS;these native helper functions were not executed. Stable initialized boot/time source is required,not invented clock or walltime qualification.",
+    "repair": "Independent25th factory-hint-initialization.UNAPPLIED.patch changes only initialization publication:acquire-load current value;on sentinel,run same helper into local zeroed typed output;CAS sentinel to that local with release success/relaxed failure;acquire-reload shared winner. Uses local published snapshots at original threshold/expiry expressions. No global lock,generation,new initializer,allocator/API policy,bootarg,5-second value,cleanup,refcount,retry/reset,header/layout or public/wire change. All four inverse substitutions recover entire original file exactly. No old patch composition or live upstream edit.",
+    "sentinels": "Parsed UINT32_MAX or converted0 keep their original sentinel/reinitialization behavior;no guessed nonzero conversion or successful allocation. Multiple concurrent callers may compute local initialization,but unpublished loser values are not used. Native atomic availability is object evidence only,not a new runtime qualification.",
+    "remaining_mutable_pair": "failedBytes and failedAt reads/writes remain byte-identical and non-atomic. Expiry can clear size;failed attempts lower minimum size and always replace timestamp. Initialization repair does not serialize those transitions or prove a coherent threshold/timestamp pair. Whole factory,allocator and backoff concurrency remain unqualified;independent field atomics would not by themselves prove a transaction.",
+    "selected_factory_boundary": "Parent selected iOS17 nullable/nonpageable nil-task rejection remains unchanged;optional contiguous branch is unsupported in normal initialized selected SDK. No kernel_task substitution or contiguity/cache/pool/import selection. Comments/history are not K80 allocation/IOVA/power policy. DefaultOFF narrow CPU registry/GMU variants and all old profiles remain unselected.",
+    "checks": "4new source mutations and2actual Mach-O object mutations refused;independent original source-review git check/apply equals candidate and inverse exact. One fresh actual current iOS17 NativeMemory pair has equal raw SHA,328 recursive source/include/recipe inputs. Actual 32/64-bit LDAR and LDXR/STLXR publication present;helper calls retained. Imports exactly match sealed parent;no atomic runtime helper or initializer added. No old pairs/suites rerun. Unchanged Memory header preserves source class layout only;no new full-module/AppleABI or retained-kernel link proof. RoleAPI/fullcore refusal remains archived and is not retried.",
+    "execution_boundary": "No native factory,bootarg,time,atomic operation,allocator,prepare,cache,descriptor,release,provider,phone or successful host allocation/backoff model executed. No new component/runtimecaller/FD/kernel/candidate/wire;hardware owner/context/route/stop/DMA/readablefailure and GPU/rendering/Metal remain unavailable. Old24 patches and new25 remain independent UNAPPLIED."
+  },
+  "qualification": "Isolated source/object evidence only;not whole factory concurrency,finalkernel,AppleABI,allocation/stop/DMA or GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

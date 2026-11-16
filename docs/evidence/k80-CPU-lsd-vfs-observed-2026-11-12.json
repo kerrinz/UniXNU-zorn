@@ -1,0 +1,220 @@
+{
+  "recorded_at": "2026-11-12T19:39:05.527550+08:00",
+  "status": "recovered-protected-storage-unchanged-root-unqualified",
+  "scope": "single-K80-ios26-CPU-lsd-vfs-300s-cbb23711",
+  "record_id": "cbb23711582b42b3ac52928bb71dcef3",
+  "boot_sha256": "2deb82f0b18b02e6fe1a5b7e64b71a51494bf3412d792f8e6c443b429abb5bed",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_userland_progress=1 zorn26_cpu_presenter=1 zorn26_software_accelerator=1 sample=0 sb_wallpaper=0",
+  "verified_contract_violation": {
+    "observer": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-lsd-vfs-cbb23711582b42b3ac52928bb71dcef3/ZornLSDVfsAdapter26.inc",
+      "sha256": "375cff417bac854350d468310236abf1f840a0fee0e9a106a2641fed1c6ef70b"
+    },
+    "ARM64_copyinstr": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/osfmk/arm64/copyio.c",
+      "sha256": "3be70427aebd03f130de44ca06db5adcbf16a9576fa43b9ccc47a50f29930456"
+    },
+    "condition": "A reserved lsd file call passes NULL as the required copyinstr length output.",
+    "kernel_effect": "ARM64 copyinstr unconditionally stores through the output pointer before checking the user address.",
+    "failure_mode_observed": "Recovery returned at 139.196s with no new diagnostic record.",
+    "exact_device_panic_text_recovered": false
+  },
+  "root_config_audit": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-CPU-lsd-config-audit-2026-11-12.json",
+    "sha256": "08577a87248c178efaeaf52d80ab131b6f806adc8dba3e29c2acaae0cecebed9"
+  },
+  "previous_same_root_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-CPU-sb-peer-observed-2026-11-12.json",
+    "sha256": "e6381bded5b8293416b58f3d1d63317ab377514f51fa215d16d9b789476948d7"
+  },
+  "same_bootargs_as_previous_control": true,
+  "native_file_outcomes": null,
+  "springboard_wait": null,
+  "springboard_reply_peer": null,
+  "CPU_display": null,
+  "prior_CPU_display": {
+    "SpringBoard_pid": 5,
+    "SpringBoard_exit_state": 0,
+    "PosterBoard_pid": 72,
+    "copies_45s": 2,
+    "copies_150s": 2,
+    "vsync_port": false,
+    "vsync_callback": false
+  },
+  "source_selection": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/source-selection.json",
+    "sha256": "340479f784b5acff25d031b9db4d8f90b5c7fd32eed8a38f4be0fee883dfde76"
+  },
+  "compile_and_wire_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/offline-lsd-vfs-verification.json",
+    "sha256": "5f6417a42d4bbfeab0adf581e48e2ff72fac5bc4e04586e305ba2bdc51cfe451"
+  },
+  "collector_and_formatter": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/lsd-vfs-host-check.json",
+    "sha256": "14f0b67963c9b036c399f41c6a2555df5a42dc3e04bbc76a7a1638bbcd281ab0"
+  },
+  "full_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/full-link/link-result.json",
+    "sha256": "eccd5392bcbac8fb09a4d3056a99abd36b1870c87a78eeabb6635667bc21dca1"
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/boot-package/verified.json",
+    "sha256": "2452239b8b6470e8a8182c92b9e865cd40e8eb2f2d94ab66639bc12e4a2d31c8"
+  },
+  "boot_plan": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/device-plan.json",
+    "sha256": "644f6577a899cd41664ee6f792640b184191213a97d365c8ba5da2180b47f537"
+  },
+  "boot_bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/bundle.json",
+    "sha256": "d3a23651bd71af9528450eb00b97fa232e4f086a064cbfec6f71c164ce312d28"
+  },
+  "runner_refusals": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/runner-lsd-vfs-mode-check.json",
+    "sha256": "abe6e95da74fc43da9a765d3db23d8fa66873712da61d31c00290844a07d6bc6"
+  },
+  "earlier_install_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-passive-delta-review26-cc9fbb3b/admission/run/result.json",
+    "sha256": "b3e1a4deb21fcbd473a65e74035c1db844ba5a4898d215c5caa2820c839eaac1"
+  },
+  "new_root_write": false,
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/one-shot.claim.json",
+    "sha256": "23fea28d2b052ba3b7d8071b1a182cdad8842d58ac7f248576d6581dcb31e802"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/run.json",
+    "sha256": "6bcb51fe30c6fbb6c9d5ece65d122bee6e3a8d0c64804c0d52d66a7dc823f36c"
+  },
+  "protected_captures_equal": {
+    "Data": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      }
+    },
+    "Data_metadata": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      }
+    },
+    "after": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "before": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "root_after": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "root_before": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    "root_first_page": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-root_first_page.bin",
+        "sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-root_first_page.bin",
+        "sha256": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+      }
+    }
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "recovery_seconds": 139.19597216701368,
+  "camera_observations": [
+    {
+      "image": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/camera/live-early.jpg",
+        "sha256": "cd77c0657b4e9574dbc95aaa0968aafafd471cdc688476e8b9123718b407b9a3"
+      },
+      "report": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/camera/live-early.json",
+        "sha256": "dbb49d2b6d83a7ced04ee0c2af8c21236519ce46250b7e95bc6f47404955c931"
+      },
+      "seconds_after_fastboot_return": 21.55378246307373,
+      "run_status_at_capture": "single-boot-attempt",
+      "visual_observation": "Boot console with bright unreadable text on a dark background."
+    },
+    {
+      "image": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/camera/live-middle.jpg",
+        "sha256": "62b3f1608cdb4606b007fb60047284d0d39a8ab29d15d6d4a7ca4155769cc278"
+      },
+      "report": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/camera/live-middle.json",
+        "sha256": "301dd54f106fbd880ca9370ebfc11f2b50f314a4c865a8059a25e2ec2826d761"
+      },
+      "seconds_after_fastboot_return": 185.76077365875244,
+      "run_status_at_capture": "recovered-protected-storage-unchanged-root-unqualified",
+      "visual_observation": "TWRP passcode prompt after automatic return to Recovery."
+    }
+  ],
+  "visual_lockscreen_confirmed": false,
+  "visual_welcome_confirmed": false,
+  "before_diagnostic_page": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/before-log.bin",
+    "sha256": "f9a9257d051f0d7a648f6bce429e00bd6704f8d32df8ce8db3cef42bda1dfc61"
+  },
+  "diagnostic_page": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/root-trial-cpu-lsd-vfs/trial/after-log.bin",
+    "sha256": "f9a9257d051f0d7a648f6bce429e00bd6704f8d32df8ce8db3cef42bda1dfc61"
+  },
+  "observed_log_unchanged": true,
+  "decoded": null,
+  "native_record_refusal": "base record envelope/CRC differs",
+  "actual_userland_progress": null,
+  "archive_space_reclaimed": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/archived-historical-ios26-link-maps-lsd-trial-20261112.json",
+    "sha256": "6494915f7a46ac8b6f25aea865b31016002a8ac2f682de3f1cf9f448dd9dc446"
+  },
+  "GPU_started": false,
+  "touch_started": false,
+  "goal_complete": false,
+  "finding": "The diagnostic page was unchanged and retained the preceding run ID, so this trial yielded no new lsd or UI data. Source review confirmed the new observer passed a null length-output pointer to ARM64 copyinstr, which writes the output unconditionally at entry. The device panic text was not captured.",
+  "next_action": "Fix the native copyinstr call and exercise its required length output in the host regression. Rebuild and admit a distinct one-shot CPU package on the same root after verification."
+}

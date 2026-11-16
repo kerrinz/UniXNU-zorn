@@ -1,0 +1,42 @@
+{
+  "status": "research-only-no-device-access",
+  "recorded_at": "2026-11-13T00:30:00+08:00",
+  "user_request": "Search unixnu.com and other devices' UniXNU projects on GitHub for the same problem and its solution",
+  "trigger": "18a1c0e6 boot: SpringBoard main thread waits on a connection port in transit inside one of 3 messages queued on launchd's service port com.apple.sessionservices (domain 1)",
+  "findings": [
+    {
+      "source": "UniXNU-zorn/docs/progress-2026-10-27-gui.md (K80 iOS17, 05:55 section)",
+      "fact": "The original OS read-only shows liveactivitiesd is provided by SessionCore and its launch declaration includes com.apple.sessionservices. On iOS17 SpringBoard was seen in a synchronous ActivityKit/BoardServices request; a later boot moved past it, and the liveactivitiesd-disable candidate 7516d9be was never run."
+    },
+    {
+      "source": "UniXNU/docs/devices/sirius-huajifruit.md, alioth.md, munch-erodenine.md (other UniXNU ports, iPadOS 17)",
+      "fact": "liveactivitiesd crashes repeatedly with SIGTRAP at one fixed PC (alioth/munch: 11 in 420 s; sirius: 17 crashes, 32 exits, xpcproxy exit 78). Sirius symbolized it as a Swift runtime trap in SessionSyncEngine under SessionCore.Daemon.workloop. Later sirius notes attribute SpringBoard and liveactivitiesd crashes to the missing display/framebuffer driver."
+    },
+    {
+      "source": "https://github.com/xVanTuring/UniXNU-qemu (recorded in progress-2026-10-27-gui.md and k80-CPU-cross-device-github-research-2026-11-12.json)",
+      "fact": "With a CPU renderer, liveactivitiesd/chronod/SpringBoard wait unless the AppleKeyStore state/event component is present; the fix was restoring that component and normal service startup, not disabling services."
+    },
+    {
+      "source": "UniXNU/drivers/AppleKeyStoreState, UniXNU/drivers/NativeKeyStoreEvents (used with sheng-aks=1)",
+      "fact": "Upstream UniXNU ships an AppleKeyStore state client handling keybag and lock-state events. The K80 iOS26 kernel instead carries iokit/Kernel/MiniAppleKeyStore.cpp; whether it delivers the lock-state events liveactivitiesd needs is not yet checked."
+    },
+    {
+      "source": "https://unixnu.com/guide/skip-setup, /xnu/boot-arguments, /guide/debugging",
+      "fact": "Official tools: Skip Setup preferences (purplebuddy SetupDone, springboard BKNoWatchdogs), lite= and disable-jobs= to isolate launch jobs, and boot-ui-focus process stack traces. The docs say to keep the services userland needs and use disable-jobs only to rule a dependency in or out."
+    },
+    {
+      "source": "UniXNU/docs/devices/asteroids.md",
+      "fact": "On asteroids the official lite list itself held an XPC wait cycle; the fix was keeping only bluetoothd and coreduetd in sheng-disable-jobs."
+    }
+  ],
+  "no_exact_iOS26_fix_found": true,
+  "candidate_checks_in_order": [
+    "Read the root's launchd job for com.apple.sessionservices (expected com.apple.liveactivitiesd) and the current K80 iOS26 disable/lite list; confirm the job is not disabled by our own policy.",
+    "Add an observation of whether liveactivitiesd is spawned and how it exits (SIGTRAP at a fixed PC as on other ports, or never spawned).",
+    "If it runs and traps, compare K80 MiniAppleKeyStore lock-state/event handling with upstream AppleKeyStoreState/NativeKeyStoreEvents, per the UniXNU-qemu result.",
+    "Use disable-jobs=com.apple.liveactivitiesd only as an isolation test, not as the fix."
+  ],
+  "no_external_issue_post_or_message_sent": true,
+  "no_disassembly_or_reverse_engineering": true,
+  "phone_access_in_research": false
+}

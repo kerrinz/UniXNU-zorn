@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T20:49:09.284700+08:00",
+  "state": "Catalog149-prepare-partial-UPL-owner-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-prepare-upl-owner-contract/source-contract.json",
+  "functions_body_SHA_recorded": 7,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Selected iOS17 wireVirtual partial UPL accumulation/abort and exact149 failed prepare descriptor handling only.7bodySHA/full actual selected-source identities,no old suites/targets/pair rerun.",
+    "accumulation": "wireVirtual sets original access/UPL flags,allocates page-info storage before acquisition. Early page-info size/append failure returns before this acquisition loop. For each successfully returned UPL,appends block into descriptor memoryEntries;append failure aborts/deallocates the current unsaved UPL then abortExit handles previously saved blocks. Actual allocation success/failure not modeled.",
+    "abort": "On abortExit gets saved block count,requests upl_abort then upl_deallocate for each saved nonnull UPL,truncates entries to zero-IOPL data shape and preserves error except two original remaps. upl_abort returns status from abort_range (or invalid-null),but caller ignores it;deallocate separately decrements refcount and may call iodone/destroy only at0. This is not universal page-free or successful abort/stopDMA proof.",
+    "prepare": "prepare calls wireVirtual for virtual types and increments wireCount only on error0. For fresh failed import prepare it therefore does not create successful wire count. PreparedReadOnly is set on original completed Out wiring path,not a promise every failed prefix has no changed metadata. Existing already-prepared error case remains distinct;no blanket complete on failed prepare added.",
+    "release": "Descriptor free for nonphysical types loops complete while wireCount remains,then releases memory-entry storage. Exact importTask releases failed descriptor before optional raw2 Out recreation,and sets NativeMemory preparedtrue only after successful prepare. This source order does not prove all lower acquisition failures return null output or all lower abort callbacks succeed.",
+    "remaining": "wireVirtual lower request error jumps to saved-list abort without separate current-unsaved UPL check at that branch. Ownership/output contract of memory_object_iopl_request/vm_map_create_upl is needed before alleging leak or adding cleanup;uninitialized local block is not read there as a fabricated valid pointer. No successful UPL/page/task/address peers or guessed force-abort/free/refcount policy.",
+    "decision": "No33rd complete/unwire/retry/cleanup/stopDMA policy.32 independent UNAPPLIED/no composition;all native/UPL/prepare/descriptor/allocator/device OFF. K80 ownership/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable;no component/caller/image/wire/CPU/security expansion."
+  },
+  "qualification": "Partial UPL request/abort source only;not final page free/abort/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

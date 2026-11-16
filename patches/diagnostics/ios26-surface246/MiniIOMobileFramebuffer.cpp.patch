@@ -1,0 +1,22 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -57,6 +57,7 @@
+ #if defined(ZORN_IOS26)
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
++#include "ZornSurfaceBacking246.h"
+ static ZornPresentTrace245 zornPresentTrace245;
+ extern "C" int zorn26_present_snapshot245(uint32_t (&out)[16]){return zornPresentTrace245.snapshot(out)?1:0;}
+ #include "ZornFramebufferProgress26.h"
+@@ -1417,9 +1418,9 @@
+                 // Schema,frame,producer,lease,tail,completed,surfaces,first SID,
+                 // all-surface acquire passed,pixel-copy counter advanced,ledger valid,
+                 // counter before/after low words,width,height,reserved.
+-                const uint32_t record[16]={1,swapWord(swap,SWAP_ID),producerFence,lease.gpu()?2u:1u,
++                const uint32_t record[16]={2,swapWord(swap,SWAP_ID),producerFence,lease.gpu()?2u:1u,
+                     tail,retired,count,firstSid,lease.gpu()?1u:0u,after>before?1u:0u,ledger?1u:0u,
+-                    uint32_t(before),uint32_t(after),fWidth,fHeight,0};
++                    uint32_t(before),uint32_t(after),fWidth,fHeight,count?zorn_surface_fence246(firstSid):0};
+                 zornPresentTrace245.publish(record);
+ #endif
+             }

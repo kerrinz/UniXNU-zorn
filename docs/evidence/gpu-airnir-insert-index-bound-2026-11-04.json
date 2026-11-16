@@ -1,0 +1,45 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_AIRNIR_WIDE_INSERT_INDEX_REFUSAL_REPAIR",
+    "timestamp": "2026-11-03T19:48:28.595140+00:00",
+    "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-airnir-insert-index-bound-20261104/source-contract.json",
+    "changed_files": [
+      "Frontend.cpp"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-airnir-insert-index-bound-20261104/insert-index-bound.UNAPPLIED.patch",
+    "patch_sha256": "21370cb1e8568bd200059ba6321150e19268475060d53dcd0561cd4a665ed55f",
+    "checks": {
+      "wide_scalar_witnesses": 3,
+      "small_range_controls": 36,
+      "wide_type_small_value_controls": 4,
+      "source_mutations_refused": [
+        "unsafe-extraction",
+        "wrong-rejection-bound",
+        "wrong-saturation-limit"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "real_local_LLVM_23_api_type_object_only": true,
+      "API_type_object_is_host_not_iOS_or_complete_Frontend": true,
+      "delta_replay_byte_equal": true,
+      "original_kit_files_unchanged": 21,
+      "only_existing_range_guard_changed": true,
+      "no_LLVM_APInt_IR_parser_backend_NIR_shader_or_provider_execution": true,
+      "no_full_compiler_driver_link_or_runtime_selection": true,
+      "old_suites_run": false
+    },
+    "isolated_airnir_source": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-airnir-insert-index-bound-20261104/airnir-source",
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "linux_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-legacy-import-align-unit-20261104/linux-reference",
+    "runtime_selection": false,
+    "complete_Frontend_or_iOS_target_compiled": false,
+    "LLVM_parser_backend_NIR_shader_native_device_execution": false
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-airnir-insert-index-bound-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-airnir-insert-index-bound-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-airnir-insert-index-bound-20261104/archive.json"
+}

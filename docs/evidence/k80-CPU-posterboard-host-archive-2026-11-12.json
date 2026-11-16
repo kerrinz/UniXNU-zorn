@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-11-12T12:07:46.152468+08:00",
+  "status": "offline-adapter-candidate-replayed-and-reviewed",
+  "root_cause": "Transport already archived each device read. The adapter allocated a second 24449024-byte host copy after the 126 retained reads matched and hit ENOSPC before patch preimages.",
+  "stopped_attempt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-posterboard-reply-install-stopped26.json",
+    "sha256": "eff9e0a80c31ec27bd88cfbfe1c33229e338f926f4b998758324f7556a275cd6",
+    "bytes": 5199
+  },
+  "candidate_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-delta-review26-6fc92019/host-archive-candidate/recovery_metal_root_delta.py",
+    "sha256": "b85cf5121f3eb8209fa341c9bada03e3c08c2a832257fbdfd35737fefe539ceb",
+    "bytes": 5326
+  },
+  "source_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-delta-review26-6fc92019/host-archive-candidate/host-archive.patch",
+    "sha256": "fe1b361dcaac8ac968431cdd95ecd9238b0407ca2bdb0f793f224d68918ffc4c",
+    "bytes": 2651
+  },
+  "offline_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-delta-review26-6fc92019/host-archive-candidate/offline-review-inputs.json",
+    "sha256": "8aa343e07d92840d49303d5916f63e3dd35b5aff41d4a038bee9c0997cde4103",
+    "bytes": 19390
+  },
+  "host_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-delta-review26-6fc92019/host-archive-candidate/host-regression.json",
+    "sha256": "c019672e58c1cdce612b9ec966185bda5ee4caab22239d39180ae7d9836afb2d",
+    "bytes": 492
+  },
+  "behavior": "Compare all live retained bytes with the pinned plan, accumulate a digest, clone the pinned aggregate via Darwin clonefile, and verify the clone against the live digest before calling the original delta engine.",
+  "risk": "Requires same-volume APFS clone support and metadata space. The other capture and receipt files still require host space. Clone or verification failures propagate before the first-write guard.",
+  "original_review_still_valid": true,
+  "offline_proposal_refused_by_original_fixed_scope": true,
+  "device_access": false,
+  "fresh_admission_created": false
+}

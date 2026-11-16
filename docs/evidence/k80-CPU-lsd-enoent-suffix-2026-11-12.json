@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-11-12T21:56:00+08:00",
+  "status": "offline ENOENT-suffix candidate packaged, not booted",
+  "record_id": "a1c0e5b7d4f64c0a9e2b8d3c6f1a0e91",
+  "kernel_sha256": "95cd68b4d0a71632035e735ae7a7281a3371ac1375b19f54d2e0c262956d17a0",
+  "boot_sha256": "71444f5a266a197009fe73ba80c7be747311d60f6756d83b4cfdad8a5457e6a9",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "behavior": "Keeps the suffix after /var/db/lsd from the first ENOENT only, at most 31 bytes. A later ENOENT does not replace it. /var/db/com.apple.lsd is not stored in this field.",
+  "host_test": "PASS",
+  "device_ready": false,
+  "booted": false,
+  "next": "A new fixed-runner scope can boot this package once to name the missing /var/db/lsd child. Do not reuse 56812d90."
+}

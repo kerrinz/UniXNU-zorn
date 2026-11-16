@@ -1,0 +1,53 @@
+{
+  "status": "four-legacy-normal-SCM-helpers-connected-to-shared-native-gate-compiled-linked-unexecuted",
+  "date": "2026-11-10T08:28:48.472737+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-c-coordination-c6b5a4c098204fdc83e7ef336b448b48",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-scm-c-coordination26-c6b5a4c098204fdc83e7ef336b448b48",
+  "source_selection": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-c-coordination-c6b5a4c098204fdc83e7ef336b448b48",
+    "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-normal-gate-42a964ec32aa4952b24e7da08836901b",
+    "base_link": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-legacy-scm-transport26-69d12a2276a846ec931848c4b35ad9c5/full-link",
+    "legacy_callers": [
+      {
+        "name": "redwood_adsp",
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-c-coordination-c6b5a4c098204fdc83e7ef336b448b48/legacy-normal-callers/redwood_adsp.c",
+        "original": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/dev/redwood_adsp.c"
+      },
+      {
+        "name": "redwood_wifi",
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-c-coordination-c6b5a4c098204fdc83e7ef336b448b48/legacy-normal-callers/redwood_wifi.c",
+        "original": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/dev/redwood_wifi.c"
+      },
+      {
+        "name": "redwood_adreno",
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-c-coordination-c6b5a4c098204fdc83e7ef336b448b48/legacy-normal-callers/redwood_adreno.c",
+        "original": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/dev/redwood_adreno.c"
+      },
+      {
+        "name": "hakios_dada_gpu",
+        "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-scm-c-coordination-c6b5a4c098204fdc83e7ef336b448b48/legacy-normal-callers/hakios_dada_gpu.c",
+        "original": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/bsd/dev/hakios_dada_gpu.c"
+      }
+    ]
+  },
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-scm-c-coordination26-c6b5a4c098204fdc83e7ef336b448b48/full-link/kernel.ZORN26-scm-C-coordinated.UNSELECTED.macho",
+    "sha256": "d1969698fa702291b3570d2f232495a1d61a09e4691485ff37e13f8fa3dbe4e0",
+    "bytes": 30306568,
+    "inputs": 1393,
+    "replaced": 5,
+    "preserved": 1388,
+    "undefined_symbols": 0
+  },
+  "compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-scm-c-coordination26-c6b5a4c098204fdc83e7ef336b448b48/compile-result.json",
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-scm-c-coordination26-c6b5a4c098204fdc83e7ef336b448b48/actual-C-scm-call-proof.json",
+  "implementation": [
+    "Private C lock-scope bridge uses the same atomically published kernel-lifetime mutex as native CX/ZAP.",
+    "Four real legacy helpers acquire before a normal SCM sequence and release through compiler cleanup on all returned paths;fast-call selection,raw registers,answer writes and100-entry continuation loops retain their old code.",
+    "Context/unavailable/reentrant refusal returns the existing software -1 path before SMC or answer mutation;it is not a captured firmware errno.",
+    "Independent epoch/power/security grants remain mandatory;this synchronization does not provide them."
+  ],
+  "GPU_or_phone_execution": false,
+  "full_goal_complete": false,
+  "next_action": "Close the remaining actual inline/other SCM call paths with source-backed entry applicability or shared sequencing,including the retained HoujiAdspTransport helper. Then implement the real K80 platform power/security handoff and independent epoch producer;do not treat CPU locking as hardware permission."
+}

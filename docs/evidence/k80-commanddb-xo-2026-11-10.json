@@ -1,0 +1,27 @@
+{
+  "status": "actual-resource-XO-address-binding-and-graph-propagation-compiled-linked-unexecuted",
+  "date": "2026-11-10T09:31:09.143577+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-commanddb-xo-3badc85dcc584bf3a19b2cddb82597b7",
+  "native_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/shared/commanddb-xo-3badc85dcc584bf3a19b2cddb82597b7/k80",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-xo26-3badc85dcc584bf3a19b2cddb82597b7",
+  "proof": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-xo26-3badc85dcc584bf3a19b2cddb82597b7/verification.json",
+  "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-commanddb-xo26-3badc85dcc584bf3a19b2cddb82597b7/full-link/kernel.ZORN26-CommandDB-XO.UNSELECTED.macho",
+  "sha256": "d62fe7296d26135359f51e6b82ec2dbcabd0f6563b1797d92f74d40ff336968f",
+  "bytes": 30323408,
+  "inputs": 1394,
+  "replaced": 62,
+  "preserved": 1332,
+  "undefined_symbols": 0,
+  "implementation": [
+    "Actual CommandDB OSObject exposes address-only copy through the common CPU resource reader;XO consumes its original xo.lvl ID without requiring AUX consumption or synthesizing a global version.",
+    "XO uses explicit tagged input alternatives. Original strict snapshot/version binder remains available;source missing-address error,aggregate/cache and actual sync/async send paths are preserved.",
+    "Physical,rail,stock and native clock graph input copies propagate the explicit optional actual reader instead of silently reverting to an empty strict snapshot. Existing caller storage-owner retention remains mandatory."
+  ],
+  "initial_failure": "First compile found missing resource-reader propagation in ActualClockRailResources;added the actual shared field and recompiled affected dependencies. Initial failure source/command/stderr retained.",
+  "limitations": [
+    "Full mapped-reader board/startup binding and BCM/host-table routes are not yet connected.",
+    "Clock requests,resource reads,mapping,MMIO or native/device execution were not performed."
+  ],
+  "GPU_or_phone_execution": false,
+  "full_goal_complete": false
+}

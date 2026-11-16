@@ -1,0 +1,43 @@
+{
+  "status": "offline-compiled-reference-linked-unselected",
+  "time": "2026-11-10T22:37:39.582712+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-secure-stream-exclusion-649daf030146480fa155e84b056bb4c5",
+  "base_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-pm-claim-reuse-mainline-5983b29715ae41c583183f148b52454c",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-secure-stream-exclusion26-649daf030146480fa155e84b056bb4c5",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-secure-stream-exclusion26-649daf030146480fa155e84b056bb4c5/source.patch",
+  "actual_secure_endpoint": "/arm-io/kgsl-iommu/gfx3d_secure",
+  "actual_fwspec_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-secure-stream-exclusion-649daf030146480fa155e84b056bb4c5/ZornGen7SmmuFwspecSource26.inc",
+  "fix": "Read actual secure iommus using the ordinary endpoint decoder and matching controller phandle. Both GMU and host GPU supply it to the existing overlap rejection before stream ledger, grant and writes.",
+  "compile": [
+    {
+      "name": "ZornGen7SmmuDomain26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-secure-stream-exclusion26-649daf030146480fa155e84b056bb4c5/ZornGen7SmmuDomain26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-secure-stream-exclusion-649daf030146480fa155e84b056bb4c5/ZornGen7SmmuDomain26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-mainline26-5983b29715ae41c583183f148b52454c/full-link/inputs/1250-ZornGen7SmmuDomain26.cpo",
+      "sha256": "273a5aef516cff0a8564008d235af4305474139e230f4331000d03918f9dbe6b",
+      "warnings": 3
+    },
+    {
+      "name": "ZornGen7SmmuStream26.cpo",
+      "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-secure-stream-exclusion26-649daf030146480fa155e84b056bb4c5/ZornGen7SmmuStream26.cpo",
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-smmu-secure-stream-exclusion-649daf030146480fa155e84b056bb4c5/ZornGen7SmmuStream26.cpp",
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-pm-claim-reuse-mainline26-5983b29715ae41c583183f148b52454c/full-link/inputs/1257-ZornGen7SmmuStream26.cpo",
+      "sha256": "a39bfbab185a841909ecf0eeae69c4a378d1edbfa9668a552f4a8ed249f0b001",
+      "warnings": 0
+    }
+  ],
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-secure-stream-exclusion26-649daf030146480fa155e84b056bb4c5/full-link/kernel.ZORN26-SMMU-SECURE-STREAM-EXCLUSION.UNSELECTED.macho",
+    "sha256": "65f9f4c881e084ce680201126ca1be093e79f36b4a7c168ff057cbcec8e1b38f",
+    "bytes": 30462376,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 2,
+    "preserved": 1395,
+    "undefined_symbols": 0
+  },
+  "corrected_cfgprobe_scope_changed": false,
+  "native_execution": false,
+  "device_execution": false,
+  "whole_image_readback": false
+}

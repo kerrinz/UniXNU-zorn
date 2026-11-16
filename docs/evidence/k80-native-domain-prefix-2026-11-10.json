@@ -1,0 +1,35 @@
+{
+  "status": "actual-CX-and-SMMU-resource-sequence-reused-offline-linked",
+  "implementation": {
+    "status": "actual-original-CX-and-SMMU-resource-sequence-connected-offline",
+    "shared_methods": [
+      "prepareGen79HubMetadata",
+      "prepareDdrMetadata",
+      "prepareGen79CoreInputs",
+      "prepareCxGdscRegisters",
+      "prepareCxGdscCore",
+      "prepareCxCompletion",
+      "prepareSmmuPowerResources"
+    ],
+    "source_values": "unchanged existing K80 source/controller and actual DT inputs",
+    "enabled_in_running_v22": false,
+    "device_executed": false,
+    "next_requires": "actual register-map/SMMU PM/bank/atomic/security producers,not successful stand-ins"
+  },
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-domain-prefix26-ea635068d5a7495ba94165e62c056863/source-selection.json",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-domain-prefix-ea635068d5a7495ba94165e62c056863",
+  "compilation": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-domain-prefix26-ea635068d5a7495ba94165e62c056863/compile-result.json",
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-domain-prefix26-ea635068d5a7495ba94165e62c056863/full-link/kernel.ZORN26-NATIVE-DOMAIN-PREFIX.UNSELECTED.macho",
+    "sha256": "163689b51fdef31a8800d29ed78aa2655e0fa74b2d1685cc001a087b94db0044",
+    "bytes": 30399744,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 3,
+    "preserved": 1393,
+    "undefined_symbols": 0
+  },
+  "device_executed": false,
+  "domain_prefix_selected_in_v22": false,
+  "remaining": "Actual register-map and SMMU PM/bank/atomic/security backends and current hardware validation are still required."
+}

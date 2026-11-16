@@ -1,0 +1,37 @@
+{
+  "updated": "2026-11-02T11:34:01.214369+08:00",
+  "state": "Catalog149-ABI-fence-width-guards-unapplied",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-fence-query-width/source-contract.json",
+  "functions_provenance_only": 10,
+  "new_source_mutations_refused": 3,
+  "new_actual_object_mutations_refused": 2,
+  "new_current_iOS17_independent_pairs": 2,
+  "new_per_object_inputs": [
+    316,
+    316
+  ],
+  "union_inputs": 317,
+  "UserClient_bytes_unchanged": 6424,
+  "new_driver_patches": 1,
+  "patch_count": 29,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 no-active-Job fence queries and actual published ABI request producers. Frozen28th active Job ring repair,table/preempt/count and parent/Entry evidence read first.10 selected functions match27th coherent source,legacy presence/body delta recorded as provenance only. No old allocator/Ring protocol/Submit/VM/CPU/native target or suite reexecuted.29th candidate is original source plus two ABI dispatch width guards,not composed with28th or any older repair.",
+    "issued_domain": "Submit observeFence rejects unattached/poisoned and zero,then asks ringOfFence and selected Ring observeFence. Wait first finds active Job by 32-bit fence equality and uses its stored ring,otherwise uses the same historical cache. Ring rejects zero or unsigned fence>seqno;this is an upper bound,not proof each intervening number was issued by that ring or this client. Global numbering interleaves rings. Active Job find does not take a client/queue argument;UserClient wait has no per-client issued fence ledger. ABI comment earlier fence of this client is not enforced by an actual membership check here.",
+    "historical_lookup": "8192 tagged cells can lose old association. An exact tag preserves ring index within original caller/ring lifetime assumptions,but does not prove client ownership. A miss falls back to signed fence-minus-Ring0-lastSubmitted,which is not historical identity. Null cache is rejected,not ring0 or success. No-Job observe/wait can return success from the chosen ring without releasing a Job;only actual active wait calls release. Thus query0 is not a new release/IRQ/DMAretire proof.28th corrected only active retirement;observeFence still always uses cache,even when a matching active Job may exist. No additional mode/history/generation policy is selected.",
+    "published_path": "Actual runCore WaitFence poll calls fencePending outside g.lock,then dispatches the same request under the lock when pending false or time is up. fencePending already rejects zero or >UINT32_MAX only by returningfalse;false requests locked validation,not BadArgument. native_adreno_fences returns one published g.ring lastSubmitted/fenceValue pair,not Submit-wide per-client issued history or two-ring snapshot. Output API bool is availability,not retirement/lease. Rolefullcore and actual K80 publication/board IRQ producer remain unbound;no execution claimed.",
+    "concrete_width_defect": "ABI WaitFence.fence and Submit.wait_fence are uint64,while downstream UserClient casts them to uint32 before Submit wait/observeFence. Original dispatch fixed-size copies contain no upper-bit validation. A high-word-nonzero request can therefore alias a different low32 query rather than preserving the supplied identifier. This is a concrete source-reachable narrowing defect at the existing public dispatch,independent of allocator OOM or constructing any successful fence/ring sequence. Actual success/error of the aliased hardware query is not supplied or modeled.",
+    "repair": "Independent29th abi-fence-width-validation.UNAPPLIED.patch adds only two checks after original fixed-size copy and before submit/waitFence calls:if the uint64 wait_fence/fence exceeds UINT32_MAX,set existing kIOReturnBadArgument and break through the original tally/return. All other source bytes/inverse equal original. Zero optional dependency still follows original submit path;WaitFence zero still follows original method rejection. No new public/wire/header/field/return domain,packet,clamp/mode/key generation,refcount/free/reset/retry/cleanup policy. Direct internal calls bypassing dispatch are unchanged and remain caller-precondition boundaries. Guard does not prove <=UINT32_MAX identifiers were issued or belong to this connection.",
+    "wrap_boundary": "Ring observation/wait use unsigned fence<=seqno and observed>=fence,with observed>seqno poison checks. Explicit-number framed producer rejects zero and signed(number-seqno)<=0;global base and tag fallback also use signed differences. Ordinary implicit-number producer uses seqno+1 without an explicit zero fence guard in submitWords. Header has no generation in uint64 ABI reply:actual producer widens uint32. No source-wide half-range/epoch/reuse contract for arbitrarily old queries was found in these paths. No 2^32 submission model,wrap execution claim or guessed reset/clamp/generation repair is introduced. Clock conversion/caps and original result domains are retained.",
+    "validation": "3 source mutations refused:remove either guard,or compare after uint32 truncation. Independent original source review check/apply and full inverse match.2 actual object mutations remove each high-word refusal branch and are refused. CurrentiOS17 exact real class plus entire original/candidate dispatch bodies and unchanged source prelude compiled as2 new independent rawSHA pairs,316 inputs each/317 union. Emitted submit upper-word load at field byte3284 and wait high32 shift precede original calls/BadArgument tally exit. UserClient6424 unchanged/imports identical. No new SDK declarations/stub/role constants/foreign headers/OS/production flags/sanitizer/import relaxation. Selected method extraction is not full NativeUserClient/module/finalkernel/AppleABI qualification;known role API fullcore refusal was not retried.",
+    "ownership_limits": "No native API,clock/query/callback/allocator/fence/cache/provider/phone or success peer executed. CPU guards/source-selected ring do not validate underlying CPU pages,IRQ routing,cache visibility,ASID/provider epoch or hardware completion. K80 owner/context/route/stop/DMA/readablefailure/firstGPU/rendering/Metal remain unavailable.28th ring repair stays independent UNAPPLIED;the new width guard does not authorize combining candidates or enabling any component.",
+    "preservation": "29 independent patches/8profiles/3111+39/default42/CPUstorage/full64primary/28th84archive/27th172+13closeout and old input/object capsules preserved.25th initialization remains partial/nontransactional failure pair. No new component/runtimecaller/FD/kernel/candidate/wire/CPU policy. Next independent actual queue scope/admission/destruction source,not a repeated whole fence/Submit suite."
+  },
+  "qualification": "ABI dispatch representability/source and selected method objects only;not issued membership,history/wrap,fullcore/AppleABI or native hardware qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

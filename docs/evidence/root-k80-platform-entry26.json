@@ -1,0 +1,168 @@
+{
+  "date": "2026-11-09T13:16:53.629992+00:00",
+  "classification": "progress: native iOS26-only root platform creator and exact proposed safe window connected before BSD platform publication;real retained UFS/root hook reused",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-root-entry-candidate",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.1708049774169922,
+    "inputs": 1386,
+    "replaced": 1,
+    "preserved": 1384,
+    "added": 1,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/full-link/kernel.ZORN26-root-platform-entry.UNSELECTED.macho",
+    "sha256": "e1e1fc2b9cabfd7348a928bb412778f9c98044fb24fc20434791e54378ac098a",
+    "bytes": 30257008
+  },
+  "root_image_hash": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-app-catalog-repair26/ios26-root-app-catalog.UNSELECTED.hfsx",
+    "sha256": "c86a172bfe2ab2a8e6218ad422da90840dfe05362b88822dd1d324901e23c99b",
+    "bytes": 34359738368,
+    "expected_matched": true,
+    "stat_unchanged": true,
+    "seconds": 21.456960499985144
+  },
+  "proposed_root_window": {
+    "status": "OFFLINE_PROPOSED_IOS26_ONLY_BOOT_ROOT_WINDOW_NOT_INSTALLED",
+    "owner_clarification": "K80真机上不需要共存iOS26和17",
+    "phone_iOS17_boot_preservation_required": false,
+    "local_iOS17_source_artifacts_preserved": true,
+    "Android_and_existing_Data_preserved": true,
+    "storage_descriptor": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/storage/unixnu64.json",
+    "storage": {
+      "schema_version": 1,
+      "name": "unixnu64",
+      "serial": "92988a43",
+      "product": "zorn",
+      "slot": "a",
+      "partition": {
+        "name": "unixnu",
+        "linux_by_name": "/dev/block/by-name/unixnu",
+        "type_guid": "0fc63daf-8483-4772-8e79-3d69d8477de4",
+        "unique_guid": "b279731f-ccad-4ef5-a8b7-e7440cd08de3",
+        "first_lba": 47271680,
+        "last_lba": 64048895,
+        "lba_bytes": 4096,
+        "bytes": 68719476736
+      },
+      "system": {
+        "format": "SHNGROOT",
+        "image_bytes": 9382658048,
+        "image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+        "runtime_readonly": true
+      },
+      "Data": {
+        "profile": "8g",
+        "relative_first_lba": 4194304,
+        "pages": 2097152,
+        "window_blocks": 2097217,
+        "bitmap_blocks": 64,
+        "volume_uuid": "C7D77FF3-6437-4C4A-8E05-E8E239AC1641",
+        "seed_sha256": "f05d5604237ef74da29181b5c1de5524b7ad0af9e18bad9c439df318dd5d2703"
+      },
+      "log": {
+        "relative_lba": 2291712,
+        "blocks": 1
+      },
+      "native_selection": {
+        "environment": "UNIXNU_ZORN_STORAGE_PROFILE=unixnu64",
+        "define": "ZORN_UNIXNU64=1",
+        "Android_userdata_fallback": false
+      },
+      "scope": "exact installed dedicated partition; 64GiB partition, initial8GiB logical Data; not a boot/I/O authorization"
+    },
+    "root_image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-app-catalog-repair26/ios26-root-app-catalog.UNSELECTED.hfsx",
+    "expected_image_sha256": "c86a172bfe2ab2a8e6218ad422da90840dfe05362b88822dd1d324901e23c99b",
+    "image_bytes": 34359738368,
+    "root_window": {
+      "mdev_index": 0,
+      "lun": 0,
+      "relative_byte_start": 25770852352,
+      "relative_first_lba": 6291712,
+      "blocks": 8388608,
+      "absolute_byte_start": 219395653632,
+      "absolute_first_lba": 53563392,
+      "absolute_last_lba": 61951999,
+      "bytes": 34359738368
+    },
+    "gap_after_Data_bytes": 782336,
+    "required_boot_args": [
+      "rd=md0",
+      "zorn26_root=1"
+    ],
+    "image_installed_or_current_target_contents_verified": false,
+    "device_io_authorized": false,
+    "boot_ready": false,
+    "future_required_evidence": [
+      "Fresh exact Recovery identity/GPT/slot/storage checks under new scope",
+      "Current target-window contents checked and backup policy reviewed before writes",
+      "Exact installation and complete readback digest matching this root artifact",
+      "Fresh complete kernel/FD/loader/ADT/root-input cohort and bounded recovery",
+      "Separate actual writable iOS26 Data/userland mount path;old Data compatibility not assumed"
+    ]
+  },
+  "ADT": {
+    "input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-platform-entry26/generated-ADT-final/kernel.touch-resources.UNSELECTED.adt",
+    "input_sha256": "6362f481c39c55bde1ba42b23ea4585cc7a3e60ef7b3d80bb514ac3e1b5a10b5",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/generated-ADT/kernel.root-window.UNSELECTED.adt",
+    "output_sha256": "68c94a630cb130c0d137f18445ef6e9c4a07e11fec0b101703f4161582fdfd3e",
+    "root_window": {
+      "mdev_index": 0,
+      "lun": 0,
+      "relative_byte_start": 25770852352,
+      "relative_first_lba": 6291712,
+      "blocks": 8388608,
+      "absolute_byte_start": 219395653632,
+      "absolute_first_lba": 53563392,
+      "absolute_last_lba": 61951999,
+      "bytes": 34359738368
+    },
+    "intended_image_sha256": "c86a172bfe2ab2a8e6218ad422da90840dfe05362b88822dd1d324901e23c99b",
+    "installed_or_authorized": false,
+    "boot_ready": false
+  },
+  "checks": {
+    "affected_native_translation_units": 2,
+    "full_link_inputs": 1386,
+    "replaced_inputs": 1,
+    "added_inputs": 1,
+    "preserved_inputs": 1384,
+    "undefined_symbols": 0,
+    "new_link_diagnostics": 0,
+    "compile_warnings": 0,
+    "actual_compiler_inputs": 378,
+    "old_source_files": 23,
+    "unchanged_old_source_files": 22,
+    "changed_old_source_files": [
+      "GenericARMPE.cpp"
+    ],
+    "new_source_files": [
+      "ZornRootPlatform26.cpp",
+      "ZornRootPlatformStart26.h",
+      "ZornRootWindow26.h"
+    ],
+    "source_deltas_and_independent_inodes_verified": true,
+    "old_root_UFS_preparation_bind_backends_unchanged": true,
+    "actual_32GiB_root_hash_matches_verified_fsck_artifact": true,
+    "actual_window_avoids_Data_log_and_partition_edges": true,
+    "all_original_ADT_bytes_preserved_except_two_new_chosen_inputs": true,
+    "staging_before_BSD_platform_publication": true,
+    "loader_RAMDisk_conflicts_refused_before_staging": true,
+    "native_refusal_edges_exclude_creator": 17
+  },
+  "behavior": "With zorn26_root=1 and rd=md0,the real platform creator checks actual started expert/native K80 DT/intended image+window/RAMDisk exclusion and one attempt,then retains context and stages through actual ZornRootStartup26 before platform publication to BSD. Existing IOFindBSDRoot hook later invokes real UFS initialization/read-only HFS binding. Absent selector preserves prior startup;selected refusal retains partials and skips publication/optional UFS users. The candidate root window is32GiB at unixnu-relative24GiB+1MiB,after existing Data,with exact absolute LUN0 coordinates. Actual root artifact hash is checked locally;no installed-phone image or hardware rights inferred from DT metadata.",
+  "limitations": [
+    "Offline code/native compile/full link/static checks only;no provider lookup/open/map/UFS/root bind/VM/native or device operation executed.",
+    "Owner clarified phone need not retain bootable iOS17;local17 source/artifacts and Android/existing Data remain protected. No new phone-write or boot authorization.",
+    "Target-window current contents/backup requirement,exact installation and complete readback provenance still need new reviewed scope;no installed-image proof from HFS header or intended hash metadata.",
+    "Writable iOS26 Data path/userland startup is not completed;retained older Data compatibility is not assumed. No root mount,PID1,SpringBoard,touch or GPU qualification.",
+    "This full kernel and ADT remain unselected;not a boot-ready complete FD/loader/kernel/root cohort,no new ready/claim. Previous f73 scope consumed-no-repeat."
+  ],
+  "native_or_device_execution": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/verified.json",
+  "actual_compile_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/actual-inputs.json",
+  "compiled_refusal_CFG": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/compiled-refusal-CFG.json",
+  "source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/original-source-manifest.json",
+  "owner_clarification": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-platform-entry26/owner-clarification.json",
+  "iterations": "Initial new source used raw-pointer OSNoRetain constructors against actual shared return types;corrected to returned ownership. Revision1 retained before moving root staging ahead of BSD platform publication and adding loader RAMDisk conflict guard. Host checker corrected allowed pre-init OSObject release classification. Earlier sources/objects/full link retained;only changed TUs rebuilt."
+}

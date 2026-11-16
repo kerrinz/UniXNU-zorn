@@ -1,0 +1,32 @@
+{
+  "updated": "2026-11-02T10:09:17.301465+08:00",
+  "state": "Catalog149-Entry-handle-reservation-publication-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-handle-publication-contract/source-contract.json",
+  "new_exact_header_Gitblob_fullSHA_verified": true,
+  "Entry_functions_frozen_file_provenance_only": 5,
+  "ordinary_serial_nonzero_key_insert_failure_not_established": true,
+  "key_exhaustion_and_arbitrary_concurrency_unqualified": true,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "no_old_suite_or_target_reexecution": true,
+  "all26_patches_independent_UNAPPLIED": true,
+  "no_native_API_or_success_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact catalog149 HandleIndex primary fullSHA/Gitblob/URL matches already exported manifest;no network/submodule change. Actual Entry free/publish/find/clear/grow sourceSHA matches frozen release source. New relationships are caller occupancy/key/value bounds and ignored insert reachability;not a rerun of allocation/import/VM/Submit/CPU tests or a successful handle-index model.",
+    "actual_table": "Header has cells,size,count only;there are no tombstones/dead counter. Key0 is empty;find returns UINT32_MAX for absent and Entry wrapper rechecks index<entry_count,used and matching handle. place uses multiplicative unsigned hash plus linear probing until empty/same key;erase searches existing key then shifts later cells whose home requires closing the hole and decrements count. Missing-key erase does not decrement. No native allocator or table method executed.",
+    "reserve": "free() first reserves live_+1,then finds free Entry or grows chunks. reserve doubles while keys*2>size;grow allocates/zeros new array then rehashes and deletes old array. Failed allocation keeps the current table/keys. A multi-grow reserve may have already enlarged capacity before a later failure,so its comment nothing-changed is not byte-identical-capacity attestation. API false returns no Entry;caller keeps/discards existing prepared output by frozen owner contract. No special rollback required or invented.",
+    "caller_count_domain": "For intact serial Entry state before handle exhaustion,each indexed published Entry is used and counted in live_. Failed allocation retention adds used/unreleasable Entry with handle0 and increments live_ without index insertion,so count<=live_ remains conservative rather than equal. Entry growth is chunk64 and stops at UINT32_MAX-EntryChunk guard. On selected arm64 size_t64,live_+1 is bounded by this32-bit Entry domain;doubling that key count is below2^33. Thus generic reserve multiplication overflow is not established reachable for this caller. It is not a bound for every independent user of header or corrupt/arbitrarily racing state.",
+    "insert_result": "After successful reserve(live_+1),capacity>=2*(live_+1)>=2*(count+1). For cells present and a nonzero fresh key,insert first growth/failure condition is false and place has empty cells. A missing index memory allocation failure during ordinary serial publication is therefore not a concrete defect merely because publish ignores bool. No redundant27th insert guard,rollback or cleanup policy added.",
+    "value_token": "Chunk entries get exact index while growing. publish stores token=index+1;Entry domain keeps value/token below UINT32_MAX sentinel,independent of64-bit opaque handle. These are table identities,not physical/user/IOVA addresses or mapping leases. find wrapper never treats an arbitrary stored value as an Entry without bounds and used/handle checks. No proof of arbitrary memory corruption safety.",
+    "key_exhaustion_boundary": "publish takes next_handle_++ directly;open initializes1 and no source zero-skip/exhaustion check appears. Under unsigned wrap,a later publication can select key0,which insert rejects,and eventual reused nonzero keys can collide. This is an explicit source exhaustion boundary,not an observed/reachable-within-K80-session failure or a simulated2^64 successful-allocation history. A lifetime allocation-count/wrap policy is not bound;no guessed key generation/reset/refcount/rollback behavior or new successful-handle peer is introduced. Normal pre-wrap count proof does not cure this boundary.",
+    "serialization": "Actual published allocation dispatch and manual BoImport path use existing g.lock;close uses that lock for core teardown. This qualifies only those source call regions under nonreentrant serial owner assumptions,not arbitrary standalone NativeAdrenoUserClient callers,all kernel code,CPU private gate or native locks. No thread/lock/API execution or hardwareowner/route/IRQ/stop/DMA inference.",
+    "other_consumer": "Exact catalog header also appears in NativeAdrenoVm,not NativeAdrenoSubmit. The per-Entry live_ bound cannot mechanically qualify VM mapping-index occupancy or mutation order. Next only that exact second consumer index/key/capacity edges;already frozen VM map/Capacity/cache/Submit proofs remain unchanged and are not rerun.",
+    "decision": "No new ordinary-publication insert allocation failure proved for valid serial nonzero Entry key;no27th patch or unrelated target. Generic arithmetic/arbitrary concurrency/key exhaustion remain explicit limitations. All26 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/archives/consumedclaim/recoveredrun preserved. No native/index/allocator/refcount/cache/provider/VM/MMIO/phone/success model execution,new component/runtimecaller/FD/kernel/candidate/wire/CPU policy or fullkernel/AppleABI/GPU qualification."
+  },
+  "qualification": "Exact source/caller count-domain proof only,not native handles/wholemodule/AppleABI/hardwareowner/stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

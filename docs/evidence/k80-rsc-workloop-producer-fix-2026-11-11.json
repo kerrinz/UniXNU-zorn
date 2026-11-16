@@ -1,0 +1,38 @@
+{
+  "status": "actual-captured-managed-workloop-producer-fixed-offline-linked-unselected",
+  "time": "2026-11-10T16:32:54.868910+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-workloop-fix-7c06958eff01401f9eea40fc76e4a7e3/ZornGen7StartupOwner26.cpp",
+  "prior_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-factory-boundary-e971b53dd23b4910ad9b99876acc703b/ZornGen7StartupOwner26.cpp",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/startup-workloop.patch",
+  "source_sha256": "fb08ecc0f7840a3fb29054f61f3e8f78468c0f51be9093275b64029a64f75776",
+  "defect": "Captured CommandDB creator left Storage::loop null while managed runOnce passed *s.loop to Probe factory,which retains it. Full schedule creator already allocated loop.",
+  "fix": "Captured+managed selection constructs real IOWorkLoop before submitWorker;failure returns original kIOReturnNoResources before scheduling;existing pinned owner retains loop. Pure observation and full creator unchanged.",
+  "header_or_class_layout_change": false,
+  "native_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/compile-result.json",
+  "identity_compile": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/identity-compile-result.json",
+  "actual_creator_relocations": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/creator.disassembly.txt",
+  "actual_workLoop_factory_before_submitWorker": true,
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/full-link/kernel.ZORN26-RSC-WORKLOOP-FIX.UNSELECTED.macho",
+    "sha256": "22c36c284a0b06e004fe7866a6b94ac20dec1dcc8299235d80ed94947f56ac12",
+    "bytes": 30396080,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/root-package-rsc-workloop-fix/verified.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-workloop-fix26-7c06958eff01401f9eea40fc76e4a7e3/root-package-rsc-workloop-fix/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "3f1974eae05bd27d45d93efe9567d5762ffa8e725704ee70e084b6de7f172bb0",
+    "bytes": 11612160
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=90 zorn26_gpu_board_stage=1 zorn26_gpu_board_record=1 zorn26_owned_clocks=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_layout_read=1 zorn26_rsc_managed=1 zorn26_rsc_masked_runtime=1",
+  "device_scope_created": false,
+  "phone_or_native_executed": false,
+  "hardware_bug_fix_proven": false,
+  "new_full_root_readback": false,
+  "whole_goal_complete": false,
+  "next_action": "Resume mainline from real null-workloop producer fix7c06958eff01401f9eea40fc76e4a7e3,now compiled/1396-input linked and packaged offline. Captured managed-RSC creator allocates genuine IOWorkLoop before submitWorker;pure CommandDB observation unchanged,full creator unchanged. Actual object relocation proves workLoop call before submitWorker. No new headers/layout or fake callback. Next derive a NEW fixed-runner scope v33 for this exact kernel22c36c28/boot3f1974ea,using persistent archived binder/EL0 proof/decoder and exact current inputs;remove all temporary isolation selectors,keep actual disabled-install-only source selector so IRQ enable/clocks/GMU/GPU remain OFF until its return is observed. Fresh owner/ready/claim and original WDT1/90s/600s Recovery required,standing active goal7/8 authorization applies. Check actual existing SDK37 server via fixed runner;prior sandbox localhost EPERM establishes no device availability fact. Do not implicitly start server or reuse consumed v32. Temporary /private/tmp pointer/helpers disappeared across pause;use persistent build files and current fields,not missing tmp paths. New package is not ready/scoped/executed. Preserve no-whole-root-readback policy;read only original log/protected metadata. Continue full GPU/Metal/touch goal."
+}

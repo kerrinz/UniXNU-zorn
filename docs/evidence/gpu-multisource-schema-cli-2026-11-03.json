@@ -1,0 +1,38 @@
+{
+  "default_output_exactly_matches_prior_comparison": true,
+  "opt_in_compared": true,
+  "opt_in_source_count": 4,
+  "opt_in_incompatible_exit": 2,
+  "all_per_source_pure_refusals_preserved": true,
+  "no_prepare_permission": true,
+  "new_gate_checks": [
+    {
+      "case": "flag-cannot-bypass-manifest-SHA",
+      "error": "input manifest bound/SHA mismatch"
+    },
+    {
+      "case": "self-signed-compatibility-rejected",
+      "error": "source requires exact id/path/independent SHA fields"
+    },
+    {
+      "case": "pinned-diagnostics-required",
+      "error": "pinned source diagnostics changed"
+    }
+  ],
+  "child_no_write_or_process": true,
+  "headers": 0,
+  "prepare_audit_formatter_executed": false,
+  "old_suites_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/compare-zorn-gpu-power-sources.py": "520cd07e528707ed04a7dee37c481286639338a605bc4bd2d5edd7d8aa73d596",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-multisource-schema-cli.py": "7691e217131678605ab0df1cb54f174405fe83c30ded83b0b3fe0d63f570c6b3"
+  },
+  "header_scope_approval_received": false,
+  "source_input_branch": "read-only input/provenance/diagnostic integration complete;next header/layout step requires the explicit pending source-header scope",
+  "scope": "Opt-in source diagnostics integration;not a driver build or first GPU execution",
+  "pending_scope_proposal": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-multisource-schema-cli-20261103/source-layout-scope-proposal.json"
+}

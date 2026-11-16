@@ -1,0 +1,23 @@
+--- /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-width-candidate/direct-runtime/ZornGen7DirectClient26.cpp
++++ /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7DirectClient26.cpp
+@@ -22,7 +22,7 @@
+ extern "C" volatile uint32_t zorn_direct_io_coherent;
+ extern "C" volatile uint32_t zorn_direct_coherent_import_fallbacks;
+ /* Per kernel method: [method][0] calls, [1] calls that returned non-zero, [2] last status, [3] total time (us, 32-bit). Method numbers are the ABI's (1..16). */
+-extern "C" {extern uint64_t (*zorn_direct_vm_now_us)(void);volatile uint32_t zorn_direct_method_stats[20][4];volatile uint32_t zorn_direct_map_fail[7][2];}
++extern "C" {volatile uint32_t zorn_direct_method_stats[20][4];volatile uint32_t zorn_direct_map_fail[7][2];}
+ static void noteImport(IOReturn status,uint32_t stage,uint64_t bytes,uint64_t address)
+ {
+     if(!status)return;
+@@ -499,10 +499,7 @@
+             zorn_direct_method_stats[method][3]=zorn_direct_method_stats[method][3]+(uint32_t)(now-began);
+         }
+     };
+-    /* The same clock times the VM's table transactions (the board service's probe never ran on this path, so nothing else installed it). */
+-    static const NativeAdrenoRingClock *vm_clock=nullptr;
+-    vm_clock=clock;
+-    zorn_direct_vm_now_us=[]()->uint64_t{return vm_clock && vm_clock->now_us?vm_clock->now_us(vm_clock->cookie):0;};
++    // VM/submit diagnostic uptime is OS-owned; never retain this call's clock/cookie.
+     IOReturn tally_result=kIOReturnSuccess;
+     Tally tally(method,&tally_result,clock);
+     const size_t expected_in=inputSize(method),expected_out=outputSize(method);

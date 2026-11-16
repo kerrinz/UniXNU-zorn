@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "scope": "source and local offline-build evidence only; no matching new published source commit or device execution",
+  "result": {
+    "updated": "2026-11-01T18:40:41.156212+08:00",
+    "offline_complete": true,
+    "scope": "single-unixnu64-UEFI-media-qualification-terminal-before-payload",
+    "boot_sha256": "762a1234bd714ffc678109de8d4a67e32eb46fe4b4b8ee5e5aea61869eab63d1",
+    "fd_sha256": "f4d0fdeab4b7dff9e0339dfa2e422db0962aebdd8dd6adebb296e88fe8ba9183",
+    "module_sha256": "d49397eacd352ef953a0aa132b0677bced93f4738fb270dad9aa5c2f52e0ef0f",
+    "kernel_sha256": "e32880346be9156d0c35f2b1f49ca0bf831fa12e1d4e18d43b795e0df1896acb",
+    "firmware_objects": 559,
+    "current_inputs": 3108,
+    "firmware_archive_files": 7633,
+    "compiled_independent_objects": 9,
+    "PE_mutations_refused": 8,
+    "runner_controls": {
+      "admission_refusals": 37,
+      "valid_synthetic_admission": 1,
+      "recovery_BCB_double_faults": 9,
+      "independent_claim_refusal": true,
+      "processes": 0,
+      "USB_calls": 0,
+      "workflow_doubles": [
+        {
+          "fault": null,
+          "boots": 1,
+          "status": "recovered"
+        },
+        {
+          "fault": "bcb",
+          "boots": 0,
+          "status": "failed-stop-device-operations"
+        }
+      ],
+      "synthetic_host_only": true,
+      "not_candidate_or_hardware_qualification": true
+    },
+    "currentstart_independently_assembled_equal": true,
+    "kernel_and_payload_reused_exactly": true,
+    "terminal_before_payload": true,
+    "native_GPU_invoked": false,
+    "phone_operations": false,
+    "WriteAuthorized": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "device_permission_pending": true
+  },
+  "candidate_preflight": {
+    "actual_candidate_file_checks_passed": true,
+    "temporary_hypothetical_approval_removed": true,
+    "no_approved_pertrial_files_created": true,
+    "no_claim_created": true,
+    "owner_activation_approved": false,
+    "processes": 0,
+    "USB_calls": 0,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "trial_bundle_sha256": "ea5683f4b801d9178dda9e6898939f4a700d0bb11ed37b75895242a9574fc7e3"
+  },
+  "maintained_runner": "scripts/zorn_gpu_unixnu64_trial.py",
+  "entry": "scripts/run-zorn-debug.py --gpu-unixnu64-media-trial admission.json",
+  "host_check": "python3 scripts/check-zorn-gpu-unixnu64-trial.py",
+  "candidate_builder": "scripts/build-zorn-debug.py --gpu-unixnu64-media-image --os 17",
+  "firmware_builder": "uefi-zorn/scripts/build-zorn-firmware.py --gpu-unixnu64-media-candidate",
+  "one_shot": "claim before first USB, new scope/slotA/unixnu64; old claims untouched",
+  "limits": [
+    "\u6709\u6548\u4ecb\u8d28owner\u4e4b\u524d\u5931\u8d25\u6216I/O\u4e0d\u8fd4\u56de\u65f6\uff0c\u53ef\u80fd\u6ca1\u6709\u65b0\u65e5\u5fd7\u3002\u8fd9\u662f\u5148\u524d\u5df2\u6279\u51c6\u7684\u7b56\u7565\u8fb9\u754c\u3002",
+    "\u65b0nonce/CRC\u8bb0\u5f55\u4ec5\u8868\u793a\u6240\u8bb0\u5f55\u7247\u6bb5\uff1b\u4e0d\u662f\u79c1\u6709commit\u62a5\u544a\uff0c\u4e0d\u80fd\u8bc1\u660e\u4e24\u4e2a\u539f\u751fEFI_STATUS\u5747SUCCESS\uff0c\u66f4\u4e0d\u8bc1\u660eGPU/power/SMMU/DMA\u6240\u6709\u6743\u3002",
+    "\u7f3a\u5931/\u9648\u65e7/\u635f\u574f/\u672a\u53d8\u65e5\u5fd7\u4e00\u5f8b\u4e0d\u53ef\u7528\uff0c\u4e0d\u89c6\u4e3a\u6210\u529f\u3002\u539f\u6b63\u5e38v18/84text/3072footer\u548c\u5176\u5b83\u534f\u8bae\u4e0d\u53d8\u3002"
+  ],
+  "activation_pending": true,
+  "local_artifacts": [
+    "out/zorn/gpu-unixnu64-media-candidate/offline-result.json",
+    "out/zorn/gpu-unixnu64-media-candidate/fd-audit.json",
+    "out/zorn/gpu-unixnu64-media-candidate/image-audit.json",
+    "out/zorn/gpu-unixnu64-media-candidate/activation-proposal.json"
+  ]
+}

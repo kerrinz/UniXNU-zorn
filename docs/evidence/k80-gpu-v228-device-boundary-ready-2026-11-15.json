@@ -1,0 +1,63 @@
+{
+  "version": 228,
+  "summary": "v228根差分已按固定新scope安装并读回：44页/12组，e063d566匹配本地回放，全部保护/BCB检查通过，安装前后TWRP，未自动启动、未读回手机全根。新root4651199b/内核1ac1c498/bootcc110cc8/ADT与普通probe228身份已绑定；独立boot scope接收器先行120秒39帧119808B、独立300秒WDT/600秒Recovery，check-only和8项拒绝通过。只增加原wait/setenv/标准Metal返回处有界标记，仍需实机确认实际到达边界和后续正常渲染/退出，不认定功能完成。",
+  "candidate": {
+    "version": 228,
+    "tag": "554a417898d14e899a0fcc8ba92862c2",
+    "program_tag": "554a417898d14e899a0fcc8ba92862c2",
+    "frontend_tag": "01e033d5c00e485aa92df8b986e55ec0",
+    "rust_tag": "7a16d3fe9b1a44cb859527a1ca87b961",
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2",
+    "parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v227-checkpoint45-c65e1ef41544494f93192b8e32e9180f",
+    "root_payload_changed": true,
+    "kernel_built": true,
+    "hardware_trial_ready": true,
+    "PAC_root_cause_fixed": false,
+    "purpose": "Three minimal own-source markers after original10s nanosleep,after setenv/before standardMTL device creation,and afteractualMTLreturn;retain all real GPU/root/frontend lifecycles,nominal45GPUprofile",
+    "system_booted": false,
+    "installed_parent_root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/root-candidate/ios26-root-metal215.UNSELECTED.hfsx",
+      "sha256": "4a12265d312a0f07ea1348a2f2ea16734dd290ccc58fd2443c637b4f3687a523",
+      "bytes": 34359738368
+    },
+    "root_candidate_built": true,
+    "root_installed": true,
+    "boot_package_built": true,
+    "hardware_trial_consumed": false,
+    "IOSurface_render_validated": false,
+    "retained_root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v226-pipeline-return-01e033d5c00e485aa92df8b986e55ec0/root-candidate/ios26-root-metal226.UNSELECTED.hfsx",
+      "sha256": "d94042c9a9d066c261c2a5f2cb6c10c17817bf121d1791504f704edf330a09b4",
+      "bytes": 34359738368
+    },
+    "retained_probe": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v224-IOSurface-image-19a4a5e9872542ebab85c20db1e20129/user-probe-launch/zorn-metal-probe193",
+      "sha256": "84840ffe87ae9ee4da143788d43dffb951082110b7e2f80cbf5fe9d6486838e5",
+      "cdhash": "6a3bcf65e26695a42ca617abd05c9b47c4c51529"
+    },
+    "probe_parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v224-IOSurface-image-19a4a5e9872542ebab85c20db1e20129"
+  },
+  "install": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal228-root-delta-review-554a4178/admission/run/result.json",
+    "sha256": "3ad13ff51e9a51bd8d53a2190986de39161a02bd07cb2b07af0573671380698e"
+  },
+  "scope": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2/trial-binding.json",
+    "sha256": "51464078c87aaece2bf117b75e3f43ca6471d06d216cfea51e5356effbacfa8e"
+  },
+  "launch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2/launch-command.json",
+    "sha256": "2d11e2b55b32297a6b18f1ec5e0a9ade8c3899ba30037198e87ee35511019919"
+  },
+  "runner_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2/runner-source-review.json",
+    "sha256": "8861487cd88b89dc371437bf10cdabe81a4125d254c2dd163c5c20dc53f549f4"
+  },
+  "goal_complete": false,
+  "hardware_only_pending": [
+    "newprobe launch/signature acceptance and ownsource boundaries",
+    "device,pipeline,IOSurface oracle,render andclose",
+    "bounded Recovery return/protection equality"
+  ]
+}

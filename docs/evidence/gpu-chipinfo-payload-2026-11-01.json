@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "scope": "New static internal payload path and length barrier only; no hardware availability or native ABI claim.",
+  "result": {
+    "state": "selected-internal-shared-memory-path-bound-payload-validity-unavailable",
+    "source_blob": "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.efi",
+    "source_sha256": "38c7c0d036ff9e9fc0700983874bca910d87b2d853e22dd6c1d542a8757a5185",
+    "item_literal": 137,
+    "internal_tables_RVA": [
+      37272,
+      37584
+    ],
+    "selected_internal_get_RVA": 25320,
+    "no_public_EFI_SMEM_call_on_this_path": true,
+    "public_EFI_SMEM_not_substituted": true,
+    "get_return_shape": "x0 pointer, x1 points to UINT32 size; observed shape only, not a fabricated callable typedef",
+    "consumer_nonzero_pointer_and_size_only": true,
+    "consumer_minimum_length_not_checked": true,
+    "unconditional_read_end_exclusive": 176,
+    "unconditional_string_copy": [
+      124,
+      32
+    ],
+    "version_gated_read_end_exclusive": {
+      "14": 172,
+      "16": 184,
+      "19": 216
+    },
+    "internal_region_check_does_not_prove_payload_schema": true,
+    "native_payload_size_version_namespace_or_provenance_available": false,
+    "private_native_types_and_payload_primary_definition_unbound": true,
+    "new_semantic_mutations_refused": [
+      {
+        "name": "item-number",
+        "refused": "payload contract at 0x5d08"
+      },
+      {
+        "name": "nonzero-size-check",
+        "refused": "payload contract at 0x5d1c"
+      },
+      {
+        "name": "internal-get-slot",
+        "refused": "payload contract at 0x6074"
+      },
+      {
+        "name": "payload-size-output",
+        "refused": "payload contract at 0x6388"
+      },
+      {
+        "name": "region-boundary",
+        "refused": "payload contract at 0x63c8"
+      }
+    ],
+    "words": {
+      "0x5d08": [
+        "0x52801120",
+        "0xd10013a1",
+        "0x940000c8",
+        "0xb85fc3a8"
+      ],
+      "0x5d1c": [
+        "0x7100011f",
+        "0xfa401804",
+        "0x9a8003e0"
+      ],
+      "0x6074": [
+        "0xf9428108",
+        "0xb4000228",
+        "0xf9400508",
+        "0xb40001e8"
+      ],
+      "0x6094": [
+        "0x2a1303e0",
+        "0xaa1403e1",
+        "0xd63f0100"
+      ],
+      "0x5f4c": [
+        "0x90000028",
+        "0x91066108",
+        "0xf800c268"
+      ],
+      "0x5fc0": [
+        "0x90000029",
+        "0x52a00188",
+        "0x910b4129",
+        "0xb9000268",
+        "0xf800c269"
+      ],
+      "0x6388": [
+        "0xb9400968",
+        "0xb9000268"
+      ],
+      "0x63b8": [
+        "0x9000002a",
+        "0xb944f14a",
+        "0x6b0a017f",
+        "0x540000a2"
+      ],
+      "0x63c8": [
+        "0x8b0a0129",
+        "0x8b080288",
+        "0xeb09011f",
+        "0x54000063"
+      ],
+      "0x63d8": [
+        "0xaa1f03f4",
+        "0xb900027f"
+      ],
+      "0x5bf4": [
+        "0xb9407809",
+        "0xb940ac0a"
+      ]
+    },
+    "supplemental_primary_fetches": "Linux v6.1 raw GitHub returned429; kernel.org inaccessible. No remote source incorporated or claimed exact selected source.",
+    "no_new_native_component_so_no_target_compile_required": true,
+    "provider_or_phone_calls": 0,
+    "new_request_or_candidate": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "source_recipe": "uefi-zorn/scripts/check-zorn-chipinfo-payload.py",
+  "source_recipe_sha256": "d17bbaa47655e81eb88ecbfe90054c2e4dbfba81458741ee3917cbbc9c46e30b"
+}

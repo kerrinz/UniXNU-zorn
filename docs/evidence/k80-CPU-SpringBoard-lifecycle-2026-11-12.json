@@ -1,0 +1,80 @@
+{
+  "status": "CPU-SpringBoard-lifecycle-offline-candidate-verified",
+  "recorded_at": "2026-11-12T01:30:17.962592+08:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-lifecycle-afed6c22a4dd4a07b0ddb45fe428c0a8",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8",
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/SpringBoard-lifecycle.patch",
+    "sha256": "c8716ba5ea99a30a52bd7074b12cc99d6d1366ab2794b09b2b20116cb4b0fc60"
+  },
+  "baseline_source_recompile_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/exec-exit-baseline-proof.json",
+    "sha256": "01677ebb7a40c88164faa4d993ff0fe5b27660ec9231c19db38be3c397aa2842"
+  },
+  "native_link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/full-link/kernel.ZORN26-CURRENT-ROOT-USERLAND-CONTROL.UNSELECTED.macho",
+    "sha256": "75e13f22a7f2f4529637f2f754435e8398106fb92a826722dbef18f27775f278",
+    "bytes": 30469400,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 12,
+    "preserved": 1385,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-lifecycle26-afed6c22a4dd4a07b0ddb45fe428c0a8/boot-package/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "a39c5625a5f7c2621d654d64ba40109a2f3c5672d7bc4ff889978245ee68fcbe",
+    "bytes": 11640832
+  },
+  "root_sha256": "3b56c850bd9416e7716094a20ea0af0c25bd767b1e94a022aff6945fcf54cd6d",
+  "host_regression": {
+    "ASan_UBSan_passed": true,
+    "exact_backend_tested": true,
+    "wrong_path_and_null_inputs_refused": true,
+    "PID_reuse_disambiguated_by_proc_uniqueid": true,
+    "first_result_preserved": true,
+    "success_and_error_status_widths_preserved": true,
+    "concurrent_attempts": 32,
+    "parser_positive_cases": 4,
+    "parser_negative_cases": 4,
+    "no_executable_contents_or_user_memory_or_stacks_read": true,
+    "device_accessed": false
+  },
+  "source_inputs": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-lifecycle-afed6c22a4dd4a07b0ddb45fe428c0a8/kern_exec.c",
+      "sha256": "fd62b156363e1e250a6ad93b253671f2dd831850d4659992726e573f8540cfd2"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-lifecycle-afed6c22a4dd4a07b0ddb45fe428c0a8/kern_exit.c",
+      "sha256": "634f7189fd11d815a82f7012c4f62e168576e06c003eae1983b1157bd7ae5a6b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-lifecycle-afed6c22a4dd4a07b0ddb45fe428c0a8/ZornSBLifecycle26.h",
+      "sha256": "fdc1135487cd685bb26f2e51c3881274326f352e3266e9329cace82a7fae1252"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-sb-lifecycle-afed6c22a4dd4a07b0ddb45fe428c0a8/ZornSBLifecycleBackend26.inc",
+      "sha256": "4b3d9680e7200ade28c64d43e3a8f00402f33980e9c03a60ccd2fa924b5581a2"
+    }
+  ],
+  "observed_points": [
+    "exec_activate_image: exact SpringBoard kernel-copied path,begin and final native result",
+    "posix_spawn: final native result correlated with process unique ID",
+    "kern_exit: original raw status/reason namespace/code for same first process"
+  ],
+  "implementation": "First process only; immutable proc_uniqueid correlation prevents PID reuse confusion. Atomically publish payload only after completion. Existing exec/spawn/exit return values and control flow unchanged.",
+  "limitations": [
+    "No observation of failures before a valid kernel-copied target path is available.",
+    "Activation success does not establish user instruction execution or UI success.",
+    "First-process results plus aggregate activation attempt count are not a complete history."
+  ],
+  "risk": "Bounded atomic observation adds startup timing overhead; hardware evidence still required. No executable contents, user memory, registers, stacks or IPC payloads inspected.",
+  "mode": "unattended-phone-connected",
+  "GPU_startup": false,
+  "touch_startup": false,
+  "device_accessed": false,
+  "device_ready": false,
+  "next_action": "Bind exact lifecycle candidate and parser to new unattended fixed-runner scope;validate fresh archives/ready before one Recovery-return CPU trial.",
+  "goal_complete": false
+}

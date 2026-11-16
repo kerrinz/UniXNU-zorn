@@ -1,0 +1,31 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornPresentTrace245.h"
+ extern "C" void zorn26_native_known_image_observation(unsigned (&)[32]);
+ extern "C" void zorn26_native_kernel_client_observation(unsigned (&)[40]);
+ 
+@@ -928,7 +929,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    const unsigned size=zorn_progress_format202(line,cap,"9a697dec3b024930bd83b9161c05e99d",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"9a697dec3b024930bd83b9161c05e99d",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -939,6 +940,14 @@
+         callbackPoint?__atomic_load_n(&zornCallbackToken222,__ATOMIC_ACQUIRE):0u,
+         __atomic_load_n(&zornCallbackViewState222,__ATOMIC_ACQUIRE),
+         __atomic_load_n(&zornCallbackMapState222,__ATOMIC_ACQUIRE));
++    if(size>=2){
++        uint32_t dp[16]{};const unsigned available=zorn26_present_snapshot245(dp)?1u:0u;
++        const int n=snprintf(line+size-2,cap-(size-2),
++            ",dp=%u/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x\r\n",
++            available,dp[0],dp[1],dp[2],dp[3],dp[4],dp[5],dp[6],dp[7],dp[8],dp[9],dp[10],dp[11],dp[12],dp[13],dp[14],dp[15]);
++        if(n<0 || unsigned(n)>=cap-(size-2))return 0;
++        size+=unsigned(n)-2;
++    }
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}
+     return size;
+ }

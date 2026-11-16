@@ -1,0 +1,151 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 v82 board-owned SMMU lease",
+  "status": "offline full-linked kernel; not packaged, selected, booted, or tested on device",
+  "history": {
+    "earlier_gpu_real_device_tests": true,
+    "farthest_recorded_stages": [
+      "v59 GMU cold-clock/GPUCC prefix and SMMU global-control stage",
+      "v60 read-only SMMU bank/stream census"
+    ],
+    "gpu_branch_reached_lockscreen": false,
+    "cpu_render_later_reached_lockscreen": "b0da41e9, owner visually confirmed",
+    "cpu_reference_kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091"
+  },
+  "cpu_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/full-link/kernel.ZORN26-KEYSTORE-RETAG.UNSELECTED.macho",
+    "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "kernel_unchanged": true,
+    "device_or_package_write_performed": false
+  },
+  "implementation": {
+    "source_snapshot": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113",
+    "changes": [
+      "BoardOwner now creates the SMMU start and post-CP TCR authority callbacks from its retained live GPU/GMU provider claim, exact register maps, power/HFI/IRQ/RSC state, and the live SMMU domain.",
+      "SMMU MMU-start authorization rechecks live consumer and reserved context bank/ASID pairs, current PRR state, and the real zero descriptor/page.",
+      "SMMU table updates use bounded GMU-idle polling plus GBIF client/arbiter halt acknowledgement; uncertain failures retain the halt.",
+      "GPU start checks keep the same actual GPU/GMU provider claims and exact mapped resources bound across the start grant.",
+      "Native GPU ICC QoS path now claims the actual provider before mapping and access."
+    ],
+    "source_sha256": {
+      "ZornGen7DarwinBoardOwner.h": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7DarwinBoardOwner.h",
+        "sha256": "c5d44489ca0616832853f4f67864980e8bc90fddda895a540cb925c6c751d343"
+      },
+      "ZornGen7DarwinBoardOwner.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7DarwinBoardOwner.cpp",
+        "sha256": "f14500a77c7c4b33d7388a7c3c9a6e9ba3128b70a8872ce401076aa6971ed9dd"
+      },
+      "ZornGen7InactiveOwner26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7InactiveOwner26.cpp",
+        "sha256": "9b083b2b5c244ce4309259d84e3777ed6aaeaf95b5f5ca787df11d9c20828373"
+      },
+      "ZornGen7RegisterMaps26.h": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7RegisterMaps26.h",
+        "sha256": "aa2e224a57053890a483e501a363efd7e88fbb8a8d0492ab524f5f1ba31d6158"
+      },
+      "ZornGen7RegisterMaps26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7RegisterMaps26.cpp",
+        "sha256": "2180c8e881697406b8d2fd4b05ded3c101e287631e27586e321372e316651f5e"
+      },
+      "ZornGen7SmmuDomain26.h": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7SmmuDomain26.h",
+        "sha256": "8935c7d45305ef532b56787550ca70fb7684a9dc40900951536c9d64203a770e"
+      },
+      "ZornGen7SmmuDomain26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7SmmuDomain26.cpp",
+        "sha256": "4e945bae1158bf69395db00ead0abb9119c462c53ce5a8076cc6129add551b04"
+      },
+      "ZornGen7StartupOwner26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7StartupOwner26.cpp",
+        "sha256": "7864b3dd90d1425044ee9c76fad191ffc7bd622ae0fb21a6b0f642b667530287"
+      },
+      "ZornGen7IccInputs26.h": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7IccInputs26.h",
+        "sha256": "86996cb7aed7e048a6f70cb89774ed6558dfeb682c6e60053b3c1849d17f9fa3"
+      },
+      "ZornGen7IccInputs26.cpp": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-mmu-board-owned-lease-v82-20261113/ZornGen7IccInputs26.cpp",
+        "sha256": "d187731673eddfc86629c897c0e5fc246b707e8232589d1608d00efbea2c465d"
+      }
+    }
+  },
+  "build": {
+    "compiler_objects": {
+      "ZornGen7SmmuDomain26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v4/ZornGen7SmmuDomain26.cpo",
+        "sha256": "e2e84a6a0fb2d0fc19603ba686b1689e13c75d14cff9ba9e63f7a4770b6da940",
+        "compile_exit": 0
+      },
+      "ZornGen7RegisterMaps26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v4/ZornGen7RegisterMaps26.cpo",
+        "sha256": "77944c628640a3c84cd4418855e810cdf170ed2fb37d93f59accff62d19f35f3",
+        "compile_exit": 0
+      },
+      "ZornGen7StartupOwner26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v4/ZornGen7StartupOwner26.cpo",
+        "sha256": "6f62f5f6c3a5737f45ec4a3e753cfdf8091f251d83664847402cfe2a31f78403",
+        "compile_exit": 0
+      },
+      "ZornGen7DarwinBoardOwner": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v6/ZornGen7DarwinBoardOwner.cpo",
+        "sha256": "16c149520b78eb27bf3da20e21c2647606416a44efe84e88935fb1e3e5f591bf",
+        "compile_exit": 0
+      },
+      "ZornGen7InactiveOwner26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v6/ZornGen7InactiveOwner26.cpo",
+        "sha256": "30660ad45e33fe448c8f9a31ad9a26c1d07d8ff0a6b8fdc9e5e87c3aa7e8fc6c",
+        "compile_exit": 0
+      },
+      "ZornGen7IccInputs26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v6/ZornGen7IccInputs26.cpo",
+        "sha256": "7848f657e2f21ca25a12d3f6873b3d8dfb28176ede90dec54f298d20e59eb172",
+        "compile_exit": 0
+      },
+      "ZornGen7SmmuRuntimePm26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v6/ZornGen7SmmuRuntimePm26.cpo",
+        "sha256": "9157eab71931e8f1bfbcefb962f4b66e97308c512943ce37b505dc502287bc30",
+        "compile_exit": 0
+      },
+      "ZornGen7QtbFence26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v7/ZornGen7QtbFence26.cpo",
+        "sha256": "8f024fc2b3403ab16f6a235dca6a1e27cf777405701497136379b5cc060e54f9",
+        "compile_exit": 0
+      },
+      "ZornGen7SmmuStream26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v7/ZornGen7SmmuStream26.cpo",
+        "sha256": "5be1d505ba5d73990eebd075bca85709ff61ff63bce2ffc5fc4c9d3931bf84a0",
+        "compile_exit": 0
+      },
+      "ZornGen7SmmuFaultIrq26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/compile-v7/ZornGen7SmmuFaultIrq26.cpo",
+        "sha256": "4d0838740ae3516a683b540c2116b20fd5a0434df536c8ecd07c019ec37a4aea",
+        "compile_exit": 0
+      }
+    },
+    "kernel_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-mmu-board-owned-lease-v82-20261113/full-link-v3/kernel.ZORN26-GPU-MMU-BOARD-OWNED-LEASE-V82.UNSELECTED.macho",
+    "kernel_sha256": "06d628845bb1b9e4a2e510fa2ab07f31850e9afaa60ebe3fdd930e620f8e9034",
+    "kernel_bytes": 30572144,
+    "link_exit": 0,
+    "link_inputs": 1397,
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "missing_inputs": 0,
+    "undefined_symbols": 0,
+    "linker_warnings": 10,
+    "warning_lines_match_v80": true
+  },
+  "device_execution": {
+    "v82_boot_attempts": 0,
+    "gpu_runtime_tested": false,
+    "candidate_unselected": true,
+    "recovery_requalified_for_v82": false,
+    "new_scope_ready_or_claim_created": false
+  },
+  "limits": [
+    "This is a build/link milestone, not a GPU runtime result.",
+    "It does not demonstrate GMU firmware/HFI startup, GPU jobs/fences, GPU rendering, Metal, or GPU display.",
+    "The maintained root still needs the complete GPU startup owner graph and a real all-master GPU/GMU scheduler quiescence owner before an incremental device test.",
+    "No touch-driver work was performed."
+  ]
+}

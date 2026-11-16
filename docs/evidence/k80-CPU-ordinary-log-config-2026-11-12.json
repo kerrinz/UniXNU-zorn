@@ -1,0 +1,38 @@
+{
+  "status": "CPU-ordinary-logging-readonly-config-inspection",
+  "recorded_at": "2026-11-12T07:51:09.559948+08:00",
+  "inventory": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-osfiles26-2d336139b9b14db5aa3958508cd21429/ordinary-log-config-readonly/result.json",
+    "sha256": "a91d67a6f7663b88fe829fac907b0bf9d66b64c71d699da1e5c3f21d597218f5"
+  },
+  "root_sha256": "515fa6c6a231b50556dce7353197f7c908225da8ff51f3d13eec15ee1f7daad5",
+  "tools": {
+    "/usr/bin/log": false,
+    "/usr/bin/syslog": false,
+    "/usr/sbin/syslogd": true,
+    "/usr/libexec/logd": true,
+    "/usr/libexec/diagnosticd": true,
+    "/usr/bin/tail": false,
+    "/bin/cat": false,
+    "/redwood/bin/log": false,
+    "/redwood/usr/bin/log": false
+  },
+  "findings": {
+    "standard_log_and_syslog_export_tools_absent": true,
+    "daemon_programs_metadata_present": true,
+    "legacy_syslogd_job_disabled": true,
+    "logd_diagnosticd_stdout_stderr_devnull": true,
+    "ASL_config_does_not_prove_active_logging": true,
+    "no_public_runtime_log_export_path_selected": true
+  },
+  "limitations": [
+    "Only local readonly515f configuration and executable filename metadata were inspected;does not prove daemon activation or runtime logging success.",
+    "No executable contents or custom private logd/diagnosticd protocol/trace data examined.",
+    "Do not treat logging configuration as SpringBoard crash cause or as authority to enable legacy services.",
+    "No phone command/root/Data/image change;image metadata unchanged after readonly detach."
+  ],
+  "phone_access": false,
+  "root_changed": false,
+  "goal_complete": false,
+  "next_action": "CPU UI first;2d336139 trial has been safely recovered and recorded,no frame/lockscreen. Local readonly515f inventory confirms no /usr/bin/log or /usr/bin/syslog export tools;logd/diagnosticd present by metadata only,syslogd job disabled,logd/diagnosticd standard output/error to /dev/null. Do not guess logd interfaces/trace format/extra launch jobs or enable legacy logging as a presumed fix. Next use public XNU native ordinary exit-reason description already owned/printed by kernel:independent bounded first-SpringBoard reason text observation,only validated EXIT_REASON_USER_DESC text,no other KCData items,no task/process-memory/stack/register/IPC/executable analysis. Missing description is valid and not crash-cause proof. Preserve native exit behavior/returns,first-process uniqueid,bounded copies/sanitization/no pointer retention;new candidate/runID/tests/full native link/exact scope before any new boot. Family lifecycle/withdrawal scalars can separately explain three inactive attempted helper slots if useful;do not repeat unchanged boots or claim all helper activations succeeded. Installed515f/helpercce unchanged,CPU selected,GPU/touch deferred,goal active."
+}

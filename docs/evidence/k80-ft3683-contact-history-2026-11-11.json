@@ -1,0 +1,39 @@
+{
+  "time": "2026-11-10T23:45:20.840019+00:00",
+  "status": "FT3683-contact-history-follows-local-HID-frame-acceptance-offline-link-passed",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-contact-history-candidate",
+  "source_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-provider-resources-f6b80efc750146c68f929f17bc2fb1bd",
+  "display_link_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-format-admission26/full-link",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-contact-history26/touch-contact-history.patch",
+  "compile": {
+    "name": "ZornFt3683Source26-shared.o",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-contact-history26/ZornFt3683Source26-shared.o",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-contact-history-candidate/ZornFt3683Source26.cpp",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-present-format-admission26/full-link/inputs/1324-ZornFt3683Source26-shared.o",
+    "sha256": "cbe80948f3bcaf6046031e4b27a5f1b6d900ad7849fb456edffece0a058423de",
+    "warnings": 10
+  },
+  "unchanged_inherited_warning_count": 10,
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-contact-history26/full-link/kernel.ZORN26-TOUCH-CONTACT-HISTORY.UNSELECTED.macho",
+    "sha256": "544081e99f4ca2f23c811983d4f26d8464dd78c93171bf08a4df5dae751b3102",
+    "bytes": 30411472,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "object_disassembly": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-touch-contact-history26/contact-disassembly.txt",
+  "semantics": [
+    "The detector updates its previous frame during decode. The actual HID service commits its previous frame only after successful synchronous gated submission.",
+    "On a submission refusal the source restores the previous contact frame. An empty-contact release clears history only when accepted. This prevents reusing a still-reported contact ID after an unaccepted frame.",
+    "Physical baseline adaptation and actual IOReturn are preserved. No replay of a refused HID frame, extra poll, or GPIO release."
+  ],
+  "limits": [
+    "Local HID service acceptance is not end-to-end event delivery. Physical contacts, release, and edges remain unverified.",
+    "Combined display and touch reference link only. The exact previous finite touch package remains separate. This build has no package, scope, ready or claim."
+  ],
+  "phone_access": false,
+  "full_root_readback_performed": false
+}

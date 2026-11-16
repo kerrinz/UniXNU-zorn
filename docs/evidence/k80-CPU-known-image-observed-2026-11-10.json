@@ -1,0 +1,91 @@
+{
+  "status": "actual-CPU-known-image-and-pixel-readback-with-automatic-Recovery",
+  "date": "2026-11-10T06:01:57.440386+00:00",
+  "scope": "single-K80-ios26-CPU-known-image300s-v14",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/root-trial-presenter-known-image/trial/run.json",
+  "kernel_sha256": "db3124ba12753129c1beb799c52aea299b51a754188381926e279b6904de5855",
+  "boot_sha256": "89c91c96e382e75f268ead68a7ae18ca6d1573d8aa316d131a74cc9c63a5ac59",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/presenter-known-image-7e852e92ee264a418b9482d0632451a8",
+  "delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/known-image.delta",
+  "actual_returns": {
+    "schedule_raw": 0,
+    "status_returned": true,
+    "submitted": true,
+    "handle_returned": true,
+    "creation_returned": true,
+    "creation_raw": 0,
+    "refusal_mask": 0,
+    "pattern_raw": 0,
+    "pattern_flags": 15,
+    "pattern_checked_pixels": 4608000
+  },
+  "CPU_presenter_creation_proven": true,
+  "CPU_visible_pixel_readback_proven": true,
+  "CPU_known_image_physical_observation_proven": true,
+  "visual_evidence": {
+    "inspected_frames": [
+      {
+        "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/root-trial-presenter-known-image",
+        "scope": "single-K80-ios26-CPU-known-image300s-v14",
+        "boot_sha256": "89c91c96e382e75f268ead68a7ae18ca6d1573d8aa316d131a74cc9c63a5ac59",
+        "run_status": "single-boot-attempt",
+        "camera": "USB  Camera",
+        "audio": false,
+        "seconds_since_fastboot_return": 35.012503147125244,
+        "started": "2026-11-10T05:55:55.950910+00:00",
+        "phone_commands": 0,
+        "desktop_or_GPU_qualified": false,
+        "returncode": 0,
+        "stderr": "[avfoundation @ 0x775cc50000] Stream #0: not enough frames to estimate rate; consider increasing probesize\n",
+        "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/root-trial-presenter-known-image/camera/elapsed-35s.jpg",
+        "bytes": 80606,
+        "sha256": "e85771f02cae723e546342d1c5a0eb77b37707461b3875dd71b70be76c970ae5"
+      },
+      {
+        "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/root-trial-presenter-known-image",
+        "scope": "single-K80-ios26-CPU-known-image300s-v14",
+        "boot_sha256": "89c91c96e382e75f268ead68a7ae18ca6d1573d8aa316d131a74cc9c63a5ac59",
+        "run_status": "single-boot-attempt",
+        "camera": "USB  Camera",
+        "audio": false,
+        "seconds_since_fastboot_return": 240.00894117355347,
+        "started": "2026-11-10T05:59:20.946987+00:00",
+        "phone_commands": 0,
+        "desktop_or_GPU_qualified": false,
+        "returncode": 0,
+        "stderr": "[avfoundation @ 0x7734c18000] Stream #0: not enough frames to estimate rate; consider increasing probesize\n",
+        "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/root-trial-presenter-known-image/camera/elapsed-240s.jpg",
+        "bytes": 80493,
+        "sha256": "76797ba452913141b422c9d97f8783372ee3c314cb8794368bb4672307f1f433"
+      }
+    ],
+    "observation": "Connected phone shows four full quadrants: camera top-left green,top-right white,bottom-left red,bottom-right blue;matches source logical red/green/blue/white after phone rotation. No stripes or missing quadrant in inspected frames.",
+    "scope": "Static CPU image during this bounded trial only;not colorimetric accuracy,vsync,swaps,desktop,GPU or Metal proof."
+  },
+  "root_PID1_EL0_proven": true,
+  "GPU_started": false,
+  "GPU_known_image_proven": false,
+  "Metal_or_desktop_proven": false,
+  "touch_proven": false,
+  "recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_seconds": 332.7762194589959,
+  "protected_pages": {
+    "root_first_page.bin": true,
+    "before.bin": true,
+    "root_after.bin": true,
+    "after.bin": true,
+    "Data.bin": true,
+    "root_before.bin": true,
+    "Data_metadata.bin": true
+  },
+  "normal_source_buffer_free_scope": "CPU-only input has no asynchronous borrower;freed after synchronous existing copy and readback return. GPU resource lifetime unchanged.",
+  "next_action": "Close CPU-only test path after this success;retain as display regression baseline. Connect actual Gen7 direct-ring startup creator to existing real native clock/MMIO/SCM/SMMU owners in isolated candidate;identify and implement actual authority producers before a GPU prefix trial. Do not fake callbacks or infer GPU lease from CPU image/root/DT;GPU/Metal/touch goal remains incomplete."
+}

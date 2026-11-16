@@ -1,0 +1,47 @@
+{
+  "kind": "source",
+  "date": "2026-11-04",
+  "result": {
+    "state": "UNSELECTED_OEM_RECURRING_RECOUNT_REPAIR",
+    "reference": "retained OnePlus OEM453d8875 source, not Xiaomi installed kernel or K80 runtime",
+    "source_gap": "valid-context replay reuses recurring_cmdobj without resetting numibs; helper adds cmdlist length again; populate_ibs writes only actual list entries but publishes accumulated count",
+    "repair": "reset numibs in existing non-STOP counting branch before list walk",
+    "changed_files": [
+      "adreno_gen7_hwsched_hfi.c"
+    ],
+    "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-recurring-recount-20261104/recurring-recount.UNAPPLIED.patch",
+    "patch_sha256": "ab9c8f4821a6d88cecaffc0855b7fd302ad54f959a84ce962ca6cdcfb57b1508",
+    "checks": {
+      "source_replay_binding_verified": true,
+      "existing_object_no_numibs_reset_in_replay": true,
+      "source_count_projections": 3,
+      "original_false_limit_refusals": 2,
+      "STOP_and_empty_controls": 2,
+      "source_mutations_refused": [
+        "lost-reset",
+        "nonzero-reset",
+        "wrong-owner"
+      ],
+      "sanitizers": [
+        "address",
+        "undefined"
+      ],
+      "Linux_or_cmdobj_or_callback_or_packet_execution": false,
+      "new_native_target_or_Linux_build": false
+    },
+    "delta_replay_byte_equal": true,
+    "parent7_sources_unchanged": true,
+    "existing_owner_acquired_here_and_replay_error_capture_preserved": true,
+    "no_new_wire_field_or_capacity_or_policy": true,
+    "Linux_kernel_compiled_or_executed": false,
+    "new_native_target": false,
+    "successful_cmdobj_provider_or_ACK_model": false,
+    "native_or_device_execution": false,
+    "runtime_selection": false,
+    "native_coherent_tree": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-index-value-sentinel-20261104/native",
+    "timestamp": "2026-11-03T17:18:10.064032+00:00"
+  },
+  "readme": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-recurring-recount-20261104/README.md",
+  "next_plan": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-recurring-recount-20261104/next-plan.json",
+  "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-recurring-recount-20261104/archive.json"
+}

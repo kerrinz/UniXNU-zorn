@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T06:51:38.973024+08:00",
+  "state": "exact-GMU-timing-consumer-contract-no-new-patch",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gmu-time-consumer-contract/source-contract.json",
+  "new_source_mutations_refused": 4,
+  "callback_failed_output_shortcircuit_and_monotonicity_bound": true,
+  "original_callback_int_forwarding_and_status_folding_separated": true,
+  "no_wallclock_or_completion_deadline_proof": true,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "old_startup_HFI_suites_not_reexecuted": true,
+  "no_native_clock_wait_callback_or_phone_execution": true,
+  "no_success_time_hardware_peer_or_new_component_caller_image_wire": true,
+  "full_core_role_API_gap_unresolved": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "source semantics only,no new target/clock/hardware qualification",
+  "details": {
+    "exact_scope": "Sm8550Platform a9f45dc60c035084b95463781538380f4c3606c9 ShengGmu.c/h timing consumers,not a K80 provider/startup selection. NativeKernelTime catalog149 nullcookie/void IODelay contract from frozen parent;all callbacks and hardware OFF.",
+    "poll_output": "Initial now callback int failure returns before start is used. Each iteration now failure is left operand of || so now<last is skipped on error. A valid int0 callback must write output;exact KernelTime does so with valid nullcookie/output. Arbitrary callback0 does not attest output or clock. No success clock peer executed.",
+    "elapsed": "After checking now>=last with last initially start,now-start is nonnegative without unsigned underflow within this serial contract. Counter wrap or backwards observation is rejected as ClockError;equal timestamps are allowed and loop budget can terminate a stalled clock. Time is sampled before faults/data read/barrier;there is no post-read time check in this poll. This is not a completion acceptance deadline or a guarantee about late/blocking callbacks.",
+    "iteration": "Public validation permits poll_budget1..1024 before the internal poll is used. Internal poll calls initial now even if budget0 were passed directly;budget0 then returnsTimeout without a register sample. wait100 is called only between unsuccessful iterations,not after the last. Per-loop fault/data/barrier and wait may block or not return;previous selected IODelay may thread_block. Finite iterations/elapsed checks do not prove wallclock/cancellation/readablefailure.",
+    "returned_domains": "poll maps any returned nonzero now/wait int to ShengGmuClockError,backwards time to same status and elapsed or exhausted budget to ShengGmuTimeout. It does not preserve native EFI/IOKit/cache or individual callback raw errors. startup_now/startup_wait forward the exact int unchanged with original device services cookie,not StartupContext cookie. ColdStart later folds protocol ClockError and WaitError together. No failure value is invented where callback did not return.",
+    "context_lifetime": "ColdStart builds local StartupContext and service struct and invokes synchronous AdrenoHfiStartupRun before returning;the local StartupContext forwards to original device.services.cookie. The exact AdrenoFirmware20ad3d7 source is byte-identical to local current source;old startup suite/body tests and targets were not rerun. Its documented callback-bound precondition remains unsatisfied by an arbitrary IODelay walltime assumption. Device/result/provider and mappings must be independently retained;local context lifetime does not hold hardware resources.",
+    "report": "Load report zero-initialized before validation;poll_reads increments only after a successful time sample and elapsed check,so it counts entered polling iterations,not every read32 call. Fault or target output may be partial on read error. Failed clock output is not copied into report,ClockError does not identify now versus wait. resources_must_retain remains set;historical ready fields are observations,not current-running or retirement evidence. No new report/wire/codec fields.",
+    "decision": "No new concrete reachable violation was shown under this exact serial typed provider contract. No speculative raw-error patch,clock model,guard,timeout policy,retry/reset/refrelease or adapter was added. Seventeen existing repairs remain independent UNAPPLIED. Catalog full-core role API mismatch remains unresolved;this source-only contract does not repair it or authorize execution.",
+    "checks": "4 new source mutations refused:output inspected before status,backwards clock accepted,extra final wait,forwarded int folded. No C/native callback or host-success time model executed. No new native component or target,old timing/startup/HFI/CPU/VM/Submit suites not rerun."
+  },
+  "old_patches_unapplied": 17,
+  "GPU_execution_rendering_Metal_complete": false
+}

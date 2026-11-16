@@ -1,0 +1,101 @@
+{
+  "status": "v42-recovered-source-SMMU-power-unavailable-PM-not-called",
+  "scope": "single-K80-ios26-native-SMMU-power-held-PM90s-v42",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-power26-473953e38f564e0487566518a93f5606",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-power26-473953e38f564e0487566518a93f5606/full-link/kernel.ZORN26-NATIVE-SMMU-POWER.UNSELECTED.macho",
+    "sha256": "42ce0385f0eeed62a1fcdbdf7880e23bb7174c8857a3622d179ff4a790513e44",
+    "bytes": 30401832,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 41,
+    "preserved": 1355,
+    "undefined_symbols": 0
+  },
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-power26-473953e38f564e0487566518a93f5606/source-selection.json",
+  "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-smmu-power26-473953e38f564e0487566518a93f5606/root-trial-native-smmu-power/trial/run.json",
+  "actual": {
+    "gpucc": {
+      "returned": true,
+      "complete": true
+    },
+    "graph": {
+      "returned": true,
+      "assessment": 6,
+      "hardware_constructed": 29,
+      "namespace_records": 3,
+      "cores_registered": 29,
+      "complete": true
+    },
+    "list": {
+      "returned": true,
+      "assessment": 3,
+      "raw_available": true,
+      "raw": 6,
+      "entries_returned": 6
+    },
+    "hub": {
+      "returned": true,
+      "raw": 0
+    },
+    "ddr": {
+      "returned": true,
+      "raw": 0
+    },
+    "core_inputs": {
+      "returned": true,
+      "raw": 0
+    },
+    "cx_probe": {
+      "returned": true,
+      "attempted": true,
+      "configuration_store_returned": true,
+      "retain_update_returned": false,
+      "native_prefix_returned": true
+    },
+    "cx_core": {
+      "returned": true,
+      "raw": 0
+    },
+    "completion": {
+      "returned": true,
+      "registered": true
+    },
+    "smmu_power_resources": {
+      "returned": true,
+      "raw": 0
+    },
+    "CPU_register_mappings": {
+      "returned": true,
+      "raw": 0
+    },
+    "CX_primary": {
+      "returned": true,
+      "wait_assessment": 1,
+      "wait_raw_available": false,
+      "wait_raw": null,
+      "regulator_disposition": 0,
+      "regulator_domain": 2,
+      "regulator_raw_available": true,
+      "regulator_raw": 0
+    },
+    "SMMU_source_power": {
+      "returned": true,
+      "disposition": 2,
+      "domain": 0,
+      "raw_available": false,
+      "raw": null
+    },
+    "SMMU_native_held_PM": {
+      "returned": false,
+      "raw": null
+    }
+  },
+  "recovery_seconds": 122.91298187499888,
+  "protected_captures_unchanged": true,
+  "whole_root_readback": false,
+  "GPU_execution_proven": false,
+  "SMMU_translation_proven": false,
+  "limit": "Power returned Unavailable without raw status;cannot localize caller admission versus lower source branch from this record. No errno or hardware failure invented. PM not called.",
+  "next_action": "Trace exact native caller and lower source power partials;preserve one-shot/no retry,then implement necessary failure-result propagation in a new isolated source candidate."
+}

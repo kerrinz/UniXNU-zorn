@@ -1,0 +1,39 @@
+{
+  "version": 195,
+  "status": "recovered-diagnostic-text-unavailable-CDC-wrapper-not-launched",
+  "ready": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v195-metal-discovery-ready-2026-11-15.json",
+    "sha256": "ff08951732a8c95c05d0c874ccb713761882f15d61ad290fb8b29dc4d2fec857"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v195-metal-trial-064848b236b64ae699127ef8aa4bde37/root-trial/trial/run.json",
+    "sha256": "11ac270c4bd1da62763604c2f07ccb8221c916fe62e8d8c838a546eaeefb5575"
+  },
+  "native_record": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v195-metal-trial-064848b236b64ae699127ef8aa4bde37/root-trial/trial/decoded-native-record.json",
+    "sha256": "dd4162446e05830d4c353f60c4640f662366b35cfb5515be2ff5c8d2fb384969"
+  },
+  "late_CDC_attempt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v195-metal-trial-064848b236b64ae699127ef8aa4bde37/root-trial/trial/late-cdc-attach.json",
+    "sha256": "7e439608f58399d054118a34b1bfd8718849431cb4e083f4378effd526b12bba"
+  },
+  "recovery_seconds": 333.0422311249422,
+  "protection_pairs": [
+    "before-root_first_page.bin",
+    "before-before.bin",
+    "before-root_after.bin",
+    "before-after.bin",
+    "before-Data.bin",
+    "before-root_before.bin",
+    "before-Data_metadata.bin"
+  ],
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "finding": "Direct fixed boot entry ran once, but integrated CDC capture wrapper was not started. A bounded receive-only late attachment found no matching CDC port; no second boot was attempted. Recovery retained snapshot confirms8CPUs,earlyGPU initialization andCPU presenter activity but contains no application/plugin diagnostic text. Do not infer Metal device creation or a failure cause.",
+  "next": "v196 fresh identity and claim; retain exact195root/program/principal and native behavior; start existing integrated CDC wrapper before boot.",
+  "constraints": "No disassembly/reverse engineering;Recovery333.04s/protection pass;195claim consumed. Goal active."
+}

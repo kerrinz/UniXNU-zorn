@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-09T17:22:08.009809+00:00",
+  "status": "private-process-ASID-and-context-encoding-implemented-offline",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate",
+  "files": {
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7ProcessTables26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7ProcessTables26.h",
+      "sha256": "1e2408499b15efb283154066640482661c301ff45965a8ff014424e1c07d8b2f"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7HostGpuTables26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7HostGpuTables26.cpp",
+      "sha256": "68587920ccc7fc762072b8a6567f007920004e6a777a11a2bc32ba07c3bd63f4"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7SmmuTablePages26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7SmmuTablePages26.h",
+      "sha256": "4490208cd2cd3c8730219a8ceb30e072099496748227453b6755ac34c8fea3db"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7ProcessTables26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7ProcessTables26.cpp",
+      "sha256": "50b0cc44e54a504f792c85a4e32caba19530c36843af83ed0a7e22f5e1d9880a"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7SmmuTablePages26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7SmmuTablePages26.cpp",
+      "sha256": "7207dbc15104f1ad731f5ce86a55cdb430b5433b4fcb5c7ada99bfeda78fec3d"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7SmmuDomain26.cpp": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7SmmuDomain26.cpp",
+      "sha256": "fedff71b9c22741e6c315d31b8e8b9120163ab90852b438e94afc8bc2c123e56"
+    },
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-process-asid-candidate/ZornGen7HostGpuTables26.h": {
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/source-archive/ZornGen7HostGpuTables26.h",
+      "sha256": "f92eb318fbac75f50dcaba4e73548ec4d7813ce2245ec84cce3df7da6fb0fc8c"
+    }
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.15412650000007488,
+    "inputs": 1387,
+    "replaced": 3,
+    "preserved": 1383,
+    "added": 1,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-process-asid26/full-link-r2/kernel.ZORN26-process-asid.UNSELECTED.macho",
+    "sha256": "aec9e314579c0970b35cda6cf066740c04e4ae296acbdbb6c8a7bcfdab1fac8e",
+    "bytes": 30281584
+  },
+  "semantics": "One domain host-table owner reserves all actual/prospective bank ASIDs [0,actual probed bank count).Process tags chosen from remaining existing AArch64 AS16 encoder namespace,under actual driver gate,only after graph construction succeeds.Exhaustion returns NoResources,does not wrap/reuse occupied tag.Each child retains own tag,encoded context and exact lower root.Only complete never-installed page retirement returns tag;failure retains it.No hardware context installation/root export or app publication API added.",
+  "source_basis": [
+    "ZornGen7SmmuDomain26::reserveActual uses ASID=actual allocated cbndx,bank count from ID1 low8/min actual override",
+    "Existing ZornSmmuSparse4KEncodeContext sets TCR2.AS=1,admits16bit ASID and actual AArch64 capability inputs",
+    "Houji NativeAdrenoGpuContext createVm/destroyVm supplies reusable software ownership pattern;fixed start16 and other-machine buffer geometry not copied"
+  ],
+  "limits": "Software reservations and context encoding only,not hardware ownership/capability attestation. No installed VM mapping/submission or idle/fence/TLB retirement proof.Future root export/install must first revoke never-installed retirement token and retain failures.No application endpoint enabled.",
+  "affected_objects": [
+    "ZornGen7HostGpuTables26",
+    "ZornGen7ProcessTables26",
+    "ZornGen7SmmuDomain26",
+    "ZornGen7SmmuTablePages26"
+  ],
+  "zero_undefined": true,
+  "inherited_compile_warnings": 6,
+  "unchanged_link_warnings": 10,
+  "dependency_files": 475,
+  "loader_parse_status": 0,
+  "PAC_check_mode": "actual-file parse;NULL signer,NULL loaded;not actual authentication",
+  "target_or_phone_executed": false,
+  "goal_complete": false
+}

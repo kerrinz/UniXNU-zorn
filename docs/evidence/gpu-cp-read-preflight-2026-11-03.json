@@ -1,0 +1,24 @@
+{
+  "scope": "missing read32 in public already-programmed mode is argument refusal,not hardware failure",
+  "original_SHA": "58a7a2d1aa83ffa7eb7131351a694d45272586a0abbb5f24916ea2105538a2d6",
+  "candidate_SHA": "64f382a12afc8d6be10207aaf174c1a2b011a134cd71a3e503d68813948ccba5",
+  "source_before": "nonzero sqe_base_programmed and missing read32 short-circuits before callbacks but calls poison();next call NotReady",
+  "source_after": "same missing member rejected BadArgument before any callback,not poisoning;no internal retry added",
+  "write_mode_read32_requirement_not_added": true,
+  "nonnull_callback_failure_and_readback_mismatch_still_poison": true,
+  "all_valid_calls_order_payloads_parameters_and_fence_behavior_unchanged": true,
+  "source_corruptions_refused": [
+    "removed",
+    "unconditional-read-requirement",
+    "still-poisons-invalid-argument"
+  ],
+  "new_CpInit_iOS17_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "known_retained_Service_and_NativeGpu_callers_mode_zero": true,
+  "known_callers_or_K80_failure_not_claimed": true,
+  "no_run_poison_ring_getter_callback_allocator_readback_native_or_success_peer_execution": true,
+  "no_CP_ME_INIT_firmware_pwrup_or_K80_parameter_generation_selection": true,
+  "layout_ABI_wire_logs_pins_32patches_profiles_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

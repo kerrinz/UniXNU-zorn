@@ -1,0 +1,30 @@
+{
+  "scope": "public requiredBytes integer addition before widening",
+  "original_SHA": "625935493062e63f18d87a691436b4f53cce22969509501e77cbd58d27e398c4",
+  "candidate_SHA": "fefb5e3679ccc2749f7704eb803149edcb2d0ee823a1bc520da6637c03e1007a",
+  "three_wide_count_tuples_wrong_before_correct_after": true,
+  "three_legal_count_controls_unchanged": true,
+  "host_outputs": {
+    "before": "ok=1 wide_sum_mismatches=3 legal_controls=3 size-only-no-policy\n",
+    "candidate": "ok=1 wide_sum_mismatches=0 legal_controls=3 size-only-no-policy\n"
+  },
+  "ASan_UBSan_pass": true,
+  "only_operands_widened_before_sum": true,
+  "new_changed_Pwrup_iOS17_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "pack_rejects_these_large_counts_before_requiredBytes_call": true,
+  "no_pack_overrun_or_actual_K80_trigger_claimed": true,
+  "no_pack_buildA740_register_list_policy_allocator_native_or_provider_execution": true,
+  "no_rate_vote_variant_or_component_selection": true,
+  "previous_alignment_candidate_not_combined": true,
+  "catalog_pins_32patches_profiles_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false,
+  "GMU_service_lifetime_review": {
+    "new_gap": false,
+    "partial_mapping_failure": "all memory/map failure branches call stop(provider);stop resets all OSSharedPtr maps then count=0 then base stop",
+    "parse_failure": "before map loop,sets count0 and base stop",
+    "ownership": "getDeviceMemoryWithIndex borrows array member;OSNoRetain adopts map result;shared_ptr reset releases held object;default class destructor invokes member destructors",
+    "limits": "no live leak,UAF,unmap or hardware quiescence claim;no cleanup policy changed;existing SDK/source contracts read only"
+  }
+}

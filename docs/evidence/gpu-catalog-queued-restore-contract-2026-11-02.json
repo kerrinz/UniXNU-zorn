@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T19:08:25.568350+08:00",
+  "state": "Catalog149-queued-WPTR-restore-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-queued-restore-contract/source-contract.json",
+  "functions_body_SHA_recorded": 7,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all32_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Exact149 queued WPTR restore intent/withdrawal/error and original preempt completion callers only.7bodySHA/full identities,frozen12/13/preempt provenance;no old suites/targets or32nd pair rerun.",
+    "producer": "Noncurrent successful submitWords sets restore_wptr_=true then advances next/seqno/output;noncurrent kick also sets it and returns0 without WPTR callback. Pending getter simply returns bool. CPU intent is not actual ring loaded/ACK/completion or device stop/DMA.",
+    "consumption": "restoreWptr first refuses unattached/poisoned. No pending returns0 without write. Pending calls writeWptr(next_);nonzero returns IOError before clearing pending. Only returned0 reaches pending=false. Existing writeWptr source may return0 without fence-status provider or after retry budget/ignored clear errors;cleared intent is not observed GPU receipt. No new retry/restore policy.",
+    "completion": "preemptIrq gates preemption/inFlight and complete,gets loaded ring,marks CPU current flags. Pending branch counts restored only if restoreWptr0. No-pending branch calls restoreWptr (which normally does no write) and increments noteRestoredWptr unconditionally. That counter/true return cannot certify WPTR write. Overall bool remains true after successful complete even if restore fails or selected ring null.",
+    "failure": "A returned WPTR callback error poisons ring and leaves pendingtrue. preemptIrq does not propagate that IOReturn via bool;preempt completion/software current and pending WPTR status are separate. driveSwitch may proceed after true;caller effect separately unbound. Actual board IRQ producer/context ownership remains missing,no successful complete/write or K80 fault fabricated.",
+    "frozen": "13th independent private error-retention candidate records RestorePending/RestoreOther without changing bool,stage or counting policy;12th records original callback int availability. Neither selected/composed or rerun. Existing restartSecondary clears pending after its original source work;this is not permission to run reset or a generic error cleanup.",
+    "decision": "No33rd guessed retry/restore/counter/refcount/free/reset policy.32 independent UNAPPLIED/all native/device OFF,no new component/caller/image/query/HFI/log/carrier/wire/CPU/security policy. K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unavailable."
+  },
+  "qualification": "Software restore intent/return source only;not GPU receipt/context/IRQ/stopDMA qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

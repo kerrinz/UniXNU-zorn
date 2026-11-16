@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-11-12T15:42:59.034461+08:00",
+  "status": "direct-host-GMU-version-order-full-linked-unselected",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-host-version-order-candidate",
+  "source_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/source.patch",
+    "sha256": "e16068f9bdb9a26cfeb1e10b73816ca077c3fd81f08730a66cd2b60076df7bd5"
+  },
+  "selected_original_sources": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/source-selection.json",
+    "sha256": "c9ecbdd6aeeb2dad8f6d0f9cd4337e524576d9c56281b18f88ed26855f43377c"
+  },
+  "linux_reference": {
+    "path": "/Volumes/macData/projects/ios-zorn/references/k80-zorn-trees-gpu-20261106/linux-graphics/adreno_gen7_gmu.c",
+    "sha256": "776f894dc59a95b485ff7538755be274e8cd944bbfa29931e026f58c43cb0851",
+    "revision": "7d16b7d994c942808a01e2ae6b18ff7a1b7f9285",
+    "function": "gen7_gmu_first_boot"
+  },
+  "cause": "Host direct ring uses the same seven HFI buffers as the HWSCHED path. The loader used buffer layout to select late GMU version reads.",
+  "fix": "Pass the actual host direct path to the retained firmware loader. Capture five DTCM version words before the ITCM shadow and CX security, then publish the retained values after GMU register configuration. Require the matching receiver path.",
+  "regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/version-order-regression.json",
+    "sha256": "1bc5ecef35ec4dd1f9e41e9227c14527b2276ff5a7b787dad42774181736b472"
+  },
+  "full_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/full-link/link-result.json",
+    "sha256": "8e03d5435d9225f1b3cefe84cb21e2c3307f49c54dda702ffdf2b1f9f8074b4b"
+  },
+  "tools": {
+    "prepare": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/prepare-version-order.py",
+      "sha256": "f3241965882680548a26fc23fccecc431ace523e496d540bfdd883507d195ec3"
+    },
+    "build": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/build-version-order.py",
+      "sha256": "79ffc49bfb52f96c9d2d7574e28a9e075e5e474128f4dc84f0904c6f5167c1a5"
+    },
+    "check": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-host-version-order26/check-version-order.py",
+      "sha256": "5113df33f7a0473162c69af2c125484fe8db99bb36f16a50cd732fc7418ce13f"
+    }
+  },
+  "remaining_hardware_validation": "The prepared direct-ring path still needs actual board authority, guarded register returns, GMU/HFI and later GPU/Metal qualification.",
+  "risk": "The change moves the real version reads earlier in the host direct startup sequence. It depends on the existing reset-held load grant, guarded TCM access and active GMU context.",
+  "device_access": false,
+  "selected": false
+}

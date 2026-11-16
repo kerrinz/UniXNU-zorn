@@ -1,0 +1,107 @@
+{
+  "status": "v43-recovered-SMMU-four-prepared-first-enable-unavailable",
+  "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-power-results26-9bfd48f1822349bb9514d241502304c3/root-trial-smmu-power-results/trial/run.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-power-results26-9bfd48f1822349bb9514d241502304c3/full-link/kernel.ZORN26-SMMU-POWER-RESULTS.UNSELECTED.macho",
+    "sha256": "d14dc6e209af70c87b11193a078e77d876a36456f8231ea536d8169c70049335",
+    "bytes": 30403344,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 41,
+    "preserved": 1355,
+    "undefined_symbols": 0
+  },
+  "source_selection": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-smmu-power-results26-9bfd48f1822349bb9514d241502304c3/source-selection.json",
+  "actual": {
+    "gpucc": {
+      "returned": true,
+      "complete": true
+    },
+    "graph": {
+      "returned": true,
+      "assessment": 6,
+      "hardware_constructed": 29,
+      "namespace_records": 3,
+      "cores_registered": 29,
+      "complete": true
+    },
+    "list": {
+      "returned": true,
+      "assessment": 3,
+      "raw_available": true,
+      "raw": 6,
+      "entries_returned": 6
+    },
+    "hub": {
+      "returned": true,
+      "raw": 0
+    },
+    "ddr": {
+      "returned": true,
+      "raw": 0
+    },
+    "core_inputs": {
+      "returned": true,
+      "raw": 0
+    },
+    "cx_probe": {
+      "returned": true,
+      "attempted": true,
+      "configuration_store_returned": true,
+      "retain_update_returned": false,
+      "native_prefix_returned": true
+    },
+    "cx_core": {
+      "returned": true,
+      "raw": 0
+    },
+    "completion": {
+      "returned": true,
+      "registered": true
+    },
+    "smmu_power_resources": {
+      "returned": true,
+      "raw": 0
+    },
+    "CPU_register_mappings": {
+      "returned": true,
+      "raw": 0
+    },
+    "CX_primary": {
+      "returned": true,
+      "wait_assessment": 1,
+      "wait_raw_available": false,
+      "wait_raw": null,
+      "regulator_disposition": 0,
+      "regulator_domain": 2,
+      "regulator_raw_available": true,
+      "regulator_raw": 0
+    },
+    "SMMU_source_power": {
+      "returned": true,
+      "disposition": 2,
+      "domain": 0,
+      "raw_available": false,
+      "raw": null
+    },
+    "SMMU_native_held_PM": {
+      "returned": false,
+      "raw": null
+    },
+    "SMMU_power_progress": {
+      "caller_phase": 12,
+      "source_phase": 7,
+      "bulk_assessment": 2,
+      "prepare_assessment": 5,
+      "enable_assessment": 2,
+      "prepare_entries": 4,
+      "enable_entries": 0
+    }
+  },
+  "recovery_seconds": 122.6316893330004,
+  "protected_captures_unchanged": true,
+  "full_root_readback": false,
+  "GPU_execution_proven": false,
+  "limits": "CCF enable lower callback unavailable is not a device errno;no successful PM/translation/GPU or suspend/stop inferred.",
+  "next": "Actual parentless HLOS1 vote branch retains cached0 but native positive-rate guard stops before halt check.Implement explicit source-minimum200us compatibility without invented rate;positive formula and actual halt/-EBUSY retained."
+}

@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-09T12:39:04.560085+00:00",
+  "classification": "progress: source-selected native GIC RSC registration integrated after actual independent cold-controller result and held DRV;legacy callback path preserved,no synthetic grant",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-rsc-irq-candidate",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.17943096160888672,
+    "inputs": 1385,
+    "replaced": 5,
+    "preserved": 1380,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-rsc-irq26/full-link/kernel.ZORN26-native-rsc-irq.UNSELECTED.macho",
+    "sha256": "b9ed0d600a5b7194329b4819213733e01ead5f3f763b1cebb80bb317eba09b7c",
+    "bytes": 30216992
+  },
+  "checks": {
+    "affected_native_translation_units": 5,
+    "shared_header_dependencies_all_recompiled": {
+      "changed_header": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-rsc-irq-candidate/ZornGen7RscProvider26.h",
+      "affected_current_firmware_translation_units": [
+        "ZornGen7RegistryStartup26",
+        "ZornGen7RscProbe26",
+        "ZornGen7RscProvider26",
+        "ZornGen7RscRegistry26",
+        "ZornGen7StartupOwner26"
+      ],
+      "all_recompiled": true
+    },
+    "full_link_inputs": 1385,
+    "replaced_inputs": 5,
+    "preserved_inputs": 1380,
+    "undefined_symbols": 0,
+    "new_link_diagnostics": 0,
+    "warning_observations_in_unchanged_inherited_header": 12,
+    "inherited_warning_sites": 3,
+    "new_compile_warning_sites": 0,
+    "actual_compiler_inputs": 504,
+    "unchanged_source_files": 157,
+    "changed_source_files": [
+      "ZornGen7RscRegistry26.cpp",
+      "ZornGen7RscProvider26.cpp",
+      "ZornGen7RscProvider26.h",
+      "ZornGen7StartupOwner26.cpp",
+      "ZornGen7RscRegistry26.h",
+      "ZornGen7RscProbe26.cpp"
+    ],
+    "cold_result_refusals_exclude_publication": 4,
+    "native_prerequisite_or_DRV_refusals_exclude_GIC": 3,
+    "actual_native_GIC_return_stored_and_selects_registration_state": true,
+    "legacy_authority_record_class_data_and_vtable_declarations_unchanged": true,
+    "actual_GIC_overlay_provenance": {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/zorn26-component-integration-candidate/rsc-gic-control-lock-candidate/gic_v3_irq.c",
+      "source_sha256": "93de26b8b116517b7ddf31873c5f06ea92cd673612f548a23b7cbc7266b78550",
+      "compile_command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-zorn-integration26/attempts/1794209052220706000/027-gic_v3_irq.o-command.json",
+      "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-zorn-integration26/attempts/1794209052220706000/027-gic_v3_irq.o",
+      "object_sha256": "8320f2394b691595e22fa411a6ee603d7e4e5baf20d8850b9490d3909f568c93",
+      "current_link_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-rsc-irq26/full-link/inputs/0374-0374-0374-0374-0374-0374-0374-1253-027-gic_v3_irq.o",
+      "current_link_object_unchanged": true,
+      "scope": "Actual native masked registration/configuration readback backend,not a current hardware lease or IRQ-delivery proof"
+    }
+  },
+  "behavior": "Registry startup explicitly uses actual native GIC masked SPI registration. Native registration stays unavailable until its real private RSC probe observes the separate cold-controller callback return and retains that probe for the same source DRV. No external IRQ grant result is synthesized;its returned bit stays unavailable in native mode. Actual GIC checked return determines registered/failed-retained state. Duplicate/source/precondition errors do not call GIC. Existing external-epoch factory and per-source callback remain intact;all original mask/unmask/error/failure-retain paths preserved.",
+  "limitations": [
+    "Only offline source/object/full-kernel/static CFG verification,no native/GIC/register/map/IRQ/device execution.",
+    "Native GIC registration/readback is not IRQ delivery,power/security or a persistent hardware lease. Independent actual RSC cold power/security/exclusion must still be supplied and acquired.",
+    "Real early clock/CommandDB/RSC cold/SCM/SMMU and remaining GPU platform creator inputs remain to be completed;this change is not a complete GPU startup.",
+    "Earlier f73 platform/UFS trial applies only to its exact kernel;its one-shot claim is consumed. Current native-RSC kernel remains unselected/unexecuted."
+  ],
+  "native_or_device_execution": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-rsc-irq26/verified.json",
+  "actual_compile_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-rsc-irq26/actual-inputs.json",
+  "compiled_refusal_CFG": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-rsc-irq26/compiled-refusal-CFG.json",
+  "source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-rsc-irq26/original-source-manifest.json"
+}

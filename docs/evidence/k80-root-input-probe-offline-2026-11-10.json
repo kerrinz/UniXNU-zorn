@@ -1,0 +1,51 @@
+{
+  "status": "offline-root-input-observer-compiled-linked-unselected",
+  "recorded_at": "2026-11-10T03:45:04.703770+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-root-input-probe26-8342de9b2e274d359d64e4d2bf71ddb2",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/root-input-probe-8342de9b2e274d359d64e4d2bf71ddb2",
+  "proof": {
+    "kernel_sha256": "fbc3b1e47354892228239a566bdd1c36f0a71fdc4eb0de7f1006ee3420557252",
+    "actual_ARM64_probe_wait": {
+      "symbol": "__ZN9IOService22waitForMatchingServiceEP12OSDictionaryy",
+      "instruction": 18446744005124006820,
+      "target": 18446744005120628388
+    },
+    "actual_probe_outlined_noreturn_helper": "_IOFindBSDRoot.cold.9",
+    "actual_main_probe_helper_call": {
+      "symbol": "_IOFindBSDRoot.cold.9",
+      "instruction": 18446744005121440428,
+      "target": 18446744005124006784
+    },
+    "probe_wait_cannot_reach_root_attach_in_final_CFG": true,
+    "actual_Generic_probe_call": {
+      "symbol": "__Z26zorn26_root_platform_probeP9IOServicePcj",
+      "instruction": 18446744005120950992,
+      "target": 18446744005122863708
+    },
+    "registerService_dominates_observer_call": {
+      "instruction": 18446744005120951052,
+      "vtable_offset": 672,
+      "final_encoded_slot": "0x80117d5900c6c6bc",
+      "resolved_method": "IOService::registerService(unsigned)"
+    },
+    "actual_observer_call": {
+      "symbol": "_zorn26_platform_record_start_reason",
+      "instruction": 18446744005120951064,
+      "target": 18446744005122855560
+    },
+    "probe_path_cannot_reach_normal_root_start": true,
+    "reason_owned_copy_before_thread_start_source_verified": true,
+    "actual_CPU_result_only_not_root_or_hardware_success": true,
+    "compile_objects": 7,
+    "exact_link_inputs": 1390,
+    "preserved_inputs": 1383,
+    "undefined_symbols": 0,
+    "phone_or_target_execution": false,
+    "next_requirement": "Distinct fixed-entry observation scope plus packet,decoder,claim/ready/watchdog gates; no packet/phone selection implied by offline link."
+  },
+  "failure_preserved": "Initial Generic compile lacked two actual dependency headers; original stderr retained and exact original headers copied independently. Only affected Generic TU resumed. CFG checker corrected for LLVM-outlined probe helper and authenticated virtual registration; no target/source guards relaxed.",
+  "screen_recollection": "Owner does not remember panic text;not treated as new failure diagnosis",
+  "device_executed": false,
+  "root_or_GPU_qualified": false,
+  "next": "Build distinct fixed-entry packet and unchanged-envelope CPU-only decoder; verify exact inputs,watchdog,suppressed root binding and fresh claim before any device command. Do not reuse consumed root or platform trial scopes."
+}

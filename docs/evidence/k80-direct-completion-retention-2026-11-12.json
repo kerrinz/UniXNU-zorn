@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-11-12T17:04:03.829613+08:00",
+  "status": "direct-ring-completion-reference-fix-native-full-link-host-verified",
+  "root_cause": "The completion path retired indirect buffer references before acquiring GPU-written imports. On cache acquisition or partial reference retirement failure, the retained job could still list references already retired.",
+  "base_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-submit-unwind-candidate/ZornGen7DirectSubmit26.cpp",
+    "sha256": "32d925f2a8d855502d6a8994d4c590d32c4431e52b9a63c3a262d494012be030"
+  },
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-completion-retention-candidate/ZornGen7DirectSubmit26.cpp",
+    "sha256": "0924e8d81b499b5163c63748743854f3870830c72ed059fcfc625253239c10c1"
+  },
+  "source_delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-completion-retention26/direct-completion-retention.patch",
+    "sha256": "c5bdb098b6ecee339d157f9845a6e3bb44790be5087923e82e013480899deb53"
+  },
+  "vm_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-candidate/direct-runtime/ZornGen7DirectVm26.cpp",
+    "sha256": "500340827fa928e57e84bcd025d3376fb0b8b12e21dcb2159593364f9423a1ca"
+  },
+  "unchanged_vm_object": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-ring-board-preparation-lifetime26/full-link/inputs/1297-ZornGen7DirectVm26.cpo",
+    "sha256": "e66b3a7ae287e288f7d800282ebc8dc0acd236b16fe0b808edc090df66f1cfc9"
+  },
+  "behavior": "After the actual ring fence returns, acquire GPU-written imports while all job holds are present. Retire IB holds from the end and remove each from the job after successful retirement. Stop on the first refusal. Retire the namespace hold before publishing the fence and clearing the job.",
+  "risk": "Any cache or retirement refusal stops the submitter. Retained resources remain owned pending independent recovery. The host fixture supplies simulated VM and ring return values.",
+  "compile": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-completion-retention26/compile-result.json",
+    "sha256": "5ed8618373c909f8bbbcc2d7eed4522354560355b9e63d5aa0bc842eb520e0d1"
+  },
+  "full_link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-completion-retention26/full-link/link-result.json",
+    "sha256": "71a472ea86dc12bcc608ed89cd2f244ec8f03e92487ca591e3306e75f3c5ecc3"
+  },
+  "completion_host_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-completion-retention26/direct-completion-host-check.json",
+    "sha256": "bc904f199e9bfc636f0539efb4d6b33c27ef1057ee9c17681ab17cb7bb63dda6"
+  },
+  "submit_unwind_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-completion-retention26/submit-unwind-host-check.json",
+    "sha256": "7f4325bf7224f3816554a52ee5f8813c7f052349a91223bd2ec0a15ec3a4eed4"
+  },
+  "link_diagnostics_identical_to_prior_candidate": true,
+  "physical_GPU_or_phone_executed": false,
+  "selected": false,
+  "goal_complete": false
+}

@@ -1,0 +1,69 @@
+{
+  "version": 202,
+  "status": "retained199root-system-unbooted",
+  "candidate": {
+    "version": 202,
+    "tag": "231613e23b4d4a73b5894be408a6f7e4",
+    "program_tag": "7d13f747733a450f886fef3490fd9ca0",
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4",
+    "parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v201-cdc-before-gpu-c34dbc88d85148678c65c8ec1ac4175a",
+    "parent_root_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v199-signed-turnip-e1fa9af7d85a4cff9888d1d3abd26263",
+    "purpose": "Bounded actual CDC completion acknowledgment before deferred GPU call and before ordinary application publication; three initial heartbeat frames, retain signed199root/probe197 and existingGPU semantics."
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/ready-snapshot/manifest.json",
+    "sha256": "546b0d868dfcdbd77194986f55e28b27f935d266594f10bb89f7c54110c3d716"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/boot-package/boot.ZORN26-GPU-V202-APPLICATION-UNSELECTED.img",
+    "sha256": "ecdc9b0f88d4175d6b4be53edccf22ecdfb1fbb0ab59147408b99b36fea05b5b",
+    "bytes": 11755520
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v199-signed-turnip-e1fa9af7d85a4cff9888d1d3abd26263/root-candidate/ios26-root-metal199.UNSELECTED.hfsx",
+    "sha256": "7976b83a84818bd6b4e438435a9d3bae4171aa7df4122fb997af507cd388e78a",
+    "bytes": 34359738368
+  },
+  "kernel_sha256": "299c14d9b8ebf349cd5204cb9ee59b65ada80f42f1a3d4bc2c9566c63f823816",
+  "trial_binding": {
+    "scope": "single-K80-ios26-gpu-v202-cdc-stage-ack-300s-231613e2",
+    "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-metal-trial-231613e23b4d4a73b5894be408a6f7e4/root-trial",
+    "bundle": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-metal-trial-231613e23b4d4a73b5894be408a6f7e4/root-trial/bundle.json",
+      "sha256": "61201e15885a02b137abb331da99e4706680d8ea4fc86c1d75c925da03881165"
+    },
+    "capture": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-metal202-cdc.py",
+    "runner": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_gpu_v202_metal_trial.py",
+    "application_probe_run_id": "7d13f747733a450f886fef3490fd9ca0",
+    "boot_attempted": false
+  },
+  "launch": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/launch-command.json",
+    "sha256": "b503c587731457c914f5fd9bddb0181c32d575aec2ce878e868c2a3dac8ec264"
+  },
+  "root_installation": false,
+  "behavior": "v202 ready: three initial CDC frames before one worker; same worker waits up to10s for actual bulk-IN completion of entry point1 before GPU call, and point2 after real known-image success/before existing application publication. Timeout stops dependent action and reports explicit abort; no fabricated SMR success. Retain199signedroot7976b83a/probe197. Actual callback/worker/publication branch ASan/UBSan,43parser/5envelope cases,1398inputs/0undefined/37header checks pass. Bootecdc9b0f/kernel299c14d9 frozen. Thread/USB timing and Metal outcome require hardware test.",
+  "host_checks": {
+    "ownership_formatter_worker_ASan_UBSan": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/progress-host-check/result.json",
+      "sha256": "bd799da57e6886df1e05a3d1b1dba7a4ec0bf7b36036a4d06acd678d7737d4cf"
+    },
+    "parser": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/progress-parser-check.json",
+      "sha256": "215bed38b6d1fa45691c133b109b67295f850270e9142c7cdb9d444388d649e9"
+    },
+    "actual_capture_envelope": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/progress-capture-check.json",
+      "sha256": "ac49f40ba2d27ea76a3f5fdd6466f24211637f8532985498400c83cc28a98627"
+    },
+    "native_build": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4/full-build-review.json",
+      "sha256": "e9f99ae6e531fc8991da30ff72dbfcfae9e4ec000283610bd66f77396ca2108f"
+    }
+  },
+  "expected": "Actual pre-GPU heartbeat; entry frame completion before GPU execution and before-publication frame completion after knownimage path. Frame ack only confirms transmission, not final Metal success. Partial frames never fullqualification.",
+  "watchdog_seconds": 300,
+  "recovery_deadline_seconds": 600,
+  "hardware_qualification": false
+}

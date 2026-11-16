@@ -1,0 +1,13 @@
+# K80 iOS26 v231：终止源码类别与进度
+
+目标active，严格禁止逆向、反汇编、符号化或寄存器回溯分析。先读[v230实测](handoff-2026-11-15-k80-ios26-gpu-v230-active.md)、AGENTS。
+
+v231为独立kernel-only终止源码类别/进度候选，保留229根193e5f01及实际probe229/frontend226/Rust214/Turnip。v230后的精确IOService/IOAcceleratorES/AppIo源码、所选对象重编、头依赖及arm64e参数审计未发现已证实ABI混用；HOUJI与ZORN宏名不同但实际AppIo预处理字节完全相同，不能当作根因。新类别仅对原first_panic已发布文本的5个固定源码前缀做有界比较，输出未知/数据中止前缀/指令获取中止前缀/initproc退出前缀/initproc启动失败前缀/GPUworker返回前缀；不输出或解析任何格式化数值、地址、寄存器、回溯。结束时对既有state/requested/ack/result进行两次有界原子采样，只有相等且合法才输出，否则p777/vff未知；这不是全局原子或静止快照。单包62B仍在原<=63B、39帧/119808B内，全部230所有者、DMA空闲判定、单次START、失败保留和原Recovery/WDT/wait源码恢复对照逐字节通过。实际sender/getter及5前缀/截断、784组有效上下文ASanUBSan通过，实际loop/terminalhook/producer和100组USB竞争及1000组census竞争通过；52原parser及84新terminal边界、完整/部分capture通过。测试最初的转写/旧函数调用和跨模拟进程静态packet假设已拒绝并归档，只修正测试；生产代码未因测试变动。初始打包证明继承47B元数据已被核对拒绝并保留；按62B实际sender修正配方重跑完整打包，boot字节不变。完整kernel5f681008、bootee6b92e3，1398精确输入/22重编/48头/0undefined；FAT仅kernel变化，FD/ADT/菜单/根不变。新scope及15项拒绝/check-only通过，未启动231。
+
+B231：`/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v231-terminal-source-context-2b454121da9e43309b50fcfd586a0f8a`。源码：`/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v231-terminal-source-context-2b454121da9e43309b50fcfd586a0f8a`。kernel/USB/record为2312b454121da9e43309b50fcfd586a0f8a；普通probe仍22965f3efb4a587473a9caebe54d7a99aea，不要混同。根没有新安装或写入。启动必须使用launch-command.json中的receiver入口，不能单独执行inner、复用claim或重试。
+
+[准备证据](evidence/k80-gpu-v231-terminal-source-context-ready-2026-11-15.json)。[源码补丁](/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v231-terminal-source-context-2b454121da9e43309b50fcfd586a0f8a/terminal-context231-final.patch)。[上游GPU教程](https://unixnu.com/zh/porting/gpu)。
+
+
+v231已单次观测并自动回收，本段替代未启动状态：v231kernel-only单次receiver-first启动，200.276秒自动回TWRP，session52139 exit0/inner0。收到7753B、15个正常CDC帧及一个本轮2b454121完整62B终止包r2/c0/p652/vff。普通帧与终止采样均已requested6/ack5/state2，实际registerService已返回，推翻此前把尚未收到gate6当作调用内失败的推断；六号诊断等待尚未观测确认，不代表发布函数整体返回。probe229 marker1/2已到，phase2/standardMTL进行中，真实native首session已正常close，第二session8calls最后BoCpuMap13返回0；225关联nr5/method13/stage3/run0/base0，不能冒充后续IPC或用户映射已成功。无rawstderr/native丢失，未到pipeline/IOSurface验证。c0仅说明5个固定前缀未匹配或原first-panic文本尚未发布，不能说明异常种类、PAC或根因。实际debug.o按原recipe重编字节相同，实际预处理含UNIXNU_IOS26=1及capture调用；各编译单元IOService/IORegistryEntry/OSObject/IOAcceleratorES源AST布局一致，仍不等于完整行为ABI证明。原USB资源保留直到整机Recovery，不能由送达推断设备DMA完成。七组保护及完整BCB通过，229根193e5f01未写。 [证据](evidence/k80-gpu-v231-terminal-source-context-observed-2026-11-15.json)。
+目标active。保持全部历史及已消耗scope，不重试。继续精确源码错误识别：只在实际公开源码formatter加入固定格式字符串的源诊断ID，不读取参数、PC、地址、寄存器、回溯或二进制指令；先离线集成和完整构建/边界检查，再准备独立验证。不能猜测更多前缀并把未知当作根因。

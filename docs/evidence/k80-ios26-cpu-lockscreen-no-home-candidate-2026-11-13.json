@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-13",
+  "record_id": "fb591cab872e44a099af1968fe02391b",
+  "status": "isolated ADT fix for K80 without physical Home button",
+  "reference": "https://unixnu.com/guide/mobilegestalt#full-screen-gestures",
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-no-home26-fb591cab872e44a099af1968fe02391b/boot-package/verified.json",
+    "sha256": "3df0ff779ec07ffde6e1ea070845550a22c833184a0b286bcf78e720f0ee8de6"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-no-home26-fb591cab872e44a099af1968fe02391b/boot-package/boot.ZORN26-CPU-LOCKSCREEN-NO-HOME-UNSELECTED.img",
+    "sha256": "996ff2878d9c832efdbe154d3f395f2468537b826a2df08cfab3534e298c3434",
+    "bytes": 11673600
+  },
+  "base_adt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-keystore-retag26-b0da41e98417481f979a24106c21f3bc/boot-package/inputs/ADT-ADT-ADT-ADT-ADT-ADT-ADT-ADT-kernel.mac-identity.UNSELECTED.adt",
+    "sha256": "7d0e29c1c4622df3a118be49ff7da01c6ebf8a5146d46712e260074921d9db2d"
+  },
+  "candidate_adt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-no-home26-fb591cab872e44a099af1968fe02391b/boot-package/inputs/ADT-k80-no-home.adt",
+    "sha256": "ddd1e39d7af3e6e2117872c6df8275c5d39258d13106e19a4f44c70c6044612e"
+  },
+  "generator": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_no_home_adt.py",
+    "sha256": "cf137dc7df511bce4c6044861100eab4bf864f9b95d0795a62534471cc122056"
+  },
+  "bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lockscreen-no-home26-fb591cab872e44a099af1968fe02391b/root-trial/bundle.json",
+    "sha256": "164a38196cd8987d97f427e1fdfd9a17f0604bbfcd6f06c51602a5af3600c8a1"
+  },
+  "tests": [
+    "Removing the added buttons node restores the complete input ADT byte for byte.",
+    "Refuses duplicate buttons, wrong model or non-K80 compatibility.",
+    "New FAT members and actual loader parse passed."
+  ],
+  "hardware_acceptance": "pending owner observation and Recovery readback"
+}

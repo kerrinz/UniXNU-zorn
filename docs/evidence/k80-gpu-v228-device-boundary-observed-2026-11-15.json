@@ -1,0 +1,193 @@
+{
+  "version": 228,
+  "summary": "v228普通探针新身份已实际运行，单次receiver-first210.621秒自动回TWRP，session86527 exit0/inner0，8412B/17帧，无尾帧或诊断丢失。最后phase2/flags1/service10000024b/device0，raw仅DISC，新增wait返回、setenv后/MTL前、MTL返回三个标记均未观测；native session0/nr0。证据尚未确认phase2 report本身返回EL0、10秒wait进入/返回或MTL进入，不能断定MTL/Rust失败，更不能认定panic或PAC根因。七组保护及完整BCB通过，root2284651199b保持；安装44页读回e063d566，不是全手机根哈希。实际XNU线程退出源代码确认kernel_task自退出同步thread_apc_ast，排除普通thread_terminate返回落入panic的猜想；无需改动。",
+  "next_action": "不复用228claim。独立229候选移除215最初增加的10秒诊断wait，保持真实标准Metal调用、setenv、来源明确的边界日志、原backend及IOSurface/已知图像/生命周期；这是源时序对照，不先宣称修复。继续源码级定位，不执行任何逆向/反汇编。官方指南及其他机型公开README检索未提供可直接采纳的本机26修复；不照搬27/macOS/Mali板级和安全策略。",
+  "candidate": {
+    "version": 228,
+    "tag": "554a417898d14e899a0fcc8ba92862c2",
+    "program_tag": "554a417898d14e899a0fcc8ba92862c2",
+    "frontend_tag": "01e033d5c00e485aa92df8b986e55ec0",
+    "rust_tag": "7a16d3fe9b1a44cb859527a1ca87b961",
+    "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2",
+    "parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v227-checkpoint45-c65e1ef41544494f93192b8e32e9180f",
+    "root_payload_changed": true,
+    "kernel_built": true,
+    "hardware_trial_ready": false,
+    "PAC_root_cause_fixed": false,
+    "purpose": "Three minimal own-source markers after original10s nanosleep,after setenv/before standardMTL device creation,and afteractualMTLreturn;retain all real GPU/root/frontend lifecycles,nominal45GPUprofile",
+    "system_booted": true,
+    "installed_parent_root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e/root-candidate/ios26-root-metal215.UNSELECTED.hfsx",
+      "sha256": "4a12265d312a0f07ea1348a2f2ea16734dd290ccc58fd2443c637b4f3687a523",
+      "bytes": 34359738368
+    },
+    "root_candidate_built": true,
+    "root_installed": true,
+    "boot_package_built": true,
+    "hardware_trial_consumed": true,
+    "IOSurface_render_validated": false,
+    "retained_root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v226-pipeline-return-01e033d5c00e485aa92df8b986e55ec0/root-candidate/ios26-root-metal226.UNSELECTED.hfsx",
+      "sha256": "d94042c9a9d066c261c2a5f2cb6c10c17817bf121d1791504f704edf330a09b4",
+      "bytes": 34359738368
+    },
+    "retained_probe": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v224-IOSurface-image-19a4a5e9872542ebab85c20db1e20129/user-probe-launch/zorn-metal-probe193",
+      "sha256": "84840ffe87ae9ee4da143788d43dffb951082110b7e2f80cbf5fe9d6486838e5",
+      "cdhash": "6a3bcf65e26695a42ca617abd05c9b47c4c51529"
+    },
+    "probe_parent": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v224-IOSurface-image-19a4a5e9872542ebab85c20db1e20129"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/run.json",
+    "sha256": "9088e463c99a7bfbcc3d30fd3f9a04d5c528ab3e016ea3dbe410e69a113a2c39"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/cdc-capture.json",
+    "sha256": "7a7dd376ca69d1d9d4e31dd9d4ce90071966a1167d70e58bb1e1d03877b04a84"
+  },
+  "snapshot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-device-boundary-554a417898d14e899a0fcc8ba92862c2/observed-snapshot/manifest.json",
+    "sha256": "8ebf4bd233751ddeda757fc4c139903d0cdc27b0a091ffd4d21afaa9f8a02651"
+  },
+  "protection_pairs": [
+    {
+      "name": "Data",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      }
+    },
+    {
+      "name": "Data_metadata",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      }
+    },
+    {
+      "name": "root_first_page",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-root_first_page.bin",
+        "sha256": "0c20ea529c3084340c01913eb688b01610a4fabc91ca035e56e0c80e492ec6ad"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-root_first_page.bin",
+        "sha256": "0c20ea529c3084340c01913eb688b01610a4fabc91ca035e56e0c80e492ec6ad"
+      }
+    },
+    {
+      "name": "root_before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    {
+      "name": "root_after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    {
+      "name": "before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    },
+    {
+      "name": "after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/before-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v228-metal-trial-554a417898d14e899a0fcc8ba92862c2/root-trial/trial/after-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      }
+    }
+  ],
+  "device_boundary": {
+    "stages": [],
+    "ordered_prefix": true,
+    "foreign_identity": false,
+    "invalid_stage": false,
+    "unambiguous": true,
+    "original_wait_returned_success_observed": false,
+    "before_standard_MTL_call_observed": false,
+    "standard_MTL_call_returned_observed": false,
+    "scope": "Source markers only; stage2 precedes the call, stage3 permits nil; absence proves no failure cause, panic or PAC defect."
+  },
+  "last_application": {
+    "program_identity": {
+      "unique": 10,
+      "pid": 10
+    },
+    "raw_stderr": "ZORN195DISC es=1 name=1 class=1\n",
+    "raw_stderr_dropped": 0,
+    "complete": false,
+    "render_complete": false,
+    "native_teardown_complete": false,
+    "native": {
+      "unique": 0,
+      "pid": 0,
+      "flags": 0,
+      "calls": 0,
+      "method": 0,
+      "raw": 0,
+      "close_returned": 0,
+      "close_raw": 0,
+      "attempts": 3,
+      "copy_errors": 0,
+      "lines": 2,
+      "bytes": 150,
+      "dropped": 0
+    },
+    "sessions": [],
+    "session_rejected": 0,
+    "report_terminal": 0,
+    "report": {
+      "phase": 2,
+      "flags": 1,
+      "status": 0,
+      "code": 0,
+      "service": 4294967883,
+      "device": 0,
+      "crc": 0,
+      "first_bad": 4294967295,
+      "ticks": 2542049674
+    },
+    "error": null,
+    "reasons": [
+      "Metal-render-not-complete",
+      "native-teardown-not-complete"
+    ]
+  },
+  "goal_complete": false,
+  "panic_confirmed": false,
+  "PAC_fix_claimed": false,
+  "manifest_erratum": "boot-package inherited installation_receipt_binding_scope says66/6120 from historical baseline;not current228 evidence. Actual receipt and installed-root-cohort prove44pages/12groups and prior7118pages;strict runner uses these explicit hashes/counts. Preserve admitted historical artifact;correct new candidate recipe."
+}

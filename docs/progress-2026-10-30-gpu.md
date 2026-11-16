@@ -1,9 +1,25 @@
 # K80 GPU发现与适配（2026-10-30）
 
-> 最新：已恢复无人值守GPU适配；显式Gen7收发通过隔离软件peer及ARM64接口链接。Gen7静态内存provider已实现，下一进入规范原生集成/完整链接，见文末最新阶段。旧“下一步”均为历史。
+> Latest status: [2026-11-16 v244 progress](progress-2026-11-16-ios26.md). The dated entries below are an archival ledger;their scopes are not current completion claims.
 
 
-CPU1窄发布证据及默认42 / 桌面3a保留。c50唯一CPU/GUI观察已完成、历史苹果标志未复现且未缩小根因，按机主方向转GPU。当前仅主机只读材料分析，没有新手机操作或GPU代码接入。
+> CPU 里程碑（2026-11-13）：CPU-only K80 启动 `b0da41e9` 期间，机主目视确认已进入 iOS 系统锁屏；BackBoard 记录 69 次换帧/像素拷贝，检查点间再增加 66 次。运行器的 `lockscreen_proven` 仍为 false，且没有相机照片，因此保留为机主视觉确认，不冒充机器验证。见[CPU 记录](evidence/k80-CPU-keystore-retag-observed-2026-11-13.json)。这是独立于 GPU 的进度里程碑。
+
+> GPU 最新进度（2026-11-13）：此前 K80 真机 GPU 分支试跑确已发生，推进到 v59 GMU 冷时钟前缀/SMMU 全局控制和 v60 只读 bank/stream census；当时未进入 iOS 系统锁屏，所以转做 CPU 渲染。v80 加入 GPU/GMU provider 的可选 IOKit claim 与实时身份复核，离线全链接成功但尚未打包或上机。v81 在此基础上只重新生成平台记录身份对象，并用已确认的 CPU 锁屏包作封装模板，保留 CPU presenter 参数与原根区、ADT、FD；候选内核 SHA-256 `5b803527c084ba30989ee010141e127bd45328b6029592f0f0819172a2db6a6f`，启动镜像 SHA-256 `d1df60c65701d5054868d7eb37d6502cfc0391fdc882a061c33ce66eba464eca`。v81 仍是未选择、未上机的阶段性候选，不启动 GMU 固件/HFI 或 GPU 提交。完整 `ZornGen7StartupGpuInputs26` 仍未由实际 root/board 构造，真实全主设备静止/排他 owner 仍缺。CPU 锁屏基线 `9f6474ce…a091` 字节未变。v73 固定运行器的 Recovery 停止门仍有效；后续上机需要新的有界 scope、固定运行器和全新的完整 Recovery 保护读回。GPU 提交/fence、Metal 与 GPU 图像显示仍未验收；FT3683 暂停。见[v80 候选记录](evidence/k80-gpu-v80-provider-claim-owner-offline-2026-11-13.json)、[v81 候选记录](evidence/k80-gpu-v81-provider-claim-cpu-baseline-offline-2026-11-13.json)及[v73 停止记录](evidence/k80-gpu-v73-provider-census-recovery-stop-2026-11-13.json)。
+
+> 既往真机阶段进度澄清：K80 iOS26 GPU 板级启动依赖此前做过多轮真机试跑，并非从未做过 GPU 真机测试。v37 的 GPUCC 启动锁修复后，实际 GPUCC/PLL helper、时钟代理前缀返回；v43 推进到 GMU 时钟图、SMMU 电源资源及 CPU 寄存器映射；后续 v53 注册了保持 masked 的 SMMU 全局 IRQ；v59 在真机确认 GMU 冷时钟前缀完成、SMMU 全局 fault/TLB-sync 控制路径返回，并在 PID1 后自动回到 TWRP；v60 读取了真实 SMMU bank/stream 空闲快照。这些是硬件上的分阶段驱动/平台初始化验证。v59 明确未启动 GMU 固件、GPU、Metal 或触控；截至现有记录，没有 GPU 命令提交、真实 fence 或 GPU 渲染通过的验收证据。详见[GPUCC 真机修复](evidence/k80-GPUCC-startup-lock-fix-2026-11-11.json)、[SMMU IRQ 真机记录](evidence/k80-native-SMMU-bootCPU-IRQ-2026-11-11.json)、[v59 SMMU 全局 fault 控制](evidence/k80-native-SMMU-global-fault-control-observed-2026-11-13.json)、[v60 bank/stream census](evidence/k80-native-SMMU-readonly-bank-stream-census-observed-2026-11-13.json)。
+
+CPU1窄发布证据及默认42 / 桌面3a保留。CPU 锁屏成功是独立进度里程碑；GPU 继续优先，FT3683 暂停。本轮没有访问手机分区。
+
+## 2026-11-13 当前 GPU 下一步
+
+v66 在 `acquireExclusiveGpuMmuStart` 成功之后，先轮询 GMU busy 状态（忽略 bit 30），再依次请求 GBIF client halt 和 arbitration halt，并各自等待真实 ACK。两路 SMMU context/peer stream 编程、回读及 QTB fence 收尾期间保持 halt；完整成功前再查 GMU idle，清除 halt 并确认 ACK 位已清零。各阶段有界等待，失败会停止流程、保留资源；释放结果不确定时会尝试恢复 arb halt。QTB 仍只表示 TBU 事务栅栏，不能单独证明软件调度器所有权或 SMMU 页表所有权。
+
+候选内部已有 `StartupOwner → InactiveOwner → DarwinBoardOwner → SMMU Domain` 转发，并包含 SMMU 表页持有、进程私有表和 Direct VM 映射事务实现。v68 现在也让 host 与 process direct-ring 提交和 fence 退休持有 SMMU Domain 的实际 gate，避免依赖 HostRing 外层 issuer 才能串行化页表与 DMA 引用的建立/回收。当前实际链接的 root-platform 入口只准备根输入；另一个 direct bridge 只接受调用方已经构造好的 `ZornGen7StartupGpuInputs26`，没有真实 OS/板级 owner 创建这组输入。仍缺覆盖有效 GPU stream 集的 GPU/GMU 排他与调度 lease provider，以及把既有映射所有者放进实际启动/运行生命周期的接线。
+
+补充契约审计：iOS26 对应的 XNU `IOService::open` 默认实现以单 owner 记录客户端，但 provider subclass 可改写 `handleOpen`；`kIOServiceSeize` 会请求既有 owner 关闭服务。v72 `RegisterMaps` 保留真实 GPU/GMU service 身份并把资源传给寄存器 authority，但没有打开 provider；`DarwinBoardOwner` 继承 `OSObject`，本身不是 IOKit open client。K80 provider 的实际 metaclass/open 状态仍未观测，因此当前没有可证明的 provider 排他租约。细节见[provider open 契约审计](evidence/k80-gpu-provider-open-contract-review-2026-11-13.json)。
+
+当前下一项是把已有真实板级 owners 组装进 root 启动生命周期，并补上有硬件/服务状态支撑的 GPU/GMU 全主设备静止与排他授权；v80 的 IOKit client claim 只阻止符合该服务 open 契约的其他 client，不能代替 DMA/firmware idle 或 scheduler quiescence。完成真实 owner 图和固定构建/Recovery 链前不启用直接 GPU startup。后续硬件尝试仍走固定 runner，先取得新的有界 scope 与完整 Recovery 保护读回。GPU 提交/fence、Metal 与 GPU 图像显示尚未验收；FT3683 保持暂停，CPU 锁屏基线不变。
 
 ## 本机身份与资源来源
 
@@ -19,7 +35,7 @@ CPU1窄发布证据及默认42 / 桌面3a保留。c50唯一CPU/GUI观察已完�
 
 另外，固定提交原始gen7_reg.h为SHA2e564d7eaeec26bc30e79b1d117b86efa79603345769626157c83610fc4c051c，与旧houji生成器宣称的5da9d8b1不同；原始URL与GitHub contents端点字节相同，Git blob对象校验通过，换行归一化不能消除差异。保留旧报告、不借用其寄存器表为K80证明。初次沙箱DNS失败、错误GMU源文件名404与旧SHA拒绝也全部保留；实际源为adreno_gen7_gmu.c/h。
 
-## 下一项可执行工作
+## 2026-10-30 当时计划的工作（已在后续完成，见下文）
 
 从已有OS3.0.308原始super.img进行有界只读元数据/文件定位，优先仅取得vendor / vendor_dlkm中的GPU固件和KGSL模块及版本/哈希，避免解出完整9GB镜像或删除原备份。先核对AOSP sparse/LP及实际文件系统工具来源和输出边界，再做选定文件提取；不读写手机分区、不启动Android。取得实际固件/模块后比较固定参考的格式/版本/队列依赖，形成最小初始化设计并审计，当前不启动GPU探针。
 
@@ -1479,3 +1495,7832 @@ runner提案新增启动前纯文件准入，当前pending模板在USB前拒绝�
 实际iOS17原生内核和原kext完整重链e3288034…，7个存储函数/220调用边、六provider桥、原Data marker路径、原GPU关闭行为/108函数/233边/81槽及独立当前start.s对象核对。新FAT/ADT/menu/WDT与完整外层image5c622cef…核对，11884当前输入及独立inode/APFS归档绑定。最初工具PATH、误移动派生unstripped而未重链noctf、fresh/touch与checkpoint组合拒绝均保留；未改旧proof或放宽生产guard。
 
 首次新Data初始化按原fresh保护不启用触控，在单独新存储镜像验证后再恢复原retained触控配置；原触控代码和基线未移除。当前一次固定runner新安装轮进行中，freshBCB整页及尾部读回已过，仍待Recovery回收和新日志；尚未确认iOS可用界面或Android实际启动，GPU/Metal未启用。旧57/c50/0fe不重启。[证据](evidence/dual-system-reinstall-2026-11-01.json)。
+
+
+## 2026-11-01: attended GPU resume after unixnu64 reinstall
+
+The owner resumed GPU adaptation in attended mode. The new maintained UEFI
+checkpoint library binds exact `unixnu` name/type/unique GUID, entry35, zero
+attributes and LBA47271680..64048895; the HD path must also report ordinal35.
+Android userdata and old slotB media claims are refused. New focused tests use
+actual archived applied GPT bytes with explicit UEFI doubles:58 refusals and4
+compiled source mutations pass. Four actual ARM64 SDK objects independently
+match;7 final no-entry PE mutations are refused.
+
+A complete isolated3MiB FD85d67581 and closed boot428f8e66 are built. The module
+extracted from the FD matches exactly;12 actual module recipe objects independently
+match and8 final PE mutations are refused. Existing iOS17 kernel e3288034,
+retained8GiB Data/touch/WDT payload, FAT/menu/ADT are reused exactly; no new
+kernel/currentstart build or device run is claimed. All4 diagnostic native
+macros are0, ordinary discovery passes FALSE and commit returns DISABLED.
+Normal v18/84text/footer and the other existing wire formats remain unchanged.
+
+No device action, GPU execution or live UEFI media verification occurred.
+WriteAuthorized0, allow_boot=false and readback_qualified=false remain. The next
+work is an isolated native media qualification candidate for this new identity,
+with new immutable inputs/protection review; old57/c50/0fe and installation
+claims cannot be reused. GPU power/security/stop/SMMU/DMA and rendering remain
+unqualified. See [source and build evidence](evidence/gpu-unixnu64-checkpoint-2026-11-01.json).
+
+
+## 2026-11-01: new unixnu64 terminal media candidate, execution pending
+
+The new dedicated candidate762a1234 / FDf4d0fdea uses exact unixnu64 identity,
+not the consumed slotB/userdata57 candidate. The actual LTO driver calls the
+media verifier, records an adapter diagnostic stop and always resets/deadloops
+before payload. Only this dedicated build selects the one-write/SUCCESS-only
+one-read body; GPU/query/SCM/PAS paths stay uninvoked.8 final PE mutations are
+refused and9 actual module objects independently match. Currentstart was newly
+assembled and matched; the tested e3288034 kernel and retained FAT/menu/ADT are
+reused exactly.559 firmware objects,3108 current inputs and7633 independent
+archive files are bound, plus38 independent runtime/protection inputs.
+
+The fixed runner now has a separate slotA/unixnu64 admission path. It consumes
+its claim before the first USB query, requires exact OrangeFox/GPT/root/Data
+identity, preserves and reads back the whole BCB page/tail, and keeps a600s
+Recovery deadline. It has no bootstrap or Data installation/reset operation.
+37 admission refusals,9 Recovery/BCB/variable faults, two whole-workflow
+transport doubles and the new exact candidate file preflight pass without a
+process or USB call. Temporary hypothetical approval fixtures were removed;
+no real approval/ready/claim was created. Recovered records remain distinct
+from private native commit statuses and GPU ownership.
+
+The concrete new [execution proposal](evidence/gpu-unixnu64-media-candidate-2026-11-01.json)
+is pending a distinct owner decision. No phone action or GPU execution has
+occurred. allow_boot=false/readback_qualified=false/WriteAuthorized0 remain;
+normal v18/84text/footer and all old claims/archives/baselines remain unchanged.
+
+
+## 2026-11-01: one authorized unixnu64 native-media trial recovered
+
+The owner explicitly authorized this exact762a1234 candidate once. The fixed
+runner consumed the new claim before its first USB call; OrangeFox/slotA,
+exact GPT/root/Data metadata/fences and preboot BCB tail/whole page passed.
+fastboot accepted the temporary image and Recovery was observed after40.623s.
+The new4KiB ZORNGQF1 block78566d26 differs from preboot89c60012 and matches the
+fresh nonce277e1ba4defecff3e49c77fb1c297214, input identity and kernel identity.
+
+The returned104B discovery report has131 handles, parent index0/child index40,
+state2/error0 and GPT verified1. The160B reader reports64 GPT entries and exact
+ordinal35;4 ReadBlocks and4 CalculateCrc32 statuses are raw0, all masksff/0xf.
+All4 CRC values match the applied primary/backup GPT. Both EBS owners created
+their two events successfully, expired0. Child and parent reported the same
+numeric MediaId; they remain distinct typed interfaces, not one handle/lease.
+
+Stage8/adapter EFI_ABORTED0x8000000000000015 is the planned diagnostic stop,
+not an observed hardware failure. Query/publication/GCD/PAS fragments are absent;
+XNU and GPU did not run. The checkpoint transport was observed for this epoch.
+The private commit report is not on this wire, so both native write/read SUCCESS
+statuses remain unproven. General readback qualification and all write/GPU rights
+remain0/false. Runner postchecks compared root manifest/Data metadata/fences/GPT;
+the raw postcheck buffers were not separately archived. No full filesystem,
+Android boot, rendering or long-term result is claimed.
+
+The claim is consumed-no-repeat, the phone was left in verified Recovery and
+no further device call was made. [Trial evidence](evidence/gpu-unixnu64-media-trial-2026-11-01.json)
+binds the actual record, BCB, exact candidate and independent run archive.
+Next work is a new default-off resource-query/checkpoint source integration,
+reusing existing real typed providers and the approved record without a new
+codec or power/SCM/GPU invocation. This one execution decision is exhausted.
+
+
+## 2026-11-01: default-OFF resource-query/checkpoint join
+
+The new source delta obtains the typed media adapter result before querying.
+It reuses the original272B capture and the unchanged real collector/codec.
+The48B collector report distinguishes an armed report from an attempted terminal
+capture; existing attempts, including encoding failures, are never recollected.
+An early returned adapter failure with no attempted capture keeps its full64-bit
+status. Media preparation refusals block commit. Existing ZORNGQF1/normal wire
+formats are unchanged; no new carrier, GPU/power/SCM operation or device call.
+
+The public staging recipe creates a closed full FD2a6ff24c; all five native
+selectors are0.12 own-module objects independently match and8 final PE mutations
+are refused.13 ASan/UBSan orchestration cases and4 real source mutations pass
+with the actual collector/codec and explicit CABI peers; no successful hardware
+owner is modelled, and media preparation only refuses. A separate real SDK
+inspection directly links20 independently compiled selected objects, entryRVA0,
+no old module archive and no FD deployment;7 new PE mutations are refused.
+
+The real backend intentionally lacks vote/rate/variant policy and cannot return
+a successful platform configuration. Its selected LTO success branch is removed;
+this is retained rather than changed to success. Native lookup/GCD results would
+remain observations only. The old archive accidentally used by the first
+inspection link was detected by semantic review; those attempts and checker
+refusals are preserved, and only the corrected final link counts.
+
+[Evidence](evidence/gpu-resource-query-checkpoint-2026-11-01.json) describes these
+local software/build results. The next step is a new selected observation
+candidate and distinct scope/admission/proposal, still offline.762a and all old
+claims remain consumed; no new query or boot permission exists.
+
+
+## 2026-11-01: complete resource-observation candidate, execution pending
+
+The new isolated candidate has actual module entry and selected diagnostic
+flags: boot a315c9bb, FD73567093, module1faac92c. It obtains the real media
+owner before the existing query, preserves the first terminal attempt and raw64
+status, and stops before payload. Ordinary firmware selection remains off.
+The original272B capture/ZORNGQF1 and normal log formats are unchanged.
+
+The observation would perform at most3 protocol locates,3 clock resource ID
+lookups and16 GCD metadata queries. Lookup bookkeeping may allocate or block;
+counts are not wall-clock bounds. The backend still intentionally lacks
+vote/rate/variant policy. No clock enable, rate, vote, power/SCM/PAS/MMIO, GPU
+execution or new hardware ownership is supplied by these observations.
+
+All20 actual module objects independently match,7 new query-path PE corruptions
+and4 native-commit/EBS corruptions are refused. The new admission adds25 focused
+refusals, including old scopes and NOENTRY annotations, without rerunning the
+old transport or provider suites. The559 firmware objects,3111 exact current
+inputs,7683 independent firmware archive files and39 runtime input/archive
+pairs are bound. Currentstart was newly assembled with a matching SHA; the
+tested e328 kernel and retained FAT/menu/ADT are reused exactly.
+
+Actual-file admission preflight passed using temporary hypothetical host
+approvals, which were removed. The real pending admission refuses; no active
+owner, ready or claim exists. No phone query/boot/I/O or GPU operation occurred.
+The previous762a claim is consumed. A new exact execution decision is required
+for this selected resource observation, under original fresh BCB/watchdog1/
+600-second recovery protections.
+
+[Candidate evidence](evidence/gpu-resource-observation-candidate-2026-11-01.json)
+binds the complete candidate, checks, admission and concrete activation proposal.
+
+
+## 2026-11-01: real resource observation recovered; policy remains unavailable
+
+The owner explicitly authorized a315c9bb/FD73567093 once. The fixed runner
+claimed before first USB, verified Recovery/slotA/unixnu64 and fresh recovery
+BCB tail/full-page readback, then temporarily booted the exact candidate.
+It returned to verified OrangeFox in40.660s with a new c7793318 terminal record;
+nonce ac536d1e1704bd86ede1f583aaf9957a, original input/kernel identity and CRC
+match. GPT/root manifest/Data65metadata/two-fence comparisons passed. The raw
+postcheck buffers were not separately archived; no full filesystem or retained
+file-marker-content proof is inferred. The claim is consumed with no repeat.
+
+The original272B capture contains real Clock/RPMh/CommandDB versions
+0x1000a/0x10001/0x10000. All3 LocateProtocol and3 resource-ID lookup native
+statuses are raw0, with attempted/available masks7. CX/GMU/HUB IDs are
+0x2001f/0x10159/0x10165; they numerically match the prior FILE catalog indices
+31/345/357. IDs remain descriptive historical scalars. They do not attest the
+whole running provider or select a frequency/variant. Both query events were
+created/closed with raw0, masks3,expired0; local protocol borrows were retired.
+
+One real GCD call returned raw0 and Reserved type1 over the declared8KiB span;
+its descriptor is broader, with no image/device handle, and supplies no buffer,
+secure-world or DMA ownership. Stage8/adapter raw5 maps to the existing
+ZPC_POLICY_UNAVAILABLE: vote/rate/variant policy is still absent. This is a
+protective adapter result, not a native lookup failure. No publication/PAS
+fragment, XNU payload, GPU execution, clock enable/rate/vote or SCM/MMIO action
+was added to the GPU path. The original storage/touch/watchdog paths remain.
+The private native commit write/read statuses remain unavailable
+on this wire; freshness does not prove both SUCCESS. General allow_boot/
+readback/WriteAuthorized remain false/false/0.
+
+[Actual trial evidence](evidence/gpu-resource-observation-trial-2026-11-01.json)
+binds the complete returned record and raw statuses. The next small source task
+is offline binding of the previously unused IsClockEnabled/GetClockFreqHz
+methods in the exact archived provider and real header, with any typed request
+non-callable. It must distinguish cached state from backend/MMIO and preserve
+missing shared-vote/rate/variant policy. No new device execution is authorized;
+no completed provider, ID, HFI or CPU/GUI/memory suite is repeated.
+
+
+## 2026-11-01: clock-state methods bound, inert request only
+
+Reused the exact archived ClockDxe53c18 and existing PE reader, without new
+extraction or provider calls. IsClockEnabled uses slot4/offset32, wrapper15a4
+to7fe4/6230, and writes BOOLEAN1B. GetClockFreqHz uses slot7/offset56
+(reusing the earlier incidental slot fact), wrapper1668 to8050/655c, and
+writes UINT32. Both have mode-bit3 paths returning SUCCESS without writing
+the output. Native zero status alone therefore cannot establish availability.
+
+IsClockEnabled is not a harmless metadata query: its conditional backend path
+updates counters, calls a1fc/ccb8/cd38, and the selected GMU/HUB FILE callback
+f830 reaches a register-address-derived load. A missing callback may also
+produce false. GetClockFreqHz instead reads the cached selected-plan pointer
+and frequency word, not measured frequency, running state or eligibility.
+No current mode, backend vote state or dynamic selection is inferred.
+
+A new256B non-callable request reuses the original pure source-shape validator,
+retains raw64 source/status/IDs and records method/output-width/caveats. Invoke,
+attempted, native-status/output availability, lifetime, running/ownership and
+runtime flags stay0. The actual closed a315 capture refuses; it is not restored
+into a live source. Four synthetic data preparations,14 focused refusals,2
+source corruptions and7 provider semantic corruptions pass without native calls.
+
+Four LTO target objects independently match raw SHA under exact original
+recipe/output paths. The non-LTO ABI inspection has real COFF timestamps; both
+hashes and the except-timestamp equality are recorded separately, with no
+metadata normalization/equivalence claim. The selected SDK NOENTRY link excludes
+the old module archive and rejects6 new PE corruptions;54 recursive inputs and
+26 SDK libraries are bound. It is not a new module, FD, kernel or device test.
+Initial reader-global/CRT-header/C++ annotation refusals and distinct-output/
+COFF timestamp mismatches are retained; production flags/guards were not relaxed.
+
+[Evidence](evidence/gpu-clock-state-binding-2026-11-01.json) describes the exact
+new paths and source recipe. All a315/762a and older claims remain consumed.
+Next is only offline binding of the hardware-filter information contract behind
+48bc/c80c, reusing the completed catalog. No harmless-query assumption, new
+provider/USB/MMIO/vote or new carrier is authorized. Shared policy/ownership,
+GPU execution and rendering remain unavailable.
+
+
+## 2026-11-01: hardware-filter indirect interface and typed boundary
+
+The exact existing ClockDxe53c18 consumer48bc is now traced through bootstrap
+GUID ae37b942-457f-4c91-a196-d9669fd347a3, real LocateProtocol slot0x140,
+bootstrap init slot8, services attach slot0xd0/device literal0x0200006f/version
+0x10000, then opaque handle+8 to indirect slots0x70/0x58. These are observed
+call shapes, not invented DAL declarations or an EFI ChipInfo table. Query
+return status is ignored before32-bit stack-output loads, and those output
+slots are not initialized in this consumer; no host zero becomes valid data.
+
+c80c reads a cached UINT32 at FILE RVA35950. c7d8 writes it from input+8,
+fed by initialization's indirect slot0x48; attach failure can feed zero.
+The initial FILE zero is not an observed chip version. The version comparisons
+use lower-inclusive/upper-exclusive bounds; no runtime filter/eligibility model
+or frequency selection was implemented. Raw list constants658/659 are not
+reinterpreted as the public header's nominal enum counts401/102.
+
+Existing generated DALSys/ChipInfo PE32 section bytes match their independent
+archives and giulia blobs295f1465/38c7c0d0. This is an in-place build/source
+comparison, with no module re-extraction or running-provider attestation.
+Both blobs contain the bootstrap GUID; neither contains a literal public
+EFI ChipInfo GUID. That does not prove an absence of any dynamic installation.
+The exact selected SDK DAL handle/services/ChipInfo prototypes remain missing.
+
+A real SDK data-only annotation verifies the distinct public EFI methods at
+8/24/48, with32-bit version/ID/family types. Its independent LTO object raw
+SHA matches;2 wrong indirect-slot substitutions fail compilation. The NOENTRY
+PE has zero code bytes and no executable/writable sections;3 data/entry/GUID
+corruptions refuse. Seven new provider semantic corruptions refuse,50 exact
+recursive inputs bind, and no callable wrapper, DAL type, request or hardware
+information success was fabricated. COMDAT layout and FFS/Ffs same-file alias
+checker refusals are preserved, without changing source types/flags/manifests.
+
+[Evidence](evidence/gpu-clock-hardware-info-2026-11-01.json) records this precise
+typed boundary. Next locate traceable native definitions and the actual selected
+bootstrap/services/provider registration path; do not use the public EFI header
+as a substitute or repeat this barrier. All calls/phone operations remain off,
+prior trial scopes consumed, and GPU power/variant/voltage/ownership unqualified.
+
+
+## 2026-11-01: selected DAL registration and distinct direct ChipInfo prefix
+
+The actual DALSys bootstrap installation, services table and selected ChipInfo
+registration/attach path are now bound. Device literal0x0200006f leads to the
+private handle/table, whose native declarations are still missing in searched
+selected headers/references. No private callable type or inert request was made.
+
+A separate direct EFI interface is installed by the same ChipInfoDxe. Its GUID
+is b0760469-970c-487a-a4b5-28db7b45cef1, matching selected QcomPkg.dec's
+gEfiChipInfoProtocolGuid declaration; the header macro61224fbe differs. The
+revision10005/direct slots8/24/48 match the existing typed public prefix. This
+does not substitute that prefix for ClockDxe's private indirect table. Old
+macro-search evidence and ABI barriers remain intact. Both GUIDs are retained
+in the new native data annotation; the SDK and old manifests were not changed.
+
+The three direct wrappers map nonzero private results to EFI_UNSUPPORTED,
+losing original private error detail. Private methods write cached32-bit
+version/ID/family. Initialization can lack its input payload, latch initialized
+and return zero anyway. Thus SUCCESS is insufficient to qualify hardware data;
+input availability/size/provenance still need binding. No variant/rate/shared
+vote/voltage policy or hardware eligibility is inferred.
+
+Ten new provider registration/output corruptions refuse semantically beyond
+the SHA guard. One data-only actual-recipe LTO object independently matches
+raw SHA;51 recursive inputs bind. Three final-data PE corruptions refuse.
+The annotation has entry0/code0 and no executable/writable section. Initial
+getter-page encoding refusal and failed checker preimage are retained; only
+the checker expectation changed to the observed instruction. No old suite,
+phone/provider call, FD/kernel/candidate or capture/log format change occurred.
+
+[Evidence](evidence/gpu-dal-chipinfo-2026-11-01.json) records the exact chain.
+Next follow the initializer's real payload-provider path and primary-source
+output contract, without assuming that a familiar SMEM name or a successful
+cache getter supplies validity. All execution scopes remain consumed.
+
+
+## 2026-11-01: ChipInfo initialization payload length boundary
+
+The selected initializer uses module-internal shared-memory tables9198/92d0,
+not public EFI_SMEM_PROTOCOL. Internal get62e8 returns a pointer and writes a
+32-bit size through the observed second argument; no native typedef is made.
+For item137, the consumer checks nonzero pointer/size but no minimum payload
+length. It unconditionally reads a four-byte field at offset0xac (end0xb0)
+and copies32 bytes at0x7c; later format-gated reads reach0xb8/0xd8. The
+internal region-bound check does not establish payload schema or provenance.
+Thus cached identity remains unavailable for policy, even if getters succeed.
+
+Five new semantic instruction corruptions refuse beyond the SHA guard. No
+new native component/request/target/FD/kernel/candidate or provider/phone call
+is produced; old suites and wire formats are untouched. Selected EFISmem.h
+cannot replace this internal table. Exact payload primary definitions were
+not found in the searched pinned roots; two supplemental primary-source web
+fetches failed and supplied no incorporated source. No successful native data
+or interface declaration was invented.
+
+[Evidence](evidence/gpu-chipinfo-payload-2026-11-01.json) preserves the precise
+boundary. Stop extending inert identity requests; next independently bind the
+remaining dynamic MEM_ALLOC allocation/ownership/lifetime provider contract
+against completed startup/owned-memory records and pinned actual consumers,
+without changing HFI codecs or claiming a GPU/SMMU lease.
+
+
+## 2026-11-01: runtime MEM_ALLOC ownership contract
+
+The pinned gen7 hwsched consumer has32 allocation records, separate from the
+eight static firmware backings. It reuses kind+GMU-handle matches before
+checking the new request, without revalidating size/flags/align. A native
+provider must explicitly reject changed reuse parameters, as a stricter local
+policy. GPU-global allocation followed by failed GMU import clears the source
+record while intentionally leaking backing; a native implementation must keep
+the real object and original failure in persistent quarantine instead.
+
+GMU-only RAM, GPU globals, fixed IPC and borrowed preallocated fence/memstore
+are separate paths. HOST_INIT reset zeroes contents and does not free them.
+The success host handle is published only after allocation processing; it
+cannot be made from a host peer. No transport reply/ACK is a retirement proof.
+The selected current NativeAdrenoMemory API is recorded, without selecting
+its upstream pool/write-combine features or claiming real mapping rights.
+
+[Evidence](evidence/gpu-dynamic-backing-2026-11-01.json) binds exact source
+fragments and four new semantic refusals. No previous parser/transport/memory
+suite was rerun, and no allocator/address success model, HFI codec change,
+native target or device operation occurred. Runtime caller/domain/preallocated
+providers and release proof remain missing. Next implement the persistent
+native ownership registry in isolation, with allocations and device operations
+closed; retain failures and reject incompatible duplicate keys before any
+future allocation. Native backing preparation remains a separate qualification.
+
+
+## 2026-11-01: real native runtime-backing registry implemented
+
+The isolated registry now contains32 actual current NativeAdrenoMemory
+objects with persistent local reservation state. It revalidates existing
+ZGPlanMemAlloc output, rejects changed duplicate request parameters, retains
+the first full signed64 adapter failure, and refuses failed-slot retries.
+No object/address accessor, success host handle, native allocation attempt,
+allocator call or implicit error/reset/destructor cleanup is exposed. Reserved,
+retained and unknown masks are CPU metadata; native attempted/allocated/status
+availability/runtime-complete all remain0.
+
+Actual-source ASan/UBSan checks cover32 slots, duplicate/drift, failed retry,
+raw64 error, full capacity and alias refusal. Three real-source corruptions
+are rejected. Host substitutes only scalar IOReturn declarations, with the
+real native class; no allocator/object/address-success double is used.
+
+Current root iOS17 C/C++ recipes compile two new objects independently with
+matching raw SHA. Constinit persistent storage has no initializer. The new
+registry uses general registers only; its relocatable link closes the planner
+and imports only memcpy/memcmp plus the unchanged BSD stack guards. Used
+recursive inputs are SHA-bound. This is not a new kernel/FD/candidate, final
+Apple ABI or hardware qualification. The unused libsa include-search warning
+and initial scalar-header/stack-guard checker refusals remain in the archive;
+production flags/security guards are unchanged. Old suites were not rerun.
+
+[Evidence](evidence/gpu-runtime-backing-registry-2026-11-01.json) records the
+new source/object checks. Next add an isolated default-OFF one-attempt CPU
+backing prepare path using the real allocator, preserving native errors and
+retained failure objects; no execution or device candidate is authorized.
+GPU/GMU mapping and actual runtime ownership remain separate missing contracts.
+
+
+## 2026-11-01: default-OFF one-attempt CPU backing source implemented
+
+The isolated registry now has a real NativeAdrenoMemory::allocate prepare
+branch. Normal compilation returns Disabled and imports no allocator. The
+selected compile-only branch reserves per-slot attempt/logical budget before
+one call, preserves the native32-bit IOReturn separately from64-bit adapter
+errors, and retains/quarantines failed native objects without release/retry.
+Native SUCCESS followed by a failed local backing check preserves native0
+and a separate adapter failure. Cleanup status remains explicitly unavailable.
+
+Initial CPU policy permits only generic kind0 host-accessible RAM, no supplied
+mapping/host handle,4KiB alignment and explicit native-supported width,
+contiguity, per-backing and aggregate logical budgets bounded256MiB. It is
+local CPU preparation policy, not a selected K80 hardware width, SMMU OAS,
+GMU/GPU map permission or firmware eligibility. All other resource classes
+remain unsupported. No address/object accessor, host success handle or ACK
+is generated. CPU prepared state never sets runtime_complete.
+
+New actual-source ASan/UBSan policy/default-OFF checks pass; two policy
+corruptions refuse. Turning native calls on in the host build refuses at
+link without allocator stubs. Neither successful nor failed native allocation
+was executed or modelled. OFF and selected current iOS17 objects each have
+independent matching raw SHA; only selected imports the real allocator. Both
+are general-registers-only and persistent storage has no initializer.
+Initial unused OFF-budget and mutant-width compiler refusals are retained;
+the budget is now observable as logical bytes, and the mutant was narrowed
+without relaxing flags. Old suites/immutable registry artifacts are intact.
+
+[Evidence](evidence/gpu-runtime-cpu-prepare-2026-11-01.json) records these
+limits. Next compile and audit the actual current native allocator/CPU helper
+body with this selected component and existing planner, binding exact used
+SDK inputs and kernel imports. No runtime caller, new kernel/FD/candidate or
+phone operation is authorized; actual runtime mappings/protection still lack
+qualification.
+
+
+## 2026-11-01: actual CPU backing dependencies and used ABI closed statically
+
+The selected registry, current NativeAdrenoMemory/NativeAdrenoCpu and unchanged
+planner now link as a new isolated CPU component. Six base source objects
+(including fresh IOKit vtable annotations) independently match raw SHA. The
+23 genuine remaining kernel imports all occur in the retained e328 baseline;
+no native stubs or forced unresolved success is used. No initializer is added.
+
+Fresh IOBufferMemoryDescriptor44/IOMemoryDescriptor37 table entries match that
+baseline. Six typed annotations identify prepare27,complete28,bytes41,length22,
+physical-segment19 and release5;10 actual allocation/error-cleanup virtual
+edges match. The actual new allocator caller passes pooled=false in w5 and
+stores raw32-bit IOReturn separately after return. Three independent object
+corruptions and one wrong-width compile are rejected. A first checker STP
+scale expectation refusal is retained; provider/source/flags were unchanged.
+This comparison is not a new final-kernel, arbitrary object or hardware proof.
+
+Four byte-identical source files are now independently copied to maintained
+native/gpu-owned/runtime with their own source-profile and README. The old
+parent source-profile is unchanged; no component/caller is selected. Both
+maintained source paths were independently recompiled and linked with this
+phase's new native dependencies, adding two independently matching objects.
+No capsule-to-maintained debug-path SHA equality was claimed. All actual
+recursive inputs (including new ABI and maintained paths) are bound.
+
+[Evidence](evidence/gpu-runtime-cpu-native-2026-11-01.json) records the result.
+All allocations/device calls remain unexecuted, no new kernel/FD/candidate or
+wire change occurred, and no old policy/registry/hardware suite was repeated.
+Next bind the actual current GMU/SMMU memory import API and caller lifetimes
+against fixed OEM consumers before any backing can become device-visible.
+Completed SMMU role description is a reference, not an assigned context/lease.
+
+
+## 2026-11-01: actual GMU import lifetime and retention repair
+
+Current NativeAdrenoGmuMemory is a legacy fixed-address/size allocator, not
+a K80 Gen7 runtime import adapter: its default HFI is16KiB versus the known
+73728B Gen7 backing, and its fixed five mapped payloads/permissions do not
+supply per-request Gen7 VMA/attribute/ownership requirements. No address,
+bank or domain was selected from those constants or from DT/caller flags.
+NativeAdrenoSmmuMemory binds real contiguous retained table memory and takes
+a device reference; it does not establish route/power/security/stop rights.
+Its publication callback collapses native IOReturn into0/1, losing raw detail.
+
+An actual cleanup defect is now isolated: legacy map rollback erased each
+handle even if unmap failed. NativeVm can poison/retain memory before returning
+a handle, so zero handle is insufficient to prove nothing was exposed. An
+unapplied source repair preserves handles and raw rollback statuses, skips
+rollback on a poisoned VM, latches uncertain failure, stops cleanup on the
+first failure, and blocks remap/release. Status words are available only where
+the cleanup attempt mask is set. Original upstream files are unchanged; this
+repair does not qualify its legacy geometry/allocation cleanup for K80.
+
+Four static source corruptions and one wrong-handle-width compile refuse.
+Original GMU, isolated candidate, original SMMU visibility and native ABI data
+objects each independently match raw SHA using current iOS17 SDK recipes.
+No allocator/VM/provider method, mapping/address/handle success model, phone
+operation, new runtime caller/candidate or wire format was executed/added.
+
+[Evidence](evidence/gpu-gmu-import-contract-2026-11-01.json) records314 bound
+inputs and the unapplied repair. Next implement a narrowly typed persistent
+visibility publisher that preserves raw native publication errors, default
+OFF and source/target-only. Genuine context ownership and device-visible
+Gen7 import remain unavailable; old SMMU-role and CPU backing suites stay closed.
+
+
+## 2026-11-01: persistent native table-visibility publisher implemented
+
+The new isolated publisher implements the exact ArmSmmu4KLiveVisibility
+callback ABI and real NativeAdrenoMemory::publishForDevice call. Default OFF
+binds no callback and imports no native publisher; selected code is target
+inspection only. A caller-held real device reference, native non-imported/
+non-WC descriptor, single complete span and stable4KiB page range are checked.
+These are native object/lifetime preconditions, not hardware ownership proof.
+
+The first raw32 native error and last result/attempt index are preserved
+separately from adapter errors. Later post-call failure cannot erase a native
+SUCCESS0 observation. Failures/reentry latch, retained memory is quarantined,
+and no retry/reset/rebind/free is provided. Context and memory must persist
+through every possible callback. Snapshot can be Busy while the real backend
+is in flight; no cancellation or wall-time/readable-failure claim is made.
+
+Only OFF bind/snapshot/alias/reuse tests execute on host; no callback or native
+memory method is invoked or modelled. Forged OFF success and ON host link
+without publisher stubs are refused;3 static source corruptions refuse. OFF,
+selected and data ABI objects each independently match raw SHA under current
+iOS17 recipes. Two new object corruptions and a wrong callback-size compile
+refuse. The actual call uses4KiB/writes=false/includeWC=false, then stores raw
+w0 with its attempt index. Persistent native storage has no initializer.
+
+[Evidence](evidence/gpu-native-visibility-2026-11-01.json) records the source
+and target limits. The private report does not alter query/HFI/log transport
+or cross an EFI/Darwin pointer boundary. Original upstream SMMU callback and
+legacy GMU patch remain unselected/unapplied. Next compose native table prepare
+with this persistent publisher in a default-OFF source bridge, guarding mixed
+compile modes before any native preparation; no runtime caller or candidate.
+
+
+## 2026-11-01: default-OFF native table preparation and visibility composition
+
+The new maintained runtime/visibility source composes actual native table
+preparation with the persistent publisher. Both macros default OFF. A selected
+bridge queries the publisher's compiled object mode before any native prepare;
+mixed modes refuse. This is software configuration, not hardware eligibility.
+The legacy callback stays private. Only successful preparation and binding can
+export the persistent member callback. Owners, native table, arena and state
+must outlive every possible callback under the caller's real exclusive gate.
+
+Raw32 NativePrepare IOReturn/availability and later adapter/bind errors remain
+separate. That upstream API already folds some underlying ArmSmmu errors, which
+the bridge cannot recover. Later failure retains native0, poisons state and
+quarantines the table without releasing references, resetting or retrying.
+An explicit context/table-pool alias check was added during source review;
+preliminary files remain archived. Range checks do not authenticate pointers.
+
+Four build-mode combinations run refusal paths only; two host negatives, four
+static source corruptions and two actual-object corruptions refuse. Five fresh
+capsule/dependency objects and four independently recompiled maintained objects
+each match their own same-path raw SHA.300 actual recursive inputs are bound.
+Selected relocatable links close the real native preparation dependency, while
+remaining ArmLive/cache/reference imports are explicit. No final kernel or
+native success/post-call failure path, callback, provider or phone operation
+was executed. Constinit storage has no initializer. Existing profiles and
+query/HFI/log formats are unchanged; no component/caller/candidate is selected.
+
+[Evidence](evidence/gpu-visibility-composition-2026-11-01.json) records the
+limits. Next bind the remaining Gen7 dynamic VMA reservation/import details
+to current native interfaces without choosing IOVAs or inventing context,
+attributes, route, stop or DMA ownership. Rendering and Metal remain unavailable.
+
+
+## Gen7 GMU VMA reservation contract and extent validator
+
+The owner switched to fully unattended operation. Source/target work continues;
+physical assistance is unavailable and no new device execution is authorized.
+The fixed OEM reference reserves rounded backing length before dynamic map.
+VA alignment and size alignment are separate; its explicit unbacked tail must
+remain reserved. The current native VM searches mapped spans, which alone do
+not protect that tail. Static cursor advance occurs only after map succeeds.
+
+Dynamic failure searches the descriptor GMU address while the attempted
+reservation used the local address. The exact lower map helper remains unbound,
+so failure-time descriptor mutation and actual rollback effect are unknown.
+Partial unmap preserves the reference VMA node but still reaches backing free;
+that cannot qualify release in the native port. Real context/route/attributes,
+VMA ownership and stop/DMA lifetime remain missing; no adapter calls them.
+
+The new maintained runtime/gmu extent helper reuses the existing decoder and
+checks request/backing/reservation sizes, rounding the backing rather than the
+request. It preserves the unbacked-tail count and rejects secure/fixed/borrowed
+preallocated paths. Sizes are supplied data, not native observations. It emits
+no address/handle/ACK or ownership token and calls no allocator/VM/provider.
+Three new reference corruptions and three executable arithmetic corruptions
+refuse. Three current iOS17 objects independently match raw SHA;143 recursive
+inputs and real planner link close, with only C/stack-guard kernel imports.
+No initializer, new caller/candidate, phone operation or wire change is added.
+Existing profiles/capsules/default42 remain preserved.
+
+[Evidence](evidence/gpu-gen7-vma-2026-11-01.json) records source provenance and
+limits. Next bind the exact pinned lower map/partial-cleanup implementation,
+then implement only source-local retention logic supported by that contract.
+
+
+## 2026-11-02: exact lower GMU map failure and native raw-error retention
+
+Three precise primary files at the fixed OEM453d8875 revision are now bound by
+URL/full SHA. They remain reference source, not Xiaomi stock attestation.
+The actual gmu_core_map_memdesc never writes the descriptor GMU address. Thus
+its dynamic caller's failure lookup of that field need not name the local
+reservation it just inserted. The helper preserves negative errors, converts
+zero mapped bytes to ENOMEM, and folds positive lengths to0 without checking
+the requested length. The exact wrapper selects five/six-argument Linux
+iommu_map_sg by kernel version; selected Linux-core rollback remains unknown.
+No failure here proves all translations/DMA retired or permits native freeing.
+
+The current native VM also folds its real cache-publication IOReturn into a
+generic map failure. A new isolated UNAPPLIED repair retains the first raw32
+publication error in separate persistent private metadata before that fold.
+It survives ordinary operation-result clearing. The outward return, mapping,
+poisoning and cleanup behavior are unchanged. Live upstream VM bytes/layout
+are untouched; the candidate's additional private layout is not final ABI.
+
+Only negative/zero-map and SG-construction-error paths of the exact reference
+function run on host, using failure diagnostics. No native method or successful
+allocation/map/address/handle model executes. Two host and two native-source
+corruptions refuse. Original VM, candidate VM and ABI-data objects independently
+match raw SHA with current iOS17 recipes;311 recursive inputs are bound. Actual
+typed publication relocation and raw32/first-error store are checked, with two
+object corruptions and one wrong-width compile refusing. No initializer,
+phone operation, runtime caller, FD/kernel/candidate or wire change is added.
+
+[Evidence](evidence/gpu-gen7-map-retention-2026-11-02.json) records all limits
+and network-fetch refusals. Next implement only the Gen7 rounded reservation
+quarantine bookkeeping supported by this contract; mapping ownership remains
+unavailable. All previous claims are consumed and the owner is unattended.
+
+
+## 2026-11-02: bounded Gen7 supplied-reservation quarantine ledger
+
+The new maintained runtime/gmu/reservations source records32 supplied ranges,
+borrowed real native types and canonical requests in persistent CPU metadata.
+Overlap uses the full rounded reservation including the unbacked tail. Reused
+keys with changed request/descriptor/range, descriptor aliases, failed retries,
+capacity32 and bad bounds/output aliases refuse. First signed64 local adapter
+error is retained without clearing the interval; no reset/release API exists.
+No pointer/range accessor or native mapping/status claim is exported. Local
+indices are metadata, not HFI handles. Native attempted/status available,
+mapping complete and runtime complete stay0; native status stays unknown.
+
+The ledger calls no native method and does not acquire a device reference,
+prove real backing or quarantine hardware. The actual caller must retain the
+descriptor/backing/range under its real lifetime gate. CPU pointer aliases and
+supplied GMU-space scalars remain distinct. Host fixtures deliberately use
+unbacked real native-class objects only to exercise metadata refusals/masks;
+no successful allocator, mapping, address/handle or provider model is supplied.
+
+Four actual-source corruptions and two absent reset/release API compiles refuse.
+Ledger, actual extent/planner dependencies, constinit ABI/storage and maintained
+ledger objects each independently match raw SHA using current iOS17 recipes.
+416 actual recursive inputs are bound; internal helper imports close, leaving
+only C/stack guards. No initializer/SIMD or native/provider/phone call is added.
+Byte-identical source promotion has independent inodes/profile; existing
+profiles, unapplied patches, query/HFI/log transport and default42 are intact.
+
+[Evidence](evidence/gpu-gen7-reservations-2026-11-02.json) records the limits.
+Next compose internal CPU-prepared backing ownership with this bookkeeping
+without exposing objects or widening policy, default OFF and compile-only.
+No runtime caller, FD/kernel/device candidate or GPU execution is qualified.
+
+
+## 2026-11-02: private CPU backing / GMU reservation source composition
+
+The new unselected ZornGpuGmuRuntime owns32 actual native memory objects and a
+private persistent supplied-range ledger. It derives from frozen registry code
+without copying live objects or exposing object/range accessors. Original CPU
+policy/prepare/report function bodies are byte-bound after type renaming; the
+generic4K/nonpool host-RAM scope is unchanged. Both selectors default OFF.
+Actual object modes00/10 return Disabled and01 returns ModeMismatch before
+any getter. Selected11 source requires returned CPU/native-success/backed/
+prepared evidence before reading actual member bytes and private recording.
+
+Original raw32 CPU status, signed64 local adapter errors, ledger results and
+availability remain distinct. Failed recording retains backing; once a local
+ledger index exists, later failure retains the full rounded interval too.
+Failure before recording never claims a recorded range. Owner gate nests only
+into its private non-callback ledger; no reverse lock/reset/release/cleanup API
+is added. No address/IOVA/HFI handle/ACK or native map result is produced.
+Actual selected success/post-record failure/getter paths remain unexecuted.
+
+Two new refusal-only host modes, two host negatives, four source corruptions
+and selected host link without allocator stubs refuse as expected. Three actual
+object corruptions refuse. Eight capsule/source objects, two fresh actual
+NativeMemory/NativeCpu dependencies and three maintained owner modes each
+independently match raw SHA.476 recursive inputs are bound. Full selected
+relocatable link closes component/native-memory helpers;23 remaining kernel
+import names exist in retained e328. This transfers no old address or final
+kernel/vtable ABI qualification. Constinit storage has no initializer/SIMD.
+
+The import classifier initially mistook a NativeMemory parameter for a native
+receiver; completed host/source/owner pairs were preserved and only incomplete
+target work resumed. A backward-branch checker encoding refusal was corrected
+from the actual target. Both preimages/logs remain; production guards/flags did
+not weaken. No native method/provider/phone call, runtime caller, FD/kernel/
+device candidate, live upstream change or query/HFI/log transport change occurs.
+
+[Evidence](evidence/gpu-gmu-runtime-composition-2026-11-02.json) records limits.
+Next bind the separate actual Gen7 HW_FENCE/MEMSTORE preallocated providers and
+their lifetime, without treating software fences or transport ACKs as GPU DMA
+retirement. Genuine platform ownership and first GPU execution remain missing.
+
+
+## 2026-11-02: preallocated providers bound; independent GMU AO classification
+
+Six exact primary files at fixed OEM453d8875 bind the preallocated consumer
+owners. HW_FENCE bypasses ordinary GMU allocation even without GFX_ACC;
+MEMSTORE reaches its existing global descriptor only through GPU-access flow.
+HW_FENCE needs an external registered client and Tx/Rx descriptor, not a new
+generic backing. Actual public manager header/native counterpart remains
+unbound; no descriptor typedef, PA/IOVA meaning, client handle or borrowed
+adapter was fabricated. MEMSTORE is Linux PAGE_SIZE*8 device-global allocation,
+with a40B UAPI record/EOP8, distinct from native CP timestamp at fence+4.
+Removal reaches global-free, without binding native stop/DMA/release proof.
+
+The exact unsupported-feature branch passes an opaque manager handle to a
+function that declares/requires adreno_device*. A one-line UNAPPLIED reference
+patch uses adreno_dev. A C++ port type check refuses void*; this does not claim
+that original Linux C rejected that conversion or that a phone fault occurred.
+Four new provider semantic corruptions refuse. No provider is invoked.
+
+Because native resource providers remain missing, independent platform work
+continued with a supplied GMU AO scalar classifier under runtime/gmu/irq-status.
+Pinned handler/masks classify watchdog0/AHB-fence3/host-AHB5, preserving raw32
+and every other bit as unhandled, including named RSCC1/DBD4. AHB-fence error
+needs separate real auxiliary status; it is unrelated to HW_FENCE Tx/Rx or
+CP completion. Native RBBM/CP IRQ is another domain. This CPU function reads,
+clears, masks, acknowledges and signals nothing and proves no observation.
+
+All32 bits plus invalid output/combined cases pass; three source and two actual
+object corruptions refuse. AO source, data-only typed/UAPI annotation and
+maintained AO source each independently match raw SHA with current iOS17
+recipes;383 recursive inputs are bound. The data annotation has no callable
+provider/imports/initializer. Byte-bound source promotion has an independent
+profile. No native method/IRQ/MMIO/NMI/allocator/provider/phone call, runtime
+caller/FD/kernel/device candidate or query/HFI/log transport change occurs.
+
+[Evidence](evidence/gpu-gen7-preallocated-providers-2026-11-02.json) records
+remaining provider gaps and all fetch failures. Next bind the separate HFI IRQ
+register domain/registration/status semantics without changing packet codecs,
+queue retirement or interpreting an ACK as GPU completion or ownership.
+
+
+## 2026-11-02: selected Gen7 hwsched HFI domain and supplied CPU status
+
+Exact pinned gen7_9_1 selects adreno_gen7_9_0_hwsched_gpudev and ultimately
+gen7_hwsched_hfi_handler, not the similarly named gen7_hfi_irq_handler from
+the previous next-plan. Cookie types and clear/mask behavior differ. The
+selected path reads INFO, clears only raw & software mask, suppresses only
+MSGQ0 when absent from that mask, then handles MSGQ0/DBGQ2 and CM3 fault15.
+DBGQ/CM3 branch tests are not individually mask-gated. SIDEMSGQ1 has no direct
+branch. oob_max=8 leaves bit24 in the unhandled diagnostic test; ignored25..31
+is different from header OOB16..31. OOB is separately polled by its actual
+caller, not completed by this handler. No auxiliary status is read by this
+handler; none is fabricated. AO and native RBBM/CP domains stay separate.
+
+Cached DT names hfi/gmu and raw cells0,304,4 /0,305,4 match both historical
+FDTs using the existing byte-identical parser. Source registration is byname,
+trigger-high and initially disabled. This neither re-observes the phone after
+reinstallation nor grants Linux/XNU interrupt numbers, routing or ownership.
+
+The new unselected runtime/gmu/hfi-status source classifies supplied integers
+only, preserves raw/mask/unclassified/ignored bits and exact branch semantics.
+It has no register address, clear/mask API, callback, IRQ source, packet decode,
+ACK/fence/queue retirement or wire format. Return OK means CPU classification
+only. Six combined cases, all32 one-hot bits under two masks and invalid
+output shapes pass ASan/UBSan. Four reference-source, three scalar-source and
+three actual-object corruptions refuse. Three independent current iOS17
+objects match raw SHA;383 recursive inputs are bound. ABI data has no imports
+or callable provider. Maintained source is byte-identical with independent
+inodes/profile; old profiles/capsules and three UNAPPLIED repairs are unchanged.
+
+An initial manifest-location refusal and a checker comment-match blind spot
+are saved with both preimages; the exact regread guard now rejects the source
+negative. Production source/flags were not weakened. No native method, IRQ,
+MMIO, callback or phone operation occurred; no runtime caller/FD/kernel/device
+candidate was created. First GPU execution, stop/DMA and rendering remain
+unqualified. Next bind actual Gen7 fault/stop return propagation and lower
+idle/RSCC/GBIF helpers; a source return0 cannot establish native DMA stop.
+
+[Evidence](evidence/gpu-gen7-hfi-irq-contract-2026-11-02.json).
+
+
+## 2026-11-02: Gen7 lower-stop error retention, isolated reference repair
+
+Exact fixed453d8875 sources plus one new pinned adreno.h close the lower helper
+contracts. Selected hwsched fault entry can return initial0 after cleanup;
+RSCC failure is overwritten by GBIF, whose client-halt failure is itself
+overwritten by arb-halt. RSCC also has early0 software-state paths and folds
+poll errors to ETIMEDOUT. Lowest-idle/idle/slumber checks involve actual MMIO,
+polling or HFI; none was invoked. Timeout loops do not guarantee wall time.
+
+Void suspend cannot certify stop: RPMh aggregate is ignored, void halt logs
+timeouts and can resume SMMU pagefaults, and regulator failures are logged.
+Existing native platform requires already-powered windows, legacy context has
+no teardown, and IOService::stop/map cleanup is not a K80 GMU/DMA stop provider.
+
+A three-file UNAPPLIED reference patch preserves first RSCC/client-halt return
+and persistent first nonzero error per stage/global first error. Fault-entry
+EIO is explicitly an adapter rejection; void cleanup remains unknown. Error
+slots are interpretable only under failed_mask, never initialized-zero native
+SUCCESS. This is lifetime error history rather than one consistent epoch.
+No reset/release is added; existing owner serialization remains a precondition.
+Original hardware operation ordering stays unchanged. The live reference,
+current native implementation and all older repairs were not modified.
+
+Four source and two pure negative-scalar capture mutations refuse; two actual
+CPU object mutations refuse. Two extracted CPU-helper/data annotations each
+independently match raw SHA using current iOS17 recipes;377 recursive inputs
+are bound. Only that exact pure capture helper and data types were compiled,
+not the full Linux driver, a callable hardware adapter or a new native kernel.
+Host tests have no allocator/MMIO/provider/stop/ACK/fence-success doubles.
+
+No native or phone call, runtime caller/FD/kernel/device candidate or wire
+change occurs. The upper selected caller still discards stop status before
+CPU fence drain/context unregister: this patch alone cannot fix that gap or
+prove DMA retirement. Next bind that exact caller/queue/fence lifetime before
+a separate minimal source repair; all four repairs remain UNAPPLIED.
+
+[Evidence](evidence/gpu-gen7-stop-error-retention-2026-11-02.json).
+
+
+## 2026-11-02: upper Gen7 stop propagation and fence/context lifetime
+
+Six existing exact primary inputs bind both static upper callers, lower cleanup
+callers and last-close table dispatch. Idle work and PM wrappers serialize with
+the device mutex; worker flush drops/reacquires that mutex and requeues work.
+Context walks use context read lock then drawctxt spinlock. Last-close still
+decrements open_count even on returned error. These are source contracts, not
+observations of the actual kernel/config or DMA quiescence.
+
+The pre-shutdown fence check can already remove entries whose timestamps are
+at/below out_fence_ts. Removal puts a dma_fence reference and frees metadata.
+CPU trigger is void: update_txq failure logs/returns, yet its caller still
+removes the entry. External manager/trigger result contract remains unbound;
+no return value/handle/provider was invented. Unregister also resets peer queue
+indices, registered flags and timestamps; it is not a harmless local flag edit.
+
+A separate one-file UNAPPLIED reference patch returns known OOB/stop errors
+before post-stop CPU drain/unregister/started-state reset, preserving first
+chronological OOB/pending/stop failure and logging separate ints. Failed PM
+poweroff returns directly rather than restarting the dispatcher via common
+err. Boot cleanup retains its original error, with secondary stop logged;
+idle work logs without adding a retry. Zero stop return still proves nothing
+about DMA. Earlier check removals/lower effects are not rolled back, future
+retry/reset and metadata-power disagreement remain unresolved.
+
+Four actual-source mutations refuse. Clean source-review application to both
+original and separately lower-repaired copies passes; the lower function body
+and frozen capsule are unchanged. No fake stop/fence/provider peer executes.
+This stage introduces no native component: neither Linux driver compilation
+nor an unrelated iOS target/metadata-object suite is claimed. The first token
+checker rejected an intervening block comment; saved preimage/log explain the
+code-token normalization fix without altering the actual guard.
+
+All five repair patches remain UNAPPLIED. No native or phone call, runtime
+caller/FD/kernel/device candidate or HFI/query/log wire change occurs. Next
+bind real current NativeSubmit/VM failure-reference retention before a minimal
+native source repair; actual GPU execution and stop/DMA proof remain missing.
+
+[Evidence](evidence/gpu-gen7-upper-stop-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: actual native Submit failure-reference retention repair
+
+Current NativeSubmit/VM/Ring/Memory contracts close the failure accounting
+path. VM hold/retire counters change only after actual NativeMemory success;
+quiescence remains a caller precondition. Submit previously ignored cleanup
+IOReturn on three submission failures yet incremented retired,losing local
+handle metadata on partial cleanup. Completion release continued after errors
+and folded retire/import acquisition errors into generic poison.
+
+The isolated two-file UNAPPLIED native repair records retained metadata before
+rollback,counts only actual successful retirement and stores a per-job retired
+mask. On first cleanup failure it stops,keeps pending refs/metadata and poisons
+the Submit. Original primary API status and first cleanup status remain
+separate full IOReturn32 values with explicit availability. Completion release
+preserves actual returned errors and does not clear the job until retirement
+and acquisition both succeed. Shared rollback is reverse order;retirement is
+accounting,not an independent stop check. Count includes retained metadata for
+already-retired handles,identified by the mask. No reset/release/accessor added.
+
+Four source mutations,one wrong64-bit handle prototype and three actual object
+mutations refuse. Nine current iOS17 object pairs independently match raw SHA;
+436 recursive inputs are bound. Seven fresh objects close native class/PM4
+imports in a relocatable component;9 SMMU kit imports remain typed/external,
+22 kernel import names match historical e328 without transferring addresses.
+Actual raw32 stores/first-error guards,success-only progress,typed VM calls and
+data-only ABI are checked. Private Submit1360B/Job160B changed layout requires
+a future full rebuild;public stats40B remains. This is not new final-kernel or
+Apple full ABI/hardware qualification. Original SDK warnings/flags are kept.
+
+No native VM/ring/fence/cache/allocator/provider method,including a host double,
+was executed. Upstream and old profiles/capsules remain byte-identical. No
+runtime caller/FD/kernel/device candidate or query/HFI/log codec was changed.
+All six patches remain UNAPPLIED. True ownership,stop/DMA and GPU execution
+remain unavailable. VM publish/acquire still folds underlying cache statuses;
+next build a separate precise companion without modifying the older map-cache
+repair or inventing skipped/native SUCCESS values.
+
+[Evidence](evidence/gpu-native-submit-retention-2026-11-02.json).
+
+
+## 2026-11-02: VM publish/acquire native-error companion composition
+
+Frozen map-cache VM and native Submit candidates were copied with preimages
+and independent inodes. The new UNAPPLIED VM increment preserves each first
+nonzero NativeMemory publish/acquire IOReturn before existing fail(IOError).
+Map source/prefix0/4,coherence/imported skip policy,public returns,poison/route
+quarantine and Submit source remain unchanged. Skip predicates depend on the
+existing global coherence flag;they do not attest K80 coherence or untouched
+imports. Availability0 means no retained failure,not no-call/SUCCESS or proven
+cache maintenance. No status is manufactured for skip/gate/unreached paths.
+
+Failure record24B has map0/4,publish8/12,acquire16/20 raw32/availability pairs.
+Actual VM280B/report248 and relocated since_audit272 require future complete
+consumer/owner rebuild;Submit1360B remains. Private history assumes serialized
+persistent ownership and has no arbitrary multicore snapshot/stop/DMA lease.
+NativeMemory internal details can still be folded before its returned API.
+
+Four new source corruptions,one raw-width compile and three actual object
+corruptions refuse. VM,Submit and ABI each freshly compile twice to identical
+raw SHA with current iOS17 recipes:313 actual fresh recursive inputs. Five
+explicitly reused sealed dependencies have425 actual per-object inputs,all
+current SHA-bound and independent copies,none depends on changed VM/Submit
+headers. They are not claimed freshly rebuilt. Combined input union433 and
+seven-object native-class closure have the same31 external imports as parent
+(9 typed SMMU kit,22 historical kernel names),not new final-kernel/Apple ABI or
+hardware qualification. Actual call prototypes,raw32/availability before
+poison and existing map-prefix offsets are checked. Source-review replay of
+old-map/new-cache/old-Submit patches exactly matches compiled source bytes.
+
+No native or host cache/VM/ring/fence/allocator/provider method was executed;
+no runtimecaller/FD/kernel/devicecandidate or query/HFI/log wire changed. Old
+capsules/profiles/upstream remain unchanged;all seven patches are UNAPPLIED.
+Next bind only the three Ring commit callbacks' own int errors before poison,
+without treating callback integers as original EFI/IOKit results or adding a
+new observer/carrier. Hardware ownership and first GPU execution remain absent.
+
+[Evidence](evidence/gpu-native-vm-cache-composition-2026-11-02.json).
+
+
+## 2026-11-02: three native Ring commit callback errors,source-only candidate
+
+Exact callback types and publish->barrier->WPTR sequence are bound. The new
+isolated UNAPPLIED Ring repair preserves each first nonzero callback int32,
+software stage1/2/3 and explicit availability before original poison. Public
+IOReturn,commit order/framing/counters and reference retention are unchanged.
+This is only callback ABI data,not recovered EFI/IOKit/hardware status. Other
+sites and unreturned callbacks remain unknown;availability0 proves neither
+no-attempt/SUCCESS nor hardware completion. No new observer/accessor or wire.
+
+Four new source corruptions,one callback return-width compile and three actual
+object corruptions refuse. Ring,affected Submit and ABI each freshly compile
+twice to equal raw SHA with current iOS17 recipes:312 fresh recursive inputs.
+Five sealed dependencies (parent VM plus four header-independent dependencies)
+have427 current per-object inputs;none includes changed Ring header,recipes
+match parent and copied objects have independent inodes. They are not claimed
+freshly rebuilt. Combined union434 and seven-object native closure retain the
+same31 external imports. Actual raw32/stage/availability stores,three indirect
+calls and unchanged poison path are checked. Ring144B private layout requires
+future full consumer/owner rebuild;VM280/Submit1360 remain. This is not new
+final-kernel/Apple ABI/hardware qualification. No native method/callback or
+host successful provider/address/fence peer executes. Source-review replay
+of the four relevant patches exactly matches compiled bytes.
+
+Actual producer source exposes the next concrete lifetime gap:the service's
+block-local gpu_window is passed as retained Ring cookie;cp_window similarly
+escapes through IRQ's copied io. RingCache is a service member,but stop resets
+maps without a bound stop/DMA certificate. This is a source finding,not an
+observed phone fault. The service class lives inside NativeAdrenoService.cpp,
+without a separate service header. Next bind/fix only persistent typed cookie
+storage while keeping map teardown/true ownership gaps explicit and unavailable.
+
+All eight patches remain UNAPPLIED;upstream and old capsules/profiles are
+unchanged. No runtime caller/FD/kernel/devicecandidate or query/HFI/log carrier
+was added. GPU execution,rendering and Metal remain unqualified.
+
+[Evidence](evidence/gpu-native-ring-commit-errors-2026-11-02.json).
+
+
+## 2026-11-02: service-owned callback cookie source repair;full-service compile gap
+
+The actual inline NativeAdrenoGpuService class passes automatic window objects
+to Ring/IRQ tables that copy and retain their cookie pointers. A new one-file
+UNAPPLIED source repair moves the exact typed descriptors to two private service
+members,keeping assigned bases/sizes,callback bodies,readiness gates and call
+order unchanged. The CP/Pwrup synchronous calls use the same persistent CP
+descriptor. RingCache was already service-owned. Submit/core/client raw pointer
+retention does not establish IOService/map lifetime. Existing stop still drops
+maps without bound quiescence. This repairs only automatic-frame storage expiry
+in the source;it proves neither safe teardown nor hardware ownership/DMA stop.
+
+Four new source corruptions and one wrong bytecount-width compile refuse.
+The exact extracted window and real Ring/IRQ types compile twice with the
+current root iOS17 recipe to the same raw object SHA:16-byte window,8-byte
+alignment,pointer at0 and size_t at8. The annotation is data-only with no native
+imports or initializer;there is no fake Service class or successful host peer.
+Full Service compilation stops at missing ShengGmu.h,with original warnings and
+diagnostics retained. No full Service object/layout,selected start path or final
+kernel qualification is claimed. The catalog names Adreno740149ef6d8 and
+Sm8550Platform a9f45dc6;the legacy NativeAdreno tree is not automatically proof
+of that selected component. Exact dependency/source alignment is the next task,
+without copying other devices' platform policy or forcing generated macros.
+
+All nine repairs remain UNAPPLIED. No upstream/submodule/profile/CPU/storage
+change,native/callback/phone operation,new caller/FD/kernel/devicecandidate or
+wire change. GPU execution,rendering and Metal remain unqualified.
+
+[Evidence](evidence/gpu-service-cookie-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: exact main catalog Service dependencies and remaining CP cookie
+
+The missing ShengGmu header is now supplied from the exact catalog primary
+revision in an isolated directory. Main pins Adreno740149ef6d8 and
+Sm8550Platform a9f45dc6;the unchanged local Adreno740 checkout is4e0314df.
+The exact component was exported from existing Git objects without checkout or
+submodule update.64 source/header/notice files,26 pinned kit header/notice files
+and9 exact Sm8550 primary files have Git-blob/full-SHA provenance. Of60 common
+legacy NativeAdreno files30 differ. Old capsules retain their old-byte scope.
+
+The pinned Service already fixes the Ring cookie and expands RingIo to48B
+(fence cookie32,status callback40). Only its remaining CP/IRQ automatic-window
+cookie is repaired in a new one-file UNAPPLIED candidate. Existing Ring member,
+fence hook,callback bodies,readiness and stop are unchanged. Three new source
+mutations,one new callback-width compile and two actual object mutations refuse.
+Original Service,candidate and ABI each compile independently twice with the
+current iOS17 recipe and equal raw SHA:394 recursive inputs. Real class size
+changes3192->3208;Ring window stays3176,CP window is3192. Constructor allocation
+size and CP zero-initialization are checked. No old object was relabelled.
+
+The Service class/nonoptional code compiles. No board-generated rules,votes or
+CommandDB headers/macros were supplied:their guarded startup path remains
+source-only and unqualified. This is not final-kernel/prelink/Apple ABI or K80
+hardware evidence. No callback,service,MMIO,cache,allocator or phone operation
+ran. Source A740 code is not adopted as K80 policy. Existing stop still drops
+maps without proven quiescence;stable cookie storage does not solve that gap.
+
+All ten repairs remain UNAPPLIED,old profiles/submodules/baselines unchanged.
+Next bind the actual four-argument NativeMemory allocation contract before
+adapting old five-argument CPU-only callers in a new isolated default-OFF scope.
+Do not silently reuse old allocator/cache semantics. No new selected caller,
+FD/kernel/devicecandidate or query/HFI/log carrier. GPU execution,rendering and
+Metal remain unqualified.
+
+[Evidence](evidence/gpu-catalog-service-dependencies-2026-11-02.json).
+
+
+## 2026-11-02: catalog149 CPU-only owners and actual four-argument allocator
+
+The exact main NativeMemory allocator is now bound independently of the legacy
+five-argument pooled API. Its kernel-mapped four-argument path still checks
+CPU4K,width,contiguity,mapping/span bounds,zeroing and owned-page cleaning.
+It removed the old native256MiB upper cap;new isolated caller variants preserve
+the existing per-backing/aggregate logical cap and every other narrow CPU policy.
+They select neither system/import/borrow/pool/WC allocation nor a runtime caller.
+Original native32 status,independent adapter64 error,unknown cleanup and failed
+object/budget retention remain. Parent profiles/source/capsules are unchanged.
+
+The new provider also initializes global page-ownership bookkeeping lazily.
+Per-owner gates do not serialize other driver users,bitmap allocation can be
+unavailable,and auxiliary overhead is unknown. These facts remain explicit
+limits;neither native0 nor CPU readiness proves bitmap/GPU/stop/DMA ownership.
+Current cache batching is source semantics,not a wallclock/cancellation result.
+
+Two new source mutations,the actual old five-argument caller compile and two
+new object corruptions refuse. Ten fresh current iOS17 object pairs have equal
+independent raw SHA,472 recursive inputs. OFF objects have no allocator import;
+selected compile-only code calls the real four-argument method. Real types are
+NativeMemory80B/registry8592B/GMU18840B;object stride and raw32 status retention
+are checked. Two relocatable components close native/helper method imports.
+Of29 external names,two are absent in the historical e328 symbol set:the strong
+minimal UBSan negate helper and weak diagnostic native_pmap_user_mappings.
+No final-kernel/link/Apple ABI qualification or resolution is claimed. No stubs
+or sanitizer weakening. The initial STR immediate expectation was refused;both STR/STP expectations
+were then checked against actual words. Preimage/log retained,production unchanged.
+
+No allocator,getter,cache,provider or phone operation or successful hardware
+peer executed. Old eight profiles,ten UNAPPLIED patches,storage/CPU/default
+protections and wire formats remain unchanged. Next bind the actual shared
+bitmap/caller-lock lifetime and selected minimal UBSan source/link inputs.
+GPU execution,rendering and Metal remain unqualified.
+
+[Evidence](evidence/gpu-catalog-cpu-memory-2026-11-02.json).
+
+
+## 2026-11-02: private bitmap initialization and real XNU UBSan provider
+
+Catalog published dispatch uses g.lock,but other possible Service/private-owner
+callers are not proven to share it. System pages are prepared before that lock
+and adopted under it;handed-off frees occur afterwards. If independent callers
+overlap,the original tried/pointer initialization can skip a note and later
+trust an incomplete bitmap. This is a conditional source issue,not a phone fault.
+A new isolated UNAPPLIED repair uses one CAS initializer,release/acquire pointer
+publication and sticky conservative queries after skipped notes. There is no
+explicit wait for another initializer,no reset/retry/free,new observer or wire.
+Allocation/error/cache/release bodies and header/class80 remain unchanged.
+Arbitrary alias concurrency,descriptor lifetime and true DMA stop remain unknown.
+
+Three source mutations and three actual object corruptions refuse. Two fresh
+independent target pairs use395 recursive inputs;three explicitly sealed objects
+have413 unchanged dependencies. The real selected full XNU UBSan source uses its
+recorded sanitizer flags and matches its existing build-input SHA. Its negate
+handler is BRK0xff00/RET,not a stub. A five-object relocatable component binds
+that private handler locally. The initial checker expected global T;the actual
+linker produced local t. Preimage/refusal preserved,only checker corrected,and
+completed compiles were not repeated. Recovered trace is labelled explicitly.
+
+Correction to the prior symbol classification:those searches used global-only
+nm -gj. An all-symbol scan finds both negate and early sysctl in retained e328
+as non-external former-private symbols. They are not absent implementations.
+The pmap diagnostic is still not found. Old reports remain frozen;no addresses
+were copied and no accepted import/public ABI is inferred. The real runtime
+has startup/sysctl metadata;adding a second copy to an already-linked kernel
+is not qualified. Current source supplies early sysctl with a startup-phase
+assertion and initializes UBSan during boot. Actual prelink policy is next.
+
+All eleven patches remain UNAPPLIED;old profiles/capsules/source/CPU/storage
+and consumed claims are unchanged. No native allocator,lock runtime,cache,
+provider or phone call or hardware-success peer ran. No new selected caller,
+FD/kernel/devicecandidate or codec/carrier. GPU execution,rendering and Metal
+remain unqualified.
+
+[Evidence](evidence/gpu-owned-bitmap-init-2026-11-02.json).
+
+
+## 2026-11-02: native source-link and donor prelink policy
+
+The fixed debug builder calls the guarded legacy view and native XNU build.
+Archive recipes feed LD_KERNEL_ARCHIVES into the XNU source link alongside
+link.filelist;the selected UBSan runtime is already present once. This differs
+from donor pointer rebinding,whose reader requires defined external symbols.
+Private externals with N_EXT pass that name filter;final localized symbols do
+not. The collision-name helper has another role. The AMFI-only postlink symbol
+helper is not a GPU import mechanism. No private addresses were saved or bound.
+
+Exact historical native e52df7df and postlink e3288034 archives match their
+frozen plan. Current mutable native543de146 differs;current core and staged
+build scripts are separately pinned and are not assigned to the old run.
+Two new source-policy mutations were refused using existing real artifacts,
+without a new target,link,image or repeated old suite. Pmap remains optional
+and unbound;startup-only helpers and a duplicate runtime are not authorized.
+
+All eleven repairs remain UNAPPLIED. No runtime caller/component selection,
+native callback/provider/allocator/cache/phone execution or codec change.
+Actual GPU execution,rendering,Metal and platform ownership remain incomplete.
+
+[Evidence](evidence/gpu-native-import-policy-2026-11-02.json).
+
+
+## 2026-11-02: catalog WPTR callback errors, isolated and UNAPPLIED
+
+Exact catalog149 optionally polls/clears its AHB fence and reissues WPTR.
+Clear callback errors were ignored;retry-limit success is not completion.
+A new isolated repair privately preserves the first returned signed int32
+and software stage without changing public return,short-circuit order,poison,
+retry or reference behavior. Ignored clear errors can coexist with SUCCESS.
+Availability0 is not no-attempt or success. Service/platform cookies retain
+raw windows,not a proven GMUnode/map hold;stop/quiescence remains unqualified.
+
+Six accepted current iOS17 independent object pairs bind407 recursive inputs:
+old/new Ring,affected Submit,ABI,coherent Service and its other by-value GPU
+owner. Ring200->208 and Service3192->3200 are static layouts only. The first
+Service pair mixed old/new headers and was refused;its logs/objects remain,
+and only that consumer was rebuilt with an independent exact-header snapshot.
+Four source,two object and one callback-width refusal checks passed. A target
+checker expected six static callback sites;exact old/new disassembly has seven
+because initial/tail barrier paths are separate. Its preimage is retained;
+production source/flags were not weakened and completed pairs were not rerun.
+
+All twelve patches remain UNAPPLIED and unselected. No native callback,
+allocator/cache/provider/VM/service/phone call or successful hardware peer.
+No selected runtime caller,new image or codec. GPU execution/rendering/Metal
+and actual platform ownership remain incomplete.
+
+[Evidence](evidence/gpu-catalog-wptr-errors-2026-11-02.json).
+
+
+## 2026-11-02: upper restore and stall API error retention
+
+Exact catalog149 restoreWptr/kick can return0 without a register write.
+noteRestoredWptr only increments a counter;one upper branch notes it after
+ignoring the return. Stall recovery calls kick even after TLB invalidation
+fails. Published IRQ completion uses a try-lock and can defer to software;
+the per-instance serialization requirement does not prove every global
+stall counter or standalone caller safe. These are source boundaries.
+
+A thirteenth isolated UNAPPLIED patch privately saves the first returned
+IOReturn32 for each of four upper operations and the first failure across
+them in that owner. Mask bits make failure values interpretable;absence is
+not no-attempt or SUCCESS. Original notes,returns,poison,follow-on recovery,
+timings and all reference handling remain byte-identical after inverse.
+This diagnostic does not fix unsafe follow-on actions or prove DMA stop.
+The API may already fold lower failures;those details remain unknown.
+
+Three fresh current iOS17 independent pairs bind321 inputs;four source,two
+object and one API-width refusals passed. Submit3672->3704 is a private
+layout change requiring future full owner/consumer compilation. Original
+catalog Ring200 and Preempt/VM are unchanged;old patches were not combined.
+No native callback/recovery/provider/VM/allocator/MMIO/phone or hardware peer
+ran. No selected caller,new kernel/image or codec;GPU/Metal remain incomplete.
+
+[Evidence](evidence/gpu-catalog-recovery-errors-2026-11-02.json).
+
+
+## 2026-11-02: preempt producer boundary and independent GMU node
+
+Catalog149 supplies a PreemptIo contract and callable IRQ consumer;the actual
+board callbacks/controller caller remain unbound in the inspected pinned
+roots. No new Preempt patch or substitute provider was invented. readCntl
+ignores status and can return caller-mutated output;complete folds errors and
+ignores optional keepalive status. closeEvent is a global diagnostic row with
+register reads,not a UEFI event;its outcome is written before remaining reads.
+
+Independent exact GMUnode source owns maps but exports borrowed volatile
+pointers. stop resets maps;object lifetime alone does not prove window validity
+or safe DMA teardown. Its append/property bool returns are ignored,but reachable
+append failure after exact capacity allocation is not yet established. No
+cleanup policy was guessed. Two fresh current iOS17 pairs bind343 inputs;one
+lost-volatile type check refused. Data annotation has0 code/imports/initializer,
+and node336B is only static layout. Original source and all13 patches remain
+unchanged;no driver patch,selected caller,new image or codec was added.
+
+No mapping/property/provider/callback/MMIO/phone methods or hardware-success
+model ran. Full GPU execution,rendering,Metal and ownership remain incomplete.
+
+[Evidence](evidence/gpu-preempt-producer-gmu-node-2026-11-02.json).
+
+
+## 2026-11-02: GMU property publication and selected SDK lifetime
+
+Successful OSData capacity allocation covers the serial node's at-most8
+eight-byte appends,so no redundant append guard was added. Actual selected
+registry/dictionary code can returnfalse on a new property's failed growth;
+the dictionary retains the object without copying its bytes. This conditional
+source failure is not an observed phone fault or a bounded allocator promise.
+SharedPtr reset releases before clearing its pointer;map free ignores unmap's
+return. Object retention and void cleanup remain insufficient for DMA safety.
+
+A fourteenth isolated UNAPPLIED guard saves the returnedbool,releases the
+temporary data exactly once and reuses the original failure stop path before
+registerService whenfalse. All other code,append,mapping/stop and336B class
+are unchanged. No new refcount or cleanup policy is claimed. Two fresh iOS17
+pairs bind342 inputs;one explicit sealed original has341 current inputs,
+union343. Three source,one object and one bool-signature refusal checks passed.
+Original node pairs were not rebuilt. No native property/map/reset/provider/
+MMIO/phone or hardware peer ran;no selected caller,image or codec changed.
+All14 patches remain unselected and GPU execution/Metal remain incomplete.
+
+[Evidence](evidence/gpu-gmu-publication-contract-2026-11-02.json).
+
+
+## 2026-11-02: IOKit device-memory descriptor and map route
+
+Selected standard DT code installs descriptor arrays on the nub/provider.
+Bare lookup reads the receiver's local property array and returns a borrowed
+pointer. Catalog GMUnode parses provider reg but looks up memory on itself;
+personality/resource inputs remain needed before any receiver change. Resolver
+failures can skip entries,so reg index alone cannot attest descriptor identity.
+This is a conditional source gap,not an observed K80 fault.
+
+map(Anywhere) requests the whole descriptor in kernel_task and returns a nullable
+map,not its lower IOReturn. Compatible maps may be reused;cache/protection comes
+from options,descriptor and memory reference. Retained refs and cleanup do not
+prove DMA/route/stop rights. No mapping adapter,receiver-only fix or new driver
+patch was made. One fresh data-only iOS17 pair binds339 inputs and rejects a
+wrong map-return-as-IOReturn type;code0/import0/noinitializer. Original node,
+parser/SMMU suites and all14 old patches remain untouched. No native lookup/map/
+provider/MMIO/phone or successful hardware peer ran;no new caller/image/codec.
+GPU execution,rendering,Metal and actual ownership remain incomplete.
+
+[Evidence](evidence/gpu-iokit-device-memory-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact GMU personality and parent/ranges source
+
+Exact catalog149 Info.plist is now Gitblob/SHA bound. Its GMU personality has
+only class,provider class and score;no local descriptor array. Standard matching
+copies personality props into driver init and does not generically clone provider
+resources. K80 formal component closure and fixed legacy archive list do not
+select Adreno. Main's optional archive branch explicitly installs no personality;
+this generic node is not an observed running K80 GPU startup path.
+
+Selected DT resolution reads parent counts and normalized host cell words;
+ARM64 ranges/CellsValue conventions differ from NativeBoard's explicit BE raw
+reader. Missing/empty/nonempty ranges have distinct translation behavior and
+failed entries may be omitted. No receiver-only repair or inferred descriptor
+identity was introduced. Current/main/staged script bytes remain separately
+identified. No new native component required a target build;old parser/ABI suites
+were not repeated. All14 patches remain UNAPPLIED. No native probe/property/map/
+callback/provider/phone call,new selected caller,image or codec. Actual GPU,
+rendering,Metal and hardware ownership remain incomplete.
+
+[Evidence](evidence/gpu-gmu-personality-ranges-2026-11-02.json).
+
+
+## 2026-11-02: catalog direct-entry and dynamic table provider
+
+Catalog149 replaces the old fixed table pool with real on-demand TablePages
+and changes prepare's typed inputs. Exact source deltas were bound;old proof
+SHAs/ABIs were not relabelled. Direct-entry still needs an actual powered,
+owned mapped context and has no bound K80 caller. Five legacy payloads/default
+sizes and explicit geometry remain unsuitable for K80 Gen7. Lower API folding,
+readback availability and ignored rollback status remain explicit gaps.
+
+The new provider's coherence fastpath originally returned0 before validating
+cookie/page/size/alignment/membership. A fifteenth isolated UNAPPLIED patch
+moves exactly the existing guard before both paths. It does not set coherence
+or grant domain/route/DMA rights or arbitrary pointer/concurrency safety.
+Five fresh current iOS17 independent pairs bind345 inputs;three source,two
+object and one old-pool-type refusal checks passed. Report144/TablePages72/
+SmmuContext656/GmuContext1848 are static layouts only. No old suite was rerun.
+All15 patches remain unselected;no native allocation/prepare/publication/map/
+provider/MMIO/phone or successful hardware peer,new caller,image or codec.
+Actual GPU/rendering/Metal and platform ownership remain incomplete.
+
+[Evidence](evidence/gpu-direct-entry-table-provider-2026-11-02.json).
+
+
+## 2026-11-02: on-demand table-page lifetime and actual SDK returns
+
+The exact factory's nonpageable IOBuffer path auto-prepares during successful
+construction. Under its required stable serial InOut lifecycle,the subsequent
+prepare has no observed or source-established nonzero return path;IOGeneral
+complete's returned nonzero path is Remote,which this factory does not request.
+Free balances residual auto-preparation and can panic on active DMA rather than
+return a useful cleanup error. Null construction folds internal errors;no raw
+status was invented. This is source reasoning,not a native SUCCESS observation.
+
+The release loop's potential stale prefix metadata remains a conditional source
+shape,not a demonstrated reachable failure of the selected stable factory.
+No redundant guard or sixteenth patch was added. NativePrepare allocates before
+kit shape validation;early failure can keep root/metadata without setting poison,
+so zero count/state does not prove retry or release eligibility. Exact kit primary
+files also bind the changed dynamic empty-table allocation boundary. Four new
+source mutation checks passed;no old suite or unnecessary native target ran.
+All15 patches remain UNAPPLIED. No allocator/provider/callback/VM/MMIO/phone,
+successful hardware peer,new caller,image or wire change. Actual hardware
+ownership,GPU execution,rendering and Metal remain incomplete.
+
+[Evidence](evidence/gpu-table-page-lifetime-contract-2026-11-02.json).
+
+
+## 2026-11-02: changed catalog VM Capacity and reference lifetime
+
+Exact149 uses dynamic tables and a distinct Capacity path absent from the frozen
+legacy VM. The kit may keep published/linked empty tables before allocation
+refusal,then returns before data-leaf stores. VM withdraws the new data Mapping
+and its device ref without poisoning that path;table objects remain owned.
+Capacity is not zero mutation or permission to free translation tables.
+
+Child/parent publication errors instead poison target/peer;VM keeps its record
+and device ref and quarantines retained objects. A zero output handle does not
+prove no exposure. Capacity clears metadata before checking retirement,but a
+retirement failure is not established for the stable serialized actual ref path;
+no speculative sixteenth repair was added. Imported BOs also use map;there is
+no separate mapImported method. Exact per-file deltas and four new source
+mutation refusals are archived. An initial checker ordering refusal/preimage is
+preserved;only its search scope was corrected. No production source changed.
+No new native component required a target;no old suite was repeated. All15
+patches remain UNAPPLIED. No native/callback/VM/provider/MMIO/phone call,
+successful hardware peer,new caller,image or codec. K80 ownership,stop/DMA,
+actual GPU execution,rendering and Metal remain incomplete.
+
+[Evidence](evidence/gpu-catalog-vm-capacity-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact imported descriptor and read-only fallback
+
+Continued directly from Capacity into the distinct actual import provider path.
+Each importRange tries Persistent then ordinary descriptor;prepare Mach
+protection failure2 can trigger a new Out importRange,for up to four constructor
+attempts. Used SDK value2 and explicit lower error conversions are bound;nullable
+factory does not expose a raw failure. Successful ordinary descriptor creation
+does not imply prepare,unlike the earlier nonpageable IOBuffer path.
+
+Named-entry rights select the persistent UPL path;ordinary fallback uses the
+task map. The lower entry/object/COW/task-lifetime contract remains to be closed.
+Read-only imports have Write removed before map. Failed Entry metadata clear
+preserves its real NativeMemory;reported release failure keeps it unreleasable
+without a successful handle. These are source ownership rules,not native
+observations or stop/DMA proof. Three new source mutations were refused;no
+driver patch/native target or old suite was added. All15 patches remain
+UNAPPLIED. No import selection,CPU policy expansion,native/phone invocation,
+successful hardware peer,new caller,image or codec. Actual K80 GPU execution,
+rendering,Metal and hardware ownership remain incomplete.
+
+[Evidence](evidence/gpu-catalog-import-descriptor-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected lower named-entry and UPL lifetime
+
+The exact lower source now distinguishes named-entry extracted-object refs,
+temporary UPL-call refs and VM-object activity/wiring. Entry send rights retain
+an extracted object/offset,not the original task/VA or later remaps. Required
+protection can fail during nullable construction;named-entry access mismatch is
+InvalidRight,while ordinary-map write pinning can return ProtectionFailure2 to
+prepare. These returned domains were not collapsed into a generic identity.
+
+Ordinary read-only executable fallback has a non-macOS kernel-copy branch,so
+successful import is not universally same-page zero-copy. Active-object
+termination can defer to an asynchronous reaper;it is neither synchronous release
+completion nor proof of an observed deadlock. Four new source mutations passed.
+No native component/target or redundant sixteenth patch was added. The next real
+import producer is catalog NativeAdrenoPublish,not the dormant generic Service
+table;its connection/task/close contract remains to be bound. All15 patches,
+old proofs and CPU policy remain frozen. No VM/UPL/allocator/provider/MMIO/phone,
+successful hardware peer,new selected caller,image or wire change. Actual K80
+GPU execution,rendering,Metal and hardware ownership remain incomplete.
+
+[Evidence](evidence/gpu-xnu-import-object-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: published import owner and returned-map reference
+
+The real catalog BoImport producer is now bound to current_task and g.lock;
+close/error/live/core and selected IOUserClient owner/IPC lifetime paths are
+separate from dormant generic Service. IOService close can report Success while
+discarding clientClose failure;failed teardown retains core/space. No cleanup or
+hardware stop proof follows from the public close result.
+
+A concrete returned-reference leak was found:removeMappingForDescriptor retains
+and returns a map,while original dropViews discarded it. Current iOS17 type
+annotation proves OSPtr is raw here,not an automatically released shared pointer.
+The sixteenth isolated UNAPPLIED patch balances that one returned reference only.
+Other map/port refs and unmap status remain unknown;the original forced_unmaps
+counter is not completion evidence. All other source/flow/layout remain intact.
+
+Three source,two actual object and one wrong-type refusals pass;three fresh
+current iOS17 independent pairs bind380 inputs. Published client remains280B,
+imports and existing metaclass initializer sizes match;no initializer executed.
+Source-review apply matches compiled candidate;live upstream is unchanged.
+No host successful mapping/reference peer,native iterator/map/release/import/
+provider/MMIO/phone,new selected caller,image or wire. All16 patches remain
+UNAPPLIED. Actual K80 GPU/rendering/Metal and hardware ownership remain incomplete.
+
+[Evidence](evidence/gpu-published-import-owner-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: iterator/map refs and CPU-unmap validation ordering
+
+The actual OSSet iterator uses4B inline state with initIterator always true;
+normal returned OOM was not established,so no speculative guard was added.
+Same-task client-set mappings and shared/other-task Mach-port mappings have
+different owners. One balanced returned reference or empty client set still
+does not prove all maps/PTEs retired;unmap can clear metadata despite error.
+
+A concrete catalog ordering defect was found:BoCpuUnmap used token/dropViews
+before core validated reserved/handle/token and schema. Independent seventeenth
+UNAPPLIED patch shares private exact metadata validation under the existing gate
+before view handling. The lease remains until the original post-view core
+dispatch decrement. All unrelated source is byte-identical;no new wire field,
+accessor or cleanup policy. The16th returned-reference patch is not combined.
+
+Iterator4/validation3 source and2 object refusals pass. An initial checker reset
+mutant acceptance/preimage is retained;only that fourth check was resumed.
+Two fresh current iOS17 pairs/379 inputs cover complete caller and exact CPU
+methods on the real class;one original caller object/380 inputs is explicit
+sealed reuse. Full original core compile was refused:task_get_gpu_role and two
+GPU-role constants are absent from selected source/headers. No stubs,foreign
+headers,guessed policy or relaxed flags were used. Full module/AppleABI remains
+unqualified;failure logs are preserved. All17 patches remain UNAPPLIED.
+No native/getter/iterator/map/unmap/preflight/provider/MMIO/phone or successful
+hardware peer,new selected caller,image or codec. Actual K80 GPU/rendering/Metal,
+ownership,route/stop/DMA and readablefailure remain incomplete.
+
+[Evidence](evidence/gpu-iokit-iterator-map-refs-2026-11-02.json).
+
+
+## 2026-11-02: catalog GPU-role source gap and actual kernel time
+
+Fixedmain627 catalog149/source/SDK provenance now bounds the full-core failure.
+The exact selected XNU revision and exported headers have no bound role API;
+no matching main patch was found. Catalog OS metadata and generic Service-only
+recipe are not a full direct-core compile proof. Local Adreno history is shallow:
+149 contains the references,but true introduction history is not established.
+No stub,borrowed OS header,guessed role policy or unchanged failed build retry.
+
+Continued with the independent actual kernel time provider. Native functions
+are byte-identical to legacy,so no old host/target suite ran. New selected SDK
+source shows IODelay may spin or thread_block;its void return and callback int0
+do not provide cancellation,raw native status or a wall-time upper bound. Plain
+delay arithmetic is distinct from a separate checked-deadline helper. Three new
+timing source mutations were refused. No new driver patch/native component or
+target. All17 patches and old profiles/proofs remain frozen. No clock read/wait,
+scheduler/provider/MMIO/phone or successful hardware peer,new selected caller,
+image or codec. Full core/AppleABI,actual K80 GPU/rendering/Metal and hardware
+ownership remain incomplete.
+
+[Evidence](evidence/gpu-catalog-role-time-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact GMU timing callback consumer boundary
+
+Bound exact a9f45dc6 GMU polling and forwarding consumers to the frozen actual
+KernelTime contract. Returned clock failure shortcircuits output use;backwards
+time is refused before elapsed subtraction. Loop count and sampled elapsed
+time are bounded,but callback/read/barrier may block and the poll has no
+post-read deadline check. Its ClockError folds now/wait failure and backwards
+time;the forwarding wrappers preserve callback int until upper status folding.
+Neither domain is raw IOKit status or hardware retirement evidence.
+
+Four new source mutations were refused without executing clocks,callbacks or a
+success peer. Exact firmware startup source is byte-identical;old startup/HFI
+suites and targets were not repeated. No concrete new defect justified a patch.
+All17 repairs remain independent UNAPPLIED,old profiles/default42 unchanged.
+No native/device execution,new component/caller/image or codec. Full-core role
+API mismatch,K80 ownership/route/stop/DMA and first GPU/rendering/Metal remain
+incomplete. Next is selected fixed Gen7 boot polling source,with any unknown
+lower Linux poll implementation retained as an input gap.
+
+[Evidence](evidence/gpu-gmu-time-consumer-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected Gen7 boot polling and regmap return boundary
+
+Returned to fixed453d8875 selected hwsched GMU boot source. Two missing exact
+regmap primary files were fetched with URL/fullSHA. The wrapper prioritizes
+reader error;NULLregion returns ENODEV without output. Upper firmware/HFI
+ready helpers fold every nonzero poll result to ETIMEDOUT and take a fault
+snapshot that can send NMI. These are hardware operations,not inert diagnostics.
+The actual selected Linux read_poll_timeout implementation is still unbound:
+no full timing schedule,hard walltime or cancellation guarantee is claimed.
+
+Four new source mutations were refused. No driver code,MMIO,snapshot/NMI,time
+callback or successful hardware peer ran. No new driver patch/component/target;
+all17 repairs stay independent UNAPPLIED. Existing startup/HFI/stop and CPU
+suites were not repeated. Reference readiness/reset is not K80 execution,
+resource ownership or stop/DMA proof. Full-core role API gap remains open.
+Next only actual Gen7 region registration/optional failure/preaccess lifetime.
+
+[Evidence](evidence/gpu-gen7-boot-poll-contract-2026-11-02.json).
+
+
+## 2026-11-02: Gen7 region registration and warning-only preaccess
+
+Selected hwsched uses common GMU component registration after master GPU
+regmap initialization. Master GPU carries preaccess;GMU/AO/CX_DBGC add NULLops.
+Exact two power-control primary files close the producer:preaccess only WARNs
+about mutex and conditionally clock/AXI flags,it neither locks nor powers on;
+GMU mode bypasses the latter check. It is not a typed ownership/power gate.
+
+AO registration status is ignored,while missing optional resource may be
+intentional. Historical cached named descriptions include AO and four disjoint
+registered ranges;no count overflow is shown in that chain. Actual selected
+Linux mapping-failure/devres semantics are unbound,so no speculative guard or
+new patch was added. Descriptor names/ordering are not live mapping authority.
+
+Four new source mutations refused. Initial checker accepted the fourth due to
+a substring match;preimage/log/first3 checkpoints retained,only missing fourth
+resumed after tightening exact assignment count. Production sources unchanged.
+No target,driver/provider/MMIO/phone execution or successful peer. All17 old
+repairs/profiles/default42 preserved. Next only component-unbind/probe-error
+region metadata versus managed-map lifetime;stop/DMA/GPU proof remains absent.
+
+[Evidence](evidence/gpu-gen7-region-registration-2026-11-02.json).
+
+
+## 2026-11-02: Gen7 component map lifetime and external core boundary
+
+Bound master probe-error/unbind and selected GMU/HFI remove paths. Module
+cleanup has no explicit shared-regmap retirement,but selected hwsched probe
+requests a fresh device object;uncleared metadata alone does not prove a later
+bind reuses the old object or overflows its slots. Selected9_0 has no legacy
+base.remove hook. Master common probe error clears pdev and outer unbind skips
+that path. Workerstop and void remove are not hardware stop/DMA certificates.
+
+Four exact module build metadata files7930B now bound withURL/fullSHA:
+Makefile uses external KERNEL_SRC,Android uses external DLKM,and Bazel uses
+//msm-kernel target_variant. No actual external core commit/config is bound.
+No unrelated kernel was fetched,selected or used to fill component/devres gaps.
+Four new source mutations refused;no speculative cleanup/reset/countclear patch
+or new target. All17 repairs remain independent UNAPPLIED. No native/component,
+thread,IRQ,map/MMIO/phone or successful peer executed,new caller/image/wire.
+Next only selected HFI IRQ/worker producer lifecycle,not packet/status suites.
+Full-core roleAPI,K80 ownership/route/stop/DMA/GPU/rendering/Metal remain open.
+
+[Evidence](evidence/gpu-gen7-component-map-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: selected HFI worker error-pointer removal guard
+
+Bound exact IRQ producer/managed owner and worker creation:probe requests IRQ
+with borrowed adreno_dev cookie;worker starts later in HFI init. Its failed
+kthread_run result is retained as an error pointer and returned. Original
+remove only tested nonnull before kthread_stop,so a retained encoded failure
+passed that test. This is a conditional source defect,not a K80 failure report.
+
+Independent18th worker-error-pointer.UNAPPLIED.patch changes only the remove
+condition to !IS_ERR_OR_NULL. Valid-task stop and original failure remain;no
+clear/reset/retry/refrelease or new cleanup policy. Three new source mutations
+refused and an independent original review check/apply matches candidate.
+Complete Linux driver was not built;no unrelated native target was compiled.
+No task,thread,IRQ,callback,provider/MMIO/phone or successful peer executed.
+All17 parent repairs/profiles/default42 remain frozen,not auto-composed.
+
+Repeated stop/task refs,core IRQ/devres timing and buffer lifetime stay open;
+worker stop is not hardware/DMA retirement. Next only actual trace/HFI buffer
+producer and release order,without old packet/allocator suite reruns. Full-core
+roleAPI,K80 ownership/context/route/stop/DMA/GPU/rendering/Metal remain absent.
+
+[Evidence](evidence/gpu-gen7-hfi-worker-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: worker private-buffer lifetime and source provenance correction
+
+Trace and HFI initialization precede worker creation in the selected source.
+New exact sharedmem primary shows private allocate_kernel entries are in the
+GMU descriptor array,not the separate device->globals wrapper list. Therefore
+master globals removal alone does not free these private buffers. Child HFI
+remove calls stop before GMUarray cleanup,but actual stop/IRQ/DMA lifetime is
+still unbound. No redundant NULLguard or nineteenth patch was added.
+
+Source provenance correction:some prior stages read retained stop candidates,
+not whole-file primary. Original source SHAs/capsules remain untouched. Twenty-
+one used function bodies compare byte-identical with exact primary;new source
+erratum/diffs bound this label correction without rerunning old suites.
+Four new buffer-publication/collection source mutations refused. No allocator,
+thread,shared-memory read,provider/MMIO/phone or successful peer executed.
+No new component/target/caller/image/wire;all18 repairs/profiles/default42 frozen.
+Next only timer/deferred-work producer and teardown lifetime,not fence protocol.
+Full-core roleAPI,K80 ownership/route/stop/DMA/GPU/rendering/Metal remain open.
+
+[Evidence](evidence/gpu-gen7-worker-buffer-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: deferred timer work domains and teardown boundary
+
+The selected fence timer schedules hw_fence_ws on global KGSL workqueue.
+Dispatcher close destroys a different kthread worker,HFIremove stops f2h,and
+suspend flushes events/lockless queues. Timeout work accesses message queues
+before testing fault flags,so cleared flags are not proof it avoids buffers.
+Module-exit global queue destruction occurs after device-driver unregister;
+it is not evidence of an earlier per-device drain.
+
+Actual pending work,external fence enablement,caller exclusion/rearm ownership
+and selected core cancellation/release semantics remain unbound. No UAF or
+new safe cancellation policy was inferred;no nineteenth patch was added.
+Three new source mutations refused without timer/thread/workqueue/provider or
+phone execution. No new target/component/caller/image/wire or successful peer.
+All18 repairs and parent proofs/default42 remain frozen. Next only deferred
+context get/copy/clear/put lifetime,not packet or fence retirement protocol.
+K80 ownership/route/stop/DMA/GPU/rendering/Metal remain incomplete.
+
+[Evidence](evidence/gpu-gen7-deferred-work-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: deferred diagnostic context reference repair
+
+Actual get/put live in retained kgsl_device.h/kgsl.c;two guessed separate
+context-file locators404 were preserved,not retried. Exact directory-listed
+adreno_drawctxt.c closes the module destroy callback through kfree. Producer
+gets one setup ref;two release paths originally put it before shared-pointer
+clear. Timeout copied that pointer without an independent diagnostic ref.
+This is conditional source lifetime exposure,not a reported K80 UAF.
+
+Independent19th deferred-diagnostic-reference.UNAPPLIED.patch withdraws the
+shared pointer/ts under existing lock before those puts,and acquires a temporary
+diagnostic ref under that lock only for faulttrue/nonNULL,paired after reads.
+Original processing/errors/activecount/flags/wakeup/fault order remains;no new
+public fields,wire or generic ownership model. Four new source mutations
+refused;independent original review check/apply and inverse bytes match. One
+mutation label was corrected to its actual missing-get operation,original
+artifact retained without repeat. Complete Linux driver was not compiled.
+
+Queued defer-worker copies and core refcount/queue/IRQ/devres behavior remain
+separate unclosed inputs. This does not prove arbitrary concurrency,teardown
+or hardware stop/DMA. No refcount/thread/provider/MMIO/phone/successpeer or
+new target/caller/image executed. All19 repairs remain separate UNAPPLIED.
+Next only ACK enqueue/worker-copy serialization,not packet or stop suites.
+K80 ownership/route/stop/DMA/GPU/rendering/Metal remain incomplete.
+
+[Evidence](evidence/gpu-gen7-deferred-context-refs-2026-11-02.json).
+
+
+## 2026-11-02: queued worker reloaded-NULL context guard
+
+ACK enqueue checks pointer presence under fence lock,but passes no retained
+context snapshot to work and discards queue return. Worker later reloads the
+shared pointer and originally dereferences before higher mutexes. Reset HFI
+stop can drain ACKs into this enqueue path;later reset processing can clear
+the shared pointer. An enqueue-time presence check cannot protect a later
+NULL reload. This is a conditional source path,not an observed K80 crash.
+
+Independent20th queued-context-null.UNAPPLIED.patch only returns on reloaded
+NULL after spin_unlock and before first dereference. No lock/ref/generation,
+queue return,retry,cancel,fault or hardware policy added. All nonnull flow and
+other source inverse bytes match. Three new source mutations refused and
+independent original review check/apply matches. Complete Linux not compiled;
+no new native target or ref/queue/thread/provider/MMIO/phone/successpeer.
+
+Nonnull lifetime/replacement and actual core queue semantics stay unresolved;
+19th diagnostic and18th taskerror guards remain separate UNAPPLIED. All20
+repairs/profiles/default42 preserved. Next only dispatcher software halt
+admission and setup replacement;software halt is not hardware/DMA retirement.
+Fullcore roleAPI,K80 ownership/route/stop/DMA/GPU/rendering/Metal remain open.
+
+[Evidence](evidence/gpu-gen7-queued-context-guard-2026-11-02.json).
+
+
+## 2026-11-02: software halt admission and replay exceptions
+
+Exact adreno halt helpers only manipulate an atomic software counter;they do
+not stop hardware. Normal sendcmd checks halt/fault before inflight/submit,
+after metadata allocation. Replay directly calls submit and ignores its int
+return without that gate;recurring submission has a separate entry check.
+Therefore normal halt cannot prove admission/exclusion for every caller.
+
+Setup gets a contextref and overwrites deferred pointer/ts without an existing-
+owner check;its activecount API result is ignored. Counter/contextref/active
+power count are different domains. Replacement/failure reachability and policy
+remain inputs;no universal single-owner claim or21st repair was invented.
+Four new source mutations refused,no software gate/submit/refcount/provider or
+phone execution/successpeer,new target/caller/image/wire. Header exact-primary
+SHA verified;old suites unchanged. All20 repairs/profiles/default42 preserved.
+Next only replay returned-API status/ownership contract before considering
+private error retention,without changing recovery admission or release policy.
+K80 ownership/route/stop/DMA/GPU/rendering/Metal remain incomplete.
+
+[Evidence](evidence/gpu-gen7-software-halt-admission-2026-11-02.json).
+
+
+## 2026-11-02: private replay callback error retention
+
+Exact internal header9183B binds both replay callback declarations to C int.
+Original replay discards their returns. Independent21st replay-callback-errors
+UNAPPLIED patch retains only the first nonzero returned int/softwareoperation/
+availability in private owner fields. It preserves every original continuation,
+notifier,counter and release decision;it neither gates replay nor retries or
+quarantines objects. Callback int is not raw IOKit/EFI/hardware status;0 or
+availability0 does not prove accepted work/noattempt/retirement.
+
+Four new source mutations refused;independent two-file review check/apply and
+inverse bytes match. Existing owner initialization zeros fields,but arbitrary
+concurrent snapshots/reinit epochs are not qualified. Internal layout changes
+require future whole module/owner rebuild. Full Linux driver was not compiled;
+no surrogate XNU data target/native build or callback/provider/MMIO/phone ran.
+All21 repairs are separate UNAPPLIED,no new caller/image/wire or success peer.
+Next only static callback buffer/active storage versus actual pdev/owner lifetime.
+K80 ownership/route/stop/DMA/GPU/rendering/Metal remain incomplete.
+
+[Evidence](evidence/gpu-gen7-replay-error-retention-2026-11-02.json).
+
+
+## 2026-11-02: owner-bound callback scratch pointer and recurring state
+
+Submit's function-static scratch pointer was allocated against the first
+caller's pdev;recurring function-static bool controlled owner-specific vote
+logic. Independent22nd owner-callback-storage.UNAPPLIED.patch moves these to
+existing initialized hwsched fields. Lazy same-pdev/same-size allocation and
+nonnull publication remain;all recurring branches/errors/count calls only
+substitute the storage location. No free/reset/retry/locking policy added.
+
+Four new source mutations refused;independent original twofile review check/
+apply and inverse bytes match. No new native target/fullLinux build or actual
+callback/allocator/provider/MMIO/phone/successpeer. Internal layout changes
+require future wholeowner rebuild. Owner metadata is not a pdev ref/devres
+lifetime extension or proof of same-owner concurrency/reinit/stop/DMA safety.
+Original recurring vote/error balance remains a separate next contract.
+All22 repairs remain independent UNAPPLIED,without21st fields auto-composed.
+Old profiles/default42/upstream/CPUstorage/claims remain unchanged;no new
+selected caller/image/wire. K80 ownership/route/stop/DMA/GPU/Metal remain open.
+
+[Evidence](evidence/gpu-gen7-owner-callback-storage-2026-11-02.json).
+
+
+## 2026-11-02: recurring acquisition-scoped error rollback
+
+Exact selected get returns int and increments active count only on0;put is
+void and can return without decrement. START may acquire a new count,STOP
+may use existing state. Original context/send errors unconditionally put and
+clear active while the recurring object remains tracked,allowing later error
+paths with no new acquisition to reach another put. No K80 failure is claimed.
+
+Independent23rd recurring-acquired-here.UNAPPLIED.patch marks only a successful
+get in this call and scopes the two error rollback blocks to that mark. It
+retains preexisting source state,without changing primary errors/kfree/STOP
+success/retirement or other flow. Four new source mutations refused;original
+review check/apply and inverse match. Initial substring scope assertion refused
+before candidate creation;full error-block matching preserved STOPsuccess.
+
+Staticactive cross-owner gap still belongs to separate22nd patch. Newlyacquired
+vote cleanup after possible publication and voidput outcome remain unknown;
+this is not a power/stop/DMA lease. Complete Linux uncompiled,no new target/
+layout/publicfields or activecount/ref/callback/provider/MMIO/phone/successpeer.
+All23 repairs remain separate UNAPPLIED. Next only recurring drawobject refs
+and STOPretire ownership,not old packet/counter or native Submit suites.
+K80 ownership/route/stop/DMA/GPU/rendering/Metal remain incomplete.
+
+[Evidence](evidence/gpu-gen7-recurring-acquisition-rollback-2026-11-02.json).
+
+
+## 2026-11-02: recurring drawobject ownership and selected feature boundary
+
+Two exact directory-listed drawobj primary files (52971B) were fetched at
+453d8875 with Gitblob/fullSHA verification. Constructor takes a context ref;
+START success hands the existing object to recurring tracking without an
+extra get. STOP ioctl constructs a separate temporary object:successful
+callback retires the tracked one,then ioctl destroys its temporary one.
+Ordinary errors preserve tracked STOP object and destroy temporary/input
+under original non-EPROTO rule. Published-error buffer ownership stays unknown.
+
+Destroy cleans command metadata before ref put;extra refs do not preserve
+those list contents. List nodes copy descriptors without a backing-entry get.
+Recurring profiling flag is cleared before memlist creation,so generic retire
+profile early-return is not shown reachable here. No speculative cleanup fix.
+
+Selection boundary:exact gen7_9_1 features omit ADRENO_LSR. Public recurring
+wrappers return EOPNOTSUPP before callback;LSR initialization is also gated.
+Callback presence alone does not establish reachability. Prior21/22/23
+recurring candidates remain conditional UNAPPLIED with historical SHA intact,
+not selected K80 execution evidence. No24th patch or feature enable added.
+
+Four new source mutations refused;initial checker wholefile scope ambiguity
+was refused before first test and localized,preimage/log preserved. No Linux/
+native target or API/refcount/object/provider/MMIO/phone/successpeer execution.
+All23 patches/8profiles/CPUstorage/default42/parentarchives preserved. Next
+only selected normal POWER/inflight acquisition accounting,not dormant LSR.
+
+[Evidence](evidence/gpu-gen7-recurring-drawobj-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: normal dispatcher POWER/inflight accounting
+
+Actual worker holds hwsched mutex and retires before issuing more;it only
+power_downs after issue if final inflight is zero. Retiring the last object
+can leave POWER set while inflight becomes zero. The next first command can
+reuse this dispatcher-held count without a new get. Therefore the separate
+recurring acquired-here patch must not be mechanically applied to normal.
+
+Get failure rolls back increment without put/setPOWER. Callback error at
+inflight1 puts and clears POWER,so later power_down skips duplicate put;
+error with other inflight commands keeps their POWER. These are exact source
+conventions,not successful native count/lease or no-publication guarantees.
+Void put can return without decrement;unknown raw outcome stays unknown.
+
+Idle_check checks device active_cnt/time/submit_now under device mutex and
+does not own dispatcher inflight/POWER. Reset/replay metadata and previously
+bound stop/voidsuspend gaps remain unchanged. No24th patch or new policy.
+
+Four new source mutations refused,no counter timeline/success peer/API/
+native target/phone execution or old suite rerun. All23 patches/8profiles/
+3111+39/CPUstorage/default42/parentarchives preserved. Next only normal batch
+partial ownership and actual ioctl cleanup/types before considering repair.
+
+[Evidence](evidence/gpu-gen7-normal-power-accounting-2026-11-02.json).
+
+
+## 2026-11-02: public batch ownership and timestamp source contract
+
+Actual normal producers create optional SYNC then one CMD/MARKER;legacy
+queues one CMD. Aux creates optional SYNC then timestamp-SYNC/BIND or
+TIMELINE/trailing MARKER. There is at most one timestamp allocator. Global
+user timestamp validation precedes enqueue;prefix SYNC/TIMELINE do not
+change context timestamp. Generic multi-element error sites therefore do
+not prove public partial-transfer UAF. No speculative rollback/24th patch.
+
+Inline marker retirement requires empty queued count,excluded by queued
+prefixes;actual marker has no following element. Constructor type remains
+pure CMD or MARKER. Queue0 can mean enqueue or inline retire,not hardware
+acceptance. Caller cleanup keeps original EPROTO exception;context/job refs
+and core kref lifetime do not establish buffer pinning or DMA retirement.
+
+Four new source mutations refused,no batch/timestamp success model or
+queue/refcount/native target/provider/MMIO/phone API execution. No old suite
+repeated. All23 patches/8profiles/3111+39/CPUstorage/default42/archives frozen.
+Next only actual normal pre-enqueue reclaim-to-pinned source/flags/refs,
+separate from old native imported descriptors or CPU allocation policy.
+
+[Evidence](evidence/gpu-gen7-batch-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: reclaim-to-pinned publication and partial lifetime
+
+Exact reclaim.c/h (13883B) were acquired from fixed453d8875 directory entries
+and Gitblob/fullSHA checked. Actual Linux configuration remains unbound.
+Disabled preflight returns0 without work;enabled PINNEDset also skips the
+walk. Neither0 means fresh per-buffer residency/map/GPU completion proof.
+
+Enabled restore holds reclaim_lock,gets eligible entries under mem_lock,
+puts after restore and preserves returned error. Whole walk sets PINNED only
+at completion. Partial restored slots and counter decrements survive later
+page/map error;RECLAIMED clears only after map0. Background reclaim shares
+reclaim_lock and checks CMD count/foreground;these are software gates.
+
+Process/entry/worker refs and pending-free source paths are bound,with core
+kref/queue semantics still missing. CPUfault can decrement one restored
+page while RECLAIMED stays;detach subtracts full page_count under that flag.
+This is a conditional accounting boundary needing exact free/map reachability,
+not a demonstrated K80 negative count or permission for cleanup. No24th patch.
+
+Four new source mutations refused;no pin/map/refcount/counter success model,
+native target/wholeLinux build/API/MMIO/phone execution or old suite rerun.
+All23 patches/8profiles/3111+39/CPUstorage/default42/archives preserved.
+Next only partial-restore versus final-detach accounting and actual callers.
+
+[Evidence](evidence/gpu-gen7-reclaim-pinned-contract-2026-11-02.json).
+
+
+## 2026-11-02: remaining unpinned slots at final detach
+
+Exact public free/VMA source closes a conditional path independent of backend
+map failure:CPUfault fills slots/decrements count while RECLAIMED stays;free
+drops user refs and VMAclose later puts its entry. Final detach originally
+debits full page_count again. No actual K80 negative count is claimed.
+
+Independent24th remaining-unpinned-accounting.UNAPPLIED.patch counts only
+still-NULL slots before the original processput. It changes one accounting
+block;inverse all other bytes match. No page writes/flag/reset/clamp/locks/
+free/map/retry/return/public layout or wire policy changes. Original final
+owner/valid-array contract required,not arbitrary alias/concurrency proof.
+
+Three exact primary files (23279B) bind sharedmem header and Kconfig/Kbuild:
+PROCESS_RECLAIM selects SHMEM and conditionally builds reclaim. Actual
+generated config/core still unknown. Source erratum:kgsl_mmu_map is declared
+in header,defined in accurate C source;old capsule/plan bytes preserved.
+
+Four new source mutations refused;independent original check/apply matches
+candidate. Full Linux uncompiled,no fake native target/page/map/refcount/
+counter success model or native/phone calls. All24 repairs remain separate
+UNAPPLIED;8profiles/3111+39/CPUstorage/default42/parentarchives unchanged.
+Historical counter damage/shrinker arithmetic and voidfree retaining backing
+are unresolved. Next only actual SHMEM release ownership after detach.
+
+[Evidence](evidence/gpu-gen7-reclaim-detach-accounting-2026-11-02.json).
+
+
+## 2026-11-02: SHMEM release cookie and descriptor owner boundary
+
+Exact SHMEM file setup stores borrowed memdesc in inode android_vendor_data1.
+Core init registers restricted hook;callback reads cookie/uses its page list
+without an explicit descriptor get. Core hook exclusion/unload/config remains
+unbound;source names alone do not establish a callback-after-free event.
+
+Normal helper puts nonNULL pages,clears cookie,then fputs file. But voidfree
+can return early with MAPPED still set,retaining pages/file;entry destroy
+still unconditionally kfrees its embedded descriptor owner. Retained backing
+is not a persistent quarantine owner or stop/DMA proof. No guessed free,
+retry,ref resurrection/cancel/leak policy or25th patch was added.
+
+Four new source mutations refused;no file/page/tracehook/native/allocator/
+map/refcount/MMIO/phone APIs or success models executed. No new target/fetch
+or old suite repeated. All24 patches/8profiles/3111+39/default42/CPUstorage/
+archives preserved.24th accounting patch does not fix this lifetime gap.
+
+Missing exact core hook contract is recorded. Next independent platform
+source is actual catalog149 Memory release/releaseSystemInto/default dtor
+and Entry ownership,per-function delta before reusing any old native proof.
+
+[Evidence](evidence/gpu-gen7-shmem-release-ownership-2026-11-02.json).
+
+
+## 2026-11-02: catalog149 system release output and Entry owner
+
+Frozen catalogCPU/nativeSubmit/import-owner sources were read and SHA matched
+before10 per-function comparisons. Two hold/retire methods are byte-identical
+and get provenance only. New releaseSystemInto/discardSystem are absent from
+legacy;ordinary release now has system/owned branches. No old native patch
+or object/layout qualification is mechanically transferred.
+
+Eligible releaseSystemInto moves existing descriptor ownership into output,
+withdraws source fields,then releases metadata. Published BoFree owns zeroed
+stack output,binds/unbinds collector under g.lock,discards after unlock. Entry
+clear is after release0;errors retain Entry. Default destructor does no RAII
+release. No API0/software refs imply actual GPU/DMA quiescence.
+
+DiscardSystem drops complete return and clears output,but reachable failure
+for its actual system factory remains to bind. Frozen nonpageable TablePages
+proof is not substituted for new pageable/tasknullptr alternatives. No25th
+patch,cleanup/refcount/retry policy or CPU import expansion was invented.
+
+Four new handoff source mutations refused,no native APIs/models/targets or
+unchanged fullcore roleAPI retry.24 independent patches/8profiles/3111+39/
+CPUstorage/default42/parentarchives preserved. Next only actual system factory
+versus selected SDK kind/options/complete reachability,unchanged SDK as provenance.
+
+[Evidence](evidence/gpu-catalog-release-owner-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: system factory versus selected iOS17 SDK
+
+Five selected SDK files match frozen TablePages SHA;three SDK methods get
+provenance only. Actual pageable/nulltask constructor becomes kernel_task
+Virtual64/BufferPageable/Persistent without AutoPrepare or Remote. Explicit
+prepare may be first wiring and returned error is folded into nullable result,
+then Native NoMemory;raw cause is unavailable,not observed memory pressure.
+
+New compatibility boundary:optional contiguous call clears Pageable while
+passing nullptr task. Selected initialized-XNU IOBuffer rejects this before
+nonpageable allocation. Historical contig comments/counters are not this SDK's
+capability/OOM proof. No silent kernel_task/mapping-policy substitution.
+
+Actual stable factory does not select complete's returned Remote error;panic,
+nonreturn and lower cleanup status remain unknown. No redundant25th guard
+or cleanup/retention policy added. Four new catalog factory source mutations
+refused;SDK provenance/no old suites or native targets/APIs/models/phone.
+
+All24 patches/8profiles/3111+39/default42/CPUstorage/archives frozen. Next only
+actual factory function-static metadata versus published allocation outside
+g.lock and exact call gates;no assumed serialization or allocator policy change.
+
+[Evidence](evidence/gpu-catalog-system-factory-contract-2026-11-02.json).
+
+
+## 2026-11-02: factory initialization publication candidate
+
+Actual BoAlloc prepares outside g.lock. Selected IOUserClient IPC locks are
+per client;separate connections and core fallback are not globally serialized.
+Original bootarg/time helpers write shared initialization storage directly.
+The independent25th UNAPPLIED candidate computes into typed locals and uses
+32/64-bit release CAS plus acquire reload of the published winner. No lock,
+generation,bootarg,duration,allocation,cleanup or retry policy was added.
+
+FailedBytes/failedAt remain unchanged and unqualified;this is a partial
+initialization repair,not whole factory concurrency safety. Optional contiguous
+nil-task rejection by selected iOS17 remains;no kernel_task substitution.
+
+Four new source/two actual object mutations refused;original review check/apply
+and inverse match. One fresh current iOS17 Memory object pair has equal raw SHA
+and328 recursive inputs;imports equal sealed parent,no new atomic helper or
+initializer. Memory header unchanged;no wholecore/AppleABI/new kernel proof.
+No native APIs or successful concurrent allocator/backoff model executed.
+
+Old24 patches/8profiles/3111+39/default42/CPUstorage/archives preserved;new25th
+remains separate UNAPPLIED. Next only paired failed-size/timestamp metadata.
+
+[Evidence](evidence/gpu-catalog-factory-init-publication-2026-11-02.json).
+
+
+## 2026-11-02: paired failure backoff source boundary
+
+Actual factory stores the minimum failed size but updates one timestamp on
+every failure. Expiry clears size alone;the timestamp need not belong to
+the size-setting attempt. Source time is captured before allocation. Outside-lock
+preparation and per-client IPC gates do not make this pair transactional;the
+25th initialization candidate leaves it byte-identical and unqualified.
+
+Selected iOS17 rejects optional nil-task contiguous creation,but that failure
+can itself update metadata when a nonzero hint selects the attempt. Neither
+the hint nor an active K80 caller is attested. No successful allocation is
+needed for this conditional source writer;none was modeled or executed.
+
+No26th patch:independent field atomics do not specify coherent ownership,
+and no lock/generation/reset/backoff/retry policy was invented. New exact
+factory-body SHA/paired-writer binding only,no target or completed-suite rerun.
+All25 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage preserved.
+Next only actual published preallocation offer validation/transfer versus
+frozen per-function owner evidence;all native/device paths remain OFF.
+
+[Evidence](evidence/gpu-catalog-failure-backoff-contract-2026-11-02.json).
+
+
+## 2026-11-02: preallocation offer validation candidate
+
+Original published BoAlloc prepares before core checks alignment12..24 and
+reply schema. Invalid alignment can reach preparation via ordinary table;
+existing tunnel can also supply wrong reply shape. Independent26th UNAPPLIED
+candidate adds only those existing checks before optional preparation. Original
+locked dispatch returns,offer withdrawal and discard remain unchanged;no new
+return,field,header,cleanup/retry or allocation policy.
+
+Actual stack pages output retains unconsumed descriptor;eligible allocateSystem
+transfers it and zeros output. Close between outside-lock preparation and dispatch
+can yield NotReady then original discard. WC mismatch can select fallback instead
+of adoption. Transfer/flags/API0 do not prove successful allocation,DMAstop or
+all cleanup;first preparation status is ignored and fallback remains to bind.
+
+Nine frozen functions get provenance only. Three new source mutations refused;
+review check/apply/inverse exact. One fresh candidate complete Publish iOS17
+independent rawSHA pair/378inputs;original378inputs/object explicitly sealed,
+not recompiled. Actual object schema/alignment guards precede prepare;imports
+match,AGX class280 unchanged. Metaclass not executed;no wholecore/AppleABI proof.
+
+Old25 patches/8profiles/3111+39/default42/CPUstorage/archives preserved;new26th
+independent UNAPPLIED. No native APIs,success descriptor model or phone operation.
+Next only prepared-output failure/fallback and actual error ownership domains.
+
+[Evidence](evidence/gpu-catalog-preallocation-offer-2026-11-02.json).
+
+
+## 2026-11-02: preallocation failure and fallback owner edges
+
+First prepare status is discarded;nullable factory folds lower errors. Empty
+offer may reach a second factory only after validation,free Entry and CPUcheck.
+A nonmatching nonempty offer retains its own descriptor while fallback owns
+another. Matching adoption zeros stack output before later segment/cache checks:
+taken means transfer,not successful allocation or hardware acceptance.
+
+Post-transfer failure preserves primary error but discards first release status;
+Entry repeats release and can retain used/unreleasable state. Stable selected
+pageable/noRemote factory still does not establish returned complete failure.
+Panic,nonreturn and deeper raw cleanup remain unknown. No27th guard,diagnostic,
+retry/reset/forcefree/ref resurrection or quarantine policy was invented.
+
+Nine frozen functions receive SHA provenance only;six new source ownership/error
+edges recorded. No native APIs,success descriptor/handle model,new target or old
+suite rerun. All26 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage
+and parent archives preserved. Next only actual Entry/handle-index reserve and
+publish failure reachability;all native/device paths remain OFF.
+
+[Evidence](evidence/gpu-catalog-preparation-fallback-contract-2026-11-02.json).
+
+
+## 2026-11-02: Entry handle-index publication source contract
+
+Exact catalog header Gitblob/fullSHA matches exported primary. Actual index
+uses key0/linear probing/backshift deletion,without tombstones/dead count.
+Entry free reserves live+1;indexed count<=live,including unindexed retained
+failures. Chunk64/32-bit token limit bounds multiplication on selected arm64.
+For intact serial nonzero fresh key,the reserved half-load prevents ordinary
+insert allocation failure. Ignored bool alone does not justify27th guard.
+
+Five unchanged Entry functions get provenance only;no target,suite or successful
+handle model. Unsigned next_handle wrap has no explicit zero/exhaustion policy:
+this remains a source boundary,not an observedK80 failure or a simulated history.
+No key generation/reset/rollback/free policy was invented. Existing published
+lock regions do not qualify arbitrary standalone callers or hardware ownership.
+
+All26 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/archives
+preserved. Next only actual NativeAdrenoVm mapping-index second consumer;
+Entry count bound is not mechanically transferred to it. No native APIs/phone.
+
+[Evidence](evidence/gpu-catalog-handle-publication-contract-2026-11-02.json).
+
+
+## 2026-11-02: VM handle-index second consumer
+
+Nine VM bodies/fileSHA equal frozen catalog Capacity source,provenance only.
+Actual map reserves objects+1 before device ref/record,not before earlier
+scratch/observe operations. Index count<=objects,including retained unindexed
+failures;half-load reserve excludes normal nonzero-key insert allocation failure.
+VM array byte-overflow guard gives its own arithmetic bound,not Entry's token bound.
+
+VM rejects UINT64_MAX before map publication,unlike Entry's unguarded wrap.
+Its order/index values are32-bit while array capacity is size_t;no explicit
+slot ceiling appears. Huge-capacity allocation reachability remains unbound;
+8GiB/comments do not certify it. No simulated mappings,27th cap or key policy.
+Index values are slots,so CPU array relocation alone does not rebind them.
+Unmap erases index/record only on final original path;earlier retained metadata
+and API0 do not prove safe descriptor/DMA retirement.
+
+All26 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/archives
+preserved,no target/old suite/native API/phone. Next only actual VM scratch
+borrowing and visibility bind-failure ownership,not map geometry or old suites.
+
+[Evidence](evidence/gpu-catalog-vm-index-contract-2026-11-02.json).
+
+
+## 2026-11-02: VM scratch borrower and bind-failure reachability
+
+VM owns CPU scratch arrays;external arenas borrow their pointer/capacity.
+Initial allocation failure precedes new arena stores;growScratch allocates both
+new arrays before freeing/replacing old ones. Exclusive serialized use remains
+required,no caller or hardware lease proved.
+
+Stable validBinding requires successful exact TablePages root lookup,which
+implies nonzero page count. Along with other prechecks and nonnull private
+visibility output,this satisfies actual BindSmmuVisibility returned-error guards.
+A later bind-error cleanup dangling shape is conditional,not established
+reachable for stable real owner;no speculative27th repair. Post-store observe
+failure poisons and retains arrays. Detach withdraws arena scratch before free;
+default destructor is not automatic detach. No result implies DMAstop.
+
+Eight unchanged functions get SHA provenance only,no target/old suite/API/model.
+All26 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/archives
+preserved. Next actual process-VM owner is NativeAdrenoGpuContext create/destroy
+and published failure callers;no such API is invented on SmmuContext.
+
+[Evidence](evidence/gpu-catalog-vm-scratch-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: process-VM private CPU owner registry candidate
+
+Actual createVm failure can retain poisoned/unclean object but returnNULL output,
+losing its sole local owner. Failed-open destroy failure can also lose localspace.
+Backing refs are not a discoverable C++ owner. Source explicitly requires failed
+object/memory retention. Independent27th UNAPPLIED candidate links each real new
+ProcessVm into private GpuContext typed root before preparation and unlinks only
+before the two original successful deletes. No new free/reset/retry/native
+cleanup,ASID bitmap/count/status policy,public accessor or wire was added.
+
+This preserves CPU owner reachability while parent lives;not OSObject retain,
+provider lease,safe parent teardown or failed-ASID reservation/reuse proof. All
+original return/cleanup order remains;default destructor is not recovery.
+Actual failed-open/close and checkCpSwitch callers were read,never executed.
+
+Five new source/two actual object mutations refused;two-file review/inverse exact.
+Three fresh currentiOS17 independent rawSHA pairs:original GpuContext baseline,
+candidate,and affected coherent-header whole Publish.343/343/378per-object,
+390union;sealed original Publish378/currentSHA/imports only,not recompiled.
+ProcessVm1008->1016/rootlink1008;GpuContext10520->10528/root10520;Publish280.
+Actual new allocation/headzero emitted,imports same. Future wholeowner rebuild
+required;no finalkernel/AppleABI/selected component or hardware qualification.
+
+Old26 patches/8profiles/3111+39/default42/CPUstorage/archives preserved;new27th
+independent UNAPPLIED. All native/device APIs OFF,no success owner peer. Next
+only actual parent-context/board/publisher raw lifetime,not hardware policies.
+
+[Evidence](evidence/gpu-catalog-process-vm-owner-2026-11-02.json).
+
+
+## 2026-11-02: process owner closeout metadata correction
+
+Postflight refused stale active current. A finish-loop path variable had redirected
+the intended current JSON into isolated catalog NativeAdrenoGmuPlatform.h after
+archive sealing. Wrong payload/current/script preserved separately;the header
+was restored from an independent exact Gitblob/fullSHA backup. No build/native
+API or phone operation used the overwritten header. Existing172 archive/source/
+object evidence stays unchanged;full64 primary comparison and explicit
+current_path closure correct the metadata. No completed5/2/3pair suite rerun.
+
+[Correction](evidence/gpu-catalog-process-vm-owner-closeout-2026-11-02.json).
+
+
+## 2026-11-02: parent context static root and publisher borrow
+
+Actual board_gpu_context is a TU-static C++ pointer,stored before bringup and
+not cleared/deleted on its returned failure in inspected source. Getter requires
+ready. Publisher borrows it;switching failure clears g.context without deleting
+parent.27th process registry is reachable while parent/image lives,not an
+OSObject retain,global-once guarantee or provider/ASID/stop/DMA lease.
+
+NativeAdrenoGpuPublished has no stop/free/unpublish override. Source comment
+requires every supplied input outlive system;raw pointers and clock-cookie copy
+do not implement that ownership. Base service/provider termination is not a
+C++ parent-retain contract. No28th speculative parent guard or cleanup policy.
+
+Locator correction:NativeAdrenoBoard.cpp is DT parser,not publisher caller.
+Exact main627 tracked source and inspected catalog/retained platform scope did
+not bind actual K80 caller;no global absence or substitute-device policy claimed.
+Six unchanged functions provenance only,no target/old suite/native API/model.
+All27 patches/8profiles/3111+39/default42/CPUstorage/archives preserved;full64
+primary source still matches restored export. Next actual Submit table-cookie
+and cached-VM withdrawal before process deletion,not a hardware acceptance test.
+
+[Evidence](evidence/gpu-catalog-parent-context-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: retained table-cookie and VM withdrawal
+
+Three catalog table methods are absent in legacy;current bodies match frozen27th
+source,provenance only. Submit default vm_ differs from per-job local vm_.
+Mode1 waits/calls actual parent writer before updating tracked pointer;mode2
+sets Ring0 scalar intent and table_vm before submission/commit. Inline useTable
+and tableInstalled are CPU stores,not bank acknowledgement or VM retain.
+
+Forget waits first,may return0 without a write when victim is not tracked,or
+restores default through writer then withdraws raw pointer. Actual clientClose
+only destroys process after original releaseAll/forget status0 gates. Returned
+callback/wait0 and scalar cache still do not cover preempt-flight,SMMU or DMAstop.
+Exact publisher callback already folds lower kit error toIOError;no28th diagnostic
+field,mode/cancel/refcount/cleanup policy or success peer was invented.
+
+No old target/suite/API/phone execution.27 independent UNAPPLIED/8profiles/
+3111+39/default42/CPUstorage/full64primary/archives preserved. Next only actual
+per-ring preempt TTBR/ASID CPU producer and return/lifetime versus pending jobs,
+without filling the missing board IRQ producer or rewriting packets.
+
+[Evidence](evidence/gpu-catalog-table-switch-lifetime-2026-11-02.json).
+
+
+## 2026-11-02: per-ring preempt CPU producer and flight boundary
+
+Actual WPTR writer returnsIOReturn from bool CPU helper whose only refusal is
+null record,already checked in driveSwitch. SMMU-info bool refuses null/zeroTTBR,
+then writes bytes;no cache/MMIO/ASID/IRQ status. Initial record writer also has
+base/rptr prerequisites;actual supplied-page caller/owner remains unbound.
+Ten unchanged functions get SHA provenance only,no old complete/readCntl tests.
+
+Pending Job.vm/table_vm supplies root;CPU WPTR/info writes precede bool trigger.
+Trigger true means callbacks returned0 and armed was set;false can follow partial
+writes. Neither is hardware acceptance or noattempt. Outstanding counts active
+Jobs,while inFlight is separate armed flag. Wait0 alone does not prove flight
+false,IRQ quiescence,safe process/page deletion or DMAretire. No reproduced race
+or successful fence/page fixture;no28th guard/cancel/reset/cleanup policy.
+
+All27 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64source/
+archives preserved,no target/native API/phone. Next only real fence-to-ring
+metadata lazy allocation and lookup/retirement paths,not a whole Submit suite.
+
+[Evidence](evidence/gpu-catalog-preempt-table-producer-2026-11-02.json).
+
+
+## 2026-11-02: active Job completion ring owner candidate
+
+Actual tag/ring arrays are finite8192 cells,allocated lazily after active Job
+records its target ring. Null is not ring0;overwritten tag uses a last-issued
+heuristic that does not prove historical ring identity. This is independent of
+claiming allocatorOOM:exact IOMallocZero uses WAITOK/ZERO,tracking/zone/large
+route can matter and actual runtime failure is not supplied.
+
+Original retireCompleted had an active Job but looked its ring up through that
+cache. Independent28th one-line UNAPPLIED candidate uses ring(job.ring),as wait
+already does for an active Job. Original fence arguments/result/release/poison/
+stats/driveSwitch stay byte-identical. No field/header/mode/refcount/retry/free
+or packet change. No corrupted-state or hardware completion qualification.
+
+Three new source/one actual object mutation refused;review/inverse exact. One
+fresh currentiOS17 Submit independent SHApair/312inputs;sealed original312 and
+headers/currentSHA checked,not recompiled;union320 not allfresh. Job ring byte
+3152 load precedes original observe/release;Submit3672/Job3168/imports unchanged.
+No allocator/fence/ring success peer or native API was executed.
+
+Old27 patches/8profiles/3111+39/default42/CPUstorage/full64source/archives
+preserved;new28th independent UNAPPLIED. No-active-Job historical fence lookup
+still uses cache;next only its actual caller/issued/wrap domain,not all Submit.
+
+[Evidence](evidence/gpu-catalog-fence-ring-owner-2026-11-02.json).
+
+
+## 2026-11-02: fence query domain and ABI width candidate
+
+No-active-Job wait/observe uses finite ring cache then Ring unsigned upper-bound
+checks. These do not prove exact issued membership or client ownership;the ABI
+earlier-client-fence comment supplies no ledger. Publisher pending=false selects
+locked dispatch,not rejection. Its scalar submitted/retired pair names one ring,
+not an atomic two-ring/per-client history. Signed producer windows and unsigned
+observation lack a bound historical-query wrap/epoch contract in these paths.
+No generation/reset/clamp policy or successful fence sequence was invented.
+
+Actual ABI fence fields are64bits but UserClient narrows to32. Independent29th
+UNAPPLIED candidate adds only two dispatch guards after copying and before the
+original submit/wait calls,reusing BadArgument and the original tally exit.
+All other source/inverse exact,zero/valid-width flow unchanged. It does not fix
+history or direct internal callers;28th active-ring repair stays separate.
+
+Three new source/two actual object mutations refused;review/inverse exact. Two
+new currentiOS17 independent rawSHA pairs for actual dispatch bodies on the real
+full class,316inputs each/317union;UserClient6424/imports unchanged. Upper32
+checks precede original calls. This is selected-method proof,not fullcore or
+AppleABI;missing task-role fullcore target was not retried or stubbed.
+
+Ten frozen function bodies provenance only,no old suite/API/peer/phone. All29
+patches independent UNAPPLIED;8profiles/3111+39/default42/CPUstorage/full64primary/
+parentarchives preserved. Native execution/GPU/rendering/Metal remain incomplete.
+
+[Evidence](evidence/gpu-catalog-fence-query-width-2026-11-02.json).
+
+
+## 2026-11-02: queue scope and directory owner contract
+
+Actual queue growth has its own uint32 guard:power-of-two capacity reaches at
+most2^31,not Entry's separate bound. Nullable allocation is checked before old
+directory copy/free/publication. CloseQueue compares uint64 request against
+capacity before indexing,then checks active jobs before clearing/reusing slot.
+No fence-style narrowing or concrete capacity-overflow repair was needed.
+
+Actual published user range is uint32 next_client times2^32 under g.lock,with
+zero refusal and increment only after successful scope. Overflow to0 is terminal
+for later user mounts,not reuse of a live earlier range. Kernel singleton is
+separate. Alignment and valid queue IDs bound addition;range predicate is
+unsigned subtraction on active Jobs. No huge success/count model was executed.
+
+Fresh scope refusal has no exposed requests,used BOs or owned jobs;the ignored
+releaseAll return is not generalized to reused cores. Normal releaseAll stops on
+wait/free errors before clearing queues;clientClose original gates remain.
+No software range/count0/wait0 implies preempt-flight/IRQ quiescence or DMAstop.
+
+Four new source mutations refused;13 bodies get SHA/delta record,unchanged
+Submit/SDK paths provenance only. No30th speculative guard or unrelated target,
+rolefullcore retry/native/API/queue/allocator peer.29 independent UNAPPLIED/
+8profiles/3111+39/default42/CPUstorage/full64primary/parentarchives preserved.
+Next only actual software context-ID producer and scalar context lifetime,
+without selecting a K80 hardware context or changing packet/HFI protocol.
+
+[Evidence](evidence/gpu-catalog-queue-scope-contract-2026-11-02.json).
+
+
+## 2026-11-02: software context producer and scalar intent
+
+UserClient open assigns a nonzero relaxed atomic uint32 ID after its returned
+allocation failures. open_ was set before the ID;this is not release publication
+of the object. Actual publisher g.lock covers open and later core/live publish.
+Close withdraws borrowed pointers,not the counter or shared Ring scalar. Skipzero
+is not a live-ID registry,wrap uniqueness,ASID reservation or hardware ownership.
+
+Ring useContext changes CPU intent and requests a pending reset only when the
+value differs. Later submit errors can leave intent without accepted Job;the
+scalar getter/void return is not acknowledgement. Original fallible framed path
+clears pending only on its original success,unchanged/provenance only.
+
+UserClient supplies intent to its given Ring;Submit may choose another target
+and records Job.context from that target. Actual K80 dual-ring/board producer
+and generic direct-Submit context contract remain unbound. Blind propagation
+or new one-shot/reset fields would choose missing policy;no30th patch or mode
+was invented. No K80 context-loss or hardware restore success was reproduced.
+
+Four new source mutations refused;9 bodySHA/delta records,no old packet/HFI/
+Submit/CPU/VM suite,target or native/API/context success peer.29 independent
+UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/parentarchives
+preserved. Next independent cached user-view descriptor owner source only,
+not force-unmap or missing board context/IRQ/stop/DMA policy.
+
+[Evidence](evidence/gpu-catalog-context-scalar-contract-2026-11-02.json).
+
+
+## 2026-11-02: cached view owner before directory growth candidate
+
+Actual selected SDK forwards uint32 memory type to clientMemoryForType without
+a BO-token bound. Original cold path grows its directory before testing backing,
+so an uncached/unowned type can trigger allocation before final NotFound. This
+is a source attempt/order defect,no manufactured huge allocation/OOM outcome.
+
+Independent30th UNAPPLIED candidate preserves cached hit first,then grows only
+after real memoryForToken backing under g.lock and reloads slot after growth.
+All other bytes/inverse exact:no cap/cache option/refcount/free/unmap/retry or
+wire policy. Cache/output descriptor refs and original error/cleanup stay as
+before;an object ref does not prove raw backing pin or PTE/DMA retirement.
+16th returned-map and17th unmap preflight repairs stay separate/unapplied.
+
+Three new source/two actual object mutations refused;review/inverse exact. One
+fresh complete candidate Publish currentiOS17 independent pair/378inputs,one
+explicit sealed original378/currentSHA/exact native headers,379union not allfresh.
+Backing gate precedes actual directory allocation;slot reload follows publish.
+AGX280/imports unchanged,no fullcore role-API retry or native API/success peer.
+Eight original function identities bound;old SDK/map/iterator/VM suites not rerun.
+
+All30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/
+parentarchives preserved. Next only actual physical64 range descriptor kind,
+copy/count and backing owner source,no force cleanup/cache choice or GPU lease.
+
+[Evidence](evidence/gpu-catalog-view-growth-owner-2026-11-02.json).
+
+
+## 2026-11-02: physical64 view copy and backing owner
+
+Selected LP64 Physical64 aliases Physical. NULLtask factory copies range values;
+count1 uses embedded storage,multiple ranges allocate a copy. Internal reference
+flag on embedded storage does not borrow the caller temporary array. Physical
+wireCount increment is by definition,not a UPL or original NativeMemory page ref.
+Descriptor/map object refs do not pin that raw backing.
+
+Actual public raw-view allocation is contiguous;validated adjacent pages merge
+to one span. System memory uses its own descriptor and CPUmap refuses imports.
+No reachable UInt32 span-count narrowing failure bound here,no31st guard or
+huge successful allocation model. Generic scattered/borrow callers unqualified.
+Weak mapping diagnostics do not veto NativeMemory free or attest every PTE.
+
+Five frozen catalog bodies provenance only,three SDK function SHA records;no
+new component/target/API/peer or old suite.30 independent UNAPPLIED/8profiles/
+3111+39/default42/CPUstorage/full64primary/parentarchives preserved. Next only
+actual physical pager/map ownership,not force cleanup or stop/DMA permission.
+
+[Evidence](evidence/gpu-catalog-physical-view-contract-2026-11-02.json).
+
+
+## 2026-11-02: physical pager versus original backing owner
+
+Physical descriptor passes reserved storage to device pager. Pager/named entry
+refs own pager/reserved lifetime;descriptor free withdraws reserved memory under
+global LOCK. Data action takes a temporary retained descriptor under that lock
+or returns KERN_ABORTED after withdrawal. Request range overflow is checked;
+setup/lookup can panic,not universally nullable recoverable failure.
+
+Physical segment population and temporary descriptor refs do not acquire original
+NativeMemory backing owner. Catalog g.lock ends before SDK maps returned output;
+actual IPC/caller exclusion remains to bind. No observed K80 race/PTE reuse or
+safe free claimed,no31st forced cleanup/pin/refcount policy.16/17/30 independent.
+
+Ten function SHA records,no new suite/target/API/pager/page success peer. All30
+independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/old
+inputs/archives preserved. Next actual IPC call exclusion,not hardware execution.
+
+[Evidence](evidence/gpu-catalog-physical-pager-contract-2026-11-02.json).
+
+
+## 2026-11-02: conditional IPC versus driver lock exclusion
+
+With defaultLocking enabled,SDK map/unmap Write spans callback and actual map,
+excluding same-connection externalMethod Read/Write and close Write. Disabled
+map/external paths take None;close Write alone then provides no exclusion.
+__ipc lifetime count is not a physical backing owner. Different connections
+have different IPC locks;driver g.lock remains a separate metadata gate.
+
+Flags depend on actual open properties/kext dependency. Catalog does not set
+them explicitly;actual K80 flags/producer remain unbound. Direct runCore or
+poller calls cannot inherit an IPC lock solely from standard externalMethod.
+No observed race or universal safety claim,no31st lock/pin/cleanup policy.
+
+Nine function SHA records,no old suite/target/native IPC/map or success peer.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/
+oldinputs/archives preserved. Next actual direct poller owner/call boundary,
+without decoding or changing mailbox/query/HFI/log/carrier fields.
+
+[Evidence](evidence/gpu-catalog-view-ipc-contract-2026-11-02.json).
+
+
+## 2026-11-02: direct poller owner and call boundary
+
+Poller snapshots/retains client under g.lock,uses it after unlock and releases.
+Close withdraws global owner under lock and releases after unlock. The ref
+protects client object,not BO pages or IPC exclusion. runCore checks live/core
+under g.lock,but direct poller enters neither IPC nor runTimed view handling.
+Ordinary externalMethod/preflight evidence therefore does not cover every
+direct call;actual K80 producer/method eligibility remains unbound.
+
+Mount sets started only on kernel_thread_start returned success and drops the
+returned thread ref. Failure leaves flag false;no invented Linux error-pointer
+or per-owner stop/cancel policy. Core continuation/reference semantics remain
+next source boundary. No packet/carrier fields decoded or rewritten.
+
+Six frozen function SHA records,no31st patch/target/old suite/native/thread/
+map success peer.30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/
+full64primary/oldinputs/archives preserved,no race or safe teardown claim.
+
+[Evidence](evidence/gpu-catalog-poller-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected kernel thread output and returned reference
+
+Actual chain is kernel_thread_start/start_priority/kernel_thread_create and
+thread_create_internal,not user thread_create_running. Returned errors precede
+caller output stores;mount starts with nullptr and consumes only SUCCESS.
+Success publishes thread output before starting;it does not certify continuation
+ran. Existing stack/assert/nonreturn paths remain,no fabricated failure model.
+
+Internal continuation/parameter pointer and refcount initialization do not retain
+arbitrary pointees. thread_deallocate releases returned ref,not terminate/join;
+final deallocation requires terminated state. No31st speculative stop/ref policy.
+Selected thread.c contains old zorn instrumentation;6bodySHA/base deltas record
+actual bytes,no pure upstream or historical-run identity substitution.
+
+No old CPU/scheduler/IPC suite,target/native thread or success peer.30 independent
+UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/oldinputs/archives
+preserved. Next static mailbox backing owner source,no packet/carrier change.
+
+[Evidence](evidence/gpu-catalog-thread-start-contract-2026-11-02.json).
+
+
+## 2026-11-02: static mailbox backing owner
+
+Actual factory supplies kernel_task/InOut/nonpageable fixed buffer;successful
+initialization rejects null storage. Getter follows initialized buffer/range;
+no stable nullable-getter failure demonstrated,no31st redundant guard.
+Static gMailbox owns descriptor while gMailboxWords borrows bytes;inspected
+source has no backing release/reset. Close withdraws client owner only.
+
+Mount initialization precedes thread/owner publication under g.lock,but poller
+uses some availability/data outside it. Static lifetime does not establish every
+publication/replacement/request exclusion or revoke old mapped views. No packet
+fields decoded,no free/reset/generation/refcount/stop policy or race model.
+
+Four catalog/two SDK bodySHA records,no old suite/target/native buffer success
+peer.30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/
+oldinputs/archives preserved. Next actual newUserClient failure/output ownership.
+
+[Evidence](evidence/gpu-catalog-mailbox-backing-contract-2026-11-02.json).
+
+
+## 2026-11-02: newUserClient handler and failure owner
+
+Handler is cleared at entry and written only on handoff or mounted-plugin
+success. Init/type/cap/mount refusal releases creating reference;this is not
+proof object destroyed or provider detached. Attach status is mainly diagnostic;
+AGX inherits selected base start returning true,so conditional startfalse code
+is not a demonstrated failure here. Actual inactive-provider caller still unbound.
+
+Post-attach refusal has no uniform explicit terminate/detach. Exact registry
+reference ownership is the next boundary before cleanup policy. Existing
+sandbox/grant writes are not a selected K80 authorization or compatibility proof;
+no grant/property/allow-list change. No31st speculative lifecycle repair.
+
+Four frozen catalog/two SDK bodySHA records,no old suite/target/native/client
+success peer.30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/
+full64primary/oldinputs/archives preserved,no handler/stop/DMA hardware claim.
+
+[Evidence](evidence/gpu-catalog-new-client-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: registry relation reference ownership
+
+OSArray link insertion retains peer;removal releases its slot reference. Successful
+registry attach holds parent/child relations both ways. Creating-ref release
+alone does not unlink or prove destruction. attachToParent combines link and
+callback results without local rollback;false does not prove no mutation.
+
+Registry detach uses temporary parent retain and removes both existing links.
+IOService detach additionally changes matching/busy state and may schedule
+provider termination/finalization;it is not harmless bookkeeping. Catalog
+post-attach refusal can retain relations,conditional on actual links. No K80
+leak/UAF observed and no31st blind detach/terminate/free policy added.
+
+Eight function SHA records,no old suite/target/native registry or success peer.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/
+oldinputs/archives preserved. Next provider callback/failed-client cleanup boundary.
+
+[Evidence](evidence/gpu-catalog-registry-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: provider finalization and pre-mount failure boundary
+
+Terminate phase2 scheduling is gated by inactive/phase state and can enter
+worker/wait paths. Finalize depends on user-reference gate and queued work;
+scheduleStop also queues child/provider. No returned cleanup/destructor ACK.
+
+Unsupported/capped client before mount has no core/space/live state,but init,
+registry/provider/filter callbacks already ran. Failed mount may additionally
+have process-VM state. Handler null therefore cannot select one blanket
+detach/terminate/free strategy. Provider epoch/current references still missing;
+no31st speculative cleanup/retry/ref policy or reproduced K80 fault.
+
+Six function SHA records,no old suite/target/native/provider success peer.30
+independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/
+oldinputs/archives preserved. Next grant source compatibility only,no security
+setting/allow-list/sandbox authorization change.
+
+[Evidence](evidence/gpu-catalog-provider-finalize-contract-2026-11-02.json).
+
+
+## 2026-11-02: grant writer versus selected reader source mismatch
+
+Catalog writes boolean NativeSandboxGrant on connection. Selected iOS17 reader
+expects string NativeSandboxGrantProcess on service;object,key,type differ.
+Reader also participates before newUserClient,so late connection bool cannot
+satisfy that earlier gate. External service properties/K80 producer remain
+unbound;no universal deny/allow or consent claim. No grant/sandbox change.
+
+Reader body matches exact main627 patch export;two fixed patches have Gitblob/
+fullSHA and separate workspace SHA. K80 series names them.2function hashes,
+no old suite/target/fullcore retry or native property/security success peer.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/
+oldinputs/archives preserved. Next required handoff bridge source compatibility,
+without altering display/CPU or creating absent provider/stub/caller.
+
+[Evidence](evidence/gpu-catalog-grant-source-compatibility-2026-11-02.json).
+
+
+## 2026-11-02: exact handoff bridge provider source
+
+Catalog strong imports match two C signatures in exact GopFramebuffer19ef3a75
+Presenter. Local checkout has different HEAD/bytes and cannot resolve that pin;
+failed lookup is not file absence. Exact public tree and22577B primary were
+retrieved separately and Gitblob/fullSHA verified.4function SHA pairs preserve
+local versus exact provenance;no source pin/checkouts or display bytes changed.
+
+Fixedmain component source list and auxiliary Presenter builder are distinct.
+K80 ordinary GopFramebuffer selection does not qualify auxiliary link/startup;
+no newly bound selected Presenter object or finalkernel proof. Getter retains
+returned descriptor under provider state predicates,not a hardware lease.
+
+No old display/CPU/GPU suite,target/native/getter/success peer;30 independent
+UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/oldinputs/archives
+preserved. Next only exact Presenter static owner/source startup requirements.
+
+[Evidence](evidence/gpu-catalog-handoff-bridge-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact Presenter static owner and auxiliary startup
+
+Exact create returns a fresh unattached service;set_source borrows its source.
+Start validates original description/map/gate and original mode before storing
+raw gHandoff and registering. No mode/display/CPU or source pin change.
+Stop withdraws gHandoff then closes online/wakes waiters;free releases mapping
+and gate. Getter retains output descriptor,not provider before raw load.
+
+Service stop-before-free and actual creator/provider/caller exclusion remain
+required. Auxiliary builder entry/ordinary GopFramebuffer name do not prove
+K80 object/link/create/attach/start selection. No31st guessed lock/retain/stop
+policy or native success peer. Six exact bodySHA,no old display/SDK/CPU suite
+or target;30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/
+full64primary/oldinputs/archives preserved. Next scanout reference ownership only.
+
+[Evidence](evidence/gpu-catalog-presenter-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact offered scanout reference ownership
+
+Offer retains descriptor in accepted slot;wait adds temporary refs and kept
+entries separately retain descriptor/map/task. Victims and slots withdraw under
+gate,then release outside. Kept-cache and pending-swap lifetimes differ;mapping
+unlocked intervals still require real client/stop exclusion,not a new policy.
+
+Complete/abandon release slot refs before original borrowed-display callback.
+Exact callback primary59740B is URL/Gitblob/SHA bound. Selected runAction invokes
+action synchronously under recursive gate;no async stack-Args defect established.
+Target display lifetime and hardware stop/DMA remain unbound;API0/counters are
+software outcomes. No31st speculative retain/free/generation/cancel policy.
+
+Eight function hashes,no wire decode/display/CPU change,old suite,target or
+native success peer.30 independent UNAPPLIED/8profiles/3111+39/default42/
+CPUstorage/full64primary/oldinputs/archives preserved. Next exact client refs.
+
+[Evidence](evidence/gpu-catalog-scanout-reference-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact Presenter client task/controller references
+
+Init acquires task reference after original checks;free releases it. Controller
+is cast from provider without extra client-body retain;registry attachment refs
+remain separate. Selected base open/close arbitrate raw owner publication,not
+entire wait/completion execution or hardware ownership.
+
+Stop abandons then closes before withdrawing controller/opened state. The inline
+clientClose override calls terminate and returns Success;this is not synchronous
+stop/free proof. Actions check state then use controller;actual provider epoch
+and IPC-versus-stop exclusion remain unresolved. No reproduced race/UAF or31st
+guessed retain/cancel/free/termination policy.
+
+14 bodySHA plus8 parent hashes provenance only;no fetch,old suite,target,native
+success peer,wire decode or display/CPU/mode change.30 independent UNAPPLIED/
+8profiles/3111+39/default42/full64primary/CPUstorage/oldinputs/archives preserved.
+Next only selected terminate return/scheduling source for this inline caller.
+
+[Evidence](evidence/gpu-catalog-presenter-client-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected default client termination path
+
+Exact inline clientClose calls terminate with header default options0,discards
+its bool and returns Success. Selected terminate adds Terminate then phase1;
+array allocation failure can return false before state walk. No actual K80
+failure or new error/termination policy is claimed.
+
+Phase1 may wait on prior phase state;default phase2 queues work without selecting
+Synchronous. Inactive/requestTerminate/didTerminate and provider-open checks gate
+stop scheduling. actionStop calls stop,conditionally closes,then detaches;this
+is ordered CPU cleanup source,not completed free,IPC exclusion or DMA retirement.
+
+7 new bodySHA/14 client parent hashes provenance only,no old suites/targets,
+fetch,native peers,31st patch or display/CPU/mode/security/wire changes.30
+independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only stop-list temporary refs/workloop producer/exclusion.
+
+[Evidence](evidence/gpu-catalog-presenter-termination-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected stop-list roots and workloop provenance
+
+Parallel stop lists hold client/provider across actionStop in the successful
+insertion domain. Worker attempts freeList insertion before removing list roots,
+then releases freeList outside gJobsLock. OSSet duplicatefalse may already hold
+the object;other unchecked insert failures/count domains remain unqualified.
+
+_workLoopAction retains the returned workloop around synchronous action,or calls
+directly. Exact Presenter/client inherit provider-chain getWorkLoop;their IOLock
+gate is not that producer. Actual provider chain and IPC/action-stop exclusion
+remain missing;CPU roots are not original-page ownership or DMA retirement.
+
+Provenance correction:Presenter inline handleOpen/Close/IsOpen override the base
+handle methods recorded in prior client capsule. They likewise store raw owner;
+base open/close arbitration remains actual. Old archives/tests unchanged.
+
+9 new bodySHA/7+4 frozen hashes provenance only;no31st policy,old suite,target,
+fetch,native peer,wire decode or display/CPU/mode/security change.30 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only actual collection insertion failure/count domain.
+
+[Evidence](evidence/gpu-catalog-stoplist-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected stop-list insertion/count domain
+
+Parallel stop arrays start requested16,not permanent bounded counts. scheduleStop
+ignores two append results;worker expects paired index. OSArray append grows
+before retaining/publishing and uses allocator-returned capacity. Counter wrap
+and rounded capacity overflow have no actual service/count reachability proof.
+
+freeList is identity-deduplicating OSSet;false may already be held or failed
+append. It can accumulate unique objects across worker batches,so initial16 is
+not a proof of no growth. Its insertion attempts precede source-root withdrawal.
+
+Pinned selected container macros pass WAITOK/ZERO and FULLSIZE flags;null branch
+alone does not prove ordinary OOM,successful enormous counts or recoverable
+pair failure. Lower returned/null/panic domain remains unbound;no31st guessed
+rollback/free/reserve/retry policy.4 new bodySHA,9+2 frozen hashes provenance
+only,no old suites/targets/native peers/fetch/display-CPU-wire-security change.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only selected lower allocator return boundary for these callers.
+
+[Evidence](evidence/gpu-catalog-stoplist-insertion-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected typed-container lower return boundary
+
+kt_size converts multiply/add overflow or high-bit size to a reject sentinel.
+Typed container flags WAITOK_ZERO/FULLSIZE do not select NOFAIL or REALLOCF.
+General nonzero changed-bucket realloc preserves old address on returned null
+without REALLOCF;OSArray publishes new pointer/capacity only after nonnull.
+
+Large-to-large realloc delegates KMR_FREEOLD semantics to kmem_realloc_guard;
+its failing old-entry behavior is not inferred from that flag name. Zone/VM
+returned failure,panic and nonreturning cases remain conditional;WAITOK alone
+is not ordinary OOM proof or universal infallibility. No enormous successful
+count/page model,actual K80 failure or31st cleanup/rollback/retry policy.
+
+7 new bodySHA/4 frozen insertion hashes provenance only,no old suites/targets,
+fetch,native peer,wire/display/CPU/security/flag changes.30 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+selected large realloc VM failure/old-entry source boundary.
+
+[Evidence](evidence/gpu-catalog-container-lower-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected large-grow failure old-entry contract
+
+Grow prepares pages then finds new space. Returned failure preserves old
+allocation unless REALLOCF;FREEOLD is a distinct flag and the actual container
+caller does not request REALLOCF. Prepared pages/new failed entry are cleaned
+before returning the original VM status with zero address.
+
+Page-list allocation can wait or return shortage under exact budget/flag
+conditions;no actual K80 OOM/count sequence is claimed. Later old-entry/guard/
+pager validation can panic or wait. Successful FREEOLD mapping removal is not
+the early-failure path and does not attest GPU stop/DMA retirement.
+
+3 new bodySHA/7 typed-lower hashes provenance only,no31st cleanup/retry/error
+policy,old suites/targets,fetch,native peers or wire/display/CPU/security changes.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only selected typed-container zone WAITOK/exhaustibility source.
+
+[Evidence](evidence/gpu-catalog-large-realloc-failure-contract-2026-11-02.json).
+
+
+## 2026-11-02: selected container zone/WAITOK producer
+
+Typed view flags/processed metadata and size choose heap/zone or large path.
+Default and KT_VAR size classes use selected kalloc zone initializer;defaults
+set wired_max to all-ones. Exhaustible/exhausted predicates and slow allocation
+branch are explicit,but actual finite-limit configuration is not established
+for these collections. No kalloc producer calls zone_set_exhaustible here.
+
+WAITOK may wait in expansion;zero after exhaustion and NOFAIL panic are distinct
+branches. This is not ordinary OOM proof or universal infallibility. Existing
+selected zalloc_ext zorn instrumentation is actual-SHA bound;recorded base
+locator unavailable,no base comparison claimed. This is not pure
+upstream or new CPU/native execution qualification;no log/flag changes.
+
+11 new bodySHA/3 parent hashes provenance only,no31st cleanup/rollback/retry
+policy,old suites/targets,fetch,native peers or wire/display/CPU/security changes.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Bounded allocator source audit closes;next independent catalog roleAPI
+source compatibility only,without retrying unchanged fullcore failure.
+
+[Evidence](evidence/gpu-catalog-container-zone-contract-2026-11-02.json).
+
+
+## 2026-11-02: exact catalog role API source compatibility gap
+
+Exact catalog requires task_get_gpu_role and PRIO_DARWIN_GPU_BACKGROUND/UTILITY.
+Selected iOS17 source/export headers lack them in the recorded search scope;
+frozen fullcore log retains5 undeclared-identifier errors. Three current catalog
+function hashes are provenance only,with full source still matching old proof.
+No failed fullcore retry,stub or foreign SDK/constants/flags/OS substitution.
+
+Selected PRIO_DARWIN_GPU ALLOW/DENY updates TF_GPU_DENIED permission state via
+security-checked BSD path. Its boolean task_is_gpu_denied is not a GPU role;
+compiler game-mode suggestion is unrelated. Fixedmain627 tracked patch/script/
+profile search supplies no producer in that scope,not global provider absence.
+
+5 bodySHA,no31st guessed role/default-priority/security repair,old suites/targets,
+native peers or wire/CPU/display changes.30 independent UNAPPLIED/8profiles/
+3111+39/default42/CPU/full64/oldinputs/archives preserved. Fullcore remains
+unqualified;next only downstream role metadata versus priority/ring callers.
+
+[Evidence](evidence/gpu-catalog-role-api-source-contract-2026-11-02.json).
+
+
+## 2026-11-02: role metadata versus actual priority ring selector
+
+Actual selector is ringForPriority. It reads next_priority,not next_role;role
+copies to Job then existing timeline metadata. Priority predicate uses mode,
+preemption/dead state and exact2/3/conditional1 values;comments alone are not
+policy. Client unset priorities avoid one role query but submit still queries
+role independently,so this does not bypass the selected roleAPI source gap.
+
+Published SetPriority and generic dispatch take g.lock. Direct core callers do
+not inherit that or IPC gates automatically. Startup checkCpSwitch temporarily
+sets0 then restores-1 before service publication;it is not universal client
+default. No role0/stub/denial substitution or priority/mode/security change.
+
+10 bodySHA/3 parent methods unchanged,provenance only;no old suites/targets,
+native peers,31st repair or wire/CPU changes.30 independent UNAPPLIED/8profiles/
+3111+39/default42/CPU/full64/oldinputs/archives preserved. Context carrier-versus-
+target remains unbound;next only actual priority member reuse/error lifetime.
+
+[Evidence](evidence/gpu-catalog-priority-role-contract-2026-11-02.json).
+
+
+## 2026-11-02: priority members across fresh/shared core lifetimes
+
+Core open/close do not reset priority members;successful close mechanically
+permits generic reopen,but no reset policy or actual successful reuse is assumed.
+Published AGX mount creates fresh private core per fresh connection. Failed
+teardown retains live state;successful close reaches original deferred deletion.
+
+Alternate catalog Service creates one core then gives wrappers borrowed shared
+core. Wrapper close does not close/reset it;this is distinct conditional source,
+not selected K80 startup or per-wrapper priority/lock policy. UserClient submit
+overwrites shared next priority/role before each lower attempt;after lower error
+these scalars remain,but early rejection never calls lower submit. Generic direct
+callers/actual overlap remain unbound;no31st reset/one-shot/default-role repair.
+
+13 bodySHA/3 parent consumers unchanged,provenance only;no old suites/targets,
+native peers,wire/security/CPU changes.30 independent UNAPPLIED/8profiles/
+3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only alternate
+Service wrapper selector-schema/clock forwarding source compatibility.
+
+[Evidence](evidence/gpu-catalog-priority-lifetime-contract-2026-11-02.json).
+
+
+## 2026-11-02: alternate Service wrapper dispatch boundary
+
+14-entry table uses selector-1 and forwards the unchanged method number. First14
+ABI/schema declarations align;15..18 are not exposed here. Selected explicit
+SDK dispatch validates counts/descriptor lengths then calls action;standard IPC
+sets args.selector. Core still checks flat pointers/schema;descriptor size alone
+does not materialize backing or authorize a new adapter.
+
+Action forwards null clock:WaitFence and Submit dependency wait reject it before
+waiting. No-dependency submit can still reach lower code,so null clock is not a
+universal disable. AGX private core/g.lock/runTimed handlers do not transfer to
+this shared-core route. Actual attachment/provider epoch/selection remain gaps.
+
+9 bodySHA/3 Service parent methods unchanged,SDK provenance only;no31st table/
+clock/attach/lock policy,old suites/targets,native request peers or wire/security/
+CPU changes.30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/
+oldinputs/archives preserved. Next only SDK override versus base attach/start
+responsibility,without selecting the alternate Service.
+
+[Evidence](evidence/gpu-catalog-alternate-dispatch-contract-2026-11-02.json).
+
+
+## 2026-11-02: virtual new-client attachment responsibility
+
+IPC calls five-argument virtual raw overload. Base property-class fallback
+explicitly init/attach/starts,but it does not run after an override. Selected
+SharedPtr overload adopts retained output with OSNoRetain;output ownership is
+not a provider registry root.
+
+Alternate Service override/factory only new/init/borrow-core/output. Recorded
+selected IPC post-return path sets open/locks/properties/security/owner records;
+it does not backfill client attach/start. AGX helper explicitly attaches/starts
+and has separate failure behavior. registerOwner task/client queues do not
+attach or retain shared provider/core. No mechanical lifecycle-policy copy.
+
+8 bodySHA/2 parent Service methods unchanged,SDK identity provenance only;no31st
+attach/free/ref/termination repair,old suites/targets,native peer or wire/security/
+CPU changes.30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/
+oldinputs/archives preserved. Conditional gap is not K80 leak/UAF/crash proof.
+Next only alternate Service raw-core/execbuf parent teardown ownership.
+
+[Evidence](evidence/gpu-catalog-client-attachment-contract-2026-11-02.json).
+
+
+## 2026-11-02: alternate Service raw-owner parent lifetime
+
+Raw core/execbuf are allocated in original CP branch;VM/ring pointers refer to
+parent-contained state. Actual stop only resets mappings and calls base stop;
+it does not drain/delete/clear these pointers or readiness in this TU. Exact
+class has no free override;selected metaclass macro destructor body is empty.
+C++ member destruction does not automatically delete raw pointees.
+
+Client wrappers borrow core and close only withdraws borrow. Heap retention does
+not retain parent VM/ring/callback data;actual parent/module/caller exclusion
+remains missing. No inferred native leak/UAF/K80 fault or safe force cleanup/
+retain/attach/stop policy. This alternate remains unselected/unqualified.
+
+8 bodySHA/2 parent methods unchanged plus macro provenance,no31st repair,old
+suites/targets,native peers or wire/security/CPU changes.30 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+shared-core mutable request storage versus actual IPC gate applicability.
+
+[Evidence](evidence/gpu-catalog-alternate-parent-contract-2026-11-02.json).
+
+
+## 2026-11-02: shared-core storage versus per-client IPC gates
+
+Submit request/buffer scratch belongs to core;alternate wrappers share that
+core. Selected SDK gates use each wrapper lock:read may overlap same connection,
+write excludes only that connection,and different wrappers have distinct locks.
+__ipc protects client lifecycle bookkeeping,not common mutable core or pages.
+Alternate action has no published g.lock;actual caller/flags remain missing.
+
+Dispatch also stores borrowed clock in function-static vm_clock and installs a
+global VM time lambda before schema validation. This crosses core instances;
+actual readers/provider lifetime require binding. No successful overlap model,
+race reproduction,global lock/atomic/ref/reset/time policy or31st repair.
+
+8 bodySHA/3 frozen SDK methods unchanged,provenance only;no old suites/targets,
+native peers or wire/security/CPU changes.30 independent UNAPPLIED/8profiles/
+3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only exact VM
+time callback producer/readers and diagnostic versus control-flow use.
+
+[Evidence](evidence/gpu-catalog-shared-core-ipc-contract-2026-11-02.json).
+
+
+## 2026-11-02: VM time hook diagnostic-only consumers
+
+Service probe installs static KernelTime wrapper before matching success. Core
+dispatch installs lambda borrowing function-static clock before schema checks;
+published static g.clock copies callback struct while cookie remains borrowed.
+Null clock leaves lambda able to return0,not an availability/acceptance result.
+
+Exact VM PhaseClock samples only feed elapsed/count/bytes/max diagnostic arrays
+in map/unmap. No hook use in timeout selection,returned map status,route or
+retire permission is found in recorded scope. Changing timebase/null samples can
+degrade diagnostics;no native race/clock/fence peer or stop/DMA proof is made.
+
+8 bodySHA/parent dispatch unchanged,provenance only;no31st time/atomic/lock/reset
+policy,old suites/targets,log/carrier/wire/security/CPU changes.30 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next separately actual RingClock wait-control callbacks/deadline source.
+
+[Evidence](evidence/gpu-catalog-vm-clock-contract-2026-11-02.json).
+
+
+## 2026-11-02: actual RingClock wait-control boundary
+
+Ring wait/observe acquire and inspect fence before clock/deadline checks. Null
+clock or timeout0 can inspect current state;pending then times out. now callback
+returns time only,not availability/raw status;idle nonzero folds into Timeout.
+Unsigned microsecond subtraction assumes a useful timebase;callback latency or
+nonadvancing time is not bounded by the finite timeout argument alone.
+
+Submit maps existing fence outcomes. Active wait timeout calls noteStall before
+return;waitAll reapplies timeout per job,not a single total wall deadline. These
+software outcomes do not prove preempt flight ended,IRQ or DMA stopped. VM time
+hook remains separate diagnostics. Actual K80 callback/provider epoch is unbound.
+
+8 bodySHA/3 frozen fence hashes unchanged,provenance only;no31st timeout/clock/
+raw-idle/reset policy,old suites/targets,native peers or wire/security/CPU changes.
+30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only exact timeout-to-noteStall work/guard contract.
+
+[Evidence](evidence/gpu-catalog-ring-clock-control-contract-2026-11-02.json).
+
+
+## 2026-11-02: timeout-to-noteStall callback eligibility
+
+Timeout paths call void noteStall before returning original Timeout. Module-
+static pending metadata resets on observed+1 change,not owner/provider epoch.
+Nonzero time gates staged work;stage advances before original invalidate/kick
+and later drain callbacks. Their errors do not replace caller Timeout.
+
+Snapshot guard advances before stallState. Timeout can therefore include extra
+callback/inspection work,not just timer checks. Existing drain polling bound/
+API0 does not prove ACK masks or hardware stop/DMA. No policy/constants adopted.
+Frozen13 private diagnostic candidate remains independent and does not qualify
+all later callbacks;waited-ring versus inferred next/ring/VM needs separate bind.
+
+6 bodySHA/parent wait and frozen13 original source unchanged,provenance only;no
+31st policy/automatic composition,old suites/targets,native peers or wire/security/
+CPU changes.30 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/
+oldinputs/archives preserved. Next only actual waited-ring/source association.
+
+[Evidence](evidence/gpu-catalog-stall-eligibility-contract-2026-11-02.json).
+
+
+## 2026-11-02: independent31st waited-ring stall carrier
+
+Global issue numbers can leave holes in each ring completion stream,so
+observed+1 need not identify the waited ring even with intact tags. wait already
+has original nonnull r. Independent31st patch passes this typed ring to private
+noteStall at both timeout calls,instead of inferring another ring from next.
+
+No fields/refs/mode/reset/retry/stop policy or wire change. Inverse is byte-equal
+except private declaration/callee/call argument and ownership comment. Original
+find(next) snapshot VM,static epoch and all callback/return policy remain gaps.
+13/28/other parents are not composed;initial historical r lookup still unqualified.
+
+3 source refusals/two-file review inverse;1 fresh currentiOS17 whole Submit SHA
+pair312 inputs plus sealed original312 not rebuilt/union320 notallfresh. Actual
+x3 carrier/callee,Submit3672/Job3168/imports match. Future whole owner rebuild
+required,not native/finalkernel/AppleABI qualification.31 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved;all native OFF.
+
+[Evidence](evidence/gpu-catalog-stall-ring-carrier-2026-11-02.json).
+
+
+## 2026-11-02: remaining stall pending-Job VM association
+
+find(observed+1) has no ring predicate;global numbering permits absent or other-
+ring Job,then source falls back to default VM.31st candidate keeps this VM
+selection byte-identical while carrying actual waited ring separately.
+
+pendingOn filters same ring/first pending by signed comparison,but also rereads
+fence/cache and returns null for several cases. Mechanical substitution adds
+observation/error policy;CPU first-pending does not certify actual loaded CP
+context. Stable allocated Job addresses are not retained snapshots:release clears
+records and free reuses them under original caller-serialization contract.
+
+Peek interval/cache checks do not prove intended VM owner or DMA retirement.
+9 bodySHA/provenance only,no32nd guessed VM/queue/ref/diagnostic policy,old suites
+or31 target rerun/native peers.31 independent UNAPPLIED/8profiles/3111+39/
+default42/CPU/full64/oldinputs/archives preserved. Next only actual snapshot
+producer scope versus loaded-ring/table/Job VM source association.
+
+[Evidence](evidence/gpu-catalog-stall-vm-association-contract-2026-11-02.json).
+
+
+## 2026-11-02: CP snapshot scope versus software ring/table markers
+
+stallState uses fixed CP-named reads through borrowed IO cookie,without current/
+loaded/table/Job VM validation. Secondary source shares one CP register set,but
+cookie could virtualize a provider window;actual K80 bank/epoch is unbound.
+Copied IO structs and per-ring object identity are not a register-owner lease.
+
+current/loaded/inFlight are software markers. table_vm can describe queued
+intent before acknowledgment;first pending Job VM alone does not identify sampled
+fetch context during switches.31st ring carrier does not close snapshot VM scope.
+Returned stallState error stops sole caller before consuming full words;later
+ignored faultState output/error is separate. No32nd guessed bank/VM/ref policy.
+
+9 bodySHA/table method unchanged,provenance only;no old suites/targets,native
+reads/loaded peers,wire/security/CPU changes.31 independent UNAPPLIED/8profiles/
+3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only faultState
+return/partial-output availability,without assuming zero means no fault.
+
+[Evidence](evidence/gpu-catalog-snapshot-scope-contract-2026-11-02.json).
+
+
+## 2026-11-02: fault-state output/error availability
+
+faultState early BadArgument/NotReady returns leave output untouched. It selects
+last nonzero region context offset,then sequential callbacks write directly into
+four caller words;first callback error folds to IOError without rollback. Actual
+failing callback output is provider-dependent,not a manufactured raw status.
+
+noteStall initializes zero words,ignores this status and copies all four into
+existing diagnostic storage before continuing. Zero or partial values are not
+proof of no fault. Default VM/context selection remains distinct from sampled CP
+owner. Original Service callback guard failures leave output untouched;volatile
+load is not a recoverable hardware-error channel or actual K80 reader evidence.
+
+4 bodySHA/full primary identities,provenance only;no32nd diagnostic/validity
+policy,old suites/targets,native peer or device operations.31 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only scoped writers/readers of existing diagnostic storage,without wire
+decode or field/carrier expansion.
+
+[Evidence](evidence/gpu-catalog-fault-output-contract-2026-11-02.json).
+
+
+## 2026-11-02: bounded stall diagnostic publication/source consumers
+
+Exact catalog defines C-linkage volatile arrays and writes them through noteStall
+and existing helper slices. Searches of selected iOS17 source/export-like files
+and fixedmain627 patches/scripts/profiles find no named reader in those scopes.
+This is not whole-image export/retention or external debugger availability proof.
+
+Sequential fault/helper/ring stores and final source marker do not establish an
+atomic snapshot,paired acquire or exclusion. Early returns can retain previous
+contents. Existing helper sentinels do not validate ignored fault output. Source
+comments about same-moment sampling/reuse are not K80 hardware observations.
+
+3 unchanged bodySHA/full identities,provenance only;bounded diagnostic branch
+closed without32nd validity/sentinel/guard/export policy or wire decoder/field
+changes.31 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs
+and parent archives preserved;no old suite/target/native peer/device operation.
+Next independently traces numeric nextOwner/Job.owner metadata,not task lease.
+
+[Evidence](evidence/gpu-catalog-stall-publication-contract-2026-11-02.json).
+
+
+## 2026-11-02: numeric nextOwner/Job.owner handoff
+
+nextOwner stores a PID scalar;selected proc_selfpid reads current execution
+process identity,not stored connection task or a retained process reference.
+UserClient submit is the sole catalog setter caller,after its early validation.
+Lower accepted handoff copies owner into Job then clears scalar;earlier errors
+leave it. Next UserClient submit overwrites it;direct lower callers bypass setter.
+
+Published generic dispatch holds g.lock through setter/lower handoff;this does
+not transfer exclusion or execution-process identity to every direct/poller/
+alternate caller. Actual startup check calls lower without nextOwner. Job.owner
+is consumed only by existing timeline storage,not page/VM/queue authorization.
+No PID value/reuse fault,race,task reference or32nd reset/default-owner policy.
+
+8 bodySHA/full identities,unchanged bodies provenance only;no old suites/targets,
+roleAPI retry,native peer/phone/wire/security/CPU changes.31 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next independently binds weak DCVS level producer,without clock/vote execution.
+
+[Evidence](evidence/gpu-catalog-owner-scalar-contract-2026-11-02.json).
+
+
+## 2026-11-02: weak DCVS level source compatibility gap
+
+Submit declares a weak C array and conditionally samples element1 into Job.level.
+Declaration length15 is not storage definition/runtime size or lifetime proof.
+Fallback0 is numeric metadata,not hardware level/status. Job.level feeds only
+existing timeline packing in exact catalog,not ring/VM/queue control flow.
+
+No named definition found in exact64 catalog,archived exact Sm8550 primary,
+selected iOS17 source/export-like files or fixedmain627 tracked tree. Absence is
+limited to these searched scopes;actual selected producer remains unbound.
+Retained Sm8550 GPU/GMU paths and9 exact primary Gitblob/fullSHA checked,without
+fetching or substituting local revisions. No array/clock/vote provider invented.
+
+2 frozen parent Submit bodySHA unchanged,provenance only;no32nd stub/default/
+lock/rate/vote policy,old suites/targets,native peers or phone operations.31
+independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only acquired-prefix rollback source before ring commit.
+
+[Evidence](evidence/gpu-catalog-dcvs-source-contract-2026-11-02.json).
+
+
+## 2026-11-02: acquired-prefix rollback and error ownership
+
+Hold counters advance only after lower success;later hold failure rolls back
+only the acquired prefix. Original cleanup ignores retirement errors and advances
+retired statistics. Conditional publishMapped failure poisons VM before returning;
+subsequent retire rejects poisoned VM before decrementing. This source path
+requires no concurrency assumption,but is not an observed K80 hardware failure.
+
+Before accepted/uncertain commit publication Job remains inactive. VM/device
+references and quarantine remain;no active Job does not imply freed pages or
+stopDMA. Legacy independent6th patch uses16 handles/fixed Jobs/default VM and
+32bit queue,unlike exact128/dynamic/per-Job VM/64bit queue. No mechanical mask/
+layout transplant,automatic composition or32nd invented cleanup/refcount policy.
+
+8 bodySHA/full identities plus frozen6th SHA,provenance only;no old suites/
+targets,native hold/retire peers or phone operations.31 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+actual poisoned-VM BoFree/releaseAll/close gates and retained metadata.
+
+[Evidence](evidence/gpu-catalog-prefix-rollback-contract-2026-11-02.json).
+
+
+## 2026-11-02: poisoned-VM free and close gates
+
+freeBo returns poisoned-VM unmap refusal before clearing mapped Entry metadata
+or releasing memory. Memory refs/quarantine block release and deferred-system
+transfer;VM detach rejects poison. No accepted Submit Job is needed for these
+gates,and empty waitRange does not prove VM refs retired or hardware stopped.
+
+releaseAll can clear an Entry lease count before first free error;it then returns
+without queue reset/close. AGX close drops views and mailbox owner before failure,
+but nonzero blocks forget/destroy/live=false/terminate. free retains a live core.
+This is partial teardown with retained core/space,not an atomic rollback or
+stopDMA proof. No actual K80 leak/UAF or force-cleanup/retry policy inferred.
+
+11 bodySHA/full identities,provenance only;no32nd cleanup/refcount policy,old
+suites/targets,native lifecycle peers or device operations.31 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only retained-live client's actual post-failure dispatch/view eligibility.
+
+[Evidence](evidence/gpu-catalog-poison-close-contract-2026-11-02.json).
+
+
+## 2026-11-02: failed close driver versus IPC entry eligibility
+
+Selected is_io_service_close sets closed before callback and discards callback
+status,returning Success. Nonshared later close skips callback when closed1;
+clientDied has the same CAS condition. AGX may retain live/core/space on error,
+so driver failure is not automatically visible or retried through this wrapper.
+
+runCore still tests live;externalMethod/callExternalMethod bodies do not add a
+failed-close test. Body eligibility is not proof the connection port survives or
+that poisoned-VM methods succeed. Mailbox owner withdrawal blocks its own map
+predicate;BO leases and scanout getter have separate conditions. No successful
+post-close client/map peer,closed reset/retry/security policy or32nd patch.
+
+9 bodySHA/full identities,provenance only;no old suites/targets,native calls,
+wire decode or fields.31 independent UNAPPLIED/8profiles/3111+39/default42/
+CPU/full64/oldinputs/archives preserved. Next only selected closed/death/owner
+reference roots,without assuming active port/task or executing termination.
+
+[Evidence](evidence/gpu-catalog-failed-close-entry-contract-2026-11-02.json).
+
+
+## 2026-11-02: closed/death callback suppression and owner references
+
+Owner registration links task/client pointers without explicit ref acquisition
+in that body;noMoreSenders removes those association records. Port creation
+separately tagged-retains object,and eligible mscount teardown withdraws port
+association with temporary object protection. This is not guaranteed final free.
+
+clientDied conditionally skips clientClose for closed nonshared client. Task
+phase2 temporarily retains ownerless clients across unlocked callback work and
+can also skip closed callbacks. Remaining registry/IPC roots are separate. Base
+free asserts owner links gone;AGX free keeps raw core if live. No actual K80
+final destruction,leak/UAF or stopDMA conclusion follows from these source refs.
+
+9 bodySHA/full identities,provenance only;no32nd retry/reset/free/refcount
+policy,old suites/targets or native lifecycle/port peer.31 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+actual sharedInstance property/open producer,without creating a property policy.
+
+[Evidence](evidence/gpu-catalog-closed-owner-roots-contract-2026-11-02.json).
+
+
+## 2026-11-02: sharedInstance property/open producer
+
+Selected open assigns sharedInstance from presence of the client property key,
+not OSBoolean truth. Present false still counts;absent assigns0 at this reader.
+Ordinary IPC open starts null propertiesDict,rejects incoming properties,and
+passes null to5arg provider override. Exact AGX forwards that to base init.
+
+Base initWithTask routes properties to superclass;registry init retains/copies
+a supplied dictionary or creates empty table. Exact catalog has no shared key
+writer. Fresh standard AGX path without external mutation thus follows absent/
+nonshared case;direct helper properties and actual K80 provider remain unbound.
+This source condition does not create a shared/retry/security/free policy.
+
+6 bodySHA/full identities,provenance only;bounded close/property branch closed
+without32nd policy,old suites/targets or native client/port peer.31 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next independently binds rollback reference-statistics producers/consumers.
+
+[Evidence](evidence/gpu-catalog-shared-property-contract-2026-11-02.json).
+
+
+## 2026-11-02: independent32nd rollback retirement statistics
+
+Held and normal release-retired counters advance only after API0,but four
+rollback sites advanced retired even on failure. Frozen conditional poison path
+rejects retirement before decrement;counter increase therefore need not mean
+actual retirement. size_t getter copy has no named exactcatalog consumer;it is
+not an atomic live-ref snapshot or hardware completion/stopDMA certificate.
+
+Independent32nd guards only those four increments with same API0 test. Original
+calls/loops/primary returns/cleanup/refs remain byte-equal under inverse. No
+bitmap/retained Job/poison/retry/free policy or6th composition. Source apply/
+reverse review and1fresh currentiOS17 full Submit SHA pair pass;sealed original
+verified not rebuilt. Imports equal,header/field/method declarations unchanged.
+
+4 original bodySHA/provenance only;no old suite/target/native peer/device run.
+32 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/
+archives preserved. Next only nonpoisoned ring-error rollback eligibility.
+
+[Evidence](evidence/gpu-catalog-retired-stats-accounting-2026-11-02.json).
+
+
+## 2026-11-02: ring-error rollback eligibility
+
+Exact Ring nonpoisoned errors come from validation/unattached/capacity paths
+before attempted append. Capacity can already read RPTR/acquire and update
+shadow;nonpoison does not mean no IO. Read/emitter/publication/barrier/returned
+WPTR callback failures poison;CPU ring stores may precede conservative poison.
+
+Submit retains held handles/VM on poisoned ring error,without a successful
+fence. Nonpoisoned path attempts reverse rollback and preserves original error
+mapping.32nd only fixes retirement statistics;cleanup metadata remains separate.
+Noncurrent success queues restore intent and software seqno,not GPU ACK.
+Ignored WPTR clear/retry-budget Success remains an independent frozen boundary.
+
+10 bodySHA/full identities/6-8-12 provenance,no old suites/targets/32nd pair
+rerun,packet decode or native peer.32 independent UNAPPLIED/8profiles/3111+39/
+default42/CPU/full64/oldinputs/archives preserved;no33rd cleanup/stop policy.
+Next only queued restore flag consumption/error and actual preempt callers.
+
+[Evidence](evidence/gpu-catalog-ring-rollback-eligibility-2026-11-02.json).
+
+
+## 2026-11-02: queued WPTR restore intent and completion return
+
+Noncurrent submit/kick sets pending CPU intent. restoreWptr refuses unavailable/
+poisoned state;no pending returns0 without write. Pending write error returns
+before clearing flag;only API0 clears it. Existing WPTR0/retry/clear semantics
+remain separate from actual GPU receipt,loaded context or ACK/stopDMA.
+
+preemptIrq marks CPU current after complete. Pending branch counts only API0;
+no-pending branch can count without a write. Overall true reports its completion
+path even if restore fails or loaded ring is absent. Returned callback error
+poisons ring and retains pending flag;true does not propagate that IOReturn.
+Frozen13/12 candidates remain independent and do not change this bool policy.
+
+7 bodySHA/full identities,provenance only;no old suites/targets/32nd pair rerun,
+native IRQ/write/context peer or33rd restore/retry/refcount policy.32 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only driveSwitch continuation/source guard after this completion bool.
+
+[Evidence](evidence/gpu-catalog-queued-restore-contract-2026-11-02.json).
+
+
+## 2026-11-02: driveSwitch continuation after restore result
+
+After preemptIrq true,driveSwitch checks dead flag then loaded/pending/aging/
+disjoint/record pointers,without explicit Ring poison or restore-pending veto.
+pendingOn reads fenceValue whose body checks attached/callback,not ring poison;
+null is still ambiguous. These are source predicates,not a reproduced retrigger.
+
+Trigger guards its own attached/armed/index/loaded fields,not Ring restore state.
+Original record writes/results and partial-trigger failures remain separate.
+True changes CPU current flags;false records skipped/dead. Void driveSwitch
+does not replace accepted Submit or retirement return with a restore/switch
+error. Adding a veto would choose policy;no33rd guessed guard/retry/cleanup.
+
+10 bodySHA/full identities,provenance only;no old suites/targets/32nd pair
+rerun,complete/readCntl replay,native switch/IRQ/context peer or wire change.
+32 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/
+archives preserved. Next only preempt-dead scalar producers/consumers.
+
+[Evidence](evidence/gpu-catalog-switch-continuation-contract-2026-11-02.json).
+
+
+## 2026-11-02: preempt-dead scalar producers/consumers
+
+First markPreemptDead latches reason;later marks preserve it. Trigger refusal,
+timeout,stranded age and guilty ring1 have distinct source call sites. No dead
+latch reset appears in exact Submit source. This is CPU decision state,not an
+attested hardware fault,stop/cancel/IRQ/DMA or lifetime epoch.
+
+Dead sends future priority choice to ring0 and stops new selection after original
+inFlight handling;it does not clear preemption/ringcount/armed/jobs/table state.
+Wait/retirement retain their own gates. hangCheck can return0 with hungtrue for
+stranded jobs;recovery remains separately callback-driven. Hashing its existing
+body does not execute or qualify restart/replay,and it does not clear dead.
+
+10 bodySHA/full identities,provenance only;no old suites/targets/32nd pair
+rerun,native recovery peer or33rd dead/reset/refcount policy.32 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only original hang-poller/recovery source gates/callback owner.
+
+[Evidence](evidence/gpu-catalog-preempt-dead-contract-2026-11-02.json).
+
+
+## 2026-11-02: hang-poller recovery source gates and callback owner
+
+Publication stores raw owners/copied clock and sets published before thread
+start;thread failure does not roll it back. Poller loops sleep/lock then tests
+Submit plus hangCheck0/hungtrue,without separate live/published/recovering guard.
+Lock/callback return is not a bounded wallclock or hardware exclusion proof.
+
+Restart setter borrows raw function/cookie;scoped exactcatalog/fixedmain search
+does not bind installer. No hook only counts;with hook,endFault error suppresses
+its diagnostic copy but does not veto recover. Returned recover status updates
+software fault/suspend counters,not hardware reset/stop/suspend ACK.
+
+7 bodySHA/full identities,provenance only;no old suites/targets/32nd pair
+rerun,native thread/recovery peer or33rd restart/error-gate/refcount policy.32
+independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only endFault partial/error and original mutating request order.
+
+[Evidence](evidence/gpu-catalog-hang-poller-contract-2026-11-02.json).
+
+
+## 2026-11-02: endFault output/error and mutating prefix
+
+Early !ready/null returns before output zeroing;zero offset returns zeros with
+NotReady. Original first/multiple reads can leave partial output on error.
+Contained IO/state handle accessors provide addresses,not retained board owner
+or lifetime/route/stop rights;ready is a software setup phase only.
+
+Original method can request resume,then fault clear,then barrier. Short-circuit
+errors fold to IOError after different attempted prefixes,without rollback or
+readback. This is not a read-only diagnostic;no requests/constants are adopted
+or executed here. Poller suppresses error diagnostic copy but still recovers
+under existing hook path. Missing record is not no-fault/no-attempt/no-mutation.
+
+6 bodySHA/full identities,provenance only;bounded fault branch closes without
+33rd validity/gate/reset/refcount policy,old suites/targets/32nd pair rerun or
+native peer.32 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/
+oldinputs/archives preserved. Next only existing status software counter/reply.
+
+[Evidence](evidence/gpu-catalog-end-fault-contract-2026-11-02.json).
+
+
+## 2026-11-02: status software counters and existing reply
+
+Global uint64 fault/suspend counters saturate;exact producers are returned
+recovery failure/success. Status itself performs no detection/reset/suspend.
+PerVM faults initializes0 with accessor but no increment in exact source;noteHang
+updates hangs,while fail sets poison/quarantine without changing faults.
+
+status zeros local reply,checks open/status pointer,then adds global/VM faults
+and copies suspends. It has no poison/usable health gate. Addition has no local
+saturation,but absent perVM producer is not an actual overflow witness. Dispatch
+copies reply only after API0;error-local zeros are not external no-fault proof.
+Existing two-field ABI unchanged,no missing counter/lost-device policy added.
+
+11 bodySHA/full identities,provenance only;no33rd counter/status policy,old
+suites/targets/32nd pair rerun or native query/peer.32 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+actual VM poison/unusable/fault/hang producers and their existing readers.
+
+[Evidence](evidence/gpu-catalog-status-counter-contract-2026-11-02.json).
+
+
+## 2026-11-02: VM poison versus unusable/fault/hang state
+
+VM initializes poison/unusable false and counts0;copy/assignment are deleted.
+Exact VM source has no unusable/perVM-fault transition beyond initialization.
+noteHang ignores bool and increments hangs. fail sets poison/quarantine/result
+without changing faults/unusable;Submit's own poison reset is a distinct field.
+
+Submit unusable guard is not produced true in this scoped source,but subsequent
+VM describe still rejects poison before returning ranges. Poisoned VM therefore
+is not proven submit-capable by the missing unusable transition. Status reads
+faults,not operational poison;unchanged reply and NotReady can coexist.
+No lost-device/counter/reset policy is inferred from old-driver comments.
+
+10 bodySHA/full identities,provenance only;bounded status/failure branch closes
+without33rd transition/refcount policy,old suites/targets/32nd pair rerun or
+native peer.32 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/
+oldinputs/archives preserved. Next only software coherence/cache-skip source.
+
+[Evidence](evidence/gpu-catalog-vm-failure-state-contract-2026-11-02.json).
+
+
+## 2026-11-02: software coherence/cache-skip source policy
+
+io_coherent has static-storage0;owned_coherent explicitly0,wc_enabled1. Exact
+catalog has no nonzero coherence setter;fixedmain searched patches/scripts/
+profiles do not bind one. Exported volatile symbols are not immutable runtime
+flags or actual K80 coherence/ownership/DMA capabilities. No flags changed.
+
+coherentMapping tests writeback/current global;importedUntouched tests imported/
+global independently of writeback. VM publish/acquire skips lower maintenance
+under either predicate,while attachment/poison/mapping gates remain. Mapping
+intent/old A740 comments or legacy test toggles do not qualify K80 cache behavior.
+Predicates reread globals without an owner epoch contract;no race was reproduced.
+
+9 bodySHA/full identities,provenance only;no33rd coherence/cache/CPU policy,old
+suites/targets/32nd pair rerun,native peer or device operation.32 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only owner_uncached producer and actual inspected mapping scope.
+
+[Evidence](evidence/gpu-catalog-coherence-policy-contract-2026-11-02.json).
+
+
+## 2026-11-02: owner_uncached physical-attribute observation scope
+
+Import assigns helper result once after validated positive page-aligned spans.
+PagesUncached checks per-physical-page cache metadata within kernel DRAM and
+assumes outside-DRAM uncached;it has no task/PTE iterator or error channel.
+Generic all-zero-byte spans return true,but actual import producer excludes
+that input. No successful empty span/page/address model or33rd guard added.
+
+Selected ARM pmap reader returns canonical page WIMG/default or IO-range attrs,
+not every virtual alias/cache line. owner_uncached therefore is a cached source
+observation,not all-current-CPU mappings or K80 coherency/DMA lease. Imported
+publish/acquire can skip lower work after original gates;release clears bool
+only on its completed cleanup path. No revalidation/free/cache policy invented.
+
+7 bodySHA/full identities,provenance only;no old suites/targets/32nd pair
+rerun,native pmap/import peer or CPU policy change.32 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+actual prepare protection/read-only fallback status/direction contract.
+
+[Evidence](evidence/gpu-catalog-owner-uncached-contract-2026-11-02.json).
+
+
+## 2026-11-02: import prepare protection/read-only fallback
+
+Catalog raw protection literal2 matches selected mach KERN_PROTECTION_FAILURE.
+prepare forwards wireVirtual error;its abort remaps two other statuses,not raw2.
+IOKit NotWritable for already-read-only prepared state is distinct. Default
+prepare None inherits descriptor direction;Out selects copyout/read DMA intent.
+
+Only raw2 recreates InOut descriptor as Out;read_only becomes true only after
+second prepare0. Later segment validation/cleanup remains original. mapBo
+removes write permission when this bool is true,without proving all task aliases
+or granting cache/owner rights. No generic error retry/access policy added.
+Partial UPL preparation/abort before failed descriptor release remains separate.
+
+7 bodySHA/full identities,provenance only;no33rd protection/free/refcount
+policy,old suites/targets/32nd pair rerun,native descriptor/page/task peer.32
+independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives
+preserved. Next only selected wireVirtual partial UPL failure ownership.
+
+[Evidence](evidence/gpu-catalog-import-readonly-contract-2026-11-02.json).
+
+
+## 2026-11-02: failed prepare partial UPL ownership
+
+wireVirtual appends each returned block;append failure aborts/deallocates the
+current unsaved UPL before saved-list abort. abortExit requests abort/deallocate
+on saved nonnull blocks,then truncates entries and returns original/remapped
+error. Ignored abort status and refcounted deallocate are not final page-free
+or stopDMA proof;early page-info allocation failure precedes acquisition.
+
+prepare increments wireCount only on0;fresh failed import has no new successful
+wire count. Descriptor free completes existing wired state then drops entries.
+Import releases failed descriptor before raw2 recreation. Lower request error
+output/current-UPL contract remains needed before alleging lost UPL or adding
+cleanup. No33rd force-abort/complete/unwire/retry/refcount policy.
+
+7 bodySHA/full actual selected-source identities,provenance only;no old suites/
+targets/32nd pair rerun or native UPL/page peer.32 independent UNAPPLIED/
+8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved. Next only
+actual lower UPL request error/output ownership in retained selected source.
+
+[Evidence](evidence/gpu-catalog-prepare-upl-owner-contract-2026-11-02.json).
+
+
+## 2026-11-02: lower UPL failure output is not a live owner
+
+Named-entry/map wrappers can reject before touching output. Lower object
+request publishes UPL output before all page work succeeds,but returned-error
+unwind destroys its local UPL without nulling caller output. Failure output can
+therefore be untouched or stale,not a returned live resource to abort again.
+
+wireVirtual tests error before reading/appending current block,then aborts saved
+successful blocks. Missing explicit current cleanup is not a demonstrated leak;
+blind cleanup could target destroyed output. No33rd abort/free/null policy added.
+Named-entry rights failure can be InvalidRight,distinct from raw protection2;
+actual persistent-versus-map branch still needs caller/source binding.
+
+5 bodySHA/full actual selected-source identities,provenance only;no old suites/
+targets/32nd pair rerun,native UPL/page/task peer or stopDMA claim.32 independent
+UNAPPLIED/8profiles/3111+39/default42/CPU/full64/oldinputs/archives preserved.
+Next only persistent descriptor/memRef producer and actual branch/error route.
+
+[Evidence](evidence/gpu-catalog-upl-error-output-contract-2026-11-02.json).
+
+
+## 2026-11-02: persistent descriptor factory and prepare branches
+
+Exact importRange first requests Persistent and falls back to plain options on
+any null factory result. Selected withAddressRanges adds Virtual64 for a task,
+creates an owning shared result and returns it only after init success. Fresh
+persistent init creates a memory reference;an error becomes factory null. The
+helper does not request AutoPrepare. Factory outcome does not prove pages pinned.
+
+Fresh persistent prepare uses named-entry UPL requests;fresh plain task prepare
+uses map UPL requests. These paths can return different permission errors. Only
+prepare raw2 triggers exact importTask read-only recreation;earlier null factory
+fallback does not establish that status. Entry-reference cleanup is not proof of
+final physical-page free or stopDMA. Raw/shared factory ABI is not newly qualified.
+
+8 bodySHA/fullSHA with two unchanged parent bodies provenance only;no new patch,
+old suite/target/32nd pair rerun or successful descriptor/task/page/address peer.
+32 independent UNAPPLIED/8profiles/3111+39/default42/CPU/full64/archives retained.
+Next only selected named-entry creation error/output ownership.
+
+[Evidence](evidence/gpu-catalog-persistent-import-contract-2026-11-02.json).
+
+
+## 2026-11-02: named-entry returned-error ownership
+
+Fresh exact helper options select user-map existing-object extraction. Range
+validation/extraction/protection errors precede named-entry handle publication.
+The copy extractor discards its local copy on returned error;post-extract
+protection rejection also discards it. Error output is not a live entry to free,
+and is not universally initialized null. Earlier write-COW work can have run.
+
+Upper memoryReferenceCreate checks error before consuming current entry and
+frees accumulated accepted entry references on returned failure. Fresh init
+collapses error to factory null,distinct from later prepare raw2. Entry metadata
+allocation uses existing NOFAIL/wait semantics;no bounded allocation or physical
+page-free/stopDMA result follows. Other allocation/growth invariants stay unqualified.
+
+7 bodySHA/fullSHA with four unchanged parent bodies provenance only;no33rd patch,
+old suite/target/32nd pair rerun or successful descriptor/port/page peer.32 patches
+remain independent UNAPPLIED,all native/device OFF. This bounded import-error
+branch is closed. Next consolidate finite first-execution prerequisites from
+existing evidence,with missing producer/artifact and permitted offline next step.
+
+[Evidence](evidence/gpu-catalog-named-entry-output-contract-2026-11-02.json).
+
+
+## 2026-11-02: finite first-GPU-execution prerequisites
+
+Existing evidence is indexed into eight prerequisite categories:K80 power and
+security policy;context/routing;DMA/cache/lifetime;safe stop;selected iOS17
+compatibility;startup/integration;failure observability;fresh authorization and
+bounded recovery. Each has SHA-pinned evidence,missing producer/artifact and an
+allowed offline next action. This is a planning inventory,not executable ready
+or runtime selection. None establishes current K80 hardware authority.
+
+32 independent unapplied patches and repeated source audits do not measure a
+completion percentage or support an ETA. Catalog fullcore role errors remain
+frozen;generated board startup and native hardware prerequisites remain open.
+The conversational weeks-or-longer allowance is not a verified project schedule.
+
+11 existing evidence SHA only,zero new function bodies/tests/compiles or driver
+patches. Existing protection,CPU/storage/default42 and independent archives
+preserved. Next focus exact supplied K80 power-policy producer availability
+against historical adapter policy-unavailable5;no new rates/votes or execution.
+
+[Evidence](evidence/gpu-first-execution-prerequisites-2026-11-02.json).
+
+
+## 2026-11-02: K80 power-policy producer availability
+
+Fixed main627 tracked source scopes and corrected maintained board roots do
+not supply a named K80 vote/rate/variant producer or the generated Service
+firmware-rules/votes/commandDB outputs. Component metadata,include paths and
+device names are not generators. This is bounded source availability,not a
+global absence claim. The SM8650 tracked SoC slice is explicitly non-GPU.
+
+Historical adapter terminal5 already means missing policy,not a native provider
+error. K80 cached resource/firmware/CPU-startup descriptions are not authority.
+Exact Sm8550 APIs require authenticated board policy and retained coherent
+commandDB bytes with independently qualified version;they cannot supply K80
+policy by substitution. Four missing artifact requirements are recorded.
+
+18 pinned file identities plus searched file/tree identities;no new body,
+compile,test,generated policy or patch.32 independent UNAPPLIED/all native and
+device OFF;CPU/storage/default42/old inputs/archives preserved. Next only actual
+K80 context/routing producer availability from the finite prerequisite inventory.
+
+[Evidence](evidence/gpu-k80-power-policy-availability-2026-11-02.json).
+
+
+## 2026-11-02: K80 context/routing producer availability
+
+Corrected fixed-main/maintained-board/exact64 searches bind library APIs and
+source-check scripts,but no qualified actual K80 GPU context-bank/ASID/SID
+owner,preempt-record caller,IRQ-controller route or target-context handoff.
+UFS bank takeover code and GPU CPU-domain descriptors are separate contracts.
+
+The exported preempt IRQ bridge and a GpuPowerProbe comment do not establish
+an installed K80 interrupt handler. Decoder attach/programMask is not controller
+registration. Exact alternate Service initializes gpu_context_ready false with
+no true writer in exact64;GMU scalar bootargs do not supply GPU-stream authority.
+No flag,bootarg,caller,bank or routing policy is added;alternate stays unselected.
+
+17 fileSHA plus bounded source searches;existing scalar/preempt owner proof is
+provenance only. Four missing producer/owner artifacts recorded,no global absence
+claim,new body/compile/test/patch or native operation.32 independent UNAPPLIED,
+CPU/storage/default42/full64/oldinputs/archives retained. Next only finite DMA/
+cache/lifetime prerequisite producer availability,not generic consumer re-audit.
+
+[Evidence](evidence/gpu-k80-context-route-availability-2026-11-02.json).
+
+
+## 2026-11-02: K80 DMA/cache/lifetime producer availability
+
+Maintained registries and visibility bridges supply default-OFF CPU software
+contracts. Private32objects,budgets,caller output width/IOVA Geometry and cached
+FDT resources do not establish hardware OAS/domain authority or live ownership.
+Existing catalog variants remain separate from legacy five-argument CPU sources.
+
+The table bridge requires actual stable inactive memory,exclusive arena/state
+and retained callback lifetime before any native call. Its selectedMode checks
+software configuration only;poison/retention does not prove stop or DMA retirement.
+Scoped searches find library/check code,not a qualified external K80 owner
+producer. Four missing ownership/visibility/lifetime artifacts are recorded.
+
+19 fileSHA plus bounded searches,zero new body/compile/test or patch. Existing
+refusal checks and target objects are provenance only.32 independent UNAPPLIED,
+all native/device OFF;CPU/storage/default42/full64/oldinputs/archives retained.
+Next only actual K80 safe-stop/DMA-retirement producer availability from the
+finite prerequisite inventory,no generic cache/import/shutdown consumer re-audit.
+
+[Evidence](evidence/gpu-k80-dma-owner-availability-2026-11-02.json).
+
+
+## 2026-11-02: K80 safe-stop/DMA-retirement producer availability
+
+Fixed-main/maintained-board source scopes do not bind an actual K80 quiesce
+provider,all-master stop acknowledgement,DMA-retirement release eligibility or
+owner-epoch lifetime. Exact NativeAdrenoGpu injects callbacks and interprets
+API0 as a CPU quiesced flag;that does not supply the missing board implementation.
+
+Frozen Service framework stop and independent Linux error-retention repairs do
+not prove hardware stop. Linux reference is not Xiaomi exact policy. Job/fence
+counts,halt flags,drain/unregister/quarantine,CPU profile epoch1 and historical
+Recovery cannot become a new GPU stop/owner lease. No callback or flag added.
+
+18fileSHA plus bounded searches,zero new body/compile/test or patch. Four
+missing artifacts recorded,with no global absence claim.32 independent UNAPPLIED,
+all native/device OFF;CPU/storage/default42/full64/oldinputs/archives retained.
+Next only finite selected-iOS17 compatibility/startup artifact assessment from
+frozen evidence,no old role search/fullcore/target/suite/pair rerun or candidate.
+
+[Evidence](evidence/gpu-k80-stop-owner-availability-2026-11-02.json).
+
+
+## 2026-11-02: finite selected-iOS17 compatibility/startup artifact map
+
+13 frozen records now index six missing software/startup artifacts and their
+dependencies. Catalog role API5-error failure stays SHA-verified and unretried.
+Permission-denial/game/process roles or default0 cannot replace that contract.
+32 independent UNAPPLIED patch/object proofs are not a coherent combined build;
+private owner/layout/signature changes need a future whole-owner rebuild.
+
+Actual Service preprocessing excluded generated rules/votes/DB startup headers.
+Canonical462-input context proof still has19 unpopulated core gitlinks,no
+compile receipt/object or runnable/full-workspace qualification. Native linking,
+donor export selection and collision names remain separate obligations.
+
+Zero new body/search/compile/test/patch or final kernel/candidate selection.
+Four hardware prerequisites remain open. CPU/storage/default42/full64/oldinputs/
+archives and all native/device OFF retained. Next only remaining observability/
+fresh-authorization boundaries and a single finite eight-category state index,
+then meaningful source/artifact deltas rather than repeated unavailable scans.
+
+[Evidence](evidence/gpu-k80-build-startup-prerequisites-2026-11-02.json).
+
+
+## 2026-11-02: finite eight-category first-execution state index
+
+All eight prerequisite categories now link concrete evidence,missing source/
+artifact requirements and allowed next actions. Power/context/DMA/stop source
+gaps and catalog compatibility/startup gaps remain unqualified. The final two
+entries bind approved failure-observability limits and absent fresh execution
+authorization. This index is not executable ready,admission or a hardware lease.
+
+Original single4KiB terminal-before-payload and normal v18/84text/3072footer/
+v19/E20/v21 remain unchanged. A report may be unavailable before valid owner or
+on nonreturning I/O. Historical readytrue is consumed pre-payload scope;current
+allow_boot/readbackfalse/WriteAuthorized0. No private commit double-SUCCESS or
+full-filesystem claim follows from the historical resource record.
+
+14recordSHA/current owner snapshot,zero new body/search/compile/test or patch.
+32 independent UNAPPLIED/CPU/storage/default42/full64/oldinputs/archives retained.
+A bounded source-delta baseline now prevents repeating completed generic audits
+or unchanged absence scans. Continue only concrete meaningful permitted input
+deltas;keep heartbeat/wake active and unchanged conditions quiet. FirstGPU/
+rendering/Metal remain incomplete;no measured ETA or audit-based percentage.
+
+[Evidence](evidence/gpu-k80-first-execution-state-index-2026-11-02.json).
+
+
+## 2026-11-02: cached GPU/Gen7GMU DT input graph implementation
+
+Owner corrected the idle loop;the former delta-only waiting instruction is superseded. Added an offline source tool using the existing pinned FDT parser. It follows provider cell arity,retains original property bytes/status,refuses duplicate handles/paths,truncated arguments,SHA mismatch and output replacement. Actual cached GPU clock phandle0 remains explicitly unresolved,without guessed provider boundaries. GPU and actual qcom,gen7-gmu roots are included. No generated policy/header or runtime selection. New focused tool checks passed;no old suite/target/native/device execution.32 patches remain independent UNAPPLIED. Next bind existing raw stock DT/overlay extraction inputs to this concrete unresolved source graph.
+
+[Evidence](evidence/gpu-dt-input-graph-2026-11-02.json).
+
+
+## 2026-11-02: raw stock GPU DT source extraction implementation
+
+New offline extractor validates embedded FDTs with the existing parser and SHA-pinned local image bytes. It extracted four vendor_boot base trees plus one DTBO overlay source without selecting a boot variant or applying an overlay. All four raw GPU clock properties contain provider references,where cached live source had only0. Full source inputs are now available for the next parsing step;no clock/rate/vote policy is generated or adopted. New focused extraction/length/version/SHA/no-overwrite checks passed. Overlay-only source refusal by the previous graph tool is retained and motivates actual overlay-aware source inspection next. No old suite/target/native/device calls;32 patches stay independent UNAPPLIED.
+
+[Evidence](evidence/gpu-stock-dt-source-2026-11-02.json).
+
+
+## 2026-11-02: overlay-aware source relation implementation
+
+New source inspector resolves external symbols,fragment target/path and property byte-offset locations separately against each unselected base,without applying fixes or overlays. It retains unresolved symbols and local fixup bytes;local target handles cannot accidentally resolve to colliding base handles. Four source relations each resolve89fragments/426external fixups. No direct GPU/GMU overlay target appears. New malformed/collision/no-mutation checks pass;final source relations unchanged by the added local-fixup guard. Original GPU/GMU power/OPP/status properties now have source locations for strict schema reading next,without speed-bin/rate/voltage/variant selection or policy generation. No old suite/target/native/device call;32 patches remain independent UNAPPLIED.
+
+[Evidence](evidence/gpu-overlay-source-2026-11-02.json).
+
+
+## 2026-11-02: strict raw GPU/GMU source schema implementation
+
+New reader validates source cell widths,required fields,per-table duplicate IDs,empty tables,SKU cell arrays,initial-index references and complete GMU pairs. Optional speed-bin absence is retained as unavailable,not default0;disabled source rows stay present. All four unselected base trees retain their four GPU tables (12/14/9/12 or13/12/13/11) and two raw GMU pairs. It chooses no rates,voltage,SKU,bin,variant or runtime header. Existing non-Xiaomi gen7 consumer only establishes alternating cell-read provenance. Eight malformed-source checks plus disabled/absence/input/no-overwrite checks pass. No old suite/target/native/device call;32 patches remain independent UNAPPLIED. Next locate actual existing votes-header generator source and repair only a concrete ambiguous-input/schema bug without generating K80 policy.
+
+[Evidence](evidence/gpu-power-source-schema-2026-11-02.json).
+
+
+## 2026-11-02: actual votes-generator input-order repair
+
+Located two identical retained prepare-sheng-gmu-votes.py sources. Their fixed single-OPPv2/Sheng catalog schema is distinct from K80 multi-SKU source tables and is not adopted. Actual generator wrote its votes header before validating commandDB compatible/range/no-map/size. An independent UNAPPLIED source repair moves the unchanged DB validation ahead of output setup and header writes. Four new CPU source-input refusal traces reproduce/intercept the original premature write;the repaired order rejects before any write. No policy header is emitted and full prepare/audit is never invoked. Independent patch apply/reverse restores exact bytes. This fixes input-validation ordering only,not filesystem multi-file atomicity or missing K80 policy.32 driver patches remain independent UNAPPLIED. Next implement isolated pure input preflight to reject incompatible/ambiguous source before audit/formatting/emission.
+
+[Evidence](evidence/gpu-votes-generator-preflight-2026-11-02.json).
+
+
+## 2026-11-02: isolated pure votes-generator source checker
+
+Independent UNAPPLIED addition to exact original generator exposes validate_source_nodes without running prepare/audit/formatters/header writes. Previous generator order repair is not composed;prepare AST remains unchanged. Six malformed/unsupported source cases and all four actual K80 multi-SKU bases are refused;source checker executes only with restricted CPU builtins,without file/import/process capabilities. No rate/bin/SKU/variant conversion or policy header emitted. Initial harness omission of range is preserved and fixed only in the restricted builtin list. Independent patch apply/reverse restores exact original. This is shape/refusal scope,not whole-generator or K80 hardware qualification.32 driver patches remain independent UNAPPLIED. Next add a source-check-only command route so raw source inputs can be checked directly without default generator execution.
+
+[Evidence](evidence/gpu-votes-pure-source-check-2026-11-02.json).
+
+
+## 2026-11-03: isolated source-check-only CLI implementation
+
+Independent generator candidate now accepts SHA-pinned raw source JSON via --source-check-only and returns explicit stdout schema acceptance/refusal. Default emission is disabled locally. Duplicate JSON keys/node paths,malformed hex/root and SHA mismatch are refused. Thirteen CLI routes including four real K80 multi-SKU source graphs pass under child audit guards forbidding file writes and subprocess execution. Original prepare AST stays unchanged and is never called;no policy headers emitted. Independent patch apply/reverse restores original.32 driver patches stay independent UNAPPLIED. A concrete source-table-only header proposal is prepared for review because the owner restriction on K80 policy/runtime header generation remains in force;no physical assistance or device activation is requested.
+
+[Evidence](evidence/gpu-votes-source-cli-2026-11-03.json).
+
+
+## 2026-11-03: source-check CLI phandle identity repair
+
+While the header-scope proposal remains unapproved,continued independent source code repair. The prior pure CLI checked fixed OPP phandle equality but accepted a second source node with the same handle,conflicting linux aliases,reserved0/ffffffff and malformed unrelated handle widths. Six newly reproduced admissions now refuse with a whole-source identity guard;equal aliases on one node remain valid source shape. Seven new cases only run under no-write/no-process child guards,no old CLI suite rerun. prepare AST unchanged/unexecuted,independent apply/reverse inverse exact,0 headers. This is source identity,not K80 hardware ownership.32 driver patches remain independent UNAPPLIED. Next separately bind claimed source JSON properties to actual SHA-pinned raw DTB provenance;JSON self-SHA alone does not attest raw source.
+
+[Evidence](evidence/gpu-votes-source-identity-2026-11-03.json).
+
+
+## 2026-11-03: raw DTB source provenance verification
+
+Separately SHA-pinned source JSON and saved raw DTB now undergo exact declared node/property-set/byte and inherited-status correspondence checks. The compatibility checker consumes the whole raw tree,so a trimmed JSON cannot hide K80 SKU nodes. Eleven new cases and four real source bindings pass under child no-write/no-process guards;raw-source verification and incompatible multi-SKU schema refusal remain distinct. Coverage is declared properties/status only,not JSON reference edges or root-selection attestation. No header/policy/prepare/native execution;32 driver patches stay independent UNAPPLIED. Header proposal remains unapproved. Next implement raw reference-cell correspondence without adopting hardware policy.
+
+[Evidence](evidence/gpu-source-provenance-2026-11-03.json).
+
+
+## 2026-11-03: raw reference correspondence and missing-arity repair
+
+Added separate raw reference-cell correspondence verifier:whole-tree phandle aliases/provider arities reconstruct each declared reference and cell offset;unknown handle/arity retains the original unresolved tail. Four real source graphs bind,seven forged-edge cases refuse,and eight focused raw-cell cases pass. The producer previously threw on a known provider missing its arity property;it now preserves the unresolved tail while malformed present arity still refuses,verified by three new producer observations. Coverage remains declared references only;roots/closure and hardware authority are not attested. No old suite,header,prepare/native/device execution.32 driver patches remain independent UNAPPLIED. Next bind source roots and dependency closure to the saved raw tree.
+
+[Evidence](evidence/gpu-reference-source-2026-11-03.json).
+
+
+## 2026-11-03: complete raw source graph and pure schema route
+
+The existing read-only reference CLI now offers --graph-check-only,deriving GPU/Gen7 GMU compatible roots and the complete children/known-provider dependency closure directly from the saved raw tree. Declared roots,node membership and strict boolean resolution status must match. Four actual base graphs pass;nine forged graph cases refuse;cycle/disabled-root/unknown-tail and absent-root fixtures retain source semantics. The additional --source-schema-check route requires graph verification and extracts only the pinned pure generator function AST. Four complete K80 graphs still refuse incompatible Sheng multi-SKU schema;omitting the graph flag refuses before entry. Graph completeness does not imply schema compatibility or K80 ownership. No prepare/audit/formatter/header/native/device operation;32 independent driver patches unchanged. Next expose validated raw power-source tables through a read-only stdout mode.
+
+[Evidence](evidence/gpu-graph-closure-2026-11-03.json).
+
+
+## 2026-11-03: verified power-source stdout integration
+
+read-zorn-gpu-power-source.py now exposes --stdout with mandatory separately SHA-pinned raw DTB and graph JSON. Raw property/reference/root/closure validation precedes unselected table reading;all verified source properties retain bytes and raw hex,including unknown values. Four base inputs each retain four GPU tables and two GMU cell pairs. Nine new refusal routes pass under no-write/no-process child guards. Legacy --out remains mutually exclusive,retains the original JSON shape and refuses overwrite. This is source data,not acceptance by the incompatible Sheng generator or hardware authority. No header/policy/prepare/native/device operations;32 independent driver patches remain unchanged. Next compare raw source differences across all bases without collapsing or choosing variants.
+
+[Evidence](evidence/gpu-power-source-stdout-2026-11-03.json).
+
+
+## 2026-11-03: explicit multi-source raw table comparison
+
+Added a read-only explicit multi-source comparison CLI. Each source independently revalidates its raw DTB/graph/closure before raw GPU/GMU table bytes are compared. Four distinct base identities remain visible:154 property positions share bytes across all sources,and267 differ or are absent. This is raw equality,not semantic policy equivalence. Ten new manifest/source refusal cases and focused missing-versus-empty/unknown/node-presence checks pass;child writes/processes are forbidden and source inputs remain unchanged. No variant/bin/SKU/frequency selection,vote derivation,header,prepare/native/device execution;32 driver patches stay independent UNAPPLIED. Next expose precise path/property/width schema mismatches at the existing pure generator input boundary without conversion or emission.
+
+[Evidence](evidence/gpu-power-source-compare-2026-11-03.json).
+
+
+## 2026-11-03: structured pure source-schema mismatch diagnostics
+
+Added structured schema diagnostics after raw DTB/graph verification. Actual fixed Sheng node/table/count paths are extracted from the pinned pure-checker AST;only that pure function executes. Reports retain K80 source paths,unselected SKU/bin availability,each entry property raw bytes/width and GMU cell pairs separately from the OPPv2 consumer contract. Four actual sources retain the original multi-SKU refusal;four invalid input routes refuse before diagnosis. No alternate path selection,width conversion,scaling or value derivation is performed,and prepare_allowed remains false. No headers/prepare/native/device actions;32 independent driver patches unchanged. Next attach these per-base diagnostics behind an explicit option on the existing read-only multi-source CLI.
+
+[Evidence](evidence/gpu-source-schema-diagnostics-2026-11-03.json).
+
+
+## 2026-11-03: integrated multi-source schema diagnostics and concrete next scope
+
+The multi-source comparison CLI now accepts explicit --schema-diagnostics,passing each already verified raw root directly to the pinned diagnostic/pure-checker entry. Four K80 inputs preserve the compatibility refusal:compared=true,source_schemas_compatible=false,prepare_allowed=false and exit2. The no-option output exactly matches the prior comparison;three new flag/pin/self-signed-result gates pass. Workflow documentation provides the exact retained manifest invocation. The read-only source-input branch is complete. Its next source-derived header/layout review is a concrete pending scope change under the existing no-header/policy restriction;no proposed header or compile output has been created. This is not a driver build or hardware progress.32 driver patches remain independent UNAPPLIED;native/device actions remain OFF.
+
+[Workflow](gpu-offline-source-inputs.md). [Evidence](evidence/gpu-multisource-schema-cli-2026-11-03.json).
+
+
+## 2026-11-03: owner-approved source data header and iOS17 isolated layout compile
+
+The owner replied “允许” to the concrete unselected source-data header/layout proposal. Added an explicit approved-manifest emitter;all4 base identities,16 GPU tables,192 entries,8 GMU pairs,340 nodes,2298 original properties and explicit optional-field absence survive raw-byte/order roundtrip. The generated header passes isolated arm64 iOS17 compile-time layout checks. A separate data-only MH_OBJECT contains167116 bytes exactly matching the reviewed source model,with no instruction bytes,undefined symbols,exports or relocations;it is never loaded or linked. Three invalid layout clones,three invalid object clones and two new emission-gate failures refuse;exclusive outputs and32 independent driver patches remain preserved. This approves raw data/layout review only;no table selection,rate/vote policy,startup/component/caller/FD/kernel selection,native API or device operation occurred. Full GPU execution/rendering/Metal remains incomplete.
+
+[Evidence](evidence/gpu-source-layout-review-2026-11-03.json).
+
+
+## 2026-11-03: default-plan-only source data build entry and raw failure retention
+
+Added build-zorn-source-data-review.py as a maintained source-review-only entry. Default mode validates the exact approved manifest/receipt/compiler and prints a plan without output writes or processes;explicit --execute creates a fresh isolated review,compiles only iOS17 source data and verifies the data-only object. Existing/sealed outputs refuse. One initial actual build,five preflight gates,a real clang refusal and explicit timeout/write-error fixtures pass. A subsequent raw-log repair removes text decoding:stdout/stderr bytes and hashes are retained independently,including NUL/nonUTF8 timeout/error prefixes;one changed-entry real build and two focused failure fixtures pass. Initial preimage/test evidence is retained,not mechanically requalified or rerun. No old driver suites/fullcore/pairs,native/device APIs,component/caller/FD/kernel selection or policy generation.32 patches remain independent UNAPPLIED. Next add explicit read-only artifact verification without rebuilding.
+
+[Evidence](evidence/gpu-source-data-build-entry-2026-11-03.json).
+
+
+## 2026-11-03: read-only source review verification without rebuilding
+
+Added explicit --verify-only with an independently retained receipt SHA. It reconstructs expected data from the approved raw DTB/graph inputs,checks exact header/model/object bodies and local raw streams/events/command/scope coherence,and never follows external paths from a receipt. Source bodies remain required even if a caller re-signs a modified success JSON. One existing review verifies under a no-write/no-process guard;13 new refusal cases cover forged source/object/model bodies,logs,event histories,authority/target flags and receipt anchors. No compile,old suite or device operation is repeated. The result is source archive integrity,not trusted compiler execution or GPU readiness. This finite source-review interface branch is complete. The next bounded implementation uses already supplied SHA-bound AOP ELF files to distinguish static firmware containers from the exact complete coherent CommandDB snapshot contract;no firmware execution or database/version/rights inference.
+
+[Evidence](evidence/gpu-source-review-verify-2026-11-03.json).
+
+
+## 2026-11-03: bounded stock AOP ELF source-kind reader
+
+Added a SHA-bound read-only ELF32 source-kind inspector for the two supplied stock AOP files. Header/program/section file extents are checked without load-address output or firmware execution. PT_NULL metadata,zero-byte ranges and NOBITS retain their distinct file semantics. Static firmware and literal magic always refuse live CommandDB snapshot/version qualification. Two actual files,13 malformed/SHA cases and four source-boundary cases pass under a no-write/no-process child guard. A subsequent bounded-reader fix reads at most64MiB+1 before hashing;two focused byte-limit cases and one guarded real input pass while the parser AST remains unchanged. Old suites/driver compiles were not rerun;32 patches remain independent UNAPPLIED and all native/device paths remain OFF. Next implement the supplied four DT reservation descriptions as source descriptions only.
+
+[Evidence](evidence/gpu-aop-source-kind-2026-11-03.json).
+
+
+## 2026-11-03: strict raw CommandDB reservation source descriptions
+
+Added a read-only SHA-bound CommandDB reservation-description reader for all four retained stock DTBs. Exact raw properties and explicit parent cell declarations match the retained source inputs. Missing/unsupported cell geometry,incomplete reg tuples and contradictory boolean properties refuse;absent/nonempty ranges remain unknown/uninterpreted instead of inventing translation. Raw unknown properties survive,and no physical address accessor,mapping permission,live DB or version eligibility is produced. Four guarded real-source paths,10 new refusals,three unknown-preservation cases and two focused byte-limit/malformed-FDT cases pass. No old suite,compile,native or device operation occurred. The finite source-description branch is complete;the next concrete audit checks the retained consumer's stated4096-entry contract against its actual count/extent checks using isolated synthetic inputs,without selecting K80 geometry or policies.
+
+[Evidence](evidence/gpu-commanddb-reservation-2026-11-03.json).
+
+
+## 2026-11-03: conditional CommandDB aggregate count repair
+
+The retained primary CommandDB header promises a4096-entry bound,but its C implementation only checked individual file extents. Under an explicitly synthetic100000-byte host fixture,both a single4097-entry row and a total4097 entries across rows reached Missing instead of an early count rejection. An independent UNAPPLIED source patch caps aggregate scan work before record traversal. Both cases now return Corrupt;4096-entry and other argument/version/magic failure cases retain their behavior. All eight failure outputs remain byte-identical;ASan/UBSan pass. The real generated Source.h is unavailable;the fixture is neither K80 geometry nor a qualified DB/version. The first harness compilation failed on missing stdio.h and is retained;the host-only sysroot correction supplies sanitizer-harness headers without changing the iOS17 target. The32 driver patches and catalog sources remain untouched;no startup/native/device execution or policy integration occurred.
+
+[Evidence](evidence/gpu-commanddb-count-contract-2026-11-03.json).
+
+
+## 2026-11-03: GMU pure range helpers and callback boundary
+
+Isolated the exact retained GMU extent/overlap integer helpers without compiling the validator or runtime. Twelve extent boundaries and ten overlap pairs in both orders pass against independent interval expectations under ASan/UBSan. Empty-range behavior has a counterexample outside the caller domain:validate requires nonzero firmware and memory extents before overlap. No reachable defect or repair is claimed. Static review confirms validate invokes sha256 and therefore is not pure;its callback was never supplied or executed. The header requires exclusive ownership,coherency and independent physical alias proof. Startup initializes resource retention before validation;post-mutation reset/poison never authorizes release. None of those runtime contracts was exercised. No generated policy header,selected startup,old suite or device operation;all32 driver patches and the separate CommandDB patch remain UNAPPLIED.
+
+[Evidence](evidence/gpu-gmu-range-contract-2026-11-03.json).
+
+
+## 2026-11-03: GMU byte-bound predicate review and finite offline closeout
+
+The exact fits return expression was isolated as an integer-only model using synthetic numeric tokens;no native MMIO descriptor or address was constructed. Fifteen alignment,4-byte endpoint and overflow cases pass under ASan/UBSan. BindMmio was reviewed statically only:output clears before validation,all window/overlap checks precede callback publication,and the header requires disjoint inputs/output. Neither binding nor any callback ran. No reachable defect or source patch is claimed. This closes the finite unselected source/data and pure GMU boundary branch. Startup integration still lacks an actual owned coherent CommandDB snapshot and independent expected version,qualified K80 policies and native ownership/coherency/stop/SMMU contracts;the existing approval excludes runtime selection/startup/device execution. Those missing inputs cannot be replaced by synthetic fixtures,Sheng policy,DT cells or more diagnostic indexes. Full GPU execution/rendering/Metal remains incomplete.
+
+[Evidence](evidence/gpu-gmu-fits-contract-2026-11-03.json).
+
+
+## 2026-11-03: raw CommandDB offline receiver and acquisition design
+
+After the owner requested continued GPU work,implemented a bounded read-only raw-file decoder from the supplied Linux byte-layout contract.All resource rows/raw IDs/address bytes/priorities/AUX remain unselected and observed version is never qualified.Three preservation cases,12initial refusals,a guarded CLI and one subsequent aggregate-budget refusal pass;no old suite/target was rerun.The acquisition design shows why debugfs text and the existing4KiB carrier cannot deliver a complete131072-byte reservation.No device exporter/boot admission is ready and no device operation or recurring automation was started.
+
+[Evidence](evidence/gpu-commanddb-input-acquisition-2026-11-03.json).
+
+
+## 2026-11-03: unselected freestanding CommandDB C file core
+
+Implemented ZornCommandDbFile.c/.h as a reusable pure byte-layout core without Sheng vote types,generated board headers,resource-name filters or version/voltage/rate policies.It validates all searched rows/AUX and capacity/alias/budget constraints before copying any output;header/raw entries remain available as source data and qualification fields stay zero.Four valid cases and17refusals pass with byte-unchanged failure outputs under ASan/UBSan.The same source compiles into an isolated arm64 iOS17 object,whose deployment load command is checked;the target object is never executed.Initial harness enum-signedness compile failures are retained;types were fixed without weakening warnings.No selected component/caller/startup,old suite,native provider,automation or device action.
+
+[Evidence](evidence/gpu-commanddb-freestanding-core-2026-11-03.json).
+
+
+## 2026-11-03: raw receiver repeated-AUX amplification repair
+
+Found and reproduced an actual raw-file receiver output amplification:one75000-byte synthetic file with256 overlapping65535-byte AUX ranges produced33553920 AUX hex characters;the previous input/count limits did not bound repeated AUX materialization.Fixed the decoder with a complete AUX extent/aggregate-byte preflight before per-entry hex construction.Repeated aliases count toward an8MiB AUX-export budget;over-budget inputs refuse instead of truncating source data.Mutable supplied buffers are frozen before the two passes.Three new over-budget cases reject with less than1MiB traced allocation,including a cross-row aggregate and the one-byte-over boundary.The exact8MiB boundary succeeds,within-budget output remains identical to the retained preimage,and guarded CLI returns only failure JSON with exit2.No old suite,driver/object target or device operation was repeated.The C file core remains unchanged because it returns AUX offsets/lengths instead of copying AUX bytes.The budget is an offline receiver resource limit,not K80 runtime policy or snapshot qualification.
+
+[Evidence](evidence/gpu-commanddb-aux-export-budget-2026-11-03.json).
+
+
+## 2026-11-03: AOP envelope aggregate payload-hash work repair
+
+The adjacent static AOP envelope reader had a distinct hashing-work amplification:an actual1MiB synthetic ELF with128 repeated in-file PT_NULL ranges was accepted and hashed128MiB of payload;the previous per-file and row limits could permit256GiB of repeated hashing.Fixed the reader with metadata/aggregate-payload preflight before the first payload hash.The64MiB aggregate payload-work budget counts duplicate/overlapping ranges separately and changes no runtime geometry.Three new refusal paths perform zero payload hashes;exact64MiB work succeeds.Two actual retained AOP sources retain byte-identical envelope output under the changed reader;this checks only the modification,not firmware authentication or hardware qualification.Guarded CLI refuses over-budget work.No old malformed suite,driver/fullcore target,native/provider or device execution.The separate raw CommandDB AUX-export amplification was also fixed and archived this round.
+
+[Evidence](evidence/gpu-aop-payload-hash-budget-2026-11-03.json).
+
+
+## 2026-11-03: independent visibility snapshot output-alias repair
+
+Reproduced a source-level report overwrite in the default-OFF visibility publisher:the actual snapshot method excluded its own context but not cached table-pool or borrowed memory-object intervals.An independent UNAPPLIED candidate now rejects either alias before copying,without a native getter or layout/API change.Three pool collisions and three additional opaque-owner collisions changed host bytes before the respective fixes and now reject unchanged;adjacent outputs and lock release remain intact.ASan/UBSan pass.Tests inject cached metadata only,with no native object construction/dereference,bind,successful backing or callback.The final default-OFF iOS17 ARM64 candidate compiles against actual selected headers with285 inputs and no native provider imports;the target is not linked/executed.Pool-only phase sources/outputs/object remain separate from the further owner guard.No main native source,32driverpatch,8profile,component/caller or device selection changes.
+
+[Evidence](evidence/gpu-visibility-report-pool-alias-2026-11-03.json).
+
+
+## 2026-11-03: independent preparation report exclusion repair
+
+The preparation composition report methods excluded only their own context,not caller-retained memory/arena/state or the observed table pool.An independent UNAPPLIED candidate stores non-owning exclusion intervals after existing argument checks and before failure/native paths;it adds no getter and retains neither short-lived Geometry nor callback-output storage.Both snapshot APIs now reject collisions before copying/delegating.24 host byte-overwrite cases reject unchanged,16adjacent cases and empty reports retain behavior,and malformed metadata/lock-release checks pass under ASan/UBSan.No native object,prepare,getter,bind,callback or successful backend is exercised.The private candidate context grows168host->240bytes,with240 independently confirmed in an iOS17 constinit object without an initializer;public Report fields stay identical.Changed OFF/compile-only-ON objects use real selected headers and preserve recipe flags;no target executes.Main sources,32driverpatches,8profiles and the previous child candidate are unchanged/uncomposed.
+
+[Evidence](evidence/gpu-preparation-report-alias-2026-11-03.json).
+
+
+### 2026-11-03: bounded offline provenance/reference reads
+
+Reproduced whole-file reads before the JSON limit and missing raw DTB read cap. Two isolated UNAPPLIED candidates use 16 MiB+1 actual reads; the reference candidate strictly pins the provenance candidate. Oversize traces, exact-bound helper, two real equivalences per CLI and dependency-tamper rejection passed. Original source chain/pins and old profiles remain unchanged; no old suite/target/native/device execution. Evidence: `docs/evidence/gpu-provenance-bounded-read-2026-11-03.json`.
+
+
+### 2026-11-03: power-reader and emitter source input bounds
+
+Reproduced both callers’ own whole-file DTB/graph reads and retained isolated UNAPPLIED bounded-helper candidates with strict candidate dependency pins. Two actual power stdout byte streams, legacy fresh output bytes, and the full four-source emitter model remain identical. Oversize/no-partial-output, exact/+1 and dependency tamper boundaries passed. No old target/suite, header generation, native or device execution. Original pinned source chain and source profiles remain unchanged. Evidence: `docs/evidence/gpu-power-reader-bounded-inputs-2026-11-03.json`.
+
+
+### 2026-11-03: bounded verify-only artifact reads
+
+Five actual whole-file receipt/body/object/stream/event reads were reproduced and bounded in an independent UNAPPLIED candidate. Three malformed stream byte-count gates, exact 16MiB receipt, non-UTF8/NUL preservation and one changed-path archive equivalence pass under the no-write/no-process guard. Budgets describe offline review work only; original builder/dependency pins/receipts/profiles remain unchanged. No compilation or old suite. Evidence: `docs/evidence/gpu-review-artifact-read-bounds-2026-11-03.json`.
+
+
+### 2026-11-03: preflight control reads, finite branch closed
+
+Two actual caller approval/manifest whole-file reads now refuse at 1MiB+1 in an independent UNAPPLIED candidate. Four exact/+1 cases preserve the strict SHA gates; the valid plan retains identical content hashes and compiler arguments. Approval parsing reuses the same SHA-checked bytes. Guarded default plan creates no outputs/processes. Original builder/receipts/manifests/profiles remain unchanged. The planned file-read-bound branch is closed; no repeated suite or wrapper expansion. Evidence: `docs/evidence/gpu-review-preflight-control-bounds-2026-11-03.json`.
+
+
+### 2026-11-03: finite CommandDB core contract review closed
+
+Source comparison found no new reachable zero-count/terminator/extent/transaction defect in the unselected file core. The existing 4/17 cases and iOS17 object were read as historical records, never rerun; no new patch/test or hardware milestone is claimed. Current concrete software branches are closed. Next action is a real complete capture with independent ownership/coherency and expected-version evidence through the existing offline receiver; startup additionally needs qualified K80 policy/native contracts and integration scope. Meaningless periodic retries stop at this boundary; independent wake and native/device OFF remain. Source review: `../../out/zorn/gpu-commanddb-core-contract-closeout-20261103/source-review.md`.
+
+
+### 2026-11-03: limited runtime failure propagation review
+
+Source review confirmed separate raw native/adapter error channels and first-error retention in RuntimeBackings/GMU composition. No new reachable gap found in this scope; no patch, tests, target/native execution or hardware progress claimed. Historical OFF/mixed-mode records were read only. Continue a distinct owner-report publication source path. Evidence: `docs/evidence/gpu-runtime-failure-contract-review-2026-11-03.json`.
+
+The distinct owner publication source path was followed in the same round: configure/ready release-acquire ordering and one-shot prepare/capture copying preserve stable reports; FRESH argument rejection is refused by the existing wire contract. No new gap, patch, test or native/transport execution; codecs remain unchanged.
+
+
+### 2026-11-03: pure IOMMU-property transaction repair
+
+Exact retained parseIommus violated its SID-output failure contract:8 late invalid phandle/SID cases exposed an earlier prefix. An independent UNAPPLIED two-pass candidate rejects with unchanged SID output;4 pure property layouts preserve order/boundaries and failure count remains0. Sanitizers and one changed-candidate real-header iOS17 object pass;no target/native execution or hardware route qualification. parseReg/K80 caller isolation require no change. Catalog/pins/32patch/8profiles unchanged. Evidence: `docs/evidence/gpu-board-iommus-transaction-2026-11-03.json`.
+
+
+### 2026-11-03: copied SMMU service reference lifetime
+
+Exact Service source released its copyMatchingService reference before a later conditional cast/window access. An independent UNAPPLIED candidate moves the single release after the last synchronous use and before both post-acquisition returns;4 source lifetime mutations refuse. No native/provider model or live UAF reproduction. One changed nonoptional iOS17 Service object passes;no link/execute/fullcore/roleAPI retry. Object retention is not map/stop/SMMU authority. Catalog/pins/32patch/profiles remain unchanged. Evidence: `docs/evidence/gpu-service-smmu-reference-2026-11-03.json`.
+
+
+### 2026-11-03: persistent SMMU callback-cookie storage
+
+Exact source traces automatic Service window storage through copied io_.cookie into persistent SMMU-context/VM consumers,including retained failure paths. An independent UNAPPLIED private POD-member repair and4 source refusals pass. One changed-candidate real-header iOS17 object confirms Service3192->3208,new16B member at3192. This is separate from GPU/CP cookie and service-ref candidates;consistent future rebuilding is required. No native/peer/address/MMIO execution or mapping/stop qualification. Catalog/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-service-smmu-cookie-2026-11-03.json`.
+
+
+### 2026-11-03: callback reachability closure and GMU size arithmetic repair
+
+Exact Service/kit caller bounds prevent the proposed SIZE_MAX callback witness;no offset patch or repeated fits test. Continued to a distinct public GMU size-input contract:3 aligned uint64 tuples wrap dummy+log+hfi and pass the original preallocation predicate. An independent UNAPPLIED subtraction-based guard rejects them;3 scalar boundary controls/sanitizers and one changed iOS17 module pass. Only extracted arithmetic ran,no allocate/getter/native object/provider. Defaults are not claimed affected;catalog/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-gmu-size-sum-contract-2026-11-03.json`.
+
+
+### 2026-11-03: public reserve cardinality width
+
+Current UserClient/VM caller bounds were checked and are not claimed to hit overflow. The separate public reserve(size_t) contract incorrectly skips growth after keys*2 wraps. Independent UNAPPLIED early-width/division guard:3 scalar witnesses now refuse,7 boundaries/sanitizers and an actual-header iOS17 inline-method object pass;no native index,allocator,provider or successful handle model. Layout24B unchanged,no selected caller or old VM/fullcore/roleAPI retry. Catalog/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-handle-reserve-width-2026-11-03.json`.
+
+
+### 2026-11-03: best-effort diagnostic return preservation
+
+Exact GMU readBack discarded5 callback int returns without diagnostic availability. Independent UNAPPLIED source-report capture adds attempted/returned/zero masks and exact int32 returns;primary status/ready,read count/order/offsets and all wire/log formats stay unchanged. Four source controls and context/caller/POD iOS17 objects pass;report144->176 requires consistent future caller rebuilding. Initial constinit fixture rejection preserved,only corrected fixture recompiled. No callback/peer/bringUp/native or synthetic returned-value execution. Catalog/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-gmu-diagnostic-status-2026-11-03.json`.
+
+
+### 2026-11-03: GMU and GPU public I/O-table preflight
+
+Both public contexts latched state/progress and used read32 before checking callback completeness. Two independent UNAPPLIED guards now reject missing members/short first-read extent before any such effect. Current callers already supply complete tables;no K80 failure claimed. Once-only31/44/3 pure presence/count checks,sibling source controls and one changed real-header iOS17 object each pass;no context/object/callback/provider execution. Initial multiline source-control matcher failure retained/corrected before compilation. Original report/class layouts,catalog/pins/32patch/profiles/diagnostic candidate unchanged. Evidence: `docs/evidence/gpu-context-io-preflight-2026-11-03.json`.
+
+
+### 2026-11-03: direct SMMU diagnostic-load declared extent
+
+Service lacked a windowBytes guard before5 direct loads ending0x48+4;provider parsing promises no such minimum. Independent UNAPPLIED if-initializer guard reuses the single getter result;75 scalar short counts refuse,3 inclusive controls/source mutations/sanitizers and new iOS17 Service object pass. No window/address/provider/getter/MMIO execution or observed K80 short window. Class layout,load order/logs/selectors and catalog/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-service-smmu-extent-2026-11-03.json`.
+
+
+### 2026-11-03: private Service cache native-status preservation
+
+Earlier Ring/VM captures did not retain the Service-folded NativeMemory IOReturn. Independent UNAPPLIED RingCache first native publish/acquire failures now retain exact4B values/availability before unchanged0/1 callback returns. Four source controls and new real-header iOS17 Service object pass;native import set matches sealed original metadata. RingCache16->32/Service3192->3208 require consistent future owner rebuild,not interchangeable with same-sized cookie candidates. No callback/cache/provider/native or synthetic returned-value execution,wire/getter/owner API change. Catalog/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-service-cache-native-status-2026-11-03.json`.
+
+
+### 2026-11-03: exported GMU platform offset arithmetic
+
+Public size_t callback bounds promise violated by at+4 wrap; independent UNAPPLIED subtraction guards repair both read/write predicates. Three scalar wrap witnesses/eight controls/sanitizers/three source controls/new iOS17 module pass. No callback/bind/native/window/address execution or K80 caller trigger claimed; generated startup offset source absent, not inferred. Original catalog/pins/32patch/profiles unchanged. Evidence: `docs/evidence/gpu-gmu-platform-offset-2026-11-03.json`.
+
+
+### 2026-11-03: UserClient refusal paths
+
+Two independent UNAPPLIED repairs:three early validation failures now feed their actual returned status to the existing tally;closed-client BoMap failure diagnostics skip VM queries when VM is absent,without fabricated zero counts. Three source controls each;only extracted guard iOS17 compilation,not whole UserClient due frozen role API. No client/dispatch/VM getter/clock/native execution or wire/log expansion. Service selector/size and success-only output-copy review found no new gap. Original32/pins/profiles preserved. Evidence: `docs/evidence/gpu-dispatch-refusal-status-2026-11-03.json`.
+
+
+### 2026-11-03: framed timeline destination extent
+
+Ring word-count bounds showed no new gap;continued source review found timeline emission accepts declared fence storage below its own1536-byte layout. Independent UNAPPLIED preflight refuses only stamped framed submission before readRptr/emission. Three scalar short counts/four controls/three source mutations/sanitizers/new iOS17 Ring object pass. No ring/address/stamp/commit/native execution;no actual K80 short buffer claim. Old32/pins/profiles/packet/log/layout unchanged. Evidence: `docs/evidence/gpu-ring-timeline-extent-2026-11-03.json`.
+
+
+### 2026-11-03: complete preemption-header word bounds
+
+Independent UNAPPLIED recordWord fix refuses61..63 crossing its64-byte CPU-header region;two56-byte comments corrected from existing56+8 store. All61 complete offsets including unaligned and3 original refusals preserved;3 source controls/sanitizers/new iOS17 module pass. Raw bytes only,no native record/context/IOVA/ACK or writer execution;existing snapshot offsets unaffected,no actual full-record overrun claim. Old32/pins/profiles unchanged. Evidence: `docs/evidence/gpu-preempt-record-word-2026-11-03.json`.
+
+
+### 2026-11-03: partial RBBM/CP IRQ result availability
+
+Independent UNAPPLIED capture preserves only successfully returned raw fields before later clear/barrier/protect failure;valid_fields marks availability and completed decoding. Primary status/order/mask/normal wire/log unchanged. Four source controls/new IRQ and POD iOS17 objects pass;report20->24 requires future consistent consumers. No IRQ/native callback/readback/provider execution or fabricated raw value;AO/HFI branches and old32/pins/profiles not composed. Evidence: `docs/evidence/gpu-irq-partial-result-2026-11-03.json`.
+
+
+### 2026-11-03: byte-buffer serializer alignment
+
+Firmware-view caller alias review found no concrete overlap;continued source review found Pwrup byte-output typed-store alignment defect. Independent UNAPPLIED memcpy cursor repair preserves bytes/order/counts. Isolated old store UBSan rejection retained;four byte alignments/canaries/three source controls/new iOS17 module pass. Full pack/buildA740/register callbacks not executed,no policy list generated or selected. No hardware qualification;old32/pins/profiles unchanged. Evidence: `docs/evidence/gpu-pwrup-byte-store-2026-11-03.json`.
+
+
+### 2026-11-03: CP read-mode argument preflight
+
+Independent UNAPPLIED conditional read32 preflight returns BadArgument before I/O for a missing public read-mode member,which previously poisoned without I/O. Valid callback failures/readback mismatch still poison;mode0 requirements/payloads/layout unchanged. Three source controls/new iOS17 module pass;no run/poison/ring/callback/provider execution or new CP/K80 parameters. Retained callers mode0 not claimed faulty;old32/pins/profiles not composed. Evidence: `docs/evidence/gpu-cp-read-preflight-2026-11-03.json`.
+
+
+### 2026-11-03: public borrow interval representability
+
+Independent UNAPPLIED last-byte bounds reject unrepresentable mapping/physical intervals before allocation or clearing;existing shape/ABI/publication order unchanged. Two generic integer witnesses/six controls/three source controls/sanitizers/new iOS17 NativeMemory object pass. No pointers or hardware addresses instantiated,no borrow/bzero/native execution. No retained caller or K80 fault claimed,no mapping/OAS rights inferred;old32/pins/profiles not composed. Evidence: `docs/evidence/gpu-borrow-extent-2026-11-03.json`.
+
+
+### 2026-11-03: Client/kernel software width agreement
+
+Independent UNAPPLIED Client input_bits lower bound32->31 matches retained UserClient open/query. All65 integer widths/three source controls/new iOS17 Client object pass;no query/transport/client/provider/native execution or K80/OAS selection. Other version/flags/output/metadata/count guards unchanged. Two checker-only failures corrected before first target build and retained. Old32/pins/profiles unchanged. Evidence: `docs/evidence/gpu-client-input-width-2026-11-03.json`.
+
+
+### 2026-11-03: complete compatible-property tokens
+
+Three independent UNAPPLIED GMU/GPU/SMMU helper repairs preserve original needles but require complete NUL tokens;GPU substring previously accepted GMU/SMMU names. First21 cases/seven false matches/six controls/two new targets,then only10 SMMU cases/three controls/one new target pass with sanitizers. Earlier targets not rerun,no provider/probe/start/map or selected component. Local iOS17 CompareKey exact-token contract read. Original32/pins/profiles/ABI/log unchanged. Evidence: `docs/evidence/gpu-compatible-tokens-2026-11-03.json`.
+
+
+### 2026-11-03: public size helper pre-widening sum
+
+GMU Service partial-map source review found cleanup via stop/shared-pointer reset,no new leak claim. Continued independent Pwrup requiredBytes review reproduced uint32 addition before widening. Independent UNAPPLIED operand widening passes3 scalar witnesses/3 legal controls/sanitizers/new changed iOS17 module. pack already rejects wide counts,no pack overrun or policy/list execution claimed. Prior alignment candidate/old32/pins/profiles not combined. Evidence: `docs/evidence/gpu-pwrup-size-addition-2026-11-03.json`.
+
+
+### 2026-11-03: SMMU prepare lower-status propagation
+
+Independent UNAPPLIED SmmuContext failure return now preserves lower IOReturn instead of folding allocation/audit/busy errors to BadArgument. Five actual source return traces/three controls/new iOS17 module pass. Success config/prepared order/class ABI unchanged;no prepare/allocator/kit/provider/native or synthetic status peer. Old32/pins/profiles not combined,no hardware qualification. Evidence: `docs/evidence/gpu-smmu-prepare-status-2026-11-03.json`.
+
+
+### 2026-11-03: byte-count refusal before board activity
+
+Independent UNAPPLIED NativeGpu preflight moves existing Ring byte prerequisites before started/reserve/boot/program. Nine invalid count pairs/four controls/three source controls/sanitizers/new iOS17 module pass;no GPU config/provider/address/callback execution. Valid input flow unchanged;other address checks remain later,no complete-preflight claim. Unselected legacy API byte limits not K80 geometry;old32/pins/profiles not combined. Evidence: `docs/evidence/gpu-start-byte-preflight-2026-11-03.json`.
+
+
+### 2026-11-04: coherent offline source integration resumed
+
+Renewed owner instruction restores unattended source integration. The historical no-combine guard no longer blocks an isolated review; original32 patches/catalog/pins/eight profiles remain unchanged. 34 fixed inputs are separated into24 NativeAdreno and10 Linux Gen7 reference inputs. 27 apply cleanly; seven semantic conflicts are resolved, including one Service cookie repair subsumed by catalog+patch10. The coherent review preserves typed TablePages,128-buffer/uint64-queue/per-job-VM semantics, actual raw WPTR capture inside the retry wrapper, and acquired-here Linux ownership.
+
+12 newly changed Native TUs and four affected header consumers compile with one consistent iOS17 header tree. Six destructive source mutations are rejected; a pure128-slot bitmap ASan/UBSan check passes. Two complete domain deltas replay onto71 independent baseline copies byte-for-byte. No old suites/fullcore or complete UserClient role-API compile is rerun. UserClient integration remains source-only at that frozen boundary; Linux is not kernel-built, and there is no whole-driver link or runtime/device/GPU qualification. Checker-only failures are retained and corrected; this is source integration progress, not hardware progress. Next integrate the separately archived Service SMMU-reference/cookie/extent/cache-status fixes semantically into a fresh cohort, preserving this completed result. Evidence: `docs/evidence/gpu-coherent-source-integration-2026-11-04.json`.
+
+
+### 2026-11-04: coherent Service ownership/extent/status integration
+
+Four independent Service repairs now compose in a new copy of the34-input cohort: copied SMMU reference retained through synchronous use, persistent SMMU cookie alongside GPU/CP storage, single declared-byte guard over five direct loads, and actual native RingCache failure capture before unchanged0/1 callbacks. Six destructive source controls and byte-identical delta replay pass; one newly changed Service iOS17 object compiles, actual layout3280->3312/RingCache16->32. Public headers and parent sources unchanged; no old16 targets or standalone suites rerun. Initial checker mistakenly included pre-acquisition returns and was corrected with raw failure retained before compilation. No native/Service/callback/provider/MMIO or GPU execution, no map/stop lease or full-driver qualification. Next compose GMU size/diagnostic/IO guards with consistent report consumers. Evidence: `docs/evidence/gpu-coherent-service-integration-2026-11-04.json`.
+
+
+### 2026-11-04: coherent GMU size/diagnostic/I/O contracts
+
+Four independent fixes compose cleanly in a fresh Service-cohort tree: bounded size sum, five actual diagnostic return captures, and GMU/GPU public callback-table preflight. Typed TablePages, mapping-retention and process-VM owner registry survive; primary/ready function tails and readBack argument/order remain identical. Six new source mutations are refused; combined four-file delta replays byte-identically. Five newly changed/affected iOS17 TUs compile once, binding all four report consumers to report176B (previous144); Service remains3312B. No old scalar suites or five standalone targets rerun, no callback/context/allocator/provider/native/device execution, no full driver link or role API workaround. Next compose Board/compatible-token/Client software input fixes. Evidence: `docs/evidence/gpu-coherent-gmu-contract-integration-2026-11-04.json`.
+
+
+### 2026-11-04: coherent Board/compatible/Client input contracts
+
+Five independent fixes compose on the GMU-contract tree: transactional Board iommus output, complete-token GMU/GPU/SMMU matching and Client software input_bits31 agreement. All other helper-owner methods, probe scores, Service ownership/extent/status, public headers and wire ABI stay unchanged. Six destructive source controls and twelve new combined raw-token ASan/UBSan checks pass; five new changed iOS17 TUs compile once, Service3312/report176 remain consistent, and combined delta replays byte-identically. Initial source checker missed a deliberate first-loop write and was strengthened before first target compilation; raw failure retained. No old Board/property/width suites or parent targets rerun, no provider/getProperty/probe/start/client/query/transport/native/device execution or component/policy selection. Next compose six representation/storage/preflight repairs. Evidence: `docs/evidence/gpu-coherent-property-integration-2026-11-04.json`.
+
+
+### 2026-11-04: coherent representation/storage/preflight contracts
+
+Six fixed repairs compose cleanly: borrow representability, HandleIndex width, GmuPlatform offsets, Pwrup byte-store+size sum, and CpInit conditional read preflight. Six new source mutation refusals and byte-identical five-file delta replay pass. Four changed TUs plus VM's actual inline-reserve call site compile once as five fresh iOS17 objects; HandleIndex24/VM640 layouts remain. The other actual reserve caller is UserClient, whose unchanged source/full TU stays frozen at missing role APIs. Service source/report header unchanged; previous Service3312/report176 is inherited, not recompiled. Pwrup store order/count/header/failed-output and genuine CP failure semantics preserved; no old numeric suites or parent targets rerun. No index/borrow/allocator/getter/callback/pack/policy/native/device execution, mapping/OAS permission or driver qualification. Next compose Ring/Preempt/IRQ/dispatch state/output repairs. Evidence: `docs/evidence/gpu-coherent-representation-integration-2026-11-04.json`.
+
+
+### 2026-11-04: coherent Ring/Preempt/IRQ/dispatch state-output contracts
+
+Five reviewed fixes compose cleanly: Ring stamped-frame extent, Preempt complete-word read, IRQ partial raw availability, UserClient early Tally result and closed BoMap diagnostics. Six new source refusals and six-file delta replay pass. Seven fresh iOS17 objects comprise three changed native TUs, GPU/Service IRQ declaration consumers, actual-header IRQ24B assertion and a pure dispatch guard type fragment. Retained source contains no IRQ handle caller; no live IRQ consumer invented. Service3312/report176 remain consistent; full UserClient stays uncompiled at frozen role APIs, fragment is not runtime/full-TU qualification. Old suites/targets not rerun; no record writer/IRQ/callback/getter/native/device execution, new mask/route/ACK or wire/log change. Planned known cohorts are composed; next bounded new review is public HandleIndex stored-value/sentinel contract, first excluding old VM-capacity and reserve findings. Evidence: `docs/evidence/gpu-coherent-state-output-integration-2026-11-04.json`.
+
+
+### 2026-11-04: public index reserved-value refusal
+
+Separate from the old unqualified VM slot-width finding, public HandleIndex.insert accepts UINT32_MAX even though find documents that exact scalar as absence and returns stored values unchanged. A fresh unselected candidate refuses only that reserved value before growth/place, preserving the composed reserve-width guard and24B class. One pure predicate witness/eleven controls/three source refusals/sanitizers and new actual VM-caller plus compile-only layout iOS17 objects pass; patch replay is byte-identical. No native index/method/provider/handle model executes. Caller ignored-bool behavior and huge VM slot reachability remain explicitly unfixed/unqualified; no K80-trigger claim or new cap/policy. Parent64 sources, original patches/pins/profiles preserved; full UserClient role boundary unchanged. Next inspect a distinct retained Linux recurring IB-count initialization/retry source path with actual callers before any repair. Evidence: `docs/evidence/gpu-index-value-sentinel-2026-11-04.json`.
+
+
+### 2026-11-04: OEM recurring replay IB recount
+
+Continued in the same turn after the public index repair. Exact OEM gpudev binding and replay source show the retained recurring object reaches counting again without resetting numibs; populate_ibs emits actual list entries but publishes the accumulated count. A separate unselected Linux-reference derivative resets only the non-STOP count before walking. Three pure integer projections reproduce accumulation (two false2000-limit refusals); STOP/empty controls, three source refusals/sanitizers and patch replay pass. Per-owner/acquired_here/replay-error semantics preserved by inverse comparison. No cmdobj/packet/ACK/provider model, Linux/native target or device/GPU execution; this is OEM453 reference, not Xiaomi/K80 runtime evidence. Initial whitespace-only source matcher corrected before scalar compile with raw failure retained. Native coherent tree preserved. Next trace distinct normal queue_cmds initialization/actual callers before assuming the same issue. Evidence: `docs/evidence/gpu-gen7-recurring-recount-2026-11-04.json`.
+
+
+### 2026-11-04: normal queue bounded; ibdesc input guards
+
+Normal queue count audit found fresh-object/single-call paths in four retained ioctls, no new recount gap; no transplanted reset/test/target. Continued same turn to public ibdesc helper negative signed-count acceptance and unchecked uint64 word-to-byte shift. New guards preserve intentional marker count-ignore and representable inputs, refuse before compat/native copy or ctrl/profiling/allocation side effects. Two signed-count/three word-conversion scalar witnesses, controls/three source refusals/sanitizers/delta replay pass; all other source bytes unchanged. Existing ioctl negative-count trigger and installed LP64 Linux/config are not claimed; no objects/pointers/packets/provider/ACK models or Linux/native/device execution. Variable-stride observation remains unqualified and unpatched, not a polling task. Native coherent tree preserved. Next inspect distinct synchronization input capacity/error publication with actual callers. Evidence: `docs/evidence/gpu-gen7-ibdesc-input-bounds-2026-11-04.json`.
+
+
+### 2026-11-04: sync pending-clear notification predicate
+
+Actual normal/aux sync-count allocation/error publication is bounded; no new capacity or generic queued-timestamp error gap claimed. Continued to concrete destroy-path predicate loss: the loop clears pending bits, then the existing scheduler call tests the now-empty mask. A local bool records only this pass's successful bit-clear and gates the same existing callback; no cancel/put/refcount/callback operation or wire/log/layout is added. 259 pure software-bit patterns/three source refusals/sanitizers and patch replay pass; nine parent inputs/native tree unchanged. This is not cancellation success, global concurrency/stop/lease or scheduler/GPU qualification; no syncobj/fence/provider model, Linux/native target or device execution. Next compare exact context-queue producer alignment with diagnostic timeout walker using source/count metadata only. Evidence: `docs/evidence/gpu-gen7-sync-clear-notification-2026-11-04.json`.
+
+
+### 2026-11-04: bounded OEM timeout diagnostic reader
+
+Exact producer pads ALIGN(raw words,4), but timeout walker used raw stride; actual sync construction is5+6*N words. A fresh isolated reader now uses aligned stride, finite observed-prefix budget, declared capacity/index bounds and wrapped private copy with header/entry count checks; producer/wire/log/reference operations unchanged.41 count-shape witnesses/62 aligned controls/57 circular controls/131328 progress predicates, seven source refusals/sanitizers and delta replay pass. Only extracted integral declarations compile (48/20/24/32B); no Linux reader/kernel build or queue/packet/provider/ACK model. Initial fixture32B expectation corrected to actual48B with failure raw retained; candidate sizeof never used guessed size. Declared observations are not coherent snapshot/owner/stop/DMA rights or K80 runtime evidence; no native/device execution. Next source review is actual message-reader failure/length contract, first excluding old HFI coverage. Evidence: `docs/evidence/gpu-gen7-timeout-queue-reader-2026-11-04.json`.
+
+
+### 2026-11-04: message consumer respects lower-read refusal
+
+Exact ordinary read rejects raw20..255-word input against19-word destination via -EMSGSIZE without queue advance; peek has no length guard. Consumer formerly ignored the explicit rejection, dispatched zero-filled metadata and retried the same position. A fresh isolated copy checks the actual read result before the unchanged dispatch switch, exits current pass on nonpositive result and retains existing mutex unlock. Context-bad1KiB cannot hit that oversize case; no disabled/empty race, malformed installed firmware or full positive-length validation claimed.236 pure count projections/20+256 controls/three source refusals/sanitizers/delta replay pass; no Linux/native target, queue/packet/provider/ACK model or native/device execution. Existing lower consumption, wire/log and successful handler semantics unchanged; no retry/drain/stop policy. Next bounded review is native Board parseReg output transaction after excluding old parser coverage. Evidence: `docs/evidence/gpu-gen7-msgq-read-refusal-2026-11-04.json`.
+
+
+### 2026-11-04: bounded Board review; timeline/bind source repairs
+
+parseReg has no unchanged-output-on-failure promise and retained callers reject before using partial arrays; no parser patch/test/target or window/address model. Continued to two concrete OEM source gaps: timeline event-error cleanup frees/NULLs array while count remains published to bound destructor; bind auxiliary helper may copy a short prefix into an uninitialized command (timeline caller already zeroed). Isolated additions clear count after existing cleanup and zero bind command before existing helper. Six source refusals, combined delta replay and33 raw-byte prefix canaries/sanitizers pass; count projections illustrative only. Initial whitespace-only staging/checker refusal retained and corrected before compile. No signal/put/free/refcount/callback operation, accepted ABI/size rule or normal count changed; core event-failure occurrence/errno not fabricated. No Linux/native target or native/fence/provider/device execution. Next examine optional sync-fence diagnostic metadata nullability with actual consumers. Evidence: `docs/evidence/gpu-gen7-timeline-error-count-2026-11-04.json`.
+
+
+### 2026-11-04: optional sync diagnostic boundary; string/cursor fixes
+
+Visible optional fence metadata consumers guard absent priv; missing exact kgsl_sync implementation was not replaced by a guessed peer (one DNS fetch/cache-miss fallback bounded). Continued to two retained kgsl.c defects: shorter metadata replacements retain old string suffix, and nonfatal missing-ID input skips occur before sole cursor advance. Add bounded terminator after successful copy and move existing advance after copy/before lookup. Original len0/copy-failure/sanitize, fixed stride, flush/refcount/call semantics unchanged; advertised variable stride remains unqualified.63 raw-string witnesses/controls/sanitizers, six source refusals and combined delta replay pass; no entry/ID/address/provider or successful lookup model, Linux/native target/cache/callback/device execution. Next inspect distinct fault-detail raw record reader bounds with actual callers. Evidence: `docs/evidence/gpu-gen7-sync-fence-metadata-2026-11-04.json`.
+
+
+### 2026-11-04: relative fault products and bulk lower-status retention
+
+Fault ioctl public count/stride are32-bit with no validated default2-count cap; two details-reader multiplications narrowed before relative traversal. Widen operands before both products, preserving raw/min-copy/type/count/lock/wire/log semantics. Retained pagefault recorder bound40 excludes a manufactured huge private list; input first case is admitted larger descriptor counts, not normal default2. Continued to actual bulk cache helper -EINVAL channel discarded by caller; retain first actual nonzero result while running all original calls/puts. Three pure relative-stride witnesses/202 controls/sanitizers, six source refusals and combined delta pass; no pointer/base/fault/provider/status peer or native/cache/usercopy/device execution. No Linux/native target or policy selection; broader giant-loop/pointer validity remains unqualified. Next bounded review is exact import descriptor length/error channels after old coverage exclusion. Evidence: `docs/evidence/gpu-gen7-fault-stride-width-2026-11-04.json`.
+
+
+### 2026-11-04: restore explicit import rejection before masking
+
+Exact address-import helper masked SECURE away before its own explicit -ENOTSUPP guard; outer ioctl does not reject the bit. Move only that existing guard before mask/init/copy, preserving every non-SECURE input and DMA path. This restores existing refusal intent, adds no security/mapping/runtime policy. Three exact-ABI pure-bit witnesses/63+zero controls/three source refusals/sanitizers and delta replay pass; all parent sources intact. No fd/handle/backing/address/provider/allocator/successful import model, Linux/native target or native/device execution. Region length is not descriptor length; compat is not32-bit kernel size_t, and missing core copy semantics not guessed. Next trace VBO entry attach/commit/failure publication after excluding old rollback coverage. Evidence: `docs/evidence/gpu-gen7-useraddr-secure-precheck-2026-11-04.json`.
+
+
+### 2026-11-04: VBO reservation/commit and unwind boundary
+
+Source review distinguishes idr_alloc(NULL) reservation from later idr_replace(entry) publication: pre-commit zero-map failure is not a demonstrated dangling published pointer. Reserved-ID/process-ref unwind differs from normal attach_and_map failure, but actual detach also releases GPU VA and the zero-map backend discards partial unmap return. No automatic detach/free/quarantine/stop policy or patch is justified by that error alone. No new implementation/tests/targets/native/device execution; trees preserved. Concrete lower rollback/consistent owner contract bounded, not polled; next independent source review is capability-property enumeration counts/errors. Evidence: `docs/evidence/gpu-gen7-vbo-attachment-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: bounded property enumeration source review
+
+Actual common9/Adreno21 tables and bound ftbl return min(remaining,21), never a negative callback result. Caller allocation min(user,30) covers all writes; zeroed prefix structs/min-copy and explicit copy failures show no new count/length/error contradiction. No arbitrary callback peer, transactional user-output or reset-clear timing/locking repair inferred. No patch/test/target/native/device execution or implementation progress claimed; trees preserved. This finite point closes; next inspect context constructor reservation/validation/failure publication after old lifetime coverage. Evidence: `docs/evidence/gpu-gen7-property-enumeration-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: continue to context maximum/history metadata repairs
+
+Same turn after bounded property review, existing max200 check > then increment admitted201; switch only to >= under same lock, preserving constant/ref/ID semantics. Actual history [tail,head) reader excluded tail; decrement inside nonempty loop now covers singleton/oldest and skips empty. Leading purge formerly moved start without reducing bytes; subtract consumed prefix first to conserve old end. Nine source refusals, scalar boundary controls/262144 index pairs/32640 byte-conservation pairs/sanitizers/final delta pass. No context/ID/atomic/history entry/GPU address/provider/fault model or native/kernel target execution; diagnostic metadata is not mapping/stop permission. No numeric policy/field/layout/call expansion, parent trees preserved. Next distinct legacy import input path, without mechanically copying modern repair. Evidence: `docs/evidence/gpu-gen7-context-count-bound-2026-11-04.json`.
+
+
+### 2026-11-04: legacy import alignment-unit correction
+
+Legacy SECURE guard already precedes mask and both supported paths refuse nonzero offset; no mechanical modern patch or compat-width conjecture. Actual64KiB branch used ilog2(SZ_64), exponent6, while exact helper takes exponent and neighboring/modern branches use matching thresholds. Change only argument toSZ_64K, exponent16; thresholds/masks/call/cleanup/other branches unchanged. Pure unit/length controls/sanitizers, three source refusals and delta pass; no descriptor/aligned buffer/address/provider/native model or driver/kernel target execution. This restores existing reference units, selects no K80 geometry/runtime policy or mapping qualification. Next compare legacy/modern memory-info output widths with actual producers. Evidence: `docs/evidence/gpu-gen7-legacy-import-align-unit-2026-11-04.json`.
+
+
+### 2026-11-04: bounded memory-info and actual GPU software-input review
+
+LP64 legacy address/size versus modern u64 outputs show no new narrowing; no invented compat32 kernel, high-flag ABI or transactional output patch. Continued same turn to unfinished shader-input plan: exact AdrenoShader is an A740 encoder, not bytecode reader. Correct locator and inspect actual retained AirNir Library container-reader bounds/publish-after-validation/immutable-backing contract; no new gap demonstrated, no fake missing-rehash or SIZE_MAX case. No patch/test/target/hash/parser/backend/shader/native/device execution or new component/profile selection; source review is not implementation/hardware progress. Continued same turn through ConstantUploads disjoint16KiB/alias/read guards with no new gap; next actual Frontend narrower metadata consumers after existing >64-bit integer guard and full preceding schema checks. No pack/LLVM/backend/NIR execution. Evidence: `docs/evidence/gpu-software-input-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: isolated wide InsertElement index refusal
+
+Actual metadata target/location/binding/size/alignment are validated before narrowing; no metadata patch. Continued to distinct vector constant index: unguarded getZExtValue precedes out-of-range rejection and can violate local APInt64-bit fit precondition. Language permits any integer index type, so use getLimitedValue(lanes) in the existing guard; subsequent original extraction is then safe, wide in-range inputs preserved. Three pure128-bit scalar witnesses/40 controls/sanitizers, three source refusals/independent delta and host real-LLVM-declaration type-only object pass. No full Frontend/iOS17 target/link or LLVM/APInt/parser/backend/NIR/shader/native/device execution; no successful IR/provider model or component/chip/profile choice. Original kit/pins/driverOS and prior trees unchanged. Next public backend helper count/array source validation, without execution. Evidence: `docs/evidence/gpu-airnir-insert-index-bound-2026-11-04.json`.
+
+
+### 2026-11-04: bounded AirNir resource/output helper source review
+
+Actual Frontend binding/location/offset/component/stage guards and owned ValueLanes bound helper writes; fixed read collection checks4096 capacity before storage. No arbitrary direct-load rejection promise, NULL-output or corrupt NIR/provider model is invented. Adjacent fwrite/close/error paths propagate status and ABI file follows successful memory-stream export; no all-files transaction promise. No new gap/patch/test/target or NIR/backend/compiler/shader/native/device execution, no runtime/profile choice. Prior repair and original source trees unchanged. Next actual BackendABI serialized metadata bounds with real producer guarantees, not arbitrary variants. Evidence: `docs/evidence/gpu-airnir-resource-helper-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: BackendABI producer source review
+
+Actual internally produced variant and zero-initialized allocation options were traced through allocation/reservation, UBO capacity, immediate publication and constlen finalization to exporter refusal. Arbitrary uint32 allocation maxima are not accepted as a reachable input defect. No new demonstrated exporter-specific gap/patch/test/target or compiler/backend/NIR/export/native/device execution; no K80 compiler/profile/capacity choice. This finite review does not qualify all compiler arithmetic. Next distinct aggregate type count/consumer contract. Evidence: `docs/evidence/gpu-airnir-backend-producer-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: shared zero-lane aggregate type traversal repair
+
+Actual intermediate InsertValue/get path can visit shared acyclic zero-lane struct subtypes repeatedly; aggregate cap64 never rejects zero totals. Source recurrence for depth32 gives8589934591 visits from33 distinct type descriptions, rather than a giant private vector. Added per-invocation completed-type memoization, including zero results; existing width/cap/count/output rules unchanged, no new policy or global cache.41 pure recurrence/4225 scalar count controls with sanitizers,3 source mutations, byte-identical delta replay and host real-LLVM declaration type-only object pass. These are source/count projections, not parsed IR execution or timing; full Frontend/iOS17 build, LLVM/NIR/compiler/shader/native/device execution and runtime/profile selection remain unqualified/off. Original kit and previous derivatives unchanged. Evidence: `docs/evidence/gpu-airnir-aggregate-type-memo-2026-11-04.json`.
+
+
+### 2026-11-04: bounded operation argument source review
+
+Actual Frontend scalar widths, opcode selection, defined operand shapes and instruction-specific FDIV/FSAT permissions exclude the backend refusal branches examined. Low-level header does not promise universal invalid-input rejection or unchanged builder state on failure; no arbitrary nir_def/NULL peer was fabricated. Existing math-flag tests were read only. No new gap/patch/test/target or LLVM/NIR/backend/compiler/evaluator/shader/native/device execution, no runtime/profile choice. Next distinct Linux property retrieval length/error contract, without reopening caps enumeration. Evidence: `docs/evidence/gpu-airnir-operation-contract-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: native LP64 property prefix count width repair
+
+After closing AirNir operation callers without a patch, continued actual property retrieval. copy_prop min_t(u32) truncated wide UAPI sizebytes capacity: existing4/8-byte sources copied0/1 bytes for capacity2^32/+1. Only the minimum type changed to size_t, preserving prefix copy/EFAULT/lookup/ABI and ordinary capacities; no huge source or mapped-buffer model.2 pure integer witnesses/194 controls with sanitizers,3 source mutations and byte-identical delta replay pass; previous9 Linux reference files preserved, exact retained adreno.c added. No Linux/native target, query/usercopy/provider/callback/device execution or capability policy choice. Earlier caps enumeration no-gap review concerned counts/source extent, not these high capacity bits. Evidence: `docs/evidence/gpu-gen7-property-prefix-width-2026-11-04.json`.
+
+
+### 2026-11-04: SETPROPERTY callback size preflight
+
+Normal allocation size/alignment rejection and IS_ERR-before-output path showed no new gap; optional metadata remains best-effort. Continued distinct SETPROPERTY: reused LP64 UAPI sizebytes implicitly narrows into unsigned-int ftbl count before actual Adreno exact-size validation. Added only >UINT_MAX EINVAL preflight before both existing callback paths; representable counts/order/ABI/defaults unchanged, no constraint/power/security policy selected.1 pure length-alias witness/1299 controls with sanitizers,3 source mutations and byte-identical replay pass; no callback/usercopy/allocator/Linux/native/device execution or Linux/native target. Initial source checker missing-token assertion error retained/corrected; candidate unchanged and scalar not rerun. Evidence: `docs/evidence/gpu-gen7-setproperty-size-preflight-2026-11-04.json`.
+
+
+### 2026-11-04: memstore VMA full-length comparison repair
+
+Actual timestamp ioctl propagates bound lower status; queued/unsupported type paths were traced without fabricated read failures. Continued distinct memstore mmap contract: token branches bypass normal entry-length checking, while unsigned-int local vma_size truncated native LP64 length before explicit whole-buffer equality. Changed only that local to unsigned long, preserving read-only checks/order/errors and existing mappings policy.18 pure count-alias witnesses/289 controls with sanitizers,3 source mutations and byte-identical delta replay pass. No VMA/address/mapped-buffer/geometry model, actual core acceptance, overmapping/data access or fault outcome claimed; no Linux/native targets, getter/mmap/callback/device execution. Evidence: `docs/evidence/gpu-gen7-memstore-vma-width-2026-11-04.json`.
+
+
+### 2026-11-04: normal mmap ID lookup width guard
+
+Normal get_mmap_entry already checks full-length footprint/size before output publication; original error/ref paths retained. Its unsigned-long pgoff narrowed at first unsigned-int find_id lookup, allowing high page-offset bits to alias a low ID before legacy fallback. Guarded only ID representability; existing fallback/range/length/ops/error/put semantics unchanged.3 pure index witnesses/578 controls with sanitizers,3 source mutations and byte-identical replay pass. No live ID/entry/address/VMA or successful/failed lookup model, no lookup/mmap/ref/callback/Linux/native/device execution or Linux/native target. Source input domain is not mapping/OAS/IOVA/owner policy or an observed K80 alias. Evidence: `docs/evidence/gpu-gen7-mmap-id-width-2026-11-04.json`.
+
+
+### 2026-11-04: published range arithmetic source boundary
+
+Actual normal allocation and imported SVM builders were traced before assessing GPUADDR_IN_MEMDESC addition. SVM pre-publication checks reject wrapping/out-of-range intervals; IOMMU range predicate explicitly rejects wrap. No arbitrary damaged descriptor was used as a witness. Every-backend proof remains limited by NOMMU physical/core and VBO builder inputs; no new patch/test/target/lookup/map/ref/native/device execution or policy inferred. Continued distinct existing AdrenoMetal scalar metadata helpers: local454ff source differs from catalog a0f0287 and remains unselected; bounded function framing/NUL checks were read without a server/API call. Next actual vertex format/count validator with retained iOS17 enum contract. Evidence: `docs/evidence/gpu-published-range-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: bounded Metal vertex metadata source review
+
+Read existing local454ff AdrenoMetal source/actual producer-consumer and old vertex test scripts without executing them. Existing selected-build SDK27 enum/availability annotations confirm formats1..42/45..55 byte table, including iOS17 packed54/55; target remains iOS17 and catalog a0f0287 is not treated as equivalent.31-slot count/index, offset subtraction, layout support bounds and2104/4080B framing are guarded. No new gap/patch/test/target or Metal/Foundation/server/native/device execution, no pipeline/layout/handle model or new wire/policy. Adjacent copies already have byte-length/NUL/path bounds; next legitimate UTF8 conversion-failure contract only. Evidence: `docs/evidence/gpu-metal-vertex-metadata-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: function-name representation refusal
+
+Legitimate embedded U+0000 in bounded NSString metadata was silently serialized by strcpy as a shorter function/constant name; SDK also documents nullable UTF8String and zero length on conversion error. Three original copy sites now check one conversion pointer and full byte-count/C-string agreement, then copy immediately through original nil/refuse channels. No escaping/lossy conversion or wire/ABI/log change.8128 raw NUL-position witnesses/128 ordinary byte controls with canaries/sanitizers,3 source mutations, delta replay and new real-Foundation declaration arm64-ios17 type-only object pass. No NSString/Foundation/Metal/lookup/server/plugin/shader/native/device execution, no NULL peer or specific Darwin unpaired-surrogate observation; full frontend/plugin build remains unqualified. Fresh85-file local454ff derivative remains unselected, catalog a0f0287/original sources and other trees unchanged. Evidence: `docs/evidence/gpu-metal-function-name-representation-2026-11-04.json`.
+
+
+### 2026-11-04: bounded Metal texture extent source review
+
+Actual getBytes width*4/stride/height guards dominate row arithmetic, and checked response/exact tight byte count precede copies. Server producer dimensions/supported4-byte formats and subtraction/division checks bound payloads; no caller destination allocation or live resource ownership inferred. Adjacent surface/blit/indexed/copy guards and existing script coverage were read without execution. No new gap/patch/test/target or Metal/Foundation/IOSurface/readback/transport/native/device execution, no resource/geometry/wire policy change. Next distinct bridge frontend descriptor/range metadata and actual FFI, without handoff/provider selection. Evidence: `docs/evidence/gpu-metal-texture-extent-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: bridge texture transfer count preflight
+
+Actual descriptor fields stay64bit and view ranges use Rust checked_add; no synthetic handle/output defect. Continued distinct replaceRegion/getBytes count producers: unsigned row/image products and sum could wrap or exceed Rust slice isize domain before FFI constructs byte slices and validates texture. Added private pure checked-count helper before both original calls, preserving representable formula/arguments/refusal channel and all ABI/log fields.4 scalar counterexamples/6561 independent128-bit controls+2 boundaries with sanitizers,3 source mutations, replay and new iOS17 pure-helper object pass. No buffer/address/descriptor/handle model or ObjC/Metal/IOSurface/RustAPI/slice/native/device execution; full frontend/plugin/Rust build and caller allocation/ownership remain unqualified. Fresh85-file local454ff derivative unselected; prior name fix preserved. Evidence: `docs/evidence/gpu-metal-bridge-texture-length-2026-11-04.json`.
+
+
+### 2026-11-04: bounded IOSurface metadata source review
+
+Actual plane/page/base/allocation/relative-offset checks precede guarded page roundup/import. Rust delegates compressed/video backing interpretation to runtime; no guessed row*height geometry rejection or synthetic getter/address/owner model. Existing weak-cache and retain/failure-release order read without modification/execution. No new gap/patch/test/target or IOSurface/Metal/RustAPI/getter/import/native/device execution; core backing boundary recorded without polling. Continued distinct NBLibrary functionNames required-count reader locator; long-name reachability still requires actual producer/parser bounds, no defect claimed yet. Evidence: `docs/evidence/gpu-metal-surface-metadata-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: actual bridge name input guards
+
+Fixed256 function enumeration reader concern remains bounded by unavailable matching translator parser/name producer source; no long-name library or output patch was invented. Continued distinct renderer NBLibrary CStr inputs: ordinary/specialized names, named constant keys and descriptor entry now refuse nonrepresentable embedded-NUL/nullable UTF8 input via existing channels. No Offline128-byte cap transplanted; descriptor guard avoids stale lower-error attribution.4 new source mutations/replay and new real-Foundation iOS17 predicate object pass; previous raw-byte proof reused as context only, not rerun. No ObjC/Foundation/Metal/RustAPI/library/parser/shader/native/device execution, no full frontend/plugin build or peer model. Fresh85-file local454ff derivative remains unselected, prior repairs and original pins unchanged. Evidence: `docs/evidence/gpu-metal-bridge-name-input-2026-11-04.json`.
+
+
+### 2026-11-04: sampler and stencil representation guards
+
+Actual sampler NSUInteger/u64 anisotropy narrowed to u32 before lower validation; public C/Rust u64 stencil masks also narrowed. Three checked conversions now use existing Result/refusal channels, preserving zero-to-one anisotropy normalization and representable inputs. SDK stencil masks are uint32_t: high-bit ObjC stencil reachability is not claimed. No hardware max16/clamp/NaN policy or ABI change.4 pure integer witnesses/525 controls with sanitizers,5 source mutation refusals/final replay,2 host Rust declaration/expression objects and2 iOS17 POD objects pass. These are not full frontend/plugin/Rust builds or runtime qualification; no descriptor/handle/provider model or ObjC/Metal/RustAPI/native/device execution. Fresh85-file local454ff derivative remains unselected; other84 files and original pins unchanged. Initial sampler-only artifacts retained; final checks include newly audited stencil conversions. Evidence: `docs/evidence/gpu-metal-sampler-width-2026-11-04.json`.
+
+
+### 2026-11-04: render descriptor width refusal
+
+Batch-reviewed actual compute/render descriptor producers and public C/Rust fields. Compute sizes already use checked conversion and fixed31 mutability enumeration. Render samples, active attribute offset/buffer index and selected layout step rate could lose u64 high bits before lower validation; checked Result conversions now refuse them, with checked buffer reused as layout key. Preserved sample zero-to-one normalization, representable values, existing enum/disabled paths, C ABI and creation/archive shared helper. No new index cap or GPU resource policy. Stride remains unchanged: SDK iOS17 dynamic stride is NSUIntegerMax and lower runtime sentinel semantics are outside retained scope, so no mechanical rejection/mapping or complete preflight claim.4 pure integer witnesses/1030 controls with sanitizers,9 source mutations/replay,1 host Rust declaration/expression object and1 iOS17 POD object pass (render2128B/compute296B); no full frontend/plugin/Rust build or descriptor/handle/buffer/provider model. No ObjC/Metal/RustAPI/compiler/shader/native/device execution. Fresh85-file local454ff derivative stays unselected, other84 files and prior fixes/pins preserved. Evidence: `docs/evidence/gpu-metal-render-width-2026-11-04.json`.
+
+
+### 2026-11-04: encoder binding and draw input representation
+
+Actual shared compute/render binding inputs narrowed NSUInteger indices to32; five range loops also formed unchecked location+k. Added five singular index prechecks and five nonempty final-index subtraction guards before array reads/binding updates, retaining empty no-op and original foreign-type precedence. Threadgroup length/index and actual draw/indexed counts/base signed32/unsigned32 now refuse nonrepresentable input before counters/ownership/FFI. Rust bytes numeric isize guard follows original null refusal and precedes raw slice/get_mut. Offset widths, representable inputs, existing refusal routes and ABI/log fields remain. No hardware cap or allocation/owner/extent policy inferred.7 pure scalar witnesses/1232 controls (including196 independent128-bit range pairs), sanitizers,17 source mutations/final replay,2 iOS17 Foundation scalar objects and1 host Rust length-expression object pass. No full frontend/plugin/Rust build, array/buffer/encoder/descriptor/handle/provider model or ObjC/Metal/RustAPI/slice/draw/native/device execution. Initial edit matcher ambiguity (library+encoder slice snippet) failed before compile; corrected exact encoder match, raw record retained. Draw audit/repair completed in the same turn with expanded final checks; initial binding-only artifacts preserved. Fresh85-file local454ff derivative remains unselected, other83 files and prior repairs/pins unchanged. Evidence: `docs/evidence/gpu-metal-encoder-input-width-2026-11-04.json`.
+
+
+### 2026-11-04: blit fill endpoint representation
+
+Batch source-review of actual NBBlitEncoder/C/Rust path found fillBuffer builds exclusive endpoint with unchecked NSUInteger addition before lower validation. Added one subtraction-based representability refusal after original buffer validation/retention and before endpoint addition/FFI; zero length and exactly representable endpoints/call arguments/error channel stay unchanged. Buffer-copy/texture-transfer offsets, rows/images/sizes stay64bit without local products; lower resource extent/mipmap guarantees are not fabricated from missing runtime source. This does not assert successful huge-buffer fill or K80 impact.3 pure relative-count witnesses/169 independent128-bit oracle controls with sanitizers,3 source mutations/replay and1 new iOS17 Foundation scalar predicate object pass. No buffer/address/handle/provider model, full frontend/plugin/Rust build, ObjC/Metal/RustAPI/getter/fill/copy/cache/native/device execution, ABI/log expansion or geometry/owner policy. Fresh85-file local454ff derivative remains unselected, other84 files and prior repairs/pins unchanged. Evidence: `docs/evidence/gpu-metal-blit-range-end-2026-11-04.json`.
+
+
+### 2026-11-04: actual cumulative Metal frontend translation unit
+
+Render-pass actual fixed8 attachment/count/enum producer preserves64bit metadata; SDK uint32 clearStencil survives binary64 exactly, no NaN/private-state or undeclared resolve/transaction promise invented. Continued distinct function-constant producer: actual payloads are1..32B and Rust index/type guards already exist; giant-array/unsafe-pointer models were not used. No new patch or scalar test. Completed previously missing cumulative verification instead: fresh85-file unchanged independent snapshot compiles the entire actual modified NativeBridgeMetalFrontend.mm once with original strict build flags, existing SDK27 and arm64-apple-ios17.0. Mach-O object records IOS minos17.0/sdk27.0;1272 actual compiler dependency paths retained. Build script was read only, never run. No generator/shader compilation, plugin/Turnip/Rust link, bundle/sign/staging or API/ObjC/getter/provider/native/device execution; this single TU is not full frontend+Rust/plugin/driver/GPU qualification. Local454ff derivative stays unselected and is not catalog a0f0287. Older targets/roleAPI/UserClient/fullcore remain frozen; no pins/SDK/OS/runtime policy changed. Evidence: `docs/evidence/gpu-metal-frontend-ios17-object-2026-11-04.json`.
+
+
+### 2026-11-04: bounded vector-mask source review
+
+Valid ShuffleVector masks select concatenated operand lanes or poison sentinel after source verifyModule admission; stored lane count follows mask length, null poison lanes are rejected when arithmetic/output requires defined values, and generic/output shape guards remain. No all-LLVM acceptance promise or damaged nir_def was invented. Continued adjacent GEP/load/select source review: installed LLVM declaration requires APInt at least IntPtr width, so a smaller index-width alone does not justify changing64bit accumulator; load count guard dominates consumers. No new qualified gap/patch/test/compile/NIR/LLVM/API/shader/native/device execution and no implementation or hardware progress claimed. AirNir/Metal/Native/Linux trees and pins remain unchanged/unselected; next distinct retained fixed-width FMA helper arithmetic review after checking old coverage, without running NIR evaluator or old suites. Evidence: `docs/evidence/gpu-airnir-vector-mask-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: fixed counter-release input prefix
+
+FusedF32/dispatch and old131072-case wide/int32 FMA coverage read only: no new reproducible arithmetic contradiction, no NIR/fmaf/eval/compiler run or exhaustive claim. Continued distinct positive-message framing left open by prior nonpositive-read repair. Actual lower reader zero-fills, accepts1..2 words and returns positive; fixed counter-release handler consumed group/countable without their complete transmitted prefix for the original perfcounter callback. New sizeof-based3-word prefix guard exits the same processing pass through existing mutex unlock before that callback. No new read/drain/retry/stop/queue-advance/callback arguments or wire/log change; normal3..19 inputs preserved, malformed firmware occurrence/K80 impact not asserted.2 pure count witnesses/17 controls using independent actual field-offset oracle, sanitizers,3 source mutations/replay and new12B iOS17 declaration-only object pass; no packet/queue/counter/ACK/provider model, Linux target, reader/handler/callback/native/device execution. Initial trivial scalar projection replaced before execution by field-presence oracle, raw subset retained. Fresh10-file Linux derivative remains unselected, other9 files and prior repairs/pins intact; remaining versioned message framing is not qualified. Evidence: `docs/evidence/gpu-gen7-counter-release-prefix-2026-11-04.json`.
+
+
+### 2026-11-04: fixed message prefix batch
+
+Batch repaired earliest fixed-field framing: lower ACK reader now requires2 words before output[1] trace/copy/advance via existing -EMSGSIZE refusal. Dispatcher requires TS_RETIRE12 words for existing minor<4 or14 for >=4 (not unused version tail), CONTEXT_BAD5 legacy or9 modern via existing minor<2 choice, and SYNCOBJ_QUERY4-word identity/timestamp prefix before trace/context lookup. Full8-word query struct/optional zero-filled tails were not imposed; ACK status payload and nested fault payload remain unqualified. Retained lower callers stop on nonpositive read, no new retry/drain; legacy process_queue returns0 after loop, so no blanket error propagation claim.40 pure short-count witnesses/74 controls with actual field-end offset oracle, sanitizers,7 source mutations/replay and new iOS17 declared-layout object pass. No queue/packet/ACK/fence/context/fault/provider model or reader/trace/callback/Linux/native/device execution, firmware occurrence, wire/log expansion or runtime/version/startup policy selection. Fresh11-file Linux derivative adds exact retained lower source to prior10;9 unaffected files and prior fixedcounter/nonpositive/timeout repairs preserved, bases/pins unchanged and unselected. Evidence: `docs/evidence/gpu-gen7-message-prefix-batch-2026-11-04.json`.
+
+
+### 2026-11-04: fault section bounds and output publication
+
+Exact payload header is4B with16bit dwords; no invented UINT32_MAX count/stride overflow. Seven legacy/modern lookup/snapshot walkers now prove local outer/header/data declared extent before dereference/consumer; existing stride preserved. Pair helper excludes orphan key without value. Private multivalue lookup now uses section-local key/value indices instead of global byte cursor and reports whether it filled; both actual2-value callers skip detail logs when unavailable, without zero/unknown register/address fabrication. Existing not-found0 and snapshot prior ret, successful log formats, nonfatal classification and recovery/stop policy remain.4 pure count/index witnesses/66810 independent section-end controls/65536 pair-count controls with sanitizers,13 source mutations/replay and new4B iOS17 POD object pass. No payload/fault/context/queue/packet/lookup/provider model, parser/copy/snapshot/log/trace/callback/Linux/native/device execution or wire/log expansion. Initial redundant scalar illustration removed before execution, raw source/object retained. Fresh11-file Linux derivative remains unselected, other8 files and earlier repairs/pins intact; declaration checks are not kernel ABI/runtime qualification. Evidence: `docs/evidence/gpu-gen7-fault-section-bounds-2026-11-04.json`.
+
+
+### 2026-11-04: diagnostic input bounds
+
+Batch repaired diagnostic metadata: ERR requires only8B code prefix and bounds its existing string to min(declared remainder,16), without imposing full72B record or adding printed fields. DEBUG/LOG_BLOCK require their16B consumed prefixes. Original linear four-u32 log iterator now preserves empty no-op before cursor formation and refuses reversed/out-of-backing ranges using descriptor.size; no guessed wrap/ring/K80 geometry. Retained Linux allocator/64KiB constant is source context only, no owner/coherency/lease. Existing caller limited processing and ERR recovery classification remain unchanged.7 short-prefix cases/50 normal controls,296225 independent range-oracle controls including directed invalid ranges,153 raw C-string canaries with sanitizers,7 source mutations/replay and new iOS17 declared-POD object pass. Host snprintf only handles raw codeunits; no HFI message/log record/queue/address/provider model, dev_err/dev_dbg/logger/trace/reader/callback/MMIO/Linux/native/device execution, wire/log expansion or runtime policy. Fresh11-file Linux derivative remains unselected,2 files changed and9 unchanged with prior fixes/pins preserved. Evidence: `docs/evidence/gpu-gen7-debug-log-input-bounds-2026-11-04.json`.
+
+
+### 2026-11-04: command result and startup prefixes
+
+Batch added count proof at seven actual result/request consumers while preserving generic2-word ACK transport: generic/check_ack status need3 words, v5 return type needs4 after original legacy-version dispatch; GET_VALUE and warmboot diagnostics retain original unavailable/err paths on short data. No GMU status or actual lost lower errno fabricated, warmboot error/reset-bit tail unchanged. Startup MEM_ALLOC checks8B discriminant then original version>0 legacy40B/modern44B copy extent before decode/provider; counter registration checks12B before existing callback. Valid status enum/value, allocator/map/owner/reply policies and ABI/log unchanged.26 insufficient-length shape cases/69 normal and4 discriminator controls with sanitizers,9 source mutations/replay and new iOS17 POD object pass; shortest abstract shapes may already fail earlier guards, not26 new runtime triggers. No ACK/queue/packet/descriptor/address/provider model, Linux target, reader/allocator/provider/counter/warmboot/callback/native/device execution or component/runtime/policy selection. Fresh11-file Linux derivative remains unselected,2 files changed and9 preserved with prior fixes/catalog/pins intact. Evidence: `docs/evidence/gpu-gen7-command-result-prefix-2026-11-04.json`.
+
+
+### 2026-11-04: alignment integer shift domain
+
+Exact8bit alignment exponents reached signed1<<n without a retained Gen7 domain check. Helpers now use1U so representable bit31 is defined; central _map_gmu rejects consumed exponents outside u32 width before its only two child/helper paths. VA field remains ignored on the original explicit-address route, preserving defined input semantics; original4KiB clamp/flags/types/error unwind retained. This numeric check may occur after allocation and does not select K80 alignment/geometry/IOVA/OAS or authorize mapping/owner/stop/release.131072 pure byte-domain/consumption controls,32 integer powers/31 defined legacy equivalences, candidate sanitizers,6 source mutations/replay and new iOS17 expression-only object pass. Old signed31 expression gives expected host ISO-C UBSan refusal; no running-kernel flag behavior inferred. No descriptor/address/backing/provider/ACK/queue model, getters/allocator/reserve/map/cache/callback/Linux/native/device execution. Fresh12-file reference adds exact adreno_hfi.h, changes it and existing gmu TU while preserving other10; outside retained helper callers and rounded-size representation remain unqualified, pins/catalog/runtime unchanged. Evidence: `docs/evidence/gpu-gen7-alignment-shift-domain-2026-11-04.json`.
+
+
+### 2026-11-04: rounded size and cache range contracts
+
+Completed original rounded-size review using actual normal allocator source bounds (PAGE_ALIGN then0<size<=UINT_MAX): central GMU path now checks aligned count fits its existing u32 consumer after exponent validation. One3GiB relative count/2GiB arithmetic-alignment alias is a source-domain scalar witness only, no large allocated/private md/backing or K80 trigger. Existing -EINVAL/unwind and hardware/owner policies unchanged. Continued distinct small cache-range defect: correct low-remainder length expansion and aligned base; exact retained SG API third parameter counts entries, not pages, so use orig_nents plus explicit requested-page limit together. Existing op/coherency/secure/range/return policies remain.1 rounded-count alias/3 cache normalization-unit patterns,180 independent128-bit rounding controls/2080 quotient-and-last-page controls, sanitizers,10 source mutations/final replay and2 new iOS17 count-expression objects pass. No selected K80 granule, SG/page/descriptor/address/provider model, allocator/cache/iterator/callback/Linux/native/device execution or kernel ABI qualification. Fresh13-file Linux reference adds exact kgsl_sharedmem.c and changes gmu TU while preserving11 prior files and all pins; initial cache-only artifacts retained, old suites/exponent target not rerun. Evidence: `docs/evidence/gpu-gen7-cache-range-normalization-2026-11-04.json`.
+
+
+### 2026-11-04: accessor extent candidate and caller boundary
+
+Batch-reviewed exact sharedmem readl/writel/readq/writeq declarations, checks and retained callers. readq checks four-byte remaining extent before an eight-byte read; fresh13-file isolated candidate changes only its extent predicate to eight bytes with subtraction protection, keeping original four-byte alignment. No actual readq caller was found in retained coherent sources, so this is explicitly a caller-unqualified source candidate, not a newly qualified reachable driver repair or K80 trigger. Other three accessors were not mechanically changed; no normal short mapped backing was invented.17219 abstract byte-budget/relative-offset oracle controls and32 final-four-byte-tail controls, ASan/UBSan,3 source mutations/replay and a new iOS17 expression-only object pass. No mapped object/address/buffer/provider model or accessor/readback/MMIO/API/Linux/native/device execution; no kernel ABI, alignment/owner/runtime policy or wire/log changes. Other12 files and pins preserved, derivative unselected. Next distinct actual host command-server framing source review after old coverage; no server/socket/transport execution. Evidence: `docs/evidence/gpu-gen7-sharedmem-readq-extent-2026-11-04.json`.
+
+
+### 2026-11-04: command framing source bounds
+
+Batch-reviewed actual HostMetalCommandServer.mm and both OfflineMetalFrontend and NativeOfflineGPU framing consumers/producers, with old host scripts read only. Server caps declared body at4080 before vector allocation; fixed REQUEST size and variable constant/label/texture/buffer prefix/count checks precede local reads. Startup scan and request loop are bounded65536/8192; session counters remain bounded by that loop rather than arbitrary UINT32_MAX state. Exact I/O handles positive partial progress/EINTR and ends on zero/error. Existing response body16MiB cap bounds result+body u32 framing; both clients verify identity, minimum result size and maximum body before allocating/reading, broker initializes outputs and invalidates reuse after partial failure. No new count contradiction established and no patch/test/compile or server/socket/transport/Foundation/Metal/RustAPI/getter/provider/native/device execution. Did not impose all-or-nothing operation transactions, new retry/stop policy, fabricate lower receive counts, damaged opaque resources or stream/peer models. Source bounds are not transport/kernel/GPU qualification; all source trees and pins stay unchanged/unselected. Distinct heap scalar/sentinel review remains available; lower runtime contracts will not be guessed. Evidence: `docs/evidence/gpu-metal-command-framing-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: heap metadata and second frontend translation unit
+
+Batch-reviewed actual NBHeap/NBDevice, C declarations and Rust heap wrappers with SDK27 iOS17-available declarations. Length/options/offset/alignment remain64bit; automatic placement u64::MAX sentinel is intentional and preserved, original sparse/enum/Result refusal channels remain. No new public scalar contradiction established. Heap lower runtime placement/alignment/availability semantics are not closed by retained bridge source; no fabricated lower errors, layouts, placements, backing or owner rights, no fetch/polling. Continued authorized cumulative compile verification of the other actually modified frontend: fresh85-file unchanged independent snapshot compiles entire OfflineMetalFrontend.mm once with strict flags and existing SDK, target arm64-apple-ios17.0. Mach-O IOS minos17.0/sdk27.0 object and actual compiler dependencies retained. This closes a distinct TU compile gap for earlier name-source changes, not a new patch, full frontend/plugin/Rust/broker/driver link, runtime/GPU qualification or OS switch. No build script/generator/LLVM/shader/compiler target/API/ObjC/heap/getter/allocator/native/device execution; only host compiler ran to emit unexecuted object. Prior NativeBridge frontend object not rebuilt; old suites/targets remain frozen. All source bytes/pins unchanged and derivative unselected. Evidence: `docs/evidence/gpu-metal-heap-review-offline-ios17-object-2026-11-04.json`.
+
+
+### 2026-11-04: archive path and retained byte-helper contracts
+
+Actual archive constructor distinguishes absent URL (documented null creates empty archive) and file URL production; serializer rejects non-file URL and Rust null path via existing error channel. SDK NSURL.fileSystemRepresentation is a nonnull inner pointer with canonical UTF8/NUL-termination contract; no evidence of a legitimate nullable conversion failure was established, so no empty-archive bug, damaged URL, concurrent mutation or Darwin failure value was fabricated. Existing synchronous CStr/PathBuf conversion consumes within original call, existing error/nil/BOOL routes retained, no new encoding/path policy. Continued distinct retained Rust air_slice boundary used by actual library caller: word offsets remain bounded by original min(count,16), optional range reads and checked slice end protect metadata; did not assert every fat container supported or alter original16-entry limit. Reviewed library/buffer raw-slice admission source without creating oversized backing/pointer witnesses or executing parser/API. No new qualified gap/patch/test/compile or filesystem read/write/serialization/Foundation/Metal/RustAPI/LLVM/compiler/shader/native/device execution. No all-library/parser/lifetime/transport proof; original source bytes, pins and unselected trees unchanged. Evidence: `docs/evidence/gpu-metal-archive-path-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: pipeline options and archive array bounds
+
+Batch-reviewed actual pipelineArchives and all three options-bearing creation callers, shared C/Rust NmbPipelineOptions plus archive-add descriptor callers. Flags remainu64, archive_count size_t/usize; NSArray type rejection occurs before FFI, synchronous vector storage covers call. Rust empty/null-options paths name no array; nonempty count proves pointer presence and isize/pointer-size bound before raw slice and per-handle clone. No huge array/private damaged handle or successful/failed pipeline model used. Reflection output is initializednil before local failure paths, existing nil/NSError and Result fallback routes retained, render descriptor is deleted on each local refusal/after use. PipelineOption::from_raw lower flag semantics are not inferred without exact lower source; no invented enum refusal, unsupported reflection-success contract or all-or-nothing archive transaction. No new qualified gap/patch/test/compile, API/ObjC/Metal/Rust/callback/provider/native/device execution or implementation/hardware progress; original source bytes/pins and unselected trees unchanged. Continued locating distinct dynamic-render scalar producers for next bounded batch; no setters executed. Evidence: `docs/evidence/gpu-metal-pipeline-options-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: dynamic state and dispatch scalar contracts
+
+Batch-reviewed actual viewport/scissor/raster/depth-bias/stencil/blend producers, C declarations and Rust consumers with SDK definitions. Actual six doubles/four u64/four floats local arrays match fixed slices; stencil staysuint32, bias staysfloat, and no narrowing occurs in this bridge. SDK zero enum values match original default cull-none/clockwise/fill associated-value production. raw enum conversion and existing command refusal routes retained; sequential setter mutation is not an undeclared atomic transaction. No NaN/clamp/geometry/lower rejection value or recovery/stop policy chosen. Continued distinct compute dispatch in same batch: two local three-u64 arrays match triple helper and Size construction, no local products/narrow casts; exact lower runtime dispatch extent/validation remains unqualified. No new reachable scalar/count gap, patch/test/compile, setter/encoder/getter/API/ObjC/Metal/Rust/provider/native/device execution or packet/handle/peer model; pins and unselected source trees unchanged. Adjacent PM4 and firmware locators were read only; codec/carrier and closed firmware branches were not reopened or selected. Evidence: `docs/evidence/gpu-metal-dynamic-state-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: selector metadata and publication bounds
+
+Batch-reviewed actual selector enumeration, PUBLIC_ANSWERS kind tags, C/Rust declarations, NBDevice argument wrappers and installation/query failure output order. get(index) returnsNULL before kind publication at end; actual installer tests returned pointer before switch. Four existing tags map zero/one argument and count/flag methods; LP64 scalar arguments/results preserve bits, flag wrappers normalize nonzero. nmb_device_answer publishes output only after UTF8/device_answer succeeds; consumers initialize local value and do not install unavailable constant answers. Existing target-family waivers, XR10 withholding and other capability values were read only, neither validated for K80 nor selected/changed; no new stub or policy. Signed MTLGPUFamily bit pattern is preserved by existing u64-to-i64 roundtrip; no fabricated introspection consumer or lower failure/PrivateCount value used. Exact private selector tables/lower metadata unavailable, so this is not full selector ABI/capability qualification. No new qualified gap/patch/test/compile, selector installation/query/OnceLock/CString/API/native/device execution or peer model. Continued distinct row-size locator: public width reaches product/rounded result, but actual lower texel-size/alignment provenance must be established before any concrete overflow or success claim. No synthetic metadata oracle/patch produced; original sources/pins and unselected trees unchanged. Evidence: `docs/evidence/gpu-metal-selector-metadata-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: row provenance boundary and existing object lifetime
+
+Closed row-size provenance review at concrete boundary: public descriptor width reaches Rust multiplication/rounding without local width cap; actual texel size and alignment come from missing exact runtime. Retained patches/input manifest supply no exact successful producer values, so no guessed bpp/alignment/provider or huge backing witness, patch, pure oracle or K80 overflow claim. Required evidence is exact pinned pixel_format_info and minimum_linear_texture_alignment producer/caller semantics, not another device query or source poll. Continued independent newLibraryWithData mapping lifetime review using existing already-built NativeBridge object only: dispatch map return saved inx19, bridge call atb5c0 precedes release_x19 atb6b0, with static relocations retained. No mapping lifetime bug in that emitted call sequence, no claim of all-compiler ARC or complete returned-library ownership proof. No recompile/test/parser/library-hash/API/dispatch/ObjC/Metal/Rust/getter/native/device execution; object was read as bytes by host disassembler. Original source bytes, pins and unselected trees unchanged. This is bounded source/object evidence, not implementation or hardware progress. Evidence: `docs/evidence/gpu-metal-row-provenance-and-map-lifetime-2026-11-04.json`.
+
+
+### 2026-11-04: command status, error and time ABI
+
+Batch-reviewed actual command-status/error/time metadata and NBCommandBuffer consumers with SDK declarations. Status staysu64/NSUInteger; existing fallback5 matches SDKError5, without inventing live status or completion rights. Error output is caller-zeroed512B; copy_out bounds data tosize-1 and terminates, optional absent error leaves the zeroed caller buffer, and nbError has an existing nil-description fallback. No complete diagnostic-text promise imposed or truncation treated as transport corruption. Timing remains f64/double through ABI with no local scale conversion; SDK expects seconds/unavailable0, while exact lower runtime time producer remains unqualified. Local refusal/current enum gates reviewed, no new actual error/clock/provider value fabricated. No new qualified gap/patch/test/compile, status/getter/query/wait/commit/callback/API/ObjC/Metal/Rust/native/device execution or peer model. A nearby mip-level shift was not called defective using a damaged texture or unproved huge lower level count. Original source bytes/pins and unselected trees unchanged; next distinct retained Linux waittimestamp entry/dispatch source, not the completed HFI timeout work. Evidence: `docs/evidence/gpu-metal-command-status-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: context-property subtype size publication
+
+Actual waittimestamp ioctl preserves unsigned lower timestamp/msecs arguments and direct result through original diagnostic reads/put; Adreno null/detached/invalid/fault overrides are explicit original policy, not lost-error defects. Exact adreno_drawctxt_wait/core admission not retained in bounded sources, so no full wait/timing proof or fake lower errno. Continued distinct reset-status source: original clear-before-copy is explicit return-and-clear behavior without a preserved-on-failure promise; no reset/retry policy patch. Found concrete adjacent context-property size-only publication defect: kgsl_get_ctxt_fault_stats updates local ctxt_property.size on size0 and returns0, but sole outer actual caller previously returned without copying that size-bearing descriptor to userspace. Fresh13-file isolated derivative captures original size-query intent and publishes the bounded descriptor only on success after original context_put, returning existing -EFAULT on output copy failure. Normal nonzero-size stats path and unsupported/error paths retain behavior; helper/provider calls, refcount/clear/owner policies, existing prefix min, ABI/log unchanged. Three source mutations refused, exact delta replay and other12 preservation pass. No synthetic context/ID/size-provider/usercopy peer, scalar execution/model, sanitizers, Linux/native target, wait/readtimestamp/get/put/usercopy/callback/trace/native/device execution or actual K80 trigger claimed. This is a source-level publication repair with no kernel/runtime qualification; inherited readq remains caller-unqualified, pins and selections unchanged. Evidence: `docs/evidence/gpu-gen7-context-property-size-publication-2026-11-04.json`.
+
+
+### 2026-11-04: context destroy and adjacent return paths
+
+Actual destroy ioctl owner-admits ID, calls kgsl_context_detach then drops its original reference and returns0. Detach is definedvoid in retained kgsl.c; no missing errno was invented. Its detached bit protects original master-reference release; recurring dequeue-before-bit and callback/event ordering remain original policy, not fabricated duplicate-stop/release defects. Actual destructor removes ID under context_lock and decrements original context count only while ID valid; no dangling published-ID claim or allocator/context peer model. Exact owner-get/put internals and device detach callbacks are outside this narrow retained source proof, so no full owner/refcount/retirement qualification. Continued distinct immediate/timestamp free entry/actual callers: original pending-bit failure reset, direct helper status propagation and original puts remain; no fake event failure/status or cleanup/refcount-policy change. No new qualified scalar/error gap, patch/test/compile, lookup/detach/put/ref/callback/wait/trace/usercopy/Linux/native/device execution or hardware progress. Prior subtype-size publication fix remains unchanged; pins and unselected source trees unchanged. Located actual GPU model/fuse/string source for next distinct input-length batch without running any getter or choosing a model. Evidence: `docs/evidence/gpu-gen7-context-destroy-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: model/fuse/string input source contracts
+
+Batch-reviewed exact model fuse/node/string code plus adjacent speed-bin, Vulkan-ID and gaming-bin metadata routes. Fuse/speed-bin initialize scalar0 and copy min(len,sizeof(val)), not unchecked u32 dereference; error pointers are refused before copy, no imagined short-read overread. Original signed value/negative fallback and zero behavior were preserved without guessed fuse data, bin policy or successful provider. Model-node property read success gates scalar comparison, fallback string remains bounded32B via scnprintf/strscpy; no complete-string/multi-GPU cache/concurrent mutation promise invented. Vulkan-ID and gaming-bin copy paths use original widths/length and existing inherited prefix helper, no model/chip/runtime choice or identity/owner/lease proof. No new qualified count/raw-string gap, patch/test/compile, nvmem/fuse/DT/getter/MMIO/provider/native/Linux/device execution or peer model. Retained DT identity is historical source context only. Original sources/pins/unselected trees and prior size-publication repair remain unchanged. Continued actual shmem page-allocation scalar locator: existing -EAGAIN predicate is higher-order only, so arbitrary order0 retry failure must not be used as a future witness; allocator not executed. Evidence: `docs/evidence/gpu-gen7-model-input-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: shmem and ordinary page count admission
+
+Actual shmem retry source refuses -EAGAIN unless order>1; no injected base-order retry or unsigned decrement counterexample. Initial remaining-length subtraction depends on real page_count/callback invariants; no damaged private state used. Ordinary allocator admission PAGE_ALIGN then nonzero<=UINT_MAX was read as source context; shmem callback/get_page_size details are not closed by that alone. One bounded non-archive inventory found no retained kgsl_pool.c/h, so exact page-size/order selector proof is finitely unresolved; no fake helper or source fetch/poll. Continued independent ordinary system-page and surrounding _kgsl_alloc_pages loops: original typed counts, per-success progress/output publication and original failure cleanup reviewed, no new qualified scalar contradiction or allocation/refcount policy change. Did not execute or model pages, SG lists, backing, callback, allocator success/failure, shifts over arbitrary private orders or core retry behavior. No patch/test/compile/sanitizers/allocator/page/clear/split/cache/VM/ref/callback/native/Linux/device execution or hardware progress; original source bytes/pins/unselected trees and earlier repairs unchanged. Next distinct secure allocation count admission source only, without selecting or enabling security/geometry policies. Evidence: `docs/evidence/gpu-gen7-shmem-page-count-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: secure-system SG traversal unit
+
+Secure allocation source applies PAGE_ALIGN/nonzero/UINTMAX admission before publishing size and branches into original system/pool page producers; no huge-private-state rounding witness. Found distinct actual unit mismatch after successful original secure unlock: secure-system destructor freed one PAGE_SIZE allocation per SG entry, while its own sg_alloc_table_from_pages builder may coalesce multiple base pages per entry. Retained primary scatterlist source explicitly defines per-page iterator and orig_nents units. Fresh13-file derivative changes only traversal to for_each_sg_page with original orig_nents and sg_page_iter_page; same __free_pages(page,get_order(PAGE_SIZE)) operation, mapped refusal, failed-unlock early return, secure stats and final table cleanup remain. This corrects enumeration count, selects no new free/security/stop policy or hardware granule/rights. Three source mutations/replay/other12 preservation pass; no SG/page/backing/provider model, scalar execution/oracle/sanitizers, Linux/native target or allocator/free/secure-unlock/SMC/SCM/native/device execution. No actual K80 coalescing/leak trigger or kernel ABI qualification claimed. Separate pre-SGT cleanup dataflow is unresolved: memdesc_init clears pages, allocator returns local pages, early error cleanup reads memdesc->pages before publication; system/non-system cleanup contracts differ. No guessed helper/array publication/free/quarantine patch made for that gap, exact pool lower remains missing. Prior context-size repair and caller-unqualified readq remain preserved; bases/pins/runtime selection unchanged. Evidence: `docs/evidence/gpu-gen7-secure-system-page-unit-2026-11-04.json`.
+
+
+### 2026-11-04: modern counted record stride
+
+Pre-SGT review confirms constructor zeroing/local pages vs _kgsl_free_pages member-input mismatch; blindly publishing arrays is insufficient across system/shmem/pool branches. Secure ops require a built table/unlock, ordinary free_system_pages also decrements stats not yet charged here, and exact pool internals remain missing. No new cleanup/free/quarantine/refcount policy or fabricated allocator failure; specific missing branch contracts recorded. Continued independent modern list audit and found retained exact UAPI header in existing preallocated archive (OEM453d reference, not Xiaomi runtime) plus primary copy_struct_from_user semantics: size is per-entry structure length, accepts shorter zero-filled prefixes or longer zero tails; actual ordinary/recurring callers forward cmdsize/objsize/syncsize without exact-size restriction. Three modern cmd/mem/sync list loops copied size but advanced kernel sizeof, misplacing later prefixes when size differs. Fresh13-file derivative changes only those three increments to size; legacy fixed/compat loops, marker/count/flags, allocation/callback/copy/error/status semantics remain. Four source mutations/replay/other12 preservation and462 generic raw-prefix canary controls under ASan/UBSan pass (259 for32B and203 for24B prefixes); four numeric second-prefix spacing witnesses are relative lengths only. No command/sync/queue/packet/ID/address/provider object or successful parse model, no copy_struct/usercopy/parser/allocator/callback/Linux/native/device execution or K80 trigger. Initial two-list artifacts retained before same-turn sync extension, final combined changed checks completed. Prior secure unit/context size repairs and caller-unqualified readq preserved; pins/fields/ABI/wire/log/runtime selection unchanged. Old gpuobj_sync variable-stride/missing helper branch was not reopened. Evidence: `docs/evidence/gpu-gen7-command-list-record-stride-2026-11-04.json`.
+
+
+### 2026-11-04: profiling consumer extent and publication
+
+Actual add_profiling_buffer first requires original profiling flag and empty retained entry, selects existing lookup route, checks both requested extent and complete profiling layout before publishing entry/start. Exact header alias resolves to fiveu64/40B UAPI structure; downstream low/high split preserves64bit and CPU consumers check entry/map availability before access. Range helper rejects request endpoint wrap and lower bound before accepting; a wrapped unsigned base+offset falls below original base, so no arbitrary private descriptor/address witness was manufactured. Prior normal published-range builder boundary was referenced without reopening it or claiming all NOMMU/VBO/mapping backends. ID-versus-gpuaddr simultaneous predicate, first-only choice, recurring flag and ref/retirement behavior remain original policy; no change made based on a possible map failure or presumed completion rights. No new qualified count/layout gap/patch/test/compile, profiling/lookup/map/ref/put/getter/callback/reader/trace/native/Linux/device execution, entry/ID/address/provider/packet model or K80 trigger. Original sources/pins/unselected trees and modern stride repair unchanged. Located actual generic timestamp_cmp helper with explicit window/equality comments for next distinct integer-source audit, without reading a timestamp or choosing new ordering policy. Evidence: `docs/evidence/gpu-gen7-profiling-extent-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: generic timestamp integer representation
+
+Exact kgsl.h defines WINDOW0x80000000 and timestamp_cmp inputs unsigned int; retained typed callers use32bit fields. Equality exits first; subtraction/window translation are unsigned modular arithmetic, not signed-overflow UB. Existing strict non-rollover vs inclusive rollover window boundary is explicitly commented; no invented global total-order, changed half-window tie or live epoch/retry/timeout policy. Actual user-generated timestamp callers compare before assignment and keep original -ERANGE gate; driver increment remains unsigned. Read only the typed call sites, without manufacturing GPU clock/context/queue/timestamp/provider values, completion/retirement rights or ignored-lower-error callbacks. No new qualified C representation/input-domain gap, patch/test/compile, timestamp read/query/wait/clock/trace/callback/getter/native/Linux/device execution or peer model. This is not full timestamp admission/epoch or hardware progress proof. Original source bytes/pins/unselected trees and prior fixes unchanged. Continued locating existing memory-usage text/attribute helpers for next distinct raw-byte/output-capacity source batch, without adding any diagnostic/index feature or executing sysfs. Evidence: `docs/evidence/gpu-gen7-timestamp-compare-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: existing memory text and bounded property names
+
+Actual kgsl_get_memory_usage traverses static NULL-terminated memtype_attrs, uses caller-size bounded strscpy/snprintf and8bit type extraction; no full-name promise or arbitrary caller capacity modeled. memtype_sysfs_show has explicit allocation/refusal paths and bounded PAGE_SIZE text output, units remainbytes; no huge private counters, IDR edge-state or backend/work success was fabricated to force an arithmetic/ownership bug. Exact external helper callers are not in the retained coherent subset, so no full caller/ref/deferred-work proof. Continued distinct existing DDR property-name helper/callers: three retained base literals are at most13bytes and nonnegative int suffix at most10digits, so expanded string at most27bytes plusNUL fits32; did not patch > versus >= using an unreachable32-byte case or select a DDR/bin/table value. These are string-count facts only, not reopening OPP/rate/board policy. One bounded inventory found no retained kgsl_ioctl.c/h implementation (only declarations in kgsl_device.h); no invented dispatcher, fetch or repeat polling. No new qualified raw-byte/count gap, patch/test/compile/sysfs/DT/getter/lookup/ref/work/allocator/callback/clock/native/Linux/device execution, new diagnostic/index or hardware progress. All source bytes/pins/unselected trees and existing repairs unchanged; next distinct constraint-record metadata validation without choosing power policy. Evidence: `docs/evidence/gpu-gen7-memory-text-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: constraint record metadata admission
+
+Actual adreno_setproperty requires exact outer constraint sizeof before copy/owner lookup, retains direct nested status and original context_put. UAPI nested data size is __kernel_size_t; power-bearing branches compare exact sizeof(single unsigned level) before copy, no LP64 truncation or short-prefix uninitialized payload established. Known enum/default paths preserve original -EINVAL/-EFAULT, no-data NONE semantics and successful old-constraint cancellation. L3 clamp/register-voter ordering versus PWR rejection is explicit existing behavior, not a software metadata bug or a new level/vote/rate/context/power choice; no transactional rollback promise invented. Single bounded source inventory found no retained adreno_compat.c/h, so compat conversion is not qualified and was not replaced with a32bit-kernel assumption or stub. No new qualified metadata/count gap, patch/test/compile, constraint/set/query/copy/lookup/ref/vote/clock/cache/callback/provider/native/Linux/device execution or peer model. Parent SETPROPERTY width repair, original fields/defaults/pins and unselected trees unchanged. Located actual scalar-property route/field cases for next source-only metadata batch, without reading or granting hardware capabilities. Evidence: `docs/evidence/gpu-gen7-constraint-record-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: scalar property routes and initialized output members
+
+All ten actual adreno_prop_u32 public table routes have matching handled cases; public unknown types return -ENODEV at the dispatcher rather than entering a fabricated unsupported private-helper path. Output starts initializedu32 and reaches inherited sizeof-based copy without local narrowing; DT-read/default and feature presentation values remain original source behavior, not new defaults, K80 OAS/IOVA/bank/UBWC or capability authority. Continued fixed output producers: model string aggregate startszero, shadow/QDSS/timer aggregates startzero and their optional-source gates precede member reads; firmware-version fields are explicitly initialized from existing state. No stack-member leak or successful provider/value model manufactured; aggregate source initialization is not a whole-object padding or exact compat-byte proof. No new qualified scalar metadata/count/error gap, patch/test/compile/query/getter/DT/nvmem/provider/copy/native/Linux/device execution, diagnostics/index feature or hardware progress. Parent enumeration/prefix-width branches and all previous repairs left unchanged. Brief retained AdrenoShader/Frontend locators were read only: their already-closed encoder/strict-straight-line admission was not reopened or presented as support for PHI/control-flow. Source trees/pins remain unselected/unchanged; next distinct native Metal open argument/failure metadata audit without opening or selecting it. Evidence: `docs/evidence/gpu-gen7-scalar-property-route-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: native Metal open and fixed stats metadata
+
+Actual native_bridge_metal_open calls nmb_device_open (the prior nmb_device_new plan locator was incorrect; no new symbol/wrapper). C/Rust declarations agree; required C strings are null-rejected before CStr conversion, original lossy path/loader/cache policy retained. Rust returns boxed device only after system_default_with succeeds; guard preserves failure reason/fallback, frontend lower-null returns nil. Actual plugin stack cache candidates are bounded and phase caller uses job-owned inputs. Existing singleton shortcut and later iOS class-layout/class-allocation nil paths do not promise rollback of earlier gDevice/gMissing/gInFlight state; no cleanup/retry/release policy inferred or changed. The536-byte class gate remains original source policy, not runtime validation. Continued fixed stats ABI: fourteen u64 repr(C) members match C order; work output is ten u64, five pipeline counters plus two message counters plus three cache fields. Actual retained consumers allocate ten words / full stats struct and gate consumption on true. Work output can be partially written before later device validation; no all-or-none failure output or coherent counter snapshot promise fabricated. No new qualified input/count/output contradiction, patch/test/compile or API/open/env/CString/loader/cache/allocator/selector/getter/ObjC/Metal/Rust/provider/native/device execution. Existing trees/pins remain unchanged and unselected; this source review is not implementation or GPU progress. Evidence: `docs/evidence/gpu-metal-open-and-fixed-stats-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: public object type field width
+
+Actual modern GPUOBJ_INFO has five u64 output fields and unsigned ID; lookup rejection precedes output assignment and original final put remains. Guard-page footprint source returns u64; ordinary admitted sizes are bounded, while no damaged private descriptor or whole import/VBO/mapping contract is invented. Distinct GPUOBJ_SET_INFO TYPE consumes public u32 directly through FIELD_FIT(mask,type), with mask0x0000FF00/shift8. Retained Linux bitfield expansion casts to typeof(mask)=signed int before shifting; public high values can overflow that expression, while a defined unsigned projection loses high bits and aliases the eight-bit field. Fresh thirteen-file derivative replaces only this predicate with an unshifted <=(MASK>>SHIFT) check: all256 representable field values retain original FIELD_PREP update; all wider values take original -EINVAL/put. No new memory-type enum, flag/geometry/owner policy or metadata/type transaction promise; metadata/NUL/cursor branch untouched. Three pure unsigned bit-projection aliases and65648 independent128bit controls plus candidate ASan/UBSan pass; four source mutations/exact replay/twelve unchanged files/independent inodes pass. One unexecuted iOS17 expression object compiled, not Linux or driver target. Old signed expression host ISO-C UBSan abort was expected; initial wrapper incorrectly expected exit1 instead of observed signal6, corrected observation retained without rerun. Local kernel macro is source arithmetic evidence, not proof of pinned OEM compile flags or running K80 behavior. No entry/ID/lookup/backing/address/provider model or usercopy/query/lookup/ref/map/allocator/native/device execution. Source trees/pins and all runtime choices remain unselected; readq inherited candidate remains caller-unqualified. Evidence: `docs/evidence/gpu-gen7-object-type-field-width-2026-11-04.json`.
+
+
+### 2026-11-04: legacy-info coverage and readtimestamp metadata
+
+Old coverage check found legacy memory-info LP64 widths already reviewed in gpu-software-input-source-review-20261104; the next-plan locator was redundant, so no old test/target or repair was reopened. Current native UAPI remains unsigned long/__kernel_size_t for address/size and u32 flags/ID, with original ID-before-address selection, source -ERANGE address check and output-before-return behavior; no invented compat32, high-flag or all-or-none output promise. Continued same turn to distinct actual readtimestamp ioctl and retained Adreno producer: public output is unsigned32, wrapper starts -EINVAL, invokes only with owned context and returns original lower status after original put/unlock. QUEUED copies existing u32, CONSUMED/RETIRED use original sharedmem accessor, unsupported type explicitly writes0/-EINVAL. No live timestamp/context/clock/completion or stop rights inferred. __adreno_readtimestamp does not propagate readl return, but an actual reachable readl refusal for valid memstore/context admission is not established; no corrupted private descriptor/hostptr/ID or fake accessor failure peer constructed to qualify a patch. Exact kgsl_readtimestamp dispatch body is only declared in these retained inputs, not replaced with a stub or polled. Fault-report stride/count source was recognized as already-covered gpu-gen7-fault-stride-width and kept closed; no high-count/fault stream test or new cap manufactured. No new qualified scalar/count/output gap, patch/test/compile/query/wait/readtimestamp/trace/getter/lookup/ref/MMIO/VM/callback/native/device execution. All trees/pins remain unchanged/unselected; source-only review is not implementation/hardware progress. Evidence: `docs/evidence/gpu-gen7-legacy-info-readtimestamp-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: fixed device tuple and bounded table index source review
+
+Actual nmb_device_max_threads_per_threadgroup uses a fixed three-u64 C output. Rust rejects null then retrieves properties before constructing/writing the three-word slice; both actual frontend consumers provide zero-initialized uint64_t[3]. Device getter returns LP64 MTLSize; render pipeline maxTotalThreadsPerThreadgroup returns s[0] after a true check, not a dimension product. The prior plan product locator was incorrect and corrected without an implementation change. Compute max-threads/execution-width wrappers also return u64 to NSUInteger; exact lower capability producer/domain remains unqualified and is not fetched/polled. No fabricated dimensions/capability/zero-or-overflow/provider model or new max/clamp/geometry policy, no tuple patch/test/compile. Continued independent retained adreno_of_parse_pwrlevels scalar admission: index is u32 and ARRAY_SIZE check precedes index+1 publication and array access; required property errors take original out path, zero frequency skip and optional source defaults retain original behavior. Initial levels/limits consume num_pwrlevels, but empty/gapped table acceptance cannot be called a reachable defect without actual caller/DT admission, so no synthetic empty DT, voltage/frequency/bin/vote/default or GENMASK counterexample/policy repair. This is a finite source-only metadata review, not K80 power-table provenance, usable capability, initialization, OPP or hardware progress. No getters/properties/DT/OPP/parser/API/ObjC/Metal/Rust/native/device execution, no patch/test/compile; trees/pins stay unchanged and unselected. Evidence: `docs/evidence/gpu-metal-fixed-device-tuple-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: power table caller/count source review
+
+Actual legacy and matched-bin callers invoke initial-level/limits consumers only after parser returns0; top-level get_power and probe preserve direct error propagation. Retained kgsl_pwrctrl.h declares32 fixed entries and unsigned num_pwrlevels; checked u32 index therefore publishes at most32 before table access. No explicit nonempty/contiguous proof was found in these callers, but no exact current K80 node/property producer establishing an empty/gapped accepted table was retained in this review. A guessed stock DTS pathname was absent; it is not evidence of missing board data globally and was not retried/fetched. No synthetic empty DT/GENMASK defect, chosen level/frequency/voltage/speed-bin/default/OPP/vote/power/security policy or provider peer manufactured. Bin property-length walk and required-read error branches were source-read only; existing bin matching and defaults are preserved. No new qualified metadata/count gap or source repair/test/compile/DT/getter/parser/OPP/clock/service/provider/native/device execution; exact lower Metal capabilities and earlier missing sources remain unqualified, not repeatedly polled. This closes this bounded caller/count review, not all GPU source review or driver implementation. Existing cumulative derivatives and readq caller-unqualified candidate remain unchanged/unselected. Concrete admission boundaries: `/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-power-table-count-source-review-20261104/frontier.json`. Evidence: `docs/evidence/gpu-gen7-power-table-count-source-review-2026-11-04.json`.
+
+
+### 2026-11-04: approved Darwin23 role compatibility and coherent object link
+
+Owner explicitly approved the isolated compatibility behavior: valid priority requests return unsupported after the original not-open/bad-argument checks; submission retains unspecified priority -1; existing role field 0 explicitly means unknown/unavailable. Only NativeAdrenoUserClient.cpp and its isolated README changed; no fake role API or kernel role subsystem was added. The complete UserClient and real Publish caller compiled against retained Darwin23 headers targeting iOS17. The coherent native tree now has 30 C++ objects: 15 newly compiled and 15 reused only after exact archived source/header/object validation. Nine exact ArmSmmu4K/AdrenoPM4 C objects also compiled; all 39 objects passed a relocatable link. New compilations use strict warnings; reused objects retain their original flags. Exact patch replay, independent input archives and static function inspection passed. No target/API/device execution occurred.
+
+This is not a final executable link or K80 startup proof. Generated board rules/votes/CommandDB headers were absent from the actual Service dependencies, so those conditional startup arms were not compiled. 281 external imports remain; a name-only comparison with the retained kernel matches 272 of 278 strong imports. The six unmatched strong names concern original IOAcceleratorES binding, the real UBSan runtime and actual GOP handoff integration; their absence from that table does not imply missing implementations everywhere. K80 power/security/stop/owner and final-image integration remain unresolved. GPU status stays planned with no selected component; CPU presentation, pins, original source trees and baselines remain unchanged. Recurring k80-gpu automation was deleted at the owner's request; this work ran continuously in the current chat. [Evidence](evidence/gpu-darwin23-role-compat-2026-11-04.json).
+
+
+### 2026-11-04: real runtime dependencies and late initializer reference
+
+Compiled unchanged NativeGOPPresenter.cpp and the actual selected Darwin23 ubsan_minimal.c into independent iOS17 objects, without executing either. GOP uses strict warnings; the UBSan build preserves the original kernel recipe and its raw warnings, not a claimed warning-free/-Werror build. Using the existing accelerator build rule, removed one automatic initializer registration and exported its exact original initializer symbol; all accelerator text bytes remain identical. No initializer caller or private original-address binding was added. The resulting 41-object relocatable reference link passes and its import set is unchanged by staging. All423 actual source/header/recipe inputs are independently archived.
+
+This is source dependency/build integration, not a new driver logic fix or complete executable link. The exact GOP and UBSan references now resolve in the reference aggregate, but the complete UBSan object also defines _ubsan_traps already present in the retained kernel and imports sysctl_register_oid_early absent from that kernel's symbol table. It must participate in a final kernel source relink, never be grafted onto the existing image. Original IOAcceleratorES binding inputs at the canonical script's directly referenced paths are unavailable; no old private addresses were applied, no global missing-source claim was made. K80 board rules/votes/CommandDB and power/security/stop ownership remain separate unresolved inputs. Existing source trees, pins, CPU display, all device scopes and deleted-scheduler state remain unchanged. [Evidence](evidence/gpu-darwin23-runtime-link-2026-11-04.json).
+
+
+### 2026-11-04: exact retained-image class and runtime symbol closure
+
+The retained e328 prelinked image and its exact postlink plan contain the original IOGPUFamily text. Independently verified its complete code hash, then derived the actual IOAcceleratorES initializer arguments (IOService parent, original class name,136-byte size), unique168-entry vtable with no operational overrides, and genuine constructor/destructor import chains. This static binary proof removes the dependency on the absent canonical audit pathname for this one image; it is not a new runtime parent observation. Three class bindings were produced for an unselected image-specific reference only.
+
+Correction to preceding global-only symbol reports: nm -g omitted non-global/private symbols. The complete retained table contains the actual UBSan negate handler and sysctl_register_oid_early. The handler's complete BRK/RET body matches the separately compiled actual Darwin23 source object. The final reference therefore excludes the whole UBSan object and binds to the existing function, avoiding duplicate runtime/sysctl definitions. Forty native/dependency/presenter objects plus one image-specific binding object pass relocatable linking: all287 strong imports resolve to verified actual image/class symbols; the3 optional weak imports remain unbound, not fabricated successes. Previous whole-runtime intermediate artifacts remain archived and are superseded by this final reference.
+
+This does not prove final executable relocation/layout, initialized classes, K80 startup, GPU execution or Metal rendering. A future image must rederive/revalidate its own bindings; no new kernel/FD/device candidate or initializer caller was produced. Exact K80 board rules/votes/CommandDB and Darwin power/security/stop/SMMU ownership remain unresolved. No old suites, target API or device operations ran; original source/pins and CPU display remain unchanged. [Evidence](evidence/gpu-darwin23-original-class-binding-2026-11-04.json).
+
+
+### 2026-11-04: K80 source composition with the current Darwin23 native layer
+
+A fresh unselected copy combines maintained K80 firmware/resource/startup/GMU/backing/visibility sources with current role-compatible native headers. Integrated the two previously reviewed four-argument CPU allocation adaptations and reviewed visibility-report alias exclusion. Actual enabled compilation exposed an incompatible table-owner API: legacy K80 bulk-memory preparation cannot call current NativeAdrenoPrepareSmmuMemory, which consumes NativeAdrenoTablePages. That failure is retained; no owner cast or fabricated storage was introduced.
+
+Implemented a separate per-page preparation source adapter using the exact native owner and native visibility callback. Caller geometry is forwarded unchanged, the actual native IOReturn remains available separately from postcondition rejection, and failure retains resources without retry, release or context/stream installation. Stable inactive ownership and exclusive lifetime remain external preconditions. Source defaults remain OFF; no cache/coherency flag or existing publisher/report ABI changed.
+
+Sixteen new K80 objects pass strict iOS17/Darwin23 compilation (12 default/source and4 compile-only enabled objects); the newly required exact AdrenoFirmware dependency also compiles. Eleven K80 objects plus that dependency and40 existing native/dependency/presenter objects pass relocatable reference linking with0 unresolved strong imports and3 optional weak imports. The existing image-specific binding is reused only against the unchanged hash-verified e328 image. All418 actual source/header/recipe inputs are independently archived. Initial C-header/working-directory and unused-default-field compile failures are preserved; no new warning suppression was introduced.
+
+This is source compatibility and dependency integration. No target API/callback/parser or device execution, old suites, runtime/component selection, new kernel/FD/device candidate, actual K80 startup or rendering is qualified. The legacy fixed-pool preparation remains incompatible and is excluded from the reference in favor of the new unselected per-page adapter; no live caller was added. Next work is a concrete source-based Gen7.9.1 platform/startup design, with board votes/CommandDB, power/security/stopped ownership and normal-thread caller requirements explicit. [Evidence](evidence/gpu-k80-darwin23-source-composition-2026-11-04.json).
+
+
+### 2026-11-04: owner-approved offline Gen7 cold-boot controller
+
+Prepared a concrete21-operation source draft from the retained Gen7.9.1 family first-boot path. The owner explicitly approved the offline one-attempt/stop-forward-progress/retain-resources policy, with no automatic Linux power/reset/OOB unwind. The accepted controller is in a fresh unselected copy. It preserves actual backend classification and raw status/domain/availability independently; zero alone does not select success. Failure state names require retention rather than claim hardware resources are already retained. Loaded DTCM version metadata is explicitly distinguished from HFI negotiation or a live ownership epoch.
+
+One new strict Darwin23/iOS17 object compiles and joins the existing K80/native reference without new unresolved strong imports;3 existing optional weak imports remain. Static object inspection finds21 indirect operation calls in interface order, no external controller imports and no dynamic initializer. Actual source/header/recipe inputs are independently archived. No controller, backend, callback, native API or device was executed, no prior objects/suites were rebuilt and no runtime caller/thread/component or new kernel/FD/device candidate was selected.
+
+The21 hardware operation contracts have no backend implementation or instance; they have no default successful/failure stub. This is control-flow implementation only, not power/security ownership, firmware authentication, GMU/HFI startup, GPU command completion or rendering. Per-object attempt state is not a global epoch/lease. The next source implementation follows the actual locally present SCM transport and calling ABI, retaining the missing board/platform contracts explicitly. [Evidence](evidence/gpu-gen7-coldboot-controller-2026-11-04.json).
+
+
+### 2026-11-04: exact-source raw SMCCC transport primitive
+
+Explicitly acquired the two missing SMCCC header/ARM64 assembly files from MiCode d9e81e6, then matched both downloaded bytes to the already-retained exact commit's Git tree/blob IDs. Restricted-shell DNS failure and the successful explicit network acquisition are both retained; no sparse checkout/pin/SDK or OS was changed. The raw Linux interface retains returned x6 for Qualcomm interrupted-call continuation in addition to x0..x3.
+
+Implemented a separate unselected Darwin two-pointer assembly entry that loads caller-supplied x0..x7 and stores actual returned x0..x3/x6. It selects no function ID, service, convention, address or success value. One assembler object and one actual target POD/prototype ABI object pass; static inspection shows exactly one SMC instruction, no other call/HVC/import or initializer. Its standalone relocatable reference retains the private external symbol for future static composition. The initial localized-symbol reference is preserved. No primitive or target/native/SMC/device operation was executed; the controller/kernel references were not changed.
+
+This is a raw source primitive, not a complete QCOM SCM/PAS backend, capability probe or GPU startup. Convention/conduit admission, interrupted/WAITQ handling, secure-buffer lifetime and service/error contracts remain required. No Linux SVE hint, retry/timeouts or other-board/PAS values were adopted. The primitive remains disconnected from the cold-boot controller. [Evidence](evidence/gpu-gen7-smccc-primitive-2026-11-04.json).
+
+
+### 2026-11-05: SCM register transport, interrupted continuation and GPU-init source
+
+Implemented source-defined register encoding and raw result handling against MiCode d9e81e6. ARM32/ARM64 and call kind are explicit inputs; Unknown/Legacy do not default to ARM64. Up to4 register slots follow the actual lower source; the >4 secure-buffer path is explicitly unimplemented. Raw x0..x3/x6 are preserved without Linux errno folding, 32-bit normalization or treating raw zero as owner/service success.
+
+The QCOM INTERRUPTED continuation now carries actual returned a0/a6 and original x1..x5/x7. Its entry budget is a required caller input, with no default count or time. This continues the same firmware call; BUSY/WAITQ are not retried/resumed automatically. Budget exhaustion retains the last real frame/result. Returned-entry counts cannot bound a nonreturning instruction or establish recovery/stop rights.
+
+Implemented the actual one-argument service-availability followed by GPU-init-register operation for an already eligible SMC session. The real convention and gpu_request must be supplied, no feature/PAS/address values are guessed. Unadvertised service, unfinished transport and firmware nonzero stop forward progress; unsupported is not silently turned into completed startup. All raw results remain distinct from software statuses. The operation has no selected caller, registered backend, implicit global lock, ownership token, allocator or cleanup path.
+
+Two final changed C++ objects pass strict Darwin23/iOS17 compile and join the two unchanged raw SMCCC/ABI objects. Their standalone kernel support imports resolve when composed with the existing controller/native reference:0 unresolved strong imports,3 existing optional weak imports. The initial single-entry source/object phase is preserved. No descriptor/reply/provider fixtures, functions, target/native/SMC/device operations or old suites were executed. This is source implementation and target-link evidence, not a complete QCOM transport, concrete21-operation Backend instance, GMU startup or rendering. [Evidence](evidence/gpu-gen7-scm-register-transport-2026-11-05.json).
+
+
+### 2026-11-05: abstract security backend and source-defined PAS operations
+
+Connected the controller's initializeSecurityRegisters operation to the actual SCM GPU-init procedure in an abstract partial backend. The other20 operations remain pure virtual; no complete backend, owner or provider instance exists. The method caches the one attempted result, retains raw registers persistently and selects raw status from the actual current stage. An earlier availability success cannot stand in for an initialization that did not return. Complete requires the actual advertised service and returned initialization zero within an already real owned/exclusive session.
+
+The partial vtable introduces the standard pure-virtual handler. Its actual global symbol, executable code section and entry bytes were verified in the unchanged retained e328 kernel against real Darwin23 OSRuntime source. An image-specific unselected reference binding uses that existing panic routine; no success stub or new runtime was generated. This evidence is tied to that image and does not qualify future kernel relocation or class initialization.
+
+Followed the actual HWSCHED CP-init to ZAP/MDT path, then implemented the three exact MiCode PAS command substeps: image initialization, optional memory setup and authentication/reset. Required peripheral, real secure metadata/range, convention and entry budget remain caller inputs. The actual MDT caller uses memory setup only for relocatable firmware; no unconditional sequence, ID13 default, trust-register fallback or cached/NULL-name authentication bypass was added. These routines require real SCM clocks/BW, global serialization, eligible thread/conduit and secure-buffer visibility/lifetime. They do not acquire any of them or replace the full platform/MDT loader.
+
+PAS consumes actual a1 only after transport a0 returned zero, preserving raw64 and the original public int return bits separately. Unfinished INTERRUPTED/BUSY/WAITQ work stops forward progress, without automatic shutdown, reset recovery or cleanup. Source-returned zero does not prove ownership, authentication lifecycle or GPU readiness.
+
+Two new C++ objects pass strict Darwin23/iOS17 compilation and their cumulative relocatable reference has0 unresolved strong imports and the same3 optional weak imports. Only new source dependencies were archived/inspected; no old suite, controller/provider fixture, native/SMC/MMIO/device call or new kernel/FD/runtime component was executed or selected. Full startup, memory/submission/completion and Metal rendering remain incomplete. [Binding evidence](evidence/gpu-gen7-scm-backend-binding-2026-11-05.json), [PAS evidence](evidence/gpu-gen7-pas-operation-source-2026-11-05.json).
+
+
+### 2026-11-05: actual GMU loaded-version metadata source operation
+
+Implemented the next concrete cold-boot operation from the retained HWSCHED caller: five loaded-DTCM version reads and the original unsigned core-version comparison. Register offsets remain source words; the real mapping origin and byte extent are required inputs. The complete consumed range is checked before any volatile access. No aperture, address, minimum version, geometry, clock or mapping owner is defaulted. Linux's actual GMU region has NULL preaccess ops; real powered/loaded mapping lifetime remains an external precondition.
+
+The leaf uses real Darwin OSReadLittleInt32 and OSSynchronizeIO after each read. Static inspection of its new iOS17 object shows five32-bit loads, each followed by an actual IO-sync relocation. The unchanged e328 image's real OSSynchronizeIO body is DSB_SY/RET, matching actual Darwin23 machine_routines source; its image-specific binding is used only for the unselected reference. No Linux barrier machine encoding was guessed or new cache policy selected.
+
+An abstract derived backend binds readLoadedGmuVersionMetadata and caches its one attempted result while retaining all five actual words. Metadata refusal and core-version mismatch remain distinct from complete; the void lower reads do not acquire a fabricated raw errno/status. Two of21 operations now have source implementations in this partial backend; nineteen remain pure virtual and no complete instance exists. Loaded metadata is not live HFI negotiation, authentication, mapping/stop rights or GMU/GPU readiness.
+
+Both new C++ objects pass strict Darwin23/iOS17 compilation and the cumulative reference has0 unresolved strong imports and the same3 optional weak imports. Actual changed source/header inputs are independently archived. No mapped buffer/provider fixture, MMIO/IO-sync/native/device call, old suite, new kernel/FD or runtime component was executed or selected. [Evidence](evidence/gpu-gen7-gmu-metadata-operation-2026-11-05.json).
+
+
+### 2026-11-05: source-defined AHB timeout control substep
+
+Implemented the actual Gen7 AHB-control leaf using five CX_MISC-relative word registers and original control bits. The timeout field is a required input from the real clock/NOC producer, with its actual0-or-five-bit domain; no frequency, timeout or K80 aperture is chosen. Source zero performs no writes and is reported separately. All consumed writable mapping bytes are checked before any access. Real Darwin IO synchronization precedes each volatile store, matching the lower source's before-write ordering requirement; returned stores are not readback or device acknowledgement.
+
+One new strict Darwin23/iOS17 object and its cumulative reference link pass with0 unresolved strong imports and the same3 optional weak imports. Static inspection shows the five stores at byte offsets0x40/44/48/4c/50 and five actual IO-sync relocations. Changed actual source/header inputs are independently archived; the prior runtime binding/objects were reused, not rebuilt.
+
+This does not complete the controller's combined AHB/CX-timer operation. The real CX timer uses16 raw-counter calibration samples and IRQ save/restore. Darwin ml_get_timebase adds cpu_base_timebase, so it is not substituted for that source counter; no raw counter domain, timing value or IRQ lifecycle is invented. Two complete backend operations remain implemented and nineteen remain pure. No mapped/provider fixture, MMIO/counter/IRQ/native/device operation, old suite, new kernel/FD or runtime selection occurred. Independent caffeinate remains active. [Evidence](evidence/gpu-gen7-ahb-control-operation-2026-11-05.json).
+
+
+### 2026-11-05: CX timer source and abstract combined boot controls
+
+Implemented fresh Gen7.9.x CX-timer calibration for one explicit supported counter variant: actual raw virtual architectural ticks with no required workaround. The exact MiCode source shows runtime physical/stable/MMIO alternatives, so neither its initial virtual default nor an enum is treated as K80 runtime admission. Sixteen samples, unsigned64 skew/rounding, low/high seed order and two critical regions follow the real source. No frequency, counter values, mapping, current epoch or initialized state is manufactured. Actual K80 domain/fresh powered-device ownership remains a required caller contract.
+
+The first target compile stopped at Mach-private prototype visibility and a deprecated proc_reg include; its source/command/refusal are retained. Exact declarations from the same real Darwin23 header now import existing ml_get_hwclock and ml_timebase_to_memory_fence, without changing SDK/OS, macro guards or compiler permissions and without stub definitions. Static proof in the unchanged e328 image confirms complete ISB/CNTVCT_EL0/RET and ISB/RET bodies. The actual public IRQ helper tail-branches to its genuine DAIF implementation and returns the previous IRQ-enable state.
+
+That proof exposed a required adaptation: the Darwin boolean helper toggles A/I/F together and may process AST work while restoring. Mixed A/I/F states now refuse before each critical region; no arbitrary Linux DAIF restoration or new interrupt policy is claimed. Real owner lifetime must survive the native restore path. The pre-guard source/objects/reference are preserved. No fake errno, post-write acknowledgement, global initialized bit or reset/cleanup is published.
+
+The abstract combined AHB/CX-timer operation refuses unsupported counter/range before AHB writes, preserves the actual separate AHB/timer results and caches its single attempt. Three of21 source operations are implemented in this partial backend; eighteen remain pure and no complete backend instance exists. A fresh53-file unselected K80 composition combines the unchanged base with actual startup source additions; frozen native objects and source were reused, with the existing legacy fixed-pool incompatibility still retained/excluded.
+
+Two changed C++ objects pass strict Darwin23/iOS17 compilation. Static inspection confirms the16-sample loop, two DAIF admission reads, four IRQ API callsites and real raw-counter/order/I/O imports; no counter, IRQ or mapped/provider fixtures were executed. The cumulative reference link has0 unresolved strong imports and the same3 optional weak imports. Actual source/header inputs are independently archived. This is source/build integration only: no native/target/device call, old suite, runtime/component selection, new kernel/FD, GMU/GPU startup or rendering qualification. [Evidence](evidence/gpu-gen7-cx-timer-operation-2026-11-05.json).
+
+
+### 2026-11-05: complete source-variant GMU register configuration
+
+Implemented the whole retained gen7_gmu_register_config hardware/software sequence, including its actual three-write boot bus/cache helper. Mandatory inputs describe real held GMU/GPU register regions, the actual shared IRQ/CM3 fault word, actual HFI/log/optional VRB mappings, retained log index, source gpurev and known BCL state. No input, descriptor, address, backing, feature or provider fixture is constructed. Unknown feature/layout states refuse, and every consumed word extent is checked before the shared relaxed32 atomic clear or any hardware access. The real owner must establish the source preaccess lock/power requirements; scalar checks cannot do so.
+
+The64KiB log case is an explicit supported source variant with an actual matching backing requirement, not a selected K80 geometry or inferred lease. Its4KiB register-field unit is not a CPU/SMMU granule. No source plan or nil/default object creates usable addresses. Optional BCL uses the real input branch and original low-byte-preserving read/barrier/write countables; gpurev formatting follows the actual revision macro, not the distinct silicon chipid macro. Store returns do not prove readback, reset, authentication or GMU/HFI readiness, and no raw errno or logging fields are fabricated.
+
+A new abstract backend binds configureGmuRegisters and forwards the same required GMU region into the inherited metadata operation, avoiding independent region inputs. Four of21 source operations now have implementations; seventeen remain pure and no complete backend or actual owner exists. A fresh57-file unselected K80 source composition preserves all prior base bytes and adds these four source files.
+
+Two changed C++ objects pass strict Darwin23/iOS17 compilation and cumulative reference linking has0 unresolved strong imports and the same3 optional weak imports. Static object inspection finds the17 optional-inclusive register store sites, real IO-order calls and inline software-fault store. Actual changed source/header inputs are independently archived; prior objects were reused. No driver/parser/provider fixture, target/MMIO/atomic/callback/native/device operation, old suite, runtime/component selection or new kernel/FD occurred. This does not complete startup ownership, GMU execution, memory/submission/completion or Metal rendering. [Evidence](evidence/gpu-gen7-register-config-operation-2026-11-05.json).
+
+
+### 2026-11-05: private native CPU firmware-file lifetime
+
+Implemented a one-attempt CPU file holder that makes four private native OSData copies under an explicit file-byte budget. The actual factory initial references remain private, including successful prefixes on failure; no borrowed mutable OSData, no-copy wrapper, raw pointer/object accessor or implicit release is introduced. Only the private copies are passed to the unchanged fixed-SHA K80 firmware planner, with its real status availability preserved separately. A NULL factory result does not acquire a fabricated IOReturn. This code would retain/validate files when called; no file object, buffer, factory, getter or parser was executed during this work.
+
+The new strict Darwin23/iOS17 object compiles. Its4 actual copy-factory and8 native-view virtual callsites precede one frozen planner call; the old parser/layout objects and suites were neither rebuilt nor executed. A newly required OSData factory import resolves to its actual global executable-code symbol in the unchanged e328 kernel, with real Darwin source/API and bounded disassembly proof. The cumulative unselected reference has0 unresolved strong imports and the same3 optional weak imports. Actual source/header inputs are independently archived. A fresh59-file K80 source composition preserves all previous base bytes and adds this implementation.
+
+This does not complete loadProcessorFirmware. The actual KGSL routine also registers/maps GPU-readonly global microcode, copies without the first dword and records its version. Further exact source review confirms Linux probe already attaches domains/builds its default pagetable before the later mmu_start; a mandatory inactive-only mapping rule cannot be inferred from that stage name. The actual Darwin probe/global-map ownership and failure contract still need integration: current NativeAdrenoVm attaches/observes live context/streams and may fault streams on map failure. No early SMMU activation, inactive VM substitute, A740 address/geometry, returned handle or new stop policy is selected to fill this gap.
+
+The abstract startup backend therefore remains at4 implemented operations and17 pure operations, with no complete instance. Private CPU file identity/planning is not backing/mapping, firmware authentication, installed-version proof, GMU/HFI startup or GPU readiness. No native/device execution, new kernel/FD/runtime component, log/wire change or prior qualification promotion occurred. [Evidence](evidence/gpu-gen7-firmware-retention-2026-11-05.json).
+
+
+### 2026-11-05: GMU firmware load and private ITCM shadow source
+
+Implemented the actual fresh Gen7 firmware-load and ITCM-shadow operation. An internal friend consumes the retained immutable file copies and frozen fixed-SHA plan; no file, plan, native object or shadow pointer getter is added. Every consumed payload and actual backing range is checked before stores. ITCM/DTCM retain the source register-word offsets and I/O barriers; external segments copy to real caller-provided prepared native backings and use the existing native cache-publication API. Its actual IOReturn is retained. Shadow allocation follows payload copies, then4096 ITCM words are read with the source read-order barrier. A NULL allocation stops without inventing an IOReturn or reusing an earlier successful cache0. All resources stay retained on uncertainty.
+
+Two new strict Darwin23/iOS17 objects compile and the cumulative unselected reference links with0 unresolved strong imports and the same3 optional weak imports. The file owner changes only by one friend declaration; its data/layout and prior object are preserved. Actual compiler inputs are independently archived; the new63-file source composition keeps all previous implementation bytes. No parser or frozen object/suite was rebuilt or executed, and no native backing, getter, allocator, cache, MMIO or device operation ran.
+
+The abstract startup extension now supplies5 operations with16 still pure, and has no complete instance or caller. Source16entry/16KiB limits and the native CPU4KiB publication API are not a K80 SMMU/OAS/IOVA choice. Actual mapped bindings, powered GMU exclusion, sleepable allocation context and retained lifetime remain caller prerequisites. Processor global mappings, PDC/RSC, interrupt ownership, CM3/HFI startup and rendering remain incomplete. No runtime component, new kernel/FD, wire/log or device authorization is selected. [Evidence](evidence/gpu-gen7-gmu-firmware-load-2026-11-05.json).
+
+
+### 2026-11-05: actual CM3 start operation source
+
+Implemented the pinned Gen7.9.x CM3-start operation: optional reset of the existing48B trace header using its actual source fields, native cache publication with real error propagation, private AO high/low/high sampling under the original local IRQ scope, SYSRESET0 with posted-write barrier, and the original100ms/mask0x1ff/expected0x100 initialization poll. The first read is immediate and strict timeout crossing retains the source final read. The exact K80 kernel iopoll dependency was acquired as one bounded fixed-commit file, Git-blob verified in a separate reference directory; the sparse checkout/pins are unchanged. No timeout/retry/snapshot/power/OOB cleanup policy or new log/wire fields were added. A timeout produces a failed source assessment without fabricating Linux/Darwin errno or reusing an earlier successful cache0.
+
+The source uses actual Darwin deadline/uptime conversion and26us delay plus74us leeway, retaining source26..100us units without assuming a hardware counter frequency. All three kernel function bindings have actual executable-code and bounded disassembly proof in the unchanged e328 image. The parent already provided the identical deadline binding; an initial duplicate-symbol link refusal was preserved and corrected by reusing it and adding only two missing actual bindings. No diagnostics were suppressed. The native kernel retains its own spin/block/context decisions; no hard realtime or nonreturning-I/O deadline, clock observation or Linux scheduler equivalence is claimed.
+
+Two new strict Darwin23/iOS17 objects and the cumulative reference pass, with0 unresolved strong imports and the same3 optional weak imports. Actual compiler/source inputs are independently archived;67 source files preserve the previous implementation bytes. The abstract backend now has6 source operations and15 still pure, with no complete instance or active caller. Actual trace bindings/shared fields, sleepable normal-thread exclusion, loaded/configured powered GMU and resource lifetime remain real caller obligations. No API/getter/trace/clock/MMIO/parser/native/device operation was executed, and no frozen suite/object was rebuilt. HFI, GPU/probe/owner/power integration and rendering remain unfinished. [Evidence](evidence/gpu-gen7-cm3-start-2026-11-05.json).
+
+
+### 2026-11-05: PDC/RSC source programming and shared loaded state
+
+Implemented the actual hardware-scheduler first-boot PDC/RSC branch for an explicitly admitted Gen7.9.x/non-Gen7.2 source variant. The real shared GMU bit5 controls the original skip. Otherwise all consumed extents are checked before the two source PDC and seventeen RSCC raw little-endian stores; only after they return does a relaxed lock-free atomic OR publish the original software loaded bit while preserving other flags. This follows the hwsched order before SCM/CM3, without adopting the different generic boot order. Exact fixed-commit bitop definitions and documentation were separately Git-blob verified; no source checkout/pin changed. A loaded software bit or returned stores do not prove readback, cross-device visibility, DMA stop or hardware ownership.
+
+The two new strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved imports and the same3 optional weak imports. The actual program object has no external imports; its shared-state RMW emits native LDXR/STXR without an added memory barrier/helper. Actual compiler inputs are independently archived, and71 source files preserve the previous implementation bytes. There was no MMIO, flag access, provider/API/native/device execution, frozen object rebuild or old-suite run.
+
+The abstract backend now supplies7 source operations with14 still pure and no complete instance/caller. Real powered PDC/RSCC mappings and same-epoch shared GMU state remain caller prerequisites. No default physical address, map/unmap/free/rollback, other-board votes/rates/CommandDB data, new power/stop policy or runtime component was selected. Full HFI service, GPU global mappings, actual power/interrupt/security ownership and rendering remain incomplete. [Evidence](evidence/gpu-gen7-pdc-rsc-2026-11-05.json).
+
+
+### 2026-11-05: actual hwsched HFI queue/control and raw command write source
+
+Implemented actual source17 queue-table preparation, source reset and HFI register-init prefix. The table keeps24B/48B header units,840B size,848B aligned queue start and the source priorities/types/1024dword queues. Only the table is initialized, not payloads. The actual writable native object/GMU binding must already be prepared/mapped/retained; no private32 accessor, allocator or mapping is supplied. Initialization must precede GMU access. Later reset requires real HFI quiescence on the same object, acquires/publishes via actual native methods and copies each enabled source write_index to read_index. Actual native IOReturn availability/bits are preserved. Then CTRL_INIT1 is followed by the original100ms/status-bit0 poll with immediate/final reads and actual Darwin time units. No timeout errno or earlier successful cache0 is fabricated.
+
+Also implemented the lower actual CMDQ write leaf for an actual caller-owned source command. It preserves declared8bit dword length, source free-space refusal,4dword padding/0xfafafafa and the two barriers around actual write_index publication. It does not stamp sequence/record bits, register waiters, notify GMU, read ACKs or claim acceptance/completion. The real upper caller must perform those steps. Packed queue0 begins at848B and shares CPU pages with adjacent queues: active writes therefore require the object's existing write-combined state and actual native pmap noncacheable attributes under real alias/lifetime exclusion. No cache-mode setter or active whole-page maintenance is substituted. Pmap/reference checks remain neither leases nor future coherence guarantees.
+
+Four new strict Darwin23/iOS17 objects and the cumulative unselected reference pass with0 strong unresolved imports and the same3 optional weak imports; no new kernel alias is needed. Final compiler inputs are independently archived, and78 source files preserve prior implementation bytes. The old A74016KiB/3queue transport remains unchanged and is not rebound to this layout. Native APIs, queues, packets, parser/readers, clock/MMIO, ACK/provider objects and device code were never executed or constructed as host fixtures; no frozen suite/object was rebuilt.
+
+The abstract backend binds the same real HFI GMU address/window used by register config. Host-resource preparation and full startHfiAndServiceActualRequests remain pure: the count stays7 supplied operations/14 pure, with no complete instance or runtime caller. A register-init bit does not close actual HFI request service, optional feature/warmboot choices, board votes, allocator/provider, interrupt/owner/security/stop lifecycle or GPU rendering. [Evidence](evidence/gpu-gen7-hfi-queues-control-2026-11-05.json).
+
+
+### 2026-11-05: actual HFI sequence/record/notify and F2H receive source
+
+Implemented actual new-request sequence stamping and upper CMDQ notification. Real same-epoch shared32bit sequence and3 LP64 record-mask words are required; no empty mask or warmboot default is supplied. The lock-free increment keeps modulo32bits and the original12bit header projection/OR semantics with full ordering. Source RECORDbit19 is applied from the actual mask, while the real caller header clears RECORD19 and NOP18 even after lower refusal. The original unconditional barrier precedes HOST2GMU_INTR_SET1 only after actual index publication. Notification-store return is not receipt or ACK, and a real pending registration still must precede requests that expect replies. ACK replies instead retain their actual request sequence.
+
+Implemented a one-frame actual message/debug queue consumer, bound to the same real native object as the inherited queue owner. It requires actual uncached pmap state and retained alias/consumer exclusion, preserving the source output clearing and4dword read-index publication. Capacity is bytes and actual copied length is dwords; cleared tails/failures are never received data. Generic ACKs require only the reviewed2word transport prefix before copy/advance; specific3/4word result fields remain consumer checks. Declared/padded extent must fit the actual published cursor budget, so no partial frame is invented or consumed. No IRQ handler/worker/drain, pending completion, retry or source timeout-final-dispatch is substituted.
+
+Two new strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved imports and the same3 optional weak imports; no new kernel alias is needed. Actual inputs are independently archived and82 source files preserve all previous bytes. No packets, queues, ACK/provider peers, native state/API, reader/parser, clock/MMIO or device execution occurred; frozen objects and old suites were not rebuilt/run. Full HFI remains pure, with7 source operations/14 pure and no complete instance/runtime caller. Actual pending/wait/request service, K80 board inputs, owner/security/stop and GPU rendering remain incomplete. [Evidence](evidence/gpu-gen7-hfi-notify-receive-2026-11-05.json).
+
+
+### 2026-11-05: actual pending ACK/native completion and generic sender source
+
+Implemented actual CPU pending registration, RECORD-only matching, bounded19word result copy, source saturating completion count and native wake/wait. The real owner must provide its initialized dedicated IOSimpleLock and persistent disjoint registry/pending/command storage; no lock/thread/event factory, IRQ handler, provider peer or hardware handle is created. Actual generic ACK frames alone populate results; hardware-fence ACK151 stays with its separate source owner. Native wake return bits, including legitimate early KERN_NOT_WAITING, are retained. The private CPU event key is not exported or used as a GMU address/lease. Standard A/I/F lock states are enforced for the actual IOKit boolean IRQ restore API; D is preserved.
+
+The one-waiter native leaf uses source1000ms/uninterruptible semantics and selected XNU assert-wait-under-lock, unlock, then thread-block ordering, without holding a spin lock while blocking. Actual completion counts close the early-wakeup/spurious-wakeup races and only actual stored words are copied out. Generic results prove3 actual/declared words and preserve the original0xffffffff rejection sentinel rather than treating all nonzero values as failures. Native API codes are reported only after actual returns. No FIFO/multiwaiter scheduling equivalence or runtime caller policy is selected.
+
+The composed generic sender now stamps, links, sends/notifies, waits, checks actual generic status and closes the CPU borrow. On deadline it instead returns FinalDispatchRequired with persistent pending state retained: the real source process_msgq still must run before final completion_done inspection and unlink. No ACK-only drain, timeout errno or resource cleanup replaces that obligation. Unlink refuses a live native wait and excludes in-flight delivery; this closes only a CPU record, never DMA/firmware stop or free eligibility.
+
+Two strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved imports and the same3 optional weak imports. Five newly required lock/scheduler imports bind only to actual global executable code in the unchanged e328 image, with source/signature/order and bounded disassembly proof; no private macro/SDK relaxation or stub exists. Inputs are independently archived and87 source files preserve all previous bytes. No native lock/event/pending/ACK/provider, waiter, reader/parser, API or device code was executed/instantiated as a host fixture; frozen objects and old suites were not rebuilt/run. Full HFI remains pure,7 source operations/14 pure with no complete instance. Final dispatcher/request providers, K80 board data, actual owner/security/stop and rendering remain incomplete. [Evidence](evidence/gpu-gen7-hfi-pending-completion-2026-11-05.json).
+
+
+### 2026-11-05: actual GPU OOB acquire and success-release source
+
+Implemented the pinned Gen7 GPU-only request0 OOB protocol: actual HOST2GMU bit30 request,100ms ACK-info bit31 poll with immediate/final actual reads and selected Darwin26..100us delay, followed by that ACK bit W1C only after a match. Source success continuation writes HOST2GMU bit31 once after actual GPU processor start. Real powered same-epoch mapping, fresh/exclusive mailbox/IRQ/OOB ownership and sleepable caller are required; scalar extents, source enum and private state do not supply those rights. Actual raw ACK word is retained without invented Linux errno or provider observation.
+
+The approved offline coldboot variant explicitly differs from Linux's unconditional failed-poll ACK-clear tail and GPU error-unwind OOB-clear: failure/unavailable stops forward progress and retains resources. No snapshot/reset/retry or failure cleanup was added. Success store return is neither readback nor DMA retirement/stop/free eligibility. No mailbox, owner, ACK fixture, native/API/clock/MMIO or device code was executed.
+
+Two strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved and the same3 optional weak imports; existing actual time/IO code bindings are reused without aliases/stubs/SDK changes. The independent91-file source composition preserves all87 previous files. Backend source now implements9 of21 full operations with12 still pure and no complete instance. Full HFI final dispatcher requires actual context/fence/sync/counter/allocator and IRQ ownership routes; its finite input record does not substitute an ACK-only drain. GPU register/processor boot, actual K80 board/owner/security and rendering remain incomplete. [Evidence](evidence/gpu-gen7-gpu-oob-operation-2026-11-05.json).
+
+
+### 2026-11-05: actual SQE/AQE instruction-base register leaf
+
+Implemented exact gen7_hwsched_init_ucode_regs: full64-bit actual SQE GPU VA splits into two original register words; actual AQE flag gates AQE0 and actual LPAC flag gates AQE1 using the same AQE binding. All consumed register extents and already-held native memory/accounting prerequisites are checked before stores. AQE-disabled source does not consume LPAC/AQE data. No firmware address is derived, exported or invented; no K80 feature, mapping, layout or security permission is selected. Real caller must provide actual loaded/published GPU-readonly mappings and prove their association/lifetime under powered GPU/OOB ownership. Refcount/backed checks cannot grant those rights.
+
+One strict Darwin23/iOS17 object and cumulative reference pass with0 strong unresolved and the same3 optional weak imports; the leaf imports only the already-bound OSSynchronizeIO and has no allocator/map/start/IRQ/SMC API imports. Independent93-file composition preserves all91 previous files. This is a real register leaf, not completion of configureGpuAndProcessorRegisters or processor boot:9 full backend operations/12 pure remain, with no complete instance. Actual gen7_start/core/LLCC/SECVID/pwrup, coresight/perfcounter/FSR/IRQ and HFI dispatcher/provider inputs remain required. No native getter, target/MMIO/API, firmware or device code was executed, no fixture/address/peer was constructed, and no frozen suite/object was rebuilt. [Evidence](evidence/gpu-gen7-processor-base-registers-2026-11-05.json).
+
+
+### 2026-11-05: actual raw-command submit/idle and distinct GMU AO binding
+
+Implemented source submit_raw_cmds/submit_lpac_raw_cmds using the real existing generic sender and pending lifecycle, then the actual200ms bit23 idle poll. ACK acceptance is distinct from GPU busy clearing. Actual opcode/producer sizes are bounded to pinned main11/3 and LPAC11words; no PM4 payload is built/parsed or modeled here. FinalDispatchRequired keeps the persistent request linked and requires the real complete source dispatcher before final inspection; no ACK-only drain/resend/second wait is added. Actual native wait/ACK raw results remain separate from the final busy word. Timeout/unavailable retains resources under the approved coldboot variant; no snapshot/IRQ-disable/reset or failure cleanup is installed. Idle is not a task/fence, DMA retirement or release/stop proof.
+
+New source inspection of gen7_gmu_reg_probe explicitly confirmed gmu_ao_blk_dec0 is separate from ordinary gmu. It exposed an inherited isolated Configure mismatch: fence0x23b11 was using gmu. The new source requires an independent actual AO Region and routes both that fence and main/LPAC busy reads through it. No actual mapping, physical range or K80 permission is invented. All real mappings/origins/power/OOB/owner/lifetimes remain caller inputs. The initial new helper's single-region assumption/compile are retained, corrected before selection/native execution; this source evidence justifies reopening only that route, not old suites.
+
+Adding the required internal AO input changes unselected Inputs104->128 and each affected backend by24bytes. All9 affected objects were recompiled with the1 new object under strict Darwin23/iOS17 flags. The reference was recomposed from the actual parent before RegisterBackend plus unchanged leaf/binding objects and all rebuilt descendants, excluding every incompatible old object without duplicate-symbol suppression. It passes with0 strong unresolved and the same3 optional weak imports, no new aliases/stubs. Native Service/wire/log ABI, sources/pins and running components remain unchanged. The independent95-file composition has5 changed existing sources and2 new files;9 full operations/12 pure and no complete instance remain. No target packet/model, getter, native API/wait/MMIO or device code executed, no old suite/fullcore rebuilt. CP producer/ZAP/PAS/full GPU boot/HFI/actual owner/board inputs and rendering remain incomplete. [Evidence](evidence/gpu-gen7-raw-submission-idle-2026-11-05.json).
+
+
+### 2026-11-05: actual HFI CP-init and switch-to-unsecure producers
+
+Implemented private pinned11word main/LPAC CP-init using the real DMS bit11 branch and full64-bit actual Gen7 power-up-list GPU VA. Actual LPAC disabled skips before consuming DMS/list/header inputs; main ignores LPAC state. Native memory/reference checks are accounting only: actual Gen7 list contents/spinlock/triplets, mapping/VA association, publication, powered SQE/HFI/OOB/IRQ/current owner and retention remain caller obligations. No A740 list, direct ring,48bit ceiling, guessed address, feature default or provider instance is supplied. The existing direct-ring NativeAdrenoCpInit stays unchanged and is not substituted for this HFI path.
+
+Implemented the separate original3word send_switch_to_unsecure producer through the same actual submit/ACK/idle leaf. Its source caller still must establish real main CP-init and actual ZAP authentication in the same owned epoch; the helper neither supplies that owner nor treats a bool/status/source enum as authority. No PASID13/default, null-name success, zap_loaded stand-in, direct SECVID_TRUST_CNTL fallback or SMC sequence is installed. Actual ACK acceptance and busy clearing are separate; idle does not prove authentication/security state, full boot, task/fence or DMA/stop/free rights. Actual modified HFI headers alone are saved to the two existing source u32 CPU fields after resolved submission attempts, including returned failure; pending full final dispatch defers the save. No new wire/log/diagnostic fields exist.
+
+Both producers reuse frozen AdrenoPM4Type7 after API/source/header and actual object-emitter code inspection; the codec/parser/helper and old suite were not rebuilt or executed. Two strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved and the same3 optional weak imports, without new aliases/stubs. All95 prior source files remain unchanged in the independent99-file composition. No packet/ACK/address/provider fixture or native getter/PM4/API/MMIO/target/device execution occurred. Full processor boot/HFI still pure,9 operations/12 pure unchanged and no complete instance; actual power-up-list producer, ZAP/MDT/SCM/current owner and GPU config/board inputs/rendering remain incomplete. [Evidence](evidence/gpu-gen7-hfi-cp-init-producer-2026-11-05.json).
+
+
+### 2026-11-05: actual Gen7.9 power-up register snapshot producer
+
+Implemented the exact gen7_patch_pwrup_reglist Gen7.9 branch:54 common IFPC+4 Gen7.9 IFPC+17 preemption register/value pairs. Only logical word indices are source constants; every value comes from an actual future GPU MMIO read with original read/rmb order. Original16B cpu_gpu_lock layout is compile-checked, gpu_req/cpu_req/turn bytes0..11 remain untouched, source IFPC54->58/preemption17 stores precede pairs and dynamic_len0 is written last. Relative616B capacity is header/pair arithmetic, not a K80 allocation/page/IOVA policy. No register value/address/list/provider or lock fixture is invented. The generic native packer clears the lock header and differs from this patch contract, so it/buildA740 remain unchanged and are not called/rebuilt/run.
+
+All actual GPU word and list extents are checked before writes/reads; actual native WC and real all-pages-uncached result are required before shared memory is changed. No cache mode is set and no whole-page maintenance can overwrite shared state. Real configured/powered/exclusive GPU mapping, real native BO/list/GPU-VA association and fresh exclusion from CP/otherCPUs remain owner obligations; bounds/ref/cache/source enum checks cannot supply those rights. Later actual source HFI command publication must order stores before CP reads. A nonreturning read may leave source full lengths and a partial pair prefix; resources remain retained without fabricated read0, rollback,cleanup,stop/free claim or hard deadline.
+
+One strict Darwin23/iOS17 object and cumulative reference pass with0 strong unresolved and the same3 optional weak imports, no new aliases/stubs. It imports only existing OSSynchronizeIO/NativeAdrenoPagesUncached. Independent102-file composition preserves all99 prior files. No snapshot, native getter/cache/API/MMIO, CPU-GPU lock, target/device or host model was executed. Full configure/processor boot/HFI remain incomplete,9 operations/12 pure unchanged with no complete instance. Actual gen7_start/register/core/LLCC/security, coresight/perfcounter/FSR/IRQ and board/owner/rendering are still required. [Evidence](evidence/gpu-gen7-pwrup-register-snapshot-2026-11-05.json).
+
+
+### 2026-11-05: actual Gen7.9.1 core register helpers and pre-LLCC prefix
+
+Implemented source GBIF5/protection48/boot-HWCG helpers and actual gen7_start prefix through protection. Exact core9_1 references gen7_0_0 GBIF,gen7_2_0 AO3 and gen7_9_0 protection, with no main hwcg array;core9_0 GBIF differs. Source aliases are not A740/legacy geometry selection, and no200MHz/625MHz/voltage/vote/default from the core initializer is supplied. Protection span order/overlaps/inclusive end-start encoding and actual LPAC conditional are preserved; CP protection fields do not grant CPU/SMMU/auth/owner permissions.
+
+HWCG uses actual source flag normalization, separate AO writes and GPU GLOBAL/LOAD, then source single trigger/max3 native1us-delay/TXDONE observations only when actual enabled. Actual disabled consumes no trigger/status fields. Only real TXDONE permits original GLOBAL0 store;three misses retain actual word/partial stores without errno,snapshot,extra attempt,cleanup or readiness claim. Existing native delay conversion is reused without assumed GPU frequency or hard time bound;real normal sleepable/current owner/preaccess context remains required. Source void failure return is not a successful GPU boot;approved coldboot retains resources and stops forward progress on error/nonobservation.
+
+The prefix performs actual source UCHE/GMEM/cmdq/dynamic-list/counter/bicubic/memory-config/preemption/RMW/busy/protection sequence using explicit real captured metadata. No HBB/GMEM/base/size/hang/prefetch/UBWC/min-access/feature value is chosen;source HBB14/16 domain is not a K80 selection. The invalid UCHE trap sentinel is not allocated memory,OAS/IOVA permission or a valid GPU address. Actual pwrup dynamic_len is read from its real uncached CPU header at the source point, not supplied as a model scalar. Ordinary GMU and separate AO busy-mask bindings remain distinct. It explicitly returns NeedsActualLlcc;no missing provider is treated as successful/disabled. Actual LLCC,post-prefix APRIV/GBIF/SECVID/HWCG/pwrup and coresight/perfcounter/FSR/IRQ/full owner remain required.
+
+Two strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved and the same3 optional weak imports,no new aliases/stubs. Independent108-file composition preserves all102 previous files;new exact register macro header is source-only. No native register/delay/getter/cache/provider/API/clock/device execution,host fixture or old suite/fullcore rebuild occurred. Full configuration/startup/HFI/rendering remain incomplete,9 operations/12 pure unchanged with no complete instance. [Evidence](evidence/gpu-gen7-core-register-helpers-2026-11-05.json).
+
+
+### 2026-11-05: actual post-LLCC APRIV/GBIF source segment
+
+Implemented the source portion between actual LLCC handling and SECVID: BR0x6f,BV/LPAC0xf,AQE1 and Gen7.9 GBIF CX high-three-bit projection1 with the actual lower29 bits preserved. LPAC APRIV remains unconditional;actual core9_1 AQE feature must be confirmed,not defaulted. Real GPU extents precede access;native pre-store/read barriers and one-attempt returned counts are retained. Source APRIV transaction controls do not grant CPU/SMMU/security/IOVA/OAS/owner permissions.
+
+This independent leaf requires the same actual powered/exclusive GPU/OOB epoch after real LLCC source handling and explicitly ends NeedsActualSecvid. It supplies no LLCC provider,activation/SCID/disabled default,security window,callback or active caller. The preceding prefix still ends NeedsActualLlcc. Source SECVID always uses BASE32 and selects MAX_SECURE_SIZE versus SIZE32 from the actual Linux MMU64 feature;named SIZE64 is not that macro result. Linux VA-mode metadata,host LP64,CPU32/Io48 and source enums do not establish the missing Darwin secure-window/owner contract. These concrete native input boundaries are archived without fetching or polling absent sources.
+
+One new strict Darwin23/iOS17 object and cumulative reference pass with0 strong unresolved and the same3 optional weak imports,no new aliases. Independent110-file composition preserves all108 previous files plus2 new source files. No target/native/API/MMIO/LLCC/provider/device execution,hardware fixture or old suite was run. Full configuration/startup/rendering remain incomplete;9 operations/12 pure and0 complete backend instances are unchanged. [Evidence](evidence/gpu-gen7-post-llcc-apriv-2026-11-05.json).
+
+
+### 2026-11-05: actual SQE/AQE payload copy, version and native publication source
+
+Implemented the remaining payload-copy/version portion of adreno_get_firmware for source core9_1 SQE then AQE, consuming only actual private immutable fixed-SHA-planned FirmwareFiles and actual already prepared global GPU-readonly NativeAdrenoMemory BOs. Copy excludes exactly first4B;dword count and version come from actual bytes. Original word1 is returned unless its low nibble is0xa,which replaces low12 bits with original word3[23:12]. No version literal,parser replacement or frozen-suite execution. Metadata becomes available after its actual memcpy;cache failure may retain copied prefix/metadata and is not a transaction rollback or readiness promise.
+
+The source calls unchanged native publishForDevice on the actual rounded payload range with device_writes=false and preserves its raw32bit return. CPU4KiB API units do not select K80 granule,OAS,IOVA or cache policy. Actual exclusive ownership covers complete publication ranges and physical aliases;extent/ref/nonoverlap checks do not provide it. No allocator,global mapping/GPU address provider,first-boot flag,release,reset,stop or retry is synthesized. The old real probe/global-map owner and failure-lifetime input boundary remains;loadProcessorFirmware is still pure. ACD requires actual AOP mailbox ownership rather than a fabricated successful send;first-boot publication also includes actual bus counters/devfreq/state,so setting two flags alone would not complete it.
+
+One strict Darwin23/iOS17 object and cumulative reference pass with0 strong unresolved and unchanged3 weak imports,no new aliases/stubs.112-file independent composition preserves109 old files,adds2 source files and changes only an internal friend declaration in FirmwareFiles;8784byte layout/fields/old methods stay unchanged. No native getter/copy/cache/allocator/VM/API/parser/firmware/device execution or modeled BO/provider peer occurred.9 backend operations/12 pure and0 complete instances remain;full GPU boot/rendering is not qualified. [Evidence](evidence/gpu-gen7-processor-firmware-copy-2026-11-05.json).
+
+
+### 2026-11-05: resumed offline mainline; actual HWSCHED asynchronous GET_VALUE
+
+Corrected the blanket blocked assessment: real missing board/owner/security inputs still block integration and execution,but do not establish that every independent source adaptation must stop. After the owner's question and explicit goal reactivation,implemented actual gen7_hwsched_hfi_get_value using the existing real Darwin command/pending interface. No new external files or phone connection were needed for this source step. Old blocker/audit evidence is preserved;no missing hardware input is claimed supplied.
+
+The private3word request forwards actual u32 property/subtype0 with source GET_VALUE12;real backend stamps sequence/size,links pending before notify and waits actual native completion. The actual async source consumes word2 with UINT_MAX rejection and failure fallback0,independent of inline-v5 word3 status. Failed/short/unobservable outcomes preserve lower raw native wait/ACK results with value unavailable;actual accepted0 remains available. Timeout explicitly retains the pending continuation until the real full final dispatcher returns. No ACK-only drain,second send/wait,capability default,owner or stop/release right is synthesized.
+
+One strict Darwin23/iOS17 object and cumulative reference pass with0 strong unresolved/unchanged3 weak imports,no aliases/stubs.114-file independent composition preserves111 prior files,adds2 source files and changes one internal friend/forward declaration only;HfiPendingBackend4040 layout is unchanged. Initial isolated compile missed a local queue header;failure logs are kept and exact same-source dependencies were copied before successful compile,no SDK/flags change. No request/ACK/queue/provider model,reader/wait/callback/native/API/device execution or frozen suite occurred.9 full source operations/12 pure/0 complete backend instances remain,so full HFI/startup/rendering is not qualified. [Evidence](evidence/gpu-gen7-hwsched-value-query-2026-11-05.json).
+
+
+### 2026-11-05: actual inline HFI wait/ACK/result path and three control producers
+
+Implemented actual non-NULL-ret_cmd inline request protocol:one stamp/send,source1000ms INFO-bit0 poll,actual FW_INIT reset[11:9],native10..100us delay,final INFO after reset/expiry,and CLR bit0 before real message processing. Final response may succeed after observed reset like source;no synthetic timeout errno,snapshot,reset or cleanup. Separate ordinary GMU region and actual native clock conversions are reused without GPU frequency/defaults. Actual IRQ routing must leave MSGQbit0 and queue for this sole inline consumer;no IRQ mask/handler/caller is selected.
+
+The source19word queue loop consumes actual frames until actual empty,including original nonfatal ERR/DEBUG/unsupported No Reply branches. It is not an ACK-only drain and does not stop after first ACK. Last full-header ACK ignoring RECORD19 only supplies its actual result prefix;no ACK cannot become a zero-initialized success. Diagnostic-only fields are not read,filled or printed;diagnostic/trace emission remains unimplemented and no normal-log/wire/carrier is expanded. Native visibility/extent refusal stays explicit under approved stop-forward/retain behavior,not a successful empty.
+
+Legacy requires actual3word ACK/word2zero and reads no version. Versioned generic uses the same backend's actual successful5word DTCM read and source12bit minor[27:16]<=4 switch;v5 requires actual4words,status0 returns complete word2 bits,6 Timeout/8 NoEntry retain separate classifications. Return bits can be data or signed C-return bits;caller must preserve each original command-specific rule. This differs intentionally from async HWSCHED GET_VALUE's UINT_MAX/word2 contract. Actual fullu32 FEATURE_CTRL11/4word,GET_VALUE12/3word andSET_VALUE13/4word producers now use this real inline path without feature/property/rate/vote defaults or new address/provider getters.
+
+Two strict Darwin23/iOS17 objects and cumulative reference pass with0 strong unresolved/unchanged3 weak imports,no aliases/stubs.118-file independent composition preserves112 previous files,adds4 source files and changes2 internal forward/friend headers plus async/inline contract comments only;HfiIoBackend4024 layout stays unchanged. Necessary new-TU rebuild after contract clarification is archived;no old suite/fullcore or packet/ACK/queue/provider model ran. No native/clock/MMIO/reader/parser/callback/API/device execution. Full HFI/platform/coldboot remains9 operations/12 pure/0 complete instances;startup/rendering is not qualified. [Evidence](evidence/gpu-gen7-inline-request-2026-11-05.json).
+
+
+### 2026-11-05: actual PERF/BW table message construction and send order
+
+Implemented fresh source PERF/BW construction and PERF-then-BW calls using actual already produced DCVS/RPMh values and the existing real inline transport. SAME backend actual loaded5word metadata selects raw HFI_VERSION2.6.1 modern PERF(type1/version0,count/stride3 and2) versus legacy fixed59words. Legacy CX starts at word51 after all16 GX slots;modern actual source macros bound the used command to111words,not the stale165word comment. Source private200word buffer and fresh static/zeroed-GMU inactive slots are preserved,no missing active values filled.
+
+BW remains source id3/full160words with actual row strides6/8 and actual command addresses/data/wait masks. Explicit ActualAbsent+NULL versus ActualPresent CNOC inputs prevent treating unknown as disabled. Source cmdcount0 consumes no address/rows;levelcount0 no rows. Actual producer success/provenance remains required;wire range checks are not K80 admission or an owner. No BCM names/default perfmode,frequency/voltage/OPP,CommandDB values,addresses/handles/mappings/providers are generated. Both sends retain original legacy-generic ACK semantics even for modern PERF;only actual matched zero PERF result permits BW. Actual warmboot/scratch/record-mask predecessor and real IRQ/queue/owner lifetimes remain caller obligations,not skipped by this phase.
+
+One new strict Darwin23/iOS17 driver-source object and cumulative reference pass with0 strong unresolved/unchanged3 weak imports,no aliases/stubs. A separate new iOS17 intrinsic-only POD object compiles exact primary struct definitions and verifies legacy CX/BW offsets/sizes;it has0 text bytes,no functions/data instances and is not linked. No packet/table/oracle/provider fixture,parser or native execution occurred.120-file independent composition preserves117 prior files,adds2 source files and changes one internal friend/forward header only;abstract backend4024 layout stays unchanged.9 operations/12 pure/0 complete instances remain;full HFI/startup/rendering is unqualified. [Evidence](evidence/gpu-gen7-startup-tables-2026-11-05.json).
+
+
+### 2026-11-05: actual ARC/DCVS source producer
+
+Implemented source primary/secondary ARC dependency lookup,CX mapping and CX-then-GX DCVS preparation. Dependency uses first matching primary value and actual last-secondary fallback;CX mapping retains separate failure/UINTMAX-sentinel rules. Original16/8/8 projection,u32-to-u16 temporary levels,Hz/1000 conversion,source zero rows,reverse powerlevel order,CX-before-GX count guard and complete-pass vote publication are preserved. Actual fixed32 pwrctrl inputs/count admission and actual immutable decoded ARC/GMU/board data remain required;no values,CommandDB provider,OPP/bin/rate defaults or ownership generated. Original count0 consumes slot0;this does not qualify empty K80 nodes.
+
+Computed data remains private and is bound directly to existing PERF/BW sender;only complete explicit preparation allows that phase. Failed private prefixes/resources stay retained without automatic cleanup/retry. One new strict iOS17 object and cumulative reference pass with0 strong unresolved/unchanged3 weak,no new aliases.122-file independent composition preserves all120 prior files unchanged. No computation with synthetic table/provider inputs or native/API/clock/parser/device execution.9 full operations/12 pure/0 complete backend instances remain;complete HFI/GPU startup/rendering is not qualified. [Evidence](evidence/gpu-gen7-arc-dcvs-2026-11-05.json).
+
+
+### 2026-11-05: actual BCM bandwidth producer bound to startup tables
+
+Implemented retained tcs_cmd_data/build_rpmh_bw_votes calculation from actual caller BCM/level/CommandDB-derived inputs. Preserved u32-bandwidth/u16-width→u64 multiply,division-before1000 conversion,source min1/saturation0x3fff,fixed-BCM14bit perfmode projection and VCD commit/wait grouping. Same actual bandwidth supplies ab/ib;original row index selects supplied perfmode threshold. Consumed variable divisors must exist/nonzero;fixed/zero-level paths do not consume them. No BCM names/default0x8,rates/votes,CommandDB acquisition or peer/owner values supplied.
+
+Private flat row storage/views connect ARC/DCVS→DDR→CNOC→existing PERF/BW sender,with complete explicit preparation before send. DDR is retained privately if CNOC admission fails;unknown CNOC is not absent. Source zero-count reads/uncharged inactive cells are retained without pretending missing active data. Actual provenance/caller admission/immutability and HFI/IRQ/resource lifetimes remain required. One new final strict iOS17 object plus cumulative reference pass with0 strong unresolved/unchanged3 weak imports,no new aliases. Initial pre-order-refinement source/object retained.124-file independent composition preserves all122 prior files. No table/provider/packet fixture or native/API/clock/parser/device execution;9 full operations/12 pure/0 complete instances and unqualified GPU/rendering remain. [Evidence](evidence/gpu-gen7-bcm-bandwidth-2026-11-05.json).
+
+
+### 2026-11-05: actual warmboot scratch inline/async request source
+
+Implemented retained gen7_hwsched_hfi_send_warmboot_cmd:explicit actual disabled branch skips before scratch/flag/route reads;unknown is not disabled. Enabled uses real existing NativeBacking/retained writable NativeAdrenoMemory and its actual size/GMU binding,checking originalu32 representation without selecting mapping/geometry/owner rights. Actual packed request is5u32/20B:id154,version0,flag,address,size;previous plan's fullu64 locator was corrected. No scratch allocation/address/ACK/provider fixture or warmboot default introduced.
+
+Inline uses original actual-versioned generic return bits;async reuses real pending/native wait/full-final-dispatch continuation and original UINTMAX rejection. Only actual accepted async ACK yields helper return0,with raw lower/wait result separate. No retry/resend/ACK-only drain,ready/INIT_DONE flags,cleanup/free/reset/replay or selected runtime. Actual capability/state/record masks/scratch lifecycle and complete START/allocation dispatcher remain required. One new strict iOS17 C++ object plus1 exact-source zero-code POD layout object pass;POD has no functions/instances and is not linked. Cumulative reference0 strong unresolved/unchanged3 weak,no aliases/stubs.126 independent files preserve123 prior files,change one friend-only header and add2new. No native/API/getter/cache/clock/parser/device execution.9 full operations/12 pure/0 complete backend instances;GPU/rendering remains unqualified. [Evidence](evidence/gpu-gen7-warmboot-scratch-request-2026-11-05.json).
+
+
+### 2026-11-05: actual cold HFI state,table and first-feature sequence
+
+Implemented actual replay/cold gate,firstboot/feature-gated GET_VALUE125,source enabled mutation,real3LP64 message-record mask initialization and exclusions154/10/12/30,separate original GMUflags6/7 clearing and SET_SCRATCH. Mutable mask identity must match existing backend read view;GMU flags match inherited PDC/RSC binding,without const_cast/new getter or local owner state. Only real capability1 sets enabled;other nonnegative values preserve prior bool,disabled leaves record mask unchanged. Actual replay-required state returns before cold mutations. Real errors/unobservable query stop forward under approved retain policy;no ready/INIT_DONE/HFI_STARTED/firstboot publication,cleanup/reset/retry or warmboot default selected.
+
+Connected same-backend prefix→actual prepared ARC/BCM/PERF/BW→ACD/BCL/CLX/IFPC/HWSCHED/KPROF/LSR/perfcounter first feature group. ACD uses real prior probe/mailbox/table provenance and full69words;CLX preserves actual11.0-v1 full7words versus otherGen7-v2 full14words and source inactive-domain zeros/constants. Original versioned controls versus legacy tables and source perfcounter enable0 override remain. Unknown consumed states reject,raw results retained;ACD's originally ignored log-event error follows approved stop-forward/retain policy. No board feature/format/control/voltage/rate/default values or providers supplied. Ends before DMS rather than bypassing later source branches.
+
+Two new strict iOS17 C++ objects and one exact-source zero-code enum/POD object pass;state-bit/ACD/CLX source layouts and native atomic lowering inspected. Cumulative reference0 strong unresolved/unchanged3 weak,no new aliases/stubs.130 independent files preserve120 prior files,modify6friend-only headers and add4source files;HfiIoBackend4024 unchanged. Initial prefix-only object retained before added source binding. No state/table/packet/provider fixture or native/API/getter/cache/clock/MMIO/parser/device execution,old suites or fullcore.9 full operations/12 pure/0 complete instances remain;full HFI/GPU/rendering unqualified. [Evidence](evidence/gpu-gen7-cold-hfi-state-prefix-2026-11-05.json).
+
+
+### 2026-11-05: actual pre-core feature sequence through CORE_FW_START request
+
+Connected actual predecessor→DMS27 gated by original shared privbit14→long_ib_detect&&!ISDBbit12 bailout17→actual stats24/8bit projection→existing logstream119/0/1 and nonzero raw loggroup111→original CORE_FW_START. Real same-backend/private owner inputs are reused;unknown switches refuse,no DMS/debugger/stat/log/timeout defaults. Original DMS -ENOENT disable/clear-and-continue and ignored stats/log errors instead follow already approved stop-forward/retain policy:actual raw results remain,existing shared state is not modified,no automatic disable/deregister/cleanup or error-as-success continuation.
+
+CORE_FW_START remains original2u32/8B id14/handle0 with LEGACY generic result,requiring real matched zero return;literal0 is protocol data,not fabricated successful allocator/host handle/lease or ECP/GPU completion. Ends before contextqueue/hwfence registration/preemption/LPAC/AQE/START/allocation/async/ready/default-vote stages. One new strict iOS17 object plus cumulative reference pass with0 strong unresolved/unchanged3 weak,no aliases/stubs.132 independent files preserve128 prior files,modify2friend-only headers and add2source files. No model/fixture/native/API/getter/cache/clock/MMIO/device execution,extra suite/fullcore or runtime selection.9 operations/12 pure/0 complete instances;GPU/rendering remains unqualified. [Evidence](evidence/gpu-gen7-pre-core-feature-sequence-2026-11-05.json).
+
+
+### 2026-11-05: actual post-core context/fence gates and pre-START controls
+
+Implemented actual firstboot and same-backend loaded12bit HFIminor>=3 contextqueue query;only real121/0 return1 sets real shared hwsched bit3. Existing bits and nonnegative non1 returns remain unchanged;raw errors/unobservable results stop under approved policy. Added original hardware-fence registration gates with explicit feature-absent/context-off/already-marked/firstboot-done skip reasons,none an ownership or registration proof. A fresh required registration returns ActualNativeRegistrationRequired BEFORE later requests,with no success callback/handle/descriptor bypass. The retained Qualcomm downstream msm_hw_fence_register header returnsNULL and is excluded as a provider/exact OnePlus dependency. Native registration/queue backing/GMU import/lifecycle remain concrete requirements;no K80 feature absence inferred. Actualbit4 gates HW_FENCE25 control;NoEntry stops/retains rather than deregister/continue.
+
+Connected actual successful predecessor→privbit9-gated preemption→actual optional4entry QoS123/index/raw→actual RT124/0/raw→original BIN117/1/10000ms+0xf→actual LPAC24/AQE29. No unused preempt values read when off,no QoS absence/default or enable state chosen,original2bit/bool projections and request order retained. Source ignoredQoS/RTzero-on-error paths follow already approved error-stop/retain;actual hint/shared state untouched. Source BIN constant remains unselected code,not a chosen K80 timer/ring/retry policy. Registration requirement cannot be bypassed to run these controls;ends before specialized START allocation/ECP service and async/ready/default-vote phases.
+
+Two new strict iOS17 C++ objects plus one exact-source zero-code constant object pass;native atomic lowering/source bits and constants inspected. Reference0 strong unresolved/unchanged3 weak,no aliases/stubs.136 independent files preserve128 prior files,modify4friend-only headers and add4source files. No state/packet/ACK/table/provider/native/API/getter/cache/clock/MMIO/device execution or old suite/fullcore.9 full operations/12 pure/0 complete backend instances and unqualified GPU/rendering remain. [Evidence](evidence/gpu-gen7-post-core-context-controls-2026-11-05.json).
+
+
+### 2026-11-05: specialized START service boundary and warmboot record-NOP source
+
+Implemented actual same-backend controls predecessor→oneword START/shared sequence→source1000ms immediate/strict-expiry/final IRQ poll→CLRbit0→one real MSG frame. It is not ordinary inline/reset polling,async completion waiter or queue drain. ACK consumes exact full4bit type,2word reqhdr/full-header RECORD19 match then3word raw UINTMAX-only rejection;nonzero valid data remains source accepted,not universal zero/v5 status. Actual MEM_ALLOC guards2word version then positive modern44B/11words versus zero legacy40B/10words;counter3word guard. Requests remain private and return explicit native-service-required states before reply/re-poll,no allocator/handle/address/counter/ACK or callback success fabricated. Unexpected-frame source rc0 is not falsely accepted;approved stop/retain applies.
+
+Added original post-START warmboot record-NOP oneword id10|RECORD19|NOP18 using LEGACY genericzero rule and same actual enabled bool;disabled is a distinct unobserved source skip. It cannot bypass required hardware-fence/START native services. Generic native backing APIs exist,but existing GMU allocator is a6xx fixed-layout/default40bit and was not used as K80 provider. Concrete native per-kind allocation/mapping/handle publication and counter services remain required,as do later actual IRQ/async/queryscratch/ready/default-vote lifecycles. No firstboot/HFI/owner readiness published or normal log/wire expanded.
+
+Two new strict iOS17 C++ objects plus one exact-source zero-code POD object pass;new source sizes/offsets checked without functions/instances/fixtures. Reference0 strong unresolved/unchanged3 weak,no aliases/stubs.140 independent files preserve130 prior files,modify6friend-only headers and add4source files;backend4024 unchanged.9 operations/12 pure/0 complete instances remain. No state/table/packet/provider/parser/reader/native/API/getter/cache/allocator/clock/MMIO/device execution or frozen suites/fullcore;complete GPU/rendering unqualified. [Evidence](evidence/gpu-gen7-start-message-service-boundary-2026-11-05.json).
+
+
+### 2026-11-05: native disabled HFI interrupt-source binding
+
+Added actual IOInterruptEventSource factory/refcon/action/addEventSource source using real caller owner/provider/IRQ index/workloop,with native raw result and owning references retained on uncertainty. No provider-less/default-index source,enabled route,runtime instance or automatic teardown is supplied. Primary-handler body uses SAME private startup GMU/fault state:read INFO,clear only status&actual mask,exclude inline bit0 from notifications,wake real worker/trigger hwsched via still-pure services,atomic CM3fault publication/barrier and original low25bit OOB classification. The four worker/scheduler/fault/report notifications remain pure;this is not a full F2H dispatcher or IRQ readiness proof. Actual owner must exclude external workloop bulk-enable and retain binding/receiver until proven quiescence;no enable/stop/release policy or power/reset cleanup implemented.
+
+One strict iOS17 C++ object passes with no static initializer. Initial target OSPtr raw-pointer rejection is preserved;corrected factory+1 ownership without SDK/macro switch. Reference links with3 new native imports statically present in the retained Darwin23 kernel plus unchanged3 weak imports;no aliases/stubs or final kernel.142 independent source files preserve138 prior files,change2friend-only headers and add2files.9 full backend operations/12pure/0complete instances remain. No reader/worker/IRQ/API/MMIO/native/device execution. [Evidence](evidence/gpu-gen7-native-hfi-interrupt-binding-2026-11-05.json).
+
+
+### 2026-11-05: actual message/debug dispatcher source
+
+Added actual same-backend private-peek/native-IOLock/message loop:ordinary19word capacity,CONTEXT_BAD1024B capacity,failed reads stop before dispatch;generic2word ACK reaches existing actual pending registry/native wake while hardware-fence151 stays separate. Actual loaded metadata gates context5/9word and TS12/14word prefixes without unread version tail. Sync query passes only actual received extent,no fabricated8word tail;counter group/countable require3words. Unknown cases preserve source no-op. Six per-kind native message services remain pure,not fake callbacks or complete F2H qualification.
+
+Added original debug loop/limited/error classification:ERR2word code prefix and string min16/declared remainder,DEBUG/LOG_BLOCK4word consumed fields,short ERR no unknown detail but original fault classification. Linear four-u32 event ranges preserve empty/reversed/out-of-declared rejection before cursor;actual backing and private startup byte limit/visibility are required,no guessed wrap/geometry. Four original reporting/fault sinks remain pure. Lower refusal/unobservable/error class latches approved stop-forward/retain without retry/unlatch/device cleanup. Existing Receive::read implementation is unchanged.
+
+Two strict iOS17 C++ objects and one exact-source zero-code POD assertions object pass;reference retains only prior3 statically-exported native imports plus3 weak imports,no new aliases/stubs. Native mutex definitions match the retained kernel.146 independent files preserve137 parent files,change5friend-only headers and add4files. No queue/ACK/provider/context/SG/backing model or reader/parser/lock/callback/native/device execution. Native worker/trace/scheduler/fault/per-kind services still incomplete;9 full operations/12pure/0complete backend instances remain. [Evidence](evidence/gpu-gen7-message-dispatch-source-2026-11-05.json).
+
+
+### 2026-11-05: actual native F2H wake/wait iteration and trace source
+
+Implemented real IRQ->worker notification with supplied native lock/private event/thread_wakeup_prim,assert_wait under that same lock before unlock/thread_block,and original enabledMSG->trace->DBG condition order. Early notifications recheck actual condition;non-awakened raw native return stops/retains under approved startup policy. Actual native event-source binding now privately identifies its receiver;same-backend checks and actual servicing workloop onThread/inGate prevent completion-loop blocking. One source iteration performs MSG,one trace record,DBG limited=true. Existing disabled MSG/DBG no-op semantics are now explicit,not false empty/ready. This is post-CM3/HFI-control source for an externally-owned current thread;kernel thread creation/outer-loop/stop/cancel/join/quiescence remain unimplemented. IRQ wake is concrete;three other IRQ services remain pure.
+
+Trace reader privately reuses real CM3 trace memory/sequence/reset state,validates actual declared/published/backing extents and supports current uncached visibility only. Preserves valid/skip/size/sequence bits,raw ticks,u16 modulo loss,known1/2 consumed7word fields,unknown id2word prefix and original modulo cursor without inventing wrapped copies/16KiB geometry. Externally-set reset skip remains;newly invalid data stops/retains without automatic source fastforward/reset-flag change. Four existing trace sinks and native MSG/DBG per-kind/scheduler/fault/report services remain pure,not stubs or GPU completion.
+
+Five changed strict iOS17 C++ objects(two new,three updated) and exact-source zero-code trace POD pass. Reference is rebuilt from unchanged START base plus five current objects,avoiding duplicate older IRQ/dispatch definitions. Four native imports including new assert_wait are statically present in retained Darwin23 kernel;three weak imports unchanged,no new aliases/stubs/final kernel.151 independent files preserve136 parent files,change10 and add5;unselected internal Interrupt24->32B binding pointer is recorded while existing backends4024/4040 remain unchanged. Patch replay matches151 files;no protocol/driver/native/thread/device execution.9 full backend operations/12pure/0complete instances remain. [Evidence](evidence/gpu-gen7-f2h-worker-and-trace-2026-11-05.json).
+
+
+### 2026-11-05: native F2H CPU-thread lifetime source
+
+Added one-attempt native kernel-thread creation with actual result/private reference,early-entry creation gate and current-thread identity,outer F2H loop,private cooperative CPU-stop/wake,entry-borrow closure and explicit once-only CPU reference drop. Stop checks run before backend admission,condition/wait and message service. Entry closure is synchronized under the same native lock;static ARM64 continuation uses only local current self afterward for cooperative native termination. Await refuses self/actual callback-loop gate,retains real interrupted status,and never equates entry closure/thread_deallocate with scheduler/IRQ/GPU/DMA stop. Aggregate owner/IRQ/maps/resources stay retained,no automatic destructor cleanup or foreign kernel-thread kill.
+
+Actual Linux init calls sched_set_fifo;Darwin FIFO equivalence/default/priority is unchosen. API requires an actual reviewed Darwin caller priority,refuses implicit negative inheritance and forwards unchanged;native kernel may clamp/inherit its scheduling mode. No scheduling input instance,thread/running owner or runtime component is selected. This remains an offline implementation requiring real aggregate ownership/full quiescence and per-kind scheduler/fault/report services.
+
+Two changed strict iOS17 C++ objects plus four exact unchanged objects reuse pass reference link;6 native imports statically match retained Darwin23 exports/3 weak unchanged,no new aliases/stubs/final image.154 independent files preserve149 parent files,change2 and add3;patch replay matches154. No thread/wait/callback/allocator/native/device execution or model tests.9 full backend operations/12pure/0complete instances remain;full GPU/rendering unqualified. [Evidence](evidence/gpu-gen7-f2h-thread-lifetime-2026-11-05.json).
+
+
+### 2026-11-05: counter dynamic reglist and CPU/CP lock source
+
+Added actual gen7_perfcounter_update/remove and kgsl_hwlock/unlock semantics,privately bound to SAME completed fresh pwrup Snapshot/native memory/GPU region. Preserves CPU request/turn/barriers,source1second strict-expiry/final observation and original cpu_req clear on acquired/busy returns;this is CPU/CP synchronization,not two-host-CPU exclusion or GPU/DMA/owner proof. Real CPU device/counter gate and source epoch remain caller obligations. Update retains source restore/existing/no-restore branches,control-last triplets/capacity and optional MMIO;remove retains second-last replacement/control move/source no-op branches and consumes actual no_restore_count only when needed. No default count,selected pipe/counter or counter/LO/HI/ACK success is fabricated. Snapshot implementation unchanged;enable/remove pipe relation remains actual source caller responsibility.
+
+One strict iOS17 C++ object plus exact-source zero-code16B layout POD passes;actual compiled gen7_reg.h matches primary453d8875.156 independent files preserve153 parent files,change one friend-only header and add2;patch replay matches156. Reference retains prior6 native imports/3weak,no new alias/stub/final kernel. No lock/clock/getter/cache/MMIO/counter/model/native/device execution. Actual get/put/table/enable service and START reply remain incomplete;9 full backend operations/12pure/0complete instances unchanged. [Evidence](evidence/gpu-gen7-counter-reglist-2026-11-05.json).
+
+
+### 2026-11-05: Gen7.9.1 counter get/put and direct enable source
+
+Implemented actual private counter get/put and direct enable,plus boot reprogramming of already assigned counters. Exact GPULIST Gen7.9.1 selects source Gen7.9.0 hwsched metadata:34 effective groups/235 slots,original UCHE9.0,reserved XO0/XO4 and last-wins BV_PC initializer;omitted groups stay empty. Preserved last-unused allocation,reference/no_restore accounting,source failure mutation/order,NONE/BR/BV aperture handling and special GBIF/GMU callback units. Same fresh Snapshot/Reglist shares private actual registry count;source remove pipe remains independent. Native register routing uses actual ordered mapping extents and returned reads,not guessed addresses or zero reads. Real original kernel reservations and caller power/gate/epoch/state/maps remain required. ACTIVE hwsched,unknown sentinel admission and assigned-zero-ref error recovery are explicit dependencies,never fabricated success/errno or cleanup.
+
+One new strict iOS17 C++ TU and cumulative reference link pass with unchanged6 native imports/3weak.160 independent files preserve155 parent files,change one friend-only Snapshot header and add4;patch replay matches160. Exact source metadata extraction reproduces;no runtime object/request/provider/model or target/native/device execution. START reply and active inline global-context/scratch path remain incomplete;9 full backend operations/12pure/0complete instances unchanged. [Evidence](evidence/gpu-gen7-counter-service-2026-11-05.json).
+
+
+### 2026-11-05: actual START counter reply source integration
+
+Bound the specialized private START counter-register frame to concrete native Service. Same actual backend GPU/GMU/AO maps are checked privately;real owner/state/kernel reservations/exclusion still required. Actual3word request calls source kernel get;only returned get0/true offsets supplies actual table words shifted2,and only actual source get error permits original nonfatal0/0 reply. Missing ACTIVE/admission/owner implementation never fabricates failure or sends reply. Original6word ACK110/new shared sequence/actual reqhdr/group/countable and existing record-mask/queue/notify path retained. One START send;successful actual counter reply resumes source one-frame poll. No uncertain replay/resend/drain. Allocation remains explicit dependency,and original predecessor/hwfence/ACK/warmboot gates remain. Internal returned counter/stamp/send results do not expand wire/log.
+
+Three affected strict iOS17 TUs/reference link pass;7 unchanged exact objects reused,prior6 native imports/3weak unchanged.160 independent files preserve156 and modify4;patch replay matches160. No packet/ACK/counter/provider model or parser/reader/native/device execution,caller selection or new kernel.9 full backend operations/12pure/0complete instances;full GPU/render/Metal not qualified. [Evidence](evidence/gpu-gen7-start-counter-reply-2026-11-05.json).
+
+
+### 2026-11-05: START ordinary GMU system backing source
+
+Added concrete private native ordinary GMU backing/WC prefix behind actual START frame and same backend. Exact legacy/modern consumption and memkind source retained;actual separate GMU globals capacity16 checked using mandatory real shared owner counter,distinct from HFI table32. No local zero fallback or entry/global count publication. Ordinary !GFX_ACC/!HW_FENCE/non-IPC path calls real NativeAdrenoMemory.allocate with explicit CPU width/budget and non-required contiguity,then real makeWriteCombined,following flags0/SYSMEM/WC source. Native4K provider constraint is not a K80 SMMU/page/IOVA selection. Actual per-step raw native result/availability retained;missing inputs never become source failure. Actual backing feeds reviewed exponent/rounded-u32 precheck after allocation. Fixed IPC,preallocated HW_FENCE/MEMSTORE,GPU/secure global paths remain explicit dependencies.
+
+Stops before actual GMU map,hosthandle/address/entry success or reply;retains real objects/no new free/ref/quarantine/reset/stream policy. Existing NativeAdrenoVm::fail faults streams,so generic VM map not adopted merely for compatible inputs. Three changed strict iOS17 TUs plus original-source zero-code layout POD/reference pass;8 exact objects reused,6native imports/3weak unchanged.163 independent files preserve158/modify2/add3;patch replay matches163. No allocator/cache/getter/parser/native/device/model execution,runtime/OS/SDK/pin/component selection or new kernel.9 backend operations/12pure/0complete instances;full GPU/render/Metal not qualified. [Evidence](evidence/gpu-gen7-start-memalloc-backing-2026-11-05.json).
+
+
+### 2026-11-05: retained native GMU batch-map source leaf
+
+Added actual native mapping leaf over SAME private Backing. Real NativeAdrenoTablePages/arena/state/context/stream inputs,actual owned Device window and actual reserved full VA tail/permissions/cache/shareability/poll budget required;none proves or creates owner/lease/quiescence. Direct kit MMIO binding and full stream/context observations before/after;real NativeAdrenoMemory hold/data publish includes WC pages. Normal batch map retains alias checks against both actual region lists. Actual publisher checks real table-pool containment and always calls native page clean,without global coherent-walk shortcut/fake callback. No NativeVm fault-stream wrapper or hardcoded NativeSmmuContext prepare policy adopted. Kit raw result and actual native availability remain separate. All references/objects/scratch retained even Capacity;post-map uncertainty poisons CPU table states only,no fault/disable/reset/free/retire/replay.
+
+One new strict iOS17 C++ TU/reference passes with prior6 native imports/3weak unchanged;165 independent files preserve162/change friend-only Backing header/add2,patch replay matches165. Static new call symbols include real batch map/stream observation/MMIO bind/native memory/cache;no FaultStreams/disable/retire wrapper import. No map/kit/cache/MMIO/API/native/device execution or instance selected. Full16GMU-global owner/source VMA and mapped-range/32HFI commit still required before address/hosthandle/START reply;9backend operations/12pure/0instances and GPU/render/Metal qualification unchanged. [Evidence](evidence/gpu-gen7-native-gmu-map-leaf-2026-11-05.json).
+
+
+### 2026-11-05: concrete native GMU resource reservation/map/commit source
+
+Added actual resource coordinator tied to SAME backend firmware/HFI/trace/log native memories and actual context/table graph observations. Actual source dynamic first-hole/static cursor/full reserved tail drive real private Mapping;source16GMU globals and32HFI entries commit only after real returned map. Preallocated range metadata prevents hidden post-map allocation failure. Exact enum7/actual producer6 distinction retained;no invented USER VMA or K80 geometry/owner/lease. All resources retained on failure;no release/reset/fault/retry policy.
+
+Three necessary strict iOS17 objects/static reference pass with10 exact reused objects and6native/3weak imports unchanged.168 independent files preserve156/modify9/add3;source replay matches. Native code remains unexecuted and unselected. Important unresolved mainline contract:kit requires ALL masters genuinely quiesced,whereas START allocation arrives from running GMU. Request receipt is not quiescence proof;START does not automatically map/reply.9full backend operations/12pure/0complete instances;GPU/render/Metal not qualified. [Evidence](evidence/gpu-gen7-gmu-resource-commit-2026-11-05.json).
+
+
+### 2026-11-05: actual committed MEM_ALLOC reply source
+
+Added real original11word ACK20 producer bound to SAME private retained START request,Backing and backend. Requires actual private entry/map commit/real memory/reference;no supplied address/handle/packet/provider result or model. Original requested size survives rounded entry size,legacy input receives original modern reply,source host handle equality follows only actual commit. Existing shared sequence/mask/queue/barrier/notification used;send return is not GMU acceptance. START is not resumed automatically and quiescence policy not bypassed.
+
+One strict iOS17 object/exact parent reference passes;170 independent files preserve165/change3friend-only headers/add2,replay matches170;6native/3weak unchanged. No native/device execution or selected instance. Owner separately approved ONLY offline append-only unpublished-VA mapping candidate;implementation next,not hardware proof.9full backend operations/12pure/0complete instances;GPU/render/Metal qualification absent. [Evidence](evidence/gpu-gen7-committed-memalloc-reply-2026-11-05.json).
+
+
+### 2026-11-05: approved independent unpublished-VA append candidate
+
+Following explicit owner offline approval,implemented separate actual map-only kit candidate while preserving original strict quiesced API/source. Retained real full graph/context/pool/alias checks;fresh PA must be disjoint from all old mapped data,even equal attributes. Actually initialized/cleaned child publishes before atomic0-to-valid parent;leaf publication is also atomic0-to-valid. Target disassembly confirms LDXR/STLXR and DSB SY. Only new append symbol exported,no unmap/replacement/stop/reset/free. Failures retain actual resources/states;no source result grants ownership or hardware qualification. Primary Linux child/PTE visibility source is design reference only.
+
+One strict iOS17 C object/static reference passes,172 independent files preserve170/add2/replay172,6native/3weak unchanged. No table/provider/MMIO/native/device execution or runtime selection. Actual Resources/START integration is next;all real platform owner/never-published VA/context/cache/firmware admission still required.9full backend operations/12pure/0instances;GPU/render/Metal not qualified. [Evidence](evidence/gpu-gen7-live-append-kit-2026-11-05.json).
+
+
+### 2026-11-05: actual ordinary START native allocation/append/commit/reply integration
+
+Connected SAME actual private START request through native backing,source VMA reservation,new approved unpublished-VA atomic append,real range/global/entry commit and original11word ACK,then original poll/one-frame loop. Strict quiesced API/seed initialization preserved;actual owner/never-published/cache/firmware admission still required. Only after real reply notification may next-frame working state reset;committed resources/counts/lifetimes persist,no retry after uncertainty. Original cached kind+GMUhandle pair reuses actual coordinator-owned committed native entry without extra flags/size/alignment restrictions,allocation/remap or count increment. Current incoming size/fields retained;no fake provider/address/handle,expanded wire/log or cleanup/reset/free/stop policy.
+
+Six affected strict native iOS17 C++ objects plus native general-register-only C object/flattened reference pass,8exact other C++ objects reused;6native/3weak unchanged.172 independent files modify10/preserve162/replay172. Actual compiler layouts preserve StartResult3328/HfiIoBackend4024. No native/device execution or runtime selection,9full backend operations/12pure/0complete instances;nonordinary providers/post-START tail/platform owner and actual GPU/render/Metal still incomplete. [Evidence](evidence/gpu-gen7-start-native-memalloc-2026-11-05.json).
+
+
+### 2026-11-05: actual post-START native handoff/async scratch query source
+
+Connected actual START+record predecessor to SAME native binding/thread/MSG/DBG/trace objects,actual MSGQ mask switch,HFI_STARTEDbit2,async QUERY_SCRATCH and enabled-only INIT_DONEbit6. Existing native activation must already belong to actual earlier prepareInterrupts caller;real event.enable()/software flag helper added,with lower provider return explicitly unavailable because XNU discards it. No route-ready/owner claim. Refuses pre-existing worker before inline phase and creates actual worker only after last inline return. Actual query timeout uses SAME full dispatcher before pending finish,no ACK-only drain/retry. Default DCVS/AXI votes remain real dependency;no values/provider/stubs chosen. Failures retain all native/state/maps,without Linux stop/unwind.
+
+Two changed strict native iOS17 C++ objects/flattened reference pass;14exact objects reused,6native/3weak unchanged.175 independent files preserve158/modify14/add3/replay175. New unselected NativeBinding private source type56->72 preserves old prefix offsets;no baseline/wire/log/backend ABI changed or runtime instance selected. No native/device execution;9full/12pure/0instances,full HFI/GPU/render/Metal not qualified. [Evidence](evidence/gpu-gen7-post-start-async-scratch-2026-11-05.json).
+
+
+### 2026-11-05: actual default-clock DCVS HFI request source
+
+Added real clock_set->dcvs_set request slice using SAME actual post-START tail/private prepared tables/native pending/full-final dispatcher. Caller must supply genuinely adjusted default level;no thermal/min/max/default policy or values chosen. Original clock path fixes bus/AB sentinels,hence BW0xffff00ff needs no invented DDR/channel/AB data. Original4word id30/ACK_BLOCK1/reversed actual GPU index,HFI_STARTEDbit2/CPU skips and source-EINVAL retained. Real ACK reaches only NeedsRdpmAndCpuVote,no full clock success;Gen7.9 RDPM/CPU QoS/native owner and AXI default lifecycle still required. No synthetic request/table/provider run or substituted callback.
+
+Two changed strict native iOS17 objects/flattened reference pass,15exact objects reused;177independent files preserve169/modify6/add2/replay177,6native/3weak unchanged. No native/device execution or runtime selection.9full/12pure/0instances;GPU/render/Metal not qualified. [Evidence](evidence/gpu-gen7-default-clock-hfi-request-2026-11-05.json).
+
+
+### 2026-11-05: actual default-clock post-ACK RDPM reporting source
+
+Added source optional RDPM MX reporting ONLY after genuine accepted HFI request,using SAME private actual table/request index. Actual mapped native Region or actual known-absence provenance required;Unknown never becomes absent. Original offset0xf00,kHz-to-MHz /1000,write-then-wmb retained. No physical base/rate/default/clock/CPU QoS policy chosen. Only reporting return/actual absence recorded;result stays NeedsActualCpuFrequencyQos,no full clock/default/HFI success or fabricated callback. All partial/native resources remain retained.
+
+One changed strict native iOS17 object/flattened reference passes;16exact reused,177independent files preserve175/modify2/replay177,6native/3weak unchanged. No MMIO/clock/native/device execution or runtime selection;9full/12pure/0instances,GPU/render/Metal unqualified. [Evidence](evidence/gpu-gen7-clock-rdpm-post-ack-2026-11-05.json).
+
+
+### 2026-11-05: actual default-level constraint-NONE source caller
+
+Connected actual SAME post-START predecessor and mandatory genuine native power-owner fields through original NONE-constraint thermal/min/max adjustment,active-then-previous state publication and real persistent HFI clock/RDPM request. No power/default/thermal/rate values or provider selected. NON-NONE stops BEFORE mutation for actual time/context/ref/timestamp/expiry dependency,no missing-lookup/expired/NONE fiction. Published state retained on later failure like source,no rollback. CPU-hint compatibility remains pending UNAPPLIED owner choice;clock-only result never becomes full default vote/HFI success. AXI/bus/native ICC/GMU-clock remains real dependency.
+
+One new strict native iOS17 object/exact parent reference passes,179independent files preserve176/friend-only1/add2/replay179,6native/3weak unchanged. No policy-field fixtures/native/API/device execution or runtime instance;9full/12pure/0instances,GPU/render/Metal unqualified. [Evidence](evidence/gpu-gen7-default-level-source-caller-2026-11-05.json).
+
+
+### 2026-11-05: actual AXI_ON/bus/HFI bandwidth request source
+
+Connected real clock predecessor to original AXI ctrl-skip/power-bit2 RMW,bus calculation/current-DCVS publication,actual source AB/RT hint and original4word HFI bandwidth request. Actual native owner/per-level fields,SAME prepared DDR/core/GMU inputs required;no default values/channels/rates/provider selected. Source ACV0 stops for actual ICC tag BEFORE no-change/send. Real ACK and software DCVS-skip have separate outcomes;GMU clock scale/ICC bandwidth/current bus+AB publication remain actual dependencies,no full AXI/default/HFI success. Software AXI bit never means hardware enabled. Partial flags/maps/requests retained,CPU-hint decision still pending strict.
+
+One new strict native iOS17 TU/exact parent reference passes;181independent files preserve173/friend-only6/add2/replay181,6native/3weak unchanged. No bus/policy/AB/table/packet fixture or native/API/device execution,runtime instance;9full/12pure/0instances,GPU/render/Metal unqualified. [Evidence](evidence/gpu-gen7-axi-bandwidth-request-2026-11-05.json).
+
+
+### 2026-11-05: approved offline unsupported CPU performance hint
+
+Implemented the owner-approved explicit unsupported/nonfatal CPU-QoS entry after genuine same clock ACK and actual RDPM return/source-proven resource absence. Internal result distinctly publishes unsupported implementation support,never a native CPU vote applied. Same DefaultLevelSetter now continues through a separate explicit entry into actual AXI bandwidth request. All strict entries and prior trees remain;no CPU IDs/frequencies,wire/log or runtime selector added. Actual native ICC/GMU clock/post-effect dependencies still stop full default-vote/HFI completion.
+
+Three affected native iOS17 TUs and flattened cumulative reference pass,6strong/3weak imports unchanged.181independent files,6changed/175preserved,source replay and5strict bodies unchanged;no old suite/model/native/API/device execution. Archive-symbol assertion initially guessed mangled length40;actual compiler length41 recorded/corrected without recompilation or source change.9full/12pure/0instances;GPU/render/Metal unqualified. [Evidence](evidence/gpu-gen7-cpu-hint-unsupported-compat-2026-11-05.json).
+
+
+### 2026-11-05: actual bus post-state source branches
+
+Implemented post-ACK/source-DCVS-skip continuation using retained actual forwarded bus/AB. Actual source perf-threshold0/equal-frequency skips permit current bus store;actual GMU-ABtrue skips ICC before current-AB store. Missing values never become those branches. Required native GMU rate change/ICC bandwidth still stops before dependent store;partial prior stores retained,no rollback/retry or copied K80 rate/default/prior-frequency lifecycle. Separate approved CPU-hint overload composes the same actual chain. Conditional source bus return0 is not full HFI/backend or hardware/owner readiness.
+
+One changed native iOS17 TU/flattened reference passes,18source-equal objects reused,6strong/3weak imports unchanged.181independent files,2modified/179preserved and source replay. No provider/clock-success/packet model,old suite,native/API/MMIO/device execution;9full/12pure/0instances,GPU/render/Metal unqualified. [Evidence](evidence/gpu-gen7-bus-post-state-2026-11-05.json).
+
+
+### 2026-11-05: concrete native GMU RCG2 control source
+
+Ported actual MiCode d9e81e6 gpu_cc_gmu_clk_src/clk_rcg2_set_rate register-control body:source rate/parent lookup,unprepared software defer,real CFG read/mask/write,configured-frequency publication,CMD update-bits and exact immediate-read/delay-after-miss timeout,current-frequency publication only after actual UPDATE clear. Source data does not select a K80 startup rate,parent/voltage or route. Full native clock manager,actual parent PLL/CX-MX voltage and prepared/session owner contracts remain;this leaf is not used as successful kgsl_clk_set_rate or full HFI/default vote.
+
+One new native iOS17 TU/exact parent reference passes.183independent files add2/preserve181/replay183;primary3rate/5parent constants match,6strong/3weak imports unchanged. Archive symbol check initially counted compiler-local switch table as a duplicate function;corrected TEXT-only assertion,no source change/recompile. No clock/poll/provider/CCF model,old suite,native/API/MMIO/device execution or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-gmu-rcg2-control-2026-11-05.json).
+
+
+### 2026-11-05: concrete native GMU PLL1 rate-only source
+
+Ported actual MiCode GPUCC PLL1 LUCID_OLE->lucid_evo rate helper:source16bit alpha/rounding,real L-low16/ALPHA writes,RESET_N-gated latch input/ACK and actual trion enabled/lock polling. Failed ACK retains latch/partial state;lock timeout preserves actual last MODE/original error,no reset/disable/retry/unwind. No PLL initialization/calibration/reference-rate/voltage/default selected. Disabled helper return0 remains distinct from physical output or whole native clock-manager success;real parent/CX-MX votes/prepare/enable/branch lifecycle still required.
+
+One final native iOS17 TU/exact cumulative reference passes,185independent files add2/preserve183/replay185,6strong/3weak unchanged. First passing object retained before necessary label-only source correction:successful update_bits may perform no store,so internal flags now say update returned. No clock/PLL/latch/provider fixture/model,old-suite,native/API/MMIO/device execution or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-gmu-pll1-rate-2026-11-05.json).
+
+
+### 2026-11-05: concrete native PLL1 and GMU branch enable source
+
+Ported actual inner PLL1 OLE->EVO enable:real FSM vote fields or original already-on/RUN/reset-release/lock/OUTCTRL path,source timeout and partial-state retention. Ported actual GMU CX branch AON enable RMW/status wait with source VOTED/no-hwcg fields,real live branch-rate unit/domain and original timeout/status predicate. No .aon disable,voltage/parent/prepare success callback or fake owner added. Native voltage prepare/calibration/lifetimes still required;neither leaf completes whole clocks/HFI/backend or proves physical readiness.
+
+Two new native iOS17 TUs/exact cumulative reference pass,189independent files add4/preserve185/replay189,6strong/3weak unchanged. Newly traced exact GPUCC supply->ARC regulator chain supplemented with only two same-pin primary files in a separate reference directory;both match local git tree blobs,original sparse checkout/pins retained. No source/model/native/API/MMIO/device execution,old-suite or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-gmu-clock-enable-leaves-2026-11-05.json).
+
+
+### 2026-11-05: concrete native synchronous RPMh TCS issue source
+
+Implemented actual synchronous-active RPMh TCS issue register sequence driven by real caller commands:CMD_ENABLE/WAIT clear/readback,source IRQ bit,actual MSGID/ADDR/DATA writes,wait/enable publication,AMC clear/clear/enable readbacks then relaxed trigger. Three exact RSC layout tables require actual owner revision/channel;no physical base,slot,resource address/voltage/geometry or provider selected. Source immediate1million readback/delay order retained;nonobservation stops forward/retains under approved startup policy,without fake errno/send0 or automatic cleanup. Posted trigger explicitly needs genuine IRQ/native completion;it is not voltage/clock success.
+
+One final native iOS17 TU/cumulative reference passes,191independent files add2/preserve189/replay191,6strong/3weak unchanged. Initial passing object preserved before correcting an own-source overrestriction:payload16 and hardware5bit NCPT capacity are separate domains;necessary changed target recompiled. Actual native RSC reservation/IRQ/persistent request/rail owner still required. No payload/provider/IRQ model,old suite,native/API/MMIO/device execution or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-rpmh-active-tcs-2026-11-05.json).
+
+
+### 2026-11-05: concrete native RPMh IRQ and persistent synchronous completion
+
+Connected actual persistent copied commands/owned pending registry before real TCS issue to genuine native IOInterruptEventSource action,actual hardware IRQ_STATUS matching,source completion cleanup/CPU bookkeeping/native wake and real10s assert-wait/block. Same sender/IRQ gate and private guard close early IRQ/wakeup and shared result-copy races;all terminal copies occur before guard unlock. Actual source borrowed-wake branch uses real captured channel data. No supplied IRQ word/callback success,physical owner or lease synthesized.
+
+Timeout/issue/cleanup uncertainty retains actual pending/slot/bitmap/objects/maps;late IRQ is acknowledged without reusing/releasing those or rewriting failed return as0. Mandatory real root fault service remains pure;factory/native software-enabled status is not physical IRQ-route readiness. ARC caches/selector/native voltage/clock/board ownership still required;protocol completion alone is not physical voltage or whole driver qualification.
+
+One final iOS17 TU/cumulative reference passes,193independent files add2/preserve191/replay193,6strong/3weak unchanged. Initial/review passing outputs preserved before necessary own-source concurrency/raw-result corrections and recompiles. No runtime concurrency/model/fixture/native/API/IRQ/MMIO/callback/device execution,old suite or component selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-rpmh-native-completion-2026-11-05.json).
+
+
+### 2026-11-05: native ARC selector/enable producer and controller cache
+
+Ported real ARC max aggregation/OFF masking/pseudo-enable removal,original cache/resend/wait selection and selector/enable CPU mutation/actual-error restoration under the actual aggregate mutex. Same operation owns persistent native sync request;real hardware IRQ/native completion is required before active-cache publication. No supplied ACK/status/success callback or chosen K80 corner/value/address.
+
+Integrated exact primary lower RPMh native controller cache before active send:actual solver admission,250 software-capacity rejection before search,per-command partial effects/unset sentinel and dirty gating. Original sleep/wake async are cache-only at this stage and now update actual cache before original regulator cache publication;no hardware flush/fake tx_done is claimed. ACTIVE async hardware remains an explicit unavailable boundary after original cache mutation,never coerced into sync. Core consumer mapping/constraints/supply/refcount/delay and real root lifecycle/ownership remain required.
+
+Two final strict iOS17 TUs/exact cumulative reference passed,197independent files add4/preserve193/replay197,6strong/3weak imports unchanged. First passing producer preimage preserved before necessary lower-cache integration/recompile. No native/API/cache/regulator/IRQ/MMIO/provider/model/device execution,old suite or runtime selection;9full/12pure/0instances,full GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-arc-native-aggregate-2026-11-05.json).
+
+
+### 2026-11-05: native ACTIVE async request and actual ARC caller
+
+Connected source-selected ARC async branch to its own persistent native request,actual TCS stores,source CPU tcs_in_use clear and native slot wake,returning Posted0 separately from genuine sync IRQ-completed0. Global wait-for-completion controls dedicated ACTIVE versus borrowed WAKE IRQ selection;actual per-command u32 wait still controls MSGID/wait mask. Dedicated ACTIVE async clears its IRQ even with command.wait,while actual ACTIVE-group-count0 selects borrowed WAKE IRQ. No coercion into sync or fake ACK/provider response.
+
+Same native registry owns async pending identity before trigger and retains borrowed-WAKE payload after posted return for real IRQ untrigger/command/wait/W1C/mask cleanup. Private IRQ observations stay separate from caller posted result;no invented async completion token. Source CPU bitmap0/pending retirement is not hardware idle/voltage/stop/free/owner permission;real reservation/channel/solver/conflict/physical idle/native root fault and regulator-core/VDD lifecycles still required. Failure retains resources,without reset/unmap/free/retry.
+
+Four affected iOS17 TUs/flattened exact cumulative reference pass,197independent files modified6/preserve191/replay197,6strong/3weak imports unchanged. Actual private target Registry384→640 and ARC744→1240 layouts are rebuilt together;strict sync wait/binding bodies unchanged. No native/API/IRQ/MMIO/cache/provider/model/device execution,old suite or runtime selection;9full/12pure/0instances,full GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-rpmh-active-async-2026-11-05.json).
+
+
+### 2026-11-05: native RSC channel and reservation producer
+
+ARC sync/async now use the same concrete native producer to select actual unused channel,check actual RSC solver/current hardware enabled-command address conflicts,choose original first-zero CPU slot and read actual physical TCS idle before marking CPU in-use and arming same persistent request. Actual captured group/index/total/NCPT remain private;no supplied selected-slot success or public address/handle getter. Same borrowed-WAKE pending callback identity cannot be replaced solely on CPU bitmap0.
+
+Actual busy claim registers native slot wait under same guard before releasing guard/gate,blocks/wakes/reacquires and rechecks;actual source channel/solver errors remain -EBUSY. Original channel polling and claim wait are unbounded in source;no new timeout/retry/cleanup policy or hardware time-limit qualification is claimed. Actual source-probed RSC configuration/maps/power/IRQ/fault root and regulator-core/VDD consumer contracts still required;metadata/reservation/posted/completed observations are not physical voltage/clock/owner/stop evidence.
+
+Three final clean iOS17 TUs plus one source-equal reused TCS leaf/exact cumulative reference pass,197independent files modified4/preserve193/replay197,6strong/3weak unchanged. Initial variable-shadow warning preimage retained and corrected with only changed Completion TU recompiled. No native/API/IRQ/MMIO/wait/provider/model/device execution,old suite or runtime selection;9full/12pure/0instances,full GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-rsc-native-reservation-2026-11-05.json).
+
+
+### 2026-11-05: ordinary ARC regulator-core voltage and native notifier chain
+
+Ported actual ordinary uncoupled PM_ON consumer/constraint intersection and range-to-minimum-selector mapping,source getter/offset/current no-op,PRE/ABORT/POST order and settling precedence/units,then direct persistent ARC/RSC driver path. Actual registered native notifier chain uses real shared RW lock,next-before-call/STOP/last-return semantics;private typed data preserves source unsigned-long/scalar bits without inventing scalar CPU addresses or reusing Linux notifier ABI. No supplied success callbacks/values or assumed absent fields.
+
+Unresolved source coupling error remains EPERM;coupled/custom balancer,upstream-dropout and necessary multi-step sequence are explicitly incomplete. Actual full source error restores only consumer CPU range;unknown outcomes retain real request/resources. Complete core enable/usecount/supply/DRMS/VDD/clk_prepare/native owner still required. Seven exact pinned helper/notifier/header inputs acquired separately with Git blob verification;original sparse source/pin untouched.
+
+Two final clean iOS17 TUs/exact cumulative reference pass,201independent files add4/preserve197/replay201. Native imports8strong(old6+2actual inline Mach RW APIs)/3weak;new names verified defined in exact retained e328 kernel,no stub/new address binding or runtime ABI/lock-init proof. Own balance-current/custom-balancer-condition corrections preserve earlier passing source/objects;initial verifier noninline-name expectation corrected without source/macro change. No model/native/API/notifier/IRQ/MMIO/provider/device execution,old suite or runtime selection;9full/12pure/0instances,full GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-arc-core-voltage-2026-11-05.json).
+
+
+### 2026-11-05: native ARC enable and VDD prepare forward chain
+
+Ported ordinary ARC core enable with actual unsigned consumer/use counts,registered OFF/ops/DRMS dispatch,CHANGE_STATUS,real persistent ARC request,source enable-time/delay/poll software getter and ENABLE notifier before use-count publication. Supply/coupled/GPIO/off-on requirements remain explicit;software always-on/current-count/source0 never becomes physical power/owner proof. Consumer tail now carries actual source load/count fields;voltage consumer rebuilt for private layout.
+
+Connected actual CCF-rate/source FMAX lookup and recorded-level/class order to real per-rail core voltage then enable and final class-level publication. No count-only ledger/success peer or chosen rate/vote/corner. Approved failure variant retains earlier classes/partial resources and skips Linux rail rollback/disable/unvote;only current-class original CPU charge restores on actual error. Fresh per-occurrence persistent operations prevent replay of prior success;full CCF/parent/calibration/platform/lifetime still required.
+
+Three final clean iOS17 objects(2new+affectedvoltage),one source-equal notifier/exact flattened reference pass,205independent files add4/modify1/preserve200/replay205. Initial reference import gate found private add/sub UBSan helpers;passing preimage retained,own CPU count operations widened/checked with sanitizer flags unchanged,only VDD TU rebuilt. Final8strong/3weak unchanged,no stub/new import/address binding. No native/API/IRQ/MMIO/clock/provider/model/device execution,old suite or runtime selection;9full/12pure/0instances,full GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-arc-enable-vdd-prepare-2026-11-05.json).
+
+
+### 2026-11-05: native PLL1 outer prepare and normal calibration sequence
+
+Connected own fresh native VDD/core/ARC/RSC prepare before actual PLL calibration/configuration admission,parent HW/CCF rate source rules,inner enable and only then normal source standby. Actual registered config/flags drive source conditional L/calibration/alpha/config/user/test stores;original enabled-config return1 remains1. Source OLE omitted CAL_L register offset remains its real base alias,without guessed register or board default. Actual inverted vote/DISABLE_TO_OFF normal calibration behavior is separate from failure cleanup;error/unavailable retains resources without automatic Linux failure unvote/reset/unprepare.
+
+Exact same-pin clk.c acquired independently and Git-blob verified. Actual parent NULL/orphan/zero source data retains EINVAL;no successful getter/default rate/provider/CCF peer produced. Parent registration/runtime-PM/prepare counts/rate protection/root lifecycle and startup clock-array composition remain incomplete,not replaced by callback0.
+
+One final clean iOS17 TU/exact cumulative reference passes;207independent files add2/preserve205/replay207,8strong/3weak imports unchanged. Initial passing source/object retained before own fresh-VDD ownership correction;only new changed TU rebuilt. No native/API/clock/getter/MMIO/provider/model/device execution,old suite or runtime selection;9full/12pure/0instances,full GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-pll1-outer-prepare-2026-11-05.json).
+
+
+### 2026-11-05: native GMU RCG2 safe-enable forward chain
+
+Ported actual current-frequency/CXO-row lookup,temporary force-enable and real ROOT_OFF polling,CFG preserve-mask/configured-frequency publication,UPDATE polling and normal temporary force clear. Current-frequency remains unchanged;source-supported table rows/parent map are not chosen K80 targets. Original update timeout keeps EBUSY. Approved stop-forward/retain variant refuses unobserved root-on instead of outer success and retains force/partial state on configuration error;unlike Linux post-error force clear,no automatic error cleanup is claimed.
+
+Actual GMU caller sets gmu/hub rates then bulk prepare/enable;CCF parent/count/runtime-PM/registration and full native root ownership remain required. Sleepable native leaves are not installed under Linux IRQ-disabled enable locking;real native context compatibility remains explicit. Previously recorded MiCode GPU-node clock-list absence is not filled from OnePlus or repeatedly fetched.
+
+One clean new strict iOS17 TU/exact cumulative reference passes;209independent files add2/preserve207/replay209,8strong/3weak imports unchanged. No native/API/clock/getter/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-gmu-rcg2-enable-2026-11-05.json).
+
+
+### 2026-11-05: native CCF parent preparation and direct callback lifetimes
+
+Ported real parent-first clk_core_prepare dispatch into concrete native PLL1/GMU-RCG VDD implementations,then source u32 prepare reference and CLK_SET_RATE_GATE protection recursion. Actual existing nonzero counts use original reference-only path;count0 cannot replay an old callback object success. Exact AON-branch/fixed-rate ops have no prepare;unknown callbacks never become no-op. Actual runtime-PM-enabled core remains unavailable pending native PM,not assumed powered/false.
+
+Added private same-held-gate PLL/VDD entry to avoid reacquiring/unlocking the real parent gate;standalone source bodies remain equal after lock-plumbing normalization. Approved error retention preserves parent votes/counts/resources without Linux failure unprepare/runtime-put/unvote. Actual provider registration/rate refresh/PM/notifier reentrancy/root lifecycle and atomic enable/bulk remain incomplete;source count/helper0 is not clock/owner/stop authority.
+
+Three final clean iOS17 TUs(new CCF+affected VDD/PLL),four source-equal reused objects/exact flattened reference pass;211independent files add2/modify4/preserve205/replay211,8strong/3weak unchanged. Four exact same-pin CCF source/header inputs independently Git-blob verified. No native/API/clock/getter/MMIO/provider/tree/counter/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-ccf-prepare-2026-11-05.json).
+
+
+### 2026-11-05: native IRQ-saved CCF enable and direct atomic callbacks
+
+Connected actual parent-first clk_core_enable to concrete PLL/RCG/AON-branch atomic private entries under a real native IOSimpleLock saved/restored interrupt state,then source u32 enable-count charge. Unprepared preserves exact ESHUTDOWN108;PLL ENABLE_IN_PREPARE and actual fixed-rate NULL enable follow original source bypass,no unknown/provider-success substitution. Actual child errors retain parents/partial resources under approved forward-retain variant,without Linux failure disable/unprepare.
+
+Selected XNU source confirms delay uses machine loop when IRQ/preemption disabled;ARM loop uses WFE/deadline. This proves no scheduler wait on that source path,not event-stream/timebase/progress/walltime or short IRQ-hold qualification. Standalone leaf bodies are unchanged after private context-plumbing normalization. Actual runtime-PM/registration/rate propagation/bulk/root ownership still required;native CPU counts/helper0 do not grant physical clock/owner/stop authority.
+
+Six final clean iOS17 TUs(new CCF enable+five affected),eight source-equal reused objects/exact flattened reference pass;213independent files add2/modify9/preserve202/replay213,8strong/3weak imports unchanged. Private target node80->120 and consumers rebuilt together. No native/API/clock/getter/MMIO/provider/tree/counter/IRQ/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-ccf-enable-2026-11-05.json).
+
+
+### 2026-11-05: native two-pass CCF bulk clock preparation and enable
+
+Connected actual clock-array slots to own fresh CCF prepare/enable operations on the same real nullable core cell. All entries prepare before any entry enables,with original order/repeated-core reference semantics;no per-entry interleaving,deduplication or guessed clock list. Actual successful probe count domain/genuine empty count/source NULL entries remain distinct from missing input or successful hardware/provider claims.
+
+Actual raw errors/unknown outcomes stop under approved retain variant,keeping earlier/partial counts/votes/resources without Linux bulk/wrapper disable/unprepare. Actual native array registration/allocator/slot lifetime,GMU/hub set-rate/parent propagation/initial RDPM/native PM/root ownership remain required;bulk0 does not publish AWARE or qualify full GMU clocks.
+
+One clean new iOS17 TU/exact cumulative reference passes;215independent files add2/preserve213/replay215,8strong/3weak unchanged. No native/API/clock/getter/MMIO/provider/tree/array/counter/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-ccf-bulk-2026-11-05.json).
+
+
+### 2026-11-05: actual initial CX RDPM step before clock rate setters
+
+Ported actual source frequency argument consumption before optional RDPM mapping,caller/helper double u32 division by1000,logical CX byte offset0xf14 native relaxed store and post-store barrier. Observed NULL mapping keeps original void skip;missing table/map-cell/extent stays unavailable. No integer errno/ACK/readback/physical clock result fabricated for a void helper,no chosen frequency/default/geometry or reused post-HFI ACK/CPU-hint policy.
+
+Real CCF constraints/protection/round/parent/subtree/pre/post source was traced;low-level PLL/RCG return cannot replace whole clk_set_rate. Actual native rate producer/parent propagation/PM/registration/notifier/K80 owner and GMU/HUB/bulk/AWARE caller remain pending. Source pointer/byte bounds/step return do not grant mapping/power/owner/stop authority.
+
+One clean new iOS17 TU/exact cumulative reference passes;217independent files add2/preserve215/replay217,8strong/3weak unchanged. No native/API/clock/getter/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-initial-cx-rdpm-2026-11-05.json).
+
+
+### 2026-11-05: actual native clock provider rounding and parent data producer
+
+Ported actual core/consumer boundary intersection,exact pinned clamp/protection,GMU-RCG CEIL/parent/rate derivation,real nested parent rounding,PLL16bit alpha/kHz/VCO rules,and fixed/AON pass-through behavior. Actual same-gate registered state/parent/VCO objects are mandatory,no supplied successful getter/round/provider values or chosen XO/rate/geometry defaults. Source parent wrapper0 retains underlying nonzero int return;PLL callback raw bits also retained. Missing lower computation never becomes0.
+
+Pure native computations recompute live source data,not earlier cached success;computed parent stays private. This is provider-round output,not full clk_set_rate or hardware frequency/owner/stop proof. Actual consumer protection/nuke,calc-new/subtree/pre/post/notifier/PM/hardware/recalc plus GMU/HUB caller remain incomplete. Exact same-pin clamp header verified before implementation to preserve min(max(value,lo),hi),including forwarded conflicts.
+
+One clean new iOS17 TU/exact cumulative reference passes;219independent files add2/preserve217/replay219,8strong/3weak unchanged. No numerical clock/request/provider/tree/consumer/VCO fixture/model,native/API/clock/getter/MMIO/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-clock-round-2026-11-05.json).
+
+
+### 2026-11-05: actual native PLL/RCG/fixed/passthrough recalculation
+
+Ported real source clk_recalc dispatch,actual PLL Llow16/ALPHA reads and RCG CFG/prepare-count/conditional ROOT_OFF reads with original safe-config/cache/current0 publication and mult_frac order. Known no-callback AON passes parent operand;fixed uses actual registered fixed-rate. Native runtime-PM true stays unavailable rather than guessing failure/parent fallback.
+
+Source software cxo cache fallback is explicitly distinct from register-derived output,not measured/chosen K80 XO/clock/power policy. Missing inputs never become fallback0/provider success;new/subtree consumer must call actual recalc rather than copy expected rates. Real same-gate source registration/map/power/security/IRQ/fault/lifetime remains mandatory.
+
+One clean new iOS17 TU/exact cumulative reference passes;221independent files add2/preserve219/replay221,8strong/3weak unchanged. Exact source math header independently Git-blob verified. No numerical clock/provider/tree fixture/model,getter/native/API/MMIO/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-clock-recalc-2026-11-05.json).
+
+
+### 2026-11-05: actual CCF rate preparation,protection and new-rate subtree
+
+Connected real consumer exclusive/protect nuke/restore,actual round/equality/EBUSY and parent/new-rate/index/subtree/new-child source work fields. Child new_rate uses genuine register/source recalc before recursive publication,no expected-rate or provider-success substitution. Raw lower returns remain;source terminal no-change0/EINVAL/EBUSY are distinct from produced new-rate subtree,which never becomes whole setter0.
+
+Initial passing source/object retained before correcting own approved-retention inconsistency:known NULL ancestor calculation now stops both upward paths before further child recalc/publication,keeping original outer EINVAL/component raw error/partial work. Prefix restores consumer CPU exclusivity at exit;full API still needs one-held-gate PM/pre/post/notifier/topology/hardware/recalc/request application. Actual native registration/maps/power/IRQ/fault/owner remain mandatory,not inferred from software graph/counts.
+
+One final clean iOS17 TU/exact cumulative reference passes;223independent files add2/preserve221/replay223,8strong/3weak unchanged. Two necessary compiles,no compiler errors,only new changed TU repeated. No numerical clock/tree/request/counter/provider/descriptor fixture/model,native/API/MMIO/getter/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-rate-preparation-2026-11-05.json).
+
+
+### 2026-11-05: actual clock VDD pre/post and old-vote removal
+
+Implemented real regmap PRE raise/POST lower from actual new/current rate,FMAX,vdd-level and prepare count. Prepared clocks add new vote then remove old in source class/primary order before level publication;unprepared software path uses actual count. Removal uses the concrete native core-voltage/enable/ARC/RSC chain with original zero-vote WARN refusal before global mutex and checked signed count/inverse-on-error. Needed aggregate-to0 normal disable remains explicit and incomplete. No chosen rate/voltage/corner/prepared value or provider-success substitution.
+
+Approved failure variant retains earlier class/new votes/resources,stops on actual old-unvote error or unknown and preserves its raw component instead of claiming ignored-wrapper0/final errno. Whole CCF pre/apply/post must retain same actual gate/consumer lifetime;notifier/PM/topology/hardware/normal-disable/native root contracts still required.
+
+Two final clean iOS17 objects/exact flattened reference pass;225independent files add2/modify2/preserve221/replay225,7existing clang named layouts unchanged,8strong/3weak imports unchanged. Initial import gate caught unsupported private UBSan loop helper;preimage retained,unsigned32 private indices after nonnegative admission corrected with sanitizer flags unchanged and only new RateChange TU rebuilt. Initial verifier overbroad no-initializer assumption corrected against5identical historical parent/current relocations;new objects add none,no recompile/relink for verifier. No native/API/clock/rail/getter/notifier/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-vdd-rate-change-2026-11-05.json).
+
+
+### 2026-11-05: ordinary ARC normal disable and same-boot last-off interval
+
+Connected real normal regulator_disable PRE/actual ARC pseudo-enable0 request/ABORT-or-POST/use-count/consumer/DRMS/coupling/supply source order and VDD aggregate-to0 caller. Actual constraints/always-on/OFF callback absence/status bits keep software effects distinct from hardware proof. Consumer underflow after count publication preserves EINVAL/partial state;positive lower code preserves original post/count/consumer-bypass behavior. Needed GPIO/coupling/supply branches remain explicit,not guessed or successful peers.
+
+Actual native continuous time including sleep is converted through selected kernel timebase to shared same-boot last_off nanoseconds;enable computes original positive whole-us remaining delay before real driver. Exact pinned Linux time headers verified;calendar boot epoch API is not used. Native root must establish real timebase/liveness/registration/resource epochs. Normal disable is not automatic failure cleanup or GPU stop/free authority.
+
+Three clean iOS17 objects(new disable+affected enable/VDD)/exact flattened reference pass;228independent files add3/modify6/preserve219/replay228.8existing named layouts unchanged;3private time/enable/rail layouts changed and all source users rebuilt.9strong/3weak imports,new mach_continuous_time verified external in retained e328 kernel without new address binding/stub or runtime qualification.5historical initializer relocations unchanged,new objects add none. No native/API/clock/time/getter/notifier/disable/IRQ/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-arc-normal-disable-2026-11-05.json).
+
+
+### 2026-11-05: recursive native CCF gate,clock notifier read-side and real PRE
+
+Replaced prepare-gate types/calls with genuine IORecursiveLock matching source same-thread owner recursion,with actual HaveLock checks on private held entries. Old IOLock objects cannot be cast/reused. Source clock notifier callbacks explicitly must not reenter top-level clk APIs;source notify/register/unregister outer prepare-lock coverage permits this native gated read-side while real registry mutation/retirement remains required. Ordered matching-consumer records,actual typed old/new rates,next-before-call/last-return/STOP remain;no generic SRCU or full producer qualification.
+
+Same-held rate preparation now continues through actual rpm_enabled admission(false original no-op,true unavailable),native notification and concrete VDD PRE,then original existing/new-child traversal excluding reparented children. Equality skips whole subtree. Approved first-failure/unknown retention skips automatic ABORT/continued callbacks;actual STOP/PRE error keeps source setter EBUSY and raw lower result. PRE-ready remains state,without hardware/current/req publication or whole setter0.
+
+Nine strict iOS17 TUs/exact flattened reference pass;230independent files add2/modify16/preserve212/replay230,13existing lower objects reused. All gate-typed entry/call owners and sole rate-node/result owner rebuilt;9existing named layouts equivalent after typed-pointer normalization.12strong/3weak,new3recursive-lock functions verified external in retained e328 kernel,no new address binding/stub/runtime qualification.5historical initializer relocations unchanged,new objects add none. No native/API/lock/clock/getter/notifier/registry/callback/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-ccf-recursive-pre-notify-2026-11-05.json).
+
+
+### 2026-11-05: canonical native clock notifier registry producer
+
+Implemented real source register/unregister with private owned records,failable native IOMallocZero/matching IOFree,actual canonical consumer/core/gate identity,head insertion and stable descending/equal priority semantics. Source EINVAL/ENOMEM/EEXIST/ENOENT preserved;exact pinned Linux errno input matches selected native headers. Original u32 notifier-count increment even EEXIST and decrement on found-record ENOENT remain,without count repair/capability inference.
+
+Normal empty owned-record unlink/free stays under actual same recursive gate;callbacks/consumers/core are borrowed and never freed. In-call guard refuses prohibited register/remove/notification reentry before mutation;rate entry checks canonical manager/gate before protection work. Source no-top-level-clk-reentry remains mandatory. This is outer-gate-scoped lifetime,not generic SRCU or independent readers,hardware/DMA/stop/free authority or runtime allocator proof. Whole actual native framework and hardware setter/root still incomplete.
+
+Two strict iOS17 TUs/exact flattened reference pass;230independent files modify4/preserve226/replay230,20existing lower objects reused. Changed canonical controller/consumer/hook/rate-node storage rebuilt in sole2owners;4notification POD layouts unchanged.12strong/3weak and5historical initializer relocations unchanged,new objects add none. Actual allocation/free symbols verified in retained e328 kernel,no new address binding/stub. No native/API/allocator/free/lock/clock/getter/notifier/registry/callback/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-notifier-registry-2026-11-05.json).
+
+
+### 2026-11-05: normal native CCF disable/unprepare chain
+
+Implemented concrete PLL public-disable/unprepare flag complement and normal vote-unvote or OUTCTRL/STANDBY/DISABLE_TO_OFF sequence,plus GMU RCG safe-cxo force/config/UPDATE/normal-clear without changing current_freq. Existing approved error retention keeps raw ignored lower failures/partial state instead of parent release/force clear/fake outer void0. These are normal source lifecycle branches,not a new reset/power/stop/failure-cleanup policy or physical clock-off proof.
+
+Native core disable preserves count0/last-critical WARN no-op,decrements before callback then parent. Unprepare preserves critical/no-op,unprotect-before-count,WARN-only enabled count,PLL conditional disable FIRST then recorded-level VDD unvote,then parent and actual PM branch. PM(true)/GPIO/coupling/supply remain explicit. Fresh separate persistent normal callbacks per occurrence are required;no successful provider replay or complete repeatable factory/root claimed. Standalone PLL lock comment clarified to require whole-callback root exclusion.
+
+Six strict iOS17 TUs/exact flattened reference pass;240independent files add10/modify5/preserve225/replay240,21existing source/prefix-compatible objects reused. Private node120->160 preserves old field offsets and sole constructor owner rebuilt;5existing named layouts equal.12strong/3weak and5historical initializer relocations unchanged,new objects add none. No native/API/clock/PLL/RCG/disable/unprepare/unvote/IRQ/MMIO/provider/model/device execution,old suite/fullcore or runtime selection;9full/12pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-ccf-normal-release-2026-11-05.json).
+
+
+### 2026-11-05: native CCF parent migration and intrusive topology
+
+Implemented private source __clk_set_parent_before/after dependency:actual flag12 old/new parent prepare-enable,prepared-core new-parent/core enable,then topology under the same native IRQ-save gate;after performs core/old-parent balancing,then flag12 new/old balancing through concrete normal lifecycle operations. The held recursive prepare gate covers the sequence. Original ignored helper errors retain raw results and stop forward under the approved variant;no automatic rollback/cleanup or invented wrapper success.
+
+Actual native child incoming-link/backlink/sibling and orphan cells support source reparent,new_child clearing,recursive orphan propagation and rate/round/lifecycle parent publication. New exact MiCode list.h blob verified;source WRITE_ONCE order is projected by relaxed native pointer stores. This is not a Linux hlist-layout cast or detached tree/provider model;real registry/membership/maps/rails/IRQ/ref/fault lifetime remain root obligations. Both halves stay private to the future full setter;before completion does not prove hardware parent switch,and normal after void is not full setter0/stop/lease evidence.
+
+Two final strict iOS17 objects/reference pass;3necessary compile attempts0failures,passing pre-WRITE_ONCE source/objects/link retained.242independent files add2/modify7/preserve233/replay242;rate node176->208 old prefix stable,sole constructor rebuilt,lifecycle160 and5other storage layouts unchanged.26existing source/prefix-compatible objects reused;12strong/3weak and5old initializer relocations unchanged,new objects none. Full hardware setter/recalc/POST/current+req/GMU-HUB caller,repeatable factory/native PM/root still incomplete.9full/12pure/0instances unchanged;no native/API/clock/MMIO/allocator/getter/callback/provider/model/device execution or runtime selection. [Evidence](evidence/gpu-gen7-ccf-parent-migration-2026-11-05.json).
+
+
+### 2026-11-05: supported-source same-gate full CCF rate application
+
+Implemented full setRateActual for concrete PLL1/GMU-RCG2/AON/fixed source operations. Same real prepare gate/consumer exclusivity now covers existing round/calc/PRE and actual PM admission,UNGATE,parent before/combined hardware/after,parent enable,normal hardware set,real recalc/current publication,normal release,POST notification,optional recalc-new,voltage POST,safe children/new-child traversal,then outer req_rate/PM-put/reprotect. Prefix-only entries remain distinct and cannot be replayed as a full setter.
+
+Private leaf paths consume real new_rate/parent-rate or prepare_count;RCG combined index/parent-rate nonconsumption matches actual primary source. Actual mapping/current-cache identities and fresh persistent operations are required. Original ignored hardware/POST errors retain raw results/partial references/topology/current state and stop forward under prior approval,without fake outer0/new errno or automatic cleanup/reset/retry/free. PM(true),repeatable native factory/registry/root remain incomplete;source setter0 is not measured rate/power/owner/stop/GPU evidence.
+
+Three strict iOS17 objects/reference pass first attempt.242independent files modify6/preserve236/replay242;rate-node208->240 and setter688->1976 keep old prefixes,sole constructor owner rebuilt. Existing PLL/RCG and5other storage layouts unchanged;27unchanged source/prefix-compatible objects reused. Original pre-leaf base prevents duplicate old PLL/RCG definitions;12strong/3weak and5historical initializer relocations unchanged,new objects none. Initial GMU/HUB named-clock/RDPM/bulk caller remains next.9full/12pure/0instances unchanged;no native/API/clock/getter/allocator/MMIO/callback/provider/model/device execution or runtime selection. [Evidence](evidence/gpu-gen7-ccf-full-rate-apply-2026-11-05.json).
+
+
+### 2026-11-05: initial native named GMU/HUB clock caller
+
+Implemented actual gen7_gmu_enable_clks forward caller:RDPM,actual frequency reread,named GMU full setter,actual u64 HUB rate consumed before lookup,only genuine HUB ENODEV nonfatal,same-array all-prepare/all-enable,then source uint32 AWARE0x20 publication. First exact byte/NUL name match and actual NULL/empty ENODEV semantics remain;unknown metadata/unsupported controller never becomes assumed absent. Same count/order/nullable lifecycle/consumer/gates/fresh setter/bulk slot identity are required.
+
+Actual source Gen7.9.1 HWSCHED firstboot passes GMU_MAX_PWRLEVELS-1,distinct from later post-HFI freqs[0]. No K80 rate/table/name/QDSS filtering/default is selected. Real present HUB still needs its distinct controller/parent/round/recalc/VDD/prepare/enable/release source;GMU RCG is not relabeled and HUB is not assumed absent. Native factory/registry/PM(true)/board root remain incomplete;no new coldboot Backend override or full instance counted.9concrete/12pure/0instances unchanged.
+
+One new strict iOS17 object/exact parent reference passes first attempt;244independent files add2/friend-only5/preserve237/replay244. All old CPP sources/storage unchanged;12strong/3weak and5prior initializer relocations unchanged,new object none. No clock/name/array/provider model,old suite/target rerun,native/API/clock/getter/allocator/MMIO/bulk/callback/device execution or runtime selection. Software state/source0 is not hardware readiness/owner/stop/GPU evidence. [Evidence](evidence/gpu-gen7-initial-clock-caller-2026-11-05.json).
+
+
+### 2026-11-05: distinct Pineapple HUB RCG2 source
+
+Added exact HUB CMD0x93ec/two CEIL rows/four source-parent mappings beside unchanged GMU0x9318/three/five metadata. Native rate/defer/configured/UPDATE,current publication,atomic safe enable/normal disable,own round/parent selection/register recalc,CCF preparation/enable/normal release/migration/full setter and VDD PRE/POST now distinguish actual registered source kind. Shared source CXO enable special case/parking remains;no K80 rate/parent/voltage/geometry or physical XO state selected.
+
+Actual full HUB root still requires its read-only divider,real AON/INT/other named branches and GCC gpll0 branch/fixed-PLL/postdivider providers. No assumption HUB absent,GMU register alias or fixed600MHz substitute. Fresh native operation factory/registry/PM(true)/K80 board root remain open;9concrete/12pure/0instances unchanged,no new coldboot override or runtime/device candidate.
+
+12changed strict iOS17 TUs/exact flattened reference first-pass;245independent files add1/modify17/preserve227/replay245,19unchanged-source objects reused.579latest coherent-header storage comparisons equal,12strong/3weak and5old initializer relocations unchanged,new objects none. Initial host layout-text audit compared early object-own records with17already-recorded qualifier/tail/recursive-gate/ARC-time changes;retained observation and corrected baseline to previous244file coherent headers,without recompilation/relink or dropping field comparisons. No compiler/target failure,native/API/clock/getter/allocator/MMIO/IRQ/callback/provider/model/device execution,old suite or runtime selection. [Evidence](evidence/gpu-gen7-hub-rcg-source-2026-11-05.json).
+
+
+### 2026-11-05: HUB read-only divider and AON/INT local source
+
+Implemented actual HUB read-only divider0x942c/shift0/width4 round and register recalc through real same-gate native source callbacks. New exact primary clk-divider.c blob verified. Original val+1,parent-forward request/NULL-parent EINVAL,source unsigned DIV_ROUND_UP_ULL and hidden-parent error retention are preserved. Regmap-device PM is checked independently from CCF-core PM;true/unknown remains unavailable. Divider has no register write or fake regmap errno/status0.
+
+Actual HUB AON0x93e8 and CX_INT0x9148 source identities now bind real voted enable-only CBCR path and CCF parent/count lifetimes. Their real source ops has no prepare/disable/set/post callback;none invented. Source flags/hold-state duties remain actual registry input,not selected K80 policy. Whole HUB still needs genuine GCC gpll0 branch/fixed-PLL/postdivider providers,repeatable native factory/registry/PM/root;no fixed600MHz or provider/name/clock model.9concrete/12pure/0instances unchanged,no new coldboot override.
+
+10changed strict iOS17 TUs/exact reference first-pass;247independent files add2/modify13/preserve232/replay247,22unchanged-source objects reused. NativeClockRound136->144 appends real divider borrow with old offsets stable and sole constructor rebuilt;538current named-storage comparisons pass.12strong/3weak and5old initializer relocations unchanged,new objects none. No native/API/clock/PM/getter/allocator/MMIO/IRQ/callback/provider/model/device execution,old suites/fullcore or runtime/component selection. [Evidence](evidence/gpu-gen7-hub-local-path-2026-11-05.json).
+
+
+### 2026-11-05: GCC GPU GPLL0 main/div vote branches
+
+Implemented actual GCC0x52000 bit15/main and bit16/div clk_branch2 BRANCH_HALT_DELAY source:real RMW then10us native delay,no frequency/halt getter/poll or fixed parent value. Native CCF VDD preparation/PRE/POST/unprepare,parent passthrough/normal release now binds real branch kind/GCC map/fresh operation identity. No AON no-op substituted for these actual VDD callbacks,no source0/void used as physical clock/owner/stop evidence.
+
+Node160->176 preserves old prefix. Enable/disable results append16bytes and12containing result/controller/slot/caller layouts change by explicit deltas;all array-stride/sret owners were rebuilt,including2unchanged CPP sources.808current storage comparisons pass.11final strict iOS17 objects/reference,15necessary compile attempts,1initial private-access error corrected with a concrete friend;raw failed output/header/script and passing preimages retained,four actual dependent TUs rebuilt,no public getter or stub. Host record audit needed the standalone Disable class from its exact prior unchanged owner;no field/delta check dropped or target rerun for that coverage correction.
+
+249independent files add2/modify13/preserve234/replay249,22unchanged-source objects reused;12strong/3weak and5old initializer relocations unchanged,new objects none. Actual GCC fixed-LUCID-OLE PLL still needs its own VDD-only prepare/real round/recalc/enable/normal-disable source,no set_rate or fixed600MHz substitute;postdivider/registry/factory/PM/root follow.9concrete/12pure/0instances unchanged,no new coldboot override,native/API/clock/PM/getter/allocator/MMIO/IRQ/callback/provider/model/device execution,old suites or runtime selection. [Evidence](evidence/gpu-gen7-gcc-gpu-branches-2026-11-05.json).
+
+
+### 2026-11-05: GCC fixed GPLL0 source operations
+
+Implemented exact fixed-LUCID-OLE GPLL0 source operations at GCC PLL-local base0,keeping live vote fields in original controller coordinates. Real VDD-only prepare/unprepare and PRE/POST,actual u8 flag-conditioned EVO enable/normal-disable,real parent/min/VCO PLL round and L/ALPHA recalc. Source has no set_rate callback;no software600MHz or GPUCC PLL1 outer-calibration substitute. Actual native flags/map/current/reference/voltage/owner still required;source init/registration/root and postdivider remain.
+
+249independent files modify14/preserve235/replay249,11changed strict iOS17 targets/reference pass0compiler failures,22unchanged objects reused.629coherent storage comparisons pass,node176->184 real flags-cell tail only,old prefix unchanged,no result/sret/bulk stride changes.12strong/3weak and5old initializer relocations unchanged,new objects none. Host precompile text-edit assertion and postlink AST-location/namespace audit corrections preserved separately;no target reruns.9concrete/12pure/0complete instances unchanged,no coldboot override/native/API/MMIO/clock/provider/model/device execution or runtime selection. [Evidence](evidence/gpu-gen7-gcc-fixed-pll-2026-11-05.json).
+
+
+### 2026-11-05: GCC GPLL0 postdivider source operations
+
+Integrated actual gcc_gpll0_out_even generic-table round,USER_CTL full-count recalc and EVO set callback. Actual source {1,2},{0,0},width4/shift10/vote bit25 semantics are retained;no fixed-divide2 or HUB read-only alias. Source-defined arithmetic retains unsigned64 addition,u32 do_div base,int bits and no-match actual val. Source-undefined zero division/abs/signed shift stops unavailable with retained state,no fake rate/errno/physical qualification. Native lifecycle correctly has no prepare/enable/PRE/POST callback for postdivider;real parent/gates/map/fresh operation still mandatory.
+
+251independent files add2/modify12/preserve237/replay251.9final strict iOS17 targets/reference pass,25unchanged-source objects reused,570storage comparisons,node240->248 old prefix retained,no result/sret/bulk stride changes.12strong/3weak and5old initializer relocations unchanged,new objects none. Initial shadow warning corrected by local rename;11total compile attempts include1accidental unchanged repeat after a host edit assertion,all recorded;9final objects0warnings/errors.66112pure relative-count128bit oracle cases/61source-undefined controls and576abs cases pass ASan/UBSan without driver/provider/register/descriptor/model execution.
+
+Source clk_lucid_evo_pll_init only installs optional debug ops;earlier init-pending wording does not mean missing hardware calibration and will not justify diagnostic-only work. Actual native registration/core/factory/PM/root/caller remain.9concrete/12pure/0complete instances unchanged,no coldboot override/native/device execution or runtime selection. [Evidence](evidence/gpu-gen7-gcc-gpll0-postdiv-2026-11-05.json).
+
+
+### 2026-11-05: Native clock core state and initial-clock backend
+
+Implemented real core-init rate/req cache,boot-enabled,critical and hold-state tail,with actual parent effective-vs-cached rate distinction and source-specific hardware/count callback semantics. Actual GPUCC GMU/HUB uses clk_rcg2_ops with is_enabled,not similarly named shared ops. Critical prepare then IRQ-locked enable and hold need_sync/boot/orphan/provider-sync/flag14 ordering are preserved. Actual PM(true)/unknown/error stops retains raw outcomes/partial state,no synthetic false/cleanup/owner or stop permission. No allocation inside IRQ gate. This tail does not finish registration/name/parent/accuracy/phase/duty/orphan/ref/native factory/root.
+
+New abstract HwschedInitialClocksBackend actually binds enableGmuClocks to full owned RDPM→GMU/HUB rates→bulk prepare/enable→AWARE caller. Exact source firstboot level is GMU_MAX_PWRLEVELS2-1,not later freqs[0];caller must supply it. Only whole caller0 plus AWARE publication is Complete,real raw source int uses existing Platform32 domain;no partial step/provider success substituted. Source inheritance proves10concrete/11pure/0complete instances,not a completion percentage or selected runtime.
+
+255independent files add4/modify4friend-only headers/preserve247/replay255.2new strict iOS17 objects/reference pass0errors/warnings,271common old storage records unchanged,all old CPP sources equal,no old target/suite rerun.12strong/3weak and5old initializer relocations unchanged,new objects none. Host audit rejected an obsolete pre-AO backend AST;actual later AO-recompiled owner matches current storage,checks retained,no target recompile/relink for the baseline correction. Native registry/fresh operations/core+device PM/maps/rails/security/SMMU/IRQ/fault/timebase/root and remaining11source operations remain;GPU/render/Metal/native/device execution unqualified. [Evidence](evidence/gpu-gen7-clock-core-state-2026-11-05.json).
+
+
+### 2026-11-05: Fresh synchronous native CCF atomic callbacks
+
+Replaced paired single-use IRQ callback actor pointers with canonical real controller/source/live-cell bindings. Each actual count0 enable or last-reference normal disable constructs a fresh concrete PLL/RCG/branch/GCC synchronous leaf;GPU conditional normal unprepare does likewise before VDD release. Returned state is copied into the actual CCF operation,not reused cached success or an attempted-state reset. Real primitive bodies are unchanged,compiled traits assert trivial destruction,no asynchronous this/allocator/callback registration;root retains actual binding/map/rail resources. No heap/pool/capacity or retry policy introduced inside IRQ gate.
+
+Native private node184->136 removes obsolete paired actor/release storage;actual source fields/ops/prepare prefix offsets remain,all changed private-field/constructor owners rebuilt.255independent files modify10/preserve245/replay255,5strict iOS17 targets/reference pass0errors/warnings,31source-equal objects reused,389storage comparisons with one explicit node replacement,no result/sret/bulk stride change.12strong/3weak and5old initializers unchanged,new objects none.
+
+This closes only synchronous atomic-leaf freshness. Stateful/asynchronous VDD/core/ARC/RSC/cache/reservation/notifier and setter/migration lifetimes still need exact source-backed handling;full name/parent/accuracy/phase/duty/orphan/ref/native registration/root and PM/physical owner inputs remain.10concrete/11pure/0instances unchanged;no clock/provider/core/descriptor model or native/API/MMIO/allocator/clock/callback/device execution,old suites,runtime choice or GPU qualification. [Evidence](evidence/gpu-gen7-ccf-atomic-fresh-2026-11-05.json).
+
+
+### 2026-11-05: Persistent VDD rail request frames and canonical class calls
+
+Replaced one-shot rail driver members with actual canonical core/ARC/consumer/cache/reservation/notifier/optional-disable bindings. Each actual voltage/enable/disable occurrence obtains a distinct failable IOMallocZero frame in the sleepable global VDD domain,aligns to real target frame requirements and links ownership before lower request issue. Real sync/async embedded requests remain valid after Posted/return/late IRQ. Frames retain original allocations on every outcome;safe ref/IRQ retirement is explicitly still incomplete,no free/stop right inferred.
+
+Canonical class calls now return fresh local results. Source duplicate memberships execute in order;add/remove share actual class and rail-array state. Original source votes/raw errors/inverse-on-error/current publication and approved partial-resource retention remain. Outer CCF/VDD wrapper freshness,full registration/factory/native root and physical inputs still pending. This does not complete any additional backend operation or GPU execution path.
+
+255independent files modify4/preserve251/replay255.3final strict iOS17 objects/reference pass,4necessary compile attempts0errors/warnings,33source-equal objects reused;passing pre-rail-identity source/object/reference retained and only changed RateChange object rebuilt.143storage comparisons,rail3808->400/class592->80,actual class prefix unchanged/all direct owners rebuilt,no result/sret/bulk stride change.24pure relative frame-extent controls from actual AST sizes,12strong/3weak/5old initializers unchanged.10concrete/11pure/0instances;no native/API/allocator/clock/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. [Evidence](evidence/gpu-gen7-vdd-persistent-frames-2026-11-05.json).
+
+
+### 2026-11-05: Fresh CCF prepare/unprepare wrapper callbacks
+
+Actual zero-count CCF prepare and last-count unprepare now create fresh PLL/VDD wrappers from canonical actual source bindings. PLL prepare uses the same atomic map/vote/flag binding plus real config/parent state;prepare/unprepare share one canonical VDD view. Exact lower wrapper bodies are unchanged,nonescaping source scope and target trivial-destructor traits checked. Real VDD class/rail/ARC/RSC requests and IRQ/cache/reservation/notifier owners stay persistent;no request moved onto stack,no once-bit reset/cached-success replay/new retry or destructor cleanup. Original counts/flags/parent/PM/raw return/approved retention remain.
+
+255independent files modify5/preserve250/replay255.4strict iOS17 objects/reference pass0errors/warnings;32unchanged-source objects reused,266storage comparisons,only private node136->128 with all old remaining offsets retained,all4direct private-field/constructor owners rebuilt,no result/sret/bulk stride change.12strong/3weak/5old initializers unchanged. Initial host layout audit selected obsolete176byte individual-object AST;exact coherent parent baseline priority corrected with observation preserved,no source/compile failure,target rerun or comparison dropped.
+
+VDD PRE/POST and setter/migration freshness,safe late-IRQ retirement,full native registration/factory/root and physical inputs remain.10concrete/11pure/0instances unchanged;no native/API/allocator/clock/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-ccf-prepare-fresh-2026-11-05.json).
+
+
+### 2026-11-05: Fresh CCF VDD PRE/POST wrappers
+
+PRE/POST hook metadata now borrows the same canonical actual VDD rate fields. Each source occurrence constructs a fresh synchronous wrapper with actual registered source kind,consuming live new/current rate at original phase. Exact lower wrapper body is unchanged,nonescaping source scope and target trivial destructor checked. Real class/rail/ARC/RSC/IRQ request owners remain persistent,no class-state copy,attempt-bit reset,cached-success replay or destructor cleanup. Existing vote/unvote/level/raw-error/approved retention remains.
+
+255independent files modify3/preserve252/replay255.Only changed NativeCcfSetRate TU compiled once:iOS17/reference0errors/warnings,35source-equal objects reused,111storage comparisons. Private hook pointer targets change;all16byte-hook/248byte-node offsets/sizes/alignment and result/sret/bulk stride unchanged,sole user/constructor rebuilt.12strong/3weak/5old initializers unchanged.
+
+PLL/RCG/postdivider hardware and paired parent-migration transaction freshness,named setter/full factory/registration/root and safe late-IRQ retirement remain.10concrete/11pure/0instances unchanged,no native/API/allocator/clock/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-vdd-hook-fresh-2026-11-05.json).
+
+
+### 2026-11-05: Fresh hardware,paired parent migration and named setter
+
+Actual rate nodes now borrow canonical PLL/RCG source fields/native framework;each occurrence constructs concrete hardware leaves and a fresh paired before/hardware/after migration frame. Named GMU/HUB calls construct full setter from actual consumer/framework,removing attempted setter actors. Real lower bodies unchanged;private postdiv raw outcome is copied before leaf destruction,without wire/log/carrier expansion. All native VDD/ARC/RSC/IRQ request owners remain persistent,source counts/flags/PM/raw errors and approved retain policy unchanged.
+
+Actual target assembly found3792byte migration/application storage per recursive level. Noninline single-node application now completes the migration frame before child recursion;final recursive frame48bytes,heavy node frame nonrecursive. Source order/same held gates unchanged;whole registered graph/kernel-stack budget remains unqualified. Passing pre-split source/3objects/reference retained;after private header/body change3coherent owners rebuilt.6compile attempts0errors/warnings,3final objects including required unchanged backend result/sret owner,33source-equal objects reused,reference pass.
+
+255independent files modify4/preserve251/replay255.358storage comparisons/9explicit private deltas:hardware pointer types24B stable,node248->240/entry40->32 remove actor tails,private rate/setter/named result+24 and aggregate GMU result/caller/backend+48 preserve actual postdiv outcome. All direct old fields/explicit aggregate shifts and changed constructor/field/result-sret/entry-stride owners checked.12strong/3weak/5old initializers unchanged. Registry/bulk/top-level native factory/root/late-IRQ retirement and physical inputs remain;10concrete/11pure/0instances,no native/API/clock/allocator/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-ccf-rate-fresh-2026-11-05.json).
+
+
+### 2026-11-05: Fresh bulk-entry and outer CCF wrappers
+
+Bulk slots now retain only actual prepare/enable gates and nullable core cell;each original pass occurrence constructs a fresh synchronous prepare/enable wrapper. Initial clock caller/backend borrow canonical actual bulk fields and construct fresh outer bulk operation. ALL prepare then ALL enable,source order/duplicate/null-core/count behavior/raw return and approved single-attempt partial-resource retention remain;no used-flag reset,cached-success replay,dedup or new cleanup/retry. All persistent real VDD/ARC/RSC/IRQ/cache/reservation/notifier owners unchanged.
+
+255independent files modify6/preserve249/replay255.3changed strict iOS17 targets/reference first-pass0errors/warnings,33source-equal objects reused,313storage comparisons. Slot1280->24;four other private pointer/reference target changes preserve all sizes/offsets/alignment,no result/sret/backend size change. All slot-stride/private-field/constructor owners rebuilt,12strong/3weak/5old initializers unchanged.
+
+Full native registry/core allocation/name/parent/accuracy/phase/duty/orphan/ref,factory/root/late-IRQ retirement and physical inputs remain.10concrete/11pure/0instances unchanged,no native/API/allocator/clock/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-ccf-bulk-fresh-2026-11-05.json).
+
+
+### 2026-11-05: Actual core accuracy/phase/duty initialization
+
+Native core tail now performs original accuracy/NULL-phase/duty before rate/req/boot/critical/hold. Canonical real metadata fields bind actual accuracy/duty and fixed-source flags/accuracy;fixed flags are source unsigned long64. Generic accuracy copies actual parent cache or observed-NULL source0,fixed callback honors independent real flag. All supported get_phase callbacks are NULL:source returns0 without overwriting phase cache,so none is fabricated/reset. Exact GMU/HUB MND0 duty returns source1/2 before MMIO;other NULL duty callbacks preserve actual flag13 parent recursion/copy or source reset. This is source CPU metadata,not measured waveform/perfect hardware accuracy or selected K80 geometry/rate.
+
+255independent files modify4/preserve251/replay255.2final strict iOS17 targets/reference pass,3compile attempts0errors/warnings;passing CoreStateInit pre-actual-parent-gate guard retained and only changed TU rebuilt.34source-equal objects reused,205storage comparisons,only private node240->248 pointer tail with every old field/type/offset retained,all metadata/constructor owners rebuilt,no result/sret/bulk/backend size change.12strong/3weak/5old initializers unchanged. Host metadata_ name audit initially matched unrelated GMU backend;observation retained and actual node field scope corrected,no source/target failure or dropped layout checks.
+
+Full core allocation/hw publication/name/ops/init/parent/list registration prefix and later orphan/ref publication,factory/root/late-IRQ retirement and physical inputs remain. Tail is not full registration0/ref1.10concrete/11pure/0instances unchanged,no native/API/allocator/clock/getter/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-init-metadata-2026-11-05.json).
+
+
+### 2026-11-06: Native clock registration publication/name/parent/list prefix
+
+Implemented actual native HW-core publication before PM/name search,root-then-orphan subtree name uniqueness,actual RCG CFG parent selection/direct-HW or legacy name/cache resolution,three parent-view publication and source intrusive child/root/orphan links before concrete metadata/rate/boot/critical/hold tail. FW/index route remains explicit unavailable until actual native producer exists,no fabricated ENOENT/fallback/provider status. Real source node/name/map/cell/epoch ownership required;no public address/provider accessor or model instantiated.
+
+Whole registration0/ref1 is not claimed. Actual completed prefix leaves pending native core;next registration is blocked until actual orphan/ref suffix exists. Actual failure/unknown freezes same manager and retains resources/CPU publications under prior approval,no Linux teardown/reset/free/retry. Optional Linux qcom init only sets debug-regmap ops;this API is not installed/executed or claimed successful,native concrete methods remain actual bodies.
+
+Initial compile generated7456byte call-local tail/result frame and new ___chkstk_darwin import. Failed source/objects/reference/import evidence retained;actual owner-held concrete tail with checked state/framework/once identity removes that temporary and restores original imports,only registry TU rebuilt.3compile attempts0compiler errors/warnings,1corrected import qualification failure;2final iOS17 objects/reference pass,35source-equal objects reused/37source objects total.257independent files add2/modify7/preserve248/replay257,208storage comparisons,only node248->264 registration-pointer/once tail retains all old field/type/offsets,no existing result/sret/bulk stride change.12strong/3weak/5old initializers unchanged. Host edit-scope guard correction preserved independently.
+
+Orphan/ref suffix,FW/lazy cache/core allocation/name copies/full factory/root/late-IRQ retirement and physical inputs remain.10concrete/11pure/0instances unchanged,no native/API/allocator/clock/getter/IRQ/MMIO/provider/model/device execution,old suite or runtime selection. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-registration-prefix-2026-11-06.json).
+
+
+### 2026-11-06: Native clock core-init orphan and software-reference suffix
+
+Same actual registration call/shared prepare gate now continues after concrete init tail through safe orphan-root iteration,actual parent resolution,fresh paired count/topology migration,whole accuracy subtree,whole cached-parent rate/req subtree,then original boot-hold subtree and unconditional orphan req_rate tail. Accuracy-only sharing does not reset phase/duty/boot caches;source msg0 emits no notifications. Heavy migration/hold frames finish before child recursion. Only completed actual suffix initializes genuine software core ref cell to source1 and clears pending;failures retain pending/resources/partial publications under prior approval. Actual ref init primary headers independently match same-pin Git blobs;this is not ref-get/put/destruction/retirement,whole __clk_register/factory/owner/lease or hardware readiness.
+
+257independent files modify4/preserve253/replay257;2final strict iOS17 objects/reference pass,3compile attempts with1 corrected Werror misleading-indentation failure,passing unchanged target not rerun.35source-equal objects reused/37source objects total;198storage comparisons,3private registration tails preserve all old direct offsets/types,existing node/backend/bulk unchanged.12strong/3weak/5old initializers unchanged,no new native imports. FW/index/clkdev parent producer/lazy cache,copied core/name/map/consumer factory/full root,late-IRQ/ref retirement/whole stack and actual native physical inputs remain.10concrete/11pure/0instances unchanged,no native/device execution or selection;GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-registration-suffix-2026-11-06.json).
+
+
+### 2026-11-06: Native clock CPU core and primary-consumer factory
+
+Added concrete failable aligned native CPU core allocation,actual NUL-bounded source name/parent-map copies with original names/data/hws precedence,source PM metadata and zero CPU-state/default boundary initialization,primary-consumer allocation/link,and actual existing core-init call. Canonical owned core fields back round/recalc/lifecycle/VDD/rate-hook/consumer views. Actual RCG current/configured cells remain shared. Parent changes now update real PLL parent HW and parent-core-parent views with existing typed topology. Every actual allocation is privately owner-linked before callbacks;errors/unknown retain resources and freeze forward under prior approval,no failure cleanup/reset/retry or returned address/handle. This is source for a real CPU core factory,not actual board/provider/service instantiation or whole native lifetime.
+
+259independent files add2/modify5/preserve252/replay259;4final strict iOS17 objects/reference pass,5compile attempts0errors/warnings,only changed Root TU repeated after canonical VDD/RCG binding correction.34source-equal objects reused/38source objects total;420storage comparisons,only node264->272 private pointer tail preserves all old field types/offsets,other result/sret/bulk/backend storage unchanged.12strong/3weak/5old initializers unchanged,no new native imports. Pure relative byte-budget checks consume actual target type/u8-count extents only,no pointer/provider/object/allocator fixture or native execution.
+
+Actual lazy parent resolution/FW namespace/board-source materialization and initial consumer/bulk connection,ref/late-IRQ retirement/whole stack and physical inputs remain.10concrete/11pure/0instances unchanged,no native/device execution or runtime choice;GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-core-factory-2026-11-06.json).
+
+
+### 2026-11-06: Native lazy parent-cache integration
+
+Actual core factory now privately binds round/core/registry identity before callbacks. Registration and real RCG determine-rate share concrete lazy parent resolver under actual prepare gate,with existing cache/direct-HW/FW-or-legacy order and paired native core/round cache publication only for actual nonNULL parent. Actual unregistered HW NULL remains uncached;needed unknown FW/index lookup is unavailable rather than fabricated absence/errno. Only completed actual resolver NULL reaches original RCG EINVAL. Full Setter parent-index discovery now retains original cached-match/populated-other-skip/direct-HW identity/legacy-name comparison/cache order and parent&&n>1 admission. No lower FW call is skipped to force fallback.
+
+259independent files modify6/preserve253/replay259;4strict iOS17 objects/reference pass,4attempts0errors/warnings,34source-equal objects reused/38source objects total.448storage comparisons:round144->160 private identity tail retains old fields;owned Core9024->9040 has only expected16byte suffix shift after embedded round,actual constructor rebuilt. Existing node272/result/sret/bulk/backend layouts remain equal.12strong/3weak/5old initializers unchanged,no new native imports.8pure relative changed-Core byte-budget controls only,no frozen suite/provider/object/address/native allocator execution.
+
+Real firmware/index/clkdev namespace,board clock/provider materialization and initial consumer/bulk/ref/lifetime/physical inputs remain.10concrete/11pure/0instances unchanged,no native/device execution or selection;GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-clock-lazy-parent-cache-2026-11-06.json).
+
+
+### 2026-11-06: Actual AXI GMU clock and RDPM source completion
+
+Added separate one-attempt post entry that uses same genuinely completed initial-clock owner and concrete native named gmu_clk setter after actual ACK/original DCVS-skip predecessor. It preserves actual freq0/perf-DDR/freq1/previous equality order;only full setter0 then shared same-operand CX RDPM report permits previous-frequency and current-bus stores. Actual required ICC still stops before current-AB publication;no fabricated bus/ICC success or reset/retry/resume. Old strict AXI source entry remains byte-equal. Real clock/RDPM component results remain in new private completion result;optional Linux trace is not claimed emitted.
+
+260independent files add1/modify4/preserve255/replay260;2strict iOS17 objects/reference pass,2attempts0errors/warnings,37source-equal objects reused/39source objects total.219old storage comparisons including actual Hfi AXI records and clock owner all equal,no existing result/sret/backend layout change.12strong/3weak/5old initializers unchanged,no new native imports. Host layout reader initially filtered out Hfi namespace;pre-link script/observation retained and corrected without target rerun. No host clock/provider/ACK/address/native allocator fixture or old suite executed.
+
+Finite source review confirms this retained native ADT generator lacks clock-provider/consumer graph;existing native DT symbols alone do not supply it. No new carrier/kernel binding or forced absent-provider route added. Actual firstboot tail also needs performance counters/features/time/devfreq/state-helper contracts,so no flag-only publication. Independent ICC/native aggregate/RPMh source work continues.10concrete/11pure/0instances unchanged,no native/device execution or selection;GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-axi-gmu-clock-completion-2026-11-06.json).
+
+
+### 2026-11-06: Actual ICC tag caller and native request/BCM aggregation
+
+Added separate one-initial-call AXI entry:the same old prefix computes actual bus,then actual native request tags are stored before exact original no-change/DCVS/HFI suffix. No old returned attempt is resumed,ACV forced or tag-success token supplied;old strict AXI CPP/layout stays unchanged. Native CPU ICC nodes/requests/path/voters/BCMs now implement actual request updates,disabled-zero,tag0 default,five buckets,per-bucket qcom floors and per-request core boot floor,with real BCM pending lists and mask/numeric vote aggregation. Actual keepalive/init/normalized metadata is required before source constants. Pending barriers retain partial state and prevent another prefix mutation;no provider-set/ICC hardware/source0 is fabricated.
+
+Provider scaling/optional clocks/ordered apply_constraints and genuine BCM CRM/RPMh transport remain. The pinned rpmh_write_batch consumes first *n only;generic multi-payload success is not assumed. Actual native graph/provider users/ALL requests/registered voters/CommandDB/lifetimes remain root obligations,not leases inferred from locks/counts. Native FW/firstboot missing-producer boundaries are inherited without repoll.
+
+263independent files add3/modify1/preserve259/replay263;2new strict iOS17 objects/reference pass,3attempts1corrected compiler failure,final0warnings. Missing old suffix noop dependency was restored verbatim and failed inputs retained;passing ICC object not rerun.39source-equal objects reused/41source objects total;217old named storage/result-sret comparisons equal.12strong/3weak/5old initializers unchanged. One host link-helper parse typo corrected before link. No target/native/provider/model/queue/packet/device execution or old suite.10concrete/11pure/0complete backend instances unchanged,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-icc-tag-aggregate-2026-11-06.json).
+
+
+### 2026-11-06: Native BCM RPMh branch and batch dependency
+
+Added actual native BCM RPMh source branch from canonical BCM aggregation,with genuine ICC/voter gates,actual CRM/AMC/wait/CommandDB bindings,stable VCD sort and original TCS bits/grouping. ACTIVE uses SAME persistent native RSC reservation/IRQ/wait request,then real controller batch-cache invalidation and original CPU WAKE/SLEEP list filter/cache calls. Normal CPU commit-link retirement occurs only after complete source branch;whole ICC bandwidth pending barrier remains. No metadata defaults or source transport selection.
+
+The pinned batch helper consumes only first *n:unconsumed groups stay explicitly incomplete and retain partial state,no generic draining. SLEEP/WAKE clear/fill/dirty use distinct batch slots and SAME actual cache guard,not source250 non-batch cache or physical PM flush. Source batch timeout BUG_ON is not a returned -ETIMEDOUT;actual native wait/error remains raw and batch source return unavailable. Approved retain preserves errors/resources instead of Linux solver-error ignore/error cleanup. Actual standalone skip requires genuine source field and proves no hardware completion.
+
+267independent files add4/modify2/preserve261/replay267;2new strict iOS17 objects/2attempts0errors/warnings,41source-equal objects reused/43source objects total.56old named ICC/RPMh storage/result-sret comparisons equal,12strong/3weak/5old initializers unchanged. Old CPP source unchanged;two headers add private friends only. Ordered ICC provider/scaling/optional clocks and whole bandwidth result remain;no native/device execution or selection.10concrete/11pure/0instances,GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-bcm-rpmh-native-batch-2026-11-06.json).
+
+
+### 2026-11-06: Native ICC provider application and AXI AB source caller
+
+Added actual core ordered provider application,qcom u32 scale/optional genuine CCF clock/voter calls and source final return. NEXT provider dispatch and PREVIOUS node own-provider selection are distinct;actual inter_set/first skips preserved. Genuine full rate then prepare/enable or normal disable/unprepare precede clock_enabled publication and BCM/RPMh. Source errors/unknown retain raw full lower objects,without Linux warn/ignored-error success or reapply. Actual clock/voter NULL cells are source observations,not missing-input defaults.
+
+Actual failable aligned per-call clock/voter/native IRQ frames and per-occurrence bandwidth transactions are owner-linked before callbacks. No successful allocator/getter/handle or stack request escape. Whole bandwidth pending barrier retires only after all actual source calls0. Separate AXI post entry holds same startup gate through original full GMU/RDPM/current-bus call,then genuine ICC MBps-to-icc/peak0 and only then current-AB store. Actual SAME power-owner icc_path cell and owner identity required;observed NULL alone preserves original ICC NULL software0. Old strict/post CPP byte-equal,all partial earlier states retained on failure.
+
+270independent files add3/modify3/preserve264/replay270;3final strict iOS17 objects/4attempts0errors/warnings,42source-equal objects reused/45source objects total.385storage comparisons:376equal and3explicit private ICC records updated (ActualNodeFields56->72,NativeDomain48->56,NativeNode192->208 with only post-fields storage+16). Sole actual changed Node storage owner TU rebuilt;old non-ICC/backend/result-sret equal.12strong/3weak/5old initializers unchanged. First passing provider-prefix object/source retained;aggregate target not needlessly rerun. No runtime/native/device/allocator/model/queue/packet execution.
+
+Conditional source chain is not all ICC provider/CRM/clock/ref/PM or K80 hardware qualification. Actual HWSCHED running-clock backend integration remains next;10concrete/11pure/0instances unchanged. Actual native graph/provider users/ALL requests/source clock get-put/CommandDB/count/lifetimes/board/power/security/SMMU/IRQ/ref/stack/FW/firstboot inputs remain. GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-native-icc-provider-apply-2026-11-06.json).
+
+
+### 2026-11-06: HWSCHED running-clock and bandwidth backend source
+
+Added actual establishRunningClockAndBandwidth override in separate abstract backend extension. It requires SAME completed initial-clock owner/source AWARE and SAME backend post-START tail/worker/IRQ/table identity,holds actual startup gate,then calls actual default-level/HFI/RDPM and AXI/GMU/RDPM/ICC/AB source chain. Uses only existing approved offline unsupported CPU-hint entry;source non-NONE constraint stays unavailable,not forced NONE/default. Genuine failable aligned persistent Frame is linked before default/HFI/ICC calls;real raw32/component outcomes survive failure,no invented allocation errno/free/reset/retry.
+
+Actual SAME power icc_path cell feeds both tag and post. Added original observed-NULL tag no-op without fake path/local source cell or forced ACV;missing remains unknown. Shared exact old no-change/DCVS/HFI suffix and noop dependency;strict/default/post CPP unchanged. Private tag enum appends after original0/1/2 with no storage/wire/log change.
+
+Archive trace-call check initially matched trace_memory constructor parameter;rule narrowed to call syntax and preimage/observation retained,no source/compile/link/replay rerun.272independent files add2/modify6/preserve264/replay272;2final strict iOS17 objects/2attempts0errors/warnings,44source-equal objects reused/46source objects total.496old storage/result-sret comparisons equal,12strong/3weak/5old initializers unchanged. Actual class-hierarchy/defined-method/symbol proof now11concrete/10pure/0instances. This is source integration,not complete native backend/hardware. Firmware CPU copy remains distinct from pre-MMU GPU-readonly GLOBAL BO allocation;old native FW/firstboot/owner gaps are not repolled. No native/API/allocator/HFI/MMIO/provider/model/device execution or selection;GPU/render/Metal incomplete. [Evidence](evidence/gpu-gen7-hwsched-running-bandwidth-backend-2026-11-06.json).
+
+
+### 2026-11-06 HWSCHED HFI startup handoff
+
+The isolated backend now runs the existing HFI queue and control initialization, then the real START/request-service and post-START path through QUERY. The default-vote step consumes the tail accepted by that attempt. Source completion at this boundary carries no raw status. Queue and thread refusals retain their real Darwin status when available.
+
+The changed iOS 17 object compiled without warnings. The reference linked with 45 reused source objects and its previous base. The two changed private layouts were accounted for and 250 other records matched. The new vtable slot binds the HFI override and nine operation slots remain pure. There are no complete backend instances. The initial call-site verifier was corrected to read Mach-O relocations, using the existing compile and link outputs.
+
+The outer first-boot feature publication and post-vote clock, capability, bandwidth and AWARE stages remain open. The linked artifact is an offline reference. GPU verification still requires a board-backed driver instance and a separately prepared device trial.
+
+[Evidence](evidence/gpu-gen7-hwsched-hfi-start-backend-2026-11-06.json)
+
+
+### 2026-11-06 GMU first-boot feature and post-vote source
+
+The isolated HWSCHED backend reads the source CX soft-fuse word after CM3. The private identity check ties LPAC publication to the actual HFI control inputs for START. Fastblend, ray tracing and the raw fuse use the original bit and store order. The actual core LPAC flag gates the LPAC update.
+
+After either successful default-vote branch, the same backend reports RDPM, sets the named GMU clock from the actual minimum-level table, queries GMU AB through the retained HFI worker, and withdraws the bootstrap ICC vote. The final source publishes the actual fault flag, AWARE and requested NONE. Unavailable lower results stop forward progress under the previously approved retention policy.
+
+Twelve affected iOS 17 objects compiled with zero warnings. The relocatable reference uses 53 source-equal objects and the earlier pre-core base. Three private records gained startup state. Two rebuilt units now match the coherent clock layouts already present in the parent tree. The first call-site verifier used the filename prefix in the C++ symbol name. The corrected check verified the existing ARM64 relocations.
+
+Nine backend operations remain pure. The board-backed root, pre-CM3 IRQ and bootstrap preparation, and full GMU first-boot validation remain open.
+
+[Evidence](evidence/gpu-gen7-gmu-first-boot-continuation-2026-11-06.json)
+
+
+### 2026-11-06 Pre-CM3 HFI and AO interrupt prefix
+
+The isolated backend now binds both interrupt sources to the same startup owner. The prefix clears pending HFI and AO bits on their separate mappings, writes the source masks, then invokes HFI enable followed by AO enable. The private results retain the native calls and actual software flags.
+
+The AO action follows the Gen7.9.1 HWSCHED watchdog path. It masks the watchdog bit, evaluates the original GX, SMMU, CM3 fault and reset conditions, and invokes the same GMU-fault sink as the HFI debug dispatcher. The root must admit the required register access and bind the fence and scheduler effects for the whole callback lifetime.
+
+Twelve affected iOS 17 objects compiled with zero warnings. The relocatable reference linked with 54 reused source objects and the retained base. Two older units were rebuilt with the established binding layout. The pre-CM3 operation still needs its version gate, conditional RBBM retirement, initial bandwidth and HWSCHED fault clear. Nine backend operations remain pure.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-irq-pair-2026-11-06.json)
+
+
+### 2026-11-06 Pre-CM3 version and bootstrap DDR vote
+
+The isolated backend now consumes the actual loaded GMU version and publishes the original HFI legacy-context flag. The same backend enables the HFI/AO pair, selects the actual default level's bus_min from the prepared DDR source, votes on the retained ICC path, and clears the original HWSCHED fault. Its HFI and late bandwidth steps consume the retained actors and ICC binding.
+
+The firmware's old-version branch and the observed no-registration branch follow the original RBBM skip. A registered source on newer firmware stops forward progress before the vote. Its Darwin provider and synchronized callback retirement remain required.
+
+Seventeen affected iOS 17 objects compiled without warnings. The relocatable reference linked with 54 reused source objects and the retained base. Two private layouts carry the added state. The vtable has 13 source overrides and eight pure operations. The K80 board-backed root and first device validation remain open.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-bootstrap-2026-11-06.json)
+
+
+### 2026-11-06 ACD table and CX GDSC register source
+
+The isolated ACD probe builds the original reverse-order power-level table in the same owned storage borrowed by the HFI consumer. The CX provider leaf implements the direct software-collapse and separate hardware-status branch with the original status windows and retention step. A live AOP channel and the CX regulator core, completion and SMMU hint callers remain requirements.
+
+Seventeen affected iOS 17 objects compiled without warnings. The relocatable reference links with 55 reused source objects and the retained base. Existing storage layouts matched.
+
+The source audit found that host HFI initialization creates the F2H worker before CM3. START changes the MSGQ mask later. The current late worker creation is the next source correction. The exact AOP wrapper and IPCC blobs are listed in the provider frontier after automatic approval review rejected their download.
+
+[Evidence](evidence/gpu-gen7-acd-cx-source-2026-11-06.json)
+
+
+### 2026-11-06 Host HFI worker order
+
+Host HFI preparation now publishes the actual queue table before creating its matched F2H worker. The worker parks on the existing wait event. After inline START and optional recorded START return, the source mask store and a locked handoff admit the same worker. The pre-CM3 and HFI operations require this earlier thread. TRACE and DBG service before that handoff remains open.
+
+Eleven affected iOS 17 objects compiled without warnings and linked into the relocatable reference with 61 reused objects and the retained base. Static inspection confirms the creation, wait and handoff calls. The host firmware and memory predecessors and the K80 native root remain open. The next source operation is first initialization of the VRB and trace header.
+
+[Evidence](evidence/gpu-gen7-host-f2h-startup-order-2026-11-06.json)
+
+
+### 2026-11-06 Fresh host VRB and trace header
+
+The host preparation source binds the VRB and trace objects to the same initialized resource registry that supplies the startup mappings. It writes the VRB size and actual trace address, then the six host trace fields. Each publication must return before HFI queue preparation and F2H thread creation. CM3 reset uses the shared field writer behind its existing flag, full-header clear and sequence reset.
+
+Fifteen affected iOS 17 objects compiled without warnings. The relocatable reference links with 92 reused source objects, three retained bindings and the earlier base. The fresh pair requires real zeroed reservations and preaccess exclusion. Retained or mixed reservations, firmware reservation admission, pre-handoff TRACE and DBG and the complete host caller remain open.
+
+[Evidence](evidence/gpu-gen7-host-vrb-trace-2026-11-06.json)
+
+
+### 2026-11-06 Host firmware reservation admission
+
+Host preparation now initializes the same Resources registry before the VRB, trace and HFI operations. It reads the loader's retained type-1 and type-7 requests, uses the supplied VMA extent and keeps the original TCM or actual user skip. An ordinary request needs a single seeded backing that covers its entire extent. The audited registry releases the private firmware load gate. A missing backing remains a dependency of the real host allocator.
+
+Forty-seven affected iOS 17 objects compiled without warnings and the relocatable reference linked. The existing stock plan contains 11 requests, including five TCM ranges and six backing requests. Those counts describe the retained plan. Actual backing acquisition, full HostResources and device validation remain open.
+
+[Evidence](evidence/gpu-gen7-host-firmware-reservations-2026-11-06.json)
+
+
+### 2026-11-06 Host warmboot scratch and HFI IB reservations
+
+The host source checks distinct GMU init and GPU boot scratch bindings when the actual core warmboot feature is enabled. The same GMU init object feeds SET and QUERY. Both scratch checks precede the VRB and trace stage. The ordinary IB backing, the recurring backing when actual LSR is enabled, and the HFI queue binding are checked in the same registry before the queue and F2H worker.
+
+Fourteen affected iOS 17 objects compiled without warnings and the relocatable reference linked. Static inspection confirms the optional feature branches and the source extents of 4096 bytes per scratch and 24000 bytes per IB backing. The actual backing producer, GPU boot scratch commands, indirect IB submission and full HostResources remain open.
+
+[Evidence](evidence/gpu-gen7-host-scratch-and-ib-2026-11-06.json)
+
+
+### 2026-11-06 GPU cold startup through main CP
+
+The unselected HWSCHED source uses the GPU scratch reservation admitted during host preparation. With the original cold route and a live HFI worker, it issues the asynchronous scratch SET when warmboot is enabled, then runs the existing main CP request and idle check. Both operations use the existing whole-message dispatch when the pending path requires it. The new operation ends at the ZAP authentication boundary.
+
+Forty-seven affected iOS 17 objects compiled without warnings and the relocatable reference linked. Static checks cover the request order and both optional dispatch calls. The private tail and frame gained storage for the retained scratch binding and pending results. The actual GPU configuration caller, ZAP loading and PAS session, later LPAC and QUERY steps, and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-gpu-cold-main-cp-2026-11-06.json)
+
+
+### 2026-11-06 Hardware clock gating and power-up register snapshot
+
+The source for the register tail after SECVID now calls the existing Gen7.9.1 HWCG implementation, then uses the same retained Snapshot that HFI START and counter restore use. A fresh patch sets the original flag after the snapshot stores return. The already-patched branch uses the retained result. Main CP checks the same memory object and full GPU address before any scratch or CP request. The actual caller holds the startup gate throughout.
+
+Sixteen affected iOS 17 objects compiled without warnings and the relocatable reference linked. The original stock module also confirms the subsequent CoreSight, counter and IRQ call order. Real SECVID, the post-register caller and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-hwcg-pwrup-tail-2026-11-06.json)
+
+
+### 2026-11-06 CoreSight and allocated-counter startup restore
+
+The startup suffix restores GX then CX from the owner's current CoreSight shadow registers, using the GPU and separate CX debug mappings. It preserves the original no-write arms for observed unregistered or disabled domains. Both arrays of 52 register words match the exact pinned source and the archived stock module. The suffix then restores the allocated counters through the same service and snapshot retained by START. The main CP entry checks the restore result before any scratch or CP command.
+
+The affected iOS 17 object compiled without warnings and the relocatable reference linked. The stock module places the SW-fuse IRQ callback in the GMU profile and leaves that slot empty in the HWSCHED profile. The live CoreSight owner, actual MMU fault-clear, GPU IRQ and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-coresight-counter-restore-2026-11-06.json)
+
+
+### 2026-11-06 RBBM interrupt mask and processor firmware at cold entry
+
+The K80 HWSCHED source now reads the same RBBM mask cell used by the earlier firmware retirement check. It skips a register write when the observed mask is zero. The nonzero path writes the live mask before programming SQE and the applicable AQE bases. The register writer consumes the same backing objects as the successful firmware copy and publication and checks the AQE and LPAC states used by HFI. Cold and warm routing follow the returned stores.
+
+Both affected iOS 17 objects compiled without warnings and the relocatable reference linked. Actual SMMU fault clearing, host IRQ activation and firmware backing ownership remain prerequisites. Main CP still hands off at actual ZAP authentication.
+
+[Evidence](evidence/gpu-gen7-irq-ucode-cold-entry-2026-11-06.json)
+
+
+### 2026-11-06 Retained-stock ZAP CPU preparation
+
+The cold-start source reaches the ZAP gate after the main CP idle result. An observed loaded state preserves the original no-copy branch. The fresh-load path uses the stock image from the same immutable FirmwareFiles as SQE and AQE. It prepares 4,044 metadata bytes and the 1,072-byte segment in retained CPU storage, then binds that storage to the boot frame. The stock ELF ranges, hashes and emitted copy operands agree with the earlier fixed-byte recipe.
+
+All 47 affected iOS 17 objects compiled without warnings and the relocatable reference linked. The reserved window, SCM-visible metadata and actual PAS authentication remain prerequisites. The following secure-mode, LPAC and GPU scratch steps remain open.
+
+[Evidence](evidence/gpu-gen7-zap-cpu-preparation-2026-11-06.json)
+
+
+### 2026-11-06 HWSCHED post-ZAP cold-start suffix
+
+The source continuation after actual ZAP authentication checks the same loaded field and the main CP idle result. It connects the existing secure-mode switch, LPAC CP initialization and GPU scratch QUERY to the same HFI worker. It preserves the original disabled branches. When enabled, QUERY uses the GPU scratch already admitted for SET. Successful completion updates the existing warmboot flag when applicable and clears the same record mask.
+
+All 17 affected iOS 17 objects compiled without warnings and the relocatable reference linked. The actual authentication and preaccess owner, outer GPU boot commit and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-post-zap-cold-tail-2026-11-06.json)
+
+
+### 2026-11-06 Successful GPU cold boot state commit
+
+After the post-ZAP cold suffix returns, the source commit uses the same startup gate and Adreno private word. A live owner supplies the actual snapshot presence and its lifetime. The source marks an existing snapshot recovered, increments the device's 32-bit reset count and clears FORCE_COLDBOOT before the existing OOB release step.
+
+The affected iOS 17 object compiled without warnings and the relocatable reference linked. The disassembly preserves the stock store order. The native snapshot and counter owner, the remaining platform operations and first-boot publication are open.
+
+[Evidence](evidence/gpu-gen7-cold-outer-commit-2026-11-06.json)
+
+
+### 2026-11-06 First-boot bus counters and software state
+
+The source first-boot override requires the same cold commit and successful OOB release. When the live bus-control setting enables counters, it reuses the START and restore counter service in the stock six-request order. Existing low offsets skip acquisition. The approved offline controller retains earlier effects and stops on the first counter error or unavailable result.
+
+The subsequent stores follow the original cooperative reset, GMU first-boot and GPU-started bits, conditional BCL, devfreq enable, signed uptime nanoseconds, ACTIVE and requested-state clearing. One affected iOS 17 object and the relocatable reference passed. Seven mandatory operations and the native root still require binding.
+
+[Evidence](evidence/gpu-gen7-firstboot-publication-2026-11-06.json)
+
+
+### 2026-11-06 SMMU context FSR before host IRQ
+
+The new continuation runs after counter restore and before the host IRQ and main CP operations. It reads the real stalled field for the user context and any actual LPAC domain in source order. A stalled context uses the existing direct SMMUv2 binding for FSR W1C, SCTLR CFIE and the barrier. It clears the stall field only after the same clock scope returns from normal release.
+
+One affected iOS 17 object and the relocatable reference passed. The actual context and clock owners still supply the bracket. The host IRQ also needs an observable provider result where a route is consumed.
+
+[Evidence](evidence/gpu-gen7-smmu-fault-clear-2026-11-06.json)
+
+
+### 2026-11-06 SMMU normal clock bracket
+
+The FSR continuation now calls the concrete SMMU clock bracket. Acquisition takes the optional actual CX reference, prepares and enables the live clock slots, then charges the count. Normal release debits the count, disables every acquired slot in reverse order, unprepares every slot in reverse order and returns the same optional CX reference.
+
+Eight affected iOS 17 objects and the relocatable reference passed. The final import set matches the parent after the reverse progress counters were bounded with unsigned arithmetic. The actual clock registrations, CX consumer and host IRQ remain open.
+
+[Evidence](evidence/gpu-gen7-smmu-clock-bracket-2026-11-06.json)
+
+
+### 2026-11-06 SMMU GCC and GPUCC clock branches
+
+The Gen7.9.1 SMMU clock source adds the GCC memory NoC and SNoC/DVM branches and the GPUCC AHB and HLOS1 vote branches. The CCF path uses the registered gate, HWCG and delay rules, and the AHB branch prepares its real hub divider parent. A voted enable that reaches its timeout calculation requires a positive rate in the source integer domain. The pinned parentless descriptors initialize to zero, so the unselected candidate retains the gate update and stops before polling when the actual timeout is unavailable.
+
+The 23 affected iOS 17 objects and the 110-object relocatable reference passed. Recompilation also aligned three inherited CCF objects with the current private layouts. The real clock registry, voted-rate source, CX reference and host IRQ route remain open.
+
+[Evidence](evidence/gpu-gen7-smmu-clock-branches-2026-11-06.json)
+
+
+### 2026-11-06 Host IRQ continuation before CP
+
+The Gen7.9.1 source preserves the zero-route and already-on branches. A fresh enable sets the original power flag before the positive RBBM and frequency limiter routes, in that order. The same registered terminal Darwin controller returns the actual status. Shared and passthrough return paths stay unavailable. The CP entry now requires the completed IRQ stage before the existing RBBM mask and processor register writes.
+
+One affected iOS 17 object and the 110-object relocatable reference passed. The added metaclass lookup is present in the retained Libkern export list. The actual terminal route and primary handler owner remain required.
+
+[Evidence](evidence/gpu-gen7-host-irq-continuation-2026-11-06.json)
+
+
+### 2026-11-06 Version-qualified direct RBBM retirement
+
+At the original 5.01.06 core-version boundary, the pre-CM3 source now unregisters the same actual direct RBBM route before the bootstrap bandwidth vote. The actual terminal return gates the mask and number stores, in that order. An attempted retirement bars subsequent enable on that route. The earlier version and known absent registration branches preserve their source behavior.
+
+One affected iOS 17 object and the 110-object relocatable reference passed. The actual direct provider and primary-handler lifetime still require binding. Event-source retirement needs the corresponding workloop and callback closure.
+
+[Evidence](evidence/gpu-gen7-rbbm-direct-retirement-2026-11-06.json)
+
+
+### 2026-11-06 LLCC activation and APRIV continuation
+
+The Gen7.9.1 prefix now calls the native LLCC activation source for the registered GPU and HTW descriptors. The GPU call precedes the two SCID writes and the HTW call. APRIV follows both selections. The approved isolated controller retains a returned activation failure and stops forward progress. The SECVID-dependent tail now checks the same post-LLCC object.
+
+Three affected iOS 17 objects and the 110-object relocatable reference passed. The retained polling header matches the MiCode blob. The actual LLCC registration owner and SECVID trusted window remain required.
+
+[Evidence](evidence/gpu-gen7-llcc-activation-2026-11-06.json)
+
+
+### 2026-11-06 CX regulator core and shared SMMU reference
+
+The isolated Darwin23 source connects the first GPU CX consumer reference to its persistent ARC parent operation and the registered direct GDSC enable path. A newly enabled provider must return through the ramp and ENABLE notifier before the core use count publishes. A returned child error restores the consumer count and retains the parent under the approved offline policy. The SMMU access bracket can take and release a distinct consumer reference on the same live core while the GPU startup reference is held.
+
+Two affected iOS 17 objects and the 110-object relocatable reference passed. The initial volatile counter diagnostic and the static instruction matcher correction are archived. The actual provider, completion gate and native SMMU TLB caller still need binding before the CX operation is complete.
+
+[Evidence](evidence/gpu-gen7-cx-regulator-core-2026-11-06.json)
+
+
+### 2026-11-06 CX completion and disable notifier
+
+The isolated Darwin23 source initializes the CX completion before adding the real notifier to its regulator chain. The new caller observes that completion before entering the primary regulator acquire. The 5000 ms wait reports a deadline separately. The normal disable notification observes the Gen7.9.1 CFG status with the source polling order, then clears the wait state and wakes all waiters.
+
+The 110-object relocatable reference passed with 37 strict iOS 17 recompiles. Eight refresh older local header inputs, and five earlier VDD and ICC layout records now match the canonical current objects. The actual completion owner, controller runtime-PM reference and SMMU TLB caller remain required.
+
+[Evidence](evidence/gpu-gen7-cx-completion-2026-11-06.json)
+
+
+### 2026-11-06 QSMMUv500 controller power callbacks
+
+The isolated Darwin23 controller resumes under the actual power lock. First use applies the present controller ICC vote, takes its registered vdd reference and acquires the controller clock slots before publishing the count. Normal last release of an owned transition observes GR0 ID0 before reverse clock release, shared CX put and a present ICC clear. The approved retain path records a lower failure or unavailable result and preserves the reached resources.
+
+Eight affected iOS 17 objects and the 111-object relocatable reference passed. The actual controller runtime-PM owner and the per-domain TLB flush remain required for the full CX startup operation.
+
+[Evidence](evidence/gpu-gen7-smmu-controller-power-2026-11-06.json)
+
+
+### 2026-11-06 QSMMUv500 per-domain stage-1 TLB
+
+The isolated source adds the actual-domain skip check and powered S1 context operation. The native gather scope checks the registered controller reference, orders TLBIASID and context TLBSYNC, and publishes the deferred clear after observing synchronization. It preserves the controller debug timeout latch and separates the vendor timeout hook and page-table retirement from the admitted empty-list path.
+
+Two affected iOS 17 objects and the 112-object relocatable reference passed. The ordered CX caller, actual native runtime-PM owner, domain mappings and retirement remain required.
+
+[Evidence](evidence/gpu-gen7-smmu-stage1-tlb-2026-11-06.json)
+
+### 2026-11-06 CX startup and ordered QSMMUv500 domain flushes
+
+The isolated Gen7.9.1 CX backend entry waits for completion and enables the primary regulator before the ordered user, optional LPAC and optional GMU TLB sequence. Each real flush requires the actual same-controller PM reference. A normally returned sequence clears the CX wait state.
+
+Five affected iOS 17 objects and the 113-object relocatable reference passed. The native runtime-PM owner, board root and domain bindings remain open.
+
+[Evidence](evidence/gpu-gen7-cx-tlb-caller-2026-11-06.json)
+
+### 2026-11-06 QSMMUv500 GPU MMU startup
+
+The isolated GPU MMU entry uses the user and optional LPAC banks admitted by CX startup. It holds one KGSL clock scope across user SCTLR, applicable user and secure PRR, and optional LPAC PRR and SCTLR. Normal clock release precedes MMU completion.
+
+Two affected iOS 17 objects and the 113-object relocatable reference passed. The actual KGSL clock array, board-root mappings and policy, and the PRR page and secure access for applicable branches remain open.
+
+[Evidence](evidence/gpu-gen7-mmu-start-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 first-boot core metadata
+
+The isolated host prefix connects one admitted core and DDR input to the existing AHB timeout, hub clock, BCL and GPU bank-bit consumers. The actual host caller invokes it before resource acquisition. CX admission requires the metadata and returned host HFI preparation.
+
+Eighteen affected iOS 17 objects and the 113-object relocatable reference passed. The compile-time AHB check covered 9,226 scalar cases. The actual DDR producer, native pre-MMU allocations and host root remain required.
+
+[Evidence](evidence/gpu-gen7-init-metadata-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 host master log and requested state
+
+The isolated host tail binds the actual master-log object and its source VMA and permissions after the firmware reservations. It preserves the returned native seed-observer error. Successful worker creation and borrow admission precede the requested ACTIVE and AWARE stores. The actual host caller uses this terminal operation after all earlier resources return and before ACD.
+
+Fourteen affected iOS 17 objects and the 113-object relocatable reference passed. Actual boot reservations, the host root and AOP transport remain required.
+
+[Evidence](evidence/gpu-gen7-host-master-log-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 pre-CM3 GMU master log
+
+The isolated boot entry allocates the 64 KiB master log through the existing native memory source, applies write-combining and enters the strict GMU mapping transaction. A returned mapping and complete range merge precede publication of the existing backing and seed cells. The shared global count is written last. The HFI map routes still admit their own prepared requests.
+
+Sixteen affected iOS 17 objects and the 114-object relocatable reference passed. The actual early GMU domain, full first-hole reservation and host lifecycle remain required for startup.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-log-reservation-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 master-log first-hole VA reservation
+
+The isolated boot entry chooses the first source-aligned 64 KiB hole from the early GMU owner interval list. Known committed coverage and full reserved tails are checked. The interval is inserted before strict mapping and retained on later failure. Mapping success and a complete merge precede backing publication and the final global count.
+
+The single affected iOS 17 object and the 114-object relocatable reference passed. Compile-time interval checks and linked instruction checks cover the search, insertion and publication order. The actual early GMU domain and complete live VMA owner remain required.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-master-log-va-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 early firmware reservations
+
+The isolated early boot owner consumes the retained firmware requests in order. Existing single-backing coverage is checked against the actual extent. Uncovered requests use the existing native ordinary allocation and strict GMU map. Dynamic intervals are inserted before mapping and the static cursor advances only on success. The fresh master log follows a successful firmware pass. The later registry checks only the CACHE cursor that it reads.
+
+Forty-eight affected iOS 17 objects and the 114-object relocatable reference passed. The actual early GMU domain, complete VMA owner and subsequent host allocations remain required.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-firmware-prealloc-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 warmboot scratch reservations
+
+The isolated early boot source prepares the GMU init scratch and then the GPU boot scratch after the master log. The actual core feature gates both 4 KiB requests. A retained backing is reused, and new requests commit the actual CACHE cursor only after strict mapping. The late HFI host source validates the same early owner and its named backing cells before using them.
+
+Fifteen affected iOS 17 objects and the 114-object relocatable reference passed. Actual early GMU ownership, VRB and trace and the remaining HFI host allocations are required.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-warmboot-scratch-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 early VRB and trace reservations
+
+The isolated early boot source admits the owner's trace layout, reserves VRB and then trace, and initializes each only on its source fresh branch. VRB size is published before trace reservation. Fresh trace publishes its address and original header. The late HFI host source verifies the same bindings and the CM3 conditional reset stays separate.
+
+Fifteen affected iOS 17 objects and the 114-object relocatable reference passed. Actual early GMU ownership and the remaining HFI host backings are required.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-vrb-trace-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 early HFI backings and shared VA reservations
+
+The isolated early boot source reserves the main IB, the recurring IB when the actual core feature requests it, and the HFI queue backing in source order. The terminal host stage uses the same queue mapping and initializes fresh memory once. Retained memory takes the fixed-layout check before the worker starts. Early and later HFI paths share the owner's VA reservation ledger, including reserved tails, under the same startup gate.
+
+Forty-six affected iOS 17 objects and the 114-object relocatable reference passed. A complete host-resource owner, full driver link and device validation remain open.
+
+[Evidence](evidence/gpu-gen7-pre-cm3-hfi-backings-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 ACD on an established AOSS channel
+
+The complete local K80 kernel supplies the pinned AOSS, mailbox shim and IPCC source. The isolated Darwin candidate borrows an established channel, writes the aligned ACD message, reads back the published length before the doorbell and checks that the remote side clears the length. An uncertain send retains its mailbox and resources.
+
+One iOS 17 object and the 115-object relocatable reference passed with the same unresolved imports. An actual K80 Darwin AOSS owner, its interrupt route and the Gen7.9.1 startup caller still need to be bound.
+
+[Evidence](evidence/gpu-gen7-aop-acd-established-channel-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 AOSS channel establishment
+
+The isolated AOSS source follows the pinned Linux link, channel and acknowledgement order. Each step publishes its register, rings IPCC and waits for the corresponding remote value. The existing ACD send uses the same wake path. An incomplete open retains the channel and blocks ACD send on that object.
+
+One affected iOS 17 object and the 115-object relocatable reference passed without additional unresolved imports. The actual shared IPCC controller, AOP child delivery and Gen7.9.1 startup caller are required for integration.
+
+[Evidence](evidence/gpu-gen7-aoss-channel-open-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 IPCC child delivery
+
+The isolated receiver clears the exact pending ID only after matching a registered child in the shared owner table. It leaves an unmatched ID pending for the parent owner. The AOP child queues a native thread call that wakes the AOSS predicate waiter in thread context.
+
+One iOS 17 object and the 116-object relocatable reference passed. Two new thread-call imports have definitions in the retained XNU object and remain external to the reference. The retained K80 ArmCpu object supplies a primary SPI entry. The shared parent route, complete child table and actual startup caller still require binding.
+
+[Evidence](evidence/gpu-gen7-ipcc-aop-child-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 first-boot ACD caller
+
+The isolated first-boot backend probes the same ACD table consumed by its HFI chain and calls the acquired AOSS client after requested AWARE. A genuine absent feature or empty source mask permits the original no-send branch. The registered path requires observed mailbox consumption before CX. Timeout or unavailable status retains resources under the approved offline policy.
+
+Eleven affected iOS 17 objects and the 116-object relocatable reference passed without additional imports. Four pure backend operations remain. The actual K80 shared IPCC owner and GPU mailbox acquisition are still required.
+
+[Evidence](evidence/gpu-gen7-firstboot-acd-call-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 pre-MMU GPU-global backing preparation
+
+The retained stock K80 boot image contains an embedded kernel configuration that confirms the 4096-byte Linux page unit. The isolated CPU allocator covers SQE, AQE, capture script, capture registers and the privileged power-up list, and uses the exact firmware-copy objects for SQE and AQE. It keeps actual allocation and cache-mode failure results.
+
+Three affected iOS 17 objects and the 117-object relocatable reference passed without new imports. The K80 GPU-global VA owner and native default and LPAC mapping still need to be bound.
+
+[Evidence](evidence/gpu-gen7-pre-mmu-gpu-backings-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 GPU-global default and LPAC map
+
+The isolated transaction publishes the prepared CPU backing, maps the default domain first and then maps an actual LPAC domain when present. It uses the owner-supplied reservation and native table pools. An incomplete LPAC operation retains the default mapping and its committed range record.
+
+Two affected iOS 17 objects and the 118-object relocatable reference passed without new imports. Actual K80 roots, VA reservation, optional guard page ownership and the CP-visible address binding remain required.
+
+[Evidence](evidence/gpu-gen7-gpu-global-map-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 mapped CP consumers
+
+The isolated backend binds SQE, AQE and the power-up list to the same startup gate and GPU global mappings. It checks the CP address against the mapped native VA using the KGSL split-table conversion and checks the firmware copy before the register prefix. The main and LPAC CP init calls consume the same retained list. The secure continuation rechecks the bindings and LPAC state before advancing.
+
+Two iOS 17 objects and the 118-object relocatable reference passed with identical imports. The native K80 owner, source-ordered firmware preparation caller and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-cp-mapped-consumers-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 first-boot firmware caller
+
+The isolated first-boot backend requires completion of the actual scheduler start. It then finishes SQE backing, mapping, payload copy and publication before starting AQE. Both copies use the retained firmware plan and the same mappings as the later CP consumers. The metadata stage requires both publications to have completed.
+
+Four affected iOS 17 objects and the 118-object relocatable reference passed with identical imports. The real Darwin submission gate and scheduler work, firmware namespace and K80 mapping owner remain required.
+
+[Evidence](evidence/gpu-gen7-firstboot-firmware-caller-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 first-boot host globals
+
+The isolated host path prepares the capture script and registers after core metadata, then maps the required power-up list before early GMU/HFI backings. A returned allocation miss in crashdump can reach the mandatory list only when the failed object has no retained backing or device reference. Cache and mapping failures retain their existing disposition. HFI initialization checks the same completed GMU owner and mapped list before creating its queue and worker.
+
+The affected iOS 17 object and 118-object relocatable reference passed with identical imports. The GMU loader, registers, CM3 and HFI consumers still need to bind the actual post-allocation values from that owner.
+
+[Evidence](evidence/gpu-gen7-firstboot-host-globals-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 post-allocation GMU host bindings
+
+The isolated cold-boot backend now implements `prepareHostResources`. The stage prepares early resources, checks the actual reservations and owner, then binds the completed seed count and the log, VRB, trace and HFI buffers under the same startup gate. The worker's debug reader uses the same master-log backing. Registry audit, queue preparation and worker creation follow the binding.
+
+All 52 affected iOS 17 objects and the 118-object relocatable reference passed with identical imports. The actual K80 host and scheduler, GPU register and processor stages, and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-host-postalloc-bindings-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 first-boot register stage
+
+The isolated backend joins the source busy-data reset, LLCC and APRIV, SECVID, HWCG and the power-up snapshot, CoreSight and counters, FSR and IRQ, and the mapped SQE/AQE bases. The SECVID stores require the actual security owner's window and values. The CP stage uses the completed register state.
+
+The affected iOS 17 object and the 118-object relocatable reference passed with identical imports. The real SECVID binding, actual scheduler and final processor stage with ZAP/PAS remain required.
+
+[Evidence](evidence/gpu-gen7-firstboot-register-stage-2026-11-06.json)
+
+### 2026-11-06 Gen7.9.1 first-boot processor stage
+
+The isolated `startGpuProcessorFirmware` stage connects cold scratch SET, main CP idle, the actual ZAP authentication interface, unsecure, optional LPAC and scratch QUERY. The retained ZAP branch requires the same owner's confirmation of the authenticated epoch. Warm replay sends EXEC and waits for the matching HFI completion on the existing worker. Both successful routes reach the outer commit before OOB release and software publication.
+
+All 49 affected iOS 17 objects and the 118-object relocatable reference passed with the same imports. All 21 sequence stages now have source bodies. The actual K80 ZAP/PAS owner, HWSCHED submission gate and worker, Darwin root and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-firstboot-processor-stage-2026-11-06.json)
+
+### 2026-11-06 K80 ZAP PAS owner sequence
+
+The isolated ZAP owner publishes the fixed stock metadata through the supplied secure DMA binding, calls PAS INIT and MEM_SETUP, publishes the relocated segment and calls PAS AUTH_AND_RESET. The owner supplies all addresses, conduit and peripheral inputs. Only a successful returned authentication recorded against the actual secure epoch permits publishing the loaded cell. The retained branch checks that epoch without issuing another PAS call.
+
+The new iOS 17 object and 119-object relocatable reference passed with identical native imports. The real Darwin secure-session implementation, HWSCHED submission gate and worker, and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-zap-pas-owner-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED submission gate and deferred work
+
+The isolated startup opens the halt gate and wakes submit waiters before requesting one retained XNU deferred work item. The HFI interrupt and timestamp retirement dispatcher request that same item. The worker serializes fault handling, draw retirement, fence signaling and issue under the actual scheduler lock. Its owner supplies the operation bodies and the reviewed priority.
+
+All 15 affected iOS 17 objects and the 120-object relocatable reference passed. The one added import, `IOLockSleep`, is declared in the fixed XNU export list. The real submitter, context registration, scheduler operation bodies and full driver link remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-gate-work-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED context registration
+
+The isolated issue entry sends `REGISTER_CONTEXT` and `CONTEXT_POINTERS` through the existing HFI pending and F2H paths. It uses the negotiated queue mode and the context owner's live page-table and memstore bindings. Both accepted responses and the actual queue route precede registered-state publication.
+
+All 11 affected iOS 17 objects and the 121-object relocatable reference passed with the same imports. The Darwin issue owner, queue publication for `ISSUE_CMD`, retirement and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-context-register-2026-11-06.json)
+
+### 2026-11-06 K80 bounded HWSCHED issue
+
+The isolated issue entry connects bounded inline `ISSUE_CMD` to the registered global dispatch and per-context queue routes. It writes the payload, completes submit timing, publishes the write index and notifies the GMU in that order. The scheduler still needs to observe the matching EOP before retiring the draw and signaling its fence.
+
+Four affected iOS 17 objects and the 122-object relocatable reference passed with the same native imports. The actual Darwin submit owner, EOP backing, fence callbacks and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-issue-command-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED EOP retirement and fence handoff
+
+The isolated scheduler retains each submitted draw and derives its CPU EOP word from the same memstore offset sent in `CONTEXT_POINTERS`. The F2H timestamp message wakes the worker. The worker applies the source unsigned timestamp comparison to the EOP word, processes draw retirement and hands the event to the fence owner. It retains the scheduling record if either callback has an uncertain outcome.
+
+Eight affected iOS 17 objects and the 122-object relocatable reference passed with the same imports. The actual shared memstore mapping, Darwin submit and fence owners, and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-eop-retirement-2026-11-06.json)
+
+### 2026-11-06 K80 common memstore
+
+The isolated startup prepares the 32 KiB GPU-global memstore before opening the submission gate. The HFI coordinator can reuse the mapped object for a GPU-only request after checking the GMU mapping ledger. Context registration verifies the same GPU base and observes zero SOP and EOP in the fresh source slot. Later EOP reads use that backing.
+
+Twenty-two affected iOS 17 objects and the 122-object relocatable reference passed with the same imports. The exact firmware request flags, optional GMU import, actual probe and process mapping owners, and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-common-memstore-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED process page table
+
+The isolated split-table registration resolves the retained process root through its native page-table pool. It derives the TTBR0 and bank from the selected default or LPAC domain and checks that the same upper root still covers the memstore. Both HFI responses and later registration reuse require the same binding.
+
+Six affected iOS 17 objects and the 122-object relocatable reference passed with unchanged imports. The actual process and context-ID owner, submit and fence integration, and complete target link remain open. GMU memstore import still requires the shared-backing cache, alias and lifetime contract.
+
+[Evidence](evidence/gpu-gen7-hwsched-process-pagetable-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED context IDs and VM holds
+
+The isolated scheduler claims the owner's context ID and retains the registration before the first HFI send. The inline path checks each IB against the same process VM and its noncacheable lower mapping. After confirming queue space, it takes one hold per VM handle before writing the HFI payload. A partial hold stays with the retained draw. EOP retirement drops the holds under the device gate before fence handoff.
+
+Eight affected iOS 17 objects and the 122-object relocatable reference passed with unchanged imports. The external Darwin client submission and fence entry, context teardown, actual board and process owners, and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-vm-ib-retention-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED client queue handoff
+
+The isolated client enqueue path copies the resolved IBs into retained draw storage and takes the VM holds before linking the record and waking the worker. The actual scheduling owner selects a context, and the worker dequeues its oldest draw. EOP and the successful fence event handoff produce a receipt for that record.
+
+Eight affected iOS 17 objects and the 122-object relocatable reference passed with unchanged imports. External Darwin Submit and WaitFence, actual fence event completion, context teardown and complete target linking remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-client-enqueue-2026-11-06.json)
+
+### 2026-11-06 K80 Darwin submit ingress
+
+The isolated publisher has a private submit entry for an owner holding the client and scheduler gates. It checks the existing ABI, resolves the active queue and client BO ranges, and hands the real VM and supplied draw to the durable HWSCHED enqueue. For a request without a fence dependency, it writes the existing eight-byte reply only after the enqueue accepts the source timestamp.
+
+Seven affected iOS 17 objects compiled. The 187-input relocatable reference replaces the exact old publisher, preserves the existing class layouts and imports, and resolves the new enqueue calls. External dispatch still needs the actual queue-to-context binding, fence lookup and event completion, and teardown across waits. The full driver link and hardware checks remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-darwin-ingress-2026-11-06.json)
+
+### 2026-11-06 K80 Darwin fence event and wait
+
+The isolated draw retains its connection identity and an event reference through the retired fence handoff. The worker arms the event after EOP and VM hold retirement. A successful handoff and completion of that draw's event may arrive in either order. The last arrival wakes waiters under the same mutex and releases the event reference. An unresolved handoff retains it.
+
+The private wait checks the existing request shape, draw identity and timestamp, then polls or waits on a single absolute deadline. Seven affected iOS 17 objects and the 187-input relocatable reference passed. Its additional deadline import has a definition in the retained Darwin 23 kernel image. The actual connection lookup, event queue and external selector bindings remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-client-fence-event-2026-11-06.json)
+
+### 2026-11-06 K80 per-connection fence ledger
+
+The isolated native connection reserves the existing nonzero timestamp key before HWSCHED enqueue. It rejects a duplicate key in the same connection, and a failed enqueue discards only the unaccepted reservation. The private wait resolves an exact key and pins a pending draw before releasing the client lock. Successful event completion releases the ledger reference and keeps the completed key for later waits.
+
+Seven iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The isolated publisher's private connection layout grows from 280 to 360 bytes. The existing core layout and wire records are unchanged. Queue incarnation, the real mount and event owner, external dispatch and teardown still need bindings.
+
+[Evidence](evidence/gpu-gen7-hwsched-connection-fence-2026-11-06.json)
+
+### 2026-11-06 K80 queue incarnation and Submit dependencies
+
+The isolated native queue keeps an internal incarnation and a retained K80 context binding. A private Submit snapshots its original connection, core, queue and context before waiting on an existing connection fence. It checks the same incarnation and resolves BOs again after the wait. A reused queue ID cannot admit the old request.
+
+Seven affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private queue layout grows from 8 to 24 bytes and the core from 6424 to 6432 bytes. The ABI's 3104-byte Submit exceeds the existing 1792-byte mailbox input capacity. The actual mount, deferred event queue, drained teardown and external methods remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-queue-incarnation-2026-11-06.json)
+
+### 2026-11-06 K80 software queue drain
+
+The private close seals one queue incarnation and checks that its Submit dependencies and fence waiters have returned their borrows. It tries the exact scheduler mutex while holding the startup gate. A matching ready draw, pending draw, retained partial hold or ledger event keeps the queue in closing state. A drained queue hands its context binding back for release outside the gates.
+
+Nine iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private queue and draw records each grew by eight bytes. Software queue drain leaves the backend's context slot, firmware registration and VM lifetime to the actual K80 owner. The external close caller and GMU unregister remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-queue-drain-2026-11-06.json)
+
+### 2026-11-06 K80 context unregister transport
+
+The isolated HFI transaction records the last notified timestamp after the draw post-effects return. Its three words carry command 129, the exact registered context ID and that timestamp. It links the pending entry before notification, waits outside the startup gate and uses full F2H dispatch on a timeout. The real owner's detached hardware-fence check precedes interpretation of the matched ACK.
+
+Thirty-four iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private registration record grows from 720 to 944 bytes. The candidate requires an actual active owner and dedicated deadline. It preserves the retained context slot, memstore and VM after the transport result.
+
+[Evidence](evidence/gpu-gen7-hwsched-context-unregister-2026-11-06.json)
+
+### 2026-11-06 K80 context handback and unregister duration
+
+The stock K80 boot configuration supplies 250 Hz, and the retained KGSL module passes 1875 ticks to its unregister wait. The isolated Darwin transaction converts that 7500 ms duration only for the live context unregister command.
+
+After the matched ACK, the candidate requires equal observed queued and notified timestamps and the original qualified CPU memstore mapping before publishing SOP/EOP. A distinct context ID owner check precedes clearing those words and returning the backend slot's retained reference. Six iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private context record grows from 944 to 952 bytes. The actual active reference, hardware fence and detach owners remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-context-handback-2026-11-06.json)
+
+### 2026-11-06 K80 deferred Darwin software fence worker
+
+The isolated scheduler queues the retained draw after its source fence handoff. A dedicated Darwin thread call removes that draw under the scheduler mutex and releases the mutex before completing the software fence event. The actual scheduler owner supplies the callback priority and must prepare the worker before admitting the client queue.
+
+Seven affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private scheduler layout grows from 120 to 144 bytes. The actual mount and close callers, hardware fence owner, BO and VM teardown, and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-darwin-fence-worker-2026-11-06.json)
+
+### 2026-11-06 K80 queue detach transport
+
+The isolated client seals and drains one queue incarnation before starting the live HFI unregister transaction. It retains the original context across the wait, with both locks released. The startup gate is reacquired for the hardware fence check and ACK interpretation. A successful result admits publication of the detach timestamps. The queue stays bound until the actual context owner and backend return the slot, then a separate method returns the queue's reference.
+
+The affected iOS 17 publisher object and the 187-input relocatable reference passed with unchanged imports and private layouts. The actual K80 mount and close callers, active reference, hardware fence owner, context ID proof and BO and VM teardown remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-queue-detach-2026-11-06.json)
+
+### 2026-11-06 K80 unused software queue return
+
+The isolated connection may return its own queue reference before any submission. Under the startup gate the scheduler verifies that the context has no backend slot, registration attempt or queued or notified timestamp. The connection then seals the queue and checks that no software waiter, draw or fence event is outstanding. A context used by firmware still requires the backend slot handback. The context ID, hardware fences and VM remain with their actual owners.
+
+Five affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports and private layouts. The real K80 mount and close callers remain open. Current core initialization still requires the legacy ring, and the private path must use the actual K80 VM and connection lock.
+
+[Evidence](evidence/gpu-gen7-hwsched-unused-queue-return-2026-11-06.json)
+
+### 2026-11-06 K80 private connection initialization
+
+The isolated private connection verifies the live process VM and prepared scheduler owner before allocating CPU handles and queues. The default context and software fence ledger are bound before the connection publishes its owner-supplied lock. Private Submit, fence wait and detach use that lock. The paired CPU close requires returned queues and BOs and a drained fence ledger.
+
+Six affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private IOKit client grows from 360 to 376 bytes for the connection lock and scheduler references. The actual K80 host caller, BO mapping and visibility contract, external dispatch and hardware lifecycle remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-private-connection-2026-11-06.json)
+
+### 2026-11-06 K80 committed BO borrow
+
+The isolated client checks an already committed BO against the same lower VM, its noncached ledger and the exact backing. It retains the mapping borrow and owner before publishing a client handle. The existing draw path uses that backing and takes its own job references. VM unmap refuses an outstanding client borrow, and client return requires zero jobs before it hands the storage reference back to the actual owner.
+
+Twelve iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. Three warnings in untouched compatibility units match their archived diagnostics. The client BO record grows from 192 to 208 bytes, and the VM mapping record stays at 64 bytes. The actual process mapping, complete lower ledger and BO owner still need to be connected. The approved append implementation continues to require an attached table with unswitched TTBR0.
+
+[Evidence](evidence/gpu-gen7-hwsched-bo-borrow-2026-11-06.json)
+
+### 2026-11-06 K80 committed process lower ledger
+
+The isolated process view projects the VM's ordered committed lower mappings into scratch owned by the process. It accounts for every recorded span and matches the table's leaf count before publishing the view. The existing VM gate protects both construction and use. BO binding and IB validation share this view, which refreshes on changes to the VM, root or generation. The existing map and unmap implementations are unchanged.
+
+Fifteen affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports and three inherited warnings. The private process table record grows from 16 to 88 bytes. The actual K80 process VM producer, retained scratch, host calls and device ownership remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-lower-ledger-2026-11-06.json)
+
+### 2026-11-06 K80 inactive process lower root
+
+The isolated startup backend uses the same live memstore and source context flags as registration. It validates the selected split domain, the owner's lower window and scratch, and prepares an empty native lower root in retained process storage. It exposes the prepared table only after checking that root against the existing upper table and memstore. A preparation failure returns its status and keeps the owner's storage.
+
+Eight affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private preparation record is 328 bytes. The actual host call and native VM attach with the populated shared TTBR1 peer remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-process-root-preparation-2026-11-06.json)
+
+### 2026-11-06 K80 shared TTBR1 process VM
+
+The isolated process VM pairs its prepared lower root with the selected bank's committed shared TTBR1. It audits the routes and both tables at attach, then requires the same upper table, page pool and routes during HWSCHED registration. Lower map and unmap retain the existing all-masters quiescence contract. Lower maps check aliases against the actual upper ledger, which stays with the first-boot owner.
+
+Sixteen affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports and three inherited warnings. The private VM grows from 640 to 672 bytes, and process preparation grows from 328 to 408 bytes. The actual Darwin host call and BO producer are still needed before the full target link and hardware stages.
+
+[Evidence](evidence/gpu-gen7-hwsched-shared-ttbr1-vm-2026-11-06.json)
+
+### 2026-11-06 K80 first-boot scheduler and fence work
+
+The isolated first-boot caller prepares both work items with the same retained F2H and IRQ owner. It accepts reviewed priorities from that owner. Submission opens only after both preparations succeed, after the common memstore and before SQE/AQE. Failure leaves submission closed and retains any prepared work.
+
+Twelve affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The private startup input record grows from 160 to 168 bytes. The backend and post-start layouts keep their sizes. The actual K80 host, job operations, accelerator and BO calls still need to be bound.
+
+[Evidence](evidence/gpu-gen7-hwsched-firstboot-work-pair-2026-11-06.json)
+
+### 2026-11-06 K80 HFI receive handoff
+
+The isolated F2H worker can service TRACE and one DBG record per iteration after HFI control initializes. The inline START and record sender owns MSG until the existing interrupt-mask store and the locked phase transition. A diagnostic iteration in flight at that point finishes as a diagnostic iteration. The following iteration can service MSG.
+
+The first-boot work entry now requires the installed disabled HFI source and its previously prepared scheduler. The source installation already checks for that scheduler. The first-boot entry prepares only missing fence work for the same owner, using its reviewed priority.
+
+Fourteen affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. Static inspection confirmed the conditional branch around the MSG reader. The actual IRQ and callback owners, complete target link and hardware behavior remain open.
+
+[Evidence](evidence/gpu-gen7-hfi-prehandoff-diagnostics-2026-11-06.json)
+
+### 2026-11-06 K80 first-boot IRQ probe
+
+The isolated probe uses the same retained owner for scheduler preparation and the disabled AO and HFI sources. It prepares the scheduler under the startup gate, releases the gate before entering either workloop, and requires AO installation to succeed before it attempts HFI. An incomplete install retains the established sources and keeps processor firmware load unavailable. The later enable and receive paths stay in their existing stages.
+
+Twelve affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual host caller must still supply the K80 provider routes, reviewed priority, workloops and callback lifetime.
+
+[Evidence](evidence/gpu-gen7-firstboot-irq-probe-2026-11-06.json)
+
+### 2026-11-06 K80 HWSCHED GMU fault publication
+
+The isolated CM3 IRQ, DBG ERR and AO watchdog paths publish GMU fault bit 5 on the same retained HWSCHED word before kicking its scheduler. The paired IRQ path binds that word and the live HWSCHED feature flags before enabling the sources. With hardware fence enabled, the actual host still needs to implement throttle abort, waiter wake and timeout retirement. The Darwin client fence continues to require actual retirement and fence handoff.
+
+Eighteen affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. Actual IRQ ownership, hardware-fence waiters and recovery remain open.
+
+[Evidence](evidence/gpu-gen7-hwsched-gmu-fault-publish-2026-11-06.json)
+
+### 2026-11-06 K80 HFI timestamp retirement
+
+The isolated HFI worker checks the loaded minor version before decoding TS_RETIRE. It borrows the retained context under the existing MSG mutex, which also protects slot publication and handback. Each valid message still kicks the scheduler. Ordinary completion continues to require memstore EOP.
+
+Seventeen affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual Darwin retirement reporting and hardware-fence provider remain open.
+
+[Evidence](evidence/gpu-gen7-hfi-timestamp-retire-context-2026-11-06.json)
+
+### 2026-11-06 K80 HFI counter release
+
+The isolated MSG worker sends the firmware's three-word counter release to the same registry that serves START. Returned source statuses keep the original handling. An unavailable operation follows the existing input refusal. The retained host supplies a dedicated mutex for registry operations and power-up snapshot initialization.
+
+Twenty-one affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual host must supply the mutex, mapped regions and CP lifetime. Active inline counter programming and the complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-hfi-counter-release-2026-11-06.json)
+
+### 2026-11-06 K80 backend-owned first boot
+
+The isolated HWSCHED backend retains the existing 21-step sequence and runs it under its startup gate. The first step verifies the disabled IRQ pair, ACD probe, matching HFI inputs and fresh first-boot state before it prepares firmware backing. The VM and private client paths now require completion from that backend.
+
+Six affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual K80 host must provide its probe, board dependencies and retained call site.
+
+[Evidence](evidence/gpu-gen7-firstboot-owner-sequence-2026-11-06.json)
+
+### 2026-11-06 K80 shared ACD enable
+
+The isolated AOP and HFI paths share the actual ACD enable cell. The HFI path reads it once for table preparation and the existing ACD commands. First firmware preparation checks the same probe and mailbox binding before touching its first backing. The explicit off branches remain available for source feature absence or an empty mask.
+
+Twenty affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual AOSS/IPCC route and client acquisition remain host inputs.
+
+[Evidence](evidence/gpu-gen7-acd-shared-enable-2026-11-06.json)
+
+### 2026-11-06 K80 AOSS receive binding
+
+The isolated AOSS path binds the prepared IPCC parent on the same mapped frame. It verifies the AOP child action and context and requires its deferred call before mailbox access or first-boot ACD admission. The receive dispatcher still leaves an unclaimed ID for the actual parent owner.
+
+Three affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual K80 owner still needs to establish the shared GIC summary, child enable and GPU client acquisition.
+
+[Evidence](evidence/gpu-gen7-aoss-receive-binding-2026-11-06.json)
+
+### 2026-11-06 K80 first-boot firmware inputs
+
+The isolated first-boot entry receives the four actual firmware spans under the startup gate. Its existing file owner copies them and applies the fixed identity plan before GPU allocation. Failure stays at the firmware stage, and a repeated call returns the retained outcome without copying the inputs again.
+
+Six affected iOS 17 objects and the 187-input relocatable reference passed with unchanged imports. The actual Darwin firmware namespace and provider, board host and complete driver link remain open.
+
+[Evidence](evidence/gpu-gen7-firstboot-firmware-input-2026-11-06.json)
+
+### 2026-11-06 K80 embedded first-boot firmware
+
+The isolated first-boot entry can consume the existing K80 stock firmware object. The reference link resolves all eight data and length symbols. GMU, SQE, AQE and ZAP bytes match the pinned local files and frozen planner in both the copied input and the reference output.
+
+One affected iOS 17 object and the 188-input relocatable reference passed with unchanged external imports. Actual host invocation, secure authorization, board services and the complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-firstboot-embedded-firmware-2026-11-06.json)
+
+### 2026-11-06 K80 RPMh tables at GMU probe
+
+The isolated GMU probe prepares ARC/DCVS and BCM tables before it derives the ACD table. The backend retains that exact table object through pre-CM3 DDR bootstrap and HFI table submission. A failed preparation leaves the probe incomplete and retains the table result.
+
+Twenty-one affected iOS 17 objects and the 188-input relocatable reference passed. The actual CommandDB and board input producers, Darwin startup caller and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-probe-rpmh-tables-2026-11-06.json)
+
+### 2026-11-06 K80 CommandDB vote inputs
+
+The isolated RPMh table builder can take a retained CommandDB snapshot, an independently supplied version and real board metadata. It uses the existing bounded file decoder, matches the first exact resource ID and reads the source ARC and BCM AUX fields. The ARC reader keeps leading zeroes and stops at the first nonzero-to-zero transition.
+
+Twenty-three affected iOS 17 objects and the 189-input relocatable reference passed. The actual K80 capture, version provenance, host caller and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-commanddb-vote-inputs-2026-11-06.json)
+
+### 2026-11-06 K80 stock CommandDB resource layout
+
+The archived K80 KGSL module confirms the three ARC IDs, DDR SH0/MC0/ACV and CNOC CN0 entries, and the Gen7.9.1 ACV vote and threshold. The isolated configuration factory builds those entries after validating the retained rows and explicit CNOC state. Its scan follows the stock first matching DDR row and last-row fallback. Four stock FDTs agree on the ten generic DDR rows and two CNOC rows. The generic DDR table reaches the threshold at zero-based index 6.
+
+One affected iOS 17 object and the 189-input relocatable reference passed with unchanged imports and private layouts. The actual Darwin probe still supplies the live board rows and a retained CommandDB capture with independent version provenance. The complete target link and hardware stages remain open.
+
+[Evidence](evidence/gpu-gen7-commanddb-stock-layout-2026-11-06.json)
+
+### 2026-11-06 K80 shared ARC and ACD power rows
+
+The isolated probe prepares the retained ARC and BCM tables, then derives ACD from the same power row count and order. The stock property reader and GMU probe use the same ACD field in the original power row. The ACD feature gate, mask, and mailbox acquisition boundary stay in their existing sequence.
+
+Twenty-three affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The private source power record grows from 408 to 536 bytes. The actual Darwin host, board input selection, CommandDB capture, full target link and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-probe-shared-power-rows-2026-11-06.json)
+
+### 2026-11-06 K80 shared bootstrap and AXI bus rows
+
+The isolated startup now gets the default row's minimum bus index, the active row's bus index and row zero's maximum bus index from the same retained power rows as ARC and ACD. The stock and reference objects show the bootstrap index read before conditional RBBM retirement and the DDR peak read afterwards. The initial AXI vote and ICC tag use the same row-zero maximum.
+
+Twenty-three affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The private power record grows from 536 to 920 bytes and the AXI input record shrinks from 136 to 120 bytes. Actual board row selection and normalization, host binding and the complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-shared-power-bus-rows-2026-11-06.json)
+
+### 2026-11-06 K80 Gen7.9.1 board vote producer
+
+The isolated producer consumes the board rows resolved by its host and uses the selected DDR table for both bus index normalization and the stock vote configuration. It keeps the stock final-row exception. The table owner passes the same prepared board rows and configuration to the existing CommandDB decoder and RPMh table builder.
+
+Sixteen alternatives across four retained FDTs yielded 9 to 14 power rows each. Those alternatives needed no bus index adjustments. One affected iOS 17 object and the 189-input relocatable reference passed with unchanged imports and existing private layouts. Actual Darwin input acquisition, CommandDB capture and complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-board-vote-producer-2026-11-06.json)
+
+### 2026-11-06 K80 stock FDT board vote binding
+
+The isolated board producer can accept an independently established raw FDT digest and exact GPU power table suffix. It binds the corresponding GPU rows, optional field presence, DDR/CNOC tables and GMU pairs to the existing board preparation. The compiled payload and pointer relocations match 192 GPU rows across sixteen alternatives from the four archived FDTs.
+
+One affected iOS 17 object and the 189-input relocatable reference passed with unchanged imports and private layouts. The actual Darwin owner still establishes the selected source, table, CommandDB snapshot and native resource lifetimes. The complete target link and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-stock-fdt-vote-binding-2026-11-06.json)
+
+### 2026-11-06 K80 first-boot board vote owner
+
+The isolated first-boot backend now takes a typed board vote owner under the existing startup gate. It prepares the private snapshot-backed RPMh table before ACD. The ACD binding, pre-CM3 bandwidth and HFI startup checks require the same prepared table through the existing bootstrap path.
+
+Seven affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports and private layout sizes. The actual Darwin host still needs to publish and retain the owner, board input and CommandDB snapshot. The complete target link and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-firstboot-vote-owner-2026-11-06.json)
+
+### 2026-11-06 K80 first-boot ACD channel publication
+
+The isolated startup verifies the existing ACD table and observes the state of the admitted AOSS channel under the startup, transmit and IRQ wait gates. It publishes the channel and its shared enable flag only after the channel is established. First boot then requires the same published channel and flag. The entry leaves channel opening and IRQ setup with the actual AOSS owner.
+
+Eight affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The private backend grows from 14872 to 14880 bytes. Actual AOSS and GIC/IPCC ownership, Darwin invocation and the complete target link remain open.
+
+[Evidence](evidence/gpu-gen7-firstboot-acd-channel-publication-2026-11-06.json)
+
+### 2026-11-06 K80 IPCC ArmCpu summary binding
+
+The isolated binding can use the retained ArmCpu level-high SPI API for an admitted summary route. It requires a prepared parent and held registration gate before the call, which enables the SPI immediately. The primary callback handles one IPCC result and forwards it to the retained owner callback. An unclaimed ID reaches the owner without a clear.
+
+One affected iOS 17 object and the 189-input relocatable reference passed. The one new import resolves in a separate relocatable link with the retained K80 ArmCpu object. The actual platform owner supplies the route, enabled children, unclaimed behavior and lifetime. The complete target link and device qualification remain open.
+
+[Evidence](evidence/gpu-gen7-ipcc-armcpu-summary-2026-11-06.json)
+
+### 2026-11-06 K80 bound AOP child enable
+
+The isolated AOP delivery checks the exact prepared parent and child callback under the existing transmit gate. It issues the source child-enable command before publishing the software issuance state. QMP open, send and first-boot ACD require that state. Four retained FDTs identify the same AOP child on the IPCC interrupt and mailbox paths.
+
+Three affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports and private layout sizes. The actual platform owner still establishes the summary route and retains the frame, complete child table and unclaimed-ID handling. The write command supplies no hardware acknowledgement.
+
+[Evidence](evidence/gpu-gen7-aop-child-enable-2026-11-06.json)
+
+
+### 2026-11-06 K80 AOSS ArmCpu transport preparation
+
+Four retained stock FDTs resolve the GMU mailbox via the AOP shim and AOSS controller to the IPCC/GIC route. The isolated transport entry binds the exact parent before ArmCpu attachment. It enables the AOP child only on the attached result and returns the native summary evidence. The owner releases the registration gate before the separate channel open.
+
+One affected iOS 17 object and the 189-input relocatable reference passed with unchanged imports. The retained ArmCpu provider resolves the SPI symbol in a separate object link. The actual Darwin AOSS owner, route and channel acquisition remain open, along with CommandDB capture, full target linking and device qualification. [Evidence](evidence/gpu-gen7-aoss-armcpu-transport-2026-11-06.json).
+
+
+### 2026-11-06 K80 first-boot probe composition
+
+The isolated probe builds the ACD table from the bound RPMh inputs and publishes the admitted AOSS channel when required. After observing that binding or the original source skip, it installs the disabled AO and HFI interrupt sources using the existing workloop gate handoff. The separate cold-boot entry now checks the same prerequisites before retaining firmware.
+
+Six affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports and backend size. The actual Darwin probe owner, CommandDB capture, resource lifetimes and full target link remain open. [Evidence](evidence/gpu-gen7-firstboot-probe-composition-2026-11-06.json).
+
+
+### 2026-11-06 K80 first-boot owner publication
+
+The isolated probe verifies the caller's two empty owner cells and the matching HFI backend. It publishes the retained vote owner and HFI tail only after the existing CommandDB vote preparation succeeds. ACD and AO/HFI installation then use those same objects.
+
+Six affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The retained Darwin 23 kernel defines all 19 strong symbol names in executable text. The actual host constructor, admitted K80 resources, full target link and device qualification remain open. [Evidence](evidence/gpu-gen7-firstboot-owner-publication-2026-11-06.json).
+
+
+### 2026-11-06 K80 persistent first-boot probe storage
+
+The isolated probe storage constructs the vote owner, HFI interrupt binding, F2H thread and HFI tail. One retained receiver supplies both the interrupt binding and worker thread. The probe checks that the AO and F2H receivers share the actual backend, scheduler gate and debug consumer before preparing votes or publishing either slot.
+
+Thirteen affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The actual Darwin platform owner, concrete receiver and reporting sinks, CommandDB input and full target link remain open. [Evidence](evidence/gpu-gen7-firstboot-probe-storage-2026-11-06.json).
+
+
+### 2026-11-06 K80 persistent HFI START construction
+
+The isolated first-boot storage now constructs the cold HFI prefix, initial and pre-core features, context and post-core controls, START and warmboot recording on the same backend. START takes the actual counter and allocation services. The same recorded START feeds the retained F2H tail.
+
+Six affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The stock core advertises hardware fence. Fresh registration requires an actual provider and queue owner when firmware enables context queues. The actual Darwin platform owner, CommandDB capture and full target link remain open. [Evidence](evidence/gpu-gen7-firstboot-hfi-construction-2026-11-06.json).
+
+
+### 2026-11-06 K80 shared early and START GMU resources
+
+The isolated HFI storage binds its warmboot scratch to the early owner's actual GMU init backing cell. Its START allocator uses the existing registry-bound constructor and shares the startup backend, gate and dynamic reservation ledger. The probe checks those bindings before preparing the vote tables.
+
+Three affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The actual early GMU domain, Darwin owner, CommandDB capture and full target link remain open. [Evidence](evidence/gpu-gen7-firstboot-shared-gmu-resources-2026-11-06.json).
+
+
+### 2026-11-06 K80 persistent Darwin first-boot host
+
+The isolated host constructs the backend, early GMU preparation and resource registry in dependency order. Its HFI probe storage binds those same resources and the host's empty startup slots. Probe admission reuses the full existing boot and registry identity check before preparing votes.
+
+Six affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. A real Darwin platform root still supplies and retains the board data, mappings, gates, receiver, resource owners and CommandDB snapshot. Full target linking and device qualification remain open. [Evidence](evidence/gpu-gen7-darwin-firstboot-host-2026-11-06.json).
+
+
+### 2026-11-06 K80 Darwin host scheduler and IRQ composition
+
+The isolated host constructs the HWSCHED scheduler using the caller's actual locks and operations. The probe storage constructs the AO receiver. Before vote preparation, the probe checks the same startup gate, scheduler and debug consumer. It publishes the AO, HFI and vote slots under the existing gate after successful vote preparation.
+
+Thirteen affected iOS 17 objects and the 189-input relocatable reference passed with unchanged imports. The real platform caller, scheduler operations, reporting sinks, IRQ provider routes, CommandDB input and full target link remain open. [Evidence](evidence/gpu-gen7-darwin-host-irq-graph-2026-11-06.json).
+
+
+### 2026-11-06 K80 persistent Darwin AOSS channel composition
+
+The isolated AOSS transport constructs its channel, deferred delivery, IPCC parent and ArmCpu summary. It validates the caller's reserved AOP entry and existing shared table before allocating the deferred action. The open entry requires release of the registration gate and returns a channel only after the existing protocol reports establishment.
+
+One affected iOS 17 object and the 189-input relocatable reference passed with unchanged imports. The retained ArmCpu route enables immediately. The actual AOSS root and the distinct AO/HFI disabled interrupt providers remain open, along with CommandDB and the complete target link. [Evidence](evidence/gpu-gen7-darwin-aoss-owner-2026-11-06.json).
+
+### 2026-11-13 K80 QTB/RSC startup full-link checkpoint
+
+The v65 candidate now carries a coherent StartupOwner, CommandDB resource reader, RSC controller and BoardOwner resource route. The ARC upstream continuation preserves the actual resource-reader route when the owner was created from captured resources, and otherwise reuses the retained parsed snapshot. This resolves the earlier bridge/startup undefined calls without introducing success stubs.
+
+All 44 candidate C++ translation units compiled successfully. The complete 1,397-input kernel linked with exit 0 and zero undefined symbols. The output kernel is 30,474,792 bytes (SHA-256 `0f19ae8ec9cd402f1fb73d6234266ca781d4c84ec4649531f69e31a54eaf6c8f`); the 10,796,496-byte map is recorded with the evidence. The linker emitted ten inherited segment-order/alignment warnings. The final 174-file candidate source tree is byte-identical to the preserved v64 source tree; this checkpoint establishes a coherent full link, not new hardware ownership.
+
+The candidate remains unselected, unpackaged, and unbooted. No device access or register writes occurred. The maintained OS/board startup still does not construct the actual direct-ring GPU/MMU authority inputs; whole-GPU producer-stop/GMU scheduler ownership and independent SMMU mapping/page-table ownership remain open. QTB's TBU ACK does not prove those conditions. GPU execution, DMA, GMU/HFI operation, Metal rendering, and display output from the GPU are not qualified. FT3683 work is paused per user direction.
+
+[Evidence](evidence/k80-gpu-v65-full-link-2026-11-13.json)
+
+### 2026-11-13 K80 Gen7 GMU idle and GBIF halt path
+
+The isolated v66 candidate now performs the pinned Gen7 GMU idle check, then requests GBIF client halt and arbitration halt in order and waits for both hardware acknowledgements. It keeps the bus halted through the QTB/SMMU context and peer-stream writes and readback, rechecks idle, and only then clears the halt and verifies both ACK bits are clear. Every polling loop is bounded. Any failed or uncertain step stops the sequence and retains the maps and resources; a failed clear attempts to restore arb halt. The existing MMIO admission and observation callbacks remain mandatory.
+
+This uses the pinned OnePlus SM8650 `adreno_gen7_gmu.c` / `gen7_reg.h` source at commit `453d8875f815bf9dfad9035982861226a4823a6c`. Two changed translation units compiled successfully with the same three warnings each as v65. The 1,397-input full link succeeded with zero missing inputs and zero undefined symbols; the 10 linker warnings are the inherited segment-order/alignment set. The linked image SHA-256 is `10ea8283561553eb6a5d77adb98dbe04ddfb7b17aa207e0066bdfdaa8da471fd`.
+
+This remains an offline, unselected candidate: no package, boot, device access, GPU execution or Metal output. The maintained OS/board startup still lacks the real ownership provider and caller. The SMMU table and Direct VM map/unmap owners are present in the candidate, but their runtime map transactions do not yet have a reusable GBIF halt lease at this checkpoint; v67 addresses that narrower lifecycle gap. The CPU-rendered lock-screen milestone remains separately recorded; FT3683 work stays paused.
+
+[Evidence](evidence/k80-gpu-v66-gmu-idle-gbif-halt-2026-11-13.json)
+
+### 2026-11-13 K80 runtime SMMU mapping lease
+
+The v67 offline candidate extends the v66 GMU-idle and ordered GBIF client/arbitration halt from initial SMMU startup to live Direct VM map and unmap operations. The maintained HostRing caller drains tracked direct submissions and confirms ring idle before BO map/free, then enters the SMMU domain gate. Each Direct VM route verifies the active context and streams, acquires the bounded GBIF halt/ACK sequence, updates the live table and waits for TLBSYNC, revalidates the route, and releases the bus only after success. The GBIF result can be reused only after a verified release; failed or uncertain halt/release remains terminal. Map now refuses while that VM has any unretired submission resources; unmap already had that check. Both the host runtime VM and per-process VMs use the owner callbacks. Failed table or release operations fault the owned stream and retain/quarantine the affected backing.
+
+Eight affected translation units compiled successfully, including the changed Direct VM, SMMU domain, register-map, HostRing, process-table, submit/client consumers. The 1,397-input full link succeeded with no missing inputs and zero undefined symbols. The ten linker warnings exactly match v66; four compile units retain three narrowing warnings from the existing `HoujiFullHostNativeMemory.h`. The unselected kernel image is 30,517,608 bytes (SHA-256 `300582171cc159e7cfd031979264366a4eecdf2a34ca16094b5695d79fb01b39`).
+
+This is source/build progress only. The candidate was not packaged, selected, booted, or used to access the phone. The actual OS/board startup still does not construct `ZornGen7StartupGpuInputs26` or provide the real whole-GPU/GMU exclusion authority. GPU execution, DMA, Metal, and GPU display output remain unverified. FT3683 is unchanged and paused.
+
+[Evidence](evidence/k80-gpu-v67-runtime-smmu-gbif-lease-2026-11-13.json)
+
+### 2026-11-13 K80 GPU MMU-to-OOB map-bound start lease (v71)
+
+v69 在 GPU/GMU 一次性冷启动窗口前后重新检查真实 provider claim；v70 把窗口授权放到持有冷 GMU 时钟、TCM、安全/SCM、IRQ、健康 HFI 和 SMMU power/domain/RSC 阶段的 DarwinBoardOwner。v71 加上映射身份闭环：InactiveOwner 把同一个实际 RegisterMaps 传给 BoardOwner 的 MMU 与 OOB 路径；MMU 成功后 BoardOwner 留存 InactiveOwner/RegisterMaps，且要求 SMMU global-I/O guard 仍绑定该 maps。随后 one-shot 回调校验 map 已准备、GPU/GMU 视图已接受、provider claims 仍在，并且传入的 GPU/GMU 服务和资源描述符逐一等于该 maps 保存的原对象。
+
+RegisterMaps、DarwinBoardOwner、InactiveOwner 三个目标对象按现有 iOS26 配方编译通过；BoardOwner 首次尝试因实现单元只有前置声明而拒绝，显式包含 InactiveOwner 定义后最终编译通过。每个对象有三条 `HoujiFullHostNativeMemory.h` 的既有 narrowing 警告。v70 StartupOwner 对象保持复用。完整链接共1,397个输入，filelist 1,318项、direct input 79项，缺失0；从 v68 基线累计替换4个候选对象，链接未解析诊断0，`nm -u` 0行。内核30,509,368字节，SHA-256 `958b8f02ea07fc08fe1b8d3fbdc6de905213f5470eec64ebc3167cd466e3f218`；10条继承的链接布局/对齐警告保留。构建命令和原始日志在离线 v71 build 目录。
+
+这只是离线 owner 接线候选。链接复用了既有 root/bridge 输入；真实 iOS26 root/board 启动入口仍未构造 `ZornGen7StartupGpuInputs26` 与完整运行 owner 图。因此它不证明手机上的 provider claim、GPU/GMU 排他权、SMMU/DMA、GPU 执行、Metal 或 GPU 扫屏。未生成可启动镜像、未选中/启动候选、未访问手机分区。下一步继续补实际 root/board authority 构造与生命周期接线，再评估准确的完整构建/恢复链；FT3683 保持暂停。
+
+[候选证据](evidence/k80-gpu-v71-map-bound-start-owner-2026-11-13.json)
+
+### 2026-11-13 K80 GPU start-callback pointer snapshot ordering (v72)
+
+v71 review found the one-shot GPU-start callback read its retained parent/maps pointers outside the BoardOwner startup lock, despite those pointers being published under that lock. v72 snapshots both pointers under the BoardOwner lock, releases it before the RegisterMaps/provider identity check to avoid nested owner/map locking, then reacquires the owner lock and confirms the bindings are unchanged before checking and consuming the callback state. The retained references live for the BoardOwner epoch.
+
+The changed BoardOwner translation unit compiled under the same iOS26 recipe with three existing narrowing warnings from `HoujiFullHostNativeMemory.h` and no new diagnostics. Starting from v71, the complete 1,397-input kernel link replaced only BoardOwner; missing inputs0, linker undefined diagnostics0, and `nm -u`0. Its 10 inherited layout/alignment warnings match v71. Kernel SHA-256 `98982ef77bea728f305afd2b7b9b6574cdf12a3fdf9243b445e2a42e2c3bdc00`.
+
+The v72 artifact remains offline and unselected. The actual root/board entry still does not construct the complete `ZornGen7StartupGpuInputs26` owner graph, and provider/SMMU/GPU hardware operation, DMA, Metal and GPU display remain unverified. No package, boot or phone/partition operation occurred. Continue with source-backed root/board authority construction and lifecycle wiring; FT3683 remains paused.
+
+[候选证据](evidence/k80-gpu-v72-start-callback-lock-snapshot-2026-11-13.json)
+
+### 2026-11-13 K80 GPU/GMU provider census Recovery protection gate
+
+v73 provider-census candidate remains a separate unselected image built over the preserved CPU lock-screen kernel. The fixed builder and runner check-only preflights passed for one exact scope. During the actual fixed-runner attempt, the device was identified as `92988a43/zorn/slot a` in TWRP Recovery. GPT, the root manifest, Data header and Data metadata matched their pins, but the read-only 4 KiB root page at UNIXNU-relative LBA 6,291,712 differed (`be93aab9…` actual; `9d188737…` pinned). The runner stopped before BCB preparation or boot: 25 recorded commands were read-only, device-write commands 0, and boot attempts 0. No provider census was observed.
+
+The current stop gate remains set after this protected-page mismatch; no more device commands are allowed until the storage evidence is reconciled in a new bounded scope. The b0da41e9 CPU lock-screen kernel remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`, matching both before and after the v73 full link. This trial proves neither a new lock-screen result nor GPU, Metal, display or touch operation; GPU startup/MMIO and touch remained disabled.
+
+[Recovery gate evidence](evidence/k80-gpu-v73-provider-census-recovery-stop-2026-11-13.json) · [CPU lock-screen milestone](evidence/k80-CPU-keystore-retag-observed-2026-11-13.json)
+
+### 2026-11-13 K80 v73 root-page pin provenance review
+
+An offline comparison found that the v73 Recovery preflight's expected first-page digest came from the older 2026-11-10 platform-stage capture (`9d188737…`). Its actual read (`be93aab9…`) exactly matches the before/after page captures from two later CPU-only runs on 2026-11-12. This reconciles the mismatch as an outdated bundle pin against the last recorded stable page; it does not establish the device's present state or reach the root before/after fence comparison.
+
+The v73 stop gate remains active and its one-shot scope remains consumed. A future attempt needs a fresh bounded scope and fresh full-page Recovery protection reads. The CPU lock-screen kernel remains the immutable reference at SHA-256 `9f6474ce…a091`; GPU and touch stayed off in the stopped trial.
+
+[Pin-provenance evidence](evidence/k80-gpu-v73-root-page-pin-reconciliation-2026-11-13.json)
+
+### 2026-11-13 K80 Adreno 750 reference boundary
+
+The public Houji project is a same-SM8650 / Adreno 750 reference. Its published record separates verified GMU/HFI, memory, HWSCHED and power/microcode diagnostics from still-pending command submission, fences and Metal UI acceleration. UniXNU's GPU guide says to complete platform DMA and basic display first and to match backend/compiler support to the actual GPU generation; the public Adreno 740 code is therefore an architectural reference, not a source of K80 register, firmware, stream or board power values.
+
+For K80, continue to require actual root/provider/resource ownership before GPU activation. The v73 provider census remains unobserved because its fixed scope stopped before boot; the stop gate stays active. The CPU lock-screen kernel remains read-only and unchanged.
+
+[A750 reference review](evidence/k80-gpu-a750-reference-review-2026-11-13.json)
+
+### 2026-11-13 K80 GPU shared-parent census and early preflight (v74-v75)
+
+Continuing from the unfinished v73 GPU/GMU provider-census candidate, v74 reports whether the actual GPU and GMU services share a direct registry parent. The result is diagnostic only and does not grant MMIO or a GPU start. After the status layout changed, `ZornRootPlatform26`, `ZornGen7PlatformBoardBridge26`, and the UFS status consumer were rebuilt together to keep the caller ABI aligned.
+
+v75 uses that observed parent match as an early preflight for the existing GPU direct-start and authenticated-prefix routes. A known mismatch now returns before the startup worker is submitted. This matches the later `DarwinBoardOwner` pair check, while leaving CommandDB observation separate. The v75 kernel links 1,397 inputs with zero undefined symbols; its SHA-256 is `1c5e8ed9f21510d82ae97fc067ab3b151ee44c01d4d6c0f452b202cc2be9a3e6`.
+
+The CPU lock-screen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`. The candidates remain offline and unselected. The actual root/board path still does not construct `ZornGen7StartupGpuInputs26` or provide the whole-GPU/GMU exclusion authority; GPU MMIO, DMA, submission, fences, Metal and GPU display are not qualified. The v73 Recovery stop gate remains in force, and touch work remains paused.
+
+[v74-v75 evidence](evidence/k80-gpu-v74-v75-same-parent-preflight-2026-11-13.json)
+
+
+### 2026-11-13 K80 GPU/GMU parent identity preflight hardening (v76)
+
+v76 continues the unselected v75 branch. The shared-parent diagnostic now requires complete positive native observations for both registry entries, IOService objects, and provider parents; nonzero registry IDs; distinct GPU and GMU entry IDs; and equal nonzero parent IDs. A missing or ambiguous observation stays a refusal. This is a stricter diagnostic predicate and grants no GPU start or MMIO authority.
+
+The changed bridge compiled with three pre-existing narrowing warnings from the selected Houji memory header; the v74/v76 stderr comparison showed only the expected source-path difference. The complete 1,397-input link succeeded with zero undefined symbols. The v76 kernel SHA-256 is `3d632b05ba71a168dc4dbb5c014d106526706a58ddfb42e06e82ef20e9bb3405`. The CPU lock-screen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+The source and kernel remain offline, unselected, unpackaged, and unbooted. The v73 Recovery stop gate remains active. The maintained root/board path still does not construct complete `ZornGen7StartupGpuInputs26` authorities or provide a real all-master GPU/GMU scheduler-quiescence lease. No device commands, GPU MMIO, DMA, submission, fences, Metal, display, or touch work occurred.
+
+[ v76 evidence ](evidence/k80-gpu-v76-parent-identity-preflight-2026-11-13.json)
+
+### 2026-11-13 K80 GPU live parent identity revalidation (v77)
+
+v77 continues the unfinished iOS26 GPU branch from v76. Immediately before either direct startup API claims its one-shot preparation slot, the root platform now resolves the live `arm-io/gpu` and `arm-io/gmu` entries again. It requires each live service entry ID and provider ID to match the complete positive observation captured by the current board stage, with distinct GPU/GMU IDs and a shared nonzero provider ID. This closes the stale-snapshot gap in the identity preflight; registry identity still grants no provider exclusion, scheduler stop, MMIO, SMMU, or DMA authority.
+
+The changed root-platform translation unit compiled with zero diagnostics. The full link succeeded with 1,397 inputs (1,318 filelist entries plus 79 direct inputs), zero missing inputs, and zero undefined symbols. Its 10 linker layout/alignment warnings exactly match v76. The offline kernel is 30,548,184 bytes, SHA-256 `be07e1184cab37dfc52b3ccc004c247f55e5c61d1d3a3b67cbc8937962cb483d`. The CPU lock-screen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+Source review confirms the maintained root/board path still has no caller that constructs the required `ZornGen7StartupGpuInputs26` bundle. That bundle requires real owners and callbacks for the host/stock mapping, GPU start and MMU, register and IRQ access, CP/ZAP/bootstrap, and direct runtime; the direct runtime callbacks explicitly require current powered state and all-master exclusion. The prepared board stage is CPU-only and intentionally supplies none of these. Keep refusing direct GPU startup until a real owner graph supplies them. This candidate remains offline and unselected; the v73 Recovery stop gate remains active. No device operation, GPU MMIO, DMA, submission, Metal, display, or touch work occurred.
+
+[ v77 evidence ](evidence/k80-gpu-v77-live-parent-identity-preflight-2026-11-13.json)
+
+### 2026-11-13 K80 GPU live provider-state revalidation (v78)
+
+v78 continues the offline iOS26 GPU candidate from v77. Before direct preparation consumes its one-shot slot, the root now checks that each live GPU/GMU service and its parent still match the captured class names and open/inactive states, as well as the captured registry IDs. Missing or changed state refuses preparation. This is snapshot consistency only; it does not acquire provider ownership or scheduler/all-master quiescence.
+
+The root-platform translation unit compiled with zero warnings. The complete 1,397-input link succeeded with zero missing inputs and zero undefined symbols; its 10 linker warnings exactly match v77. The 30,548,320-byte offline kernel has SHA-256 `702fed167fad11f04e87efe71b3ae8798e77c1ccde9b137892f9bf1c0592136e`. The CPU lock-screen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+The candidate remains unselected, unpackaged, and unbooted. The maintained root still does not construct the complete `ZornGen7StartupGpuInputs26` bundle, and a real all-master GPU/GMU scheduler-quiescence owner remains missing. The v73 Recovery stop gate stays active. No device operation, GPU MMIO, DMA, submission, fence, Metal, display, or FT3683 work occurred.
+
+[v78 evidence](evidence/k80-gpu-v78-live-provider-state-preflight-2026-11-13.json)
+
+### 2026-11-13 K80 GPU open-client preflight (v79)
+
+The owner confirms the earlier K80 GPU-branch trials were real-device attempts that did not reach the iOS system lockscreen; development then switched to CPU rendering. The CPU-rendered b0da41e9 baseline later reached the lockscreen and remains a separate preserved reference. The recorded GPU hardware stages reached GPUCC/PLL and clocks, SMMU control, GMU cold clocks, and a later read-only SMMU bank/stream census; they did not start GMU firmware/HFI or reach GPU execution, submission/fences, Metal, or GPU display.
+
+v79 adds one fail-closed root preflight: if the captured live GPU or GMU service already has an IOKit client open, direct GPU preparation refuses before consuming its one-shot slot. v78's live registry identity, class-name, open/inactive-state, and parent checks still apply. This is only a best-effort software-owner conflict filter at the moment of preflight. It does not seize a provider, synchronize against a later open, establish all-master quiescence, or prove idle firmware/DMA.
+
+The changed root-platform TU compiled with zero warnings. The full 1,397-input link succeeded (1,318 filelist inputs plus 79 direct inputs), with zero missing inputs, zero undefined symbols, and the same ten linker warnings as v78. The offline kernel SHA-256 is `2cd877cb6dedfdde966fcd209096259251127d77ccc49f70be5dcf3497952c61`. The CPU lock-screen reference remains unchanged at `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v79 remains unselected, unpackaged, and unbooted. It does not clear the v73 fixed-runner Recovery stop gate. The root still does not construct the complete `ZornGen7StartupGpuInputs26` graph or supply a real all-master GPU/GMU scheduler-quiescence owner, so GMU firmware/HFI and GPU execution remain untested on this branch. FT3683 remains paused.
+
+[v79 evidence](evidence/k80-gpu-v79-live-open-client-preflight-2026-11-13.json)
+
+### 2026-11-13 K80 GPU provider-claim owner preflight (v80)
+
+v80 continues the existing iOS26 GPU branch as an offline candidate. Behind the explicit `zorn26_gpu_provider_claim=1` boot argument, the board stage can open the initially closed GPU and GMU services through one retained IOKit claimant after confirming both live services have distinct identities and a shared parent. Direct preparation rechecks those service/parent identities and states and requires the recorded claim. This excludes competing IOKit clients at that point in time; it does not stop all GPU/GMU hardware masters, establish DMA quiescence, or prove idle firmware.
+
+Five affected translation units compiled successfully: InactiveOwner, NativeBoardStage, PlatformBoardBridge, RegisterMaps, and RootPlatform. The first four retain three existing narrowing warnings each from `HoujiFullHostNativeMemory.h`; RootPlatform has no warnings. The complete 1,397-input link (1,318 filelist plus 79 direct) succeeded with zero missing inputs and zero undefined symbols. Ten inherited linker layout/alignment warnings remain. The 30,549,064-byte offline kernel SHA-256 is `51a390fffa4cf329cef74d89752b6b72b98a12d8f6169b59cd9c9b5d525af310`.
+
+The CPU lockscreen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`. v80 is unselected, unpackaged, and unbooted; it has not had a real-device test and did not start GMU firmware/HFI or GPU execution. The maintained root still does not construct `ZornGen7StartupGpuInputs26` or a real all-master GPU/GMU quiescence owner, so direct GPU startup remains fail-closed. The v73 Recovery stop gate remains active. FT3683 work remains paused.
+
+[v80 offline candidate evidence](evidence/k80-gpu-v80-provider-claim-owner-offline-2026-11-13.json)
+
+### 2026-11-13 K80 GPU provider-claim candidate retaining the CPU lockscreen path (v81)
+
+v81 takes the complete v80 link and replaces only the platform-record identity object with a new artifact tag. The full iOS 26.6.2 link still contains 1,397 inputs (1,318 filelist and 79 direct), has zero missing inputs and zero undefined symbols, and keeps all ten v80 linker diagnostics byte-for-byte. The candidate kernel SHA-256 is `5b803527c084ba30989ee010141e127bd45328b6029592f0f0819172a2db6a6f`.
+
+The separate boot package is copied from the owner-confirmed CPU lockscreen package. It retains `zorn26_cpu_presenter=1` and adds only the opt-in GPU board stage/provider claim arguments alongside the owned-clock selector. The root image (`227ba639…e32e`), ADT (`7d0e29c1…9db2d`), and FD (`1bf94507…a11ab`) are unchanged. FAT readback matches all five expected members; only the kernel and menu differ from the CPU package, and both watchdog markers remain present. The boot image SHA-256 is `d1df60c65701d5054868d7eb37d6502cfc0391fdc882a061c33ce66eba464eca`.
+
+This candidate does not start GMU firmware/HFI, submit a GPU job, or establish DMA idle or all-master quiescence. It has not been selected or booted. The owner-confirmed CPU reference kernel remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`. No new scope, ready/admission, or one-shot claim has been created; the v73 Recovery stop gate stays active pending a new fixed runner and fresh full Recovery protection reads. No touch work was done.
+
+[v81 offline candidate evidence](evidence/k80-gpu-v81-provider-claim-cpu-baseline-offline-2026-11-13.json)
+
+### 2026-11-13 K80 GPU Recovery protection requalification after v73 stop
+
+The v59/v60 entries above are actual K80 device runs: v59 reached the recorded GMU cold-clock/GPUCC and SMMU global-control prefix, and v60 read the SMMU bank/stream state. The GPU branch did not reach the system lockscreen, GMU firmware/HFI, GPU jobs/fences, rendering, Metal, or GPU display. CPU rendering later reached the lockscreen in b0da41e9; its kernel and package remain unchanged as the reference.
+
+The v73 runner had stopped before boot because its pinned root first page was stale. Three separate read-only recovery scopes reconciled the state. The first new script used the wrong relative LBA for the Data header; the second had corrected that offset but compared the current diagnostic log to the older CPU log. Those were script reference errors, not device changes. The correct layout places Data metadata at relative LBA 4194304 and the zero guard at 4194303. The current 4 KiB native log matches the known v60 capture.
+
+The third fixed-runner scope passed 54 read-only commands across nine protected ranges from TWRP. GPT, root manifest, Data metadata, root page and fences matched their CPU before/after references; the complete BCB page was stable and its tail preserved. No boot or device/partition write occurred. The host stop gate is now cleared after this requalification, but `gpu_discovery.allow_boot` remains false. v81 remains an offline, unbooted provider-claim package and does not start GMU firmware/HFI or submit GPU work. Continue building the actual root/board startup-input graph and all-master GPU/GMU quiescence owner before preparing any incremental GPU device stage.
+
+[Recovery requalification evidence](evidence/k80-gpu-v73-corrected-recovery-requalification-2026-11-13.json)
+
+
+### 2026-11-13 K80 GPU board-owned SMMU lease candidate (v82)
+
+The owner confirms the earlier GPU-branch tests were real K80 device attempts: v59 reached the recorded GMU cold-clock/GPUCC and SMMU global-control stages, and v60 read the SMMU bank/stream state. Those GPU attempts did not reach the iOS lockscreen. CPU rendering later reached the lockscreen in b0da41e9; its kernel remains the preserved reference at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v82 adds a board-owned SMMU lease path. The board owner binds authorization to its retained real GPU/GMU provider claims, mapped register resources, current power/HFI/IRQ/RSC state, and the live SMMU domain. The domain rechecks actual reserved context bank/ASID pairs, consumers, PRR state, and the real zero page. SMMU table updates now require bounded GMU-idle polling and acknowledged GBIF client/arbiter halts; uncertain paths retain the halt. The native GPU ICC QoS path also acquires the real provider before mapping or access.
+
+Ten affected objects compiled and the complete 1,397-input link succeeded with zero missing inputs and zero undefined symbols. The candidate kernel is 30,572,144 bytes, SHA-256 `06d628845bb1b9e4a2e510fa2ab07f31850e9afaa60ebe3fdd930e620f8e9034`; the ten inherited linker warnings match v80. The CPU lockscreen kernel was read back at its reference SHA and left untouched.
+
+v82 is an offline kernel only: it is not packaged, selected, booted, or tested on the device. This does not show GMU firmware/HFI, GPU jobs/fences, rendering, Metal, or GPU display. The next GPU step remains wiring the complete startup owner graph and a real all-master GPU/GMU scheduler-quiescence owner before preparing any new device stage. No touch-driver work was performed.
+
+[v82 offline candidate evidence](evidence/k80-gpu-v82-board-owned-smmu-lease-offline-2026-11-13.json)
+
+### 2026-11-13 K80 direct-runtime attach quiescence owner (v83)
+
+The historical K80 GPU trials remain the v59/v60 real-device attempts; they did not reach the system lockscreen. CPU rendering later reached the lockscreen in b0da41e9, and its reference kernel remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v83 carries the v82 board-owned SMMU lease forward. Before direct-ring VM metadata attachment, the SMMU domain now acquires the existing bounded GMU-idle plus GBIF client/arbiter halt acknowledgements. It releases that halt only after the VM and submit metadata attach succeeds; uncertain authorization, attachment, or release keeps the bus stopped. `DarwinBoardOwner` now creates the initial direct-runtime grant from its retained K80 GPU/GMU pair, held GPU-MMU lease, exact SMMU endpoint identities, completed bootstrap, and live IRQ/HFI/RSC state.
+
+Both changed objects compiled. Their three compiler warnings match v82 exactly. The full link succeeded with 1,397 inputs, zero missing inputs, zero undefined symbols, and the same ten linker warnings as v82. The 30,572,552-byte offline kernel SHA-256 is `21506bd7cf15e0fd7f851a0018fc5d685198e7c926020a8d4d32c181aa75d648`; the CPU lockscreen reference remains unchanged.
+
+v83 remains unselected, unpackaged, and unbooted. The root still does not assemble the complete `ZornGen7StartupGpuInputs26` owner graph or invoke the direct-ring route, so this is not a hardware result. No new scope, ready/admission, or claim was created; GPU rendering, Metal, GPU display, and FT3683 remain unvalidated. No touch-driver work was performed.
+
+[v83 offline evidence](evidence/k80-gpu-v83-direct-runtime-attach-quiescence-offline-2026-11-13.json)
+
+### 2026-11-13 K80 GPU direct-runtime task authority forwarding (v84)
+
+v84 fixes a callback handoff gap in the v83 board owner. When the owner creates its native-runtime grant, it now retains and forwards the supplied kernel-task and kernel-client permission callbacks with their original cookie. Each callback remains optional; an absent permission callback stays absent and returns not-ready. This preserves the caller's actual task/client authority without manufacturing a successful grant.
+
+The changed DarwinBoardOwner object compiled with three warnings, identical to v83. The complete 1,397-input link succeeded: 1,318 filelist inputs and 79 direct inputs, zero missing inputs, zero undefined symbols, and the same ten linker warnings as v83. The 30,573,752-byte offline kernel SHA-256 is `25ce3a50addf09e892b48af1a8cd4b9cf82ead14a2fd73104860b18644a7313c`. The CPU lockscreen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v84 is unselected, unpackaged, and unbooted. The maintained root still does not construct the complete `ZornGen7StartupGpuInputs26` owner graph or invoke the direct-ring route, so no new GPU task or hardware result follows from this change. Historical GPU trials were real K80 runs (v59/v60) and remain separate from this offline candidate. GMU/HFI execution, GPU jobs/fences, rendering, Metal, and GPU display remain unvalidated; touch-driver work remains paused.
+
+[v84 offline evidence](evidence/k80-gpu-v84-direct-runtime-task-authority-forward-offline-2026-11-13.json)
+
+### 2026-11-13 K80 iOS26 Metal/Turnip integration audit
+
+The local iOS26 userland GPU stack is already built offline. The K80 application-service Metal plugin links against Turnip and the Rust bridge; its plugin SHA-256 is `1115930fe4591e99c327c57293394c63c681cc0d84412fe4a27b32149983a685`, and its Turnip SHA-256 is `a767f6360d59a7d78ad9e58465413196c4569f225b80a1af43c8ceb4407a8b31`. A separate arm64e/iOS26 full-reference bundle passed static Mach-O, dyld, export, undefined-symbol, and signature checks. Those checks establish build integrity only.
+
+The userland plugin selects `ZornGen7AppIoService26` with open type `0x4147` and a live registry ID. The v84 kernel source exposes that application endpoint with NativeAdreno ABI methods and task/client admission checks, so the source-level service contract is aligned. The service is not reached from the maintained K80 root startup path: the full `ZornGen7StartupGpuInputs26` owner graph and application-execution authority are still not constructed. The full-reference metadata explicitly records `k80_board_startup_connected=false`, `hardware_verified=false`, `installed=false`, and `device_accessed=false`; the application-service plugin is also not installed or executed.
+
+There has been no new K80 GPU device test since the historical v59/v60 attempts. No GMU/HFI runtime, GPU job/fence, rendering, Metal discovery, or display result is established by these userland artifacts. The v84 kernel remains offline and unselected, `gpu_discovery.allow_boot` remains false, and the CPU lockscreen reference remains unchanged at SHA-256 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+[GPU userland Metal/Turnip audit evidence](evidence/k80-gpu-userland-metal-integration-audit-2026-11-13.json)
+
+### 2026-11-13 K80 GPU optional CPU-memory preparation prefix (v85)
+
+v85 adds an opt-in `zorn26_gpu_cpu_memory_prep=1` step after the real K80 board stage reports prepared. With the argument absent, the current CPU-rendered boot path does not create this owner or allocate its buffers. With the exact value `1`, the root retains the real `ZornGen7InactiveOwner26` (including partial failures) and calls its existing preparation method with an empty external-buffer inventory. Status reports the actual CPU page query, firmware-asset preparation, zero-page allocation/cache result, and whether the owner reached `PreparedCpuOnly`.
+
+This step is limited to CPU-owned firmware/backing preparation. It does not create GPU register maps, GPU/SMMU/IRQ permissions, a DMA lease, GMU firmware/HFI startup, GPU runtime inputs, or a submission path. The root still does not construct the complete `ZornGen7StartupGpuInputs26` authority graph or invoke direct-ring startup.
+
+The changed root and board bridge objects compiled with the retained iOS26 recipe. Each emitted the same three `HoujiFullHostNativeMemory.h` narrowing warnings. The full link succeeded with 1,397 inputs (1,318 filelist and 79 direct), no missing filelist inputs, zero `nm -u` symbols, and ten linker warnings identical to v84. The offline candidate kernel is 30,573,792 bytes, SHA-256 `33fa524120729506ec4a697d6e370915252d449fe68afe57fc5137db95fd6b7e`.
+
+The CPU lockscreen reference remains `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`. v85 is offline, unselected, unpackaged, unbooted, and not hardware-tested; `gpu_discovery.allow_boot` remains false. Therefore there is not yet a date for GPU-device verification: it becomes schedulable only after the real K80 startup authority/ownership graph is complete and the candidate passes its offline full-link gates. The historical v59/v60 attempts remain the only GPU branch hardware tests; they did not reach the lockscreen. FT3683/touch work remains paused.
+
+[v85 offline evidence](evidence/k80-gpu-v85-cpu-memory-preparation-prefix-2026-11-13.json)
+
+
+### 2026-11-13 K80 GPU provider/resource preparation prefix (v86)
+
+v86 adds a second opt-in, `zorn26_gpu_provider_resources_prep=1`, after `zorn26_gpu_cpu_memory_prep=1` has completed successfully. It passes the actual GPU and GMU device-tree nodes retained by the K80 board bridge to `ZornGen7InactiveOwner26::preparePlatformProviders`. The retained owner reports real provider reuse or nub lifecycle results, GPU/GMU resource counts, and its genuine descriptor-retention mask, including partial failures.
+
+This reaches K80 provider identity and resource-descriptor ownership, but does not map MMIO, claim exclusive hardware ownership, change power, create SMMU/IRQ/DMA permission, start GMU/GPU, or submit work. Both new arguments are absent by default. The root still does not construct the full `ZornGen7StartupGpuInputs26` authority graph or an all-master GPU/GMU quiescence owner.
+
+The root and board bridge compiled with three existing `HoujiFullHostNativeMemory.h` narrowing warnings each. The full link succeeded with 1,397 inputs (1,318 filelist and 79 direct), zero missing inputs, zero undefined symbols, and ten linker warnings matching v85. The 30,573,856-byte offline kernel SHA-256 is `554934e25d96e32209153e3646cfe6157ee504470335125685f89c307ab1e49e`. The CPU lockscreen kernel was rechecked read-only and remains unchanged at `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v86 is offline, unselected, unpackaged, unbooted, and not hardware-tested. There is still no defensible calendar date for GPU-device validation: first the root startup authority/ownership graph and quiescence gate must be completed, then the full offline link must pass for that connected path. The historical v59/v60 K80 GPU trials remain the only device tests and did not reach the lockscreen. FT3683/touch work remains paused.
+
+[v86 offline evidence](evidence/k80-gpu-v86-provider-resources-preparation-offline-2026-11-13.json)
+
+
+### 2026-11-13 K80 GPU provider claim preparation prefix (v87)
+
+v87 advances v86 to the owner path required for the next register-map stage. It resolves GPU/GMU providers from the retained native device-tree root, records both actual lookup results and descriptor capture results, then has a separate opt-in call to `prepareGpuProviderClaims` only when all four required descriptors were retained. This uses the real base-class `IOService` opens on the exact provider pair and checks that both opens remain held.
+
+The source review caught an important handoff detail: `prepareGpuProviderClaims` requires the owner’s `registryResolutionReady` state, which `preparePlatformProviders` does not set. v87 therefore uses `prepareRegistryProviders` with the actual root. This claim excludes competing IOKit clients only; it does not prove other hardware masters are idle or grant MMIO/DMA/power/SMMU/IRQ access. No register map, GPU start, or submission is connected yet.
+
+Both affected objects compiled with the same three existing `HoujiFullHostNativeMemory.h` narrowing warnings. The full link succeeded with 1,397 inputs (1,318 filelist and 79 direct), no missing inputs, zero undefined symbols, and ten linker warnings matching v86. The 30,573,856-byte offline kernel SHA-256 is `4e7a315af3339f184bf57e5066bc22a375c40189f37bf3a12dfd3dd33a394b49`. The CPU lockscreen reference remains unchanged at `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v87 remains offline, unselected, unpackaged, unbooted, and not hardware-tested. The root still lacks the actual MMIO `OperationGuard` producer, complete `ZornGen7StartupGpuInputs26` owner graph, and all-master GPU/GMU quiescence owner, so a real GPU trial is still not schedulable. FT3683/touch work remains paused.
+
+[v87 offline evidence](evidence/k80-gpu-v87-provider-claims-preparation-offline-2026-11-13.json)
+
+### 2026-11-13 K80 GPU register operation guard (v88)
+
+The root can prepare the MMIO guard after the actual GPU/GMU provider claims succeed with `zorn26_gpu_operation_guard_prep=1`. The guard checks the retained RegisterMaps borrower and its captured descriptors, including the GCC read-only view and CX_MISC map. Register access additionally requires completed mappings and a current claim. Only the SMMU aperture permits 64-bit access. The observer matches the admitted operation and write value. If the primitive never reaches its observer, later access remains denied.
+
+Three affected translation units compiled. The full link has 1318 filelist inputs and 79 direct inputs with none missing, 10 linker warnings, and zero undefined symbols. Kernel SHA-256 is `97d46e34548cc4807220fe3e5ebd725bfa9afa6c3c555eba3c70ddc56f074eb9`. The CPU lockscreen kernel digest matched `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`.
+
+v88 only prepares the guard in the root. The GPU startup input graph still needs to pass it to the mapping owner, and operations that change DMA state still need their own verified quiescence. This candidate has no boot image or hardware result.
+
+[Offline evidence](evidence/k80-gpu-v88-operation-guard-owner-offline-2026-11-13.json)
+
+
+### 2026-11-13 K80 guarded register mapping startup path (v89)
+
+The captured CommandDB worker now accepts `zorn26_gpu_guarded_maps=1` with the existing native register-maps selector. It requires the live GPU/GMU claim from the prepared board stage, then uses the exact owner handed off from that stage. After CommandDB, RSC, clock and domain preparation, it creates the v88 guard and passes it to `prepareRegisterMappings`. This branch returns after mapping and binding SMMU global I/O. The legacy CPU mapping selector without the new argument retains its previous continuation.
+
+The isolated boot package retains the CPU presenter, ADT and FD from the lockscreen baseline, and its FAT members and compressed payload were checked by readback. The newly tagged kernel linked all 1,397 inputs with zero undefined symbols. CPU baseline hashes were checked. Boot image SHA-256 is `3369fe8b74cd1069a1a6b936ff652d7faa90f5aac9079980df1cc25f2e9b863a`. The package has no device run or fixed-runner admission. It exercises the guarded mapping stage and leaves GMU firmware/HFI and GPU submission for their own stages.
+
+[Build and package evidence](evidence/k80-gpu-v89-guarded-native-maps-offline-2026-11-13.json)
+
+
+### 2026-11-13 K80 guarded register mapping record and preboot stop (v90)
+
+The v89 menu selected both userland progress and GPU board records, which the existing PID1 hook rejects. v90 keeps the CPU presenter and selects the GPU board record. The hook waits for the completed startup result and writes the actual SMMU resource and mapping return codes to the existing single log page. The decoder checks the artifact tag, CRC, freshness and mapping prerequisites. Six host decoder cases passed.
+
+The repackaged kernel linked all 1,397 inputs with zero undefined symbols. Both fixed entry points passed host-only validation, including the existing CPU root delta receipt. The v90 scope was consumed before the runner attempted to open the existing localhost ADB transport. The execution environment returned EPERM on the TCP connect. The command archive is empty and no device command, BCB write or boot occurred. The runner recorded its stop state. The consumed scope remains archived.
+
+[Build, scope and stop evidence](evidence/k80-gpu-v90-guarded-map-record-preboot-stop-2026-11-13.json)
+
+A host-only TCP connection to the same listener succeeded with escalated execution. This isolates the refusal to the default execution sandbox. The probe sent no ADB protocol, and the v90 claim and stop state remain intact.
+
+
+### 2026-11-13 K80 v91 device recovery and v92 early result fix
+
+The v91 scope passed a fresh read-only Recovery protection check after the v90 host refusal. The fixed runner submitted one transient boot. Fastboot returned success, and TWRP returned in 149.25 seconds. Before and after protection reads matched. The log page was unchanged, so no v91 PID1, guarded register mapping or GPU startup result was established.
+
+Source review identified an independent reporting defect. An early provider-claim or CommandDB intent refusal can return from the worker before the registry phase, and the existing snapshot API required that phase to have returned. v92 exposes the terminal guarded result without changing the legacy success predicate. v92 compiled, linked 1,397 inputs with zero undefined symbols, and was packaged with a fresh identity. It remains offline. The CPU lockscreen baseline was rechecked.
+
+[Device and build evidence](evidence/k80-gpu-v91-recovery-v92-terminal-result-2026-11-13.json)
+
+
+### 2026-11-13 K80 v92 and v93 Recovery results
+
+v92 returned to TWRP in 149.04 seconds with matching before/after storage protection reads and the previous log page. An object audit found that the UFS owner supplied a different record identity from the one required by the UFS core. v93 regenerated the record identity in the UFS owner, UFS core, recovery object and platform record object. The full link and package readback passed with zero undefined symbols.
+
+v93 returned to TWRP in 149.36 seconds. The protected storage reads matched and the log was unchanged. The record identity defect is fixed in v93, but the latest run does not show that the PID1 checkpoint or guarded mapping was reached. v91, v92 and v93 produced the same observable outcome. Stop further boots of this diagnostic series and continue source-level startup and observation work.
+
+[Build and device results](evidence/k80-gpu-v92-v93-recovery-and-record-identity-2026-11-13.json)
+
+
+### 2026-11-13 K80 v94 root-mount observation
+
+v91 through v93 needed the PID1 EL0 hook to collect guarded mapping results. v94 uses the existing BSD hook after successful root mount and the same registered UFS device check. That hook starts a single kernel worker that samples board, submission and mapping results for up to 40 polls spaced by 250 ms. The worker records the result or the last waiting stage using the existing single log page. A root-mount record does not establish PID1 execution. The host decoder passed six cases covering root-mount records, legacy PID1 records and rejection of success without SMMU resources.
+
+The candidate linked all 1,397 inputs with zero undefined symbols, retained the CPU presenter and passed the package readback. CPU baseline hashes matched. v94 is offline and has no fixed-runner admission. A future scoped trial can distinguish failure to obtain a root-mount record from a recorded GPU board, submission or mapping result.
+
+[Source and build evidence](evidence/k80-gpu-v94-guarded-map-mount-worker-offline-2026-11-13.json)
+
+
+### 2026-11-13 K80 v94 Recovery and v95 guarded SMMU ID probe
+
+The v94 fixed scope booted once, returned to TWRP in 149.45 seconds and matched the before/after protected storage reads. The original log page remained unchanged, so the root mount and mapping are unqualified.
+
+v95 lets the guarded register maps feed the existing native SMMU ID probe after CX primary, SMMU power and runtime PM hold have returned successfully. The probe checks the exact SMMU provider and descriptor and reads only ID offsets 0x20, 0x24 and 0x28 via the admitted and observed register primitive. The option is independent of the legacy mapping-only path. v95 compiled both affected translation units and completed the full link with zero undefined symbols. Kernel SHA-256 is `407438337646395b1c131ce440dadaa759ad793853c3160bdd80b0a5cc2561b3`. The CPU lockscreen baseline digest matched. v95 has no package or device result.
+
+[Build and device evidence](evidence/k80-gpu-v94-recovery-v95-guarded-smmu-id-2026-11-13.json)
+
+
+### 2026-11-13 K80 v96 guarded SMMU endpoint reservation
+
+After a successful guarded SMMU ID probe, the separately selected endpoint reservation invokes the existing native allocator for the actual DT consumers. Its held-PM and provider-checked 32-bit read path admits only the global state, 24 SMR/S2CR entries and 22 context-bank status offsets needed by that allocator. The allocator checks observed geometry and rejects active or conflicting bank/stream state before reserving software bank/ASID slots. This stage neither programs context registers nor activates a stream.
+
+The two affected units compiled and the kernel linked all 1,397 inputs with zero undefined symbols. CPU baseline SHA-256 matched. This version is unbundled and unbooted. The last device run remains v94, which returned to TWRP with protected pages unchanged and no new log. Remaining dependencies include a conclusive device startup record, the context view guard and authority for changes to live SMMU and DMA state.
+
+[Offline evidence](evidence/k80-gpu-v96-guarded-smmu-reservation-offline-2026-11-13.json)
+
+
+### 2026-11-13 GPU handoff before CPU lockscreen work
+
+Resume from the v96 guarded SMMU endpoint reservation candidate and its pinned full link. The latest hardware evidence is v94: automatic TWRP return, matching protected pages and no fresh root-mount or GPU mapping record. The v96 reservation has no hardware result. Atomic SMMU callbacks run with local IRQs masked and cannot reuse the sleepable register guard. Context views, DMA exclusion and GMU/HFI still need implementation or hardware evidence. Per owner direction, work now shifts to FT3683 and eight-core verification on the CPU lockscreen branch before resuming GPU.
+
+The owner accepted the CPU milestone on 2026-11-13. On the separate no-Home candidate 996ff287 the owner reached the desktop and opened Settings. Two XNU samples confirmed accounted work on all eight cores, and FT3683 continued polling. The owner reported a return to the lockscreen when interacting inside Settings and deferred that investigation. The original b0da41e9 CPU lockscreen build is retained. Resume GPU from v96 using the CPU acceptance evidence as a reference. [CPU desktop milestone](evidence/k80-ios26-cpu-desktop-touch-eightcore-milestone-2026-11-13.json)
+
+### 2026-11-13 GPU v97 on the CPU desktop baseline
+
+v97 carries the verified no-Home ADT, FT3683 continuous acquisition and XNU per-core sampling. The GPU root platform object was rebuilt against the current desktop root digest after the first merge rejected the older embedded digest. The full 1,397-input kernel and loader checks passed. [Candidate](evidence/k80-gpu-v97-cpu-desktop-candidate-2026-11-13.json)
+
+The K80 showed the CPU-rendered lockscreen with a Home indicator at 102 seconds and returned to TWRP after 332.7 seconds with seven matching protected storage samples. The fresh joint record shows eight online CPUs, work accounted on all eight and 1,251 FT3683 frame-read calls with the polling worker still active. Guarded GPU register mapping returned zero. The SMMU probe returned kIOReturnExclusiveAccess before endpoint reservation. The native power stage already holds the controller's exclusive IOService client, and the probe attempted a second open with a different claimant before reading ID registers. [Hardware evidence](evidence/k80-gpu-v97-cpu-desktop-observed-2026-11-13.json)
+
+v98 uses the existing live controller claim retained by runtime PM and checks the original provider, power reference and startup gate through the established nativeHeldFor API. It retains the v83 domain implementation used by v97, including its runtime endpoint binding API. Full link and loader parsing pass. The next device stage checks whether the probe reaches ID reads and whether the existing endpoint allocator completes. [v98 candidate](evidence/k80-gpu-v98-smmu-claim-candidate-2026-11-13.json)
+
+### 2026-11-13 GPU v98 hardware result
+
+Boot 93560bfe passed guarded GPU register mapping, the native SMMU capability probe and endpoint reservation. Each returned success. Reusing the held controller claimant resolved the v97 exclusive-access failure. XNU accounted work on all eight cores, FT3683 was still polling with 1,251 returned frame reads, and the owner manually unlocked into the CPU-rendered Home Screen. A camera frame at 189.6 seconds shows the desktop. Recovery returned automatically to TWRP after 332.3 seconds with seven matching protected storage captures. Next implement and qualify the IRQ-safe guard for the reserved SMMU context views, then DMA exclusion and GMU/HFI. [v98 hardware evidence](evidence/k80-gpu-v98-smmu-claim-observed-2026-11-13.json)
+
+### 2026-11-13 v99 SMMU context reads and v100 GMU clocks
+
+v99 built and passed on the K80. After endpoint reservation, a bounded IRQ-masked guard admitted 32-bit reads only at the SCTLR address of each of the three actual reserved banks. All three reads returned and bit M was clear. The guard is disabled at the end of the probe. The runtime context-programming path still requires its own authority. At 118.8 seconds the camera showed the CPU-rendered lockscreen. Eight cores recorded scheduled work, FT3683 remained active and the device returned to TWRP in 334.2 seconds with seven matching protected captures. [v99 hardware evidence](evidence/k80-gpu-v99-context-reads-observed-2026-11-13.json)
+
+v100 adds the existing K80 direct first-boot GMU clock caller after successful context reads. The record carries both the Darwin return and the source result. Full link, loader parse and five parser controls passed. [v100 build evidence](evidence/k80-gpu-v100-gmu-clocks-candidate-2026-11-13.json)
+
+v100 returned a fresh device record with the K80 direct first-boot GMU clock caller and its source return both successful. Guarded mapping, SMMU reservation and context reads also succeeded. Eight cores accounted work and FT3683 continued polling. TWRP returned in 332.3 seconds with seven matching protected captures. This qualifies the clock caller; GMU firmware execution and HFI remain pending. [v100 hardware evidence](evidence/k80-gpu-v100-gmu-clocks-observed-2026-11-13.json)
+
+The v101 offline carrier e9ad2d46 connects the retained K80 CX timer helper after the verified GMU clock caller and AHB source step. It checks the held SMMU PM reference, exact retained maps and provider claims, CM3 reset and GX off before seeding the timer. Full 1,397-input link and loader parsing passed. Hardware execution remains pending.
+
+UART assessment: K80's OEM source selects the Qualcomm GENI debug UART at 115200n8. The current XNU console selector has no GENI backend, and the host exposes no identified K80 UART adapter. A separately validated TX-only console would help recover pre-UFS and watchdog failure stages. Keep the fixed Recovery page as the reproducible result and emit only bounded summaries outside IRQ, MMIO polling and ownership locks. [UniXNU log capture](https://unixnu.com/zh/porting/log-capture)
+
+### 2026-11-14 v101 CX timer and GPU log capture
+
+Candidate e813d8cf reuses the K80 CDC backend qualified with both PHY reference clocks enabled. After persisting the normal CPU, FT3683 and GPU checkpoint, its worker sends the GPU suffix over bounded bulk IN. The compact UFS record keeps the existing 512-byte text field. Mac captured 155 bytes and the fixed runner matched them byte for byte to the GPU suffix from the same boot after Recovery.
+
+Guarded SMMU context reads and endpoint reservation, GMU clocks and AHB source preparation passed. The CX timer helper returned success with 16 samples and the seed-write assessment. This establishes the helper's execution. GMU firmware execution and HFI remain pending. All eight cores recorded accounted work, FT3683 remained in continuous polling and TWRP returned in 332.43 seconds with all seven protected samples unchanged. [Hardware and CDC evidence](evidence/k80-gpu-v101-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v102 CPU-side firmware preparation
+
+Candidate 099abb9a selects the existing K80 CPU memory preparation owner with the pinned firmware assets object. Its CDC checkpoint matched all 154 bytes reconstructed from the fresh UFS page. The CPU page query returned 16 KiB, firmware graph preparation and code both returned zero, and the initial CPU zero page was prepared. GMU clocks, AHB and the CX timer remained successful. This stage covers CPU-side firmware preparation. The retained direct-ring seed requires the SMMU root pages, sparse arenas and GMU context image before it can install the firmware ranges into inactive tables.
+
+TWRP returned after 332.08 seconds with all seven protected samples unchanged. No firmware authentication or GMU execution was attempted. [Hardware and CDC evidence](evidence/k80-gpu-v102-firmware-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v103 and v104 inactive GMU context
+
+v103 reached the root-page allocator, which returned `0xe00002d8`. The read-only SMMU probe had verified all three reserved banks, but the allocator required the flag for programmable context views. [v103 evidence](evidence/k80-gpu-v103-tables-cdc-observed-2026-11-14.json)
+
+v104 records successful probe verification separately and lets the CPU-only allocator consume it. The register guard and runtime context-programming checks are unchanged. The real root-page, sparse-arena and GMU context-image operations all returned zero on K80. The 115-byte CDC record matched the fresh UFS checkpoint. TWRP returned in 332.47 seconds, and all seven protected storage samples matched. This leaves the hardware context unprogrammed. The next step is to use the retained CPU firmware inventory to seed the direct-ring ranges into these inactive tables. [v104 evidence](evidence/k80-gpu-v104-inactive-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v105 direct-ring firmware mappings
+
+Candidate eddff74c reuses the startup owner's prepared firmware inventory and selects the existing direct-ring seed entry for the pinned K80 firmware. The seed verifies the copied bytes, prepares five firmware mappings and two boot-buffer ranges, and audits the resulting inactive GMU page tables. The following hold operation publishes the five firmware backings and retains their device references. Both returned zero in the K80 run. The 120-byte CDC line matched the UFS record exactly. TWRP returned in 332.79 seconds, with seven protected storage samples unchanged.
+
+The next hardware dependency is GMU fault IRQ and stream ownership under the retained SMMU PM reference. Context programming, authentication and GMU/HFI execution remain pending. [v105 evidence](evidence/k80-gpu-v105-seed-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v106 masked SMMU global fault IRQ
+
+Candidate afde2af0 binds the existing global-fault register view after the firmware backing holds succeed. The K80 configuration readback returned, and the native owner registered INTID 705 while keeping it masked. The Mac received 130 bytes over CDC, matching the fresh TWRP UFS checkpoint byte for byte. All eight cores accounted work, FT3683 continued polling, and TWRP returned automatically in 334.38 seconds with seven matching protected samples. Global fault reporting, stream and context programming, firmware authentication, and GMU/HFI execution remain pending. [v106 evidence](evidence/k80-gpu-v106-irq-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v107 active global fault control
+
+Candidate c5579b81 reused the native global fault owner with a guarded map. Global TLB synchronization completed on the first status read. GFSR was zero. CR0 returned `0x002f0406` after the driver requested `0x002f0436`, so the driver stopped before arming INTID 705. The Mac's 162-byte CDC line matched the fresh UFS record. TWRP returned in 332.70 seconds with seven matching protected samples. The earlier K80 v59 candidate used `0x06` for GFRE/GFIE and preserved configuration fault bits 4 and 5. The v108 candidate restores that mask for the active native path and keeps exact readback. [v107 evidence](evidence/k80-gpu-v107-active-cdc-observed-2026-11-14.json) · [v59 evidence](evidence/k80-native-SMMU-global-fault-control-observed-2026-11-13.json)
+
+### 2026-11-14 v108 global SMMU fault reporting
+
+Candidate 58213ac1 completed active global fault control on K80. CR0 started and ended at `0x002f0406`, with GFRE/GFIE already set. Global TLB sync completed on the first status read, GFSR was zero, and the existing checked GIC enable path armed INTID 705. The historical masked-registration flag records the earlier step. The test observed no delivered fault. Mac captured 156 bytes and verified the same GPU checkpoint in the fresh UFS page. TWRP returned after 333.93 seconds with seven matching protected samples. Eight cores accounted work and FT3683 continued polling. The CPU presentation baseline remains archived. [v108 evidence](evidence/k80-gpu-v108-global-cdc-observed-2026-11-14.json)
+
+The K80 source device tree assigns the GMU stream SID `0x5`. The original SMMUv2 driver chooses the context fault IRQ index from the actual allocated bank. The next stage needs the selected bank's IRQ and an atomic register-access scope tied to that bank and the retained controller. The current three-bank SCTLR probe still grants only bounded reads. Context IRQ delivery, stream programming, firmware authentication and GMU/HFI execution remain pending.
+
+### 2026-11-14 v109 GMU context fault IRQ
+
+Candidate 69782a35 rechecks the reserved GMU bank and stream table under the retained controller claim. Its atomic read scope exposes only the selected bank's FSR to the fault handler. On K80 the reserved bank was 2, the corresponding native device-tree interrupt was SPI 679 / INTID 711, and FSR was zero. The GIC registration returned `0xe00002ca` after the distributor availability check and before masked registration could be confirmed. The Mac matched 173 CDC bytes to the fresh UFS record. TWRP returned after 332.79 seconds, with seven matching protected storage samples. [v109 evidence](evidence/k80-gpu-v109-context-irq-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v110 GMU context IRQ registered masked
+
+Candidate 01d42c4a routes the validated bank 2 / INTID 711 pair to the boot CPU through the existing GIC masked-registration primitive. Trigger configuration, route, mask, and nonsecure group readbacks all matched. The original v109 GIC failure has no per-register record, so its exact failed readback remains unknown. The Mac's 156-byte CDC capture matched the fresh UFS page byte for byte. All eight cores accounted work and FT3683 remained in continuous polling. TWRP returned after 332.86 seconds with seven matching protected samples. The UFS checkpoint omits the already qualified CPU firmware-preparation summary to fit the GIC observations. The CPU lockscreen baseline remains archived. The next dependency is a scoped write path and ownership for the blocked GMU stream and selected context bank. [v110 evidence](evidence/k80-gpu-v110-gmu-route-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v111 blocked GMU stream entry
+
+Candidate 6396d326 uses the retained controller claim, startup lock and actual SMR/S2CR scan to select an invalid slot for the exact GMU SID `0x5`. Its thread-scoped atomic guard admits the fault-type S2CR for the selected bank and the invalid SMR for SID 5, in that order. On K80, slot 0 accepted both writes and passed both immediate and final readback. INTID 711 remained registered masked, and the context bank stayed disabled. Mac matched 159 CDC bytes to the fresh UFS checkpoint. Eight cores accounted work, FT3683 continued polling and TWRP returned in 332.79 seconds with seven matching protected samples. The next stage applies ACTLR and programs the selected context with the stream blocked. [v111 evidence](evidence/k80-gpu-v111-stream-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v112 GMU context programming
+
+Candidate 4f35769c verifies the blocked stream, arms INTID 711 and admits image-bound writes to the actual GMU bank only. The common programmer returned phase 5 with completed TLB synchronization, a valid readback and the bank enabled. The board's exact comparison returned `0xe00002d8`. Stream slot 0 remained invalid and the driver retained the context tables. The Mac matched 168 CDC bytes to the fresh UFS page. TWRP returned in 332.47 seconds with all seven protected samples matching. [v112 evidence](evidence/k80-gpu-v112-bank-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v113 K80 context readback differences
+
+Candidate 1e144157 repeated the exact comparison while recording the differences covered by the common validator. The actual native, unswitched GMU context set TCR2.TBI0/TBI1 (XOR `0x60`) and cleared SCTLR.ASIDPNE (XOR `0x1000`). The common validator checked the remaining fields and returned phase 5. The exact board comparison still stopped startup, so stream slot 0 stayed invalid. The 168-byte CDC record matched UFS and the phone returned to TWRP after 332.62 seconds with seven matching protected samples. [v113 evidence](evidence/k80-gpu-v113-readback-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v114 GMU context programming passed
+
+Candidate 0d6c973c admits the two observed one-direction changes for the native K80 bank 2, SID 5, unswitched lower-region context. Every other field still requires exact readback. ACTLR, bounded TLB synchronization, context readback and bank enable passed. INTID 711 was armed during bank programming. Stream slot 0 stayed invalid and the firmware remained unstarted. The Mac matched 161 CDC bytes to the fresh UFS checkpoint. All eight cores accounted work and FT3683 continued polling. TWRP returned after 332.79 seconds and all seven protected samples matched. The next stage activates the owned GMU stream under checked reset and power conditions, followed by firmware loading and GMU/HFI. [v114 evidence](evidence/k80-gpu-v114-bank-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v115 early recovery during GMU stream trial
+
+Candidate 5486afca added guarded reads of CM3 reset and GX status before and after the existing stream activation routine. The phone returned to TWRP in 90.13 seconds. UFS kept the previous log page and the Mac received no CDC bytes. All seven protected samples matched. Recovery's pstore was empty and the fixed crash-log paths were absent. The exact return cause and whether either stream write ran are unknown. [v115 evidence](evidence/k80-gpu-v115-activation-early-recovery-2026-11-14.json)
+
+### 2026-11-14 v116 GMU reset and GX observation
+
+Candidate 0ca074fa keeps the GMU stream invalid and checks CM3 reset and GX status through the guarded map after bank programming. Both reads returned. CM3 reset was asserted and GX power and clock were off. The checkpoint moved to 45 seconds after PID 1. The Mac matched 166 CDC bytes to fresh UFS. TWRP returned in 332.63 seconds with seven matching protected samples. This qualifies the pre-activation reads. [v116 evidence](evidence/k80-gpu-v116-reset-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v117 GMU S2CR translation with SMR invalid
+
+Candidate f7990676 verifies the reset and GX admission, then checks the blocked slot and both fault paths. The atomic guard permits S2CR only. On K80, slot 0 returned the expected translation S2CR for bank 2, and SMR read back as `0x5` with the valid bit clear. Both fault checks returned clean. The Mac matched all 166 CDC bytes to fresh UFS and TWRP returned in 332.83 seconds with seven matching protected samples. The next stage needs independent evidence around the SMR valid write and the subsequent context, fault and power checks; the v115 reset point remains unknown. [v117 evidence](evidence/k80-gpu-v117-s2cr-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v118 GMU SMR valid readback
+
+Candidate 659c8308 keeps the validated v117 S2CR and writes SMR only after the PID 1 worker's single UFS checkpoint matches its write. The deferred owner rechecks controller ownership, CM3 reset, GX, both faults, the active context image and the exact slot before the write. On K80 slot 0 read back SMR `0x80000005` and S2CR `0x302`. Context image, fault status and reset/GX checks passed again and the CDC suffix was `m=7`. The base CDC line matches the pre-write UFS page; the post-write suffix is CDC-only. TWRP returned after 332.83 seconds with seven matching protected samples. Actual GMU DMA and the reason for v115's earlier recovery remain unobserved. The deferred trial verifies hardware routing while the existing stream owner's activation state still needs to be connected before the TCM loader can use it. [v118 evidence](evidence/k80-gpu-v118-valid-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v119 and v120 GMU TCM load and readback
+
+The v119 boot argument string was 1039 bytes, beyond DarwinBoot's 1023-byte limit. It returned to TWRP after 33.07 seconds with matching protected samples and no fresh diagnostic page. The loader's source rejects that length before handoff. The run supplied no direct loader log. v120 combines the two controls in `zorn26_gmu_deferred_valid=2`, returns to 1017 bytes and checks the length in the packer. [v119 evidence](evidence/k80-gpu-v119-tcm-early-recovery-2026-11-14.json)
+
+Candidate d0f1a640 uses the real stream owner's activation routine from the deferred checkpoint. That owner verifies the already staged S2CR, rechecks the other slots, writes the SMR valid bit and verifies the owned active slot. The reset-held loader then copies the pinned firmware to ITCM/DTCM, reads version words and captures the ITCM shadow. The candidate compares every supplied TCM payload word with the corresponding hardware readback and rechecks reset, GX, ownership and fault status. The K80 reported `m=10` over CDC, confirming the full path. The pre-operation CDC body matched the fresh UFS page, and the completion suffix arrived over CDC. All seven protected samples matched after TWRP returned in 332.86 seconds. Firmware execution remains pending with CM3 in reset. [v120 evidence](evidence/k80-gpu-v120-tcm-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v121 and v122 GMU handoff for CX security
+
+v121 repeated the reset-held TCM payload check and emitted stage 12. The board callback called the ordinary entry guard while the SMMU domain already held the shared startup lock. That guard rejects held-lock entry. The device returned to TWRP in 332.44 seconds. [v121 hardware evidence](evidence/k80-gpu-v121-cx-cdc-observed-2026-11-14.json)
+
+v122 checks the callback with the startup lock held and requires the exact SMMU domain, retained clock and timer state, and the absence of faults. The handoff published the TCM completion and five hardware-read DTCM version words to the board owner. It resolved the live GPU and SCM nodes, checked the SCM compatible bytes and validated the Gen7.9.1 feature mask. CDC reported stage 16 and matched the pre-operation UFS checkpoint. The device returned to TWRP in 332.48 seconds. In both trials all seven protected storage samples matched. v122 ended before any CX SCM call or CM3 release. [v122 hardware evidence](evidence/k80-gpu-v122-cx-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v124 native CX SCM return
+
+The board supplies the exact GPU and SCM entries, active SMMU runtime-PM claim, retained CX regulator use and register-map provider claims to the existing SCM owner. The native CX sequence shares the normal SCM gate with the four legacy C callers and Houji ADSP. Their object hashes in the linked kernel match the previously built coordinated implementations. The preserved independent watchdog and PSCI uses are fast calls.
+
+The direct-ring operation runs after the TCM handoff and before PDC/RSC. The existing owner resolves the calling convention, checks service availability and issues the source-derived request 0xb. v124 returned stage 20 with raw x0 equal to zero. The 190-byte CDC record matched the UFS checkpoint prefix. TWRP returned after 332.83 seconds with seven matching protected samples. GMU IRQ configuration, GMU firmware execution, ZAP authentication and HFI remain separate stages. [v124 hardware evidence](evidence/k80-gpu-v124-cx-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v126 masked GMU IRQs and register configuration
+
+On K80, candidate `4eed9d72` returned `m=24,s=0000000000000000,j=80013f0080013f00`. Both GIC registrations (INTIDs 336 and 337) returned zero, matched the boot-CPU route and read back as masked level interrupts. The board completed GMU register configuration and rechecked CM3 reset, GX and the active, fault-free GMU SMMU stream. The 209-byte CDC capture matched the fresh pre-operation UFS checkpoint body. TWRP returned after 331.79 seconds, with seven protected samples matching and the complete pre-boot BCB page verified. [v126 evidence](evidence/k80-gpu-v126-irq-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v127 direct HFI receiver bound with CM3 held in reset
+
+Candidate `b4544759` reused the masked GMU IRQ workloop and the direct HFI receiver. The deferred board callback held the startup gate and SMMU read scope throughout the stream, fault and sparse-map checks. The receiver validated the three retained CPU-visible queues before binding. The K80 returned `m=26` with both SPI readbacks unchanged, reset still asserted and GX still off. The 209-byte CDC capture matched the fresh pre-operation UFS body. TWRP returned after 331.85 seconds and seven protected samples matched. Firmware queue compatibility, the HFI handshake and firmware execution still require device evidence. [v127 evidence](evidence/k80-gpu-v127-hfi-bind-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v128 K80 interconnect inputs and voter binding
+
+Candidate `f4d14321` returned `m=28`. The existing ICC owner resolved the actual K80 GPU, GEM NoC and MC-virt nodes, validated the DDR and GPU power-level inputs, bound the GCC clock consumer, and prepared the CommandDB/RPMh voter using the retained RSC owner. CM3 remained in reset and both GMU interrupt lines remained masked. The CDC body matched fresh UFS. TWRP returned after 332.77 seconds with seven matching protected samples. The v128 capture script reported the HFI boolean only at stage 26. Stage 28 includes that stage, and the evidence records the cumulative result. [v128 evidence](evidence/k80-gpu-v128-icc-bind-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v129 initial K80 RPMh votes
+
+Candidate `e2e834e3` executed the existing K80 ICC voter's initial keepalive/early operation in the locked board startup path. It checked the returned source status, retired the CPU links and domain barrier, and confirmed that the RSC owner remained usable. CDC reported `m=30` with SCM return zero and both masked GMU SPIs. Its 209-byte capture matched the fresh UFS checkpoint body. TWRP returned after 334.37 seconds with all seven protected samples matching. The GMU remained in reset. [v129 evidence](evidence/k80-gpu-v129-icc-initial-cdc-observed-2026-11-14.json)
+
+The next active dependency is GEM NoC QoS. The existing bootstrap-bandwidth path requires a completed QoS recommit. The pinned K80 Linux driver maps the GEM provider register resource, applies proxy votes, enables the DT-supplied clock, programs the per-port registers and recommits normal votes. The retained Darwin backend implements these operations and requires a programming-window owner. The 16-entry source table includes shared system, display and PCIe paths. The existing exclusive IOService open verifies software ownership of the provider; the programming-window callback still needs an implementation grounded in the shared fabric's register ownership and power conditions. [K80 Linux ICC source](../../zorn-kernel/drivers/interconnect/qcom/icc-rpmh.c) · [Native QoS backend evidence](evidence/k80-native-GEM-QoS-backend-2026-11-11.json)
+
+The source review also identified a GMU IRQ enable error propagation gap. XNU's void `IOInterruptEventSource::enable()` discards the provider's status. The offline correction latches a provider refusal before the arm caller checks the IRQ owner; the existing failure path then masks both sources. The affected driver object compiled against the v129 recipe. This correction is staged for the first IRQ-enable candidate.
+
+### 2026-11-14 v130 GEM NoC QoS readback
+
+The existing K80 voter acquired its QoS proxy vote and enabled the source GCC clock. With CM3 held in reset, candidate `32b7d1b4` mapped the actual GEM NoC provider, read each of the 16 pinned QoS ports and compared the priority, urgent and forward-disable fields. CDC returned `m=31,q=ffff20e0`. Every port was readable and four matched. The candidate left the QoS registers untouched and stopped GPU startup. The 220-byte capture matched the pre-operation UFS body. TWRP returned in 332.04 seconds and seven protected samples matched. [v130 evidence](evidence/k80-gpu-v130-qos-readback-cdc-observed-2026-11-14.json)
+
+The v131 candidate connects the existing source-order RMW and verify path to a privately created GEM NoC service. The first hardware capture returned `m=31,q=0` before any port readback. The selected `GenericARMPE::excludeList()` reserves GCC but does not reserve GEM NoC. XNU's top-level publication calls `createNubs`, which replaces the raw registry node, attaches the new service and registers it before the deferred GPU worker. v133 extends the existing exclusion for the exact QoS-programming selection and checks the promoted service's live DT identity, provider, publication state and child count before access. It retains the original write mask and the same 16 port offsets.
+
+### 2026-11-14 v133 GEM NoC QoS programmed and verified
+
+The private GEM NoC provider ran the pinned K80 proxy vote, clock enable, per-field RMW, register readback, clock release and normal recommit. Candidate `ed704f52` returned `m=32,q=ffffffff`. All 16 observed ports matched the required fields, and both GMU IRQs remained masked while CM3 held reset. After successful completion the temporary mapping and software client were released. TWRP returned in 332.58 seconds, CDC matched the same boot's UFS checkpoint body and all seven protected samples matched. [v131 pre-readback result](evidence/k80-gpu-v131-qos-program-cdc-observed-2026-11-14.json) · [v133 evidence](evidence/k80-gpu-v133-qos-private-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v134 both GMU SPIs enabled
+
+Candidate `ea2090b1` returned `m=34,q=ffffffff,a=3`. The source interrupt-clear and mask operations returned, and the GIC enable calls read back both SPIs enabled. CM3 remained in reset, GX remained off and the SMMU tail recheck passed. TWRP returned in 332.82 seconds, the 224-byte CDC record matched fresh UFS and seven protected samples matched. IRQ delivery during firmware execution remains pending. [v134 evidence](evidence/k80-gpu-v134-gmu-arm-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v135 bootstrap bandwidth and v137 lock-screen regression
+
+v135 `7588894c` completed the K80 bootstrap ICC vote with average zero and a peak of 2136718 kB/s. Its checkpoint was `m=36,a=3,q=ffffffff`. CM3 was held in reset. The CDC and fresh UFS matched. TWRP returned in 333.75 seconds and seven protected samples matched. [Evidence](evidence/k80-gpu-v135-boot-bandwidth-cdc-observed-2026-11-14.json)
+
+v137 `7aee4f03` reproduced the GPU checkpoint and added a frame census 150 seconds after PID1. SpringBoard had a PID with no exit state observed, and BackBoard swap ends and pixel copies were both zero. Two camera frames showed console-like text, consistent with the owner's report that the lock screen was absent. TWRP returned in 334.09 seconds and seven protected samples matched. Comparing the actual linked platform source with CPU lock-screen baseline `b0da41e9` identified the missing `MiniIOSurfaceStart` and `MiniAppleKeyStoreStart` calls ahead of the CPU presenter. [Evidence](evidence/k80-gpu-v137-ui-census-cdc-observed-2026-11-14.json) · [CPU baseline](evidence/k80-CPU-keystore-retag-observed-2026-11-13.json)
+
+### 2026-11-14 v138 CPU lock screen restored in the GPU carrier
+
+v138 `19e248ea` restored both platform initialization calls in the order used by the qualified CPU baseline. It retained the v137 boot arguments, ADT, installed root and GPU source. At 150 seconds after PID1 both frame counters saturated at 255. Two camera captures at approximately 121 and 233 seconds after fastboot both show the iOS lock screen with an updating clock. The serial and fresh UFS bodies agreed at `m=36,a=3,q=ffffffff`; all seven protected samples matched after TWRP recovered in 332.37 seconds. Frame presentation was CPU-rendered and CM3 was still held in reset. [Evidence](evidence/k80-gpu-v138-ui-restore-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v139 first GMU CM3 initialization readback
+
+v139 `834de2bf` retained the v138 CPU display initialization. Its checked cold-start grant verified the board's live GMU owner and mapped descriptor, held SMMU runtime PM, enabled IRQ receiver, CX security, clocks, and reset/GX state. The one-shot reset release and bounded source poll returned `m=38,c=f0000100`, including `FW_INIT_RESULT[8:0]=0x100`. The saved UFS reset observation precedes the release. The later CDC stage records the release and poll result. The GPU body matched fresh UFS. The camera saw the CPU lock screen, both frame counters reached 255, and TWRP returned in 332.77 seconds with all seven samples unchanged. Firmware literals were checked from the compiler's actual header dependencies. This run reached CM3 init while PDC/RSC, HFI control and firmware commands remained outside its scope. [Evidence](evidence/k80-gpu-v139-cm3-ui-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v140 PDC and RSCC source stores returned
+
+v140 `21d1fca1` ran the existing guarded PDC and RSCC programmer after CM3 initialization, with the original retained GMU software flags. The serial checkpoint `m=40,p=c3130000` records 19 returned source stores with zero native status and the loaded flag. The CPU lock screen stayed visible. TWRP returned in 332.73 seconds with matching UFS and CDC payloads and seven unchanged samples. This checkpoint covers the source programming operations. The sleep/wake handshake has not been exercised. [Evidence](evidence/k80-gpu-v140-pdc-rsc-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v141 HFI control ready
+
+v141 `b99575bf` used the retained GMU register and IRQ owner to write HFI control init once. The 100 ms bounded poll returned control status bit 0. CDC `m=42,h=e0000001` matched the fresh UFS GPU body after TWRP returned in 332.79 seconds. Seven protected samples matched. Both CPU frame counters reached 255. This was the control-register stage before any HFI request. [Evidence](evidence/k80-gpu-v141-hfi-control-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v142 first matched HFI command response
+
+v142 `ab30dbb9` sent one `H2F_MSG_GET_VALUE(GMU_WARMBOOT,0)` on the three-queue direct transport. CDC returned `m=44` and the four-word ACK `0001040c/0010030c/00000001/00000000`. The second word matched the sequence-1 request, the returned value was 1, and the firmware status was 0. The live HFI minor field was 6. The real device accepted the request through the three-queue transport. The GPU body matched fresh UFS, both CPU frame counts reached 255, the camera showed the lock screen, and TWRP returned in 332.66 seconds with seven unchanged samples. [Evidence](evidence/k80-gpu-v142-hfi-query-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v143 PERF entry refused before publication
+
+Fresh TWRP reads on `92988a43` showed SoC 557 revision 2.0, feature AB, and reported pcode `0x1`. The stock selector uses effective pcode zero for external feature AB. Matching the actual Recovery FDT against the retained input preserved the ordered GPU rows, GMU frequency pairs and DDR/CNOC properties. Source selection returned suffix 3 for every representable three-bit speed fuse value. No fuse read was required. v143 `4aab9211` returned `m=45,f=e00002d8/00000000/00000000/00000000/00000000`. The existing table entry rejected the already-held startup gate before preparing or publishing the command. The next candidate admits the existing deferred board owner only after a real HFI response, PDC/RSC completion and held resources. TWRP returned in 333.92 seconds, the CDC body matched UFS, and the seven protected samples matched. [Evidence](evidence/k80-gpu-v143-hfi-perf-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v144 corrected board entry and identified the table key mismatch
+
+v144 `69b7bbda` admitted the already-held deferred board gate and reached CPU-side table preparation. Its checkpoint remained `m=45`, with `kIOReturnUnsupported` and zero command words. The exact linked generated vote-data table keys its rows by four stock vendor FDT digests. The earlier candidate supplied the digest of the handset's combined Recovery projection. The live selected bin 3 subtree, GMU frequency pairs and DDR/CNOC properties were compared directly with the compiled table's Pineapple v2 stock FDT input `b082a6b8` and matched byte-for-byte. v146 binds that stock input identity and retains the handset projection for evidence. v144 returned to TWRP in 333.64 seconds and seven protected samples matched. [Evidence](evidence/k80-gpu-v144-hfi-perf-gate-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v146 stock PERF table acknowledged
+
+v146 `e0895483` selected the exact Pineapple v2 vendor input that matched the live selected row projection. The existing CommandDB-backed vote preparer generated GX/CX rows, and the three-queue native receiver sent the HFI 2.6.1+ typed PERF payload. CDC `m=46,f=00000000/0f340203/0020340f/00000000/00000000` records a 52-dword command (ID 15), sequence 2, matching three-dword ACK and return value zero. Both CPU frame counters reached 255. The device returned to TWRP in 332.34 seconds and all seven protected samples were intact. [Evidence](evidence/k80-gpu-v146-hfi-perf-stock-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v147 bandwidth table acknowledged
+
+v147 `c02684c5` continued on the same three-queue receiver after PERF. CDC `m=48,b=00000000/03a00203/0030a003/00000000/00000000` records the complete 160-dword bandwidth command (ID 3), sequence 3, and matching three-dword ACK with result zero. Both CPU frame counters reached 255 and the GPU CDC payload matched fresh UFS. TWRP returned in 332.08 seconds and seven protected samples matched. [Evidence](evidence/k80-gpu-v147-hfi-bw-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v148 core firmware start acknowledged
+
+v148 `90780425` received matching ACKs for BCL, IFPC and `CORE_FW_START` in that order. CDC reported `m=50,k=12040000/22040000/32030000/0060020e`. The first two commands returned four words with status zero, and core start returned three words with value zero and the sequence-6 request header. The candidate retains the source ACD-off branch because it has no established GPU AOP channel. Gen7.9.1 has no CLX feature. Both CPU frame counters reached 255. The CDC body matched fresh UFS and TWRP returned in 331.99 seconds with all seven samples unchanged. [Evidence](evidence/k80-gpu-v148-hfi-core-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v149 default frequency and bandwidth votes acknowledged
+
+v149 `a8847ba2` sent the default GPU performance index and bus index selected by the bound AB table, followed by the GMU AB capability query. CDC `m=52,d=02030000/02030000/02040100/0090030c/00000001` records matched zero-result vote ACKs and AB capability value 1 with status zero. This establishes firmware acceptance of the requests. Actual running frequency and bandwidth were outside this trial's measurements. Both CPU frame counters reached 255, the GPU body matched fresh UFS, and TWRP recovered in 332.09 seconds with seven matching protected samples. [Evidence](evidence/k80-gpu-v149-hfi-dcvs-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v150 AB accepted before GPU page-table admission
+
+v150 `de2ab470` applied the post-start HLOS bootstrap unvote and the GMU average-bandwidth vote using the capability reported in the same boot. CDC `m=53,v=030002d8` shows both operations completed before the CPU page-table preparation returned `kIOReturnNotReady`. The native SMMU path has retained atomic context views and verified the banks disabled, but it deliberately leaves the flag for externally supplied writable views clear. v151 admits this native path for CPU-side table construction only, under the same held controller claim and deferred GMU verification. It leaves the atomic SMMU write guard unchanged. TWRP recovered in 332.71 seconds and all seven protected samples matched. [Evidence](evidence/k80-gpu-v150-native-gpu-tables-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v151 native USER/LPAC page tables prepared
+
+v151 `050c85f6` returned `m=54,v=07000000` over USB CDC after the bootstrap unvote, GMU AB vote and CPU-side preparation of the two independent GPU page-table roots completed. Both CPU frame counters reached 255. The CDC body matched the fresh UFS checkpoint, TWRP returned in 332.86 seconds, and all seven protected samples matched. USER/LPAC context enablement and stream activation remain pending. [Evidence](evidence/k80-gpu-v151-gpu-tables-view-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v152 preserved the lock screen with SMMU preflight code
+
+v152 `8c62ce8e` retains the two encoded GPU context images and limits its additional atomic reads to the two disabled SCTLR registers and PRR words. The camera showed the CPU lock screen about 143 seconds after temporary boot. TWRP returned in 334.37 seconds and all seven protected samples matched. This run invoked the fixed boot helper directly, so the USB CDC receiver did not capture the post-UFS preflight result. The v153 fixed CDC entry repeats the preflight and runs the reversible GBIF/QTB fence check only after it succeeds. [Evidence](evidence/k80-gpu-v152-mmu-preflight-camera-observed-2026-11-14.json)
+
+### 2026-11-14 v153 SMMU preflight passed, fence timed out
+
+v153 `3d557d1f` captured `m=57,w=000002d6` at `/dev/cu.usbmodem21201`. USER and LPAC images encoded, both reserved SCTLRs reported disabled, and both PRR reads returned. The fence returned `kIOReturnTimeout` with neither GBIF halt ACK observed and no QTB operation reached. The mapped K80 code now follows the Qualcomm idle helper's `(value & mask) == expected` rule with bit 30 as the mask. v154 adds failure-boundary bits for a qualified idle sample and each returned halt write. TWRP returned in 332.17 seconds. The CDC body matched fresh UFS and all seven protected samples matched. [Evidence](evidence/k80-gpu-v153-mmu-fence-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v154 idle timeout isolated to the pre-GBIF poll
+
+v154 `9aa6e624` returned `m=57,w=000002d6` using the source bit-30 mask. The new boundary bits show that the idle poll failed before either GBIF halt write returned. Qualcomm cold boot calls `kgsl_mmu_start` before the GX OOB request and HFI START. v155 instead checks hardware GX-off status on both sides of the real QTB fence for the cold-start path. The live-runtime GBIF routine retains its source-correct idle mask. v154 recovered to TWRP in 332.41 seconds with matching CDC/UFS and seven unchanged protected samples. [Evidence](evidence/k80-gpu-v154-mmu-idle-mask-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v155 cold GX readback passed and exposed the missing QTB node
+
+v155 `a4adc551` reported `m=59,w=010002f0`. The GX clock and power-off readback passed. QTB lookup returned `kIOReturnNotFound`, and inspection of the exact FAT ADT confirmed that the GPU SMMU had no children. The v157 candidate adds the K80 QTB base and relevant Pineapple DT properties with a byte-for-byte check of the rest of the ADT. Its nested QTB nub resolves the address through XNU's DT resolver. v156 was linked offline and superseded before deployment. v155 returned to TWRP in 332.23 seconds with seven matching samples. [Evidence](evidence/k80-gpu-v155-mmu-cold-qtb-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v157 cold QTB and blocked USER/LPAC routes verified
+
+v157 `82f41b6c` reported `m=62,w=ff000000`. With GX off, the QTB halt acknowledged, both context fault handlers armed, and both USER/LPAC stream owners verified their blocked entries. QTB resumed with the TBU vote released and GX still off. This stage left both contexts disabled. TWRP returned in 332.79 seconds with matching CDC/UFS and seven unchanged protected samples. v158 exercises PRR and context programming while retaining both streams in the blocked state. [Evidence](evidence/k80-gpu-v157-mmu-qtb-adt-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v160 USER/LPAC ACTLR candidate
+
+The shared `qcom,actlr` parser supplies the requested SID whitelist and separately checks the effective blocked SMR. The exact FAT ADT selects `0x32b` for all three K80 GPU SIDs. The USB CDC marker reports successful ACTLR writes, register readbacks and context TLB synchronization per host bank. v160 increased the marker capacity to accommodate the 525-byte extended v158 fixture. Full link, package readback, fixed runner host check and existing software register tests passed. The v160 single-use claim remains unused. [Evidence](evidence/k80-gpu-v160-mmu-actlr-offline-2026-11-14.json)
+
+### 2026-11-14 v160 USER ACTLR synchronized on K80
+
+v160 `71a1b89a` returned `m=63,w=0f0002ca,x=7000032b/00000000` over USB CDC. This verifies the USER ACTLR write, matching readback and TLB synchronization. USER context programming returned an I/O error before LPAC ACTLR. The CPU lock screen was visible. The runner matched fresh UFS and seven protected samples. TWRP verification at 482.64 seconds includes the host delay caused by temporary ADB service contention, resolved by closing those services. v161 records the lower-level context programming result and register differences with the blocked routes and existing comparisons in place. [Evidence](evidence/k80-gpu-v160-mmu-actlr-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v161 localized USER readback, v162 programmed both host contexts
+
+The USER failure was the board's duplicate exact comparison after successful sparse context programming. v161 reported phase 5 with valid enabled readback and only the one-direction TCR2/SCTLR differences already observed on the K80 GMU. v162 uses the same restricted native normalization for initial host programming and verification. Both host banks returned phase 5, ACTLR 0x32b and completed synchronization. QTB released with GX off. The two trials recovered automatically in 334.20 and 332.77 seconds, with matching CDC/UFS and seven protected samples each. v163 proceeds to native host stream activation. [v161](evidence/k80-gpu-v161-mmu-context-cdc-observed-2026-11-14.json) · [v162](evidence/k80-gpu-v162-mmu-context-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v164 localized the native host stream write refusal
+
+v163 preserved both programmed contexts but failed during stream activation. v164 verified both contexts again, then isolated the USER refusal to the S2CR write. The new atomic guard called the runtime owner check while AtomicSmmuIo had local interrupts masked, conflicting with the runtime provider's IRQ-enabled precondition. v165 checks the owner immediately before the bounded atomic window under the held domain gate and keeps the exact thread, slot, value, QTB and fault checks inside it. A source-extracted host regression reproduces the old refusal and tests the corrected path and invalid accesses. Both diagnostic trials recovered automatically with matched protected samples. [v164](evidence/k80-gpu-v164-mmu-context-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v165 enabled both native GPU streams
+
+v165 `ba5d0584` returned `m=64,w=ff000000,z=0000000f,u=0f000000/0f000000`. Both USER/LPAC contexts and ACTLR synchronization completed, both owned streams activated and both contexts/streams/fault states were rechecked. QTB resumed with GX still off. TWRP returned in 332.40 seconds with matching fresh UFS/CDC and seven unchanged protected samples. The atomic guard fix passed the source-extracted regression. GPU OOB, HFI START, CP/ZAP, bounded GPU jobs, fences, Metal and GPU display remain pending. [Evidence](evidence/k80-gpu-v165-mmu-context-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v166 OOB and v167 HFI START passed
+
+The native USER/LPAC stream path now proceeds through GPU OOB request/ACK/ACK-clear and GX-on readback. v166 reported all six OOB checkpoints, recovered to TWRP in 332.73 seconds, and matched seven protected samples. v167 used the retained three-queue DirectHfi owner to send HFI START (ID10, header-only request). Firmware returned the matching three-word ACK with zero status. It recovered in 332.43 seconds, with matching CDC/UFS and seven protected samples. CP/GX initialization, ZAP, GPU work, fence and rendering remain pending. [v166](evidence/k80-gpu-v166-mmu-context-cdc-observed-2026-11-14.json) · [v167](evidence/k80-gpu-v167-mmu-context-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v169 SQE/AQE instruction bases bound
+
+v168 added the direct HFI transport overload while retaining the original HWSCHED entry and shared code-binding implementation. Its first trial refused before the factory because the parent and board use separate recursive gates. v169 checks preparation under the parent gate and retains the board's independent direct/MMU/OOB/provider checks. It completed all four SQE/AQE base write/readbacks with SQE control still zero. The 27 existing binding regressions passed. TWRP returned in332.41 seconds, with matching CDC/UFS and seven protected samples. GX configuration, CP/ring, ZAP and GPU work remain pending. [Evidence](evidence/k80-gpu-v169-mmu-context-cdc-observed-2026-11-14.json)
+
+### 2026-11-14 v170 GX register configuration completed
+
+The retained HostGpuRegisters backend now accepts the direct HFI owner while retaining the HWSCHED entry. Its real board callback checks provider/resource identity, the same code descriptor, source SCACHE bypass, MMU/OOB/HFI state and retained ownership. The 775 existing configuration regressions passed. v170 completed all102 operations,75 powerup pairs and record publication, then recovered to TWRP in332.09 seconds. Fresh CDC/UFS and seven protected samples matched. GPU IRQ, CP/ring, ZAP and GPU work remain pending. [Evidence](evidence/k80-gpu-v170-mmu-context-cdc-observed-2026-11-14.json)
+
+### v171/v172 GPU IRQ 注册边界
+
+v171 `2af3feec` 已接通 DirectHfi26 的 GPU IRQ 准备入口，实机到达 `m=73,i=e00002be/00000000/00000000/00000000`。该错误是 `kIOReturnNoResources`，不是此前口头误判的 `kIOReturnUnsupported`。事件源工厂返回空会统一产生这一错误，因此不能据此断定内存不足。332.27 秒自动回到 TWRP，七组保护样本及 CDC/UFS 正文匹配。
+
+v172 `e996597b` 新增运行时设备树和工厂边界诊断，返回 `m=73,i=e00002be/00000006/000c000d/0000012c`。实际 `interrupts` 为12字节，名称为13字节，SPI编号300（INTID332），属性/名称/tuple检查及provider创建均通过，随后事件源工厂返回空。332.86秒自动回到TWRP，七组保护样本和CDC/UFS正文匹配。v173进一步记录实际GIC attach返回与寄存器回读；尚不启用GPU IRQ或执行CP作业。
+
+[v171证据](evidence/k80-gpu-v171-mmu-context-cdc-observed-2026-11-14.json) · [v172证据](evidence/k80-gpu-v172-mmu-context-cdc-observed-2026-11-14.json)
+
+### v173 定位 GIC 路由读回不匹配；v174 候选
+
+v173 `7c0dca0e` 返回 `m=73,i=e00002be/00000011/00000005/003f0000`。事件源创建确实进入原生注册，底层返回 `KERN_FAILURE`（5），GIC回读掩码为0x3f，触发类型为level、enable为0，但请求路由与实际路由不等。332.65秒自动回到TWRP，七组保护样本和CDC/UFS匹配。这一结果排除仅凭外层NoResources判定分配失败的推测。
+
+v174 `68b4258a` 为准确GPU INTID332新增bootCPU注册入口，复用已实测GMU/SMMU的真实拓扑和redistributor检查，以及原masked attach/readback；只做一次attach，无回退或重试。源码提取的12项host检查及全量链接通过。实机验收以该候选新scope串口及恢复结果为准，不能提前认定GPU中断已接通。 [v173证据](evidence/k80-gpu-v173-mmu-context-cdc-observed-2026-11-14.json)
+
+### v174 GPU IRQ 屏蔽注册与 workloop 挂接实机通过
+
+v174 `68b4258a` 串口为 `m=74,i=00000000/00000007/00000000/00000000`。实际bootCPU路由通过原有GIC寄存器读回检查，GPU事件源创建、初始屏蔽状态与workloop挂接均通过。该阶段保持GPU中断禁用，尚未绑定ring接收者、开启GPU IRQ或执行CP命令。332.79秒自动回TWRP，七组保护样本和同轮CDC/UFS正文匹配。12项源码提取host回归和全量链接通过。
+
+根因是v173实际GIC请求路由与回读不等；修复采用已经实测的GMU/SMMU策略，以内核真实拓扑boot_cpu及其redistributor为依据，在首次且唯一一次GPU INTID332注册前选定路由，保留全部回读条件。未放宽成功判定，也未在失败后重试。
+
+后续HostRing以当前真正实链的 `gpu-kernel-client-owner-candidate/ZornGen7HostRing26.cpp` 为起点，对应 `k80-kernel-client-owner26/ZornGen7HostRing26.cpo-command.json`。已从源码复现其对象SHA256 `5c746468e6be95169e8e0ee6daa973fda5866bbf4f4e413a904ed48da3353aec`，与当前镜像输入逐字节相同；旧native-smmu-full-authorized目录的HostRing对象不等，不可作为当前实链输入的替代。下一步适配HostRing真实三队列transport/OOB生命周期与板级CP授权，验证CP_INIT及ring推进，再接ZAP、真实fence、已知图像和Metal。本目标仍未完成。
+
+[v174实机证据](evidence/k80-gpu-v174-mmu-context-cdc-observed-2026-11-14.json)
+
+### v175 CP_INIT、ring 推进与初始空闲实机通过
+
+v175 `eb07e69b` 为当前实际HostRing后端增加DirectHfi26初始化入口，保留原HWSCHED接口。该入口保留并检查真实transport、pool/code描述符和GPU/GMU资源对，复用原ring发布、IRQ绑定/启用、1秒有界等待与失败保留逻辑。修正板级startup递归锁层数，使CP/IRQ访问和等待期间无startup锁。后续DirectHfi的OOB释放及客户端runtime仍待接通，不能把此CP入口当作完整生命周期。
+
+实机串口 `m=76,cp=00000000/00000303/00000007/00000001/0000000a/0000000a/00000000/03d8ec30`，确认CP授权与ring发布均返回、7项ring配置完成、SQE启用、RPTR/WPTR均为10，最后GMU busy读回及原空闲判定通过。GPU IRQ已由真实ring接收者绑定并启用；本轮未单独证明IRQ送达。该结果证明初始CP_INIT被GPU执行并推进ring，不是正常任务fence、ZAP认证、已知图像或Metal成功。
+
+332.17秒自动返回TWRP，同轮CDC/UFS正文匹配，七组保护样本一致。通用runner保留的旧 `GPU_started=false` 字段不识别新增CP阶段；本阶段以新CP专用观测和同轮UFS校验为准，原始runner记录不改写。全量链接1398输入/29替换/零未定义；118项ring状态机与5项串口解析host检查通过。历史测试把IRQ bit0作为fatal注入，与当前native通知位策略不符；归档测试副本改用bit2注入，未放宽原失败预期。
+
+下一步核对ZAP完整CPU父页保留范围、ALL-CPU别名排除和SCM实际独占条件，接通真实板级owner，再验证ZAP认证、安全模式切换、原生ring接管及真实fence。已确认加载器绑定的是K80签名资产与0x9b09a000/0x2000保留区，不能只凭no-map标量认定完整窗口已持有。没有执行新ZAP试验。
+
+[v175实机、输入和host检查证据](evidence/k80-gpu-v175-mmu-context-cdc-observed-2026-11-14.json)
+
+### v176 ZAP 完整 CPU 父页租约通过，认证前返回 NotReady
+
+v176 `3bbed4f7` 接入实际K80 ZAP owner。候选在现有IOMemoryDescriptor全局映射锁下记录物理映射尝试，独占完整16KiB父页0x9b098000..0x9b09c000；先前外来映射使claim拒绝，claim后外来物理映射拒绝。原始io_map/high-window路径对该准确父页范围拒绝并记录冲突；其余范围沿用原路径。managed直接映射排除与实际固定descriptor检查独立执行，复制结束后封存禁止新映射。三个原始kernel对象已由准确编译配方逐字节复现，新代码只在独立候选中。
+
+实机 `m=77,zp=e00002d8/00000007/00000000/00000000/00000000/00000000/00000000/00000000/c0000000/00000008/00000000/00000002/00000005/00000004`。实际XNU物理窗口为0x8c0000000起、0x200000000字节，与完整父页不重叠。owner/lease获取和受控映射均通过，无先前外来映射/原始I/O映射冲突；CP初始ring仍RPTR/WPTR10。随后认证阶段返回kIOReturnNotReady，hzl结果尚未开始，未复制镜像、未执行PAS AUTH。此结果不能区分SCM入口拒绝与loadWithHeldScm内先行PAS能力查询失败；v177同时记录两者的真实条件和64位返回。
+
+332.88秒自动回TWRP，七组保护样本匹配，CDC身份与同轮UFS检查点核对通过。42项实际租约helper检查（含并发），19478项K80实际asset loader策略检查，以及11项解析检查通过。历史houji测试的metadata CRC按独立核对的K80原厂元数据更新为c4ca6dbe；原策略预期未放宽。全量1398输入/33替换链接零未定义。ZAP认证、模式切换、真实任务fence、已知图像与Metal仍待实机验收。
+
+[v176实机及完整输入](evidence/k80-gpu-v176-mmu-context-cdc-observed-2026-11-14.json)
+
+### v177 定位 PAS 查询回调误用 loader 阶段；v178 修复
+
+v177 `4c4ae30e` 返回 `m=77,sc=00000006/00000047/00100200/00000fe3/00010105/00000001/00000000/00010306/42000601/00000000/00000001/00000000`。SCM入口完整通过，normal上下文、会话、原CX结果及Arm64 convention资格均有效；DAIF仅D位0x200置位。失败位于第一次PAS能力查询：hpp已开始、phase1，但回调返回1，输入帧x0=0x42000601/x1=1未被Native SMC改写。
+
+源码根因是ZAP call/delay共用hzl的load.phase，而hpp查询发生在hzl_run之前，此时load.phase为0。板级授权正确拒绝阶段0。v178 `ddefe3bd` 在load尚未started时选用实际QUALIFY阶段1，真正load开始后继续使用其实际phase，保持阶段0、失效窗口及其余拒绝条件。原/新实际callback函数的48项ASan/UBSan回归复现旧拒绝并验证修复；全量链接和打包通过。
+
+v177在332.31秒自动回TWRP，七组保护样本匹配，CDC身份与UFS检查点核对通过。新增诊断本身经22项原/新SCM入口控制流、锁和隔离状态对照验证，4项解析检查通过。v178硬件结果另行记录，尚不能认定ZAP认证通过。
+
+[v177实机与源码证据](evidence/k80-gpu-v177-mmu-context-cdc-observed-2026-11-14.json)
+
+### v178 K80 ZAP 认证实机通过
+
+v178 `ddefe3bd` 修复查询阶段后，实机为 `m=78,zp=00000000/00000008/00000000/00000000/00000000/00000008/00000000/00000000/c0000000/00000008/00000000/00000002/0000000d/0000003f`。K80原厂签名资产的PAS能力查询通过，metadata发布、INIT/MEM_SETUP、实际镜像复制及AUTH按原loader顺序完成；AUTH响应x0/x1均为0。复制已结束，CPU完整父页窗口已封存，authenticated/CPU-ended/map/attempt/valid/response六项标志均置位。SCM上下文为`6/47/00100200/fe3/00030600/000f1f1f/1/0/0/0/0/0`。hpp完成后phase为6，末查询单项字段在此不再采集，available/valid/attempted掩码与supported均有真实记录。
+
+CP初始RPTR/WPTR仍为10。此轮仅完成认证，未执行CP_SET_SECURE_MODE、首次上下文prefix、原生ring接管、真实任务fence、已知图像或Metal。通用runner的旧GPU_started=false字段不识别新增CP/ZAP观察器，不能用它否认或扩大专用观测范围；原始记录保持不改写。
+
+332.89秒自动回到TWRP，七组保护样本匹配；CDC身份与同轮UFS检查点核对通过。1117字节串口帧完整接收并通过解析。48项实际call/delay新旧回归通过，复现原查询拒绝并保持非法阶段/失效窗口拒绝。全量1398输入、34替换、零未定义链接，解析逻辑除scope模块外与v177一致。
+
+后续从v178归档源码派生新scope，不复用已消费claim或Recovery前的RAM状态。下一步接通HostRing认证后流程的真实DirectHfi OOB生命周期：当前completeAuthenticatedBootstrap仍有针对缺少旧hfi指针的阶段门槛；保留HWSCHED旧入口，复用固定模式切换、首上下文、两次writeback与NativeRing timestamp fence后端。DirectHfi当前只持有实际三队列transport，没有OOB释放/运行期引用计数接口，不能以恒定回调或类型转换替代。还须核对authorizeOwnedPostCpUserRestore及SmmuDomain post-CP路径对原legacy owner/maps/lease字段的依赖，接入已验证的native所有者与逐位/受限归一化规则；不能放宽到未知TCR/SCTLR状态。
+
+[v178认证、恢复与构建证据](evidence/k80-gpu-v178-mmu-context-cdc-observed-2026-11-14.json)
+
+
+## 2026-11-14：v179 首次真实 GPU 写回与 fence 通过
+
+v179 `38443aaea4c94d39961c1d4418aeb5f0` 已完成一次实机试验，334.23 秒自动返回 TWRP。新增串口 `bf` 字段为阶段80、phase6、flags0x7f；RPTR/WPTR均为55，两次写回分别为 `c0ffee00` / `c0ffee01`，真实 NativeRing fence1/observed1、wait complete、OOB clear raw0。1264字节串口帧与同轮UFS身份/tag匹配，七组存储保护样本一致，BCB尾部保留并完成整页读回。
+
+修复了v179全局头搜索路径覆盖其他编译单元的问题：只为Domain保留实际v178依赖优先级，其余暂存源码仅增加末尾缺失依赖搜索；Board显式包含bootstrap授权声明。实际1398输入/35替换完整内核 `970c54d18d4821bdd5952b4a0bd24d1efbb9733261c3139caf5e8b93de880bf2`、启动包 `25ff89662abe455c790210d4c45229305e0a0f8ca60c39e3d852ebf2753aee85` 已固定。源码提取测试覆盖post-CP写权限、单向归一化、授权后快照变化拒绝、bootstrap字段、USB分包与解析；没有使用反汇编或逆向。
+
+这是有界GPU命令/写回/fence里程碑。相机只看到Apple标志，不能据此声称GPU图像或桌面呈现。OOB clear仅证明store返回，未证明GX掉电或DMA停止。后续 `prepareDirectRuntime` / `runKnownImage` 仍依赖HWSCHED专用OOB接口，需要接入真实DirectHfi运行时所有权、作业OOB和映射生命周期后，复用既有已知图像后端。Metal、正常客户端、显示呈现及FT3683完整交互验收继续推进，目标保持active。
+
+证据：[v179实机结果与精确输入](evidence/k80-gpu-v179-first-fence-observed-2026-11-14.json)。暂停交接文档保留为历史快照，不覆盖旧试验记录。
+
+
+## 2026-11-14：v180 运行时连接停在 GMU idle 超时
+
+v180 `33f79419e3344671a51a34864cd5a1b0` 接入实际 native owner、DirectHfi ring 与只读 SMMU 运行时观察窗口。原有 GMU idle/GBIF client+arb halt/release 后端和失败保留规则保持；仅当原真实 bootstrap 已完成才尝试 VM 元数据挂接。没有启用正常作业或已知图像。
+
+实机 m81，首个 fence/canary 再次通过；`rt=e00002d6/1/1/0/a/e00002d6/0/0/0/0/e00002d8/1000`。运行时到达 halt 前的等待阶段，返回 `kIOReturnTimeout`，尚未调用运行时授权或 VM attach。最初误将 `e00002d6` 解读为 NotPermitted；v181 详细检查点与本候选 IOReturn.h 已纠正：这是 GMU busy bit30 等待超时。现有原始 v180 数值记录保持不变。
+
+1375字节 CDC 与同轮UFS核验通过，334.34秒自动回到TWRP；七组保护样本、BCB整页/尾部通过。离线实际源码测试覆盖131项连接/观察边界、23762项post-CP、2048项snapshot和43项解析/发送检查。相机仅Apple标志。
+
+证据：[v180运行时超时与回收](evidence/k80-gpu-v180-native-runtime-observed-2026-11-14.json)。
+
+
+## 2026-11-14：v181 定位 GMU idle 条件的阶段差异
+
+v181 `d59a2c3f5cf6441c9a0c08e32903d133` 只增加12个现有bus/guard诊断字段，保留v180全部硬件行为。实机仍m81：1000次GMU busy读取均raw0，末值`0x71000000`，bit30保持置位；client/arb halt写入均未执行。末次guard、primitive、observer均返回，guard/observer raw0。实际候选 `IOReturn.h` 明确 `e00002d6 = kIOReturnTimeout`，前文最初的访问拒绝判断已更正。
+
+核对[固定SM8650公开源码](https://raw.githubusercontent.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8650/453d8875f815bf9dfad9035982861226a4823a6c/vendor/qcom/opensource/graphics-kernel/adreno_gen7_gmu.c)：`gen7_gmu_power_off` 在lowest-idle/RPMh/slumber之后调用bit30等待，再RSCC sleep、GBIF halt。当前原生运行时未进入该下电顺序。后续应审核真正的元数据挂接是否修改硬件页表，并与需要生产者停止的映射事务分开；不能清除检查位、伪造quiesced或把OOB clear等同DMA停止。
+
+1483字节CDC完整验证，首个GPU写回/fence重复通过；332.80秒自动TWRP回收，七组保护样本和BCB整页/尾部通过。55项日志/格式化/分包、131项连接/观察、23762项post-CP、2048项snapshot回归通过。相机仍仅Apple标志。
+
+证据：[v181详细检查点与精确输入](evidence/k80-gpu-v181-runtime-bus-trace-observed-2026-11-14.json)。
+
+## 2026-11-14：v182 原生 VM 元数据挂接通过
+
+v182 `80a6c019ae464c33be64088d5d8a9055` 实机达到 m82，`rt` 为 raw0、phase5、flags0x35、capacity4096。native 分支只在原有 bootstrap 真正完成后采用 CPU 元数据，并在受限只读窗口中检查已有映射；没有执行或声称 GMU idle、GBIF halt、DMA stop。实际 map/unmap 继续要求停止、事务及恢复回调，失败保留资源。已知图像入口的 DirectHfi 作业 OOB 和运行时页表权限尚需接通。
+
+这次检查发现，原链接中的 VM/Submit 对象来自较早的集成候选，并不是此前只凭输入路径链追踪到的最旧目录，也不是含四个事务回调的 v83 源码。使用各自原编译配方逐字节复现了实际旧对象，再重编受保护的 VM/Submit 后端；保留原有 IB 四字节对齐检查、同队列前序 fence 退休规则。源码与对象对应证据见本轮 `runtime-backend-source-proof.json`，全程未反汇编或逆向。
+
+1483字节 CDC 与同轮UFS身份核对通过；首次 GPU 写回/fence 仍是 `c0ffee00/c0ffee01`、fence1/observed1、RPTR/WPTR55。332.85秒自动回到TWRP，七组保护样本一致，BCB整页读回及尾部保留通过。相机本轮看到锁屏时间与底部指示条，属于既有 CPU 呈现基线的观察，不能当作 GPU 图像或 Metal 验收。
+
+本轮实际源码测试通过133项连接/观察、80项VM事务、38项提交锁、23762项post-CP和57项CDC解析/格式化/分包检查。完整内核 `fdd966d9a3659896ec830c390fa6305eecb64a054d6f313bf211c67ea39eed20`，启动包 `fe0fc28c14d8bf49ee12a32debbb381e570294a696ab4223acd731f1931a1660`；1398输入中37项重编替换、1360项保持，CDC对象单独纳入。
+
+证据：[v182元数据挂接、来源复现与回收](evidence/k80-gpu-v182-native-metadata-attach-observed-2026-11-14.json)。目标继续active，GPU已知图像、Metal、显示呈现及完整客户端/FT3683验收尚未完成。
+
+## 2026-11-14：v183 已知图像作业 OOB 离线接入
+
+新候选 `21b1c43bfd3d4c0cb9312e89b1a958b6` 已增加 DirectHfi 真实作业 OOB 请求、ACK、清ACK、GX检查和单次释放，HostRing 的既有图像主体按实际 transport 对象选择接口。释放前后均检查实际图像完成权限；超时、访问或owner失效保留并停止，不重试。162项实际方法提取测试及52项bootstrap回归通过，ASan/UBSan无报告；DirectHfi和HostRing两个改动单元已按原native配方编译。
+
+这只是正在实施的离线候选：原生board作业授权、页表事务窗口、已知图像检查点尚未接通，也没有完整链接、启动包或设备claim。当前native map/unmap仍会遇到已有GMU bit30等待，不能直接启动此候选。下一步须以实际生产者排除、空闲观察和准确TLB权限建立事务；不能将元数据挂接或OOB clear视为DMA停止。
+
+续接索引：[v183离线源码、编译与待办快照](evidence/k80-gpu-v183-task-oob-offline-2026-11-14.json)。这不是暂停，目标仍为active；最后完整真机证据仍是v182。
+
+## 2026-11-14：v183 已知图像完整候选封存，真机启动等待确认
+
+在同一尚未上机的独立 v183 候选内，已接通原生板级作业授权、当前线程与实际图像对象绑定、生产者排除和页表事务。每次 map/unmap 前在 metadata gate 外重新检查实际 ring、RBBM、IRQ 与 GX busy bit23；仅向实际持有事务的当前线程开放 USER ASID invalidation 与 TLB sync。没有伪称 GMU 下电、GBIF halt 或 DMA stop。旧 VM/Submit 源码保持，并按当前路径重编；含 `-g` 的对象因源路径变化不要求与父版本字节相同，实际源码、配方和新对象分别固定。
+
+现已复用完整已知图像分配、映射、提交、fence、CPU读回、图像验证、解除映射与OOB释放流程，保持失败停止并保留资源。新增1774字节串口帧的32项 `ki` 字段；m83记录失败，m84必须同时满足图像CRC、真实fence完成、引用归零、两次页表事务和OOB返回检查。它仍不发布普通客户端，也未接入GPU显示呈现。
+
+实际源码测试覆盖162项task OOB、52项bootstrap OOB、114项板级授权、33项调用/锁失败路径、89项ring租约、67项原生页表事务、133项attach观察、80项VM、38项Submit、42202项post-CP权限、2048项bootstrap字段及95项CDC解析/格式化/分包检查；相关C++测试开启ASan/UBSan。完整链接1398输入、37替换、1360保留、零未定义；内核 `43e78febd8195ec344ca8f44dfc8af88338962f323dd3f2747f3f1ee9b1151e1`，启动包 `fb006a37f17d40edc1b90116f5ec1e9e5e872cadbac37fa258d889e7d81ffee8`。头文件仅新增已审阅的非虚方法声明，固定runner和实际采集程序与测试输入核对通过。
+
+自动审批系统在创建进程前拒绝了这一次真机命令，理由是未识别到本次具体操作的明确授权；已向用户请求确认，没有重试或改用其他设备通道。trial目录为空，claim未消费，active run等状态为空；v183没有真机结果。先前“仅完成task OOB”的快照所引用原始字节已独立归档，当前完整候选使用新manifest，旧证据保留。
+
+证据：[v183完整候选、离线验证及审批事件](evidence/k80-gpu-v183-native-known-image-ready-2026-11-14.json)。目标仍active；最后真机证据是v182，已知图像、Metal、GPU呈现与完整触控验收尚未完成。
+
+## 2026-11-14：v184 原生客户端 transport 离线接入
+
+在等待v183真机确认期间，从封存源码派生独立 `f0805d11a6f24fb49633534b8f76504a` 工作候选。DirectHfi新增独立客户端OOB状态，只有同一实际ring的图像OOB请求、ACK、清ACK、GX检查和释放全部完成后才能申请；客户端本身仍须独立授权。HostRing的客户端许可、OOB持有、初始化与关闭按真实保留transport选择，保持旧HWSCHED实现和失败时的实际引用保留。
+
+源码审核发现一个尚未在实机触发的后续集成风险：原生 `reserveActual` 依靠实际controller claim与空bank观察，不设置旧 `acquireActualBank`；进程Select却无空值检查直接调用该回调。现明确拒绝缺少新进程ASID授权的情况，在标记grant attempt或写TTBR之前停止；没有把初始bank许可代替进程许可。
+
+182项客户端OOB、106项实际native/legacy客户端调用/关闭、32项进程bank授权拒绝检查通过，162项图像OOB与52项bootstrap回归通过，C++测试使用ASan/UBSan。四个相关native单元编译通过，当前源码哈希与记录匹配；两个头文件各仅新增四个非虚方法，未变更对象布局。
+
+本候选尚未接通原生板级客户端授权、每次操作的issuer线程身份、真实进程ASID/TTBR0窗口及进程map/unmap事务，因此不能发布或执行native客户端。没有v184完整内核、启动包、runner或claim；源码暂继承v183诊断标记，须在完整候选阶段另行retag。阶段源码、测试和编译结果已独立封存，后续修改工作目录不会覆盖本次证据。
+
+证据：[v184客户端transport、潜在空回调修复与剩余集成](evidence/k80-gpu-v184-client-transport-offline-2026-11-14.json)。v183原始完整候选未改动，自动审批拒绝后的具体真机确认仍待回复；本轮未重试或通过新候选绕过该拒绝。
+
+## 2026-11-14：v183 原生已知图像 2D 实机通过
+
+用户明确批准本次v183试验后，复核封存输入和未消费claim，固定runner仅执行一次临时启动。实机串口为 `m=84`，`ki` raw0/phase6/flags0x3f，RPTR/WPTR均101，真实NativeSubmit fence2/completed2；native与Submit均无outstanding，VM/Submit无poison，图像device引用为0。图像输出CRC为 `e843b26a`、first_bad为 `ffffffff`，两次表租约acquire/release均完成，作业OOB标志0x7f、5次读/3次写、最后clear寄存器0x1f994/raw0。原bootstrap fence1与两次canary、原生元数据挂接均保持通过。
+
+本次选用的实际依赖是 `gpu-kernel-client-owner-candidate/direct-runtime/K80KnownImage26.h` 和 `GpuKnownImage2d.h`。它们复用固定Mesa来源的247字CP_BLIT前缀与任务，输出为32×32线性RGBA8红色图像。CPU将输出页初始化为0x6d，完成后验证整个32768字节：4096字节输出须为期望红色，其余字节保持原值。该结果证明专用2D图形任务、映射/提交/实际fence/缓存读回/完整结果校验/解除映射/OOB返回链路，不代表shader、Metal或GPU显示呈现通过。OOB clear仍只证明store返回，不能声称GX下电或DMA停止。
+
+1774字节CDC帧完整验证并与同轮UFS身份核对通过。332.1206307919929秒自动返回TWRP，七组保护样本逐字节一致，BCB尾部保留及整页读回通过；active run/build/admission/session均已清空，stop_device_operations=false。相机在本轮看到锁屏时间与底部指示条，属于既有CPU呈现；本候选未将GPU图像复制到控制台。
+
+封存内核仍为 `43e78febd8195ec344ca8f44dfc8af88338962f323dd3f2747f3f1ee9b1151e1`，启动包仍为 `fb006a37f17d40edc1b90116f5ec1e9e5e872cadbac37fa258d889e7d81ffee8`。此前审批拒绝和“等待确认”文档保留为历史事件，现已由本次明确授权及单次实际结果续接，claim已消费，不得复用。v184仍停留在已封存的stage1客户端transport源码；本轮尚未写入板级client authority/issuer变更。
+
+证据：[v183已知图像2D、串口、保护与回收](evidence/k80-gpu-v183-native-known-image-observed-2026-11-14.json)。后续继续实际客户端授权、进程ASID/TTBR窗口与提交序列，再推进Metal设备发现/pipeline、GPU显示及完整FT3683交互和资源生命周期验收。完整目标保持active。
+
+## 2026-11-14：v184 板级客户端授权和 issuer 线程绑定
+
+已在独立v184工作候选接通native客户端grant/check/release回调，核对真实客户端身份、kernel task、GPU/GMU资源pair、provider/runtime-PM/MMU/IRQ/RSC状态，以及已完成的图像/fence/unmap/OOB前提。授权使用独立epoch5；正常释放许可必须看到进程列表清空、无pending资源、真实fence完成和同一issuer线程。Board仅缓存非拥有身份，实际Ring在foreign grant前保留客户端，正常close成功后释放；失败保留实际引用。
+
+所有issuer锁路径现通过实际IOLock辅助方法记录/清除当前持有线程；foreign grant期间issuer已释放，单独的grant-thread token绑定这一请求，返回后立即清除。对28个旧方法逐体核对，仅改变锁包装和该token维护，已知图像、应用分支、presenter的原操作保持。真实宿主并发线程验证互斥、非持有线程拒绝和解锁清除；185项客户端transport/生命周期/线程身份及133项板级实际回调/资源拒绝检查通过，使用ASan/UBSan。四个相关native单元编译通过，source hash一致；相对stage1仅增加两个非虚私有声明，不改变HostRing对象布局。
+
+本阶段仍未实现原生进程ASID/TTBR0选中、恢复和退休授权，以及selected-process只读/页表事务窗口。缺少旧bank回调时的明确拒绝保留，不能用初始bank许可代替进程许可。没有v184完整内核、启动包、runner、claim或客户端发布入口选择。DirectHfi及Domain实现相对stage1未变，其旧测试通过结果通过精确源码相等继承，没有冒充本阶段重跑。
+
+证据：[v184板级客户端授权、线程互斥和当前编译](evidence/k80-gpu-v184-client-authority-offline-2026-11-14.json)。stage1和stage2源码、配方、结果各自封存；最新硬件证据仍是已完成并回收的v183专用2D图像。
+
+
+## 2026-11-14：v184 进程 ASID/TTBR 窗口与后端来源核验
+
+已接入native进程页表选中、恢复、退休和只读观察窗口。实际controller claim、保留的USER bank/stream、客户端OOB与当前issuer共同约束操作；HostGpuTables从实际子页表、页所有者、ASID位图和稀疏context编码推导目标值。选中/恢复只允许本次准确TTBR0和对应ASID同步，退休只允许待退休ASID同步，观察不授予写权限。旧transport仍须原acquireActualBank回调。底层MMIO admission可能在中断屏蔽时运行，因此只消费已建立的同线程窗口，不在该层调用PM/IOService。
+
+进程硬件读回复用已经在K80 USER路径采用的nativeHostImage单向TCR2/SCTLR规则；根地址、ASID、TTBR1、TCR和地址宽度仍精确匹配。实际稀疏context编码/校验器参与238项页表窗口、选中/恢复和错误注入检查，111项实际Domain授权/嵌套观察、38项Ring身份/生产者排除与125218项post-CP访问检查通过，ASan/UBSan无报告。失败写入/同步或错误根地址均保留页表和ASID，不尝试自动恢复或重试。
+
+按原配方逐字节复现了实际选中的ProcessTables、DirectClient、DirectIo对象。依赖核对发现旧ProcessTables构造/元类对象仍含较短的VM Routes布局；新增四个事务回调后，进程对象内嵌布局发生变化，必须替换该旧对象。已将原ProcessTables源码和相同头文件纳入当前候选，并使用当前VM头重新编译，依赖输出核对通过。共六个相关native单元编译成功；这不是完整链接，旧对象不能继续沿用到后续客户端构建。v183未执行进程客户端，因此其图像通过不构成该布局的运行验证。
+
+当前stage3源码、测试、来源复现和编译产物已独立封存；stage1/2与v183保持原字节。进程map/unmap仍须替换旧GMU下电idle/GBIF路径，建立实际selected-process空闲事务；持有metadata gate的原生提交也仍须接入准确的进程提交身份。未生成v184完整内核、启动包、runner或claim，未选择客户端发布入口或操作手机。后续继续这两条实际执行路径，再构建有界客户端探针与新的串口诊断，最终完成Metal/shader、GPU呈现及FT3683验收。
+
+证据：[v184进程页表窗口、来源复现与布局重编](evidence/k80-gpu-v184-process-window-offline-2026-11-14.json)。最新硬件结果仍是已回收的v183专用2D图像，完整目标保持active。
+
+
+## 2026-11-14：v184 原生进程映射事务和提交身份接通
+
+native map/unmap现在要求实际选中进程、客户端、当前kernel issuer、所有进程零未退休作业和零pending引用；每次修改前在metadata gate外重新读取实际ring、RBBM和GX busy bit23。整个调用仍持有issuer以排除其他提交与呈现。成功成对结束进程租约，失败保留租约与backing并停止。Domain仅向同一线程开放该进程实际ASID的失效与TLBSYNC，不开放TTBR/TCR/LPAC写入；native分支不再调用旧GMU bit30下电等待/GBIF helper。该租约不代表通用DMA停止或GX下电。
+
+实际Submit::submit会嵌套调用retireCompleted，因此新增Domain提交身份与递归深度，分别配对每次真实gate加锁；同一进程/线程可嵌套，另一进程、线程或活动页表事务被拒绝。最外层退出清除身份，继承后端的fence等待仍在提交scope外。Ring持gate访问只接受实际Domain提交身份、客户端和issuer且无表租约的组合，保留旧图像phase3路径；客户端OOB关闭还要求进程表租约为空且成功计数配平。
+
+107项实际Ring租约/guard、185项Domain事务/授权/嵌套观察/提交身份、189项客户端关闭/transport及148288项post-CP访问检查通过，ASan/UBSan无报告。六个native单元编译成功。HostGpuTables、ProcessTables、VM/Submit、Board和DirectHfi源码与stage3完全相同，其先前对应验证按精确源码相等继承，没有冒充重新运行。stage4独立封存，尚无完整v184链接、启动包、runner、claim或手机操作。
+
+下一步通过原IOKit service、MACF/filter和externalMethod接入有界实际客户端探针，覆盖BO CPU视图、进程映射、已知图像提交/fence、输出校验、正常关闭、ASID退休和OOB返回，并增加新的串口/UFS检查点。Board的callable已识别DirectHfi；publishOwnedKernelIo要求startup gate未持有，当前native入口仍在持gate的图像结束位置返回，须进行成对且有核验的gate交接。随后重编完整依赖闭包、retag并封存新候选。Metal/shader、普通应用客户端、GPU呈现和完整触控验收仍待完成。
+
+证据：[v184进程map/unmap与提交身份离线验证](evidence/k80-gpu-v184-process-transactions-offline-2026-11-14.json)。最新真机结果仍为v183专用2D已知图像；完整目标继续active。
+
+
+## 2026-11-14：v184 实际内核 IOUserClient 图像探针离线接通
+
+stage5已在现有native启动入口接通实际客户端探针。发布前临时保留准确owner/ring，释放本层startup锁，再经原InactiveOwner/Board发布路径调用实际service的newUserClient；返回时恢复原锁并重新核对owner和状态。若仍持有嵌套startup锁则拒绝发布，不跨客户端调用持锁，也不伪造权限。实际service/client MACF与filter policy初始化保持；探针通过IOUserClient::callExternalMethod及原externalMethod分派完成Query、设备信息、BO分配、CPU视图、进程映射、提交、fence等待、CPU解除映射和BO释放。
+
+采用真实客户端返回的地址窗口、handle、token与fence，复用既有247字CP_BLIT图像任务。实际fence与空闲检查之后，对该BO执行缓存获取，并通过真实IOKit CPU视图校验整个32768字节。核对当前XNU源码确认：直接mapClientMemory64返回调用方持有的映射，不会登记到Mach包装层的client mappings集合。因此探针显式解除并释放自己持有的映射，再由原CPU-unmap方法释放描述符/租约，最后正常关闭客户端；没有声称已验证普通应用的Mach IPC或映射登记路径。
+
+正常关闭必须经原后端完成进程资源关闭、内核页表恢复、VM detach、ASID退休与客户端OOB返回，并看到实际进程列表清空、无outstanding/poison、两个页表事务成对完成和真实fence一致，才释放探针客户端引用。失败路径停止并保留剩余资源，不自动重试、复位或回滚。137项实际探针源码测试覆盖固定ABI、真实图像构建/校验器及15个操作边界故障注入；38项实际启动交接测试覆盖锁深度、owner变化与发布/探针失败，ASan/UBSan通过。六个native单元编译成功；原有97个Ring方法逐体保持不变，stage4后端和全部历史封存保持原字节。
+
+当前只完成stage5离线源码集成：新增40项内存诊断及m85/m86调用点，尚未接入UART/UFS格式化与解析，诊断UUID仍待retag。没有v184完整链接、启动包、runner、claim或设备操作，不能启动当前未封存为完整候选的工作产物。下一步接入诊断、完成包含新ProcessTables布局的全量构建与输入检查，再进行新的有界客户端真机验证。最新硬件结果仍是v183专用2D图像；Metal/shader、GPU呈现、普通应用客户端与FT3683完整验收继续推进。
+
+证据：[v184实际客户端探针、启动锁交接与离线编译](evidence/k80-gpu-v184-client-probe-offline-2026-11-14.json)。目标保持active。
+
+
+## 2026-11-14：v184 实际客户端完整候选已封存
+
+新增40项客户端串口结果，完整帧2137字节；文本缓冲区扩为4096，实际USB仍按原63字节分包。157项格式化、解析、缺失/错误字段及分包测试通过；成功阶段m86须同时满足真实fence、完整图像CRC、进程事务成对、关闭与OOB返回，m85保存真实失败。保留原单次UFS先落盘、随后执行GPU并发送串口的顺序：UFS用于核对同轮身份，不声称包含后执行的客户端结果，没有新增日志块或第二次持久化。
+
+全量1398输入、38替换、1359保持、1个CDC新增，零未定义符号。实际VFS解析和四个页表使用方的源码预处理证明扩展VM Routes一致，重编ProcessTables构造/元类已进入最终链接；没有将依赖文件中的虚拟路径误当作旧头内容。内核8d760b9ba6b4040da6cf33398f82b1ff4381e8da3e5a2cf387470a4af5983f05，启动包0c012959b3d9cb0ec533c86267f2f373151aa22fec24377d1787f6028c81cb2a。首次本地打包文件名仍带V183，已保留该本地产物并重新生成V184命名包，实际输入和最终包以本次封存清单为准。
+
+新scope f0805d11a6f24fb49633534b8f76504a已准备独立bundle/owner/ready/admission，固定运行器check-only通过，尚未消费claim。计划只对92988a43/slotA执行一次临时启动，300秒独立看门狗和600秒有界Recovery返回，保持七组保护样本及BCB整页/尾部检查。实际客户端授权、进程页表/ASID、提交/读回和正常关闭只能由本次真机确认。Metal/shader、普通应用Mach IPC、GPU显示和完整FT3683验收仍未完成。
+
+证据：[v184完整候选、输入与有界真机计划](evidence/k80-gpu-v184-native-client-runtime-ready-2026-11-14.json)。本条为执行前快照，目标保持active。
+
+
+## 2026-11-14：v184 客户端已打开，定位设备信息未挂接
+
+自动审批最初在进程创建前拒绝v184，理由是仅识别到此前v183单次授权；用户随后明确回复“批准这一次 v184 真机测试”，并补充“我批准后续的真机测试”。后续同范围92988a43/zorn/slotA、固定运行器、新scope/单次临时启动、看门狗/有界Recovery和原存储保护约束下的测试已获授权，不重复请求同范围批准；这不扩大到刷机恢复、重试或Android/Data修改。
+
+固定运行器实际执行一次v184，332.099秒自动返回TWRP。2137字节串口与同轮UFS身份核对通过，m85；kc为raw e00002c7、phase2、flags3、最后方法15/GetDeviceInfo。实际newUserClient与Query已经返回，进程ready/selected/active状态为0xdd，客户端OOB已获得（0x1f），BO分配/映射/提交和正常close均尚未执行。原bootstrap与专用2D图像保持通过，CRC e843b26a、fence2/completed2、RPTR/WPTR101。失败后保留进程/客户端与OOB资源，没有把未执行的关闭、ASID退休或OOB释放当成成功。
+
+实际选定IOReturn.h明确e00002c7为kIOReturnUnsupported。核对本次编译源码：openProcessClient只在app分支调用setScope/copyConfiguredDeviceInfo/attachDeviceInfo，内核客户端info_保持空；实际DirectClient::deviceInfo因此返回Unsupported。方法15及其64字节ABI本身已经实现。这是内核客户端元数据接入遗漏，不是GPU图像命令错误。
+
+七组保护样本逐字节一致，BCB尾部与整页读回通过；active run/build/admission/session均清空，stop_device_operations=false。USB摄像头在约248秒拍到4:03锁屏与底部指示条，属于CPU呈现基线；最初沙箱相机尝试失败的记录一并保留。v184精确内核/启动包、封存清单和已消费claim均不改动。
+
+证据：[v184客户端打开、Unsupported根因与回收](evidence/k80-gpu-v184-native-client-runtime-observed-2026-11-14.json)。
+
+## 2026-11-14：v185 内核客户端设备信息最小修复
+
+独立候选f9db3c322f1348d5b8175f07ed5fc9a9只修改openProcessClient：已通过各自真实权限检查的内核和应用客户端，均复用原有经过seed排除检查的进程地址范围，以及已配置GPU的设备信息；计时器初始化仍只用于原应用分支。没有伪造字段、放宽授权或绕过GetDeviceInfo。所有头文件和其他后端源码与v184逐字节一致。
+
+回归使用实际旧/新openProcessClient，以及实际setScope、attachDeviceInfo、deviceInfo方法，先复现旧内核客户端open成功但查询Unsupported，再验证两类客户端的准确地址窗口和设备信息，并覆盖非法/重叠范围、元数据失败与保留部分对象。94项检查通过，ASan/UBSan无报告；唯一受影响native单元编译通过，警告与v184一致。源码、测试与编译已独立封存。
+
+v185目前仍为离线修复：诊断身份暂继承v184，尚无完整链接、启动包、运行器或claim。下一步retag并复用已核验构建/封存流程，进行新的有界真机试验；客户端BO/map/图像/fence及正常关闭/页表恢复/ASID退休仍需实证。普通应用、Metal/shader、GPU显示和完整FT3683验收继续推进，目标保持active。
+
+证据：[v185内核客户端设备信息修复与回归](evidence/k80-gpu-v185-client-info-offline-2026-11-14.json)。
+
+
+## 2026-11-14：v185 完整候选及新一轮运行器已准备
+
+v185已完成身份更新、完整链接和打包。1398项实际输入、38替换、1359保持、1个CDC新增，零未定义符号；实际VFS头文件与v184一致，四个页表使用方的源码预处理确认布局一致。94项实际设备信息回归和157项串口格式/解析检查通过。实际ADT包含K80芯片ID43051401与UBWC4，没有填入其他机型参数。
+
+内核ca53af23244903fa88bd08b34783ea6d4a1b094b8a41b9e67d4566b1d1c48bec，启动包8c94b5082d2b38284d5d879a3473cf2a110ad82a6b0ed9c1d60f6de2cc3e7049。106项候选源码/配方记录已封存，独立scope f9db3c322f1348d5b8175f07ed5fc9a9及bundle/owner/ready/admission已生成，固定运行器check-only通过，尚未消费claim。继承用户明确批准的后续同范围真机测试授权，采用300秒看门狗和600秒有界Recovery返回，保护七组存储样本和BCB整页/尾部。
+
+本条为执行前记录。下一步验证真实GetDeviceInfo及客户端BO、映射、图像、fence和正常关闭；Metal、普通应用、GPU呈现及完整FT3683仍未验收。
+
+证据：[v185完整候选与有界运行计划](evidence/k80-gpu-v185-kernel-client-info-ready-2026-11-14.json)。
+
+
+## 2026-11-14：v185 实际内核客户端图像及正常关闭通过
+
+一次已授权临时启动完成，2137字节串口记录验证为m86，raw0/phase12/flags2047。真实GetDeviceInfo已通过；客户端分配BO、取得CPU视图、映射至IOVA63040000、提交247字专用2D图像命令并等待真实fence3，完成值3，RPTR/WPTR均173。取得设备写入并读回实际32768字节BO，CRC为e843b26a，firstBad为ffffffff，完整图像一致。
+
+实际调用方映射解除与释放、CPU-unmap、BO-free和clientClose均成功；原关闭路径恢复内核页表、detach进程VM、退休ASID22并清空进程/selected/client引用。页表事务2次获取/2次归还，kernelIoPhase4/state0102，无未完成任务或poison，客户端OOB为7f/raw0。v184的设备信息缺失问题已由本轮实机确认修复。没有复位、失败重试或把OOB清除等同于所有DMA停止。
+
+看门狗使手机在332.827秒返回TWRP，七组保护样本一致，BCB整页与尾部核对通过；运行状态已清空，未触发停止设备操作。约180.57秒的USB相机帧拍到CPU锁屏4:03及底部指示条。单次UFS检查点早于GPU执行，run.json原GPU_started=false保持原值；后续GPU成功由同轮身份核验的串口m86证明，不修改旧检查点含义。
+
+当前完成的是单个实际内核客户端的专用2D图像和正常生命周期。普通应用/Mach IPC、多客户端与异常退出、shader/Metal、GPU显示和完整FT3683仍未验收。按[官网GPU教程](https://unixnu.com/zh/porting/gpu)继续客户端/Metal阶段；实际源码已确认普通应用路径尚含HWSCHED引用，并且发布与本轮kernel-only探针互斥，下一候选需要独立接通DirectHfi应用权限、进程访问及实际应用发布，不能借用内核客户端授权。
+
+证据：[v185真实客户端图像、关闭及自动回收](evidence/k80-gpu-v185-kernel-client-info-observed-2026-11-14.json)。目标保持active。
+
+
+## 2026-11-14：v186 应用 DirectHfi OOB 传输离线接通
+
+独立候选d55c2bab3d6d436386ca54c7b6a74f06继承v185成功基线，stage1接通普通应用的DirectHfi OOB请求、真实ACK清除、GX状态核对及正常归还。每个实际AppExecution保留自己的记录和准确传输对象；DirectHfi持有activeApp直到实际清除成功，失败停止并保留，不借用内核客户端grant或重置已消费记录。回调真实应用权限时释放HFI锁，busy与保留的activeApp阻止竞争修改。HostRing的acquire/release/held和操作检查同时支持现有HWSCHED及当前DirectHfi，缺失或对象不符则失败。
+
+实际三个传输方法和OobRecord的829项断言、实际11个HostRing方法的150项断言均通过ASan/UBSan，覆盖两种分派、权限撤销、7个MMIO失败边界、超时、错误所有者、后续新会话和失败保留。OS、MMIO与权限提供方为host测试替身，不声称完成真实应用权限。13个受影响native单元重新编译通过，包含AppExecution、AppIo和原HWSCHED消费者；实际头文件内容审计只出现预期三个头变化及DirectHfi新引入的原IOKit依赖。首次旧HWSCHED配方缺少v83回退包含目录的尝试已保留，补入父候选同一idirafter后通过。
+
+AppExecution仅将原记录owner指针换为公共OSObject身份并添加DirectHfi访问关系，未增加字段/虚方法。全部既有DirectHfi方法及HostRing应用传输段之外的源码保持v185原字节，Board代码和启动选择不变。源码、测试、编译与123项快照已封存。本阶段尚无真实Board应用acquire/check/release、native应用进程权限、应用发布、完整链接或设备执行，诊断身份暂继承v185，不可将本工作树作为新启动包。下一步完成实际应用权限与页表访问路径，再接普通任务和Metal。
+
+证据：[v186应用传输源码、回归及native编译](evidence/k80-gpu-v186-application-transport-offline-2026-11-14.json)。目标保持active。
+
+### 2026-11-14：v186 应用板级权限与关闭线程绑定（离线）
+
+已在独立候选接入真实 Board acquire/check/release：精确绑定应用客户端、打开任务、Ring、GPU/GMU 描述符及仍持有的电源/资源窗口。Ring 的外部权限调用绑定当前线程、阶段和操作；AppIo 记录实际 clientClose 线程，仅该关闭流程允许 kernel_task 完成 Close/OobRelease。正常权限释放要求进程资源、页表租约和真实 OOB 均完成归还；失败保留。
+
+实际源码提取的179项 Board、81项身份绑定和75项关闭断言通过 ASan/UBSan，13个受影响原生编译单元通过。AppIo 新增字段要求最终完整构建替换其对象。此阶段仍未接通原生应用进程门禁/启动选择，未完整链接、打包或进行应用真机验证。精确输入与封存见 [v186 stage2证据](evidence/k80-gpu-v186-application-authority-offline-2026-11-14.json)。
+
+### 2026-11-14：v186 原生应用进程页表与提交路径（离线）
+
+已修复原生页表、提交门禁仅接受 kernel_task 的阻点：应用使用实际权限、当前操作、精确客户端/任务/线程；建表和关闭的页表切换有各自允许的操作序列，Map/Close 页表修改仍要求真实空闲、配对租约及未故障状态。AttachVm 在绑定客户端之前、DetachVm 在成功清理之后的身份窗口分别收窄；内核代办关闭限于实际 clientClose 线程。底层 SMMU、VM 和提交实现未替换。
+
+246项进程断言、82项权限绑定断言及154项路由断言通过 ASan/UBSan；13个原生编译单元通过，依赖头文件内容与阶段2一致。证据见 [v186 stage3](evidence/k80-gpu-v186-application-process-offline-2026-11-14.json)。尚未选择应用启动分支、完整链接/打包或进行应用真机测试。下一步准备固定 ABI 的普通进程已知图像测试和匹配的启动/信任/日志路径，之后完成有界真机验证；Metal、GPU呈现和完整触控验收仍未完成。
+
+### 2026-11-14：v186 普通用户进程图像测试程序（离线）
+
+已基于当前内核实际 ABI 和已验证的 K80 图像源码，编译链接 arm64e/iOS26 测试程序。程序使用普通 IOServiceOpen、固定选择器和真实 Mach CPU 映射，按分配/填写命令/提交/等待/验证整块32768字节/时间戳/解除映射/释放/关闭的顺序运行；失败时不再主动发出 GPU 清理调用。已本地签名，尚未加入手机信任、启动或日志路径。
+
+实际事务源码的成功、13个失败边界及畸形响应/图像破坏测试通过；模拟输出仅验证主机控制流程，不构成 GPU 成功。记录见 [v186 用户态测试程序](evidence/k80-gpu-v186-user-probe-offline-2026-11-14.json)。当前候选仍未完整链接或启动；下一步是支持的启动/信任/日志集成与独立应用启动分支。
+
+
+### 2026-11-14：v186 普通应用启动根镜像与差分回放（离线）
+
+已制作独立 iOS26 根候选，只新增签名测试程序与自有 launchd 任务，以 mobile 身份单次运行并输出至控制台。原有563个监测文件的内容和属性均保留，包含既有启动任务、初始化/注入配置、CPU/触控与 Metal 文件。HFSX 文件系统、签名和完整父镜像保持检查通过；本轮无手机访问。
+
+源码核对发现 GPU 在25+20+105秒检查点之后才初始化，原120秒服务等待会提前结束。已将等待改为240秒并重新编译签名，事务/ABI/已知图像源码不变，保留原阶段4与首次根候选作为历史。修正后程序为5c9550e3…，根镜像为4d636e89…；完整比较产生92个4KiB差分页，共376832字节。12组有界差分在独立克隆中回放后，完整32GiB镜像哈希一致；布局仍避开 Android、保留 iOS17、Data 和日志窗口。
+
+下一步接通应用服务启动选择、实际用户输出及原生生命周期的串口观察，随后绑定新根哈希、完整链接和打包。现有旧 Metal 插件仍保留，应用资格测试的内核发布需避免它自动占用独占客户端。根候选尚未安装，普通应用签名接受、实际映射/图像/关闭均待真机验证。证据见 [v186 启动根镜像与差分回放](evidence/k80-gpu-v186-application-root-offline-2026-11-14.json)。目标保持 active。
+
+
+### 2026-11-14：v186 原生应用服务发布（离线）
+
+已将已知图像完成后的启动分支切换为实际应用服务发布，调用期间释放并恢复启动锁，使用 Board 自身的真实应用权限；不再执行互斥的内核客户端探针。资格测试构建通过专用编译定义关闭自动 Metal 发现属性，保留普通精确类打开路径；正常 Metal 构建仍保留原属性。
+
+新增独立发布阶段87/88和原子返回状态，串口 ap 字段仅表示发布结果，旧 kc 字段只用于85/86。13个受影响原生单元及串口观察单元编译通过，实际启动调用段的36项锁/保留/错误处理断言通过 ASan/UBSan。首次串口编译的类型声明位置错误已修正；同时发现旧配方重复 -MF 导致父候选一份依赖清单误写，已归档并按原源码配方重新生成，父对象未变。原依赖文件哈希不可恢复，不将重建清单标作历史原件。
+
+普通应用图像/关闭输出与原生 OOB/生命周期采集仍待完成，随后需要更新诊断身份、绑定新根哈希并完整链接打包。当前工作树仍不可作为 v186 启动包，无手机操作。证据见 [v186 应用服务发布](evidence/k80-gpu-v186-application-publication-offline-2026-11-14.json)。目标保持 active。
+
+
+### 2026-11-14：v186 普通应用输出与关闭结果采集（离线）
+
+已把诊断记录绑定到实际通过客户端准入的首个进程 uniqueID/PID，并在真实准备/OOB/进程创建和关闭返回处记录状态。标准写入路径只额外复制该进程的完整成功 stderr 写入，每条小于384字节、最多32次；仅保留含本轮精确前缀的完整可打印行。非阻塞原子锁竞争时丢弃诊断，原生返回和释放顺序保持不变。
+
+串口在应用发布88后最多等待60秒，看到关闭返回后再留500毫秒获取最终用户报告；新增 au 数值与 at Base64 文本字段。应用文本仍是应用报告，不能以诊断存在代替真实图像证据。AppIo/UfsOwner/sys_generic 原生编译通过，20项采集边界断言及76项实际关闭流程断言通过 ASan/UBSan。编译输出已全部隔离。
+
+下一步更新诊断身份与根哈希、完整链接替换 sys_generic/AppIo 等所有受影响对象并打包，随后执行有界真机验证。实际 stdio 完整行交付、签名/客户端准入、图像/映射/关闭仍需实机确认；准入失败前没有已绑定的用户输出采集。无手机操作，目标保持 active。证据见 [v186 应用结果采集](evidence/k80-gpu-v186-application-observation-offline-2026-11-14.json)。
+
+
+### 2026-11-14：v186 完整内核与启动包（离线）
+
+完整内核1c940e45…已生成：1398个精确输入中替换21个对象，包含 AppIo/AppExecution/HWSCHED、Board/Ring/DirectHfi、sys_generic 输出采集及身份/根绑定对象，未解析符号为零。其余输入逐项匹配 v185 哈希，31处受影响头文件依赖解析一致。运行身份已切换 d55c2bab…，根哈希4d636e89…同时绑定到内核与 ADT。
+
+启动包65e4538a…已完成 FAT 成员读回、现有启动器 PAC 检查和封存。沿用 v185 的1018字节启动参数、FD、加载器、shim 与看门狗/触控标记；ADT 仅改根哈希，FAT 仅换内核和 ADT。新根尚未安装；包记录明确清空当前安装凭证并将旧根凭证列为历史，device_ready=false，无 scope/ready/claim 或手机访问。
+
+下一步准备固定运行器及新一轮准入材料，核验实时差分页原像和保护区后才应用已审查的92页根差分，再进行普通应用 GPU 图像与正常关闭的有界真机测试。尚不构成应用 GPU、Metal、显示或完整触控验收。证据见 [v186 完整构建与启动包](evidence/k80-gpu-v186-full-build-offline-2026-11-14.json)。目标保持 active。
+
+
+### 2026-11-14：v186 普通应用根差分已安装（Recovery）
+
+使用新的精确 scope/owner/ready/admission/单次 claim，在固定92988a43/zorn/slotA 的 TWRP 中完成92页、12组根差分。写入前，运行器实际核对6170个历史修改页、全部本轮原像和保护区；写入后376832字节逐组读回，聚合9e4b8998…与本地完整回放一致。七组保护样本及整页 misc 前后一致。
+
+预期完整根身份为4d636e89…，来自完整本地镜像与差分谱系；没有执行32GiB整根设备读回，不能扩大实际读回范围。手机仍在TWRP，没有启动 iOS、执行 GPU 或重试。运行/准入状态已清空，未触发停止标记。原离线包记录保持不动，新 installed-root-cohort 关联实际安装凭证。
+
+下一步完成 v186 串口解析和新的临时启动准入，再验证普通应用图像、映射、fence及关闭。证据见 [v186 根差分安装结果](evidence/k80-gpu-v186-root-installed-2026-11-14.json)。目标保持 active。
+
+
+### 2026-11-14：v186 普通应用已准入，执行会话准备返回 NotReady
+
+单次临时启动收到2067字节串口记录：服务发布成功，普通进程PID12/unique12进入实际客户端；首次Query在准备执行会话时返回`0xe00002d8`（`kIOReturnNotReady`）。原生flags仅1，未完成执行权限/OOB/私有进程创建。两行用户stderr完整收到，无丢失或copy错误；最终报告phase1/method1/flags0/fence0。进程退出触发的关闭保留同一失败，不能认定成功释放。基础已知图像仍为CRC`e843b26a`、fence2。
+
+手机332.826秒自动返回TWRP，七组保护样本相同，BCB整页及尾部检查通过。摄像头可见模糊图形界面，当前仍为CPU显示路径。193项解析检查、实际源码格式化/base64/63字节USB包生产测试通过，但这些主机测试不代替GPU证据。
+
+源码发现：Board创建Ring时传入同一startup锁，应用权限回调持有该锁再检查身份，而`nativeApplicationBinding`拒绝锁已持有，形成确定的条件冲突。v186未记录内部具体拒绝分支；下一步在独立v187用共享锁复现并最小修正，保留回调入口不得预持锁与任务/线程/身份/issuer检查。证据见 [v186 普通应用真机结果](evidence/k80-gpu-v186-application-observed-2026-11-14.json)。应用图像、Metal、GPU呈现和完整触控验收尚未通过，目标保持active。
+
+
+### 2026-11-14：v187 共享启动锁修正，完整候选已准备
+
+以实际Board权限回调和实际Ring身份检查组合、共享同一把锁，复现v186的NotReady。v187只将身份检查改为要求回调已经持有这把锁；进入外部回调前仍必须未持锁，issuer及任务、线程、客户端、阶段检查保留。共享锁前后对照20项、身份生命周期82项和串口解析193项检查通过。
+
+完整1398输入链接、21对象替换、零未解析符号，内核`7cb0725f…`、启动包`99798f35…`。沿用已安装根`4d636e89…`及原签名测试程序，无新根写入；应用程序标签d55与新启动/串口标签d2a0分别绑定，不能混用前一轮日志。ADT、启动参数、FD、启动器和shim未改变，仅FAT内核替换。
+
+首次单对象编译遗漏配方工作目录、首次本地FAT副本继承只读属性，均保存失败证据并按实际目录/独立副本权限修正。新scope、封存包与准入材料已就绪，尚未启动。证据见 [v187共享锁修正与完整候选](evidence/k80-gpu-v187-shared-lock-ready-2026-11-14.json)。下一步执行已授权的300秒看门狗、600秒Recovery有界验证。
+
+
+### 2026-11-14：v187 实机通过应用权限/OOB，进程准备仍返回 NotReady
+
+新启动身份d2a0与已安装的d55测试程序分别绑定；2067字节串口记录通过验证。实际PID12/unique12的原生flags由v186的1推进为7：客户端准入、执行权限准备、应用OOB获取均完成，确认共享锁修正有效。
+
+失败仍在首次Query触发的`openApplicationProcess`内部，返回`0xe00002d8`，尚无process-open标记8。现有记录不能区分其中的操作权限检查、空闲检查、Prepare/Select/AttachVm或openProcessClient；不猜测具体分支。用户报告phase1/method1/flags0/fence0，进程退出关闭保留同一失败。基础已知图像CRC`e843b26a`、fence2仍通过。
+
+332.950秒自动回到TWRP，七组保护样本一致，BCB检查通过，无根写入或重复启动。下一步独立v188增加有界阶段/原始返回值记录，保留失败资源与原生命周期；进一步确定原因后再修正。证据见 [v187普通应用真机结果](evidence/k80-gpu-v187-application-observed-2026-11-14.json)。应用GPU图像、Metal、GPU呈现和完整触控仍待验收，目标保持active。
+
+
+### 2026-11-14：v188 应用进程准备阶段日志与完整候选
+
+为实际open/begin-operation、进程表切换和quiesce路径增加首次失败阶段、原始返回值及操作类型。记录绑定实际准入客户端，try-lock不等待，最多128事件；后续包装层错误不覆盖首个失败。没有新增硬件读写、重试或资源释放。12条实际quiesce源码前后路径的调用顺序/返回值保持一致，20项原观察器、76项clientClose、208项解析及实际格式化/base64/USB包生产检查通过。
+
+原生共享头消费者均重编；完整1398输入/21对象替换/零未解析符号，内核`751651ba…`、启动包`f693862e…`。继续复用已安装根4d636和签名d55测试程序，新启动/USB身份864d。仅FAT内核变化。新scope/封存包/准入已就绪，尚未启动；下一步收集实际内部失败位置。证据见 [v188阶段诊断候选](evidence/k80-gpu-v188-prepare-trace-ready-2026-11-14.json)。目标保持active。
+
+
+### 2026-11-14：v188 首个失败收窄到 SMMU Domain Prepare
+
+实际2106字节串口通过新解析器。`ax=26/e00002d8/0/16/1/0000007b0701023e`确定首次失败来自`transitionHostProcessTables(Prepare)`，保留16个实际事件和原始NotReady。此前应用权限、连接检查、quiesce、ring guard、硬件idle及无待完成任务均成功。PID12/unique12的客户端/执行/OOB仍为flags7，日志无copy错误或丢失。
+
+现有记录尚不能区分Domain内部准入、窗口、故障/stream检查与HostGpuTables页表准备，不能声称已进入分配或写根。应用首次Query仍失败、无应用图像提交；退出关闭保留同一失败。基础已知图像CRC`e843b26a`、fence2继续通过。
+
+332.924秒自动回到TWRP，七组保护样本及BCB检查通过，无根写入或重试。下一步独立v189记录Domain内部返回点，保留原保护与生命周期语义。证据见 [v188阶段诊断实机结果](evidence/k80-gpu-v188-prepare-trace-observed-2026-11-14.json)。目标保持active，Metal、GPU呈现和完整触控尚未验收。
+
+
+### 2026-11-14：v189 Domain Prepare 内部诊断候选
+
+v188 已把首个失败定位到 Domain Prepare；v189 增加阶段40–52，区分入口/执行窗口、状态、全局与各bank故障、stream冲突、实际consumer权限及HostGpuTables返回。仅记录真实客户端当前Prepare操作，保留首次错误；页表部分进度只读已有软件状态，没有新增硬件读写或放宽检查。35条实际Domain源码前后路径、9项实际身份转发检查和221项捕获解析检查通过。
+
+完整1398输入、21对象替换、零未解析符号，内核`f9e4b4f5…`、启动包`367e849a…`。复用已安装根4d636及签名d55测试程序，启动身份7173，300秒看门狗/600秒Recovery新试验包已封存，尚未启动。见 [v189候选证据](evidence/k80-gpu-v189-domain-trace-ready-2026-11-14.json)。目标仍active，普通应用图像、正常关闭、Metal、GPU显示及完整触控尚未通过。
+
+
+### 2026-11-14：v189 确认原生 post-CP 窗口开启拒绝
+
+2106字节实际串口记录通过验证，`ax=43/e00002d8/0/20/1/00000f7b0701023e`。Domain入口、Ring权限、调用方未持锁及窗口前置状态均通过；首次失败来自`beginNativeHostPostCpWindow()`。尚未进入后续故障/stream检查或HostGpuTables页表分配，不能据此认定分配失败。
+
+普通应用PID12/flags7、Query NotReady与关闭失败保留不变，已知图像CRC`e843b26a`/fence2成功。332.871秒回到TWRP；七组保护样本一致、BCB检查通过、运行状态清空，无根写入或重试。下一步v190拆分该窗口的原有短路条件，只观测首个拒绝条件。见 [v189实机结果](evidence/k80-gpu-v189-domain-trace-observed-2026-11-14.json)。目标active。
+
+
+### 2026-11-14：v190 窗口拒绝条件诊断就绪
+
+把原生窗口的原有短路条件分别记录为阶段53–60：持锁、运行时就绪、实际控制器占用、故障状态、已有窗口、两类线程所有者及开启成功。512条实际源码前后组合确认调用顺序/返回值/窗口状态保持一致，229条解析检查通过。内核`147583bb…`、启动包`11047d9c…`已封存；新45c3启动身份，保留已安装4d636根和d55测试程序，尚未启动。见 [v190候选证据](evidence/k80-gpu-v190-window-trace-ready-2026-11-14.json)。
+
+
+### 2026-11-15：v190 自动回收，但未取得新诊断
+
+一次临时启动后已确认TWRP返回。没有CDC数据，UFS记录仍为v189，解析器按陈旧身份拒绝；因此不能据此归因到某个窗口条件，也不能证明由新增诊断或已知启动不稳定造成。七组保护样本和BCB检查通过，状态清空，无根写入/重试。下一步v191从最近有效的v189源码派生，让窗口助手只通过可选局部输出返回拒绝条件，由实际Prepare调用点记录，缩小诊断的调用范围。
+
+独立复编确认当前PM源码与所链接历史对象逐字节一致；旧命令文件的源码哈希误用了Domain值，复核单独归档，不改写历史记录。见 [v190未取得有效诊断的实机记录](evidence/k80-gpu-v190-window-trace-observed-2026-11-15.json)。目标active。
+
+
+### 2026-11-15：v191 限定窗口诊断调用位置
+
+从实机有效的v189分支派生，窗口助手仅写可选的局部失败条件编号；只有实际Domain Prepare调用请求该编号并记录阶段61，不在其他助手调用者中调用Ring观察器。512条助手组合、35条Domain路径及233条解析检查通过；完整内核`a682e491…`、启动包`397e29b1…`封存，新7c7c身份，根4d636/d55程序不变。尚未启动。v190早退原因仍未知，此变更缩小诊断作用范围，不声称已经修复启动问题。见 [v191候选证据](evidence/k80-gpu-v191-window-return-ready-2026-11-15.json)。
+
+
+### 2026-11-15：v191 定位Domain停止状态与阶段88遗漏
+
+实际串口`ax=61/e00002d8/38/21/1/20000f7b0701023e`，detail十六进制38即条件56，确认窗口因`failed()`拒绝；此前持锁、原生运行时和实际控制器占用检查均通过。源码调用链进一步确认：Board发布应用服务成功返回88，失败返回87；Domain回调的成功阶段列表只包含到86，遗漏88，因而把成功发布标记为`stopped`。这是一处可确定复现的源码错误，与实际条件56吻合。
+
+v192仅补入成功阶段88。1029项实际分类/发布返回/failed/window源码组合检查复现旧错误，并确认保留87、未知阶段、原有停止及IRQ失败处理。硬件修复尚待验证。v191本轮332.958秒回TWRP、七组保护样本/BCB通过；摄像头看到CPU呈现锁屏，基础已知图像通过，普通应用仍无成功提交或正常关闭。见 [v191实机与源码根因证据](evidence/k80-gpu-v191-window-return-observed-2026-11-15.json)。目标active。
+
+
+### 2026-11-15：v192 修复成功发布阶段被误标记停止
+
+仅将实际应用服务发布成功的阶段88补入Domain启动结果成功列表；失败87、未知结果、原有停止状态和IRQ故障均保留原处理。1029项实际源码回归复现并验证修正，233项解析检查通过。完整内核`6ac9b519…`、启动包`66ef592d…`封存，根4d636/d55探针不变，新7e4c试验准备完成、尚未启动。见 [v192修复候选证据](evidence/k80-gpu-v192-publication-stage-ready-2026-11-15.json)。实际应用图像及正常关闭仍待真机验证。
+
+
+### 2026-11-15：v192 普通应用GPU图像与正常关闭实机通过
+
+成功阶段88误分类修正后，普通mobile应用PID12通过实际IOServiceOpen/IOConnect路径完成BO分配、CPU/GPU映射、247word二维命令提交、真实fence等待、32768字节CPU可见结果校验、解除映射、释放与IOServiceClose。2104字节同轮串口绑定新7e4c启动身份与原签名d55程序：`phase=11 raw=0 flags=3ff iova=63040000 fence=3 crc=e843b26a firstBad=ffffffff closed=1`。原生flagsff、17事件、12完整日志行，无copy错误或丢失；`ax=9/0/0/61/0/201fff7b070103fe`确认进程准备全部必需阶段完成。
+
+332.359秒自动回到TWRP，七组保护样本一致、BCB全页/尾部通过、运行状态清空。无根写入或重试。证据见 [v192普通应用图像/生命周期实机结果](evidence/k80-gpu-v192-application-image-observed-2026-11-15.json)。这是一次有界普通应用会话的已知二维图像及正常关闭验收；CPU呈现仍启用，尚不代表shader、Metal、GPU显示呈现、长期稳定性或完整FT3683交互通过。v190无新日志的早退原因仍未知。下一步核对固定iOS26 Metal/Turnip/bridge与实际K80客户端ABI，推进真实Metal设备/pipeline/渲染/读回，再接GPU呈现和触控验收。目标保持active。
+
+
+### 2026-11-15：v193 普通 Metal 绘制测试准备
+
+复用已安装的生命周期修复版 Metal 插件与 registry-r2 Turnip；通过正常 Metal API 加载自有着色器、创建 pipeline 并绘制32×32棋盘，全4096字节校验。官方编译器已生成普通metallib。采集记录最多四个顺序原生会话，分别判定绘制与关闭；179项实际采集解析检查和ASan/UBSan观察器/格式测试通过。
+
+完整内核be80bc75…与启动包d9547953…已封存。根0e17eb76…精确107页差分已在固定Recovery工具中安装并读回，保护区域保持不变；本条记录时尚未进行v193系统启动，不能据此声称Metal通过。见 [v193准备证据](evidence/k80-gpu-v193-metal-ready-2026-11-15.json)。
+
+
+### 2026-11-15：v193 已回收，尚未观察到 Metal 客户端打开
+
+本轮333秒内自动返回TWRP，七组保护样本和BCB检查通过。1881字节同轮串口记录确认应用服务发布成功、内核已知图像仍通过；应用会话、准备调用与程序文字均为零。摄像头见CPU锁屏。当前日志在用户客户端准入后才捕获stderr，因而不能区分启动、dyld、设备发现或插件加载环节的提前失败；下一轮先补齐前置日志，不能将缺失记录判成着色器或GPU执行失败。见 [v193实际结果](evidence/k80-gpu-v193-metal-observed-2026-11-15.json)。
+
+
+### 2026-11-15：v194 定位到正常 Metal 设备发现返回空
+
+前置日志捕获实际PID10的三次完整输出，无复制错误或丢失：程序运行并取得GPU服务ID0x10000024c，但MTLCreateSystemDefaultDevice返回nil，尚无原生客户端准入。排除了本轮程序未进入main或未发现服务的情况，仍不能区分Metal发现过滤与插件内部前置检查。GPU内核已知图像仍通过；332.84秒自动返回TWRP，七组保护样本与BCB一致。下一步从自有插件源码和正常NSBundle加载接口补充诊断。见 [v194实际结果](evidence/k80-gpu-v194-metal-discovery-observed-2026-11-15.json)。
+
+
+### 2026-11-15：v195 Metal 发现诊断准备
+
+v194 已证明普通程序找到实际GPU服务，但正常Metal设备创建返回空值且尚未进入原生客户端。v195 保留正常创建路径，新增实际注册表属性、插件入口阶段及失败后的NSBundle加载错误日志；不手动构造设备。仅两个现有根文件变化，已通过签名、源码语义保持、ASan/UBSan、日志边界、完整链接与本地差分回放。精确5624页/101组已安装读回，保护区域保持一致。系统测试待运行，尚不能判定插件为何返回空值。见 [v195准备证据](evidence/k80-gpu-v195-metal-discovery-ready-2026-11-15.json)。
+
+
+v195 于333.04秒返回TWRP，保护区域一致；启动入口调用遗漏CDC包装器，导致插件诊断文本缺失。已保留该缺口，未将基础记录当作Metal结果。v196保持相同根镜像、程序和驱动行为，仅使用新启动标识；改为通过先启动接收线程的包装器执行，结果待回收。见 [v195采集缺口](evidence/k80-gpu-v195-capture-gap-observed-2026-11-15.json) 与 [v196准备](evidence/k80-gpu-v196-metal-capture-ready-2026-11-15.json)。
+
+
+### 2026-11-15：v196 定位至 Metal 桥接层创建设备
+
+本轮2340字节串口记录通过身份核验。实际普通进程PID10找到IOAcceleratorES及正确插件属性，正常Metal调用进入插件，并执行到桥接层；桥接设备创建返回空值，未观察到原生客户端进入。NSBundle加载和principalClass查询成功。第一个缓存confstr返回errno5，但后续临时目录可用，不能将其认定为最终失败原因。下一步复用前端已有的`NMB_LOG_STDERR`开关输出实际拒绝原因，避免修改前端/Rust/Turnip。Recovery332.814秒、七组保护样本和BCB检查通过。见 [v196结果](evidence/k80-gpu-v196-metal-bridge-refusal-observed-2026-11-15.json)。
+
+
+v197离线候选完成：普通程序在正常Metal创建前启用已有`NMB_LOG_STDERR=1`，原有绘制/提交/完成/读回代码不变。单个根文件修改，43页/10组差分经过完整本地回放；内核229130f4…与启动包8b0e199c…封存，尚未安装或启动。当前手机仍使用v195根镜像。下一步完成精确安装审核和新凭据，然后使用CDC包装器执行测试。见 [v197离线证据](evidence/k80-gpu-v197-bridge-stderr-offline-2026-11-15.json)。
+
+
+### 2026-11-15：v197 定位到 Vulkan 动态加载入口
+
+2557字节串口记录验证通过，原有前端日志报告`LoaderNotFound`。源码确认该错误同时涵盖动态库装载和必需入口查找失败，当前消息未保留具体动态加载器原因。实际库文件可读，但尚未进入原生客户端。下一步在自有插件中以相同加载选项检查该单一依赖，并记录有界`dlerror`文本；不调用Vulkan函数或选择替代驱动。Recovery332.782秒，七组保护样本及BCB检查一致。见 [v197结果](evidence/k80-gpu-v197-loader-refusal-observed-2026-11-15.json)。
+
+
+### v198 owned loader preflight (offline)
+
+v198 offline loader preflight compiled/signed/full-linked; root884647bb changes only principal5614pages95groups,fullreplaymatch. Kernel79f59b80/boota82f3142. Retain197probe/frontend/Rust/PM4/Turnip;diagnostic helper ASan/UBSan and186capturechecks pass. Actual dlopen/dlsym reason still pending fresh device test. [Evidence](evidence/k80-gpu-v198-loader-preflight-offline-2026-11-15.json).
+
+
+v198 root installed and fresh trial ready: v198 plugin-only root884647bb installed5614pages95groups,readbackd19e26a2/protections/TWRPpass;6424historicalpageschecked. Fresh5af90boot a82f3142/kernel79f59b80 and retained197probe bound/frozen/check-onlypass. CDCwrapperstartsreceiverbeforeboot;actualownedlibrary dlopen/entry diagnostic pending. [Ready evidence](evidence/k80-gpu-v198-loader-preflight-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal198-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v198-metal-trial-5af90dbde5c547f6a7e3a7af3437eab8/root-trial`. No boot yet at this record.
+
+
+v198 COMPLETED session80792 exit0. v198 observed2628BverifiedCDC:dlopen stage16 explicitly fails missing code signature on owned libvulkan_freedreno.dylib; independent codesign also proves unsigned. Recovery332.105s/TWRP/7protectionpairs/BCBpass,knownimagepass,ordinaryMetaldevice stillnil. Nextsign Turnip and resealouterbundle,then freshbounded normalMetal test. Currentroot884647bb,activefieldsnull/stopfalse,claimconsumed. Boundeddlerror n681 cap0 cut1; rawstderr381B/drops0. Error middle deliberately omitted, actualtail retains missingcodesignature+exactpath. [Observed](evidence/k80-gpu-v198-unsigned-turnip-observed-2026-11-15.json).
+
+
+## v199 signed Turnip offline
+
+B199 `/tmp/zorn-v199-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v199-signed-turnip-e1fa9af7d85a4cff9888d1d3abd26263`;tage1fa9af7d85a4cff9888d1d3abd26263,retainedprogramtag7d13f747733a450f886fef3490fd9ca0. v199 explicitly signs own Turnip dylib and reseals outerMetal bundle after198 actual missing-code-signature refusal. No executable recompilation/nativepolicychange;retain198principal/197probe. Three existing rootfiles128pages19groups/fullreplaymatch;root7976b83a/kernel8337f80e/boot4e6e9086. Nested and outer signatures verified separately;1398inputs/0undefined/32headers/186capturechecks pass. Freshdevice acceptance pending. [Offline evidence](evidence/k80-gpu-v199-turnip-signature-offline-2026-11-15.json).
+Currentphone still198root884647bb/TWRP. Newroot7976b83a84818bd6b4e438435a9d3bae4171aa7df4122fb997af507cd388e78a;notinstalled/notbooted.
+
+
+v199 root installed and fresh trial ready: v199 signedTurnip root7976b83a installed128pages19groups/readback2c2c0b23/protection/TWRPpass;6475historicalpageschecked. Freshe1fa9boot4e6e9086/kernel8337f80e and retained197probe bound/frozen/check-onlypass. CDCwrapperstartsreceiverbeforeboot;actualsignaturefix/normalMetaldevice/render acceptance pending. [Ready evidence](evidence/k80-gpu-v199-turnip-signature-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal199-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v199-metal-trial-e1fa9af7d85a4cff9888d1d3abd26263/root-trial`. No boot yet at this record.
+
+
+v199 COMPLETED session31333 wrapperexit1,innerbootrunner0. v199 returnedTWRP269.505s,7protectionpairs/BCBpass,UFSfresh150sCPU/touchsnapshot. CDCportnull/0B,wrapperexit1(innerbootrunner0);signaturefix/Metal result unknown,not success orprovenpanic. FixedRecoveryreadonly pstore/last_kmsg absent. Nextfreshkernel reduces postpublication observerwait100s to10s for intermediatecapture;root199retained. Currentroot7976b83a,TWRP,activefieldsnull/stopfalse,claimconsumed;no reboot in crashread. [Observed](evidence/k80-gpu-v199-early-recovery-no-cdc-2026-11-15.json).
+
+
+## v200 earlier diagnostic snapshot ready
+
+B200 `/tmp/zorn-v200-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v200-metal-early-snapshot-71d378b37f6045e5a338bac55a48d779`;tag71d378b37f6045e5a338bac55a48d779;programtag7d13f747733a450f886fef3490fd9ca0. v200 freshkernel retainsinstalled199root7976b83a/probe197/signedTurnip. Only postpublication observerwait100s to10s,identityretag;ASan/UBSan actualwaitbounds,186capturechecks,1398inputs/0undefined/32headers pass. Boot0c85683b/kernelb3c1aa65 frozen/check-onlypass. EarlierintermediateMetal/CDC evidence pending;no rootwrites. [Ready evidence](evidence/k80-gpu-v200-earlier-metal-snapshot-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal200-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v200-metal-trial-71d378b37f6045e5a338bac55a48d779/root-trial`. No boot yet at this record.
+
+
+v200 COMPLETED execsession3903 wrapperexit1/innerbootrunner0. v200 shortwait10s still returnedTWRP269.573s with0BCDC/noport;7protectionpairs/BCBpass,root199unchanged,activefieldsclear. This does not isolatecause;100swaitnot sufficient explanation. NoMetal/knownimage verdict for199/200. Nextindependent CDC initializedbefore deferredGPUcall, boundedprogress frames;no samebootretry. [Observed](evidence/k80-gpu-v200-short-wait-no-cdc-2026-11-15.json).
+
+
+## v201 independent CDC before GPU (ready)
+
+B201 `/tmp/zorn-v201-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v201-cdc-before-gpu-c34dbc88d85148678c65c8ec1ac4175a`;tagc34dbc88d85148678c65c8ec1ac4175a,programtag7d13f747733a450f886fef3490fd9ca0. v201 independentCDC beforeGPU ready: initialstate0frame mustcomplete beforeoneGPUworker;soleUSBconsumer emitsbounded21x3072Bprogressframes/60s,completedtransferbeforereuse. Retain199signedroot7976b83a/probe197. ASan/UBSanactualstream/formatter/threadchecks,25parsercases/5sameUFSenvelopecontrols,1398inputs/0undefined/35headers pass. Bootc0568612/kernela4d12c8f frozen/check-onlypass. Hardwarethread/USBconcurrency andMetal outcome pending;partialframesneverfullGPUqualification. [Ready evidence](evidence/k80-gpu-v201-cdc-before-gpu-ready-2026-11-15.json).
+SourcechangesonlyUFSworker/CDCtransport plus2headers. GPUdeferredcallmovedoneworkerafterfirstUSBcompletion;actualUSBclocksnowconcurrentwithGPU;neverretrythread/GPUonfailure. Newdecoder `inspect_ios26_gpu_progress201.py`;wrapper `read-zorn-gpu-metal201-cdc.py`ONLY;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v201-metal-trial-c34dbc88d85148678c65c8ec1ac4175a/root-trial`. Legacy-marker hostreviewrefusal archived andcorrected toactualnewprogressformat beforefreeze;packagewasgeneratedwhilechecking,butnotadmitteduntil35headerreviewpassed. No device201attempt yetatthisrecord.
+
+
+v201 COMPLETED execsession67279 exit0/inner0. v201 recovered to TWRP in269.597s;776B/two verified CDC progress frames state0 then1, no partialtail. First frame before GPU and successful worker queue observed; worker entry/return and publication not observed. Ordinary PID10/unique10 phase1, no native sessions/stderr. Seven protection pairs and BCB pass; root199 unchanged/current fields clear. USB-before-GPU transport works; absence of later frames does not distinguish scheduling, GPU execution, reset or USB interruption. Full Metal/render qualification pending. [Observed](evidence/k80-gpu-v201-initial-progress-observed-2026-11-15.json).
+
+
+## v202 bounded progress completion acknowledgments (ready)
+
+B202 `/tmp/zorn-v202-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-cdc-stage-ack-231613e23b4d4a73b5894be408a6f7e4`;tag231613e23b4d4a73b5894be408a6f7e4,programtag7d13f747733a450f886fef3490fd9ca0. v202 ready: three initial CDC frames before one worker; same worker waits up to10s for actual bulk-IN completion of entry point1 before GPU call, and point2 after real known-image success/before existing application publication. Timeout stops dependent action and reports explicit abort; no fabricated SMR success. Retain199signedroot7976b83a/probe197. Actual callback/worker/publication branch ASan/UBSan,43parser/5envelope cases,1398inputs/0undefined/37header checks pass. Bootecdc9b0f/kernel299c14d9 frozen. Thread/USB timing and Metal outcome require hardware test. [Ready evidence](evidence/k80-gpu-v202-stage-ack-ready-2026-11-15.json).
+SourcechangesUFSworker/DarwinBoardOwner,USBidentity only; two new headers. Point1 timeout gives state5/no GPU call; point2 timeout skips publication and existing failure path returns87/stoppedretained. Each wait10s; total CDC60s unchanged. No native grants or GPU command changes. Wrapper ONLY `scripts/read-zorn-gpu-metal202-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v202-metal-trial-231613e23b4d4a73b5894be408a6f7e4/root-trial`. No device202attempt yetatthisrecord.
+
+
+v202 COMPLETED execsession31629 exit0/inner0. v202 recovered to TWRP in289.977s;3288B/eight verified CDC frames, warmup0/0/0, worker queue1, entry2 point1/ack1, before-publication point2/ack2. Actual known-image function returned success before source point2; no full CRC/register envelope in this diagnostic stream. No publication result or deferred-return observed; ordinary PID10/unique10 still phase1/no native sessions/stderr at last frame. Seven protection pairs and BCB pass; root199 unchanged/current fields clear. Focus next on actual service-publication path and immediately awakened clients; interruption cause not yet established. [Observed](evidence/k80-gpu-v202-before-publication-observed-2026-11-15.json).
+
+
+v203 COMPLETED execsession73555 exit0/inner0. v203 recovered to TWRP in300.215s;5758B/14 verified CDC frames, no partialtail. Source points3/4/5 and actual completion acknowledgments observed: real service allocation/init/metadata and attach/start returned success, registerService about to execute. Point6/registration-return and deferred-return not observed. PID10/unique10 phase1/no native sessions/stderr at last frame. Known-image success path preceded point2, but no complete CRC/register envelope. Seven protection pairs/BCB pass; root199 unchanged/current fields clear. Interruption localized to registration or immediately awakened clients; no definitive panic/deadlock diagnosis. [Observed](evidence/k80-gpu-v203-before-registration-observed-2026-11-15.json).
+
+
+## v204 ordinary client loading delay (offline)
+
+B204 `/tmp/zorn-v204-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v204-client-load-delay-0302d04769474ecea3370a41685189cd`;program/boottag0302d04769474ecea3370a41685189cd. v204 offline candidate: owned ordinary probe phase2 then checked nanosleep10s before unchanged normal Metal API; interrupted/failed wait reportsphase3code4 and exits. Root3bdcea6f changes only existing probe,62pages/9groups/full32GiBreplay match;568monitoredfiles/attributes and nested/outer signatures pass. Retain199signedTurnip and203kernel service gates. Kerneladeea146/boot49e60c9c,1398inputs/0undefined/38headers; actual10.01s hostwait/ASan/UBSan,49parser/5capture cases pass. Newroot install plan reconstructs6597actualpages/145groups from6475prior plus128actual199install pages;18source/BCBrefusals pass. Not installed/not booted. [Offline evidence](evidence/k80-gpu-v204-client-delay-offline-2026-11-15.json).
+D204 `/tmp/zorn-v204-delta-review` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal204-root-delta-review-0302d047`. Existingfixedrootentry gainedonlyfreshMETAL204scope, alloldscopeparametersverifiedunchanged. Phonecurrently199root7976b83a/TWRP. Kernelrootbinding now3bdcea6f; no installation/204boot yet. Otherordinaryclients remain a caveat: probe10sdelay isolates onlythisactualprobe,notallMetalusers.
+
+
+v204 installed and fresh test ready: v204 reviewed probe-only root3bdcea6f installed:62pages/9groups,253952bytes readbackead6e554 matches local replay;6597prior actualpages and allpreimages checked,protectedmetadata/fences/BCBpass,TWRPbefore/after,noautomaticboot. Freshboot49e60c9c/kerneladeea146 binds newroot andnewprogram0302d047; retains199signedplugin and203nativegates. Fixedrunner identity/rootbinding-only parity andcheck-onlypass, snapshotsealed. Nextreceiver-first boundedboot,300sWDT/600sRecovery; probephase2 then10sdelay isolates ownclient only,otherclientsremainpossible. NoMetalqualification. [Ready evidence](evidence/k80-gpu-v204-client-delay-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal204-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v204-metal-trial-0302d04769474ecea3370a41685189cd/root-trial`. Rootinstallation completed session22193 exit0. Initialhostrunner reverse-substitution check confused intentionallyidenticalboot/probetags; archived and madecontext-specific, exactparentrestoration nowpasses. No deviceboot atthisrecord; do not reuse rootinstallclaim.
+
+
+v204 wrapper started in execsession66538;receiver-first/freshclaim. Poll samehandle untilRecovery/capturefinal;neverrestart or invoke bootentryseparately. Currentroot2043bdcea6f;installationclaimconsumed.
+
+
+v204 COMPLETED execsession66538 exit0/inner0. v204 recoveredTWRP310.383s,7825B/18verifiedCDCframes,nopartialtail. RealregisterService return point6/ack6 anddeferredGPUreturnSMR88/publication0x100000000 observed whileownprobephase2 waits10s. Later principalstage18 proves realownedTurnipdlopen+publicentrylookup success;stage9 entersnormalbridge. ActualPID10/unique10 nativeeventcounter22(includeslifecycleevents),lastmethod6WaitFence returned0;twoactualsessions,firstcloseReturned1/raw0,secondpreparationcomplete/closeunobserved. NoMetaldevice-return,render,finalteardownorfullknownimageenvelope. Sevenprotectionpairs/BCBpass,installedroot204unchanged,stateclear. Earlierregistration-only interpretation narrowed;source60sCDCdeadline maycutlaterprogress,actualstreamexitcause notlogged. No panic/deadlock or WaitFence failure established. [Observed](evidence/k80-gpu-v204-registration-and-native-client-observed-2026-11-15.json).
+Next independent205 source candidate extends only bounded CDC observation window60to90s and framebudget21to29 (29x3072=89088B;receiver/parser boundsupdatedtogether),retain3s cadence/all6gates/probe204root/signed199plugin/nativebehavior and300sWDT/600sRecovery. ValidateDMAcompletion-before-reuse,totalbounds/parserpartialtail/same-run envelope andnativefullbuild. Budgetstillindependentofwatchdog; absenceoflateframe remainsnotpanicproof. Freshscope/retag/receiver-first only,no rootwrite/retry. Moreobservationneededbecauseownprobeentersrealnativeworkonlyinlastavailableframe,notbecauseofidentifiedfunctionalfix. No205createdyet.
+Actualsource `ZornGen7AppIo26.cpp` methodtable slot6=NativeAdrenoAbiWaitFence;run.done recordsreturned result,notcurrent in-flight method. Do notcallthisaWaitFencehang. `ZornUsbCdc26.c` starts60sdeadlinebeforepoll/hostconfiguration;firstframewaitplus3s cadence canyieldfewerthan21frames. Exactexitreasonunobserved. Method6/raw0isnativewaitcompletion,notMetalimagepass.
+
+Counter precision: field `calls=22` counts `appObservationEvent`, including lifecycle events; it is not22IOKitmethods. Thelastcapturedactualmethod6returned0. SeeB204/post-run-source-window-audit.json.
+
+
+## v205 longer bounded client capture (ready)
+
+B205 `/tmp/zorn-v205-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v205-longer-client-capture-8b97f3a115574090a916be91a5c2837b`;tag8b97f3a115574090a916be91a5c2837b,retainedprogramtag0302d04769474ecea3370a41685189cd. v205 ready: extendonlyboundedCDC60to90s,21to29frames,3072Bperframe/89088Btotal;receiver/decoderboundstogether. Retain3scadence,all6gates,installed204root3bdcea6f/probe10sdelay,signed199Turnip,nativecalls and300sWDT/600sRecovery. HostASan/UBSan actualbuffer/worker/service gates,51parser/5same-runenvelope cases;1398inputs/21recompiled/0undefined/38headers. Kernelf4275fbb/boot8b0af0bd;fixedrunner/check-only/snapshotpass. No rootwrites/newfunctionalfix. Longerwindow targets native/Metalprogress after204lastframe,notproofearlierhaltwaspanic. [Ready evidence](evidence/k80-gpu-v205-longer-client-capture-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal205-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v205-metal-trial-8b97f3a115574090a916be91a5c2837b/root-trial`. No205bootatthisrecord. DevicecurrentlyTWRP/root204,last204claimsconsumed,stateclear. Countersareobserverevents,notallIOKitmethods. FullMetalrender/presentation/teardownremainsunaccepted.
+
+
+v205 wrapper started execsession43699,receiverfirst/freshclaim. Pollsamehandle untilRecovery/capturefinal;neverrestart or invoke bootentryseparately. Installed204root3bdcea6f retained,no rootwrite.
+
+
+v205 COMPLETED execsession43699 exit0/inner0. v205 recoveredTWRP310.103s;8195B/18verifiedCDCframes,nopartialtail. Registrationpoint6/ack6,SMR88/publicationpass. PID10/unique10 actualordinaryMetal phase4flags7/status0: device returned withsame registryID0x10000024f,metallib andvertex/fragmentfunctions loaded. Pipeline-return/render/teardownunobserved. Latestnativeeventcounter78(includeslifecycle),lastmethod2BoAllocreturned0;twoactualsessions,firstclose1/raw0,secondcloseunobserved. Rawstderr383B filledbyruntimewarning,rawDropped15;no warning assertedascause. CDC90s/29limitstill18frames,so60sdeadlinealone not sufficientexplanation;streamexitcauseunobserved. Sevenprotectionpairs/BCBpass,root204unchanged,stateclear. [Observed](evidence/k80-gpu-v205-metal-device-library-observed-2026-11-15.json).
+Next206 independentkernel candidate retains205streambounds and204root/probe/plugin; boundedrawstderr accumulator keepsfirst96bytes plus explicitomissionmarker andlatest282bytes afteroverflow, withinexisting384Bbuffer. Preserve structuredphase reports separately, markrawDropped truthfully, nativecalls unchanged. Validate actual accumulator underASan/UBSan chunkboundaries,identity/error/locking/refusal paths,reportselection andformatter/parser; fullnativebuild/freshscope/receiver-first required. No rootwrite or functional-successclaim. Thisaddressesobserveddroppeddiagnostics,notprovenGPUrootcause.
+No205retry;installed204root3bdcea6f/probe0302d047 retained. Actualfrontend/Rustarchive hashes match retained198linkinput and199signedbundle lineage; compilerdeps identify actualRustsources byte-identical toreviewedcopies. No forbiddenbinaryanalysis.
+
+
+## v206 bounded stderr head and tail (ready)
+
+B206 `/tmp/zorn-v206-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v206-stderr-head-tail-0e041f68121e4683b89ca31d6cd74d18`;tag0e041f68121e4683b89ca31d6cd74d18,retainedprogramtag0302d04769474ecea3370a41685189cd. v206 ready: rawstderr keepsfirst96bytes+explicit5byteomissionmarker+latest282bytes onoverflow, same384Bbuffer/layout/trylock andtruthfulrawDropped;structuredphase reports/nativecalls unchanged. Actualsource296580referencechunk checks plusidentity/copyfailure/trylock/reservation/terminal checks ASan/UBSanpass;52parser/5envelopecases,1398inputs/0undefined/38headers. Retain204root3bdcea6f/probe,199signedplugin and205CDC90s/29frames/89088B. Boot550b3efc/kernel95217652 frozen/check-onlypass. Targets205rawlogtruncation,notfunctionalGPUfix;no rootwrite/Metalrenderqualification. [Ready evidence](evidence/k80-gpu-v206-stderr-head-tail-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal206-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v206-metal-trial-0e041f68121e4683b89ca31d6cd74d18/root-trial`. No206bootatthisrecord. Initialparserfixturetailhadwrongliteralpaddinglength;archivedandcorrectedusingactualsuffixlength,parserunchanged. DeviceTWRP/root204,last205claimconsumed,stateclear.
+
+
+v206 wrapper started execsession32152,receiverfirst/freshclaim. Pollsamehandle untilRecovery/capturefinal;neverrestart or invoke bootentryseparately. Installed204root3bdcea6f retained,no rootwrite.
+
+
+v206 COMPLETED execsession32152 exit0/inner0. v206 recoveredTWRP309.619s;8195B/18verifiedCDCframes,nopartialtail. Phase4flags7/status0 againproves normalMetaldevice registrymatch andmetallib/functions. Boundedhead/tailrawstderrnowshowsPLUG15v1 aftermissingdeviceanswer warnings;devicecreationreturned,these warningsnotestablishedcause. Raw383B/rawDropped13explicit. Nativeeventcounter74,lastmethod6WaitFencereturned0,secondsessioncloseunobserved. At279.8s hostUSBregistry andreader serial/rawfd stillopen8195B;no earlyreceiverexit atthatsample. CDC90sstillno laterframes;pipeline/render/teardownunobserved,no provenpanic/deadlock. Sevenprotectionpairs/BCBpass,root204unchanged/stateclear. [Observed](evidence/k80-gpu-v206-metal-pipeline-boundary-observed-2026-11-15.json).
+Next207preparecontrolledchecked10swaitafterownedprobephase4beforeunchangednormalpipelinecreation,retainingcurrentpreMetaldelay and206head/tail. ObservewhetherCDCcontinueswhilepipelinehasnotbeencalled;otherconcurrentwork remainscaveat. Requiresnewprogramtag,signedprobe-onlyrootcandidate,fullreplay,current204installation cumulativepages,protectedexactdelta/fullnativecohort andfreshreceiver-firstscope. No207created/rootwrittenyet. Sourceauditfoundno blockingpublicationread orincorrectthread_terminate contract;no functionalfixestablished. Do notrepeatunchanged206 orfabricatemissingcapabilityanswers.
+Hostmetadatafirstpssandboxdenied,read-onlyescalatedobserve206-host.py thenpassed279.8s;noadditionalphonecommands/portopens. CameraSPCameraDataTypeempty,noimage. Allclaims205/206consumed;no livejob. Goalactive.
+
+
+## v207 pre-pipeline probe control (offline)
+
+B207 `/tmp/zorn-v207-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v207-pre-pipeline-delay-20d8898a1a0d43c5bdcacd64b0104eaf`. v207 probe-only offline progress: retain204checked10s preMetalwait; add samechecked10swait afteractualphase4 beforeunchanged normalpipeline creation. Failure reportsphase5/code4 andexits beforecall. Newprogram20d8898a compiled/signed arm64e-ios26;actualbranchASan/UBSan passes andexactparentrestorationprovesonlyidentity+newwait. No rootcandidate/kernel/package/admission/install/boot yet. CurrentphoneTWRP/root2043bdcea6f,206claimsconsumed. FullMetalpipeline/render/presentation/teardown remainunaccepted. [Evidence](evidence/k80-gpu-v207-pre-pipeline-probe-offline-2026-11-15.json).
+Continue207 with204probe-only compose-root workflow but base actualinstalled204root, retainedsigned199plugin and206kernel/headtail. Newroot fullhash/fsck/metadata/signatures/exactdelta/replay required. Reconstruct cumulativepriorreadback from204review6597pages plusactual20462pageinstallation beforefreshfixedinstaller. Updatekernel observerprogramtag/rootbinding andretagonlyUSB/UFS; fullnativecohort andreceiver-first300sWDT/600sRecovery. Do notreuseclaims orcopyunsignedTurnip. No functionalGPUfixclaimed.
+No livejob;lastturnclassifiedprogress: new signedprobe/actualbranchtest, no phoneoperation.
+
+
+## v207 root and full build (offline)
+
+v207 offline root and complete build: signed ordinary probe adds checked10s wait afterphase4 beforeunchangedpipeline. Rootd425c19b changes only existingprobe;65pages/10groups/266240B,full32GiB replay identical,568monitoredfiles/attributes andnested/outer signatures verified. Kernel25233577/bootf214fd8e bindnewroot;1398inputs/21recompiled/0undefined/38headers;73sourcefiles exactparent restoration allows only identities/rootbinding/newwait. Cumulative installed204 actualreadback reconstructed6647pages/146groups from6597prior plus62actual204pages. No207installer/admission/install/boot yet;Metalpipeline/render/presentation/teardown unqualified. [Evidence](evidence/k80-gpu-v207-root-build-offline-2026-11-15.json).
+Next prepare fresh207 rootdelta review using D204 as prior installation and6647pages/146groups cumulativecoverage;65pages/10groups candidate. Add fresh fixed207scope with historicalscope parity andhostrefusal tests, then freshadmission/install/readback. After install build freshreceiver-first systemscope/ready/claim andactualsource observer/capture checks. Retain300sWDT/600sRecovery,readonlyruntime,signed199plugin,205CDC90s/29frames and206stderr. Neverreuse204/206claims. No current liveprocess orphoneaccess thisturn.
+B207 `/tmp/zorn-v207-path` remains `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v207-pre-pipeline-delay-20d8898a1a0d43c5bdcacd64b0104eaf`. RootSHA d425c19b0a4980081a889c9c5d17bb8ebeea664177f3b102ee48cc57715a6254;kernelSHA 25233577cb119b42211f2adcbbaf51e6e521614b9288d3c0ed41f4c1013c026e;bootSHA f214fd8e7720d006db88bb0958a629fb7295c80652021f5dad6bf1b6db0f02a6. Source/build/root evidence sealed in root-build-snapshot. Phone lastobservedTWRP/root204;thisturn no freshphone observation. Existing207 sourceobserver nownewprogramtag;newrootwindow binding andUSB/UFS runidentities updated. No207 delta-review directory or fixedrunner entry yet. Previousgoal status-onlyturn no-progress;thisturn concrete root/replay/native/package progress.
+
+
+## v207 pre-pipeline control (ready)
+
+v207 rootd425c19b installed65pages/10groups/266240B withreadback1975aeaa matchinglocalreplay;6647priorpages andallpreimages checked,protectedmetadata/fences/BCBpass,TWRPbefore/after. Newkernel25233577/bootf214fd8e freshfixedscope/check-onlypass. Actualworker/servicegateASan/UBSan,52parser/5same-UFSenvelope and19installer plus6admissionrefusals pass. Ordinaryprobe phase4 thenchecked10s delaybeforeunchangedpipeline;retains preMetal10s,206stderr,205CDC90s/29frames and199signedplugin. No207systembootyet;pipeline/render/presentation/teardownpending. [Ready evidence](evidence/k80-gpu-v207-pre-pipeline-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal207-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v207-metal-trial-20d8898a1a0d43c5bdcacd64b0104eaf/root-trial`. Rootinstallation session33810completed exit0,claimconsumed;freshsystemclaim notconsumed. Root/probe now207;do not use204rootbindings. Next testrequiresreceiver-first300sWDT/600sRecovery.
+
+
+v207 wrapper started execsession54367,receiverfirst/freshsystemclaim. Pollsamehandle untilactualRecovery/capturefinal;neverrestart or invoke bootentryseparately. Installed207rootd425c19b;65pageinstallation claimconsumed.
+
+
+v207 COMPLETED execsession54367 exit0/inner0. v207 recoveredTWRP320.278s;11318B/21verifiedCDCframes,nopartialtail. Phase4flags7/status0 andmatchedMetaldevice/library/functions againobserved. Newchecked10spre-pipelinewait yieldsfourphase4frames(seq17..20),versusone(seq17)in206;nativeeventcounter74unchanged,method6WaitFencereturned0. Consistentwithprogressduringwait,notproofwaitreturned orpipelineentered. Pipeline-return/render/teardownstillunobserved;no provenpanic/deadlock. Sevenprotectionpairs/BCBpass,installed207rootd425c19bunchangedduringboot,stateclear. [Observed](evidence/k80-gpu-v207-pre-pipeline-wait-observed-2026-11-15.json).
+Next208 source-owned probe diagnostics should distinguish checkedwaitreturn,descriptorallocation/setters andactualpipelinecall. Useexplicitboundedmarkers withoutalteringnativeAPI/fabricatingcapabilityanswers;considersecondcheckedwaitafterdescriptorreadytoallowCDCdeliverybeforepipelinecall. Preservecurrenttwo10swaits,206headtail,90s/29framebudget unlesssource-reviewedbudgetrequiresadjustment. No208createdyet. Requiresnewprogramtag/signature/probe-onlyrootdelta basedinstalled207root, freshnativecohort/admission/receiver-first300sWDT/600sRecovery. Futurecumulativecoverage mustoverlayactual20765pagesonto6647priorpages;computeuniqueactualcount. Do notreuse207claims.
+All207installation/systemclaimsconsumed;phoneTWRP,installed207rootd425c19b. No livejob. No newcamera observation;no visualclaim. Goalactive.
+
+
+## v208 pipeline call boundaries (ready)
+
+v208 rootc4ab0ba7 installed65pages/10groups/266240B withreadback06f58fab matchinglocalreplay;6699priorpages andallpreimages checked,protectedmetadata/fences/BCBpass,TWRPbefore/after. Kernel636823e9/bootb5d6c4aa fixedscope/check-onlypass. Probeadds fourboundedrawmarkers: priorwaitreturned,descriptorready,beforepipeline,afterpipeline. Checked10s descriptorreadywindow;pipelineAPIunchanged. ASan/UBSan actualmarker/delay/stderr,52parser/5same-UFSenvelope,21installer/6admissionrefusals;1398inputs/21recompiled/0undefined/38headers pass. Retain207twodelays,206headtail,205CDC90s/29frames and199signedplugin. No208systembootyet;pipeline/render/presentation/teardownpending. [Ready evidence](evidence/k80-gpu-v208-pipeline-boundaries-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal208-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v208-metal-trial-704a8add38934cb682964875a31812fb/root-trial`. Rootinstallation session76494completed exit0,claimconsumed;freshsystemclaim notconsumed. Root/probe now208;do not use207rootbindings. Next testrequiresreceiver-first300sWDT/600sRecovery.
+
+
+v208 wrapper started execsession47960,receiverfirst/freshsystemclaim. Pollsamehandle untilactualRecovery/capturefinal;neverrestart orinvokeinnerbootentryseparately. Installed208rootc4ab0ba7;65pageinstallationclaimconsumed.
+
+
+v208 COMPLETED execsession47960 exit0/inner0. v208 recoveredTWRP330.969s;14441B/24verifiedCDCframes,nopartialtail. Exactownedprobe pipeline markers observed=[1, 2];lastMetalphase=4. Marker1=priorwaitreturned,2=descriptorallocation/settersreturned,3=descriptorreadywaitreturned/beforeordinarypipelineAPI,4=APIreturned(notnecessarilysuccess). Nativeeventcounter=74,lastmethod=6/returnedraw=0. Pipeline/render/teardown acceptance remains actualreport-dependent. Sevenprotectionpairs/BCBpass,installed208rootc4ab0ba7unchangedduringboot,stateclear. [Observed](evidence/k80-gpu-v208-pipeline-boundaries-observed-2026-11-15.json).
+Next209 prepare bounded source-owned markers at actualprovenance-matchedfrontend pipelineentry andbefore/afterrenderDescriptor/archive/Rustcall; onechecked10s observationwindow atentry restrictedtoownedprobe bysource-definedprocessname. This testsentrybeforeunchangedrenderDescriptor;do notinferRustentry orblamewarnings. Retainprobe208/newprogramnotrequiredifunchangedprobe, butfreshboottag/kernel/plugin/rootcohort required. Recompilefrontend fromverifiedsource/recipe,relinkretainedRust/PM4/principal,verify/sign nesteddriver thenouterbundle. Rootdelta mustbaseinstalled208root andoverlayactual20865pagesonto6699priorpages;computeuniqueactualcount. Needvalidateboundedfailure stopsdependentpipelinecall,otherclientsunchanged,90s/29framebudget/watchdogbounds,fullbuild andfreshreceiver-firstscope. No209createdyet;do notreuse208claims. No panic/deadlock inferredfrommissingreturn.
+All208installation/systemclaimsconsumed;phoneTWRP,installed208rootc4ab0ba7. No livejob. No newcamera observation/no visualclaim. Goalactive.
+
+
+## v209 actual frontend pipeline entry (offline)
+
+v209 offline actualfrontend pipelineentry candidate: exactownedprobe firstrequest haschecked10s entrywait beforedescriptor;boundedmarkers0(simpleentry),1(waitbegin),2(waitreturned),3(descriptorreturned),4(archivesreturned),5(beforeRust),6(Rustreturned),8(descriptorrefusal),9(waitfailure). Otherprocesses bypasswait;failure returnsrealerrorbeforedescriptor. Frontendrecompiled fromhashboundactualsource/recipe;1347dependency paths preserved,principal/Rust/PM4/signedTurnip unchanged,nested/outer signatures pass. Root3a5ceaf8 changesonlybundleexecutable;5632pages/93groups/23068672B full32GiBreplay identical,568monitoredfiles/attributes preserved. Kernel6fa13d89/boot15377348 full1398inputs/21recompiled/0undefined/38headers;actualhelper/guard32concurrentclaims/ASan/UBSan andstderr296590modelchecks,52parsercases pass. Retain208probeprogram704a8add andallthreeprobe10swaits;newfrontendwaitadds10sonlyfirstownedpipeline. Cumulativeactualinstalled208readback6752pages/148groups verified. No209installer/admission/install/bootyet;GPUrender/presentation/teardownunqualified. [Evidence](evidence/k80-gpu-v209-frontend-entry-offline-2026-11-15.json).
+Next adaptfixedrootdelta review toactual209bundle-executable-only change,notprobe-only204/208rules. Base installed208rootc4ab0ba7/receiptD208;priorcoverage6752pages/148groups alreadyreconstructed. Candidate5632pages/93groups;bindactual209frontendsource/compile/link/dependency/source-review andnewpluginresult,retainold199signeddriverand208probehash. Requirehistoricalscopeparity/newnegativecontrols/fsck/signature/replay/rootkernelADTcohort beforefreshfixed209installadmission. Then freshreceiver-first systemscope/check-only/ready/claim with300sWDT/600sRecovery;neverreuse208claims. Frontendentry observation during90sCDCwindow remainshardwarepending;do notinferpipeline/Rustentry frommissing208marker3. No livejob/no phoneaccess thisturn. Lastphoneobservation208 recoveredTWRP;currentinstalledroot208 untilnewreviewedinstall.
+B209 `/tmp/zorn-v209-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v209-frontend-pipeline-entry-74efc41663c444d4a50a3d519bec1c1d`. RootSHA 3a5ceaf87a27f153ad47347fe772170ad7f09ab06e02634d1ad6679ab50dff9d;kernelSHA 6fa13d89120d36cf6beed354d6b821205c88ef7ba72c698d1c1a865276e21099;bootSHA 1537734839552254171e48ae7fe6a37e78e84d48add0a0c3c94832fce081fecb. Retainedprobe build-result remainsB208/user-probe-launch;no209probe rebuild/programtag. Actualfrontend added source pathfrontend209/NativeBridgeMetalFrontend.mm. No209delta-review/fixedentry/admission yet. Completedhostsessions:frontend64727/helper95776/root90269/cumulative3590/stderr16891/native73298/delta71944/replay1862. Goalactive;previous208turnprogress,thisturnnewfrontend/replay/fullbuildprogress.
+
+
+## v209 frontend pipeline entry (ready)
+
+v209 installedroot3a5ceaf8:5632pages/93groups/23068672B readback06c14823 equalslocalreplay;6752priorpages/allpreimages/protections/BCBpass,TWRPbefore/after. Actualfrontend markers andchecked10s firstownedprobe entrywait;frontend6bdb5edd recompiled/signed,principal/Rust/PM4/signedTurnip unchanged. Kernel6fa13d89/boot15377348 freshfixedscope/check-onlypass.30installer/6admissionrefusals;52parser/5same-UFSenvelope,actualhelper/guard/concurrency/stderrASan/UBSan andfull1398inputs/0undefined/38headers pass. Retain208probeprogram704a8add/three10swaits,206headtail,205CDC90s/29frames. No209systembootyet;entry/pipeline/render/teardownpending. [Ready evidence](evidence/k80-gpu-v209-frontend-entry-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal209-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v209-metal-trial-74efc41663c444d4a50a3d519bec1c1d/root-trial`. Rootinstallation session34530completed exit0,claimconsumed;freshsystemclaim notconsumed. Rootnow209/proberetained208;do not use208rootbindings. Next testrequiresreceiver-first300sWDT/600sRecovery.
+
+
+v209 wrapper started execsession35963,receiverfirst/freshsystemclaim. Pollsamehandle untilactualRecovery/capturefinal;neverrestart orinvokeinnerbootentryseparately. Installed209root3a5ceaf8;5632pageinstallationclaimconsumed,probe208retained.
+
+
+v209 COMPLETED execsession35963 exit0/inner0. v209 recoveredTWRP338.850s;18235B/28verifiedCDCframes,nopartialtail. Exactfrontend markers observed=[0, 1];lastMetalphase=4. Frontendmarker0=simpleentry,1=fullentrybeforewait,2=waitreturned,3=descriptorparsed,4=archivesprocessed,5=beforeRustpipelinecreation,6=Rustpipelinecreationreturned,8=descriptorrefused,9=waitfailed. Nativeeventcounter=74,lastmethod=6/returnedraw=0. Sevenprotectionpairs/BCBpass,installed209root3a5ceaf8unchangedduringboot,stateclear. FullMetalrender/presentation/teardownremainreport-dependent andunqualified. [Observed](evidence/k80-gpu-v209-frontend-entry-observed-2026-11-15.json).
+Next210 relocateexistingfirstownedprobechecked10s observationwindow fromfrontendmethodentry tosourcepoint immediatelybefore nmb_function_patch_type inrenderDescriptor;passdiagnosticbool onlyfromfirstownedpipeline,defaultfalseforothercallers. Preserveone10sfrontendwait,totalprobe/nativebehavior andrealquery/results;waitfailure stopsbeforequery. Thiscanpositivelyobservewhetherdescriptorfields wereprocessed beforefirstfunctionpropertyRustquery;itdoesnotassume209waitreturned. renderDescriptoralreadycallsRustfunctionpropertyquery beforelaterpipeline-creationRustcall;marker5namesonlythelatter. Actualclassmethodinstallation and209markers0/1provefrontenddispatch. Requiresfresh210source/tag/fullrecompile/relink/nestedouter-sign/rootreview;no210createdyet. Futuredelta basedactualinstalled209root,overlay5632actualinstalledpages onto6752priorpages andcomputeuniqueactualcount. Freshreceiver-first300sWDT/600sRecovery;no209repeat/no panic/deadlock claim.
+All209installation/systemclaimsconsumed;phoneTWRP,installed209root3a5ceaf8. No livejob. No newcamera observation/no visualclaim. Goalactive.
+
+
+## v210 before function property (offline)
+
+v210 offline firstfunctionproperty boundary: relocate209checked10s firstownedprobe frontendwait into renderDescriptor immediatelybefore nmb_function_patch_type, passboolonlyfromfirstownedpipeline/defaultfalse forothercallers. Onefrontend10swait preserved;failure stopsbeforeactualquery;realquery/nativepipeline unchanged. Sourceexactparentrestoration,ASan/UBSan helper/guard/32claims/stderr296591checks and52parsercases pass. Frontenda033be26 linkedwithretainedprincipal/Rust/PM4/signedTurnip;signaturesverified. Root81137a40 changesonlybundleexecutable;5594pages/97groups/22913024B full32GiBreplay identical,568monitoredfiles/attributes preserved. Kerneld3b7b169/bootfb007dea full1398inputs/21recompiled/0undefined/38headers. Actualinstalled209coverage6813pages/147groups reconstructed. Retain208probeprogram704a8add andthree10swaits. Currentbuildretains90s/29frameCDC;209last28frames isnearboundary,missingpostwaitmarkersnotfaultproof. No210installer/admission/install/bootyet. FullGPUrender/presentation/teardownunqualified. [Evidence](evidence/k80-gpu-v210-pre-property-offline-2026-11-15.json).
+Before nextdeviceboot prepare longer boundedCDCobserver120s/39frames/119808B withdecoder/receiverlimits andactualhostchecks updatedtogether; preserve3scadence,completiongates,DMAreuse,partialtail/sameUFSenvelope,300sWDT/600sRecovery. Preserve current21090sbuild ashistory,createfreshscope/recompileaffected21objects/fullnativeproof. Retain210frontend/rootcandidate/probe; nofunctionalfixorGPUhangclaim. Then prepare frontend-executable-onlyfixedrootreview fromactualinstalled209root3a5ceaf8/D209receipt,using6813priorpages/147groups andcurrentcandidate5594pages/97groups;requireprepropertywaitlocation/onewait/defaultfalse/queryunchangedguards andlegacyparity/refusals beforeadmission. No rootwriteorphoneaccess thisturn. Lastphone209recoveredTWRP,installedroot209;no livejob. Goalactive.
+B210 `/tmp/zorn-v210-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v210-before-function-properties-52e5dfa037de478a8a15972887a8de73`. RootSHA 81137a401ff6342e91ddabd66d2701973a53f6e8492eba27f74b29795a97c76c;kernelSHA d3b7b16934e9c92b8ec67397962e8c6ff09be0c561d6ab34b1d5781509a82941;bootSHA fb007dea23825e0f0038a3b069ab6fdb76441bbf62ea6e617a8630629b1f8440. Retainedprobe build-result remainsB208/user-probe-launch. Frontend sourcefrontend210/NativeBridgeMetalFrontend.mm derives209actualfrontend;marker0simpleentry,10beforedescriptor,1prepropertywaitbegin,2prepropertywaitreturned,3descriptorreturned,4archivesreturned,5beforeRustpipelinecreation,6pipelineRustreturned,8descriptorrefused,9waitfailed. No210delta-review/fixedentry/admission. Completedhosttasks22321(artifactcomplete/postcopyerror),72955(helper),1977(root),92771(cumulative/stderr),67631(native/host/parser),7731(delta),96831(replay). No livejob.
+
+
+## v211 longer pre-property capture (ready)
+
+v211 ready: retain210prepropertyfrontend/root81137a40/probe208;newboundedCDC120s/39frames/119808B (formerly90/29/89088),3scadence/completiongates/DMAreuse unchanged,decoder/receiverbounds together. Root5594pages/97groups/22913024B installedwithreadbackb112983d equalslocalreplay;6813priorpages/allpreimages/protections/BCBpass,TWRPbefore/after. Kernel5e4f8c25/bootc436661f freshscope/check-onlypass;1398inputs/21recompiled/0undefined/38headers,52parser/5same-UFSenvelope and39installer/6admissionrefusals pass. Firstgeneratorloop error refusedbeforeadmission/phoneaccess;failedreviewarchived,exactpreviousentry restored,correctedgenerator rebuilt/reviewed. Frontendwaitonechecked10s before nmb_function_patch_type onlyfirstownedprobe;othercallersdefaultfalse;actualqueryunchanged. No211systembootyet;property/pipeline/render/teardownpending. [Ready evidence](evidence/k80-gpu-v211-longer-preproperty-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal211-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v211-metal-trial-9e17dfb945f347a08cfb1b66b5942c62/root-trial`. Rootinstallation session27050completed exit0,claimconsumed;freshsystemclaimnotconsumed. Currentroot81137a40 installedunder211from210candidate;frontendtag52e5dfa0,probetag704a8add,boottag9e17dfb9. No210systembootorrootinstallclaim evercreated. Historical21090s offlinebuild preserved.
+
+
+v211 wrapper started execsession74879,receiverfirst/freshsystemclaim. Pollsamehandle untilactualRecovery/capturefinal;neverrestart orinvokeinnerbootentryseparately. Installedroot81137a40/210frontend/probe208,211120sCDC. Installationclaimconsumed.
+
+
+v211 COMPLETED execsession74879 exit0/inner0. v211 recoveredTWRP339.111s;18235B/28verifiedCDCframes,nopartialtail;120s/39frame/119808B observer. Actualretained210frontend markers observed=[0, 1, 10];lastMetalphase=4. Marker0=simpleentry,10=beforedescriptor,1=descriptorfieldsprocessed/beforepropertywait,2=prepropertywaitreturned,3=descriptorreturned(includingRustpropertyquery),4=archivesreturned,5=beforeRustpipelinecreation,6=pipelinecreationreturned,8=descriptorrefused,9=waitfailed. Nativeeventcounter=74,lastmethod=6/returnedraw=0. Sevenprotectionpairs/BCBpass,installedroot81137a40unchangedduringboot,stateclear. 120swindowstill28frames/same~78swrite-span;90sdeadlinealoneisinsufficient. FullMetalrender/presentation/teardownremainreport-dependent andunqualified. [Observed](evidence/k80-gpu-v211-longer-preproperty-observed-2026-11-15.json).
+Next inspectactualRustfunction-property callchain andexistingCPU-side shader/library metadata tests usingown authoredshaderthroughnormalexistingcompiler/runtime APIs. Do notdisassemble/decodeinstructions orenableexistingregister/backtrace abortprobe.120sCDC still28frames~78s span,so90sdeadlinealoneisinsufficient. Marker210stage1provesdescriptorfieldsprocessedbeforecheckedwait;stage2/queryentry/returnunobserved. Needsource-definedproofinsideactualquerypath orofflinefunctionalreproduction,neverreturnfakepatchType/capabilities. Preserve211observer120s/39frames/119808B,actual210frontend and208probe. Anyfuturecandidate requires actualinstalledroot81137a40 andD2115594page receipt overlayonto6813priorpages,computeuniqueactualcoverage;freshscope/claim/fullbuild/receiver-first300sWDT/600sRecovery. No212createdyet;no blindrepeat211/no panic/deadlock claim.
+All211installation/systemclaimsconsumed;phoneTWRP,installedroot81137a40/210frontend. No livejob. No newcamera observation/no visualclaim. Goalactive.
+
+
+## v212 host CPU function properties
+
+v212 offline CPU functional query passed for exactownedshader742a5941: zorn193_vertex=Vertex andzorn193_fragment=Fragment,bothpatchNone/controlpointsNone fromrealpubliccompiler API. Eachfunction2048concurrentqueries/1000cachedqueries andrefusal-notcached passed usingactualruntimeDerived/locksource,0.353s total,noVulkan device. Sourceaudit confirms metallibproperties usesmetadata branch,notAIRdecode;hostdidnotreproducequery/memo hang. Existingarm64ebridgea98a52c9 sourcewrapper50670b9d matchesreference;targetmetadata pinned. HostmacOS test doesnotverifyexportedCFFI guard/get,actualruntimeDevice/Function construction orphonearm64e/PAC. DefaultCargocachemiss preserved;verifiedprojectvendor buildpassed offline. No newkernel/root/phoneoperation. FullMetalpipeline/render/presentation/teardownunqualified. [Evidence](evidence/k80-gpu-v212-host-function-properties-2026-11-15.json).
+Next addbounded source-owned entry/exit observation toactual nmb_function_patch_type FFI wrapper, distinguishingentry,handleaccess,runtimequeryreturn withoutfakepatchType/capabilities. Preserveactualquery/errorsemantics; iftimingcontrolneeded itmustdisclosefailure andnotfabricateanswers. UseonlycleanCargo build script withcurrentpinnedarm64e target,nightly1.101,PAUTH flags/build-std andauthoredAIR inputs;neverrunlegacybuild-ios26-bridge wrapper becauseitaddsforbiddeninstructioninspection. Reuseactualfrontend210/probe208 and211120sCDCunlessexplicitlyreviewed. Buildfreshcandidate/plugin/root/kernel cohort;actualinstalledroot81137a40,D2115594page receipt and6813priorpages needexactcumulativeoverlay/dedup beforeanyfutureinstall. No213createdyet. Phone lastobserved211TWRP;claimsconsumed,no livejob. Goalactive.
+B212 `/tmp/zorn-v212-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v212-host-function-properties-189ff050da51441883df007ad1eb9eec`. CPUcratehost-query/Cargo.toml,exactruntimeDerivedsource includedbyabsolute path;no realruntimeDevice allocation. Cargo--offline andlocalverifiedvendor;initialmissingdefaultsha2cache101archived;vendorbuild35778exit0/runexit0. No disassemblyorotherinstructioninspectionexecuted. No newdevicecommands,source/root/kernel installedstate unchanged211.
+
+
+## v213 actual Rust FFI property observation (offline)
+
+v213 offline actualRust patch-type FFI observer: onlyfirstownedprobe query addsone10s boundedwait/stages1entry,2waitsuccess,9waitfailure,3guardbody,4nonnullhandlereference(notlivenessproof),5runtimequerysuccess,6rawconversion,7guardreturn(notnecessarilyquerysuccess). Timingfailure stillrunsrealquery;existingguard/error/fallbacksemantics preserved,nofakepatchanswers.36actual-wrapperhostcontrols/32firstclaims pass. Rust92cd18f5 builtwithcleanCargo-only pinnednightly1.101/arm64e/PAUTH/build-std/localvendor;unchangedNativeMetalPages peer initiallymissing thencompleted,allactualbuildstepspass,noinstructioninspection. Signedpluginaf110a56 retainsprincipal/frontend210/PM4/signedTurnip;undefinedimportdeltaempty. Roote1a667fd changesonlybundleexecutable,5601pages/97groups/22941696B full32GiBreplay identical,568monitoredfiles/attributes/signatures pass. Kernel9c061bf1/bootd92d4ba9 full1398inputs/21recompiled/0undefined/38headers,52parser/workerASan/UBSan pass. Cumulativeactualinstalled211coverage6863pages/147groups verified. No213installer/admission/install/bootyet. FullGPU/Metalpipeline/render/presentation/teardownunqualified. [Evidence](evidence/k80-gpu-v213-Rust-property-entry-offline-2026-11-15.json).
+Next adaptfresh213fixedrootreview forRust-archive-observer-only change,notfrontend-recompiled flags. Actualbaseinstalledroot81137a40/D211receipt5594pages;priorcoverage6863pages/147groups reconstructed;candidate5601pages/97groups. PincleanCargo command/target/PAUTH/std/runtime-sourceid/authoredAIR/3Rustsourcefiles,hostwrapperreview/peerreview,actualnewRustarchive andpluginlinkinputs. Requireprincipal/frontend210/PM4/driver unchanged,realquery/errorsemantics andfirstownedboundedwait/truthfulfailure. Neverrunlegacybuild-ios26-bridge wrapper oranyinstruction/register/backtrace inspection. Root/kernel/ADTfullcohort,legacy-scopeparity andnewrefusaltests beforefreshfixedinstalladmission;then freshreceiver-first120s/39frame/119808B capture,300sWDT/600sRecovery. Retainprobe208/frontend210. No newphoneoperation thisturn,last211recoveredTWRP/root81137a40,currentclaimsconsumed,no livejob. Goalactive.
+B213 `/tmp/zorn-v213-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v213-rust-property-entry-1a86e91662fd406bb61bfd1612d9fcb6`. RootSHA e1a667fd33561b6c465f900eff9ef2e4f8e52a50bef274ee1f49bab3a8153a1a;kernelSHA 9c061bf1ba4e9e496ad63283064147721d7e39574ff5d0ce5cd5c61ab997e74c;bootSHA d92d4ba94ebc5368c09abe60bee785c1e0c3d18dc4e167a8d1ff39df563c3080. AdditionalRust10swait totals50s ownedprobe/frontend/Rustdiagnosticwaits;doesnotalter300sWDT/600sRecovery. Sourcefolderrust-bridge213 isownedcopy of3actualreferenceRustfiles;onlyNativeMetalObjects helper/onewrapperchanged. ExistinghistoricalRustarchivea98a52c9recheckedunchanged. No213delta-review/fixedentry/admission. Completedhosttasks:host67089pass,Rust54879missingpeer/refusedthen81999pass,root18993,cumulative67157,native80516,delta65280,replay96332. Legacywrapperneverexecuted. Goalactive.
+
+
+## v213 Rust property observation (ready)
+
+v213 installedroote1a667fd:5601pages/97groups/22941696B readback52e876e1 matcheslocalreplay;6863priorpages/allpreimages/protections/BCBpass,TWRPbefore/after. Rust92cd18f5/plugin af110a56actualFFIobserver;realquery/error/fallbacksemantics preservedafterdiagnosticwaitfailure,oneextra10s wait onlyfirstownedquery. Retainfrontend210/probe208/principal/PM4/signedTurnip. Kernel9c061bf1/bootd92d4ba9 freshscope/check-onlypass;54installer/6admissionrefusals,36wrappercontrols/32claims,52parser/5same-UFSenvelope,1398inputs/0undefined/38headers pass. CDC120s/39frames/119808B,300sWDT/600sRecovery. No213systembootyet;Rustentry/handle/query/pipeline/render/teardownpending. [Ready evidence](evidence/k80-gpu-v213-Rust-property-entry-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal213-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v213-metal-trial-1a86e91662fd406bb61bfd1612d9fcb6/root-trial`. Installation session73871completedexit0,claimconsumed;systemclaimnotconsumed. Capturehostfixtureinitialboundreverse incorrectlytreated211as90s,parentcomparisoncorrectedonly;decoderunchanged211. Root213e1a667fd/Rustandboottag1a86e916/frontendtag52e5dfa0/probetag704a8add. No newinstructioninspection/legacywrapper.
+
+
+v213 wrapper started execsession40756,receiverfirst/freshsystemclaim. Pollsamehandle untilactualRecovery/capturefinal;neverrestart orinvokeinnerbootentryseparately. Installedroote1a667fd/Rust213/frontend210/probe208;installationclaimconsumed.
+
+
+v213 COMPLETED execsession40756 exit0/inner0. v213 recoveredTWRP349.491s;21728B/31verifiedCDCframes,nopartialtail;120s/39frame/119808B observer. ActualRustproperty markers observed=[1];lastMetalphase=4. Marker1=ownedRustqueryhelper/prewait,2=Rustwaitsuccess,9=Rustwaitfailure(realquerypreserved),3=guardbody,4=nonnullhandlereference(notlivenessproof),5=runtimequerysuccess,6=rawconverted,7=guardreturned(notnecessarilysuccess). Nativeeventcounter=74,lastmethod=6/returnedraw=0. Sevenprotectionpairs/BCBpass,installedroote1a667fdunchangedduringboot,stateclear. FullMetalpipeline/render/presentation/teardownremainactualreport-dependent andunqualified. [Observed](evidence/k80-gpu-v213-Rust-property-entry-observed-2026-11-15.json).
+Next214 removeRust-side diagnosticnanosleep (213stage2notobserved,sowaititselfmustnotbemistakenforqueryfailure),keepboundedRustentry/guard/handle/query/returnmarkers. Move sameadditional10s observationwindow intoownedfirstpipeline C++ renderDescriptor immediatelyAFTERactual nmb_function_patch_type returns:storeactualreturnedvalueonce,useitfororiginalbranch,checkedC++waitfailure returnsrealdescriptorerror. Preserveexisting210prequerywait,total50s owneddiagnosticwaitbudget,120s/39frameCDC,realproperty/query/errorsemantics andallotherclients. ThiscontroltestsactualqueryreturnwithoutRustsleep,notafakepatchanswer. RecompilebothmodifiedfrontendandRustwithcleanCargo-onlypinnedtarget/PAUTH/std;noinstruction/register/backtraceinspection orlegacywrapper. Actualbaseinstalledroote1a667fd/D2135601page receipt plus6863priorpages mustbeoverlaid/dedupedbeforefreshrootreview. No214createdyet;no213repeat/no panic/deadlockclaim. Host212coversproperties/memoonly,notphoneFFI/PAC.
+All213installation/systemclaimsconsumed;phoneTWRP,installedroote1a667fd/Rust213/frontend210. No livejob. No newcamera observation/no visualclaim. Goalactive.
+
+
+## v214 post-property control (offline)
+
+v214 离线对照候选完成：移除 Rust 属性查询包装层的诊断 nanosleep，保留入口/guard/句柄/实际查询/返回标记；C++ 保存真实 patchType 一次，保留查询前10秒等待，并将原 Rust10秒观察时间移至查询返回之后。前后等待失败均返回真实描述符错误，其他调用方默认不等待。192项实际 frontend 控制和36项 Rust 包装控制、各32并发首次声明通过。Rust 79ab4b6b 使用固定 arm64e/PAUTH/build-std 和 clean Cargo 构建；frontend 同时重编，principal/PM4/已签 Turnip 保留，签名及 undefined-import 检查通过。根镜像 d46d588e 仅插件可执行文件改变，5616页/95组差分的完整32GiB回放一致，568文件及属性保持。内核 0683ab1b、启动包 eb624803 完成1398输入/21重编/0undefined/38头文件检查；实际 worker ASan/UBSan、52解析和5同次UFS捕获控制通过。当前安装213的历史读回覆盖6913页/148组。此证据不证明真机属性返回、pipeline、渲染、呈现或客户端退出。 [Evidence](evidence/k80-gpu-v214-post-property-control-offline-2026-11-15.json).
+继续固定 v214 安装审查，绑定当前213根e1a667fd及实际5601页安装收据、6913页累计读回基线；双重编译与真实查询语义检查、历史scope参数及拒绝控制通过后使用新admission安装5616页/95组。随后仅通过接收器先启动的214包装器执行一次临时启动，保留120秒/39帧/119808B、300秒看门狗/600秒Recovery。213仅入口可见，不能把未观察到Rust等待返回认定为查询失败。
+B214 `/tmp/zorn-v214-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v214-post-property-control-7a16d3fe9b1a44cb859527a1ca87b961`. RootSHA d46d588e12bf1e9a7cbb2ce33ec915557fb0105ad1f93711e383cbee286928b2;kernelSHA 0683ab1bdbb3ba54967bbd2a0b5d30a236a6ba0a97e1d3ec5a868bcfe5731605;bootSHA eb6248035abdd98e8de32866472f649fe4a8c6045d99465cc83a9f28ebcd6f2a. Source选择frontend214及rust-bridge214，保留probe208。总诊断等待50秒；Rust为0秒，frontend前/后各10秒，probe三次各10秒。初始stage脚本空格匹配失败和root祖先路径错误均在手机访问前纠正，失败脚本已保留。无反汇编、逆向、寄存器/回溯诊断或legacy build-ios26-bridge执行。当前根仍为213，最后已观察TWRP；本阶段没有手机操作。Goal active.
+
+
+## v214 Rust property observation (ready)
+
+v214 根d46d588e已安装，5616页/95组/23003136B读回3226fe47与本地回放一致；6913历史页、全部原像、保护区及BCB检查通过，安装前后TWRP。移除Rust诊断等待，保留真实属性查询和错误语义；frontend保留查询前10秒等待，并在真实返回值保存之后执行移入的10秒等待。总诊断等待50秒；Rust/frontend均重编，probe208/principal/PM4/签名Turnip保留。kernel0683ab1b/booteb624803通过固定scope/check-only；192frontend/36Rust控制、52parser/5同次UFS/实际worker ASan及完整1398输入检查通过。CDC120秒/39帧/119808B，300秒看门狗/600秒Recovery。尚未执行214系统启动，pipeline/render/presentation/teardown未验收。 [Ready evidence](evidence/k80-gpu-v214-post-property-control-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal214-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v214-metal-trial-7a16d3fe9b1a44cb859527a1ca87b961/root-trial`. Installation session19775 completedexit0,installclaim consumed;systemclaim unconsumed. Root214d46d588e;Rust/frontend/boottag7a16d3fe,probe208tag704a8add. New214 fixedscope retains receiver-first control flow;no instructioninspection/legacywrapper.
+
+
+v214 receiver-first wrapper started execsession69781. Poll this exact live handle until actual completion/Recovery;never restart or invoke the inner boot entry separately. Installedrootd46d588e,5616page installclaim consumed;new systemclaim owned by this run. Rust sleep removed;frontend pre/postquery10s each;probe208 retained.
+
+
+v214 COMPLETED execsession69781 exit0/inner0. v214 recovered TWRP in 349.465s; 21358B/31 verified CDC frames, no partial tail;120s/39frame/119808B observer. Rust property markers=[5, 6, 7]; frontend markers=[0, 1, 10, 11]; last Metal phase=4. Rust has no diagnostic sleep; stage5=actual property query success,7=guard returned (not necessarily success); frontend11=actual patchType returned,12=post-query wait succeeded. Native event count=74, last method=6/returned raw=0. Seven protection pairs/BCB pass, rootd46d588e first-page/boundary samples unchanged; no full-phone-root hash performed, current state clear. Full Metal render/presentation/teardown qualification remains actual-report dependent. [Observed](evidence/k80-gpu-v214-post-property-control-observed-2026-11-15.json).
+Next prepare215 as a diagnostic-time-budget control: retain bounded markers and the existing pre-Metal10s service-publication window, remove the two extra probe pipeline/descriptor10s waits and both frontend pre/post-query10s observation waits. v214 positively proves real property success/return, but frontend post-wait return12 and pipeline return remain unobserved; do not diagnose a query deadlock, panic or WaitFence hang. New frontend215 should mark before/after the same stored real patchType query without sleep helpers; preserve actual tessellation branch, guard/errors and other callers. Retain compiled Rust21479ab4b6b (no Rust sleep), principal/PM4/signedTurnip/authoredshader; recompile actual modified frontend and ordinary probe with fresh program identity, unchanged entitlements/oracle/lifecycle. Keep300sWDT/600sRecovery and120s/39frame/119808B. Fresh215 root review must allow exactly existing probe+plugin executable changes, base actualinstalled214rootd46d588e/D2145616page receipt, overlay onto6913 actual prior pages and compute unique coverage. Fresh source/fullbuild/rootfs/signature/delta/replay/negative controls/admission/receiver-first scope; no blind214 repeat. No215 exists yet.
+All214installation/systemclaimsconsumed;phoneTWRP,installedrootd46d588e/Rust214/frontend214. No livejob. No newcamera observation/no visualclaim. Goalactive.
+
+
+## v215 pipeline without extra waits (offline)
+
+v215 离线候选完成：在214已实测属性查询成功的基础上，移除 probe 的 pipeline 前/描述符就绪后两次10秒等待，以及 frontend 查询前/后两次10秒等待，仅保留原有 pre-Metal10秒窗口。真实属性值、普通 pipeline API、shader/全4096B图像检查和未知完成时的保留策略均保持。frontend24项实际控制/32并发声明及源码精确父版本还原通过。重新编译 frontend 和普通 probe；复用实际214 Rust79ab4b6b、principal/PM4/已签Turnip。两份新程序签名和undefined-import检查通过。根4a12265d只改变两个既有可执行文件，5627页/101组完整32GiB回放一致，568文件/属性及文件系统检查通过。内核2fdf85c9/boot108ab894完成1398输入/21重编/0undefined/38头文件核对，52parser/5同次UFS/实际worker ASan控制通过。当前安装214的累计读回6964页/149组核对通过。尚无215系统启动结果，pipeline/render/presentation/teardown未验收。 [Evidence](evidence/k80-gpu-v215-pipeline-without-extra-waits-offline-2026-11-15.json).
+完成215固定安装审查：当前214根d46d588e及D214实际5616页收据为父基线，6964页累计读回已重建；只允许probe和plugin两个既有可执行文件差分5627页/101组。通过新scope及拒绝控制后执行已批准的固定安装和一次receiver-first临时启动，保留120秒/39帧/119808B、300秒独立看门狗/600秒Recovery；不得复用214凭据。
+B215 `/tmp/zorn-v215-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-pipeline-without-extra-waits-e24d087ce9994306ac3c936887498d2e`. RootSHA 4a12265d312a0f07ea1348a2f2ea16734dd290ccc58fd2443c637b4f3687a523;kernelSHA 2fdf85c98a8343b7a452dbc17dfb8523543a2e1f349c13664d93f671aa6f91cf;bootSHA 108ab894d46b024ebf50a1013dbc42291ee90881eaddd75acdede1be3ca43523. Frontend/probe/boot tage24d087c，Rust保留214tag7a16d3fe。initial host oracle fixture错误使用了未在源码内的CRC字面值及错误hold次数，已依据实际父源码修正；真实程序未改动oracle/hold。compile/link后的self-copy归档错误已修正，实际编译/链接/签名均成功，失败脚本保留。无反汇编、逆向、寄存器/回溯诊断或legacy wrapper执行。最后手机仍为已回收的214TWRP。Goal active.
+
+
+## v215 Rust property observation (ready)
+
+v215 根4a12265d已安装，5627页/101组/23048192B读回7872522a与本地回放一致，6964历史页/全部原像/保护区/BCB检查通过，安装前后TWRP。移除40秒额外probe/frontend观察等待，只保留pre-Metal10秒；真实属性值、pipeline、shader/oracle和生命周期保持。frontend/probe重编，Rust214/principal/PM4/signedTurnip保留。内核2fdf85c9/boot108ab894新固定scope/check-only通过；24frontend/32claims、52parser/5同次UFS/实际workerASan/1398inputs/38headers检查通过。CDC120秒/39帧/119808B，300秒看门狗/600秒Recovery。尚未执行215系统启动，pipeline/render/presentation/teardown未验收。 [Ready evidence](evidence/k80-gpu-v215-pipeline-without-extra-waits-ready-2026-11-15.json).
+Wrapper ONLY `scripts/read-zorn-gpu-metal215-cdc.py`;trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v215-metal-trial-e24d087ce9994306ac3c936887498d2e/root-trial`. Installation session96585 completedexit0,installclaim consumed;systemclaim unconsumed. Root2154a12265d;frontend/probe/boottage24d087c,Rust214tag7a16d3fe retained. New215 fixedscope preserves receiver-first control flow;no instructioninspection/legacywrapper.
+
+
+v215 receiver-first wrapper started execsession7140;poll this exact live handle until actual Recovery/capture completion. Installedroot4a12265d,5627page installation claim consumed;new system claim belongs to this run. Newprobe/frontend/boottage24d087c,Rust214tag7a16d3fe;extra40s waits removed,preMetal10s retained. Never restart or invoke the inner boot entry separately.
+
+
+v215 COMPLETED execsession7140 exit0/inner0. v215 用户指定的本轮照片明确显示内核panic及PAC failure from kernel with IA key；照片本身无构建tag，关联依据用户说明。实测309.853秒自动回TWRP，8540B/18帧有效CDC，无不完整尾帧。原始报告可见阶段=[1, 2]；principal标记9位于native_bridge_metal_open调用前，尚无标记15返回证据。结构化报告过滤器仍固定旧probe208tag704a8add，新215probe为e24d087c，导致report为空；原始stderr仍有效。Rust/frontend/pipeline新边界标记均未观察到，不能据此断言pipeline或属性查询故障。最后native事件计数45，method2/返回值0；该值为已完成调用，不代表panic位置。七组保护采样及BCB通过，根首块/边界采样未变，未计算全手机根哈希；当前状态清空。PAC根因尚未确定，GPU/Metal渲染与退出未验收。 [Observed](evidence/k80-gpu-v215-pipeline-without-extra-waits-observed-2026-11-15.json).
+Next perform source-only kernel PAC/callback ABI audit using actual215compile inputs and matchingXNU headers; the photo changes priority from a presumed observation deadline to a confirmed kernelIA-PACpanic. Do not decode instructions, symbolize/disassemble binaries, inspect registers/backtraces, disable PAC/auth traps, fabricate callback success, or blindly repeat215. Positive source window: normalMTLCreateSystemDefaultDevice -> actualprincipal before/after native_bridge_metal_open call; last completed native selector2 is BOalloc, not a hanging-fence proof. First make a fresh216 source candidate correcting ZornApplicationObservation26.inc structured prefix from old208tag704a8add to actualretained215probetage24d087c, and add an actual-source regression gate binding probe source/build tag, observerprefix, decoder/capture programtag and artifactidentity. Retain current215probe/frontend/root4a12265d andRust214 initially; no new root write is needed solely for kernel observer correction. Add only source-justified bounded callout/lifecycle observations if needed to narrow the PAC call window before another fresh receiver-first trial. Preserve300sWDT/600sRecovery,120s39frames119808B andcurrentABI/layout. If a later rootpayload is changed, base actualD2155627-page receipt and6964priorpages,compute actual cumulativecoverage afresh. No216 exists yet;all215claims consumed,phone TWRP,currentroot4a12265d.
+All215installation/systemclaimsconsumed;phoneTWRP,installedroot4a12265d/Rust215/frontend215. No livejob. User-provided pre-reboot photo positively confirms kernelPACpanic;no GPUrender/display success visualclaim. Goalactive.
+
+
+## v216 source observer binding; confirmed215 kernel PAC panic
+
+v216 已完成源码级报告标识修复：实际 observer 将215程序tage24d087c误当作raw，原因是结构化前缀仍固定208tag704a8add。已只修改ZornApplicationObservation26.inc的前缀；用实际215旧源码复现拒收，并以实际216源码通过当前tag接收、旧tag/异任务/错PID/不完整行/控制字节/copy错误拒收及原try-lock控制；ASan/UBSan通过。源码/已编译probe来源/215artifact identity/capture程序tag一致性已核对。本修复只影响诊断报告采纳，未修改原生授权或GPU行为，也未修复照片确认的内核IA-PACpanic。216尚未完成内核身份重绑、完整构建、运行审查或真机验证。 [Source evidence](evidence/k80-gpu-v216-observer-binding-source-2026-11-15.json).
+继续源码级PAC/回调ABI与生命周期审查，使用215实际编译命令、匹配的XNU头文件和principal调用边界；必要时设计无地址/寄存器/回溯/指令内容的有界callout观测。不能将最后已完成的BOalloc selector2当作崩溃调用。216可先复用已安装215root4a12265d/probe/frontend和Rust214，单纯kernel observer修正不需要根写入；仍需精确新kernel/ADT/boot、实际报告前缀绑定回归、fresh scope/owner/ready/claim、300s看门狗/600sRecovery及receiver-first流程。当前无livejob，手机已回TWRP，215安装和启动claim均消耗；不盲重试215，不关闭PAC。
+B216 `/tmp/zorn-v216-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v216-observer-binding-PAC-audit-8e9c1cdd2147439199f3c6092338856a`;boottag8e9c1cdd reserved but kernel UFS/USB identity retag still pending. Retain program/front215tage24d087c,Rust214tag7a16d3fe,installedroot4a12265d. User photo archived in B215/user-observation/kernel-panic-before-recovery.jpg;only visible panic class text used,registers/addresses not analyzed. Current official GPU/arm64e guides and pinned public NativeOfflineAccelerator source were consulted;current27profiles are not substituted for pinned26inputs and the offline source is not treated as a K80 functional backend. No216rootreview/admission/deviceoperation. Goal active.
+
+
+## v216 first BOmap callback gates (ready)
+
+v216 已准备单次首次BOmap回调验证：修复215报告tag绑定，仅在实际已准备且成功分配BO的当前客户端首次selector3路径设置六个有界调用点。覆盖IOUserClient虚调用前、自定义分发、action入口、owner调用前、后端分发前及返回后；每点仅在其CDC帧真实发送完成后放行，10秒超时停止后续调用，不代替原生权限或成功返回。gate/真实observer谓词/报告绑定及36项实际IOUserClient IPC锁平衡控制通过ASan/UBSan；22项新解析控制及原52parser/5同次UFS/实际worker控制通过。重编22对象，1398完整输入/0undefined/41头文件核对通过。kernel338603a4/boot3bb83a7e；复用已安装215root4a12265d及probe/frontend215、Rust214，无新根写入。新scope/owner/ready/admission/check-only已通过；300秒看门狗/600秒Recovery，CDC120秒/39帧/119808B。PAC根因未修复，尚无216真机结果。 [Ready evidence](evidence/k80-gpu-v216-first-BOmap-callbacks-ready-2026-11-15.json).
+仅通过read-zorn-gpu-metal216-cdc.py进行已授权的receiver-first单次临时启动；运行器先重新确认Recovery/身份/保护区及完整BCB，再执行启动。观察bc=selector/requested/ack/failed，区分最后已完成原生method与回调到达点；point6仅代表dispatchProcessClient返回，不代表成功。若有界Recovery失败立即停止设备操作。当前目标位于官方GPU教程第4步Metal实机验证，pipeline/Metal图像/显示呈现仍未验收。
+B216 `/tmp/zorn-v216-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v216-observer-binding-PAC-audit-8e9c1cdd2147439199f3c6092338856a`. KernelSHA 338603a4b105b102918da65d8263ea1294e67dc287e942757e158dad537f0c10;bootSHA 3bb83a7efd1abeb03c0914d8918d73d290903d048fd2d6c6979f3ac53e036f30. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v216-metal-trial-8e9c1cdd2147439199f3c6092338856a/root-trial`. Program/front215tage24d087c,Rust214tag7a16d3fe,boottag8e9c1cdd. NativeJSON fragment trailingcomma/privatequote directory and hostfixture initializer_list errors were corrected before admission/deviceaccess; failed inputs retained. Original IOUserClient quotes resolve via its original Kernel source directory;newgate header binds the same exact prototype in all callers. Onlykernel changes inFAT,ADT/root/FD/menu unchanged. No disassembly/register/backtrace/symbolization or PAC-disable operation. No livejob yet;lastphone215recoveredTWRP. Goalactive.
+
+
+v216 receiver-first wrapper started execsession56202;poll this exact live handle to actual completion/Recovery. Root2154a12265d/userpayload unchanged;no root installation this candidate. Boottag8e9c1cdd,newfirstBOmap callbackgates andcurrent structuredprobetage24d087c bound. Freshsystemclaim belongs only to this run;never restart or invoke inner boot entry separately.
+
+
+v216 COMPLETED execsession56202 exit0/inner0. v216 单次运行349.526秒自动回TWRP，15501B/29帧有效CDC，无不完整尾帧。结构化报告已恢复，最后phase=2。首次BOmap selector3的六个源调用点全部观察到，ack6确认实际串口发送完成，无诊断超时；point6仅证明dispatchProcessClient已返回，其真实IOReturn未另行捕获。最终native计数6、最后已完成method2/raw0，尚无method3整体完成或Metal设备返回证据。尚不能区分gate6返回、操作收尾与后续引用释放，不能由缺失后续日志判定216panic或死锁；215照片所确认的PAC根因仍未修复。七组保护采样及BCB通过，root4a12265d首块/边界采样未变，没有根写入或全手机根哈希。pipeline/Metal渲染/呈现/退出未验收。 [Observed](evidence/k80-gpu-v216-first-BOmap-callbacks-observed-2026-11-15.json).
+准备新的217有界对照，复用当前215root/probe/frontend/Rust214。先记录实际dispatchProcessClient返回码，再把观测重点从已走通的IOUserClient入口移到gate6返回、finishApplicationOperation及其unlock/原生release前后，保持真实返回与生命周期；不得关闭PAC、模拟成功、逆向/反汇编/符号化/寄存器/回溯分析或盲重试216。审查每个新增等待点的锁/抢占/IRQ上下文；若持有不适合等待的锁，只在可安全调度的边界放置观测。原生Memory/DirectClient/IOUserClient编译记录均为arm64e，NativeMemory当前头文件两条实际路径字节一致，这些是源码/构建输入核对而不是PAC运行正确性证明。继续fresh scope、300秒看门狗/600秒Recovery、接收器先启动。当前无livejob，全部216claim已消耗，最后TWRP；217尚未建立。
+No new216camera observation;do not infer a216PACpanic from215photo. Root2154a12265d/frontend215/probe215/Rust214 remain installed. Goalactive.
+
+
+## v217 map finish return (ready)
+
+v217 已准备首次BOmap操作收尾真机对照：记录真实IOReturn，六点覆盖后端分发返回、finish入口、issuer解锁后、操作引用release返回、finish返回及owner返回。所有新增等待在issuer锁外；原有客户端串行IOLock及真实收尾检查/返回/释放顺序保持，观察拒绝时停止后续依赖调用并保留尚未安全释放的引用。恢复原生IOUserClient入口，保留旧两参数finish符号；96项实际父/新收尾语义、真实gate/observer、35项返回值/回调解析及原52parser/5同次UFS/formatter/worker ASanUBSan控制通过。22对象重编、1398完整输入/0undefined/41头文件检查通过。kernelc9865d74/boot2d46cbed；沿用215root4a12265d及probe/frontend215、Rust214，无新根写入。新scope/owner/ready/admission/check-only通过；CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery。PAC根因未修复，217尚无真机结果。 [Ready evidence](evidence/k80-gpu-v217-map-finish-return-ready-2026-11-15.json).
+仅运行read-zorn-gpu-metal217-cdc.py单次接收器先启动测试；先由固定运行器重新核对Recovery/92988a43/slotA、完整BCB和保护区。br=known/raw区分未知与真实返回码；bc只代表源调用点及帧发送确认，不能当作native成功。观察整体method3完成及后续Metal设备创建，不由缺失日志判定panic/死锁。若Recovery有界返回失败立即停止设备操作。
+B217 `/tmp/zorn-v217-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v217-map-finish-return-5ad6fb7a721243989b9f203019512434`. KernelSHA c9865d7453223614c40da943375cf7e848c588844e2b50b0406b2c4e0c88920e;bootSHA 2d46cbed879adbaecf67110c00fd54e17b85db733b7a79a3ed701df350b14eff. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v217-metal-trial-5ad6fb7a721243989b9f203019512434/root-trial`. No new217systemboot/rootwrite yet;lastphone216TWRP. No newcamera observation. Parent observer fixture path, same-file copy and staged source pre-retag pins were corrected in host scripts/review before admission; no source change after native build. First gate/predicate checks passed; missing report-fixture path prevented aggregate pass until corrected. Goalactive.
+
+
+v217 receiver-first wrapper started execsession68370;poll this exact live handle to actual completion/Recovery. Initial sandbox attempt refused local socket before claim/run/phone access;failure report preserved in B217/sandbox-pre-USB-refusal. Same fixed entry now runs with host permission under standing user authorization;no claim reuse or hardware retry. Root2154a12265d remains;no root installation.
+
+
+v217 COMPLETED execsession68370 exit0/inner0. v217 单次运行348.674秒自动回TWRP，15907B/29帧有效CDC，无不完整尾帧。首次BOmap六点及ack6全部观察到，真实返回码均为0：后端分发、finish入口、issuer解锁、操作引用release、finish返回和owner返回均已有源调用点证据，无诊断超时。最后native计数6、method2/raw0，整体method3完成、Metal设备返回及pipeline/render/presentation/退出仍未验收。不能由后续日志缺失认定217panic或死锁，215照片确认的PAC根因仍未解决。七组保护采样及完整BCB通过，root4a12265d首块/边界采样未变，无根写入/全手机根哈希。 [Observed](evidence/k80-gpu-v217-map-finish-return-observed-2026-11-15.json).
+准备218单变量串口窗口对照：源码显示120秒deadline在USB配置/DTR/首帧之前启动，本次主机文件创建至末写约81秒、29帧未达39帧上限，当前没有退出原因证据；不能把缺帧当作故障。仅把CDC绝对窗口120延长至150秒，保留39帧/119808B/3秒间隔、217六点和真实返回值、300秒看门狗/600秒Recovery。继续复用root/probe/frontend215及Rust214，无根写入。新scope及完整源码/构建/解析/预算审查后接收器先启动单次对照，不盲重试217。当前手机TWRP，217claim已消耗，无livejob/新摄像头观察。
+
+
+## v217 user photo confirms kernel IA PAC panic
+
+用户明确指定v217照片及过程：锁屏界面停留较长时间→panic画面短暂停留→自动重启。照片清晰显示IOS26 KERNEL PANIC、RECOVERY IN90S及PAC failure from kernel with IA key；v217内核IA-PACpanic现已由本次照片独立确认，纠正此前仅凭串口不能确认panic的状态。照片无构建tag，版本关联依据用户说明；没有分析寄存器、地址、回溯或二进制。串口仍只证明首次BOmap后端/finish/unlock/release/owner返回均为0，不能确定panic发生的精确函数或时刻。运行器348.674秒返回TWRP和保护区核对继续有效；用户描述的锁屏显示不等于GPU/Metal渲染验收。 [Photo evidence](evidence/k80-gpu-v217-user-photo-PAC-panic-2026-11-15.json).
+已构建的218只延长CDC窗口120→150，作为离线观察对照保留，不部署；照片使PAC故障成为明确事实，延长窗口不是修复。新219应基于217源线，把已走通的六个早期等待移出，聚焦owner返回后的完成记录前后、客户端serial IOLock解锁及回调返回；先核对源码和上下文，保持真实结果、原生所有权/生命周期和300秒看门狗/600秒Recovery，不关闭PAC或模拟成功。
+
+
+## v217 public-source PAC comparison
+
+按用户要求核对UniXNU官方GPU/arm64e教程及公开Adreno740、sheng/SM8550、小米15 dada项目，已固定4仓库提交并下载17份源码/文档，逐份核对Git blob SHA及本地SHA256，未运行远程代码/读取二进制。dada构建记录指出Rust-C/Turnip回调PAC约定不一致的相似问题；K80当前实际Rust214命令已启用相同PAC flags及build-std，目标JSON与dada语义完全一致，因此不是可直接追加的缺失配置，也不证明本次内核PAC根因。当前官方Adreno740发布端同样使用类型化dispatch表/IOUserClient基类分发并记录返回值，支持在真实完成/返回边界补观察，而不支持无依据改签名/关闭PAC。sheng记录为iPadOS27、A740，其硬件/板级值不适用于K80 iOS26；没有找到已经核实可直接套用的同类内核panic修复。 [Source comparison](evidence/k80-gpu-v217-public-source-PAC-comparison-2026-11-15.json).
+以已实测217为基线准备219：保持120秒观察预算及真实GPU/ABI/生命周期，移出已走通的早期六点等待，把观察点后移到owner返回后的done事件前后、serial解锁、action及IOUserClient基类返回。先用实际函数体验证锁平衡/真实返回/拒绝路径，并重编受影响对象。218仅延时对照保留离线，不部署。手机最后TWRP、无livejob；root/probe/frontend215和Rust214继续保留。
+Sources: [official GPU](https://unixnu.com/zh/porting/gpu), [official arm64e](https://unixnu.com/zh/porting/arm64e), [Adreno740 typed client dispatch](https://github.com/UniXNU/Adreno740/blob/54b41b8f59e90a167f6f75160739c5f825945fbc/NativeAdrenoPublish.cpp), [dada Rust build flags](https://github.com/superboyyy/hakios-arm64e-dada/blob/f1ae906fcc43ba8f763663257724ba938fb820ab/gpu2/build_bridge.sh).
+
+
+## v219 client completion return (ready)
+
+v219 完成客户端收尾/返回路径候选：恢复已走通的215原始finish，移出217早期六点等待；六个新点覆盖done入口、真实完成观察事件返回、serial IOLock解锁返回、run返回、action返回以及IOUserClient基类返回。仅当前首次自有BOmap3被观察，逐点实际CDC发送确认/10秒超时；真实结果/权限/生命周期保持，原IPC包装和2022路径逐字不变。46项实际run/action/typed-base函数体控制及真实gate/observer、35项返回值解析、52parser/5同次UFS/formatter/worker ASanUBSan检查通过，所有诊断拒绝路径serial锁平衡。22对象/1398完整输入/0undefined/40头文件通过，kernel19c32fef/boote949b7bb；复用215root4a12265d/probe/frontend和Rust214，无新根写入。新scope/owner/ready/admission/check-only通过，完整绑定219及217/216/211解析依赖。CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery。217照片确认IA-PACpanic，219仅用于定位，尚无真机结果或PAC修复结论。 [Ready evidence](evidence/k80-gpu-v219-client-completion-return-ready-2026-11-15.json).
+仅运行read-zorn-gpu-metal219-cdc.py接收器先启动单次临时启动，由固定运行器先重核92988a43/slotA/Recovery、BCB完整页及保护区。bc点2只说明完成观察事件返回，不等于外部API完成；点5/6分别证明action/基类返回，br保留实际返回值。检查后续method3记录、method13 CPU映射及Metal设备返回；不得从缺失后续帧推断精确panic位置。若Recovery返回失败立即停止设备操作。
+B219 `/tmp/zorn-v219-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v219-client-completion-return-054b93c7f0e54f7a8c5516c7349707f9`. KernelSHA 19c32fef2445cc3d2f575ffca9676918456c08a00b71359884ef9ecc142857d4;bootSHA e949b7bb4452ff025c5032689526acdd8337b399e2a520f461439f2e720ee940. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v219-metal-trial-054b93c7f0e54f7a8c5516c7349707f9/root-trial`. No new219systemboot/rootwrite yet;lastphone217TWRP. No newcamera observation. Header gate prototype spelling and review script identifier were corrected before successful native build/admission;initial failure logs preserved. Runner adds exact transitive decoder pins before any claim;initial bundle preserved. No source changes after successful build. Goalactive.
+
+
+v219 receiver-first wrapper started execsession60911 under standing user authorization. Poll this exact live handle until actual Recovery/capture final;never invoke inner boot separately or restart from an observation timeout. Root2154a12265d retained;no root installation. Newpoints only completion/event/unlock/run/action/base-return boundaries.
+
+
+v219 COMPLETED execsession60911 exit0/inner0. v219 单次运行349.326秒自动回TWRP，15907B/29帧有效CDC，无不完整尾帧。完成/解锁/回调源调用点=[1, 2, 3, 4, 5, 6]，发送确认=[0, 1, 2, 3, 4, 5, 6]，已观察且已知返回码均零=True；诊断超时=False。点2是完成观察事件返回，点3是serial解锁返回，点4/5/6分别为run/action/IOUserClient基类返回，不能当作随后IPC或Metal调用返回。最后native计数7、method3/raw0、Metalphase=2。pipeline/Metal渲染/呈现/退出仍以实际完整报告为准，未验收。七组保护采样及完整BCB通过，root4a12265d首块/边界未变，无根写入/全手机根哈希。无219新照片，不能由217照片或缺失后续帧确认219panic。 [Observed](evidence/k80-gpu-v219-client-completion-return-observed-2026-11-15.json).
+依据本次实际点位/返回值和保留的Turnip源码决定下一未观察路径；若六点均返回0，下一步应对照实际后续CPU映射13/IOConnectMapMemory64路径及其客户端内存视图生命周期，不能认定panic必定位于最后一点之后的相邻函数。只增加具有源码依据的有界观测，保留真实权限/返回/失败保留、300秒看门狗/600秒Recovery及接收器先启动；新scope，不盲重试219。当前手机TWRP、219claim消耗、无livejob。
+
+
+## v219 next actual native call
+
+v219完成后续源码核对：当前实测已观察到自有首次BOmap3的完成事件、serial解锁、run/action/基类返回全部为0，但没有随后IPC返回或下一原生调用的实时证据。houji参考Turnip的darwin_bo_map先调用BoCpuMap13再IOConnectMapMemory64，这只是可核对的参考源码路径；尚未重新证明该当前参考文件就是保留signedTurnip二进制的精确编译输入，因此不能据此断言下一调用必然13或panic位置。下一轮应直接捕获首次成功BOmap3之后实际到达的原生method编号，避免仅盯住假设的CPUmap。 [Source audit](evidence/k80-gpu-v219-next-native-call-source-2026-11-15.json).
+新220以219实测源线为基线：恢复已走通的原生IOUserClient基类实现，移出219首次BOmap等待；在已准备且最后完成method3/raw0的当前客户端，捕获下一次实际原生调用（1..17）的method编号/真实返回。六点覆盖该调用入口、done入口、真实完成观察事件返回、serial解锁、run返回及基类返回；wire的bc.selector须记录实际method并在所有后续点保持同一客户端/线程/method。必须同步修改producer/formatter/decoder、严格控制首次声明/非目标旁路/真实发送确认/10秒拒绝/帧预算及实际函数体锁平衡；重编受影响对象并fresh scope。只有实际到达13时才把后续视图/IOConnectMapMemory64作为已观察入口。保持root/probe/frontend215和Rust214、CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery、无新根写入。无220创建或设备操作；219已回TWRP且claim消耗。
+
+
+## v220 next owned native call (ready)
+
+v220 完成下一原生请求候选：恢复原始共享IOUserClient，移出219已走通的首次BOmap等待；仅在当前已准备客户端最后完成method3/raw0之后，声明下一实际method1..17并绑定客户端/线程/method。六点覆盖准备后的run入口、done入口、真实完成观察事件返回、serial解锁、run返回和基类返回。入口尚无工作结果，br明确unknown；后续保留真实返回，不预设13。实际gate32控制涵盖17种method/首次声明/异method与线程旁路/6处10秒及上下文拒绝；46实际完成链、60动态method/未知结果解析及52parser/5同次UFS/formatter/worker ASanUBSan控制通过。22对象/1398完整输入/0undefined/40头文件通过，kernel69a5bac9/bootcb28a0e8；沿用215root4a12265d/probe/frontend和Rust214，无新根写入。新scope/owner/ready/admission/check-only通过，完整绑定220及217/216/211解析依赖。CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery。PAC根因未修复，220尚无真机结果。 [Ready evidence](evidence/k80-gpu-v220-next-owned-native-call-ready-2026-11-15.json).
+只运行read-zorn-gpu-metal220-cdc.py接收器先启动单次临时启动；固定运行器先重核92988a43/slotA/Recovery、BCB完整页及保护区。观察bc.selector的实际method；point1 br未知不能当作成功，点2实际结果/点3事件/点4解锁/点5run/点6基类返回各自分开。依据实际进入的请求决定后续源码调查，不由缺失帧推断panic位置。若Recovery有界返回失败立即停止设备操作。
+B220 `/tmp/zorn-v220-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v220-next-owned-native-call-7a3feb1851274e0d9a55d3ff613f774e`. KernelSHA 69a5bac944c15b9477a39de38f8a554598c69ad59e5d321e094d8fdfcfbdddde;bootSHA cb28a0e8e82fe6929e55aaedb27b1665430a28edf206e07c6b35fd8d4efce0db. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v220-metal-trial-7a3feb1851274e0d9a55d3ff613f774e/root-trial`. No new220systemboot/rootwrite yet;lastphone219TWRP. No newcamera observation. Malformed fixture replacement and trailing harness self-copy were corrected in host scripts;actual native functions/gate tests passed. SharedIOUserClient and nativefinish restored;no source changes after native build. Goalactive.
+
+
+v220 receiver-first wrapper started execsession55960 under standing user authorization. Poll this exact live handle to actual Recovery/capture final;never restart/invoke inner boot separately on observation timeout. Root2154a12265d retained;no root installation. Actual next prepared native method is not predetermined.
+
+
+v220 COMPLETED execsession55960 exit0/inner0. v220 单次运行349.501秒自动回TWRP，15935B/29帧有效CDC，无不完整尾帧。首次成功BOmap3之后实际下一请求确认为method13（本次为BoCpuMap13）；六点及ack6全部观察到，无诊断超时。入口point1结果明确未知，point2..6采到的真实返回码均0，完成事件/serial解锁/run/基类返回已有源调用点证据。最后native计数8、method13/raw0、Metalphase=2；不代表随后IOConnectMapMemory64或Metal设备创建返回。七组保护采样及BCB通过，root4a12265d首块/边界未变，无根写入/全手机根哈希。无220新照片，不能由217照片确认220panic；PAC根因未修复，pipeline/Metal图像/呈现/退出仍未验收。 [Observed](evidence/k80-gpu-v220-next-native-call-observed-2026-11-15.json).
+下一轮重点核对首次clientMemoryForType及copyApplicationIoView/物理span描述符工厂/客户端视图缓存与retain/IOKit映射；220已证明真实BoCpuMap13完成到基类返回，但不能把尚未观察的映射入口当作已到达。保留真实权限/返回和正常释放，只在可调度且不持issuer锁的源边界放观察；失败/DMA未知保持原有保留规则。新scope、300秒看门狗/600秒Recovery、接收器先启动，不盲重试220；当前TWRP、220claim消耗、无livejob。
+
+
+## v220 client memory view source audit
+
+v220源核对确认当前NativeAdrenoCpuView是spans/count/bytes，没有cookie接口；K80 copyApplicationIoView从自有CPU物理span构造IOMemoryDescriptor::withAddressRanges，随后finish，clientMemoryForType再缓存/retain并返回映射选项。该工厂调用位于issuer锁内，新增有界等待必须放在锁外。公开Adreno740源码同样含物理span描述符工厂，同时对system/pool/raw backing分支使用不同视图和缓存模式，不能不核对K80实际backing就照搬整个分支或改缓存模式。OSPtr头文件明确支持raw/shared两种接口，OSSharedPtr声明trivial_abi，不能仅因IOMemoryDescriptor.cpp启用shared宏就认定ABI错误。实际保留NativeMemory/IOBufferMemoryDescriptor/OSObject/OSMetaClass对象匹配arm64e配方，核心当前头文件一致，这不独立证明历史头文件字节或PAC运行正确。 [Source audit](evidence/k80-gpu-v220-memory-view-source-2026-11-15.json).
+准备221首次clientMemoryForType有界观察：在实际已准备且最后完成BoCpuMap13/raw0的当前客户端核对合法token1..4096，观察owner复制视图前后、描述符缓存/retain及解锁返回。使用明确的非原生ABI诊断操作标识和实际token，不把clientMemoryForType伪装成原生method18或已完成IOConnectMapMemory64。native13已验证的等待应移出，任何新增点不得在issuer锁内等待。检查所有真实错误分支保持原返回/锁平衡，不为补齐点位伪造执行或释放未知资源；诊断拒绝时停止后续依赖调用。依据实际到达点再细化工厂内部，不先认定其为panic位置。继续root/probe/frontend215、Rust214、300秒看门狗/600秒Recovery和接收器先启动；无221创建或设备操作。
+
+
+## v221 client memory view (ready)
+
+v221 完成首次clientMemoryForType视图交接候选：恢复215正常原生run/action/base路径，保留共享IOUserClient及owner原实现，仅在当前客户端最后完成BoCpuMap13/raw0后，观察首次合法token1..4096视图复制前、复制返回后和serial解锁后。诊断kind256不作为原生GPU方法；入口结果未知，后续记录真实IOReturn及交接前输出引用状态，三点各10秒且只由真实CDC发送完成放行。106项实际函数体控制覆盖新建/缓存视图、原生错误、三处拒绝、锁平衡、正常输出引用平衡与仅诊断失败保留未交接引用；15组实际gate/真实observer、47view parser/52原parser/5同次UFS/formatter/worker ASanUBSan通过。22对象/1398完整输入/0undefined/40头文件通过，kerneld29dbfb3/boot45f09984；源码AST显示实际NativeMemory/HostRing两编译上下文当前NativeMemory类布局相同，并非历史对象/PAC硬件正确性证明。沿用215root4a12265d/probe/frontend及Rust214，无新根写入。新scope/owner/ready/admission/check-only通过，CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery。PAC根因未修复，221尚无真机结果。 [Ready evidence](evidence/k80-gpu-v221-client-memory-view-ready-2026-11-15.json).
+只运行read-zorn-gpu-metal221-cdc.py接收器先启动单次临时启动，由固定运行器先重核92988a43/slotA/Recovery、完整BCB及保护区。bc.kind256只标记clientMemoryForType，bv记录实际token/输出引用状态；point2是owner复制返回，point3是serial解锁，不能当作IOConnectMapMemory64已成功返回。晚期诊断拒绝会撤回未交接输出并保留相应引用，真实原生错误保持；其他正常释放不变。若Recovery有界返回失败立即停止设备操作。
+B221 `/tmp/zorn-v221-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v221-client-memory-view-ada59109acaf4b51aeb428d2cc6804a6`. KernelSHA d29dbfb3ea93350f9d4bc904397c2ceccff08c1c9d7250aed83f2e98b84d370a;bootSHA 45f09984d934510aae7ecbfb284501bd228efb6a58341c533b8a6d3eb6b3d8c8. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v221-metal-trial-ada59109acaf4b51aeb428d2cc6804a6/root-trial`. No new221systemboot/rootwrite yet;lastphone220TWRP. No newcamera observation. Host fixture br suffix, pre-work refusal oracle and initializer include were corrected before aggregate pass. Native source unchanged after successful build. Diagnostic-only hold is limited to observer refusal;normal successful and real-error paths were checked with actual source body. Goalactive.
+
+
+v221 receiver-first wrapper started execsession59830 under standing user authorization. Poll this exact live handle through actual Recovery/capture final;never restart/invoke inner boot separately after observation timeout. Root2154a12265d retained;no root installation. Three memory-view source points,kind256/token/output-reference fields are diagnostic only.
+
+
+v221 COMPLETED execsession59830 exit0/inner0. v221 单次运行329.074秒自动回TWRP，12534B/24帧有效CDC，无不完整尾帧/诊断超时。首次合法视图token1的kind256三点及ack3全部观察到：入口结果未知；owner复制视图返回真实0；serial解锁返回，最终观察门之前输出描述符引用ready。物理描述符工厂/finish以及缓存retain输出准备已有源调用点证据，但最后gate函数返回、clientMemoryForType返回和外层IOConnectMapMemory64返回仍未直接观察。最后native8/method13/raw0，Metalphase2；pipeline/Metal图像/呈现/退出未验收。七组保护采样和完整BCB/tail通过，root4a12265d首块/边界未变，无根写入/全手机根哈希。无221新照片，不能由217照片或缺帧确认221panic；PAC根因未修复。 [Observed](evidence/k80-gpu-v221-client-memory-view-observed-2026-11-15.json).
+沿当前IOUserClient::mapClientMemory64真实源码核对clientMemoryForType返回后的hasSharingContext、调试FAKE_STACK_FRAME/getMetaClass、createMappingInTask及descriptor release/映射返回；先核对实际编译条件和允许等待的锁/调度上下文，再按实际未观察边界设计新scope。不能预先归因某函数/PAC/缓存模式。保持真实权限/结果/引用及300秒看门狗/600秒Recovery、接收器先启动；继续215root/probe/frontend及214Rust，无新根写入，不盲重试221。当前TWRP、221claim消耗、无livejob。
+
+
+## v222 IOKit mapping return (ready)
+
+v222 完成外层mapClientMemory64四点候选：已恢复215原生run/action/clientMemoryForType和owner路径，kind257仅是诊断标识。当前客户端最后成功BoCpuMap13后，依次观察外层入口、真实视图回调返回、原短路共享上下文判断返回和原mapping/release块完成或跳过；br记录回调真实返回码，bv记录返回描述符是否存在，bm记录判断/映射对象状态，不提供原生权限或伪造成功。每点10秒等待全部在issuer/serial锁和原FAKE_STACK_FRAME区间外；原有IPC可睡眠读写锁、原调试宏、映射选项/任务/地址/描述符释放块保持。85项实际映射函数与父版对照、26组实际gate/observer、50map parser/52原parser/5同次UFS/formatter-worker ASanUBSan通过；最大格式1944B小于3072B。22对象重编/1398完整输入/0undefined/40头文件通过，kernel9be0f402/bootafcfc0ae；沿用root/probe/frontend215和Rust214，无新根写入。新scope/owner/ready/admission/check-only通过，CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery。已查公开GPU教程/机型源码，未发现可直接确认的相同PAC修复；PAC根因未修复，222尚无真机结果。 [Ready evidence](evidence/k80-gpu-v222-IOKit-map-return-ready-2026-11-15.json).
+只运行read-zorn-gpu-metal222-cdc.py接收器先启动一次临时启动，固定运行器重新检查92988a43/slotA/Recovery、完整BCB及保护区。先区分实际到达四点，不把最后点之前的map非空当作外层函数/IPC返回、映射可用或Metal创建成功；未知结果保持未知。诊断拒绝仅保留未交接descriptor/map引用，正常引用处理和权限不变。沿用215根，若600秒Recovery有界返回失败立即停止设备操作。
+B222 `/tmp/zorn-v222-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-IOKit-map-return-8e2ea9a4ea604e838119aff32b435c68`. KernelSHA 9be0f402914d31c552e180a05ccc95bcea1c29fc68d23d8ee6a57a5dfdc52357;bootSHA afcfc0ae2c39d8e9a7f1e23d5c3b595b0008ff10095eb13db520fe8204edaba1. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v222-metal-trial-8e2ea9a4ea604e838119aff32b435c68/root-trial`. No new222systemboot/rootwrite yet;lastphone221TWRP. No newcamera observation. Host script identity replacement, checksum name and fixture checksum variable were corrected before aggregate pass;check-only missing bundle argument was refused before USB/claim,then corrected and passed. Native source unchanged after successful build. Diagnostic-only hold is limited to observer refusal;normal successful and real-error paths were checked against the actual parent mapping function body. Goalactive.
+
+
+v222 receiver-first wrapper started execsession20074 under standing user authorization;poll this exact live handle to actual Recovery/capture final. Do not invoke inner boot separately/restart. Retained215root4a12265d,no root installation. Four outer mapClientMemory64 source boundaries,kind257/descriptor/predicate/map states are diagnostic only.
+
+
+v222 COMPLETED execsession20074 exit0/inner0. v222 单次运行333.068秒自动回TWRP，28853B/39帧有效CDC，无不完整尾帧/诊断超时。kind257/token1四点及ack4完成：视图回调真实返回0，共享判断允许映射，原mapping/release块返回非空IOMemoryMap。随后普通MTL测试最终phase11/flags3ff/Completed4/code0，service=device=10000024e；32×32图像4096RGBA字节全匹配，CRC718ed2ce、badffffffff。实际报告render_complete=true/native_teardown_complete=true，native97次请求/flagsff/正常close0，两session均正常关闭。辅助stderr截断33，结构化MTL报告本身无copy错误/丢弃且身份匹配；严格application.complete=false、known_image_complete=false、full_GPU_qualification=false，原检查器保持，不抬升完整验收。七组保护采样/BCB/tail通过，root2154a12265d首块/边界未变，无根写入/全手机根哈希。本次为带有界映射观测的实际Metal已知图像阳性结果；无新照片/PAC根因修复/稳定性/显示呈现/完整触控验收。 [Observed](evidence/k80-gpu-v222-metal-known-image-observed-2026-11-15.json).
+依据222实际终端成功报告改变后续方向：不再假设外层映射/IPC必然失败，不增加无必要的相邻IPC等待。下一轮做去除四点映射等待的受控对照，恢复原始IOUserClient函数，保留相同root/probe/frontend215、Rust214和真实图像/关闭检查，以区分观测时序影响与稳定功能；若仍有辅助stderr截断照实保留，不能放宽验收条件。先完成空间保障/独立源码审查/完整构建、新scope、300秒看门狗/600秒Recovery和接收器先启动；不盲重试222。当前TWRP、222claim消耗、无livejob。
+
+
+## v223 without mapping waits (ready)
+
+v223 完成去除映射等待的受控对照候选：以222实际Metal已知图像阳性结果为基线，仅恢复原始共享IOUserClient文件并重新绑定试验标识；原生run/action/view/owner及root/probe/frontend215、Rust214均保持。四点映射gate实现保留但没有调用点，严格control decoder拒绝任何映射观察点，不把未选择当作成功。实际生产者/worker/formatter ASanUBSan、52原parser、10项当前无映射等待/source恢复/实际222终端fixture保守判定及5同次UFS/预算通过；原MTL和诊断丢失检查均未放宽。22对象/1398完整输入/0undefined/40头文件通过，kernel7158192e；无新根写入。新scope/owner/ready/admission/check-only，CDC120秒/39帧/119808B、300秒看门狗/600秒Recovery。此候选检查222成功是否依赖额外观测时序，不宣称PAC修复、稳定渲染或全功能验收；223尚无实测。 [Ready evidence](evidence/k80-gpu-v223-without-map-waits-ready-2026-11-15.json).
+只运行read-zorn-gpu-metal223-cdc.py接收器先启动单次临时启动，固定运行器重新检查92988a43/slotA/Recovery、完整BCB及七组保护采样。观察同一215普通Metal probe的真实device/pipeline/render/CRC/正常退出；四点映射观测必须始终为0。保留结构化报告和辅助stderr丢失的区别及严格判定。若Recovery有界返回失败立即停止设备操作。
+B223 `/tmp/zorn-v223-path` → `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v223-without-map-waits-b00b03c76099402f9446dd4e88b04cfc`. KernelSHA 7158192eb8b8afcdfb61811b104f0b00ed474e8882b7185872d2a99e050a5092;bootSHA 336a6418fcbff3d8a8cd90b99eea776a1045a3b1bfeeb072b70cdebdee4793e7. Trial `/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v223-metal-trial-b00b03c76099402f9446dd4e88b04cfc/root-trial`. No new223systemboot/rootwrite yet;lastphone222TWRP. No newcamera observation. No source changes after native build;control decoder transitive222/217/216/211 dependencies are pinned before admission. Native source unchanged after successful build. Diagnostic-only hold is limited to observer refusal;normal successful and real-error paths were checked against the actual parent mapping function body. Goalactive.
+
+
+v223 receiver-first wrapper started execsession11604 under standing user authorization. Poll exact live handle to actual Recovery/capture final;no inner boot/restart. Original sharedIOUserClient restored,all four mapping waits unselected;root/probe/frontend215/Rust214 unchanged,no root write. This is the controlled no-mapping-wait comparison after222 actual Metal known-image/normal-close success,not a PAC fix claim.
+
+
+v223 COMPLETED execsession11604 exit0/inner0. v223 去除四点映射等待的单次受控对照333.134秒自动回TWRP，31432B/39帧有效CDC，无不完整尾帧/诊断超时，所有映射观察点保持0。原始IOUserClient下普通MTL测试再次phase11/flags3ff/Completed4/code0，service=device=10000024f；32×32图像4096RGBA字节全匹配，CRC718ed2ce/badffffffff；render_complete=true/native_teardown_complete=true，97次原生请求/flagsff/正常close0。两session均正常退出。辅助stderr截断33，结构化MTL报告本身无copy错误/丢弃或身份拒绝；application.complete=false、known_image_complete=false、full_GPU_qualification=false，严格检查未放宽。七组保护采样和完整BCB/tail通过，root2154a12265d首块/边界未变，无新根写入/全手机根哈希。222及223均有实际Metal已知图像阳性，223证明本次成功不依赖222四点映射等待；不能认定PAC根因修复或长期稳定。CPU界面不等于GPU显示呈现，完整FT3683仍未验收。 [Observed](evidence/k80-gpu-v223-without-map-waits-observed-2026-11-15.json).
+进入IOSurface共享图像/实际显示交接验证准备：精确215前端源码已实现newTextureWithDescriptor:iosurface:plane:和成功完成后presentDrawable，顶部未实现注释不能作结论。先核对当前真实BoImport/任务页所有权、CPU/GPU缓存同步和surface引用生命周期，再以公开API构造小尺寸IOSurface-backed真实GPU渲染/直接CPU共享内存校验候选；不能用plain-texture成功或假drawable回调代替物理呈现。保留现有阳性223/222及原检查，暂不直接切换系统GPU桌面。需要新probe/root时先完整离线构建、delta/replay/保护审查和新scope，维持300秒看门狗/600秒Recovery、接收器先启动，不盲重试223。当前TWRP、223claim消耗、无livejob。
+
+
+v224 OFFLINE，用户已恢复目标。v224 IOSurface探针离线推进：保留原stage证据并补最终helper可重现修订；实际helper ASan/UBSan通过4K/16K对齐、stride/padding、独立读取、溢出及拒绝不访问内存检查。仅替换probe构成root224 caaaa8af，568个受监测文件与属性核对，Metal frontend215/Turnip/Rust214保持。65页266240B/11组delta完成实际本地回放，完整镜像哈希一致；重新核对iOS17/Data/log边界，未访问手机。已安装215历史读回由最新5627页实际delta重建为7016页150组覆盖，不能称手机整根读回。22对象重编/1398完整输入/0未解析导入/40头文件依赖通过，kernel72031545；启动包20a00898，ADT仅替换根摘要，300秒看门狗标记保持、现有loader源码preflight通过。新root未安装、新scope/准入/claim未生成、未启动，不是硬件成功。 [证据](evidence/k80-gpu-v224-IOSurface-offline-2026-11-15.json)。
+继续实际NativeMemory/Cpu/MiniIOSurface历史输入及板级coherence策略绑定，核对新探针trust/launch；完成224 producer/decoder/runner与实际检查，再以准确新根delta/replay/保护审核准备新scope。仅执行接收器先启动的固定wrapper，300秒独立看门狗/600秒有界Recovery；未具备准入前不访问手机。PAC根因、IOSurface实际共享图像、GPU显示呈现、完整触控及长期稳定均未验收。
+
+
+v224 COMPLETED，当前以本段取代上文“未准入/未安装/未启动”状态：v224 IOSurface探针差分65页/11组已安装并读回匹配69ef0197，保护通过。单次receiver-first启动309.673秒自动回TWRP，session37460 exit0/inner0；8563B/18帧有效CDC，无尾帧/报告丢失。新probe已执行且phase2/flags1/service10000024f，device0；principal标记9位于native_bridge_metal_open之前，未观察到返回15。原生第二session60次完成调用，最后WaitFence6返回0，第一session9次正常close0；第二session未关闭。未到新增IOSurface创建/渲染，不能归咎IOSurface实现或宣称fence挂死/PACpanic。七组保护采样及完整BCB/tail通过，当前root224caaaa8af；没有手机全根读回。GPU渲染、共享图像、GPU显示与完整触控仍未验收。 [实测证据](evidence/k80-gpu-v224-IOSurface-observed-2026-11-15.json)。
+保留224根与全部实测，先沿所选principal/frontend215/Rust214的真实native_bridge_metal_open调用链，核对60次原生完成后到principal返回标记15之间的源码回调/对象/FFI生命周期及已有观测盲区；不从地址/寄存器/回溯推断、不禁用PAC、不反汇编。不盲重跑224，不重新写相同根。新的源码修复或有依据的有界观测需新候选/完整受影响构建/新scope，仍仅wrapper接收器先启动、300秒看门狗/600秒Recovery。
+
+
+v225 READY：v225修复224观测盲区：旧完成计数位于serial解锁前，既不证明run/基类返回，也不记录后续请求入口。新增按内部args身份匹配的入口/run返回/IOUserClient基类返回三级快照，导出序号/selector/真实结果及覆盖/拒绝计数，不导出地址；未绑定首次调用不冒充匹配，跨session重置，try-lock丢失显式累计，无新增等待和原生返回值修改。实际action/external函数体、owner生命周期和tracker ASan/UBSan通过；C共享头兼容、实际formatter最大2005B/3072B，52既有parser+24新增拒绝/关联及同次UFS绑定通过。22对象重编/1398输入/0未解析导入/44头依赖，kernel6301affc/boot3d211739。沿用已装root224caaaa8af/同一签名probe224，未写新根。新scope/独立归档/owner/ready/admission/check-only与6runner拒绝通过；接收器优先、CDC120秒39帧119808B、300秒独立看门狗/600秒Recovery。只是更完整的源码进度观测，PAC根因和IOSurface渲染尚未解决，尚未执行225。 [证据](evidence/k80-gpu-v225-native-return-ready-2026-11-15.json)。
+
+
+v225 COMPLETED，本段取代前文未执行状态：v225单次接收器优先观测310.525秒自动回TWRP，session77619 exit0/inner0，9528B/18帧有效CDC。新同请求观测nr=71/6/3/1/0/0/0/0：最后WaitFence6的run及基类externalMethod实际返回0，无覆盖/拒绝及结构化丢弃；随后普通Metal设备发现与shader/function完成，phase4/flags7/service=device10000024f。第二session74次完成调用，首session9次正常close0；尚无第二session关闭。辅助stderr截断29，仍严格拒绝完整验收。末尾frontend215标记1/11/3/4/5可见，缺6；精确源码5..6同时包含真实nmb_render_pipeline_new_with_options和gTimePipeline.add，不能把缺6当作Rust入口或挂死证据。未到IOSurface创建/渲染。七组保护采样与整页BCB/tail通过，root224保持，无新根写入/手机全根读回。此观测补足kernel返回盲区，PAC根因仍未确认。 [实测证据](evidence/k80-gpu-v225-native-return-observed-2026-11-15.json)。
+以225实际phase4和frontend5为新窗口，先核对所选FFI descriptor/options布局、真实Rust pipeline入口/guard及返回后的gTimePipeline.add源码；必要时把实际FFI返回和计时更新分为独立有界标记，不用新增等待或假返回。新root若改变frontend/Rust必须仅替换必要载荷，以当前已装224和65页实际回执重新累计覆盖、完整delta/replay/保护审核；不能复用225scope或直接套旧root窗口。不盲重跑225，不将stage3推断为所有IPC返回或PAC修复。
+
+
+v226 READY：v226沿225实际frontend5窗口核对了C/Rust descriptor/options全部字段布局和arm64e目标C断言，实际descriptor value-init清零通过；未发现明确ABI/生命周期错误。仅在真实nmb_render_pipeline_new_with_options返回后、原gTimePipeline.add后各增加一个有界write，不增加等待/重试、不改变调用次数/真实handle。实际helper/语句成功/空句柄/写失败/短写ASanUBSan通过；frontend重编签名，Rust214/Turnip/principal/PM4/probe224字节保持、无新增undefined导入。root226d94042c9只改frontend；4962页/88组完整本地回放一致，重新审核存储窗口，已安装224实际65页叠加后累计7068页151组覆盖。新根差分已安装/读回1c3322cb匹配，全部保护/BCB通过、安装前后TWRP；未做手机全根读回。内核1ef011ba/bootb4d5f39d，22对象/1398输入/44头依赖/0未解析导入通过，生产者/严格parser及UFS绑定通过。新scope/owner/ready/admission/check-only及6runner拒绝通过，保持接收器先启动、120秒39帧119808B、300秒独立看门狗/600秒Recovery。尚未启动226，不宣称Rust返回、pipeline或IOSurface成功，PAC根因未解决。 [证据](evidence/k80-gpu-v226-pipeline-return-ready-2026-11-15.json)。
+
+
+v226 COMPLETED，本段取代前文未启动状态：v226新frontend根d94042c9已安装，4962页/88组实际读回1c3322cb与本地回放一致，安装前后TWRP。单次receiver-first系统观测310.419秒自动回TWRP，session77735 exit0/inner0；8412B/17帧有效CDC，无尾帧/诊断丢失。新probe224实际phase2/flags1/service10000024f、device0；raw仅发现DISC，未见principal入口标记，原生session0/nr全0。因此本轮没有进入226新增RustFFI/timer标记，不能由缺标记断定Rust或timer错误，也不能宣称panic。七组保护及完整BCB/tail通过，root226保持；无手机全根读回。USB摄像头现可用：有界取帧成功、手机在视野内但屏幕暗/反光，无可辨OS/panic文字，Recovery依据仍为固定runner的ADB身份。GPU/Metal pipeline/IOSurface/显示及完整触控未验收。 [实测证据](evidence/k80-gpu-v226-pipeline-return-observed-2026-11-15.json)。
+保留226根/源码/全部实测，不盲重跑226。先核对所选principal对象的准确编译源码/recipe，以及frontend加载构造器与动态初始化；本轮比225的phase4更早，不能继续仅盯pipeline5..6或把未到当作Rust失败。原先C/Rust ABI检查与原生返回观测仍有效但未定位PAC根因。摄像头USB0有界捕获已验证，后续新scope可在运行中读取一帧观察手机；不要操作KiPhone或依赖物理协助，不从寄存器/回溯/二进制指令推断。维持接收器先启动、300秒独立看门狗和600秒Recovery。
+
+
+v227已单次观测并回收，本段替代未启动状态：v227仅内核/菜单改为-g45提前GPU检查点，保留根226/probe224/frontend226，单次receiver-first已在210.131秒自动回TWRP，session42679 exit0/inner0；8412B/17帧CDC、无尾帧/诊断丢失。真实UFS记录u位16确认选中名义45秒，CPU25/45采样和八核通过，不能继承150秒触控/UI验收。最后仍为probe phase2/flags1/service10000024f/device0，native session0/nr全0，未见principal/FFI标记，图像/Metal/IOSurface/显示未验收。更早进入日志没有解除phase2停滞；Recovery也从226约310秒提前到210秒，不能声称已增加完整有效应用窗口。源码phase2之后尚有nanosleep10和setenv，缺后续报告不能直接断定MTL调用已进入。运行中USB0摄像头一帧暗屏，无可辨panic/OS文字；不能证明panic。七组保护与完整BCB通过，根未写、未读回全根。 [实测证据](evidence/k80-gpu-v227-checkpoint45-observed-2026-11-15.json)。
+保持目标active，不复用227 claim。基于probe224真实源代码，在既有10秒wait返回、setenv返回/标准Metal调用进入及返回处加最小有界日志，保持原API调用顺序/真实结果/失败保留，继续缩小phase2未观测窗口。Recovery早于300秒只记录实际返回，不推断panic或PAC根因。官方GPU教程仍要求逐项记录设备发现、pipeline、渲染/呈现与生命周期；当前指南示例OS27不得直接替换本地已核验26配置。
+
+
+v228 READY，本段替代未安装状态：v228根差分已按固定新scope安装并读回：44页/12组，e063d566匹配本地回放，全部保护/BCB检查通过，安装前后TWRP，未自动启动、未读回手机全根。新root4651199b/内核1ac1c498/bootcc110cc8/ADT与普通probe228身份已绑定；独立boot scope接收器先行120秒39帧119808B、独立300秒WDT/600秒Recovery，check-only和8项拒绝通过。只增加原wait/setenv/标准Metal返回处有界标记，仍需实机确认实际到达边界和后续正常渲染/退出，不认定功能完成。 [安装与准备证据](evidence/k80-gpu-v228-device-boundary-ready-2026-11-15.json)。
+
+
+v228已单次观测并自动回收，本段替代未启动状态：v228普通探针新身份已实际运行，单次receiver-first210.621秒自动回TWRP，session86527 exit0/inner0，8412B/17帧，无尾帧或诊断丢失。最后phase2/flags1/service10000024b/device0，raw仅DISC，新增wait返回、setenv后/MTL前、MTL返回三个标记均未观测；native session0/nr0。证据尚未确认phase2 report本身返回EL0、10秒wait进入/返回或MTL进入，不能断定MTL/Rust失败，更不能认定panic或PAC根因。七组保护及完整BCB通过，root2284651199b保持；安装44页读回e063d566，不是全手机根哈希。实际XNU线程退出源代码确认kernel_task自退出同步thread_apc_ast，排除普通thread_terminate返回落入panic的猜想；无需改动。 [实测证据](evidence/k80-gpu-v228-device-boundary-observed-2026-11-15.json)。
+不复用228claim。独立229候选移除215最初增加的10秒诊断wait，保持真实标准Metal调用、setenv、来源明确的边界日志、原backend及IOSurface/已知图像/生命周期；这是源时序对照，不先宣称修复。继续源码级定位，不执行任何逆向/反汇编。官方指南及其他机型公开README检索未提供可直接采纳的本机26修复；不照搬27/macOS/Mali板级和安全策略。
+
+
+v229 OFFLINE：v229从228实际源代码仅移除215加入的10秒诊断等待及失败guard，保留正常setenv/标准MTL调用、真实handle/null结果、IOSurface全图oracle和失败保留。日志改用ZORN229DEV独立语义：stage1为phase2报告已返回probe，stage2为setenv成功后/MTL前，stage3为MTL返回；不再把stage1称作wait返回。真实调用片段12种ASan/UBSan与精确还原228检查通过；arm64e编译签名通过，新cdhash22d87b1d。完整内核89b13c9b、boot4456d99c、根193e5f01已离线生成；1398输入/22重编/44共享头/0undefined，source producer及52parser、新标记与45秒UFS绑定通过；根仅替换probe，63页/10组完整本地回放哈希一致，存储窗口重新核对。Metal bundle/Rust214/Turnip/着色器/启动job保持，不继承150秒UI或触控验收。thread_act.o依当前精确recipe重编与已选对象逐字节相同，确认同步kernel线程自退出，无需线程退出补丁。229尚未安装/启动、未创建device scope，当前手机为228根4651199b、最后单次启动已回TWRP。所有host进程已完成。 [证据](evidence/k80-gpu-v229-no-preMetal-wait-offline-2026-11-15.json)。
+目标active。先从D228真实44页读回与其既有7118页重建实际228覆盖；准备229精确63页/10组新plan与原完整source/签名/前镜像/读回/保护校验。新plan应显式核对pre_Metal_delay_seconds=0、diagnostic_wait_unselected与229源代码精确还原检查，不复用旧10秒guard断言、不删安全门槛。完成固定安装工具登记/拒绝/新scope/ready/claim后安装；成功并核验Recovery后才准备独立单次boot接收器。不得复用228claim，不得把移除诊断wait预先认定为PAC或会话根因修复。
+
+
+v229 READY，本段替代未安装状态：v229根193e5f01已安装，63页10组实际读回f343fc22匹配本地回放；保护元数据/边界与完整4KiB BCB安装前后相同，TWRP前后核验通过，无自动boot。新内核89b13c9b/boot4456d99c/ADT/普通probe229身份绑定，单独接收器先启动scope/ready/claim已准备，10项runner拒绝及check-only通过，保持120秒39帧119808B CDC、300秒独立WDT/600秒Recovery。移除的是可选10秒诊断wait，尚未证明根因/Metal/GPU或显示成功。 [证据](evidence/k80-gpu-v229-no-preMetal-wait-ready-2026-11-15.json)。
+
+
+v229已单次观测并自动回收，本段替代未启动状态：v229移除10秒可选wait的候选已单次receiver-first启动，200.008秒自动回TWRP，session58616 exit0/inner0；6794B/14帧CDC，无尾帧/诊断丢失。最后state2/point5/ack5，source中gate5之后才调用实际registerService，未见gate6/注册返回；probe229仅phase1等候服务，service/device均0、native session0，尚未触及此次移除wait后的路径。不能把取消等待称作修复，也不能把缺记录当作registerService内部故障、panic或PAC根因。七组保护与完整BCB通过，root229193e5f01保持；安装63页/10组读回f343fc22，非全手机根哈希。 [证据](evidence/k80-gpu-v229-no-preMetal-wait-observed-2026-11-15.json)。
+目标active，不重跑已消耗229scope。保留实际root/probe229及frontend226/Rust214/Turnip等，下一独立kernel-only候选优先完善串口终止原因：仅在真实CDC所有者try-lock成功、bulk IN已有传输完成、控制器/端点有效且无未知事件时发送单个<=63字节源终止枚举，限制在原39帧/119808B总预算内；无法证明USB安全状态则不做新DMA，保留资源。保留原复位/WDT/Recovery流程，不从内存地址、寄存器或回溯读取原因，不作任何逆向。先完成真实USB/终止hook源码、生命周期与失败拒绝回归、完整链接及新scope后再考虑硬件。
+
+
+v230 READY：v230为独立kernel-only串口终止原因候选，保留已安装root/probe229193e5f01及frontend226/Rust214/Turnip/全部GPU实际调用。原terminal入口仅增加source原因枚举1/2/3调用，不读取/输出panic文本、地址、寄存器或回溯；不改原等待、reset或WDT。CDC正常轮询/清理与terminal共用非阻塞所有者，先读ready再访问普通状态；只有已完成bulk IN、无数据端点DMA/notify、控制器运行/命令闲置/TRB无HWO/残留/错误且无未处理事件时才允许单个47字节包，计入原39帧/119808B，START只尝试一次，命令轮询1000次无sleep/时间源依赖。无法证明状态则零新写；尝试后USB资源全部保留，正常轮询/清理不得复用或关时钟。真实sender/transfer/epcmd、实际loop/cleanup及原terminal分类片段ASanUBSan通过；100组实际双线程竞争与初始化发布的TSan通过。初始测试把全局锁空闲当作本线程已解锁、混用原子读，已修正测试边界；生产锁未因此改动。测试运行库首次默认尝试符号化但失败，该配置已停止，成功测试显式关闭symbolize；无反汇编或二进制指令检查。所选cache对象按原源码/recipe重编字节相同，宏预处理证明APPLE_ARM64_ARCH_FAMILY未定义，既有VA PoC源路径为真实通用cache循环，不走物理查找/平台回调。新终止帧含原始源sender输出47B/CRLF，23项parser边界和完整/截断capture拒绝通过，原52parser与producer通过。完整内核14ee6941/bootd292cd35、1398输入22重编45头/0undefined，source/编译输入/terminal literal绑定通过；FAT仅kernel成员变化。初始配方误将不变menu列为变化被检查拒绝并保留，最终仅kernel变化验证通过。新scope/owner/ready/check-only及14项拒绝通过；未启动230。 [证据](evidence/k80-gpu-v230-terminal-cdc-ready-2026-11-15.json)。
+
+
+v230已单次观测并自动回收，本段替代未启动状态：v230kernel-only在保留229root/probe193e5f01下单次receiver-first启动，199.991秒自动回TWRP，session78527 exit0/inner0。收到6841B、14个正常CDC帧及一个完整47B终止包r=2，身份与本轮75e1d78b匹配；无尾帧、诊断丢失或解析错误。原terminal源码把此次结束分类为panic分支，首次获得真实串口结束原因；具体panic触发源未知，不能由该枚举分析地址/寄存器/回溯，也不能据此认定PAC根因。最后仍state2/point5/ack5，未观测registerService返回后的gate6；probe229仅phase1等待服务、native session0，新Metal路径未到。单包到达证明实际尝试/传输送达，不证明设备侧DMA完成或停机，代码保留全部USB资源直至整机回Recovery。七组保护及完整BCB通过，根193e5f01未写，本轮无root安装。 [证据](evidence/k80-gpu-v230-terminal-cdc-observed-2026-11-15.json)。
+目标active。保持230新串口来源与全部已归档构建/结果，不复用claim。围绕实际registerService前后源码，核对已链接IOService/IOAcceleratorES/ZornGen7AppIoService的精确对象、实际头依赖/布局和arm64e编译参数，先排除源码或ABI混用；仅进行源码/编译器元数据/精确重编对照，不作任何二进制指令检查或符号化。必要时再由明确源码分支输出无格式化值的原因类别；不得读取/分析panic地址、寄存器或回溯。
+
+
+v231 READY：v231为独立kernel-only终止源码类别/进度候选，保留229根193e5f01及实际probe229/frontend226/Rust214/Turnip。v230后的精确IOService/IOAcceleratorES/AppIo源码、所选对象重编、头依赖及arm64e参数审计未发现已证实ABI混用；HOUJI与ZORN宏名不同但实际AppIo预处理字节完全相同，不能当作根因。新类别仅对原first_panic已发布文本的5个固定源码前缀做有界比较，输出未知/数据中止前缀/指令获取中止前缀/initproc退出前缀/initproc启动失败前缀/GPUworker返回前缀；不输出或解析任何格式化数值、地址、寄存器、回溯。结束时对既有state/requested/ack/result进行两次有界原子采样，只有相等且合法才输出，否则p777/vff未知；这不是全局原子或静止快照。单包62B仍在原<=63B、39帧/119808B内，全部230所有者、DMA空闲判定、单次START、失败保留和原Recovery/WDT/wait源码恢复对照逐字节通过。实际sender/getter及5前缀/截断、784组有效上下文ASanUBSan通过，实际loop/terminalhook/producer和100组USB竞争及1000组census竞争通过；52原parser及84新terminal边界、完整/部分capture通过。测试最初的转写/旧函数调用和跨模拟进程静态packet假设已拒绝并归档，只修正测试；生产代码未因测试变动。初始打包证明继承47B元数据已被核对拒绝并保留；按62B实际sender修正配方重跑完整打包，boot字节不变。完整kernel5f681008、bootee6b92e3，1398精确输入/22重编/48头/0undefined；FAT仅kernel变化，FD/ADT/菜单/根不变。新scope及15项拒绝/check-only通过，未启动231。 [证据](evidence/k80-gpu-v231-terminal-source-context-ready-2026-11-15.json)。
+
+
+v231已单次观测并自动回收，本段替代未启动状态：v231kernel-only单次receiver-first启动，200.276秒自动回TWRP，session52139 exit0/inner0。收到7753B、15个正常CDC帧及一个本轮2b454121完整62B终止包r2/c0/p652/vff。普通帧与终止采样均已requested6/ack5/state2，实际registerService已返回，推翻此前把尚未收到gate6当作调用内失败的推断；六号诊断等待尚未观测确认，不代表发布函数整体返回。probe229 marker1/2已到，phase2/standardMTL进行中，真实native首session已正常close，第二session8calls最后BoCpuMap13返回0；225关联nr5/method13/stage3/run0/base0，不能冒充后续IPC或用户映射已成功。无rawstderr/native丢失，未到pipeline/IOSurface验证。c0仅说明5个固定前缀未匹配或原first-panic文本尚未发布，不能说明异常种类、PAC或根因。实际debug.o按原recipe重编字节相同，实际预处理含UNIXNU_IOS26=1及capture调用；各编译单元IOService/IORegistryEntry/OSObject/IOAcceleratorES源AST布局一致，仍不等于完整行为ABI证明。原USB资源保留直到整机Recovery，不能由送达推断设备DMA完成。七组保护及完整BCB通过，229根193e5f01未写。 [证据](evidence/k80-gpu-v231-terminal-source-context-observed-2026-11-15.json)。
+目标active。保持全部历史及已消耗scope，不重试。继续精确源码错误识别：只在实际公开源码formatter加入固定格式字符串的源诊断ID，不读取参数、PC、地址、寄存器、回溯或二进制指令；先离线集成和完整构建/边界检查，再准备独立验证。不能猜测更多前缀并把未知当作根因。
+
+
+v232 READY：v232独立kernel-only源诊断ID候选，保留229根193e5f01/probe229/frontend226/Rust214/实际GPU后端。前一轮c0无法区分未匹配与未捕获，不再猜更多前缀。实际公开debug.c的panic_trap_to_debugger入口只增加一个静态格式模板识别调用，在va_list格式化前执行，源预处理及恢复对照通过。模板表来自固定本地公开XNU/K80源的显式panic/panic_plain/panic_with_options字符串，生成器不读任何二进制；3565模板/606源文件SHA固定，表达式/宏拼接等未解析模板保持unknown，不冒充完整覆盖。ID为原始格式模板而非调用点或根因，相同模板保留多处源位置；不读动态参数、错误数值、PC、地址、寄存器或回溯，不作符号化或二进制指令检查。第一入口CAS占用ffff，完成后发布实际ID；0未观察、fffe模板未收录、ffff尚未完成，重复入口不等待/覆盖。单63B包沿用原所有者/空闲判定/39帧119808B/单次START/未知保留，Recovery等待/复位/WDT逐字节恢复通过。全部模板实际Clookup与capture、独立JSON数值字节oracle、784进度上下文、实际sender/terminal/loop/producer ASanUBSan通过；100组实际格式捕获竞争和USB竞争TSan通过；进度getter及cache源路径保持相同并明确复用231证据。原52parser/新增83terminal边界、完整/截断capture通过；17拒绝及check-only通过。初始源文件UTF8假设、wire字段偏移、测试签名与parser占位替换错误均在离线被拒绝并保留；最终修正后实际编译/测试通过。完整kernel03fa3b82/bootb610ec14，1398输入23重编49头0undefined，FAT仅kernel变化；FD/ADT/菜单/根不变。新scope绑定kernel目录与decoder目录同一源模板表SHA；未启动232。 [证据](evidence/k80-gpu-v232-source-panic-format-ready-2026-11-15.json)。
+
+
+v232已单次观测并自动回收，本段替代未启动状态：v232kernel-only单次receiver-first启动，200.115秒自动回TWRP，session73619 exit0/inner0。收到6857B、14个正常CDC帧及本轮f9fd63ef完整63B包r2/fffe/p652/vff。fffe证明实际新增源码formatter hook已取得第一入口并完成lookup，但原模板未匹配，未输出动态参数。终止census已request6/ack5/state2，registerService实际已返回；最后普通帧仍point5/ack5，证明普通3秒采样不能替代终止census。probe仅phase1/native0，无渲染结果或退出完成。实际宏预处理发现kernel/native均XNU_KERNEL_PRIVATE=1，native的panic宏会给原始字面量追加静态' @%s:%d'，当前canonical模板表未匹配该后缀，这是已证实的诊断覆盖缺口，不是本次GPU根因证明。源AST的539条IOService方法声明在仅去除编译器本地node identity后顺序/参数/virtual等一致，未见已证实ABI混用。无stderr/native丢失或解析错误；七组保护及完整BCB通过，根193e5f01未写，USB资源按源码保留到Recovery。 [证据](evidence/k80-gpu-v232-source-panic-format-observed-2026-11-15.json)。
+目标active。保持全部已消耗claim及历史输入。按实际panic_call.h和实际编译器预处理扩展固定宏后缀识别，拒绝额外字符/格式变化；ID仍只指canonical源模板，不读真实源文件名/行号参数、PC、地址、寄存器或回溯。先完成实际编译与边界检查，再独立验证。
+
+
+v233 READY：v233独立kernel-only修正静态panic宏模板识别，沿用232源格式ID/63B协议、229根193e5f01与全部实际GPU/Metal输入。唯一实际诊断功能变化是recovery源改用ZornPanicMacro233.h：同一canonical模板表匹配精确字面量或其后紧接公开panic_call.h固定后缀 @%s:%d；不读实际文件名、行号或任意格式参数。一个有界表遍历，无分配、sleep、计时器、重试或新硬件写；若canonical与宏形式产生歧义，明确unknown。3565模板ID及原606源SHA完全沿用232；实际选用native编译参数的宏预处理表达式经主机编译oracle证明后缀匹配，全部canonical及宏形式、四类非法后缀、synthetic歧义、firstentry/unknown/pending、784进度上下文ASanUBSan通过，100组实际捕获竞争及USB竞争TSan通过；普通producer/52parser/83terminal边界和完整/截断capture通过。原formatter hook、USB/DMA/所有者/GPU/Recovery主体恢复对照逐字节相同。完整kernel2ac4092a/boot61ea463d，1398输入23重编50头0undefined，FAT仅kernel变化；FD/ADT/菜单/根不变。18拒绝/check-only通过，新scope必须校验macro233选择及原源目录和decoder同表SHA。无新root安装、重试或手机启动；未启动233。 [证据](evidence/k80-gpu-v233-source-panic-macro-ready-2026-11-15.json)。
+
+
+v233已单次观测并自动回收，本段替代未启动状态：v233kernel-only单次receiver-first启动，200.019秒自动回TWRP，session31781 exit0/inner0。收到6857B、14正常帧及本轮e5bb0aac完整63B包r2/fffe/p652/vff。精确固定宏后缀修正后原模板仍未匹配；不能将宏覆盖缺口认定为GPU故障根因。终止源census已request6/ack5/state2，registerService实际返回；普通最后point5/ack5，probe phase1/native0，未验证渲染或退出。七组保护及完整BCB通过，根193e5f01未写，无诊断丢失、尾帧或解析错误，USB资源保留到整机Recovery。新增纯源码检查发现sleh.c的通用panic_with_thread_kernel_state静态格式643B，超过原512B模板预算而被明确排除；这只是又一已证实覆盖缺口，尚无实机证据证明本次走该函数。 [证据](evidence/k80-gpu-v233-source-panic-macro-observed-2026-11-15.json)。
+目标active，不复用已消耗claim或重试。准备公开异常入口的有界固定来源枚举，报告已经由原源码分支决定的类别，不读取或输出PC/寄存器/地址/回溯/异常参数，不调用任何指令读取或解码函数；保持原异常处理主体和ABI。先离线精确重编、source恢复比较和实际分支控制测试，再准备后续独立验证。
+
+
+v234 READY：v234独立kernel-only固定来源事件候选，沿用229根193e5f01/probe229/frontend226/Rust214和全部真实GPU输入。新增源事件日志仅用编译期常量，不读取msg、异常参数、PC、寄存器、地址或回溯，不新增或调用任何指令读取/解码函数。公开sleh.c的23个静态fatal调用通过同一语句内逗号宏先记录来源再调用原真实handler，原条件及参数求值保留；6个现有specific fatal分支和通用入口各增加固定枚举调用。原handler及全部控制流/参数恢复逐字节通过；原所选sleh.o按原recipe重编字节一致，实际新增对象由同一编译输入集生成。first-successful-global-source-event只做一次原子CAS，不分配、sleep、重试、reset或硬件写；并发时不等于最终formatter赢家，不当作根因或PC映射。仅在原格式模板unmatched时以保留区8000+class上报，同一个63B包、原39帧/119808B及USB资源保留策略不变。25个实际预处理可达class与源表SHA固定到内核/decoder，未编入类别拒绝。源码常量logger/语句条件与一次参数求值、全部源枚举到真实sender、784进度上下文ASanUBSan通过；100组源记录并发及USB所有者竞争TSan通过；实际producer、52普通parser/83terminal/41新源事件含capture边界通过。canonical模板/格式捕获、cache/getter/原macro实现逐字节不变，明确复用233相同实现的测试而非冒充234新执行。最初消息字符串比对方案已在离线淘汰并完整归档，最终为纯源码常量并重新编译/链接；早期producer fixture缺失和未按编译条件过滤的测试/数据亦保存。完整kernel2c278376/bootca8b2d0e，1398输入24重编51头0undefined，FAT仅kernel变化；FD/ADT/菜单/根不变。20拒绝与check-only通过，新scope绑定源事件选择及相同编译class表SHA；无新root安装或布局写，未启动234。 [证据](evidence/k80-gpu-v234-source-fault-event-ready-2026-11-15.json)。
+
+
+v234单次结束并自动回收，本段替代未启动状态：v234仅单次receiver-first试验，89.983秒自动回TWRP，session88540 receiverexit1/inner0，fastboot传输成功不等于XNU启动。未发现本轮CDC端口、0B/0帧，原log块未变化且仅旧artifact记录；根挂载、PID1、panic分支、新来源事件与GPU均无法验证。不能按约90s时序推断具体panic原因、SLEH改动或0008前缀nonce是根因。七组保护及完整BCB通过，229根193e5f01未写，已消耗claim不重试。离线进一步证明SLEH原/新依赖除新源和诊断头外相同，未发现header路径shadow；实际所选IOMemoryDescriptor185与NativeAdrenoMemory源码按原recipe重编字节相同。OSPtr私有opt-in造成_mappings的预期别名差异，强制求值后各TU析构均noexcept，size96/align8/_mappings offset24及方法声明一致，尚未证实ABI缺陷，未盲改PAC/接口。 [证据](evidence/k80-gpu-v234-source-fault-event-observed-2026-11-15.json)。
+目标active。保留234完整未观测来源及两版离线构建，不重试同候选。继续最小化早期异常单元改动，下一候选恢复已核验原SLEH对象，在已有结构化错误reason路径作有界固定文字类别识别，仅上报枚举，不读取或输出PC/地址/寄存器/回溯，不作指令读取/解码。根因仍未知；source-only检查不能冒充硬件验证。
+
+
+v237已单次观测，本段替代237未启动状态：v237仅单次receiver-first启动，199.836秒自动回TWRP，session6164 exit0/inner0。收到139061B：14个当前fe0210f9普通帧6794B与132267B完整原始panic包；精确身份、长度、CRC36b99be0及尾标记通过，无截断或解析错误。首次按当前精确构建校验并保存1050B格式化panic原因全文，首句报告内核PAC认证失败；原始地址、寄存器与回溯仅留作原始日志，不解释、不符号化或逆向。128KiB msgbuf快照完整送达但为有限并发环快照，不等于全部启动历史；paniclog缓冲仍不可用(flags256)，没有冒充完整kernel paniclog。终止源census request6/ack5/state2，registerService已返回；最后普通point5/ack5，普通Metal probe phase1，渲染/正常退出未验收。七组保护及完整BCB通过，229根未写。236身份头缺陷修复实测有效，GPU PAC根因仍未知；下一步先补齐实际XNU paniclog缓冲条件并继续公开源码接口/生命周期调试。 [证据](evidence/k80-gpu-v237-panic-identity-observed-2026-11-16.json)。目标active，不复用237 claim。

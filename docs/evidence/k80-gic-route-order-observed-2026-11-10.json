@@ -1,0 +1,64 @@
+{
+  "status": "actual-route-store-barrier-did-not-resolve-current-CPU-route-readback",
+  "scope": "single-K80-ios26-GIC-route-store-order-CPU90s-v24",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-route-order26-d887fb2fc50e4bb7ade6d38aa4642bb7/root-trial-gic-route-order/trial/run.json",
+  "claim": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-route-order26-d887fb2fc50e4bb7ade6d38aa4642bb7/root-trial-gic-route-order/trial/one-shot.claim.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-route-order26-d887fb2fc50e4bb7ade6d38aa4642bb7/full-link/kernel.ZORN26-GIC-ROUTE-ORDER.UNSELECTED.macho",
+    "sha256": "ac95fb425bf6603c41bccd054b19545d1237a211d5dae2883e878c6171a7582f",
+    "bytes": 30393320,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-route-order26-d887fb2fc50e4bb7ade6d38aa4642bb7/root-package-gic-route-order/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "bfa092e8bf9e8a06571986c79d6517ff37f5441c827f92665339facaf3a5f78c",
+    "bytes": 11612160
+  },
+  "actual_GIC_attach": {
+    "status_copied": true,
+    "cpu_power_returned": true,
+    "cpu_power_raw": 0,
+    "attach_returned": true,
+    "attach_raw": 5,
+    "read_mask": 63,
+    "intid": 37,
+    "requested_type": 0,
+    "actual_type": 0,
+    "requested_route": 512,
+    "actual_route": 0,
+    "enabled": false,
+    "control": 210,
+    "group": 1,
+    "modifier": 0,
+    "priority": null,
+    "RSC_operation_returned": true,
+    "RSC_operation_raw": 3758097098
+  },
+  "recovery_seconds": 123.03948220900202,
+  "recovery_identity": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_sets_unchanged": [
+    "root_first_page",
+    "before",
+    "root_after",
+    "after",
+    "Data",
+    "root_before",
+    "Data_metadata"
+  ],
+  "full_root_readback_performed": false,
+  "scope_consumed_no_repeat": true,
+  "source_below_next_candidate": "Existing HoujiSpi26.inc routes the same INTID37 to actual boot_cpu->phys_id;current-thread migration is deliberately excluded there. Reuse in a separate single-attempt native entry,not a same-run fallback.",
+  "GPU_or_clock_started": false
+}

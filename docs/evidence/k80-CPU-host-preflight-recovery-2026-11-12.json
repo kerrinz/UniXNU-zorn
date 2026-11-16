@@ -1,0 +1,68 @@
+{
+  "status": "zero-command-host-failure-resolved-by-fixed-read-only-Recovery-check",
+  "recorded_at": "2026-11-12T04:05:33.667366+08:00",
+  "scope": "K80-8749-zero-command-host-failure-read-only-Recovery",
+  "incident": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/run.json",
+    "sha256": "e1e600f2d9aa22a94a7f98ddd5d75e8987c4a71cc670a1e520f8685b97e8004f"
+  },
+  "original_claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/one-shot.claim.json",
+    "sha256": "86c2ea24ad27d8a4b6bfcc12efd1f5aa981c81525090fc46b6ce72fae2f27a58"
+  },
+  "original_claim_reused": false,
+  "host_only_permission_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-access-check.json",
+    "sha256": "6c4d3e0eb8f5dbfd788b34657d4255aa744846f0115a459a1936c5de028ab46b"
+  },
+  "read_only_ready": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-preflight-recovery26/ready.json",
+    "sha256": "485c884154461bcde911928e54dd51015ebb3a93cbaf539e88a54b388df6ff7d"
+  },
+  "read_only_claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-preflight-recovery26/one-shot.claim.json",
+    "sha256": "1e256490ed3aedcbf8640db592076a6a9ec872bf6d7aa97ae8be30fa63f68ae8"
+  },
+  "actual_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-preflight-recovery26/result.json",
+    "sha256": "939608de808f9955462de67f1c305b928c5c046b5fac38571ed5cf918cdedc31"
+  },
+  "host_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-preflight-recovery26/host-check.json",
+    "sha256": "d4543fce7e06ef531ff3cfa65532d4cc7156237547bbb10d7b1db5308861f6ee"
+  },
+  "actual": {
+    "scope": "K80-8749-zero-command-host-failure-read-only-Recovery",
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "timeout_seconds": 60,
+    "boots": false,
+    "device_writes": false,
+    "bootstrap": false,
+    "reuse_failed_claim": false,
+    "status": "verified-Recovery-protections-unchanged-no-boot",
+    "stop_cleared": true,
+    "recovery_identity": {
+      "family": "TWRP",
+      "properties": {
+        "ro.orangefox.boot": "",
+        "ro.twrp.boot": "1",
+        "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+      },
+      "identity_scope": "property identity only;not hardware or storage authority"
+    },
+    "protected_ranges": 7,
+    "BCB_full_page_stable": true,
+    "BCB_tail_preserved": true,
+    "log_unchanged_since_actual_cfce_boot": true,
+    "transport_commands": 30
+  },
+  "independent_read_only_source_archives": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-crash-delivery26-8749f37cf3bc4059a891ec7576f04473/root-trial-crash-delivery/trial/host-preflight-recovery26/archive",
+  "source": "UniXNU-zorn/scripts/zorn_ios26_cpu_host_preflight_recovery.py",
+  "gates": "Exact terminal incidentSHA+zero boot/command files+unchanged stopped mode/root;20 refusal controls;hard read-only command allowlist;fresh Recovery/GPT/Data/root/fences/BCB/log before clearing only host-failure stop.",
+  "new_boot_or_writes": false,
+  "full_root_readback": false,
+  "GUI_GPU_or_touch_qualification": false,
+  "goal_complete": false
+}

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "scope": "Offline selected registration/DEC GUID/direct prefix/cache-output binding; no native information observation or published matching verification level.",
+  "result": {
+    "recorded_at": "2026-11-01T21:28:28.810346+08:00",
+    "state": "selected-DAL-registration-and-distinct-DEC-bound-EFI-prefix-static-only",
+    "registration": {
+      "selected_blobs": {
+        "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.efi": "295f1465f9f9679fdb4e6188e6d71db1486ea3bc4003447af40b72d088ecb96d",
+        "/Volumes/macData/projects/Mu-Silicium/Binaries/giulia/QcomPkg/Drivers/ChipInfoDxe/ChipInfoDxe.efi": "38c7c0d036ff9e9fc0700983874bca910d87b2d853e22dd6c1d542a8757a5185"
+      },
+      "selected_DEC": "/Volumes/macData/projects/Mu-Silicium/Silicon/Qualcomm/QcomPkg/QcomPkg.dec",
+      "selected_DEC_sha256": "6f117c5e5120e16e3f63b574f50e468daeb0c71d9f4c47dd19eff9222ee9b362",
+      "direct_registered_GUID": "b0760469-970c-487a-a4b5-28db7b45cef1",
+      "direct_initializer": "{ 0xB0760469, 0x970C, 0x487A, { 0xA4, 0xB5, 0x28, 0xDB, 0x7B, 0x45, 0xCE, 0xF1 } }",
+      "header_macro_GUID": "61224fbe-b240-4d53-b661-a9a1f343b05c",
+      "private_bootstrap_GUID": "ae37b942-457f-4c91-a196-d9669fd347a3",
+      "bootstrap_revision": 65538,
+      "bootstrap_init_RVA": 5280,
+      "services_RVA": 168144,
+      "attach_RVA": 11876,
+      "versioned_attach_RVA": 12236,
+      "registration_path_RVAs": [
+        41144,
+        41176,
+        32568,
+        41424,
+        14468
+      ],
+      "literal_device": 33554543,
+      "private_vtable_RVA": 32592,
+      "methods": [
+        {
+          "name": "version",
+          "direct_offset": 8,
+          "wrapper_RVA": 5348,
+          "private_offset": 72,
+          "private_RVA": 14736,
+          "cache_RVA": 42020,
+          "output_bytes": 4,
+          "private_error_detail_lost_in_outer_status": true
+        },
+        {
+          "name": "id",
+          "direct_offset": 24,
+          "wrapper_RVA": 5476,
+          "private_offset": 88,
+          "private_RVA": 14824,
+          "cache_RVA": 42016,
+          "output_bytes": 4,
+          "private_error_detail_lost_in_outer_status": true
+        },
+        {
+          "name": "family",
+          "direct_offset": 48,
+          "wrapper_RVA": 5668,
+          "private_offset": 112,
+          "private_RVA": 14944,
+          "cache_RVA": 42028,
+          "output_bytes": 4,
+          "private_error_detail_lost_in_outer_status": true
+        }
+      ],
+      "semantic_mutations_refused": [
+        {
+          "name": "bootstrap-services-output",
+          "refused": "instruction contract at 0x14b4",
+          "sha256": "ac6fffa600474e2f24ae9937882b3c9689d51a34958cea3007e13d4d31dd6e8c"
+        },
+        {
+          "name": "versioned-attach-slot",
+          "refused": "versioned attach service",
+          "sha256": "41fa1044b4b4c9c7dd5d0e60667b9783764a375051308c1161f095ec51fcec6f"
+        },
+        {
+          "name": "registration-device",
+          "refused": "registered device literal",
+          "sha256": "ff34908373b0b0357fed456bca9aa914b4aa3aac1b9d4025a4311071c85a8d7c"
+        },
+        {
+          "name": "registration-attach",
+          "refused": "registered attach/count/device-array",
+          "sha256": "b0b848570cef8c297ecb940ce77aa2b0b7ed9729780cb2306a70dc733d90ff7b"
+        },
+        {
+          "name": "handle-vtable",
+          "refused": "instruction contract at 0x38c0",
+          "sha256": "72a29da3fd102c038492063b91b89f54ac600319ec9d194707d2a748014c3c80"
+        },
+        {
+          "name": "stale-header-GUID",
+          "refused": "DEC/installed direct GUID mismatch",
+          "sha256": "37ef0da0abf49cadcbe8a3bba6e26d6a6c50684bb2774eec5bbd1040384469c3"
+        },
+        {
+          "name": "outer-family-target",
+          "refused": "direct family slot",
+          "sha256": "8d13adeb1a5ebed52db8fd7fe5823fe2713f0524e76ac9d66bcb3a45211c006b"
+        },
+        {
+          "name": "outer-private-error-mapping",
+          "refused": "instruction contract at 0x1634",
+          "sha256": "072648e280b127e39da071df1c6979155c80bd5cc18e5b3a8aaaac265d230aee"
+        },
+        {
+          "name": "version-output-store",
+          "refused": "instruction contract at 0x39a4",
+          "sha256": "ef2c5e1d2afc9fe04b3362d01cee0feac947924e14b5889165952697cb6cddc0"
+        },
+        {
+          "name": "init-fallback-latch",
+          "refused": "instruction contract at 0x5cdc",
+          "sha256": "f0109b236f4cbc2684ec018fa8133d0e65c5400aa55c81985c1219063fd59d97"
+        }
+      ],
+      "direct_prefix_typed_via_real_SDK_but_not_a_private_DAL_typedef": true,
+      "original_private_native_declarations_still_unavailable": true,
+      "cached_output_init_can_latch_without_payload": true,
+      "no_native_query_request_or_runtime_eligibility_constructed": true,
+      "native_status_available": false,
+      "native_output_available": false,
+      "native_or_phone_invocation": false,
+      "allow_boot": false,
+      "readback_qualified": false,
+      "WriteAuthorized": 0
+    },
+    "actual_recipe_LTO_raw_SHA_independent_equal": true,
+    "target_object_sha256": "b8879694b6a83cd804ca4ddfe5fec2735a41d0ad8dcb48a13a16e5eeb5eed4f1",
+    "data_PE_sha256": "5007b17ee9205ad2a0f830787471d2860623732fcf5b94ac1f56fe57e4ce9771",
+    "recursive_target_inputs": 51,
+    "final_data_PE_corruptions_refused": 3,
+    "source_recipe": "/Volumes/macData/projects/ios-zorn/uefi-zorn/scripts/check-zorn-dal-chipinfo.py",
+    "source_recipe_sha256": "68fb5440ce48627311bc8408c74f4cc2cfcf375be14e3900da6e25ca78590d6f",
+    "selected_prior_blob_binding_reused": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-clock-hardware-info-binding/selected-blob-binding.json",
+    "module_extraction_performed": false,
+    "previous_ABI_or_device_suites_repeated": false,
+    "native_DAL_typedef_request_or_eligibility_constructed": false,
+    "new_FD_kernel_or_device_candidate": false,
+    "phone_or_provider_invoked": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "retained_refusal": "Initial getter-page encoding expectation refused at0x3618; exact ADRP word corrected after inspection. Failed checker preimage retained; selected provider/source/header/flags unchanged."
+  },
+  "source_recipe": "uefi-zorn/scripts/check-zorn-dal-chipinfo.py",
+  "source_recipe_sha256": "68fb5440ce48627311bc8408c74f4cc2cfcf375be14e3900da6e25ca78590d6f",
+  "local_registration": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-dal-chipinfo-contract/registration-result.json",
+  "local_target": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-dal-chipinfo-contract/target-result.json",
+  "local_final_data_audit": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-dal-chipinfo-contract/final-data-audit.json"
+}

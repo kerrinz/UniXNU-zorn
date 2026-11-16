@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "kind": "source",
+  "scope": "Offline exact upper stop/fence locks and minimal UNAPPLIED error propagation only",
+  "result": {
+    "updated": "2026-11-02T02:05:36.791215+08:00",
+    "state": "Gen7-upper-stop-locks-fence-lifetime-bound-known-error-propagation-repair-unapplied",
+    "source_contract": "source-contract.json",
+    "source_pins": {
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched.c": "5452e244e35f19e8d5f896f3fd1805edf420211f04cfc8f39decd003eb01bc21",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/layout/adreno_gen7_hwsched_hfi.c": "306930a131d0fa3bc3cc3873dbfaf205b6bd5a4243f55a74cced411c08de6782",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/adreno_hwsched.c": "e62f222be34aea46326aedf2c9f256c1f1f61f6302d3cf8e9a6a5efbe72dd19e",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-preallocated-providers/kgsl.c": "21f8f7ba8556f4bea965ac4c811843b26c8a59508b912b7a5cdfb9791c9d7da5",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-discovery-20261030/profile-reference/adreno.c": "7610fc36f8a482f4a09a3d332c3ebb7505a8540281bf770f8e7b2f0d21346799",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-stop-error-retention/adreno.h": "15636117455bf216da1ad48224ce3af666417f7e5d0606aecdd265c9fae26151"
+    },
+    "new_upper_guard_patch": "out/zorn/gpu-gen7-upper-stop-lifetime/upper-stop-propagation.UNAPPLIED.patch",
+    "patch_sha256": "5129b994f8a25d36bd3b0dc17099fc09620bce61caaeb43df0674861bf09feee",
+    "patch_unapplied": true,
+    "new_source_corruptions_refused": 4,
+    "isolated_source_review_application_bases": 2,
+    "previous_lower_body_and_capsule_preserved": true,
+    "known_error_gate_before_post_stop_drain_unregister_state_reset": true,
+    "PM_failed_stop_does_not_restart_dispatcher": true,
+    "full_Linux_driver_not_compiled": true,
+    "new_native_component_or_target_object": false,
+    "no_native_IRQ_MMIO_allocator_provider_callback_phone_calls": true,
+    "no_host_successful_hardware_address_handle_fence_model": true,
+    "new_runtime_caller_FD_kernel_device_candidate": false,
+    "remaining_errors": "Void CPU trigger can fail before caller removes entry;precheck already removes some entries;external manager API/native provider and true stop/DMA lifetime unqualified. Source-only logs not durable capture. Returned zero not a stop certificate.",
+    "initial_checker_refusal": "Block-comment separation caused first guard-token comparison refusal;saved checker preimage/log,normalize block comments for exact code comparison. Production guard unchanged.",
+    "physical_assistance_available": false,
+    "limitations": [
+      "Fully unattended physical_assistance_available=false;no new exact device authorization. All native methods/cache/allocator/getter/provider/VM/SMMU/IRQ/MMIO/phoneUSB/SMEM/SCM/PAS/power/clock/reset/IOVA/GPU calls OFF. No runtimecaller/FD/kernel/devicecandidate.",
+      "Upper reference guard is source-review only and remains UNAPPLIED. Clean application on original and composed lower repair copies is not Linux compilation, native ABI/runtime or hardware qualification. No new native component was introduced, so no unrelated target/metadata object suite was run.",
+      "Zero stop status,transport ACK,CPU fence drain or peer index is not hardware DMA retirement or release permission. External manager API/native types remain unbound;do not fabricate return values,registered handles or leases. Existing lower side effects/precheck removals are not undone.",
+      "Only new actual native submission/ref lifetime work next;no host successful hardware/address/handle/allocator/fence model or inert request. No query/HFI/272B/ZORNGQF1/normal-log fields/fragments/carriers or preEBS/Darwin pointer transfer. Existing four repairs and new fifth remain UNAPPLIED;old profiles/capsules/claims/default42 protected. allow_boot/readback/WriteAuthorized0."
+    ],
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0
+  },
+  "artifacts": {
+    "result": "out/zorn/gpu-gen7-upper-stop-lifetime/combined-result.json",
+    "contract": "out/zorn/gpu-gen7-upper-stop-lifetime/source-contract.json",
+    "checks": "out/zorn/gpu-gen7-upper-stop-lifetime/check-result.json",
+    "next_plan": "out/zorn/gpu-gen7-upper-stop-lifetime/next-plan.json"
+  }
+}

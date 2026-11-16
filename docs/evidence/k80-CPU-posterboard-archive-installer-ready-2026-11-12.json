@@ -1,0 +1,52 @@
+{
+  "recorded_at": "2026-11-12T12:29:07.743021+08:00",
+  "status": "fresh-fixed-archive-installer-reviewed-awaiting-owner-retry-exception",
+  "target": "92988a43/zorn/slot-a",
+  "scope": "K80-persistent-iOS26-CPU-posterboard-reply-archive-b85cf512",
+  "changed_pages": 64,
+  "write_groups": 8,
+  "retained_pages": 5969,
+  "root_before": "64c099f673837efff9b14d76d23785da072022573b7efd7206771b04bc48f6c2",
+  "root_after": "c6f0709514294393996f9e50394cb35fa82516ca7663727e21358ca90721bc50",
+  "original_stopped_installation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-posterboard-reply-install-stopped26.json",
+    "sha256": "eff9e0a80c31ec27bd88cfbfe1c33229e338f926f4b998758324f7556a275cd6"
+  },
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-archive-review26-b85cf512/review-inputs.json",
+    "sha256": "3481c95bb68eff87b0ea1184689838788e36eb5d47a56d00283440fb83ab44d3"
+  },
+  "fixed_entry": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-archive-review26-b85cf512/installer-root-entry.py",
+    "sha256": "f5a9e204e32668ba2526c0ffcf24224c993e99f0bbfc3a13ed75cb068ea1dc21"
+  },
+  "fixed_runner": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-archive-review26-b85cf512/installer-run-zorn-debug.py",
+    "sha256": "6f65cf251998a4018ebfdf6d40f9f5d7fc9cafbca0542c9039c931b09b4225eb"
+  },
+  "source_control_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-archive-review26-b85cf512/installer-host-check.json",
+    "sha256": "e29bc7bf24627d72bd6f3e1a6f0ea2e36c142e4e84f13d8f6df69ed4571d8e97"
+  },
+  "exact_memory_transport_replay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-archive-review26-b85cf512/host-replay.json",
+    "sha256": "c019672e58c1cdce612b9ec966185bda5ee4caab22239d39180ae7d9836afb2d"
+  },
+  "pending_gate_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-reply-archive-review26-b85cf512/pending-admission-check.json",
+    "sha256": "b74cf3471239c107fde74c84fa9d5f55f9fd1698ef167a0c68da85e319fe2e4d"
+  },
+  "host_CPU_clones": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-host-cpu-kernel-clones-20261112.json",
+    "sha256": "b6999448f8a9e51b77e427c6b3a73a39826468d31e68ed925c9aff09467bce9d"
+  },
+  "host_cleanup": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-host-build-cleanup-20261112.json",
+    "sha256": "34fe6f969d900b677de24e0efc073aaeb6ff38e38a4e973bcca2f47f2abcc1b1"
+  },
+  "automatic_boot": false,
+  "device_access": false,
+  "claim_created": false,
+  "next_action": "Owner exception to no-self-retry is required before enabling this fresh one-shot install. Installation alone adds two ordinary prewarm log markers. The bound CPU boot package can be admitted only after successful installation readback.",
+  "risk": "A write or readback failure can leave iOS26 root inconsistent and stop the operation. Fresh identity, protected pages and all old pages precede writes. The host clone remains dependent on same-volume support and free metadata space."
+}

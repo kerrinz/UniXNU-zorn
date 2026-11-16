@@ -1,0 +1,86 @@
+{
+  "version": 242,
+  "date": "2026-11-16",
+  "status": "offline-source-full-kernel-only-not-device-ready",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062/full-link/kernel.ZORN26-METAL242.UNSELECTED.macho",
+    "sha256": "b46bad0585fa1373ac535da2c89009df3e427800ebbd38eb313ac7c18d527690",
+    "bytes": 30985096,
+    "inputs": 1398,
+    "replaced": 24,
+    "preserved": 1374,
+    "added": 0,
+    "undefined_symbols": 0,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062/full-link/exact-inputs.json",
+      "sha256": "5eef6494960ac7088a58617f2e7173adada73c3dd16f4aed06dc07d3136ecccc"
+    },
+    "unchanged_link_diagnostics": true,
+    "replaced_objects": [
+      "IOUserClient.cpo",
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostGpuCode26.cpo",
+      "ZornGen7HostGpuRegisters26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HostTables26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo",
+      "ZornGen7ZapOwner26.cpo",
+      "ZornHfsRoot26.cpo",
+      "ZornPlatformRecordStart26.cpo",
+      "ZornRootPlatform26.cpo",
+      "ZornUfsCore26.cpo",
+      "ZornUfsOwner26.cpo",
+      "ZornUsbCdc26.o",
+      "debug.o",
+      "houji_recovery26.o",
+      "pe_init.o",
+      "sys_generic.o"
+    ],
+    "device_access": false,
+    "root_sha256": "193e5f01df3b0481412a980f4e7c562401762af53ffe2ea051fee11b66f5fc0e",
+    "application_probe_qualification": false,
+    "Metal_probe_candidate": true
+  },
+  "change": "Source240 reserved bits20..23 now emitted after actual Close authorization,quiesce return,releaseAll return,and ClientStorage destruction/free. Original caller control flow/returns/failure retention restored byte-exact on removal.",
+  "inputs": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062/ZornGen7HostRing26.cpp",
+      "sha256": "7319ee7aa2f6d967c5569c0fcf979f27d20fcde1b684c597a7a030dff5d949d3"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect_ios26_gpu_source242.py",
+      "sha256": "257914733726f83b03fba50d7fe629aa3533adb3bd8caae7eb1782a82329e81f"
+    }
+  ],
+  "checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062/close-source-check/result.json",
+      "sha256": "4cc92f1001fec124a4ca21ef5df57c7039dcce29297b57f0db6361b53ea29d65"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v242-close-source-ba560d3ea4d34be8964dd3463fcd7062/full-build-review.json",
+      "sha256": "90f054870cfbf766deccaabcc81a1d618f58e04f4d20772d66e66f3741fa854e"
+    }
+  ],
+  "hardware_access": false,
+  "remaining": [
+    "Review actual terminal source composition and identity dependencies;preserve explicit old source test scopes",
+    "Regress new decoder/capture through fixed receiver and source-binding refusal tests",
+    "Build complete readback-verified boot package,retain installed229root/FD/ADT/menu/launcher",
+    "New scope/ready/claim plus current Recovery/protection/WDT gates before one device attempt"
+  ],
+  "risks": [
+    "Instrumentation alters timing/layout;not a fix or culprit proof",
+    "Quiesce/releaseAll-return marker is not success code or proof DMA stopped",
+    "Concurrent bits remain aggregate;combine only with qualified source session snapshot"
+  ],
+  "no_reverse_engineering": true
+}

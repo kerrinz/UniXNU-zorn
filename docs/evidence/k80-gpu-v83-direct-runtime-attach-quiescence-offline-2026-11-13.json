@@ -1,0 +1,74 @@
+{
+  "recorded_at": "2026-11-13",
+  "candidate": "K80 iOS26 direct-runtime attach quiescence v83",
+  "status": "offline full-linked kernel; not packaged, selected, booted, or tested on device",
+  "history": {
+    "earlier_gpu_real_device_tests": true,
+    "farthest_recorded_stages": [
+      "v59 GMU cold-clock/GPUCC prefix and SMMU global-control stage",
+      "v60 read-only SMMU bank/stream census"
+    ],
+    "gpu_branch_reached_lockscreen": false,
+    "cpu_reference_kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091"
+  },
+  "implementation": {
+    "source_snapshot": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-runtime-attach-quiescence-v83-20261113",
+    "changes": [
+      "The SMMU domain now obtains the existing bounded GMU-idle and GBIF client/arbiter halt acknowledgements before attaching the initial direct VM metadata, and releases that halt only after VM and submit metadata attach successfully.",
+      "If runtime authorization, metadata attachment, or halt release has an uncertain result, the domain stops and retains the bus halt.",
+      "DarwinBoardOwner now creates the native-runtime authorization from its retained GPU/GMU provider pair, held GPU-MMU lease, exact SMMU endpoint identities, completed bootstrap, and live IRQ/HFI/RSC state."
+    ],
+    "source_sha256": {
+      "ZornGen7SmmuDomain26.cpp": "0f16f2e7025fff7f0a6ed7bd10666842ec254c4747317e56aaad2ba99e676ee4",
+      "ZornGen7SmmuDomain26.h": "3a38410b28a2648a595e5d707bd16a296792973794ec0731dd73ecc362d26ce7",
+      "ZornGen7DarwinBoardOwner.cpp": "265ac7debba10964a0404dba59f4d4a6f5a1f157d62e1f8526f36656a90b5d4b",
+      "ZornGen7DarwinBoardOwner.h": "32519646deb6d486f14959fe88372d5311de4806941d6c062ed1877b97a1217c"
+    }
+  },
+  "build": {
+    "compiler_objects": {
+      "ZornGen7SmmuDomain26": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-direct-runtime-attach-quiescence-v83-20261113/compile-v1/ZornGen7SmmuDomain26.cpo",
+        "sha256": "946b1172c28988d1edd0d661781172e669abd96e6fc5980229bd77738beadcc4",
+        "compile_exit": 0,
+        "warnings": 3,
+        "warning_messages_match_v82": true
+      },
+      "ZornGen7DarwinBoardOwner": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-direct-runtime-attach-quiescence-v83-20261113/compile-v1/ZornGen7DarwinBoardOwner.cpo",
+        "sha256": "a28fe1e8ef0ae26c527e32bd5e68422c463b1018af11f438cf47bd3c7db951bc",
+        "compile_exit": 0,
+        "warnings": 3,
+        "warning_messages_match_v82": true
+      }
+    },
+    "kernel_path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-direct-runtime-attach-quiescence-v83-20261113/full-link-v1/kernel.ZORN26-GPU-DIRECT-RUNTIME-ATTACH-QUIESCENCE-V83.UNSELECTED.macho",
+    "kernel_sha256": "21506bd7cf15e0fd7f851a0018fc5d685198e7c926020a8d4d32c181aa75d648",
+    "kernel_bytes": 30572552,
+    "link_exit": 0,
+    "link_inputs": 1397,
+    "filelist_inputs": 1318,
+    "direct_inputs": 79,
+    "missing_inputs": 0,
+    "undefined_symbols": 0,
+    "link_warning_count": 10,
+    "link_warning_lines_match_v82": true
+  },
+  "cpu_reference": {
+    "kernel_sha256": "9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091",
+    "unchanged": true
+  },
+  "device_execution": {
+    "v83_boot_attempts": 0,
+    "gpu_runtime_tested": false,
+    "candidate_unselected": true,
+    "candidate_packaged": false,
+    "new_scope_ready_or_claim_created": false,
+    "gpu_discovery_allow_boot": false
+  },
+  "limits": [
+    "This is an offline direct-runtime ownership/link milestone, not a GPU runtime result.",
+    "The root startup path still does not construct the complete ZornGen7StartupGpuInputs26 owner graph or invoke the direct-ring route.",
+    "No GMU firmware/HFI, GPU job/fence, rendering, Metal, GPU display, or FT3683 behavior was validated."
+  ]
+}

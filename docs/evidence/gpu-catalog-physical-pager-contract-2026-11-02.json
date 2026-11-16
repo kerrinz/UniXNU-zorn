@@ -1,0 +1,27 @@
+{
+  "updated": "2026-11-02T12:18:26.410701+08:00",
+  "state": "Catalog149-physical-pager-descriptor-owner-source-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-catalog-physical-pager-contract/source-contract.json",
+  "functions_body_SHA_recorded": 10,
+  "new_source_mutations_refused": 0,
+  "new_native_targets": 0,
+  "new_driver_patches": 0,
+  "all30_patches_independent_UNAPPLIED": true,
+  "no_old_suite_or_fullcore_target_reexecution": true,
+  "no_native_API_or_success_peer_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "details": {
+    "scope": "Selected iOS17 exact physical descriptor doMap/memoryReferenceCreate/device pager data-request source;frozen physical64 copy/30th/16th/17th read.10 function SHA records;no old map/iterator/VM/release suites,targets or native APIs.",
+    "setup": "Physical NULLtask memoryReferenceCreate stores this in reserved->dp.memory and passes reserved as device_handle;pagerContig derives rangesCount1. device_pager_setup creates device pager,named VM object,stores handle/size/flags;allocation failure can panic,not fabricated returned NoMemory. Named memory-entry failure cleanup remains original. No NativeMemory/page-owner callback is supplied as handle.",
+    "references": "device_pager_reference/deallocate use pager own raw refcount. Descriptor free clears reserved->dp.memory under global LOCK before dropping its pager ref. Pager/named-entry can own reserved storage beyond descriptor;device_close eventually frees reserved. Data action under same LOCK conditionally retains descriptor using OSSharedPtr/OSRetain,invokes handleFault and releases;absent descriptor returns KERN_ABORTED. This avoids reading a withdrawn descriptor through that checked path,not a retained original BO page owner.",
+    "request": "device_pager_data_request delegates with VM_PROT_READ to data_action;actual action bounds offset+length with overflow check then returns device_data_action result. Invalid range returns KERN_INVALID_VALUE;lookup failures may panic. Do not turn these domains into EFI/IOKit/hardware status,wall-time or recoverability guarantees.",
+    "population": "Physical doMap obtains memory reference/maps and uses populateDevicePager;population obtains physical segments and calls device_pager_populate_object with physical page numbers. Address/range copy,temporary descriptor retain and pager object lifetime do not acquire original NativeMemory IOBuffer/page owner. Existing managed-page diagnostic is not a veto/pin. No page/address/pager success fixture or map/native fault executed.",
+    "lock_boundary": "Catalog clientMemoryForType returns retained descriptor after releasing g.lock;SDK subsequently creates mapping. dropViews can withdraw cached descriptor before other output/map refs disappear. Actual per-client IPC/default-locking and call exclusion must be established for any co-occurrence;not claiming K80 UAF,physical reuse or safe teardown.16th returned-ref balance/17th preflight/30th allocation guard remain independent and do not close this lifetime contract.",
+    "decision": "No concrete safe backing-retention/stop policy supplied to justify31st force-unmap/pin/free/reset/retry/quarantine repair. Record exact descriptor/pager versus original-page boundary. No new target for source-only SDK review,no unchanged fullcore role API retry/stubs/foreign headers/OS/import relaxation. All30 independent UNAPPLIED/8profiles/3111+39/default42/CPUstorage/full64primary/oldinputs/archives preserved. All native/pager/map/page/refcount/provider/cache/MMIO/phone OFF,no new component/runtimecaller/image/wire/CPU policy;K80 owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal unqualified."
+  },
+  "qualification": "Exact pager/descriptor source reference contract only;not original-page pin,map/PTE retirement,race reproduction or stop/DMA/GPU qualification",
+  "GPU_execution_rendering_Metal_complete": false
+}

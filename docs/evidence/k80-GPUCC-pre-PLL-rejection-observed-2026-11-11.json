@@ -1,0 +1,48 @@
+{
+  "status": "actual-GPUCC-pre-PLL-input-rejection-recovered",
+  "time": "2026-11-10T17:22:26.293294+00:00",
+  "run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-detail26-6dd61fde4ab3487f8c3ea8323c724ecb/root-trial-gpucc-detail/trial/run.json",
+  "scope": "single-K80-ios26-actual-GPUCC-completed-result90s-v36",
+  "actual_GPUCC": {
+    "copied": true,
+    "returned": true,
+    "admitted": true,
+    "probe": {
+      "called": true,
+      "assessment": 0,
+      "native_prefix_returned": false,
+      "pll": [
+        {
+          "called": false,
+          "native_sequence_returned": null,
+          "source_return_available": null,
+          "source_return": null
+        },
+        {
+          "called": false,
+          "native_sequence_returned": null,
+          "source_return_available": null,
+          "source_return": null
+        }
+      ],
+      "cxo_update_returned": false,
+      "demet_update_returned": false,
+      "limiter_store_returned": false
+    },
+    "proxy": {
+      "called": false,
+      "assessment": null,
+      "classes_returned": null,
+      "forward_return_available": null,
+      "forward_return": null,
+      "native_sequence_returned": null
+    },
+    "source_prefix_complete": false
+  },
+  "recovery_seconds": 122.92883475000008,
+  "full_root_readback": false,
+  "source_contradiction": "prepareNativeGpuccPrefix holds gates.startup then calls public initializeGpuccFromPhysicalFields;callable explicitly rejects holding gates.startup. Proxy public call has same contradiction after probe. No PLL operation ran in v36.",
+  "fix_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-gpucc-lock-fix-ef7e9894db3a4c36b7477e6e7334d818",
+  "fix_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/GPUCC-startup-held.patch",
+  "hardware_fix_verified": false
+}

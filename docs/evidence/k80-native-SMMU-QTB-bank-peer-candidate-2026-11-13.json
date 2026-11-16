@@ -1,0 +1,88 @@
+{
+  "title": "K80 iOS 26 native QTB, SMMU bank and peer stream integration candidate",
+  "recorded_at": "2026-11-13",
+  "status": "source-only-candidate-full-linked-unselected",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a",
+    "os": "iOS 26.6.2 (23G90)",
+    "hardware": "K80 / Adreno 750v2 Gen7.9.1"
+  },
+  "candidate": "gpu-native-qtb-power-bank-peer-v63-f38d4a1d89988f20",
+  "base": {
+    "candidate": "gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515",
+    "evidence": "docs/evidence/k80-native-QTB-power-resume-cold-2026-11-11.json",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515",
+    "kernel_sha256": "f91cb468f41868513e65ed87a1baa9a86432a77efbd64d13b4da2a7c0b520d49",
+    "kernel_bytes": 30462776
+  },
+  "changes": [
+    "Rebased the v61 native reserveActual bank allocator onto the later native QTB power/resume source. It keeps the controller-claim and live register census checks; it only reserves the software bank ledger and does not program bank or stream registers.",
+    "Reapplied the peer-aware activation change to both GPU SMMU endpoints. The second activation validates the first endpoint's exact prepared/active transition while re-reading the complete stream table.",
+    "The QTB source retains its actual child/provider/resource lookup, TBU power and normal resume path, and guarded native cold-MMIO backend. Its independent cold-controller hardware grant remains external and mandatory."
+  ],
+  "patches": {
+    "native_bank_patch_sha256": "70f991d03bca00861758d6b982d38e77a0168e66d8bdb9aa569c2804ea8d4dad",
+    "peer_activation_patch_sha256": "cdf43559aeb6947694ca205b28811484b3a00b2b08b762fd16787a91e1efd79d"
+  },
+  "source": {
+    "directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-bank-peer-v63-f38d4a1d89988f20",
+    "manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-v63-f38d4a1d89988f20/source-manifest.json",
+    "sha256": {
+      "ZornGen7SmmuDomain26.cpp": "fb801e8634d1a249a1a59c1bfddc763d4e03f30a0857afbc2472309965989780",
+      "ZornGen7SmmuStream26.cpp": "27459ea8ab5010e68ecf453bf8563512e9fc2637d45395b9b71448af10ecf2aa",
+      "ZornGen7SmmuStream26.h": "8755793eceb6d07d79f581105dcfa88a79deb98727b17b1f817670c3fcce960d"
+    }
+  },
+  "build": {
+    "directory": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-v63-f38d4a1d89988f20",
+    "compile": [
+      {
+        "translation_unit": "ZornGen7SmmuDomain26.cpp",
+        "exit_code": 0,
+        "object_bytes": 617376,
+        "object_sha256": "02c19e519bb0ba86c084c57c55e1e4ac5665796c59adc43809703c70800825ae",
+        "warnings": 3,
+        "warning_set": "same HoujiFullHostNativeMemory.h narrowing warnings as QTB power/resume base"
+      },
+      {
+        "translation_unit": "ZornGen7SmmuStream26.cpp",
+        "exit_code": 0,
+        "object_bytes": 197960,
+        "object_sha256": "25c5bccd9e65c59a4f55d2d39205b6075945b8369fb0406faf29c7eea69e3080",
+        "warnings": 0
+      }
+    ],
+    "full_link": {
+      "exit_code": 0,
+      "total_inputs": 1397,
+      "filelist_inputs": 1318,
+      "other_direct_inputs": 79,
+      "replaced_inputs": [
+        "1250-ZornGen7SmmuDomain26.cpo",
+        "1257-ZornGen7SmmuStream26.cpo"
+      ],
+      "undefined_symbols": 0,
+      "linker_warnings": 10,
+      "linker_warnings_byte_identical_to_base": true,
+      "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-qtb-power-bank-peer-v63-f38d4a1d89988f20/full-link/kernel.ZORN26-NATIVE-QTB-POWER-BANK-PEER-V63.UNSELECTED.macho",
+      "kernel_bytes": 30463040,
+      "kernel_sha256": "f7e238f1c9c6fb7889ad7bd1e06673f1b3d05484d6efa0b1282e3886bfc7d640",
+      "nm_undefined_check_exit_code": 0
+    }
+  },
+  "qualification_limits": [
+    "This is an offline, unselected link. It was not packaged, booted or accessed on the device.",
+    "The external acquireActualStream authority still must serialize the full effective match set and prove real GPU/GMU producer quiescence or fault control. Peer-state validation and the QTB fence ACK are not that lease.",
+    "The actual GPU startup-owner factory is still not connected to the direct-ring platform call path, and independent SMMU mapping/page-table ownership remains required.",
+    "No stream or context-bank register write, DMA, SMMU translation, GMU firmware/HFI, GPU execution, fence or Metal rendering is established."
+  ],
+  "touch_source_changed": false,
+  "packaged": false,
+  "booted": false,
+  "device_accessed": false,
+  "runtime_selected": false,
+  "full_goal_complete": false,
+  "next_action": "Bind a real K80 GPU and GMU producer gate across the full effective stream match set; establish independent mapping ownership; connect the real startup owner to direct-ring before preparing a hardware trial."
+}

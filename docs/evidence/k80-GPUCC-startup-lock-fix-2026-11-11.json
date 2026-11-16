@@ -1,0 +1,95 @@
+{
+  "status": "actual-GPUCC-prefix-returned-after-startup-lock-fix-recovered",
+  "time": "2026-11-10T17:25:50.596066+00:00",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-gpucc-lock-fix-ef7e9894db3a4c36b7477e6e7334d818",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/GPUCC-startup-held.patch",
+  "actual_failure": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-GPUCC-pre-PLL-rejection-observed26.json",
+  "correction": "Keep callable() original unlocked public admission. Public probe/proxy wrappers acquire and release same startup lock;private WithStartupHeld continuations require actual same lock and retain it across full GPUCC sequence. Outer prepareNativeGpuccPrefix calls private continuations directly. Original stage,one-attempt,clock_prepare lock,allocation,actual raw/partial error and retention behavior remain.",
+  "header_change": "two private nonvirtual declarations only;no field or virtual method change",
+  "header_affected_sources": 10,
+  "identity_sources": 6,
+  "compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/compile-result.json",
+  "identity_compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/identity-compile-result.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/full-link/kernel.ZORN26-GPUCC-LOCK-FIX.UNSELECTED.macho",
+    "sha256": "5e4e1d678aae489fc3b67d60abea9a8bf6557e0bd79c2ff92431cc2ea986bf7a",
+    "bytes": 30394176,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 16,
+    "preserved": 1380,
+    "undefined_symbols": 0
+  },
+  "package": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/root-package-gpucc-lock-fix/verified.json",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/root-package-gpucc-lock-fix/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "914048df0cacec1bbeb2022557941c88e8d84186dbd0cc13ebf7813162622021",
+    "bytes": 11616256
+  },
+  "scope": "single-K80-ios26-GPUCC-startup-held-lock-fix90s-v37",
+  "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/root-trial-gpucc-lock-fix/trial/run.json",
+  "root_image_changed": false,
+  "full_root_readback": false,
+  "new_frequency_or_stop_policy": false,
+  "hardware_fix_verified": true,
+  "GPU_execution_proven": false,
+  "actual_GPUCC": {
+    "copied": true,
+    "returned": true,
+    "admitted": true,
+    "probe": {
+      "called": true,
+      "assessment": 5,
+      "native_prefix_returned": true,
+      "pll": [
+        {
+          "called": true,
+          "native_sequence_returned": true,
+          "source_return_available": false,
+          "source_return": null
+        },
+        {
+          "called": true,
+          "native_sequence_returned": true,
+          "source_return_available": false,
+          "source_return": null
+        }
+      ],
+      "cxo_update_returned": true,
+      "demet_update_returned": true,
+      "limiter_store_returned": true
+    },
+    "proxy": {
+      "called": true,
+      "assessment": 4,
+      "classes_returned": 3,
+      "forward_return_available": true,
+      "forward_return": 0,
+      "native_sequence_returned": true
+    },
+    "source_prefix_complete": true
+  },
+  "recovery_seconds": 122.66613658300002,
+  "verified_recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_local_capture_bytes_unchanged": {
+    "Data": 266240,
+    "Data_metadata": 266240,
+    "before": 4096,
+    "after": 4096,
+    "root_before": 4096,
+    "root_after": 4096,
+    "root_first_page": 4096
+  },
+  "protected_GPT_contract": "fixed runner protected() before/after equality also passed",
+  "scope_consumed_no_repeat": true,
+  "actual_locked_link_calls": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpucc-lock-fix26-ef7e9894db3a4c36b7477e6e7334d818/actual-GPUCC-locked-call-link.json",
+  "qualification": "GPUCC native PLL/gate/proxy source prefix returned. PLL helper exposes no raw configure success status;do not invent raw0 for it. Proxy actual aggregate raw0/3classes. Clock graph/list not present in this packet;whole clock/domain/GMU/IRQ delivery/GPU still unqualified."
+}

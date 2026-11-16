@@ -1,0 +1,31 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -53,6 +53,8 @@
+ ZornGen7HostRing26 *presentationOwner=nullptr;
+ thread_t presentationThread=THREAD_NULL;
+ bool presentationIssuerHeld=false;
++// Cached at actual successful begin;registry and issuer remain held until end.
++uint32_t presentationTail245=0,presentationCompleted245=0;
+ IOLock *presentationLock(){
+     auto *p=__atomic_load_n(&presentationRegistry,__ATOMIC_ACQUIRE);if(p)return p;
+     auto *fresh=IOLockAlloc();if(!fresh)return nullptr;
+@@ -1789,6 +1791,7 @@
+     if(s.presentProgress.retiredFence>completed)completed=s.presentProgress.retiredFence;
+     if(!tail || producer>tail || completed>tail)return refuse(-1);
+     if(completed<tail)return refuse(0);
++    presentationTail245=tail;presentationCompleted245=completed;
+     presentationThread=current_thread();presentationIssuerHeld=true;return 2;
+     // Hold registry+actual issuer across cache acquisition and full CPU copy.
+     // There is no new hardware wait,poll,clock,reset or app authority operation.
+@@ -1805,3 +1808,11 @@
+ extern "C" uint32_t zorn_gen7_present_capture_fence26(void){return ZornGen7HostRing26::capturePresentationFence();}
+ extern "C" int zorn_gen7_present_begin_frame26(uint32_t fence){return ZornGen7HostRing26::beginPresentation(fence);}
+ extern "C" void zorn_gen7_present_end26(void){ZornGen7HostRing26::endPresentation();}
++
++// Cached completion ledger only, valid on the actual presenter lease thread.
++extern "C" int zorn_gen7_present_ledger245(uint32_t *tail,uint32_t *completed)
++{
++    if(!tail || !completed || !presentationIssuerHeld || presentationThread!=current_thread() || !presentationOwner)return 0;
++    *tail=presentationTail245;*completed=presentationCompleted245;
++    return *tail && *completed==*tail?1:0;
++}

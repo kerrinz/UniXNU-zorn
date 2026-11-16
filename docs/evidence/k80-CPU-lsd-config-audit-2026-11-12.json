@@ -1,0 +1,95 @@
+{
+  "status": "offline exact-root audit and CPU diagnostic boot package verified",
+  "prior_observation": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-CPU-sb-peer-observed-2026-11-12.json",
+    "sha256": "e6381bded5b8293416b58f3d1d63317ab377514f51fa215d16d9b789476948d7"
+  },
+  "read_only_audit": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-sb-peer26-048883009e194aa38440ac58bb8f0725/lsd-root-and-ramfs-audit.json",
+    "sha256": "23973118475d375bb60639c30eaabd9f5d93be48c3cb54f9114aa77d39d31c4a"
+  },
+  "audit_recipe": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/audit-lsd-root.py",
+    "sha256": "03d153be77318d8be7ecc123af76b550eb0556e1e52ab5af84d7d20a46b29f5b"
+  },
+  "runtime_RAMFS_init_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/userland-k80-ramfs-candidate/src/init.c",
+    "sha256": "1e211282dadbf27c8c36108084b6b02bb5bb79e24e314ec87f98f130ed0e2424"
+  },
+  "installed_root_authoring_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/root-tools/build-fresh-ios26-root.py",
+    "sha256": "f85fb4ab1405f0bbd40b07ef53c1812e232f99173fcc00d5fe77777b3bf52cca"
+  },
+  "known_K80_iPadOS17_permissions": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/startup-policy/data-permissions.json",
+    "sha256": "31938e5150d68bfcb4cbe293caf2be2a90c34b4cc5a742e29964b14e73ed2503"
+  },
+  "Houji_iOS26_job_authoring_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-houji/tools/build-ios26-root.py",
+    "sha256": "835e28936faad57c9b3e2efaa37a1b3c0ddaaf6bd19756450d4a19b6447bbd8a"
+  },
+  "Houji_iOS26_job_authoring_commit": "98bc0960f96076de8e8d16efcfb0c0603b166b85",
+  "findings": {
+    "lsd": "Stock job enabled, launches as mobile, Mach-service activation, 14 service names.",
+    "local_startup": "Exact init helper mounts fresh RAMFS at /private/var and creates the archived var.skel before launching launchd.",
+    "matched_iPadOS17_permissions": [
+      "db/lsd",
+      "installd",
+      "mobile/Library/Caches",
+      "mobile/Library/Preferences"
+    ],
+    "containers": "Several container directories present in the iPadOS17 persistent Data permissions manifest are absent from the root and the iOS26 RAMFS skeleton. Runtime creation and effect are unverified.",
+    "mobileassetd": "Omitted by the K80 job filter. Houji explicitly restores the stock demand-only job. Relevance to the SpringBoard-to-lsd wait is unverified."
+  },
+  "chosen_diagnostic": {
+    "result": "Fully linked K80 CPU boot candidate with identical root, boot arguments, firmware, and ADT.",
+    "coverage": "First lsd process by native unique ID. Post-return open, mkdir, rename destination and stat over at most 512 user path copies. Three fixed path categories and independent bitmaps for operation and native outcome. No filenames, contents or IPC payloads written.",
+    "sampling_limitations": "The successful bounded pathname copy is best effort after syscall completion. Absolute selected paths only. The first 512 matching-process copies include irrelevant paths. Snapshot is cumulative at 150s. Independent operation and outcome sets cannot associate a given return with a given syscall.",
+    "logging": "Retains existing 4KiB diagnostic page and 1920-byte PosterBoard output history. Replaces repeated wallpaper status fields in this record with lsd metadata.",
+    "source_selection": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/source-selection.json",
+      "sha256": "340479f784b5acff25d031b9db4d8f90b5c7fd32eed8a38f4be0fee883dfde76"
+    },
+    "patch": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/lsd-vfs.patch",
+      "sha256": "2e65495899f474b10c5faf6183e8514a97502a0e3a71efeda3b2f61e428b7ee9"
+    },
+    "compile": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/compile-result.json",
+      "sha256": "1832bf1ef9154778876e62be3ce56a23166a545ea33a3795d2fe1bb8cbe663c7"
+    },
+    "stack_frame_bytes": {
+      "zorn_userland_progress_worker26": 6176,
+      "fstatat_internal": 448,
+      "zorn26_lsd_vfs_note": 224,
+      "zorn26_lsd_vfs_snapshot": 0
+    },
+    "link": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/full-link/link-result.json",
+      "sha256": "eccd5392bcbac8fb09a4d3056a99abd36b1870c87a78eeabb6635667bc21dca1"
+    },
+    "host_verification": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/lsd-vfs-host-check.json",
+      "sha256": "14f0b67963c9b036c399f41c6a2555df5a42dc3e04bbc76a7a1638bbcd281ab0"
+    },
+    "record_decoder": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/inspect-userland-lsd-vfs-26.py",
+      "sha256": "3a6d44ef01f06c0d543ab30a4963b892465edadb6741a29a2d4bf62054fff259"
+    },
+    "boot_package": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-lsd-vfs26-cbb23711582b42b3ac52928bb71dcef3/boot-package/verified.json",
+      "sha256": "2452239b8b6470e8a8182c92b9e865cd40e8eb2f2d94ab66639bc12e4a2d31c8"
+    },
+    "historical_map_archives": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/archived-historical-ios26-link-maps-lsd-vfs-20261112.json",
+      "sha256": "cdb43b47afc82f3ef2a069d67f010e027a7ae507a48e2dd50e745086a3d4920e"
+    }
+  },
+  "run_id": "cbb23711582b42b3ac52928bb71dcef3",
+  "root_sha256": "227ba639a3f765fce15b1bb6f08ccf53f36872fd0a95bba7bb778f067c34e32e",
+  "boot_sha256": "2deb82f0b18b02e6fe1a5b7e64b71a51494bf3412d792f8e6c443b429abb5bed",
+  "device_access_this_stage": false,
+  "device_ready": false,
+  "current_lock_screen_verified": false,
+  "next": "Bind the exact offline package and decoder to the fixed protected runner. After one fresh admitted recovery trial, correlate lsd filesystem outcomes with both UI wait and frame checkpoints."
+}

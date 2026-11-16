@@ -1,0 +1,176 @@
+{
+  "provenance": {
+    "scope": "unapplied file-read work-bound repair;main pinned chain unchanged",
+    "before_json_read_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-json.bin",
+        "requested": -1,
+        "returned": 16785408
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/small.dtb",
+        "requested": -1,
+        "returned": 9
+      }
+    ],
+    "after_json_read_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-json.bin",
+        "requested": 16777217,
+        "returned": 16777217
+      }
+    ],
+    "before_raw_DTB_read_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/small.json",
+        "requested": -1,
+        "returned": 12
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-dtb.bin",
+        "requested": -1,
+        "returned": 16842752
+      }
+    ],
+    "after_raw_DTB_read_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/small.json",
+        "requested": 16777217,
+        "returned": 12
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-dtb.bin",
+        "requested": 16777217,
+        "returned": 16777217
+      }
+    ],
+    "oversized_JSON_does_not_open_DTB": true,
+    "exact_16MiB_helper_boundary_pass": true,
+    "two_real_changed_input_equivalences": [
+      {
+        "source_id": "fdt-01f95000.gpu",
+        "output_identical": true,
+        "raw_source_verified": true,
+        "pure_schema_refusal_retained": true,
+        "source_reads": [
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.gpu.json",
+            "requested": 16777217,
+            "returned": 47995
+          },
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-01f95000.dtb",
+            "requested": 16777217,
+            "returned": 593130
+          }
+        ]
+      },
+      {
+        "source_id": "fdt-02025cea.gpu",
+        "output_identical": true,
+        "raw_source_verified": true,
+        "pure_schema_refusal_retained": true,
+        "source_reads": [
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.gpu.json",
+            "requested": 16777217,
+            "returned": 48624
+          },
+          {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/vendor/fdt-02025cea.dtb",
+            "requested": 16777217,
+            "returned": 593278
+          }
+        ]
+      }
+    ],
+    "guarded_CLI_no_write_process": true,
+    "original_provenance_SHA": "245b28b55bebd95861933216136fef4c2115c55cdd2dc11f6d96befd07491eb4",
+    "original_provenance_unchanged": true,
+    "relocated_real_dependency_copies": {
+      "/Volumes/macData/projects/ios-zorn/UniXNU/scripts/unixnu/__init__.py": "c6ae444a32411f12494607894581cc27d6bfec49c2f5712fe47a26cece5d1007",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/scripts/unixnu/devicetree.py": "cfda7d9aad326729d1e60bbf2db555c3d1af298d25747377b314dac007e8097d",
+      "/Volumes/macData/projects/ios-zorn/UniXNU/scripts/unixnu/util.py": "1f6efa81051d67f7225783958f1f8e86a38a7d4e538299ce6aa639b3cb4a759d",
+      "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-votes-source-identity-20261103/candidate.py": "7ad80015d140f5ed62bd10ee54923743041fc7d3e769eeb1ce6b4790705e3923"
+    },
+    "candidate_SHA": "c891f57db12ccc72ddfb9041f224983e4db5eae9c10a77afb09117587793569a",
+    "patch_SHA": "12df9b03b9b5d7a3d97895e2fc43edc4b3856ad9ee95dce078be5d70dd323fe4",
+    "old_suites_or_driver_targets_rerun": false,
+    "hardware_qualification": false,
+    "device_operations": false
+  },
+  "reference": {
+    "original_unchanged": true,
+    "original_SHA": "05973a22c22e8b40d83ae37d67890ab4af7d96b5c91a1f73de4992d6f9caa19b",
+    "candidate_SHA": "a15a3d2e783502b8b04be382f002773f1d430499596928c0befeccdf5a3471c1",
+    "provenance_candidate_SHA": "c891f57db12ccc72ddfb9041f224983e4db5eae9c10a77afb09117587793569a",
+    "candidate_dependency_pin_enforced": true,
+    "before_json_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-json.bin",
+        "requested": -1,
+        "returned": 16785408
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/small.dtb",
+        "requested": -1,
+        "returned": 9
+      }
+    ],
+    "after_json_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-json.bin",
+        "requested": 16777217,
+        "returned": 16777217
+      }
+    ],
+    "before_raw_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/small.json",
+        "requested": -1,
+        "returned": 12
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-dtb.bin",
+        "requested": -1,
+        "returned": 16842752
+      }
+    ],
+    "after_raw_trace": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/small.json",
+        "requested": 16777217,
+        "returned": 12
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-provenance-bounded-read-20261103/oversized-dtb.bin",
+        "requested": 16777217,
+        "returned": 16777217
+      }
+    ],
+    "real_input_equivalences": [
+      {
+        "source_id": "fdt-01f95000.gpu",
+        "output_identical": true,
+        "graph_verified": true
+      },
+      {
+        "source_id": "fdt-02025cea.gpu",
+        "output_identical": true,
+        "graph_verified": true
+      }
+    ],
+    "guarded_no_write_process": true,
+    "old_proofs_or_pins_updated": false,
+    "device_operations": false,
+    "hardware_qualification": false
+  },
+  "review_document_SHA": "7fc85fcc46dc36be762563d854f1f4db6ef6fff47dbcce0830ac3b8c6edb9852",
+  "scope": "two isolated UNAPPLIED offline reader repairs;original strict source chain unchanged",
+  "native_execution": false,
+  "device_operations": false,
+  "hardware_qualification": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0
+}

@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-09T12:56:04.370133+00:00",
+  "classification": "progress: native GPU GIC masked IRQ backend connected after actual same-GPU completed register configuration;retained real prerequisite,legacy authority path preserved",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate",
+  "native_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-gpu-native-gpu-irq-candidate",
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.18122005462646484,
+    "inputs": 1385,
+    "replaced": 6,
+    "preserved": 1379,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gpu-irq26/full-link/kernel.ZORN26-native-gpu-irq.UNSELECTED.macho",
+    "sha256": "12e47878f185b15e5bbd655a2613d9b8ad1b39a28e2f0cc8827b1a502d1314b3",
+    "bytes": 30230712
+  },
+  "checks": {
+    "affected_native_translation_units": 6,
+    "shared_header_dependencies_all_recompiled": {
+      "changed_headers": [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7GpuIrq26.h",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7HostGpuRegisters26.h"
+      ],
+      "affected_firmware_TUs": [
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7HostGpuRegisters26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7StartupOwner26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7HostRing26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7GpuIrq26.cpp",
+        "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-gpu-irq-candidate/ZornGen7RegisterMaps26.cpp"
+      ],
+      "changed_native_TU": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/k80-gpu-native-gpu-irq-candidate/k80/runtime/startup/ZornGen7DarwinBoardOwner.cpp",
+      "all_recompiled": true
+    },
+    "full_link_inputs": 1385,
+    "replaced_inputs": 6,
+    "preserved_inputs": 1379,
+    "undefined_symbols": 0,
+    "new_link_diagnostics": 0,
+    "inherited_warning_observations": 15,
+    "inherited_warning_sites": 3,
+    "new_compile_warning_sites": 0,
+    "actual_compiler_inputs": 568,
+    "source_files": 660,
+    "unchanged_source_files": 654,
+    "changed_source_files": [
+      "ZornGen7GpuIrq26.h",
+      "ZornGen7HostGpuRegisters26.cpp",
+      "ZornGen7StartupOwner26.cpp",
+      "ZornGen7HostGpuRegisters26.h",
+      "ZornGen7GpuIrq26.cpp",
+      "k80/runtime/startup/ZornGen7DarwinBoardOwner.cpp"
+    ],
+    "original_sources_unchanged_and_separate_inodes": true,
+    "board_refusal_edges_exclude_native_factory": 12,
+    "native_factory_refusal_edges_exclude_impl": 5,
+    "actual_completed_register_source_algorithm_unchanged": true,
+    "mask_unmask_keepalive_receiver_arm_error_paths_unchanged": true,
+    "external_grant_callback_skipped_without_synthetic_return_in_native_mode": true,
+    "actual_GIC_raw_return_stored_and_selects_state": true,
+    "legacy_authority_record_class_data_and_vtable_declarations_unchanged": true,
+    "actual_GIC_overlay_provenance": {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/zorn26-component-integration-candidate/rsc-gic-control-lock-candidate/gic_v3_irq.c",
+      "source_sha256": "93de26b8b116517b7ddf31873c5f06ea92cd673612f548a23b7cbc7266b78550",
+      "compile_command": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-zorn-integration26/attempts/1794209052220706000/027-gic_v3_irq.o-command.json",
+      "object": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-zorn-integration26/attempts/1794209052220706000/027-gic_v3_irq.o",
+      "object_sha256": "8320f2394b691595e22fa411a6ee603d7e4e5baf20d8850b9490d3909f568c93",
+      "current_link_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gpu-irq26/full-link/inputs/0374-0374-0374-0374-0374-0374-0374-0374-0374-1253-027-gic_v3_irq.o",
+      "current_link_object_unchanged": true,
+      "scope": "Actual native masked registration/configuration readback backend,not a current hardware lease or IRQ-delivery proof"
+    }
+  },
+  "behavior": "Private native GPU IRQ factory checks actual registered platform parent and the actual completed register owner under its real startup gate:attempted/ready,same GPU,parent,map,and live GMU/HFI/SMMU sources. It retains that owner before event-source construction outside startup gate. Real checked GIC masked-registration return selects registered/failed-retained state;no external grant is fabricated. Legacy external callback factory remains strict. Initial mask,real receiver-before-enable,keepalive/MMIO guards and uncertain-failure resource retention remain unchanged.",
+  "limitations": [
+    "Offline source/native object/full link/static instruction checks only,no allocation,map,IRQ,GIC,MMIO,native or phone execution.",
+    "Completed register source prerequisite and checked native IRQ registration are not current hardware validation,IRQ delivery,power/security/global lease or DMA-stop proof.",
+    "Real early clock/power/security/PM/SCM/SMMU/CommandDB/platform creator handoffs remain incomplete;current candidate cannot be claimed as functioning GPU/Metal.",
+    "Prior exact f73 platform/UFS trial remains consumed-no-repeat;this kernel is unselected and unexecuted."
+  ],
+  "native_or_device_execution": false,
+  "full_goal_complete": false,
+  "verified": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gpu-irq26/verified.json",
+  "actual_compile_inputs": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gpu-irq26/actual-inputs.json",
+  "compiled_refusal_CFG": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gpu-irq26/compiled-refusal-CFG.json",
+  "source_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-gpu-irq26/original-source-manifest.json"
+}

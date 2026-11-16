@@ -1,0 +1,42 @@
+{
+  "status": "GPU-console-mode-compatibility-full-link-unexecuted",
+  "date": "2026-11-10T06:04:16.624205+00:00",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-console-mode26-88a45659a1a843e285762bdec1ba3962",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-console-mode-88a45659a1a843e285762bdec1ba3962/MiniIOMobileFramebuffer.cpp",
+  "delta": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-console-mode26-88a45659a1a843e285762bdec1ba3962/GPU-console-mode.delta",
+  "base_CPU_image_evidence": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-CPU-known-image-observed26.json",
+  "link": {
+    "exit": 0,
+    "seconds": 0.15669062500091968,
+    "inputs": 1390,
+    "replaced": 1,
+    "preserved": 1389,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-console-mode26-88a45659a1a843e285762bdec1ba3962/full-link/kernel.ZORN26-current-platform-record.UNSELECTED.macho",
+    "sha256": "699bd05edba5b46cf52fdf921ef36909c74434203afe7296962433af8f229364",
+    "bytes": 30315200
+  },
+  "actual_retained_caller": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-current-integrated-candidate/ZornGen7HostRing26.cpp",
+    "sha256": "e7d26938f28abb3aa125e2a5c9cc3a7d1fcbbc651232dc77dc43f538742445b3",
+    "object": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-console-mode26-88a45659a1a843e285762bdec1ba3962/full-link/inputs/1295-ZornGen7HostRing26.cpo",
+      "sha256": "f8d6ffbd613e24041eb3467a8a8ccafec6ecbbddf5e55e5e8266b117bf453f52",
+      "bytes": 624696,
+      "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/full-link/inputs/1295-ZornGen7HostRing26.cpo",
+      "replacement": null
+    }
+  },
+  "actual_framebuffer_object": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-console-mode26-88a45659a1a843e285762bdec1ba3962/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+    "sha256": "daf68e969ff7316f66136e5a66003fdef8f2e493db1e0332c8cb8d825e53adf7",
+    "bytes": 488776,
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-known-image26-7e852e92ee264a418b9482d0632451a8/full-link/inputs/1096-MiniIOMobileFramebuffer.cpo",
+    "replacement": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-console-mode26-88a45659a1a843e285762bdec1ba3962/MiniIOMobileFramebuffer.cpo"
+  },
+  "scope": "Only GPU result console-copy accepts selected-loader known modes0/1. All actual GPU fence/task/image/unmap/release checks,32x32 extent/alias checks,exclusive console-path2,RGBA conversion and GPU-output preservation remain. CPU-generated pattern is separate and cannot qualify GPU output.",
+  "GPU_or_native_or_phone_executed": false,
+  "new_boot_packet_or_scope": false,
+  "must_disable_CPU_test_pattern_and_presenter_for_separate_console_GPU_image_trial": true,
+  "next_action": "Implement actual Gen7 startup input/authority producer from retained native owners;keep real completion checks. Reuse this mode fix when composing that GPU candidate;do not rerun CPU-only baseline or count this offline link as GPU execution."
+}

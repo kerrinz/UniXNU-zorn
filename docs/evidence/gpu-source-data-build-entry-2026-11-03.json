@@ -1,0 +1,355 @@
+{
+  "default_plan_only_no_write_or_process": true,
+  "one_new_entry_actual_build": {
+    "completed": true,
+    "scope": "isolated unselected source-data review only",
+    "commands": [
+      {
+        "arguments": [
+          "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "-std=c++17",
+          "-ffreestanding",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-nostdinc",
+          "-nostdinc++",
+          "--target=arm64-apple-ios17.0.0",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pedantic",
+          "-fsyntax-only",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/actual-source-only-build/source-layout-check.cpp"
+        ],
+        "returncode": 0,
+        "log": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/actual-source-only-build/compile-0.log"
+      },
+      {
+        "arguments": [
+          "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+          "-std=c++17",
+          "-ffreestanding",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-nostdinc",
+          "-nostdinc++",
+          "--target=arm64-apple-ios17.0.0",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pedantic",
+          "-O2",
+          "-c",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/actual-source-only-build/source-layout-object.cpp",
+          "-o",
+          "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/actual-source-only-build/isolated-source-data.o"
+        ],
+        "returncode": 0,
+        "log": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/actual-source-only-build/compile-1.log"
+      }
+    ],
+    "generated_policy": false,
+    "any_source_selected": false,
+    "hardware_qualification": false,
+    "native_execution": false,
+    "allow_boot": false,
+    "readback_qualified": false,
+    "WriteAuthorized": 0,
+    "object_review": {
+      "sections": [
+        {
+          "name": "__text",
+          "segment": "__TEXT",
+          "offset": 392,
+          "bytes": 0,
+          "relocations": 0
+        },
+        {
+          "name": "__const",
+          "segment": "__TEXT",
+          "offset": 392,
+          "bytes": 167116,
+          "relocations": 0
+        }
+      ],
+      "symbols": [
+        {
+          "name": "ltmp0",
+          "section": 1
+        },
+        {
+          "name": "ltmp1",
+          "section": 2
+        },
+        {
+          "name": "__ZL12review_image",
+          "section": 2
+        }
+      ],
+      "undefined_symbols": 0,
+      "external_exports": 0,
+      "relocations": 0,
+      "instruction_bytes": 0,
+      "compiled_source_bytes": 167116,
+      "iOS_min_version": "17.0",
+      "no_SDK_imports": true
+    },
+    "outputs": {
+      "UnselectedSourceTables.h": "749b80044d28c3e851da86c570534cfb3fc0b77a7b46261afb3f5b7af8037f09",
+      "source-layout-check.cpp": "caf2100f5ffe55bacf9408b45d8bda672c0f01b05c5d54590de08b39a54d6590",
+      "source-layout-object.cpp": "f70f19c77a719531c34b22007d04464e35d0e701af371651d5957272c99c4d7b",
+      "source-layout-data.json": "bd45bf0e4789c2e483084b04ca6596975eec391d59473787ff4ce75ad14283ac",
+      "isolated-source-data.o": "15f7af7f34ad806a7c0b7459e8cb9b1e704c10c70cdee951f47982e32212e993"
+    }
+  },
+  "new_preflight_gates": [
+    {
+      "case": "existing-output",
+      "returncode": 2,
+      "no_writes_or_process": true
+    },
+    {
+      "case": "missing-scope-flag",
+      "returncode": 2,
+      "no_writes_or_process": true
+    },
+    {
+      "case": "wrong-approval",
+      "returncode": 2,
+      "no_writes_or_process": true
+    },
+    {
+      "case": "wrong-manifest",
+      "returncode": 2,
+      "no_writes_or_process": true
+    },
+    {
+      "case": "wrong-OS",
+      "returncode": 2,
+      "no_writes_or_process": true
+    }
+  ],
+  "new_failure_boundaries": [
+    {
+      "case": "injected-count-corruption-real-clang-refusal",
+      "result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/actual-compiler-refusal/result.json",
+      "real_compiler_returncode": 1
+    },
+    {
+      "case": "explicit-timeout-fixture-partial-output-retained",
+      "result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/timeout-fixture/result.json",
+      "synthetic_failure_only": true
+    },
+    {
+      "case": "explicit-write-failure-fixture-partial-source-retained",
+      "result": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/write-failure-fixture/result.json",
+      "synthetic_failure_only": true
+    }
+  ],
+  "prior_success_outputs_unchanged": true,
+  "all_failures_preserve_partial_files_and_logs": true,
+  "old_suites_targets_pairs_reexecuted": false,
+  "driver_patch_count_remains32": true,
+  "native_or_device_execution": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "raw_stream_preservation_fix": {
+    "one_actual_changed_entry_build": {
+      "completed": true,
+      "scope": "isolated unselected source-data review only",
+      "commands": [
+        {
+          "arguments": [
+            "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+            "-std=c++17",
+            "-ffreestanding",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-nostdinc",
+            "-nostdinc++",
+            "--target=arm64-apple-ios17.0.0",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-pedantic",
+            "-fsyntax-only",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/source-layout-check.cpp"
+          ],
+          "returncode": 0,
+          "log": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-0.log",
+          "raw_streams": {
+            "stdout": {
+              "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-0.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            },
+            "stderr": {
+              "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-0.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            },
+            "log": {
+              "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-0.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          }
+        },
+        {
+          "arguments": [
+            "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+            "-std=c++17",
+            "-ffreestanding",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-nostdinc",
+            "-nostdinc++",
+            "--target=arm64-apple-ios17.0.0",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-pedantic",
+            "-O2",
+            "-c",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/source-layout-object.cpp",
+            "-o",
+            "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/isolated-source-data.o"
+          ],
+          "returncode": 0,
+          "log": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-1.log",
+          "raw_streams": {
+            "stdout": {
+              "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-1.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            },
+            "stderr": {
+              "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-1.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            },
+            "log": {
+              "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/raw-mode-real-build/compile-1.log",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "bytes": 0
+            }
+          }
+        }
+      ],
+      "generated_policy": false,
+      "any_source_selected": false,
+      "hardware_qualification": false,
+      "native_execution": false,
+      "allow_boot": false,
+      "readback_qualified": false,
+      "WriteAuthorized": 0,
+      "object_review": {
+        "sections": [
+          {
+            "name": "__text",
+            "segment": "__TEXT",
+            "offset": 392,
+            "bytes": 0,
+            "relocations": 0
+          },
+          {
+            "name": "__const",
+            "segment": "__TEXT",
+            "offset": 392,
+            "bytes": 167116,
+            "relocations": 0
+          }
+        ],
+        "symbols": [
+          {
+            "name": "ltmp0",
+            "section": 1
+          },
+          {
+            "name": "ltmp1",
+            "section": 2
+          },
+          {
+            "name": "__ZL12review_image",
+            "section": 2
+          }
+        ],
+        "undefined_symbols": 0,
+        "external_exports": 0,
+        "relocations": 0,
+        "instruction_bytes": 0,
+        "compiled_source_bytes": 167116,
+        "iOS_min_version": "17.0",
+        "no_SDK_imports": true
+      },
+      "outputs": {
+        "UnselectedSourceTables.h": "749b80044d28c3e851da86c570534cfb3fc0b77a7b46261afb3f5b7af8037f09",
+        "source-layout-check.cpp": "caf2100f5ffe55bacf9408b45d8bda672c0f01b05c5d54590de08b39a54d6590",
+        "source-layout-object.cpp": "f70f19c77a719531c34b22007d04464e35d0e701af371651d5957272c99c4d7b",
+        "source-layout-data.json": "bd45bf0e4789c2e483084b04ca6596975eec391d59473787ff4ce75ad14283ac",
+        "isolated-source-data.o": "15f7af7f34ad806a7c0b7459e8cb9b1e704c10c70cdee951f47982e32212e993"
+      }
+    },
+    "focused_raw_failure_cases": [
+      {
+        "case": "nonutf8-return-error",
+        "synthetic_failure_only": true,
+        "raw_streams": {
+          "stdout": {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/nonutf8-return-error/compile-0.stdout",
+            "sha256": "e36719e3660e7a324f36b923f7fa38747e39089ef068e8f3a0e59459fa28e951",
+            "bytes": 17
+          },
+          "stderr": {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/nonutf8-return-error/compile-0.stderr",
+            "sha256": "60d3f0ab3c5843468cccdcd4e952e9bc412daf0f90e8c03fa35f03c39e6c4623",
+            "bytes": 17
+          },
+          "log": {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/nonutf8-return-error/compile-0.log",
+            "sha256": "3d0b037959d2f49693fa53a845e6da42d25a9854e20312622737d90f0050efe4",
+            "bytes": 34
+          }
+        },
+        "returncode": 7,
+        "timeout": false
+      },
+      {
+        "case": "nonutf8-timeout",
+        "synthetic_failure_only": true,
+        "raw_streams": {
+          "stdout": {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/nonutf8-timeout/compile-0.stdout",
+            "sha256": "e36719e3660e7a324f36b923f7fa38747e39089ef068e8f3a0e59459fa28e951",
+            "bytes": 17
+          },
+          "stderr": {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/nonutf8-timeout/compile-0.stderr",
+            "sha256": "60d3f0ab3c5843468cccdcd4e952e9bc412daf0f90e8c03fa35f03c39e6c4623",
+            "bytes": 17
+          },
+          "log": {
+            "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-source-data-build-entry-20261103/nonutf8-timeout/compile-0.log",
+            "sha256": "3d0b037959d2f49693fa53a845e6da42d25a9854e20312622737d90f0050efe4",
+            "bytes": 34
+          }
+        },
+        "returncode": null,
+        "timeout": true
+      }
+    ],
+    "non_UTF8_and_NUL_bytes_preserved": true,
+    "no_old_suite_reexecution": true,
+    "no_native_or_device_execution": true
+  },
+  "initial_entry_version_sha256": "bb6b81c552e2ff487f12f574a041385af62d6e5aa7ab698ff6b3544bb77c9c20",
+  "initial_tests_not_rerun_after_raw_stream_change": true,
+  "sources": {
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/build-zorn-source-data-review.py": "fd3a5368a8f6966cc5150cdee73ea3a17df6eb59805a3bdfd543c5bfc8231836",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-source-data-build-entry.py": "7ac41099ace79c833f4d36935f318d05868729f991104df54bf86a639017cc42",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-source-build-raw-logs.py": "6fa5503c0482316530f3b35ee07f8939dc66a62e7a28af502938cace2ddd7c38"
+  },
+  "scope": "New default-plan-only offline source-data build entry;approved four-source header/layout/data-object scope only,no runtime selection or hardware qualification",
+  "header_scope_approval_received": true
+}

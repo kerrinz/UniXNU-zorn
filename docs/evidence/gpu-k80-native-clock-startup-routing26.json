@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-09T21:32:21.684956+00:00",
+  "status": "existing-native-GCC-GPUCC-backend-connected-to-GPU-authentication-image-and-application-startup-stages-offline",
+  "source_origin": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-provider-claims-candidate/ZornGen7StartupOwner26.cpp",
+    "source_sha256": "5dbe43c15f0b50b180c92ff391c4fba3d98527949dbe3b80c467491c6ef0e893",
+    "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-startup-routing-candidate/ZornGen7StartupOwner26.cpp",
+    "copy_sha256": "e9b4a81f227b972978181ad460a8f405024939d7842c4240683ef21ca91840fd",
+    "changed_function": "ZornGen7StartupOwner26::schedule",
+    "header_or_ABI_changed": false
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.15543429199897218,
+    "inputs": 1390,
+    "replaced": 1,
+    "preserved": 1389,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/full-link/kernel.ZORN26-native-clock-startup-routing.UNSELECTED.macho",
+    "sha256": "19bf99a860bee34842f97dc74b9c089ca778fafb8e433fda63afc682555a3c3c",
+    "bytes": 30267312
+  },
+  "compile": {
+    "exit": 0,
+    "seconds": 0.21191108399943914,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/ZornGen7StartupOwner26.cpo",
+    "sha256": "0f30b76980e4ce634e647d01872b2548e7cd7735d9e7e03384e402c9c2b6cf99",
+    "warnings": 3
+  },
+  "actual_sources": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-provider-claims-candidate/ZornGen7StartupOwner26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/source-reference/ZornGen7StartupOwner26.cpp",
+      "sha256": "5dbe43c15f0b50b180c92ff391c4fba3d98527949dbe3b80c467491c6ef0e893"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-native-clocks-candidate/GenericARMPE.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/source-reference/GenericARMPE.cpp",
+      "sha256": "b9ea531f8cb5abf81446a22e06015df9979d644443ca8417a53176034a6c788b"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7ClockResources26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/source-reference/ZornGen7ClockResources26.cpp",
+      "sha256": "7a989d112445ce9f6d3c2512607ef6866fccf8625ce4964062a253f560f1b6f1"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7RegistryStartup26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/source-reference/ZornGen7RegistryStartup26.cpp",
+      "sha256": "71d6412fbbc58a22022bd4f325a822fe2a56334cfedf992e047b7f9bb3335f36"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-provider-claims-candidate/ZornGen7InactiveOwner26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-native-clock-startup-routing26/source-reference/ZornGen7InactiveOwner26.cpp",
+      "sha256": "3dcb5a8791e09483c291b16309ab18855cd9e7dea801e5eb56dd781bffa86e42"
+    }
+  ],
+  "checks": {
+    "public_headers_ABI_unchanged": true,
+    "all_prior_entry_arguments_validators_worker_and_failure_paths_unchanged": true,
+    "existing_platform_and_startup_selector_expressions_identical": true,
+    "actual_factory_retains_its_own_selector_and_fresh_nub_open_map_checks": true,
+    "actual_compiler_dependencies": 498,
+    "affected_TUs": 1,
+    "inherited_compile_warnings": 3,
+    "new_compile_warnings": 0,
+    "unchanged_link_warnings": 10,
+    "zero_undefined": true,
+    "actual_file_loader_parser_pass": true
+  },
+  "implementation": [
+    "Previously only createAndScheduleNativeClockHost could set nativeOwnedClocks. Authentication,GPU prefix,known-image,kernel client and actual application publication entries reached the same schedule with that flag false,thus requiring external clock callbacks despite the existing real native clock-resource backend and platform reservation selector.",
+    "Actual common scheduler now resolves the same zorn26_owned_clocks=1 expression as the real GenericARMPE clock-node reservation. It copies this mode into actual retained Storage and selects the existing real native-clocks registry sequence in runOnce for every admitted stage. No new proxy/fake clock backend or successful authority callback is supplied.",
+    "Absent,zero or non1 selector retains original external path for legacy entries. Existing explicitly native Host entry still forces native mode and its actual native factory retains its original independent selector check. Native failures are not retried through external callbacks. All other original admission,one-attempt latch,stages,error outputs and retained lifetimes remain unchanged.",
+    "Current1390-input kernela9b00936 is the baseline. Only actual StartupOwner object replaced;1389 current GIC serialization/root digest/provider/GPU/presenter/touch objects preserved. New kernel19bf99a8 has zero undefined,3 identical inherited shared-header warnings and10 identical link warnings;actual-file loader parse passes."
+  ],
+  "limits": [
+    "This connects a real existing backend selection to the actual GPU startup worker,but does not construct the missing platform startup input owner or independent power/security/SMMU/SCM/CommandDB/app permissions. It does not prove a single clock open,map or register operation executed.",
+    "No boot flag/package/runtime or phone selection changed. Preserved offline bootc1132857 still contains4b18a29f and does not contain this new19bf99a8 kernel;no blind repack or scope/ready/claim.",
+    "Current local rootef11f75a remains NOT installed;historical phone root is b56dafe8. Device/native/IOKit/getter/bootarg-parser/MMIO/GPU/Metal/FT3683 execution remains OFF.",
+    "GPU firmware/authentication/HFI/fence/Metal/display/touch hardware acceptance is incomplete;goal ACTIVE."
+  ],
+  "native_or_device_executed": false,
+  "app_execution_authority_backend_bound": false,
+  "goal_complete": false
+}

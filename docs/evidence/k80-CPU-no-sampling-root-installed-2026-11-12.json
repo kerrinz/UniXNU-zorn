@@ -1,0 +1,81 @@
+{
+  "status": "CPU-no-sampling-root57-page-install-verified-in-Recovery",
+  "recorded_at": "2026-11-12T01:08:43.971932+08:00",
+  "mode": "unattended-phone-connected",
+  "scope": "K80-persistent-iOS26-CPU-no-sampling-delta-63f9631a",
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-delta-review26/review-inputs.json",
+    "sha256": "3d6bb52cf3aac5e81e3f64250cb268111d613da49b9f6f4c5618fdeaa8a5e787"
+  },
+  "receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-delta-review26/admission/run/result.json",
+    "sha256": "da23550003a730da6dd07b53df3983e7eacecfec644bc57fc320ec289e3d74d4"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-delta-review26/admission/run/one-shot.claim.json",
+    "sha256": "f8efbc0d4a90271dcf179f4f9ea2f25e4e1eec26c73549900c29b6325c68dd74"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-delta-review26/admission/admission.json",
+    "sha256": "df80ad4d753b1e4d7143be825b858363f96e0b0439112a3cafed5720b4add246"
+  },
+  "host_negative_tests": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-no-sampling-delta-review26/host-admission-check.json",
+    "sha256": "a301a3d5e01fb913e62d5dac156a70fc715f38889b25c906718aebf1d4c0b493"
+  },
+  "root_sha256_expected": "3b56c850bd9416e7716094a20ea0af0c25bd767b1e94a022aff6945fcf54cd6d",
+  "previous_root_sha256": "fa6b90ea04d56d308bfec97e24f12614f5060994f6a91141c2bda3672e153a9f",
+  "written_pages": 57,
+  "written_bytes": 233472,
+  "write_groups": 11,
+  "actual_written_page_readback_sha256": "be50e8966a651c6ef4f28b09d719b2bc58ec03f6485eace2f22c08bee28d261a",
+  "protected_comparisons": [
+    {
+      "name": "log.before.bin",
+      "sha256": "9f2881f95e6e8db9fd8bf12659347f1795946c81d40adb7ce9f630e1e05807d6"
+    },
+    {
+      "name": "backup_GPT.before.bin",
+      "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054"
+    },
+    {
+      "name": "root_manifest.before.bin",
+      "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d"
+    },
+    {
+      "name": "after.before.bin",
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "name": "before.before.bin",
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "name": "Data.before.bin",
+      "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+    },
+    {
+      "name": "primary_GPT.before.bin",
+      "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967"
+    }
+  ],
+  "recovery_before": "TWRP",
+  "recovery_after": "TWRP",
+  "root_window": {
+    "partition": "unixnu",
+    "relative_first_lba": 6291712,
+    "blocks": 8388608,
+    "block_bytes": 4096,
+    "old_root_sha256": "fa6b90ea04d56d308bfec97e24f12614f5060994f6a91141c2bda3672e153a9f",
+    "new_root_sha256": "3b56c850bd9416e7716094a20ea0af0c25bd767b1e94a022aff6945fcf54cd6d",
+    "layout_change": false
+  },
+  "full_phone_root_readback": false,
+  "booted": false,
+  "GPU_started": false,
+  "Android_Data_or_boot_partitions_written": false,
+  "claim_reusable": false,
+  "UI_qualified": false,
+  "next_action": "Create new unattended fixed CPU boot scope using exact new install receipt and prepared root-bound kernel/ADT/FD/loader bundle; fresh BCB/tail/protection checks, independent watchdog and bounded Recovery return. No old claim reuse.",
+  "goal_complete": false
+}

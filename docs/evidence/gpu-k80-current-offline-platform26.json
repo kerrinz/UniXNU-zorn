@@ -1,0 +1,74 @@
+{
+  "status": "CURRENT_CUMULATIVE_PLATFORM_KERNEL_ROOT_ADT_BOOT_COHERENT_UNSELECTED",
+  "artifact_verification": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/verified.json",
+  "builder": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/build-current-offline-platform.py",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "c3de46c5cacefed46d72cc564ee6f44c855fc47a5b44e24e1b624df5e26109d6",
+    "bytes": 41172992
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-presenter-terminal26/full-link/kernel.ZORN26-presenter-terminal.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/inputs/kernel-kernel.ZORN26-presenter-terminal.UNSELECTED.macho",
+    "sha256": "d9f6759d85b9a229cb59e15877ff1304204e4f73d074b1ddb5a0da5e3b0759ed",
+    "bytes": 30254312
+  },
+  "ADT": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-root-integration26/kernel.current-metal-root.UNSELECTED.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/inputs/ADT-kernel.current-metal-root.UNSELECTED.adt",
+    "sha256": "f28ced9ddcadd720bb8a3cc5e0c38e7dc1e9022fcfccf49d7da5ee0d1766bbf1",
+    "bytes": 48276
+  },
+  "FD": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-root-integration26/offline-package/inputs/FD-FD-SILICIUM_UEFI.ZORN26-PLATFORM.UNSELECTED.fd",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/inputs/FD-FD-FD-SILICIUM_UEFI.ZORN26-PLATFORM.UNSELECTED.fd",
+    "sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "bytes": 3145728
+  },
+  "full_link_inputs": 1390,
+  "actual_link_manifest": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/inputs/exact-inputs.json",
+  "root": {
+    "status": "LOCAL_METAL_ROOT_INTEGRATED_VERIFIED_UNSELECTED",
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-root-integration26/ios26-root-current-metal.UNSELECTED.hfsx",
+    "sha256": "ef11f75a2d1349cd20b341a4474f8dcdb99a2674709721557ec6fb7303a4a608",
+    "bytes": 34359738368,
+    "files": 5,
+    "changed_files": 4,
+    "ownership_inodes_modes_preserved": true,
+    "signature_verified": true,
+    "filesystem_verified": true,
+    "phone_access": false,
+    "kernel_digest_binding_pending": false,
+    "cleanup_note": "verifyVolume remounted at /Volumes/K80iOS26Offline; exact-image entity verified and detached; original strict mount-path cleanup refusal preserved"
+  },
+  "root_full_sha_checked_this_build": true,
+  "root_installed": false,
+  "historical_installed_root_sha256": "b56dafe874ae86e84929e08317805b6f1d969973c2399b394c3f1de093aea592",
+  "historical_installed_readback_qualifies_current_root": false,
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_touch=1 zorn26_touch_continuous=1 zorn26_touch_pacing=1",
+  "actual_loader_parser_pass": true,
+  "WDT1_markers_both_present": true,
+  "original_EFI_loaders_preserved": true,
+  "OS_embedded_in_FAT_or_RAM": false,
+  "MachO_build_version": [
+    2,
+    1703936,
+    1769472,
+    1
+  ],
+  "GPU_startup_selected": false,
+  "native_owned_clocks_selected": false,
+  "stage": "platform UFS root / CPU presentation / continuous touch; GPU startup OFF",
+  "hardware_conditions_not_proven": [
+    "current UFS root startup and userspace",
+    "current continuous FT3683 HID operation",
+    "physical GPU power/security/MMU/IRQ authority",
+    "GPU authentication/GMU/HFI/direct-ring execution",
+    "Metal pipeline and per-surface display completion"
+  ],
+  "device_ready": false,
+  "phone_access": false,
+  "target_execution": false,
+  "scope_or_claim_created": false,
+  "firmware_provenance": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-current-offline-platform26/firmware-provenance.json"
+}

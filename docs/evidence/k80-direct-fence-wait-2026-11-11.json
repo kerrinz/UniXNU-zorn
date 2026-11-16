@@ -1,0 +1,58 @@
+{
+  "time": "2026-11-10T23:55:59.239544+00:00",
+  "status": "direct-ring-fence-wait-expiration-separated-from-idle-refusal-offline",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate",
+  "source_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-poll-candidate",
+  "patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-wait26/direct-fence-wait.patch",
+  "link_base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-poll26/full-link",
+  "compile": {
+    "name": "ZornGen7HostRing26.cpo",
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-wait26/ZornGen7HostRing26.cpo",
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-wait-candidate/ZornGen7HostRing26.cpp",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-poll26/full-link/inputs/1295-ZornGen7HostRing26.cpo",
+    "sha256": "8e013f7077991dc6748e3c4a0bef4964a638a2336f01305d63714a783dd8c187",
+    "warnings": 3
+  },
+  "link": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-wait26/full-link/kernel.ZORN26-DIRECT-FENCE-WAIT.UNSELECTED.macho",
+    "sha256": "0e6a303cbc7bc87b976f6361fca26817a210a00006a56457fd78d4a083f3d290",
+    "bytes": 30406352,
+    "inputs": 1397,
+    "added": 0,
+    "replaced": 1,
+    "preserved": 1396,
+    "undefined_symbols": 0
+  },
+  "compiled_control_flow": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-direct-fence-wait26/fence-wait-disassembly.txt",
+  "source_contract": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/graphics/turnip/src/freedreno/vulkan/tu_knl_darwin.cc",
+      "sha256": "7bca2f6fa1590d51adc6be9d1a2bd8f263b09b7eed14ecefe05cc2ae1aebae86"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/common/gpu/native-a750/NativeAdrenoRing.cpp",
+      "sha256": "d2cd0fac524ca3fee35810762662adbc3031b933501df5514576c0316ec71405"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-poll-candidate/direct-runtime/ZornGen7DirectSubmit26.cpp",
+      "sha256": "f6f3489b1bef190ae9293ee403989325f54bb29d32956794116f0b237f8b60b1"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-direct-fence-poll-candidate/direct-runtime/ZornGen7DirectClient26.cpp",
+      "sha256": "46e647532e97fc431ba4b4f42ab916e4914c22ab653133dc902067f3176acaaf"
+    }
+  ],
+  "findings": [
+    "Turnip issues public WaitFence in slices up to 100 ms, treating a normal timeout as pending. The ring uses the same native enum for interval expiration and idle callback refusal.",
+    "Only public WaitFence gets a synchronous clock context that records the actual idle callback refusal. The existing guard and health/poison checks remain authoritative after the call.",
+    "With an elapsed caller interval and healthy execution, the pending timeout passes through to Turnip. An idle/guard refusal or observed lost health returns NotReady and preserves the existing stop path. The application finish revalidates the matching operation before carrying normal expiration across its boundary.",
+    "No shared ring/clock header, ABI, wait duration, deadline or resource retirement change. Internal submit-dependency waits, kernel bring-up waits and other method timeouts keep the previous policy."
+  ],
+  "limits": [
+    "A healthy-looking stalled fence across multiple public wait slices needs independent hangcheck evidence. This change does not add or qualify a hangcheck.",
+    "Reference link remains uninstalled. Corrected SMMU cfg probe and finite touch package retain separate admission states.",
+    "No runtime timing, fault injection, real GPU work or device execution verified."
+  ],
+  "phone_access": false,
+  "full_root_readback_performed": false
+}

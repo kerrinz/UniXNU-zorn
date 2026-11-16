@@ -1,0 +1,280 @@
+"""Fixed CPU lockscreen continuous FT3683 carrier and Recovery transport binding."""
+import argparse
+from pathlib import Path
+import struct
+import tomllib
+
+from zorn_ios26_logdirs_boot_trial import (
+    CURRENT, STAGE, load, sha, probe_existing_adb_listener, run,
+)
+
+HERE = Path(__file__).resolve().parent
+BASE = STAGE / 'k80-gpu-v244-metal-trial-9a697dec3b024930bd83b9161c05e99d'
+TRIAL = BASE / 'root-trial'
+SCOPE = 'single-K80-ios26-gpu-v244-clock-lifetime-300s-9a697dec'
+BOOT = '04af84279f32c798142d3f35cc24433c36a23caa2041fc08d909129b7973b05c'
+KERNEL = 'fac558258f3c8f0da78a88c5061dcc5ebdfab5c9644d9301659435bc74567af1'
+ADT_SHA = '9bc3124329f66ba4a21fc8dd2e5941a18dab90813ed9ec9672341c0e91c15494'
+TAG = '9a697dec3b024930bd83b9161c05e99d'
+ROOT_SHA = '193e5f01df3b0481412a980f4e7c562401762af53ffe2ea051fee11b66f5fc0e'
+SOURCES = {
+    'clock_client': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7DirectClient26.cpp'),
+    'clock_vm': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7DirectVm26.cpp'),
+    'clock_submit': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7DirectSubmit26.cpp'),
+    'clock_test': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/clock-lifetime-regression/result.json'),
+    'clock_provenance': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/clock-provenance/result.json'),
+
+    'close_source_owner': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/ZornGen7HostRing26.cpp'),
+    'close_source_check': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/close-source-check/result.json'),
+    'close_reset_source': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7AppIo26.cpp'),
+    'close_reset_host': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/close-reset-host/result.json'),
+
+    'terminal_session_source': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/houji_recovery26.c'),
+    'terminal_session_host': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/terminal-session-host/result.json'),
+    'terminal_session_parsercheck': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/terminal-session-parser/result.json'),
+    'terminal_session_decoder': Path('/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect_ios26_gpu_application241.py'),
+
+    'client_source_header': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/ZornClientTrace240.h'),
+    'client_source_host': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/client-source-host/result.json'),
+    'client_source_decoder': Path('/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect_ios26_gpu_source242.py'),
+
+    'late_panic_gate': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/late-gate-host/result.json'),
+    'panic_ram_source': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/pe_init.c'),
+    'panic_ram_host': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/panic-init-host/result.json'),
+    'panic_ram_startup': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/startup-source-audit/result.json'),
+    'panic_ram_segments': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/segment-layout-check.json'),
+
+    'panic_identity_check': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/identity-dependency-check.json'),
+    'panic_wire_header': Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/ZornPanicPacket236.h'),
+    'panic_format_catalog': HERE / 'data' / 'k80-panic-formats232-f9fd63efaf9448ad923c58b1cfb477f5.json',
+    'progress_format_decoder': HERE / 'inspect_ios26_gpu_progress232.py',
+    'progress_decoder': HERE / 'inspect_ios26_gpu_progress236.py',
+    'progress_device_decoder': HERE / 'inspect_ios26_gpu_progress229.py',
+    'progress_previous_decoder': HERE / 'inspect_ios26_gpu_progress226.py',
+    'progress_request_decoder': HERE / 'inspect_ios26_gpu_progress225.py',
+    'progress_control_decoder': HERE / 'inspect_ios26_gpu_progress223.py',
+    'progress_mapping_decoder': HERE / 'inspect_ios26_gpu_progress222.py',
+    'progress_return_decoder': HERE / 'inspect_ios26_gpu_progress217.py',
+    'progress_callback_decoder': HERE / 'inspect_ios26_gpu_progress216.py',
+    'progress_base_decoder': HERE / 'inspect_ios26_gpu_progress211.py',
+    'entry': Path(__file__),
+    'preparation_decoder': HERE / 'inspect_ios26_gpu_prepare191.py',
+    'application_decoder': HERE / 'inspect_ios26_gpu_metal194.py',
+    'fixed_builder': HERE / 'build-zorn-debug.py',
+    'fixed_runner': HERE / 'run-zorn-debug.py',
+    'transport_core': HERE / 'zorn_ios26_logdirs_boot_trial.py',
+    'device_helpers': HERE / 'zorn_gpu_resource_trial.py',
+    'recovery_identity': HERE / 'zorn_recovery_identity.py',
+    'record_helpers': HERE / 'zorn_gpu_ios26_platform_record.py',
+    'record_decoder': HERE / 'inspect_ios26_gpu_ui_census227_record.py',
+    'record_legacy_census_decoder': HERE / 'inspect_ios26_gpu_ui_census_record.py',
+    'percore_decoder': HERE / 'inspect_ios26_lockscreen_percore_record.py',
+    'cdc_capture': HERE / 'read-zorn-gpu-metal244-cdc.py',
+    'gpu_base_decoder': HERE / 'inspect_ios26_gpu_s2cr_cdc_record.py',
+    'record_envelope': HERE / 'inspect_ios26_lockscreen_touch_cpu_record.py',
+}
+ARTIFACTS = {'boot', 'kernel', 'FAT', 'fd', 'ADT', 'loader', 'manager', 'menu', 'package', 'record_identity', 'installed_cohort'}
+PROTECTIONS = {'primary_GPT', 'backup_GPT', 'root_manifest', 'Data_header', 'Data_metadata',
+               'root_first_page', 'root_before', 'root_after'}
+TOOLS = {'installed_result', 'adb_binary', 'fastboot_binary', 'host_adb_proof'}
+EXPECTED = dict(scope=SCOPE, serial='92988a43', product='zorn', slot='a',
+                trial_seconds=300, timeout_seconds=600, retries=0, watchdog_mode=1,
+                accepted_recovery='twrp-or-orangefox', existing_server_only=True,
+                native_log_absolute_lba=49563392, native_log_blocks=1, root_read_only=True,
+                data_read_only=True, transient_boot=True, bootstrap_allowed=False,
+                gpu_firmware_start=True, allow_boot=False)
+
+
+def validate(path):
+    if path.is_symlink() or path.resolve() != TRIAL / 'bundle.json':
+        raise ValueError('canonical CPU touch scope required')
+    bundle = load(path)
+    if any(type(bundle.get(k)) is not type(v) or bundle[k] != v for k, v in EXPECTED.items()):
+        raise ValueError('CPU touch trial settings differ')
+    pins = bundle['pins']
+    if set(pins) != ARTIFACTS | PROTECTIONS | TOOLS | SOURCES.keys():
+        raise ValueError('CPU touch trial inputs incomplete')
+    for role, row in pins.items():
+        source, archive = Path(row['path']), Path(row['archive'])
+        if (not source.is_absolute() or source.is_symlink() or archive.is_symlink()
+                or archive.parent != TRIAL / 'archive' or source.samefile(archive)
+                or sha(source) != row['sha256'] or sha(archive) != row['sha256']):
+            raise ValueError(f'CPU touch input differs: {role}')
+    if any(Path(pins[k]['path']).resolve() != p.resolve() for k, p in SOURCES.items()):
+        raise ValueError('fixed runner source differs')
+    if pins['boot']['sha256'] != BOOT or pins['kernel']['sha256'] != KERNEL:
+        raise ValueError('exact CPU touch boot and kernel required')
+    proof = load(pins['package']['path'])
+    if (proof.get('clock_lifetime244_selected') is not True or
+            proof['clock_lifetime244_test']['sha256'] != pins['clock_test']['sha256'] or
+            load(pins['clock_test']['path']).get('passed') is not True or
+            load(pins['clock_provenance']['path']).get('passed') is not True or
+            [x['sha256'] for x in proof['clock_lifetime244_sources']] !=
+            [pins[x]['sha256'] for x in ['clock_client','clock_vm','clock_submit']]):
+        raise ValueError('clock source lifetime repair binding differs')
+
+    if (proof['boot']['sha256'] != BOOT or proof['root']['sha256'] != ROOT_SHA
+            or proof['touch_continuous'] is not True or proof['touch_checkpoint_seconds_after_pid1'] != 45 or proof.get('gpu_checkpoint45_selected') is not True or proof.get('touch150_qualification_transferred') is not False
+            or proof.get('pre_Metal_delay_seconds') != 0 or proof.get('diagnostic_wait_unselected') is not True
+            or proof.get('terminal_source_macro233_selected') is not True
+            or proof.get('terminal_source_format232_selected') is not True
+            or proof.get('terminal_source_context231_selected') is not True
+            or proof.get('terminal_CDC_source_selected') is not True or proof.get('terminal_wire_bytes') is not None
+            or proof.get('terminal_one_packet_max_bytes') != 409600 or proof.get('terminal_within_39frame529408B_budget') is not True
+            or proof.get('ram_panic238_selected') is not True
+            or proof.get('terminal_identity237_selected') is not True
+            or proof.get('terminal_raw_panic236_selected') is not True or proof.get('terminal_wire_limit_bytes') != 529408
+            or proof.get('terminal_DMA_bytes') != 540672
+            or proof['cpu_accounting_samples_after_pid1_seconds'] != [25, 45]
+            or proof['no_home_button_adt'] is not True
+            or proof['pins']['ADT']['sha256'] != ADT_SHA
+            or not proof['WDT1_markers_both_present'] or not proof['actual_file_loader_parser_pass']):
+        raise ValueError('carrier proof differs')
+    source_check=proof['terminal_source_check']
+    if (sha(source_check['path'])!=source_check['sha256'] or
+            load(source_check['path'])['catalog']['sha256']!=pins['panic_format_catalog']['sha256']):
+        raise ValueError('kernel source format catalog differs from decoder catalog')
+    if load(source_check['path'])['new_packet_header']['sha256'] != pins['panic_wire_header']['sha256']:
+        raise ValueError('kernel raw panic wire header differs from bound source')
+    if proof['terminal_identity_check']['sha256'] != pins['panic_identity_check']['sha256']:
+        raise ValueError('actual identity dependency check differs')
+    if (load(source_check['path'])['added_source']['sha256'] != pins['panic_ram_source']['sha256']
+            or proof['ram_panic238_source_check']['sha256'] != source_check['sha256']
+            or proof['ram_panic238_host_check']['sha256'] != pins['panic_ram_host']['sha256']):
+        raise ValueError('RAM panic source or validation binding differs')
+    if not all(load(pins[k]['path']).get('passed') is True for k in
+               ('panic_ram_host','panic_ram_startup','panic_ram_segments')):
+        raise ValueError('RAM panic offline checks incomplete')
+    if (proof.get('late_panic239_selected') is not True or
+            proof['late_panic239_gate_check']['sha256'] != pins['late_panic_gate']['sha256'] or
+            load(pins['late_panic_gate']['path']).get('passed') is not True or
+            load(pins['late_panic_gate']['path']).get('source_sha256') != sha(Path('/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/ZornUsbCdc26.c'))):
+        raise ValueError('late panic initialization gate differs')
+    if (proof.get('source_client240_selected') is not True or
+            proof['source_client240_host']['sha256'] != pins['client_source_host']['sha256'] or
+            proof['source_client240_header']['sha256'] != pins['client_source_header']['sha256'] or
+            load(pins['client_source_host']['path']).get('passed') is not True):
+        raise ValueError('source client milestone binding differs')
+    if (proof.get('terminal_session241_selected') is not True or
+            proof['terminal_session241_source']['sha256'] != pins['terminal_session_source']['sha256'] or
+            proof['terminal_session241_host']['sha256'] != pins['terminal_session_host']['sha256'] or
+            proof['terminal_session241_parser']['sha256'] != pins['terminal_session_parsercheck']['sha256'] or
+            load(pins['terminal_session_host']['path']).get('passed') is not True or
+            load(pins['terminal_session_parsercheck']['path']).get('passed') is not True):
+        raise ValueError('terminal application snapshot binding differs')
+    if (proof.get('close_source242_selected') is not True or
+            proof['close_source242_owner']['sha256'] != pins['close_source_owner']['sha256'] or
+            proof['close_source242_check']['sha256'] != pins['close_source_check']['sha256'] or
+            proof['close_source242_reset_source']['sha256'] != pins['close_reset_source']['sha256'] or
+            proof['close_source242_reset_host']['sha256'] != pins['close_reset_host']['sha256'] or
+            load(pins['close_source_check']['path']).get('passed') is not True or
+            load(pins['close_reset_host']['path']).get('passed') is not True):
+        raise ValueError('latest-close source milestone binding differs')
+    reset = load(pins['close_reset_host']['path'])
+    if any(reset['sources'][name] != pins[role]['sha256'] for name, role in
+           [('ZornGen7HostRing26.cpp','close_source_owner'),
+            ('direct-runtime/ZornGen7AppIo26.cpp','close_reset_source'),
+            ('ZornClientTrace240.h','client_source_header')]):
+        raise ValueError('latest-close reset source test differs')
+
+
+
+
+
+    for role, value in {'FAT': proof['FAT']['sha256'], 'fd': proof['pins']['FD']['sha256'],
+                        'ADT': proof['pins']['ADT']['sha256']}.items():
+        if pins[role]['sha256'] != value:
+            raise ValueError(f'carrier input differs: {role}')
+    for row in proof['FAT_members']:
+        role = {'BOOTAA64.EFI': 'manager', 'DarwinBoot26.efi': 'loader',
+                'kernel.macho': 'kernel', 'kernel.macho.adt': 'ADT',
+                'unixnu.toml': 'menu'}[Path(row['FAT_path']).name]
+        if pins[role]['sha256'] != row['sha256']:
+            raise ValueError(f'FAT member differs: {role}')
+    menu = tomllib.loads(Path(pins['menu']['path']).read_text())
+    if len(menu['entry']) != 1 or menu['entry'][0]['args'] != proof['boot_args']:
+        raise ValueError('single CPU touch menu entry required')
+    tokens = menu['entry'][0]['args'].split()
+    required = {'zorn26_touch=1', 'zorn26_touch_pacing=1', 'zorn26_touch_continuous=1',
+                'zorn26_touch_record=1', 'zorn26_cpu_presenter=1', 'zorn_wdt=1',
+                'zorn26_prearmed_recovery=1', 'zorn26_trial_seconds=300'}
+    if tokens != ['rd=md0', '-v', 'keepsyms=1', 'houji_native_root=1', 'zorn26_root=1', 'zorn26_installed_root_trial=1', 'zorn_wdt=1', 'zorn26_prearmed_recovery=1', 'zorn26_trial_seconds=300', 'zorn26_cpu_presenter=1', 'zorn26_software_accelerator=1', 'sample=0', 'sb_wallpaper=0', 'zorn26_touch=1', 'zorn26_touch_pacing=1', 'zorn26_touch_continuous=1', 'zorn26_touch_record=1', 'zorn26_gpu_board_stage=1', 'zorn26_owned_clocks=1', 'zorn26_gpu_provider_claim=1', 'zorn26_commanddb_resources=1', 'zorn26_commanddb_resources_only=1', 'zorn26_rsc_managed=1', 'zorn26_clock_prefix=1', 'zorn26_domain_prefix=1', 'zorn26_register_maps=1', 'zorn26_gpu_guarded_maps=1', 'zorn26_gpu_guarded_smmu_id=1', 'zorn26_gpu_guarded_smmu_reserve=1', 'zorn26_gpu_smmu_context_read=1', 'zorn26_gpu_guarded_gmu_clocks=1', 'zorn26_gpu_guarded_cx_timer=1', 'zorn26_gpu_cdc=1', 'zorn26_gpu_cpu_memory_prep=1', 'zorn26_gpu_gmu_context_image=1', 'zorn26_gpu_gmu_direct_seed=1', 'zorn26_gpu_masked_global_irq=1', 'zorn26_smmu_active_faults=1', 'zorn26_gmu_context_irq=1', 'zorn26_gmu_blocked_stream=1', 'zorn26_gmu_program_bank=1', 'zorn26_gmu_observe_reset=1', 'zorn26_gmu_deferred_valid=21', '-g45'] or not required.issubset(tokens) or any(arg.startswith(('zorn26_userland_progress',
+                                                            'zorn26_touch_limit')) for arg in tokens):
+        raise ValueError('exact continuous touch and CPU presenter selection required')
+    with Path(pins['FAT']['path']).open('rb') as stream:
+        for sector in (0, 6):
+            stream.seek(sector * 512 + 0x180)
+            mode = struct.pack('<II', 1, 0xfffffffe)
+            if stream.read(32) != b'ZORNGHWD' + mode + b'ZORNTPWR' + mode:
+                raise ValueError('watchdog or FT3683 power marker differs')
+    installed = load(pins['installed_result']['path'])
+    if (installed['expected_image_sha256'] != ROOT_SHA or installed['installed'] is not True
+            or installed['protected_metadata_and_fences_unchanged'] is not True
+            or installed['phase'] != 'root-delta-installed-written-blocks-readback-verified'
+            or installed['readback'] != dict(scope='written4KiB-root-pages-only', blocks=63,
+                bytes=258048, sha256='f343fc22d6bbc91d343cbf4c610c90373cff7bcbad555b5de335020799033a08')):
+        raise ValueError('CPU baseline root delta receipt differs')
+    cohort=load(pins['installed_cohort']['path'])
+    if (cohort['package']['sha256']!=pins['package']['sha256'] or
+            cohort['root_install_receipt']['sha256']!=pins['installed_result']['sha256'] or
+            cohort['boot']['sha256']!=BOOT or cohort['root']['sha256']!=ROOT_SHA or
+            cohort['system_booted'] is not False):
+        raise ValueError('exact installed root/package cohort differs')
+    if proof['application_probe_run_id'] != '65f3efb4a587473a9caebe54d7a99aea':
+        raise ValueError('exact signed IOSurface application program identity differs')
+    current=load(CURRENT)
+    if current['gpu_discovery'].get('current_phone_root_expected_sha256')!=ROOT_SHA:
+        raise ValueError('current root identity differs')
+    if load(pins['host_adb_proof']['path'])['adb_sha256'] != pins['adb_binary']['sha256']:
+        raise ValueError('ADB identity differs')
+    if load(pins['record_identity']['path'])['run_id'] != TAG:
+        raise ValueError('artifact ID differs')
+    return bundle
+
+
+def record_result(decoded):
+    if decoded['late_ui'].get('checkpoint45_selected') is not True or decoded['late_ui']['sample_seconds_after_pid1'] != 45:
+        raise ValueError('recorded GPU checkpoint45 selection required')
+    return dict(status='recovered-fresh-FT3683-percore-snapshot', root_mount_proven=True,
+                PID1_image_activation_proven=True, cpu_online=decoded['cpu_online'],
+                eight_cpus_available=decoded['cpu_online'] == 8,
+                continuous_polling_observed=decoded['continuous_polling_observed'],
+                all_eight_executed_work=decoded['all_eight_executed_work'],
+                gpu_snapshot=decoded['gpu_snapshot'], context_reads_complete=decoded['context_reads_complete'], gmu_clock_complete=decoded['gmu_clock_complete'], endpoint_reservation_complete=decoded['endpoint_reservation_complete'],
+                cx_timer_complete=decoded.get('cx_timer_complete',False), cx_timer_raw=decoded.get('cx_timer_raw'), cx_timer_samples=decoded.get('cx_timer_samples'), cx_timer_assessment=decoded.get('cx_timer_assessment'), gmu_ahb_raw=decoded.get('gmu_ahb_raw'),
+                inactive_context=decoded.get('inactive_context'), global_irq=decoded.get('global_irq'), global_fault_control=decoded.get('global_fault_control'), context_fault_irq=decoded.get('context_fault_irq'), blocked_stream=decoded.get('blocked_stream'), bank_programming=decoded.get('bank_programming'), reset_observation=decoded.get('reset_observation'), late_ui=decoded['late_ui'], touch_input_delivery_proven=False, lockscreen_proven=False)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--bundle',
+                        type=Path, required=True, dest='bundle')
+    parser.add_argument('--check-only', action='store_true')
+    parser.add_argument('--admission', type=Path)
+    args = parser.parse_args()
+    bundle = validate(args.bundle)
+    if args.check_only:
+        print('CPU touch host inputs verified; no USB or claim')
+        return
+    if args.admission is None or args.admission.resolve() != TRIAL / 'admission.json':
+        parser.error('exact local admission required')
+    admission = load(args.admission)
+    binding = dict(scope=SCOPE, nonce=TAG, bundle_sha256=sha(args.bundle), boot_sha256=BOOT, allow_boot=True)
+    for name in ('owner', 'ready', 'admission'):
+        row = admission if name == 'admission' else load(TRIAL / (name + '.json'))
+        if any(row.get(k) != v for k, v in binding.items()):
+            raise ValueError(f'{name} does not bind the exact CPU touch scope')
+        if name != 'admission' and sha(TRIAL / (name + '.json')) != admission[name + '_sha256']:
+            raise ValueError(f'{name} changed after admission')
+    state = load(CURRENT)
+    if state.get('gpu_discovery', {}).get('current_mode') != 'unattended-phone-connected':
+        raise ValueError('unattended phone mode required')
+    claim = TRIAL / 'trial/one-shot.claim.json'
+    if claim.exists() or claim.is_symlink():
+        raise ValueError('CPU touch trial already consumed')
+    probe_existing_adb_listener()
+    run(bundle, claim, record_result=record_result)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,42 @@
+--- /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v185-kernel-client-info-f9db3c322f1348d5b8175f07ed5fc9a9/direct-runtime/ZornGen7DirectVm26.cpp
++++ /Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v244-clock-lifetime-9a697dec3b024930bd83b9161c05e99d/direct-runtime/ZornGen7DirectVm26.cpp
+@@ -7,6 +7,7 @@
+     int (*zorn_direct_line_audit)(uint64_t,size_t,uint32_t *,uint32_t *);}
+ #include <string.h>
+ #include <IOKit/IOLib.h>
++#include <kern/clock.h>
+ /* Nonzero only once the board proved the GPU's cacheable inner-shareable accesses coherent with the CPU's caches in both directions (the A740's
+  * ADRENO_QUIRK_HAS_CACHED_COHERENT behind the dma-coherent GPU SMMU, which Linux maps with IOMMU_CACHE): a mapping with write-back
+  * attributes then needs no CPU cache maintenance. 0 keeps every mapping maintained as before. Counters: maintenance passes skipped for
+@@ -51,23 +52,27 @@
+     return {arena?&view:nullptr,regions_[upper].state,
+         ranges_+(upper?lower_count_:0),upper?upper_count_:lower_count_};
+ }
++// OS diagnostic time has kernel lifetime and no per-call context. The real
++// submission/fence deadlines continue to use their supplied NativeAdrenoRingClock.
++extern "C" uint64_t zorn_direct_vm_now_us(void)
++{
++    uint64_t absolute=0,ns=0;clock_get_uptime(&absolute);absolutetime_to_nanoseconds(absolute,&ns);return ns/1000;
++}
+ /* Board hook and per-phase time of the two table transactions, for the log: [0] map, [1] unmap; each row is count, the phases in order, the slowest call
+  * and the bytes mapped (int-134: BoMap averaged 135 ms and the desktop crawled). */
+-extern "C" {uint64_t (*zorn_direct_vm_now_us)(void)=nullptr;volatile uint64_t zorn_direct_vm_phase_us[2][8];}
++extern "C" {volatile uint64_t zorn_direct_vm_phase_us[2][8];}
+ extern "C" {uint64_t zorn_direct_vm_phase_max_us[2][6];}
+ extern "C" {uint64_t zorn_direct_vm_alias_paths[2];} // indexed / pairwise preflight
+ namespace {
+ struct PhaseClock {
+-    uint64_t last=zorn_direct_vm_now_us?zorn_direct_vm_now_us():0,began=last;
++    uint64_t last=zorn_direct_vm_now_us(),began=last;
+     void lap(unsigned row,unsigned slot) {
+-        if(!zorn_direct_vm_now_us)return;
+         const uint64_t now=zorn_direct_vm_now_us(),elapsed=now-last;
+         zorn_direct_vm_phase_us[row][slot]+=elapsed;last=now;
+         uint64_t old=__atomic_load_n(&zorn_direct_vm_phase_max_us[row][slot],__ATOMIC_RELAXED);
+         while(elapsed>old && !__atomic_compare_exchange_n(&zorn_direct_vm_phase_max_us[row][slot],&old,elapsed,false,__ATOMIC_RELAXED,__ATOMIC_RELAXED)){}
+     }
+     void done(unsigned row,uint64_t bytes) {
+-        if(!zorn_direct_vm_now_us)return;
+         const uint64_t total=zorn_direct_vm_now_us()-began;
+         zorn_direct_vm_phase_us[row][0]+=1;zorn_direct_vm_phase_us[row][7]+=bytes;
+         if(total>zorn_direct_vm_phase_us[row][6])zorn_direct_vm_phase_us[row][6]=total;

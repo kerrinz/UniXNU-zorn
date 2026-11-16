@@ -1,0 +1,116 @@
+{
+  "status": "actual-CX-imported-location-fix-and-domain-resource-prefix-returned-recovered",
+  "time": "2026-11-10T17:45:23.635814+00:00",
+  "actual_failure": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/evidence/k80-clock-domain-resource-trial26.json",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-cx-location-fix-c93ed1697f614cf3b3a13e85e61b94d6",
+  "source_patch": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/CX-imported-location.patch",
+  "retained_XNU_producer": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/IODeviceTreeSupport.cpp",
+    "sha256": "ad59e33481df5b0959a1ea9b2a8f495d0fba4b708b71f21a84bf851ccbedb3b1",
+    "function": "MakeReferenceTable",
+    "behavior": "setLocation(actual AAPL unit string),then remove gIODTUnitKey from property table"
+  },
+  "correction": "Match consumed unit-string bytes including NUL through getLocation(gIODTPlane);all other expected OSData properties preserve exact bytes,length and remaining dictionary count. No metadata/property is changed and no default or hardware address introduced.",
+  "native_header_or_layout_changed": false,
+  "compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/compile-result.json",
+  "identity_compile_result": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/identity-compile-result.json",
+  "kernel": {
+    "kernel": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/full-link/kernel.ZORN26-CX-LOCATION-FIX.UNSELECTED.macho",
+    "sha256": "eec96e0658116de23b80c4e1d305e77424bab989de77674e78aebb718a83ebd7",
+    "bytes": 30395528,
+    "inputs": 1396,
+    "added": 0,
+    "replaced": 7,
+    "preserved": 1389,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/root-package-cx-location-fix/boot.ZORN26-CURRENT-PLATFORM.UNSELECTED.img",
+    "sha256": "9a29b3d9d62dd40b468f10ba2372647bb4af600e20c94e396f4cd520f11290dc",
+    "bytes": 11616256
+  },
+  "scope": "single-K80-ios26-CX-imported-location-fix90s-v39",
+  "actual_run": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/root-trial-cx-location-fix/trial/run.json",
+  "full_root_readback": false,
+  "root_Data_readonly": true,
+  "hardware_fix_verified": true,
+  "GMU_or_GPU_selected": false,
+  "actual_clock_domain": {
+    "gpucc": {
+      "returned": true,
+      "complete": true
+    },
+    "graph": {
+      "returned": true,
+      "assessment": 6,
+      "hardware_constructed": 29,
+      "namespace_records": 3,
+      "cores_registered": 29,
+      "complete": true
+    },
+    "list": {
+      "returned": true,
+      "assessment": 3,
+      "raw_available": true,
+      "raw": 6,
+      "entries_returned": 6
+    },
+    "hub": {
+      "returned": true,
+      "raw": 0
+    },
+    "ddr": {
+      "returned": true,
+      "raw": 0
+    },
+    "core_inputs": {
+      "returned": true,
+      "raw": 0
+    },
+    "cx_probe": {
+      "returned": true,
+      "attempted": true,
+      "configuration_store_returned": true,
+      "retain_update_returned": false,
+      "native_prefix_returned": true
+    },
+    "cx_core": {
+      "returned": true,
+      "raw": 0
+    },
+    "completion": {
+      "returned": true,
+      "registered": true
+    },
+    "smmu_power_resources": {
+      "returned": true,
+      "raw": 0
+    }
+  },
+  "clock_prefix_complete": true,
+  "domain_resource_prefix_complete": true,
+  "recovery_seconds": 122.90077279199977,
+  "verified_recovery": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_captures_unchanged": {
+    "Data": 266240,
+    "Data_metadata": 266240,
+    "before": 4096,
+    "after": 4096,
+    "root_before": 4096,
+    "root_after": 4096,
+    "root_first_page": 4096
+  },
+  "scope_consumed_no_repeat": true,
+  "actual_compiled_XNU_producer_provenance": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cx-location-fix26-c93ed1697f614cf3b3a13e85e61b94d6/IODeviceTreeSupport-object-provenance.json",
+  "actual_compiled_XNU_producer": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/platform-irq-progress-4183982c17de4242afac60c00e330078/IODeviceTreeSupport.cpp",
+  "actual_compiled_XNU_producer_sha256": "1878e0e00a5668984edef7bd064eb2751f2b892f9b4ca496a3709a0b76cb24f5",
+  "qualification": "Actual same7-step resource prefix completed. CX core/completion and SMMU power-resource construction returned;not CX hardware power-on,global SMMU initialization/translation mapping,IRQ delivery,GMU/HFI/GPU/Metal/presentation/touch acceptance. Positive6 clock-list result retained,not normalized to errno0."
+}

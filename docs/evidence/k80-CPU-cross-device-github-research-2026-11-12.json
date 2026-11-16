@@ -1,0 +1,43 @@
+{
+  "status": "GitHub-cross-device-CPU-UI-startup-records-and-linked-K80-source-comparison",
+  "recorded_at": "2026-11-12T10:13:06.912714+08:00",
+  "user_request": "Search GitHub for similar UniXNU issues on other devices and how they solved them",
+  "cases": [
+    {
+      "url": "https://github.com/dipa-studio/ios-sweet/blob/main/NOTES.md",
+      "OS": "iOS16.7",
+      "reported_problem": "SpringBoard Failed to create work interval before Home",
+      "reported_fix": "PRIV_WORK_INTERVAL grant plus other documented bringup dependencies",
+      "K80_source_audit": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-platform-fix26-b45096798bcf46acaf4f1ce3290c0b16/linked-work-interval-policy-audit/result.json",
+        "sha256": "f15b4a7810dae7e1745ff84bd37074d2b28b81a61846defb87e57dc58d079f81"
+      },
+      "applies_as": "Existing K80iOS17/UniXNU12377 source-policy candidate;actual26 errno and causality not observed"
+    },
+    {
+      "url": "https://github.com/xVanTuring/UniXNU-qemu#readme",
+      "OS": "iPadOS17",
+      "reported_problem": "CPU renderer has no first frame while SpringBoard depends on chronod/liveactivitiesd",
+      "reported_fix": "Restore AppleKeyStore event component and normal service startup dependencies",
+      "applies_as": "Check actual K80 selected provider/events startup;do not disable chronod/liveactivitiesd from this case alone"
+    },
+    {
+      "url": "https://github.com/none24smu/UniXNU-zeta#readme",
+      "OS": "iOS26.5.2",
+      "reported_problem": "Later graphics process crashes after UI already running",
+      "reported_fix": "Per-client/shared GPU allocation/address-space capacity candidates",
+      "applies_as": "Different stage;K80 currently GPUoff/zero first frame,do not enableGPU or copy GPU workaround"
+    },
+    {
+      "url": "https://github.com/lonzzi/UniXNU-houji#readme",
+      "OS": "README identifies experimentaliOS16 port",
+      "applies_as": "SameSoC alone is not matchingOS26 failure evidence"
+    }
+  ],
+  "primary_records_read": true,
+  "exact_same_K80_iOS26_SIGTRAP_root_cause_found": false,
+  "strongest_concrete_local_difference": "Work-interval privilege exception absent from actual linked26 kernel,already present in qualifiedlocal17 and localupstream12377 source patch",
+  "no_external_issue_post_or_message_sent": true,
+  "no_machine_state_or_executable_reverse_engineering": true,
+  "phone_access_in_research": false
+}

@@ -1,0 +1,55 @@
+{
+  "scope": "same-IOReturn lower prepare error propagation",
+  "original_SHA": "183df8450e60c355f90eef689f85bd44061f5a36e42920819420fa5d447a3039",
+  "lower_source_SHA": "0318a5ab2710aa64c5d885d76a18c8eecca00e58a0de7d6cb34264960e275040",
+  "candidate_SHA": "a8e1073bf1507c26c6e28ab6b113bcc9250339d54d18c92b8b2de4b7d1ef8cc5",
+  "five_actual_lower_symbol_traces": [
+    {
+      "lower_symbol": "kIOReturnNoMemory",
+      "source": "root allocation failure",
+      "before": "kIOReturnBadArgument",
+      "after": "kIOReturnNoMemory"
+    },
+    {
+      "lower_symbol": "kIOReturnIOError",
+      "source": "audit or publisher failure",
+      "before": "kIOReturnBadArgument",
+      "after": "kIOReturnIOError"
+    },
+    {
+      "lower_symbol": "kIOReturnBusy",
+      "source": "existing state/pages guard",
+      "before": "kIOReturnBadArgument",
+      "after": "kIOReturnBusy"
+    },
+    {
+      "lower_symbol": "kIOReturnNoResources",
+      "source": "kit capacity refusal",
+      "before": "kIOReturnNoResources",
+      "after": "kIOReturnNoResources"
+    },
+    {
+      "lower_symbol": "kIOReturnBadArgument",
+      "source": "argument/other kit refusal",
+      "before": "kIOReturnBadArgument",
+      "after": "kIOReturnBadArgument"
+    }
+  ],
+  "three_source_corruptions_refused": [
+    "old-fold",
+    "only-NoMemory",
+    "invented-success"
+  ],
+  "success_config_and_prepared_publication_byte_identical": true,
+  "actual_native_NoMemory_IOError_Busy_no_longer_folded_to_BadArgument": true,
+  "no_error_promoted_to_success": true,
+  "new_SmmuContext_iOS17_object_pass": true,
+  "object_not_linked_or_executed": true,
+  "no_prepare_begin_allocator_kit_getter_program_map_cache_provider_or_native_execution": true,
+  "no_root_ASID_OAS_route_owner_or_success_peer_model": true,
+  "no_synthetic_callback_return_sequence": true,
+  "class_ABI_header_wire_log_or_policy_unchanged": true,
+  "catalog_pins_32patches_profiles_unchanged": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

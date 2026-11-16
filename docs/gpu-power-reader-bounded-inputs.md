@@ -1,0 +1,11 @@
+# Power reader and emitter input work bounds
+
+The power-source CLI and emitter collector each read their own DTB and graph files, so bounding the provenance/reference CLIs alone did not bound these callers. Both actual paths were reproduced with oversized real files. The original power CLI read a whole DTB before parsing and a whole graph before checking length. The emitter did the same inside collect.
+
+Two isolated UNAPPLIED candidates now call the previously checked provenance bounded-read helper with 16 MiB + 1 reads. Every candidate layer pins its actual candidate dependency: emitter → power reader → graph verifier → provenance implementation → raw parser. Original maintained scripts, pins, receipts and sealed proofs remain unchanged. This is one explicitly new source variant; its dependency hashes are not new hardware qualification.
+
+The power CLI's two existing source stdout byte streams and legacy fresh output bytes remain identical. Exact-limit and limit+1 DTB tests passed; malformed oversized stdout paths produce no partial JSON, and legacy oversize creates no output file. Both graph/provenance tamper checks fail before input reads. The candidate also requires these exact source dependencies on its legacy output path; the original legacy path does not. This stronger dependency check is deliberate and confined to the candidate.
+
+The emitter collector's complete four-source model is identical: 4 sources, 16 tables, 192 entries, with all original raw data/order/unknown fields. Its eight actual data file reads are bounded. Two malformed low-level collector inputs reproduce old unbounded reads and new early rejection without a partial model; these fixtures do not bypass or replace the approved CLI manifest. A changed reader body refuses before reading sources.
+
+No headers were emitted or compiled, no prior target or suite was rerun, and no native or device API executed. Legacy equivalence writes only two fresh host JSON output files. The CLI emitter's manifest/receipt reads and build-review artifact reads are separate call sites and are not claimed fixed here. These file-work limits are not DT memory geometry, coherent ownership, CommandDB version qualification, runtime policy or mapping authority.

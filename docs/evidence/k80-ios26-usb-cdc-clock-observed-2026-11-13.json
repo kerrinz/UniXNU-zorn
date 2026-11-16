@@ -1,0 +1,160 @@
+{
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/boot-package/boot.ZORN26-USB-CDC-CLOCK-UNSELECTED.img",
+    "sha256": "7b59ef672378b49f344c5f4dbec2c539aaadb56b7a2e08d913b0c9a68ce57b07",
+    "bytes": 11681792
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/boot-package/verified.json",
+    "sha256": "3366bcd292b0e8c4e8e166669f72e7bf29cf9922ff5e9f710b999873b7108740"
+  },
+  "bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/root-trial/bundle.json",
+    "sha256": "6d165fcb388dd4a626fdaf44bcf01ec7dc7aad4ccf1c833e36a4aec9070f6183"
+  },
+  "sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/ZornTouchPlatform26.cpp",
+      "sha256": "74d54e28c3cc880d3e660f317a16c5d2bd79b89cbf4258dba283056c068d41c8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/ZornUfsOwner26.cpp",
+      "sha256": "e378162cf861c19567be5ea4d4be148eb0ae25cf7db39d2f7590c72e80c2bf92"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/ZornUsbCdc26.c",
+      "sha256": "e5d8887efee2ef96decda657069b75b11c5aa2b653fb8dc63bea1ad7d7528cf8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/ZornUsbCdcProbe26.h",
+      "sha256": "f73f474fb8af7bb998aedb2f1d0b9c31fcd6b9bb42266f8823490a05adf9b2c3"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/houji_usb_policy.h",
+      "sha256": "90f940bd86dd0ea0236a02755111cb0080520583009fb708a180895ccc3279a9"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/houji_usb_protocol.h",
+      "sha256": "ee97f81c05a50c9dad99e18e3f6a4af6c359e428a57986fa047fe60cb1593b76"
+    }
+  ],
+  "references": {
+    "zorn-kernel": {
+      "revision": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+      "files": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/clk/qcom/gcc-pineapple.c",
+          "sha256": "5f52b2c960a94a1385c571748ab54eb83aac079038850c5ffdbe44ec937efb59",
+          "matches_head": true
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/clk/qcom/tcsrcc-pineapple.c",
+          "sha256": "efaa72f0d7e8edc8c3f569bc9660da78923a1c9c20de73347e0c6c4f63797e93",
+          "matches_head": true
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/usb/dwc3/dwc3-msm-core.c",
+          "sha256": "35248a0f5b434d22b0d0588c5d49b823754491fe9dd5c7b3b8758233ae3d43ed",
+          "matches_head": true
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/usb/phy/phy-msm-snps-eusb2.c",
+          "sha256": "d473a9594e6f9e2a3b4f7840d0025328ba66271b09caa01eef1ae6152f5e1168",
+          "matches_head": true
+        }
+      ]
+    },
+    "zorn-devicetree": {
+      "revision": "25446a168427695fed4adecb61fd63926f12bc17",
+      "files": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/pineapple.dtsi",
+          "sha256": "60cabffe3e606f8216066aca9ba1ee35ea428b4169d3f7b02bfeee980bc4b2eb",
+          "matches_head": true
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/pineapple-usb.dtsi",
+          "sha256": "c374d97e3b2ef29db481621a849ba0a9c0353145eab948904079448f652913c1",
+          "matches_head": true
+        }
+      ]
+    }
+  },
+  "host_test": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/check-zorn-cdc-clock.py",
+    "sha256": "f79a97143a34559ba160952a3fc92a35c7c84fbdda939dfff7cbbe1d8938dc80"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/root-trial/trial/run.json",
+    "sha256": "d415a428e24363b5ae3cee2d76967844f69dd84f520307d09ad14096120da517"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/root-trial/trial/cdc-capture.json",
+    "sha256": "810170347b0ec41039247aff55c39a03207b561f871900455b3dadd4b219c9d6"
+  },
+  "readback": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-usb-cdc-clock26-a2c6015c557640399745a2ef9df0960b/root-trial/trial/after-log.bin",
+    "sha256": "801bec711e28939b3ea39757d8b4306876fd65132c50805707cc3a6a8085513a"
+  },
+  "decoded": {
+    "run_id": "a2c6015c557640399745a2ef9df0960b",
+    "text": "K80 CDC preflight: result=10 power=f822f800 clocks=00000001 core=33313130 hw=4020400a gctl=00102001 dctl=10f00000 dsts=00d2c434 id=4c017e6b/60000047/00005111 scr0=002f0406 matches=1 route=00000004 cb=0001f000/000000e0/00000001 tx=9 cdc=0/0/0/4 phy=00102400/0b081402/00102400/0b081402/50f00000 clk=00000001/00000001/00000001/00000001/00000000/00000000/00000000/00000000",
+    "freshness": "before and after differ; tag absent before",
+    "phy": {
+      "usb2_before": 1057792,
+      "usb3_before": 185078786,
+      "usb2_awake": 1057792,
+      "usb3_awake": 185078786,
+      "dctl_after": 1357905920
+    },
+    "clocks": {
+      "sleep_before": 1,
+      "utmi_before": 1,
+      "sleep_after": 1,
+      "utmi_after": 1,
+      "usb2_ref": 0,
+      "usb3_ref": 0,
+      "usb2_bcr": 0,
+      "usb2_common": 0
+    },
+    "result": "identity route",
+    "stream_matches": 1,
+    "tx_status": 9,
+    "registers": {
+      "power": 4163041280,
+      "clocks": 1,
+      "core": 858861872,
+      "hardware": 1075855370,
+      "gctl": 1056769,
+      "dctl": 284164096,
+      "dsts": 13812788,
+      "id0": 1275166315,
+      "id1": 1610612807,
+      "id2": 20753,
+      "scr0": 3081222,
+      "route": 4,
+      "cbar": 126976,
+      "sctlr": 224,
+      "cba2r": 1
+    },
+    "cdc_state": {
+      "events": 0,
+      "setups": 0,
+      "completed": 0,
+      "flags": 4
+    }
+  },
+  "protected_sample_sha256": {
+    "Data.bin": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+    "Data_metadata.bin": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300",
+    "after.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "before.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_after.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_before.bin": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "root_first_page.bin": "be93aab95528a6a9a39243d84e33c89754cd498ef1d50979962a8f3b0c32c700"
+  },
+  "seconds_to_twrp": 332.7338790000067,
+  "event_dma_programmed": false,
+  "marker_received": false,
+  "usb2_common_sampled": false
+}

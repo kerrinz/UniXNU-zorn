@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-09T21:27:26.346670+00:00",
+  "status": "shared-native-SPI-distributor-configuration-serialized-in-current-K80-kernel-offline",
+  "source_origin": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/zorn26-component-integration-candidate/rsc-gic-control-lock-candidate/gic_v3_irq.c",
+    "source_sha256": "93de26b8b116517b7ddf31873c5f06ea92cd673612f548a23b7cbc7266b78550",
+    "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gic-config-serialization-candidate/gic_v3_irq.c",
+    "copy_sha256": "2d1dc1b348cf3b87c70e50f12ab3c58a9723bb2b45c3071c6f0b869a94b3411c",
+    "only_changed_function": "gic_spi_attach_routed_mode",
+    "existing_control_lock_used": true,
+    "registration_lock_not_nested": true
+  },
+  "actual_consumers": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-provider-claims-candidate/ZornGen7GpuIrq26.cpp",
+      "sha256": "f35f23d0c9570be057381e1a700b4273a573a147a7b4b2422e8560a384cd5c66",
+      "actual_lines": [
+        15,
+        93
+      ]
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-provider-claims-candidate/ZornGen7GmuIrq26.cpp",
+      "sha256": "af65ec40f5c6df47a2f77b3529bb0ac50661a93b07c27c14dc9f7481f8c7d9cc",
+      "actual_lines": [
+        14,
+        93
+      ]
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7SmmuFaultIrq26.cpp",
+      "sha256": "876589e5f25da4d82768d2ff09d1b98741b9b09b27997222515fa105ccf7b957",
+      "actual_lines": [
+        8,
+        89
+      ]
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/rsc-native-provider-candidate/ZornGen7RscProvider26.cpp",
+      "sha256": "d356d33f13ba2be51e567e05fbd970ab76dd51c0a5f72f69bdf16ba0487f7d42",
+      "actual_lines": [
+        11,
+        85
+      ]
+    }
+  ],
+  "compile": {
+    "exit": 0,
+    "seconds": 0.17111908399965614,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-config-serialization26/gic_v3_irq.o",
+    "sha256": "490147024ccf11416900318921555ad8c0c906162380f5daf8f9280f47e95d89",
+    "warnings": 0
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.15712341600010404,
+    "inputs": 1390,
+    "replaced": 1,
+    "preserved": 1389,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gic-config-serialization26/full-link/kernel.ZORN26-gic-config-serialization.UNSELECTED.macho",
+    "sha256": "a9b00936998554c65243fd9c75cea0122e20ea43049e8d5d359dfbcdb131078e",
+    "bytes": 30262024
+  },
+  "checks": {
+    "status": "actual-source-config-RMW-control-lock-and-pure-bit-algebra-checked",
+    "pure_integer_cases": 8832,
+    "old_unsynchronized_aliases": 3648,
+    "hardware_or_native_executed": false,
+    "only_changed_function": "gic_spi_attach_routed_mode",
+    "registration_lock_not_nested": true,
+    "local_interrupts_restored_after_control_unlock": true,
+    "early_refusal_return_values_preserved": true,
+    "trigger_route_priority_group_and_enable_values_unchanged": true
+  },
+  "exact_compiler_inputs": 360,
+  "implementation": [
+    "The real common gic_spi_attach_routed_mode publishes its software registration then drops gic_spi_lock before hardware configuration. Concurrent actual native registrations of different SPIs sharing IGROUPR/IGRPMODR/ICFGR words could overwrite separate fields through unsynchronized RMW. GPU,GMU and SMMU bridge call sites reach this shared masked registration path;the original generic/Houji routed entry also shares it.",
+    "New candidate holds the already initialized gic_spi_enable_lock around actual distributor mask,configuration RMW,route/priority and optional final unmask. Local interrupts are disabled before the control lock and restored after unlock,as in existing checked enable/mask;registration lock has already been dropped. No new lock order nesting or callback/handler invocation is introduced in this critical section.",
+    "Only this function changes. Original exact trigger/group/route/priority/pending/active/mask/enable writes,returns,existing bounded RWP wait/panic behavior and separate external hardware authorities stay unchanged. No IRQ,INTID,security route or completion value is supplied.",
+    "Actual arm64e iOS26 object compiled without warnings. Full1390-input link replaces1 GIC object and preserves1389 current root-binding/provider/GPU/presenter/touch objects. Zero undefined;10 identical inherited linker warnings. Original actual-file loader parser passes with current ef11f75a-root ADT."
+  ],
+  "limits": [
+    "This serializes concurrent registrations through this actual source entry only,not arbitrary firmware/other controllers/global GIC initialization or every register writer. It does not establish foreign/secure-master exclusion or hardware permissions.",
+    "8832 pure uint32 bit-algebra controls cover disjoint field updates and ordering;they do not execute GIC code,threads,MMIO,IRQ handlers or a fake provider/register-state fixture. Static lock-boundary/object checks are not a scheduler or hardware proof.",
+    "An initial checker expected source macro simple_lock as an object symbol;actual XNU macro resolves to lck_spin_lock_grp. Initial failure/checker preserved,expectation corrected,no implementation changes or extra compiler pass.",
+    "Current local rootef11f75a remains unchanged and NOT installed;historical phone root is b56dafe8. Existing bootc1132857 remains kernel4b18a29f and does not contain this new kernela9b00936. No blind repack,new ready/scope/claim,USB or phone operation.",
+    "GPU startup physical grants/application backend remain unbound. Real GPU/Metal/display/touch functionality and final goal remain unverified and incomplete."
+  ],
+  "native_or_device_executed": false,
+  "goal_complete": false
+}

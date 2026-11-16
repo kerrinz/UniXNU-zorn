@@ -1,0 +1,28 @@
+{
+  "scope": "exported callback public offset contract, extracted integer subexpression only",
+  "original_SHA": "1a9263b1a48df626a0e3ab4c3145d3450d34082aa9230cb4dbca7f8f97c7f2e0",
+  "header_SHA": "5634adbedceac94f0bb75b2207caeff256115b5d9dcebf38fd88efba4d979d1d",
+  "candidate_SHA": "0207a86206c82872bf1c94a2b3a0c7259ba60873809adb434556e594a0865fce",
+  "host_outputs": {
+    "before": "ok=1 overflow_pass=3 overflow_refused=0 controls=8 scalar-only\n",
+    "candidate": "ok=1 overflow_pass=0 overflow_refused=3 controls=8 scalar-only\n"
+  },
+  "three_overflow_witnesses_refused_after": true,
+  "eight_controls_preserved": true,
+  "source_mutations_refused": [
+    "read-old-guard",
+    "write-old-guard",
+    "removed-upper-limit"
+  ],
+  "ASan_UBSan_pass": true,
+  "only_two_integer_guards_changed": true,
+  "public_size_t_offset_abi_preserved": true,
+  "layout_bind_publication_and_services_unchanged": true,
+  "new_iOS17_object_pass": true,
+  "object_SHA": "a9739a68dfead43aeae4f5fecaa311569153504a562113c9b480deb21f87fdfe",
+  "no_target_link_or_execution": true,
+  "no_native_object_bind_callback_window_base_address_or_provider_model": true,
+  "actual_K80_or_generated_caller_trigger_not_claimed": true,
+  "hardware_qualification": false,
+  "device_operations": false
+}

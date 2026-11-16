@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-09T21:39:23.723844+00:00",
+  "status": "real-native-RSC-provider-exclusively-opened-and-held-by-probe-before-cold-configuration-offline",
+  "source_origin": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7RscProbe26.cpp",
+    "source_sha256": "bb7013159f9dd5b29ea9c07e677fa684238fc64a33b88cf270f4699045eb69e2",
+    "copy": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-rsc-provider-claim-candidate/ZornGen7RscProbe26.cpp",
+    "copy_sha256": "83bed4747253792fb7b9099a10b0ec863250e8b386ae729ddb19bb53ad49420c",
+    "public_header_changed": false
+  },
+  "actual_references": [
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7RscProbe26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/source-reference/ZornGen7RscProbe26.cpp",
+      "sha256": "bb7013159f9dd5b29ea9c07e677fa684238fc64a33b88cf270f4699045eb69e2"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7RscProvider26.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/source-reference/ZornGen7RscProvider26.cpp",
+      "sha256": "a3c42800d7792cef6bd8bd3ebe7021f9dce6814a422209d0685df562e9fabfbb"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-clock-resources-candidate/ZornGen7RscProvider26.h",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/source-reference/ZornGen7RscProvider26.h",
+      "sha256": "45cf47d8a19b349bc01304b3f675fc1ba05d42841c32ee64f0192babdaf7221c"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/IOService.cpp",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/source-reference/IOService.cpp",
+      "sha256": "f2f13815e5e0b0e9ff9732fb9fc14dda348495ca06ef493abcc2a0bb2055f04d"
+    },
+    {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/IOKit/IOPlatformExpert.h",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/source-reference/IOPlatformExpert.h",
+      "sha256": "786664e851544fb02ae3f6ad1111e4d2293a8008f81db87138dcc823a181cb86"
+    }
+  ],
+  "compile": {
+    "exit": 0,
+    "seconds": 0.15080516699890723,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/ZornGen7RscProbe26.cpo",
+    "sha256": "0dd27cefff8332a4bc865abbce4572decdb767c5e48ef33a7ed66be787798dea",
+    "warnings": 3
+  },
+  "kernel": {
+    "exit": 0,
+    "seconds": 0.15907370900094975,
+    "inputs": 1390,
+    "replaced": 1,
+    "preserved": 1389,
+    "added": 0,
+    "output": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-rsc-provider-claim26/full-link/kernel.ZORN26-rsc-provider-claim.UNSELECTED.macho",
+    "sha256": "0a1bfb9264cd92300d74177b1a67114a4a7960b0e50827f8aec9daec03f4ab85",
+    "bytes": 30254264
+  },
+  "checks": {
+    "private_Storage_only_no_public_header_or_ABI_change": true,
+    "actual_claimant_constructor_and_PAC_virtual_dispatch_present": true,
+    "independent_cold_authority_still_mandatory": true,
+    "independent_cold_raw_error_unchanged": true,
+    "original_readResult_free_and_prepare_wrapper_unchanged": true,
+    "affected_TUs": 1,
+    "actual_compiler_inputs": 443,
+    "inherited_compile_warnings": 3,
+    "new_compile_warnings": 0,
+    "unchanged_link_warnings": 10,
+    "zero_undefined": true,
+    "actual_file_loader_parser_pass": true
+  },
+  "implementation": [
+    "Actual native registry path constructs a final ZornGen7RscProvider26,and the RSC probe previously retained it and its descriptors without opening the provider. Probe now creates a real private IOService claimant,attaches it to the already retained actual platform and opens that exact final provider without seizure. Its inspected class inherits single-owner handleOpen.",
+    "Actual topology/inactive/isOpen checks are refreshed before probe,after the still-mandatory independent cold-controller callback and returned mapping,before each channel-configuration RMW and before actual runtime binding. No OS claim is inferred from descriptor shape or a constant callback result.",
+    "Private claimant/partial open remain with the pinned boot-lifetime probe/provider/RSC IRQ/runtime graph. No PM calls,matching,start/stop,close-on-error,automatic reset/retry or release is added. Unknown legacy provider classes retain the original independent-authority path and are not relabeled as an exclusive native claim.",
+    "Only RscProbe implementation/private allocation changes;no public header/result/wire ABI changes. Current1390-input kernel19bf99a8 baseline replaces1/preserves1389 objects,including latest native-clock stage routing,GIC serialization,root/Metal binding,provider/GPU/presenter and continuous touch. New kernel0a1bfb92 has zero undefined;3 identical shared-header warnings/10 identical link warnings;actual-file loader parser passes."
+  ],
+  "limits": [
+    "Initial checker incorrectly expected direct open/isOpen relocations;actual methods use authenticated virtual dispatch. Checker corrected to the actual constructor/helper/PAC dispatch plus exact source/header evidence;initial failure preserved,no source change/object rebuild.",
+    "This adds real OS arbitration/lifetime implementation only. It does not establish hardware cold state,power,security,PM or foreign/secure-master exclusion;original independent cold authority is required and its raw refusal remains unchanged.",
+    "No native provider/open/isOpen/allocator/map/RSC/TCS/IRQ/MMIO/API/device execution occurred offline. Native-only source branches have not executed on K80.",
+    "Boot-lifetime RSC root remains retained by the existing design;full driver shutdown/unload is not implemented here. Failure preservation is not a claim of normal per-application resource cleanup.",
+    "Rootef11f75a remains local NOT installed;historical phone root is b56dafe8. Preserved bootc1132857 remains kernel4b18a29f,not current0a1bfb92. No repack,USB,ready/scope/claim or phone operation.",
+    "Platform startup permissions/application execution backend and hardware GPU/Metal/display/FT3683 acceptance remain incomplete;goal ACTIVE."
+  ],
+  "native_or_device_executed": false,
+  "hardware_authority_supplied": false,
+  "goal_complete": false
+}

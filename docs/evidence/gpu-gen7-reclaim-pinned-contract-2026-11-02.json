@@ -1,0 +1,33 @@
+{
+  "updated": "2026-11-02T08:48:53.023375+08:00",
+  "state": "Gen7-reclaim-pinned-publication-and-partial-lifetime-contract",
+  "source_contract": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-gen7-reclaim-pinned-contract/source-contract.json",
+  "exact_missing_primary_files": 2,
+  "exact_primary_bytes": 13883,
+  "new_source_mutations_refused": 4,
+  "new_driver_patches": 0,
+  "new_native_targets": 0,
+  "selected_Linux_reclaim_config_unbound": true,
+  "disabled0_and_enabled_PINNED_skip_not_fresh_pin_proof": true,
+  "partial_restore_counter_teardown_boundary_requires_separate_reachability": true,
+  "all23_patches_independent_UNAPPLIED": true,
+  "no_native_pin_map_refcount_counter_model_or_phone_execution": true,
+  "physical_assistance_available": false,
+  "allow_boot": false,
+  "readback_qualified": false,
+  "WriteAuthorized": 0,
+  "qualification": "exact reference reclaim publication/lifetime source only,no native residency/route/stop/DMA or GPU qualification",
+  "details": {
+    "scope": "Fixed453d8875 exact directory-listed reclaim.c/h OEM reference,13883B with URL/Gitblob/fullSHA;not Xiaomi exact,K80 current Linux config or native task/pin/map execution. Source identity only,no packet/HFI/native imported descriptor or old allocation/target suite repeated.",
+    "configuration": "Header CONFIG_QCOM_KGSL_PROCESS_RECLAIM enabled branch declares full implementation;disabled branch inline preflight returns0 without pin/map work and init helpers are existing empty functions. Actual selected Linux core/config remains unbound:retained module Makefile delegates external KERNEL_SRC and Bazel module names are not generated .config. Neither branch is promoted to selected K80 execution;no new stub/config/feature created.",
+    "publication": "Enabled process init sets PINNED and foreground bits and unpinned counter0. Preflight locks reclaim_lock and returns original ret0 immediately if PINNED is already set. Otherwise walks mem_idr under mem_lock,conditionally gets entry for RECLAIMED,restores under that reference then puts before checking returned int. Only normal walk completion sets process PINNED;returned failure exits without setting it. A failed entry-get can be skipped;zero is not fresh per-entry attestation,successful native pin,route or GPU acceptance.",
+    "partial_restore": "get_reclaimed_pages skips already nonNULL slots,reads missing shmem pages,propagates PTR_ERR,does page sync then publishes page under memdesc lock/decrements unpinned only when slot stillNULL;race loser puts extra page. It invokes kgsl_mmu_map after filling slots and propagates nonzero int unchanged. Only map0 clears RECLAIMED/SKIP. Earlier page/entry progress remains on later read/map error;no rollback or hardware/no-publication conclusion supplied. Lower map int is Linux API return,not raw native EFI/IOKit status;nonreturning/error provenance unknown.",
+    "reclaim_exclusion": "Background reclaim trylocks same reclaim_lock and aborts if submitted cmd_count or foreground hint observed. Normal CMD construction already increments proc cmd_count before ioctl preflight;existing in-progress reclaim can finish its current entry before preflight obtains the lock. Reclaim filters pending_free/CAN_RECLAIM/RECLAIMED/SKIP under mem_lock,gets temporary entry ref,skips VBO or budget-ineligible entries and puts it once on each path. Original unmap0 branch NULLs page slots/increments unpinned and marks RECLAIMED;unmap error causes no such page loop but its raw error is not retained. Original process PINNED cleared if iterator next!=0 even if no successful reclaim. No software gate/lock/count is DMAstop or ownership lease.",
+    "process_entry_lifetime": "Entry attach gets process ref before publishing entry ID;entry destroy removes ID under mem_lock,puts GPU address and conditionally adjusts unpinned before dropping process ref,then frees sharedmem/object. Public process close holds private_mutex,marks pending_free under mem_lock and puts caller refs rather than taking reclaim_lock. Temporary successful entry-get is the module lifetime contract during restore/reclaim;core kref/devres release remains unbound,no arbitrary alias/concurrency safety or native stop qualification.",
+    "worker_refs": "Foreground store flips hint and gets process ref before kgsl_schedule_work;foreground work may ignore preflight int then puts process. Background work builds list with process gets under proclist lock and puts after processing. kgsl_schedule_work discards queue_work boolean. Exact core workqueue pending/requeue semantics/config are missing;no alleged queue-ref leak,forced cancel/refcount/retry policy or runtime outcome is invented.",
+    "fault_and_teardown_boundary": "CPU vmfault can repopulate one slot and decrement unpinned while leaving RECLAIMED set. Preflight can also leave a partially restored descriptor with that flag after page-read/map error. Existing detach subtracts full memdesc.page_count whenever RECLAIMED remains. This is a concrete conditional accounting boundary to investigate with exact free/map reachability and all count/flag writers,not a proven K80 negative counter,hardware fault or safe cleanup proof. Shrinker count and mutable limit arithmetic also require actual count domain before any clamp. No24th patch added.",
+    "checks": "4new source mutations refused:PINNED publish before walk,restore map error ignored,entry put before restore,and background reclaim lock removed. Disabled0 versus enabled skip/publication and exact partial progress source checked without executing object/refcount/pin/map/counter success model. No Linux/native target or wholemodule ABI claim;old suites not rerun.",
+    "remaining": "23 independent UNAPPLIED patches/8profiles/3111+39/default42/CPUstorage/parentarchives/consumed claims preserved. K80 real owner/context/route/stop/DMA/readablefailure/GPU/rendering/Metal,catalog roleAPI/fullcore,selected Linux core config/kref/queue/devres and external HWfence manager remain unbound. All native/reclaim/pin/map/cache/provider/callback/MMIO/phone calls OFF."
+  },
+  "GPU_execution_rendering_Metal_complete": false
+}
