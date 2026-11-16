@@ -1,0 +1,81 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -107,6 +107,7 @@
+     size_t runtimeCapacity=0;bool kernelProcessReady=false,kernelProcessClosing=false;
+     thread_t processTransitionThread=THREAD_NULL;
+     ZornGen7ProcessTableOperation26 processTransitionOperation=ZornGen7ProcessTableOperation26::Prepare;
++    ZornGen7PhysicalOob26 physicalOob; // actual Ring/service lifetime,not first-client storage
+     ZornGen7AppExecution26 *appExecution=nullptr;bool appExecutionPending=false;
+     IOUserClient *appAuthorityClient=nullptr;task_t appAuthorityTask=TASK_NULL;
+     thread_t appAuthorityThread=THREAD_NULL;unsigned appAuthorityPhase=0;
+@@ -1398,7 +1399,7 @@
+             s.appOobActive && applicationOobHeldForTransport(*execution) &&
+             unsigned(operation)<=unsigned(ZornGen7AppOperation26::Timestamp);
+     }
+-    if(phase!=3)return false;const auto &oob=execution->oob_;
++    if(phase!=3 || !s.physicalOob.owns(*execution,execution->oob_))return false;const auto &oob=*execution->oob_;
+     return !s.appOperationPending && !s.appOobTransition && !s.appOobActive && !s.processClients && !s.processSelected &&
+         !s.nativeProcessTableLease && s.nativeProcessTableAcquires==s.nativeProcessTableReleases &&
+         !s.native.outstanding() && !s.runtimeSubmit.outstanding() && !s.runtimeVm.hasPendingSubmissionResources() &&
+@@ -1426,9 +1427,13 @@
+         s.unlockIssuer();return kIOReturnNotReady;}
+     s.appExecutionPending=true;s.setAppAuthorityCall(client,task,1,ZornGen7AppOperation26::PrepareTables);s.unlockIssuer();
+     ZornGen7AppExecution26 *p=nullptr;
+-    const auto raw=s.maps.createApplicationExecution(*this,s.gate,client,task,codeOwner,authority,p);
++    auto raw=s.maps.createApplicationExecution(*this,s.gate,client,task,codeOwner,authority,p);
+     s.lockIssuer();s.clearAppAuthorityCall();s.appExecutionPending=false;
+     if(p){p->retain();s.appExecution=p;out=p;} // own reference separate from output/self-pin
++    // Board acquisition returned before this CPU allocation;it is not an OOB
++    // grant. Retain the exact real transport/maps in the Ring-owned lease.
++    // Allocation failure retains the already-acquired Board/application pins.
++    if(!raw && p)raw=s.physicalOob.reserve(*p,s.hfiOwner,s.maps,p->oob_);
+     if(raw || !bootstrapHealthy()){
+         if(p){__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+         s.unlockIssuer();return raw?raw:kIOReturnNotReady;}
+@@ -1462,9 +1467,14 @@
+     s.appExecutionPending=true;s.setAppAuthorityCall(client,p->task_,3,ZornGen7AppOperation26::Close);s.unlockIssuer();
+     const auto raw=p->closeAcquiredSession(client);
+     s.lockIssuer();s.clearAppAuthorityCall();s.appExecutionPending=false;
+-    if(!raw){auto *closed=p;s.appExecution=nullptr;p=nullptr;s.unlockIssuer();
+-        closed->release();closed->release();return kIOReturnSuccess;}
+-    __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();s.unlockIssuer();return raw;
++    if(!raw){auto *closed=p;
++        auto *retired=s.physicalOob.retire(*closed,closed->oob_);
++        if(retired){s.appExecution=nullptr;p=nullptr;s.unlockIssuer();
++            ZornGen7PhysicalOob26::disposeRetired(*retired);
++            closed->release();closed->release();return kIOReturnSuccess;}}
++    // A contradictory retirement retains the exact objects rather than
++    // freeing an unaccounted physical lease after foreign release.
++    __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();s.unlockIssuer();return raw?raw:kIOReturnNotReady;
+ }
+ 
+ bool ZornGen7HostRing26::applicationOobPermission(const ZornGen7HwschedHfi26 &hfi,ZornGen7AppExecution26 &execution,bool release)
+@@ -1478,6 +1488,7 @@
+ bool ZornGen7HostRing26::applicationOobHeldForTransport(const ZornGen7AppExecution26 &execution) const
+ {
+     if(!storage_)return false;const auto &s=*storage_;
++    if(!s.physicalOob.owns(execution,execution.oob_))return false;
+     if(s.hfi)return s.hfi->applicationOobHeld(*this,execution);
+     auto *direct=OSDynamicCast(ZornGen7DirectHfi26,&s.hfiOwner);
+     return direct && direct->applicationOobHeld(*this,execution);
+@@ -1485,7 +1496,9 @@
+ bool ZornGen7HostRing26::applicationOobPermissionForTransport(const OSObject &hfi,
+     ZornGen7AppExecution26 &execution,bool release)
+ {
+-    if(!storage_ || !normal() || &storage_->hfiOwner!=&hfi || !execution.client_)return false;
++    if(!storage_ || !normal() || &storage_->hfiOwner!=&hfi || !execution.client_ ||
++       !storage_->physicalOob.owns(execution,execution.oob_) || execution.oob_->transport!=&hfi ||
++       execution.oob_->registerMaps!=&storage_->maps)return false;
+     return checkApplicationExecution(*execution.client_,execution,
+         release?ZornGen7AppOperation26::OobRelease:ZornGen7AppOperation26::OobAcquire)==kIOReturnSuccess;
+ }
+@@ -1493,7 +1506,8 @@
+     const ZornGen7AppExecution26 &execution) const
+ {
+     if(!storage_ || !normal())return false;const auto &s=*storage_;
+-    return &s.hfiOwner==&hfi && s.appExecution==&execution && s.appOobTransition && s.appOobActive &&
++    return s.physicalOob.owns(execution,execution.oob_) && execution.oob_->transport==&hfi &&
++        execution.oob_->registerMaps==&s.maps && &s.hfiOwner==&hfi && s.appExecution==&execution && s.appOobTransition && s.appOobActive &&
+         s.appReleaseIdleThread==current_thread() && !s.processClients && !s.processSelected &&
+         !s.native.outstanding() && !s.runtimeSubmit.outstanding() && !s.native.poisoned() &&
+         !s.runtimeSubmit.poisoned() && s.ring.rptr==s.ring.wptr;

@@ -1,0 +1,15 @@
+--- a/ZornGen7AppExecution26.h
++++ b/ZornGen7AppExecution26.h
+@@ -16,6 +16,12 @@
+ // any unknown outcome. Software MACF/task references alone cannot supply it.
+ struct ZornGen7AppAuthority26 {
+     void *cookie=nullptr;
++    // Separate real physical authority:its identity is Ring + exact maps/HFI
++    // and lease generation,never an IOUserClient or opening task. Board still
++    // supplies actual powered-resource checks;these are not success stubs.
++    IOReturn (*physicalAcquire)(void *,ZornGen7HostRing26 &,ZornGen7RegisterMaps26 &,OSObject &,uint64_t)=nullptr;
++    IOReturn (*physicalCheck)(void *,ZornGen7HostRing26 &,uint64_t,bool releasing)=nullptr;
++    IOReturn (*physicalRelease)(void *,ZornGen7HostRing26 &,uint64_t)=nullptr;
+     IOReturn (*acquire)(void *,IOUserClient &,task_t actualOpeningTask,
+         ZornGen7HostRing26 &,IOService &actualGpu,IOMemoryDescriptor &actualGpuRegisters,
+         IOService &actualGmu,IOMemoryDescriptor &actualGmuRegisters)=nullptr;

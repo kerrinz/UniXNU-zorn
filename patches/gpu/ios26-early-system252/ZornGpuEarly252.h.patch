@@ -1,0 +1,27 @@
+--- /dev/null
++++ b/ZornGpuEarly252.h
+@@ -0,0 +1,24 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++// A candidate-specific launch policy, not a hardware authority or success test.
++// 0: legacy schedule, 1: bounded early schedule, 2: refuse malformed early input.
++template<class Parse> static unsigned zorn_gpu_early_mode252(Parse parse) {
++ unsigned early=0,old=0;
++ if(!parse("-g0",&early,sizeof(early)))return 0;
++ if(early!=1 || parse("-g45",&old,sizeof(old)))return 2;
++ const char *one[]={"zorn26_gpu_cdc","zorn26_prearmed_recovery","zorn_wdt",
++   "zorn26_installed_root_trial","zorn26_touch","zorn26_touch_continuous"};
++ for(const char *key:one){unsigned value=0;if(!parse(key,&value,sizeof(value)) || value!=1)return 2;}
++ unsigned seconds=0,software=0;
++ if(!parse("zorn26_trial_seconds",&seconds,sizeof(seconds)) || seconds!=300 ||
++    !parse("zorn26_software_accelerator",&software,sizeof(software)) || software!=2)return 2;
++ return 1;
++}
++// Wait only for CPU-side publication of the existing single-use deferred owner.
++// The caller has no startup/driver lock held; this never consumes/retries it.
++template<class Ready,class Now,class Sleep>
++static bool zorn_gpu_early_wait252(uint64_t deadline,Ready ready,Now now,Sleep sleep) {
++ while(now()<deadline){if(ready())return true;sleep();}
++ return false;
++}

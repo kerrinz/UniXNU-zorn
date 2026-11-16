@@ -1,0 +1,112 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -419,11 +419,15 @@
+     {
+         if(out || !IORecursiveLockHaveLock(gates.startup) || !task || task==kernel_task ||
+            task!=current_task())return kIOReturnBadArgument;
+-        if(direct_app_active || direct_app_sessions || direct_app_acquires!=direct_app_releases ||
+-           direct_app_acquires==UINT32_MAX)return kIOReturnExclusiveAccess;
++        if(direct_app_active || direct_app_acquires==UINT32_MAX ||
++           direct_app_releases>direct_app_acquires)return kIOReturnExclusiveAccess;
++        unsigned count=0;
++        for(auto *p=direct_app_sessions;p;p=p->next){
++            if(p->client==&client || p->phase!=ApplicationSession::Phase::Held ||
++               !p->generation || p->generation>direct_app_acquires || ++count>=64)
++                return kIOReturnExclusiveAccess;}
++        if(count!=direct_app_acquires-direct_app_releases)return kIOReturnNotReady;
+         auto *record=IONewZero(ApplicationSession,1);if(!record)return kIOReturnNoMemory;
+-        // Publish the actual attempted identity BEFORE any resource check can
+-        // fail. No failed record or generation is silently reset/recycled.
+         record->client=&client;record->task=task;record->generation=direct_app_acquires+1;
+         record->phase=ApplicationSession::Phase::Acquiring;record->next=direct_app_sessions;
+         direct_app_sessions=record;direct_app_active=record;out=record;
+@@ -431,38 +435,44 @@
+     }
+     void failApplicationSession(ApplicationSession &record)
+     {
+-        if(IORecursiveLockHaveLock(gates.startup) && direct_app_active==&record)
+-            record.phase=ApplicationSession::Phase::Failed;
++        if(!IORecursiveLockHaveLock(gates.startup))return;
++        unsigned count=0;
++        for(auto *p=direct_app_sessions;p && ++count<=64;p=p->next)if(p==&record){
++            if(p->phase==ApplicationSession::Phase::Acquiring || p->phase==ApplicationSession::Phase::Held){
++                p->phase=ApplicationSession::Phase::Failed;
++                if(direct_app_active==p)direct_app_active=nullptr;}
++            return;}
+     }
+     bool grantApplicationSession(ApplicationSession &record)
+     {
+         if(!IORecursiveLockHaveLock(gates.startup) || direct_app_active!=&record ||
+-           direct_app_sessions!=&record || record.next ||
+-           record.phase!=ApplicationSession::Phase::Acquiring || !record.client || !record.task ||
+-           record.generation!=direct_app_acquires+1 || direct_app_acquires!=direct_app_releases ||
++           direct_app_sessions!=&record || record.phase!=ApplicationSession::Phase::Acquiring ||
++           !record.client || !record.task || record.generation!=direct_app_acquires+1 ||
+            direct_app_acquires==UINT32_MAX)return false;
+-        ++direct_app_acquires;record.phase=ApplicationSession::Phase::Held;return true;
+-        // Metadata transition only. Caller still checks the whole real powered
+-        // window/Ring binding before returning actual acquisition success.
++        ++direct_app_acquires;record.phase=ApplicationSession::Phase::Held;
++        direct_app_active=nullptr;return true;
+     }
+     bool applicationSessionHeld(IOUserClient &client,task_t task) const
+     {
+-        const auto *record=direct_app_active;
+-        return IORecursiveLockHaveLock(gates.startup) && record &&
+-            direct_app_sessions==record && !record->next &&
+-            record->client==&client && record->task==task && task && task!=kernel_task &&
+-            record->phase==ApplicationSession::Phase::Held &&
+-            record->generation && record->generation==direct_app_acquires &&
+-            direct_app_releases!=UINT32_MAX && direct_app_acquires==direct_app_releases+1;
++        if(!IORecursiveLockHaveLock(gates.startup) || !task || task==kernel_task ||
++           direct_app_active || direct_app_releases>direct_app_acquires)return false;
++        const ApplicationSession *found=nullptr;unsigned count=0;
++        for(auto *p=direct_app_sessions;p;p=p->next){
++            if(p->phase!=ApplicationSession::Phase::Held || !p->generation ||
++               p->generation>direct_app_acquires || ++count>64)return false;
++            if(p->client==&client){if(found || p->task!=task)return false;found=p;}}
++        return found && count==direct_app_acquires-direct_app_releases;
+     }
+     ApplicationSession *retireApplicationSession(IOUserClient &client,task_t task)
+     {
+         if(!applicationSessionHeld(client,task))return nullptr;
+-        auto *record=direct_app_active;record->phase=ApplicationSession::Phase::Retired;
+-        direct_app_active=nullptr;direct_app_sessions=record->next;record->next=nullptr;
+-        ++direct_app_releases;return record;
+-        // Caller may free this CPU metadata only after the original phase3
+-        // Ring/VM/fence/OOB/authority release predicate actually succeeded.
++        auto **slot=&direct_app_sessions;
++        while(*slot && ((*slot)->client!=&client || (*slot)->task!=task))slot=&(*slot)->next;
++        if(!*slot)return nullptr;
++        auto *record=*slot;*slot=record->next;record->next=nullptr;
++        record->phase=ApplicationSession::Phase::Retired;++direct_app_releases;return record;
++        // Actual Ring per-member VM/fence retirement and logical OOB release
++        // must succeed before this CPU-only metadata may be freed outside gate.
+     }
+     bool nativePhysicalResourcesHeld()
+     {
+@@ -5103,10 +5113,13 @@
+             const auto reserved=state.reserveApplicationSession(client,task,session);
+             if(reserved)return finish(reserved);
+             auto fail=[&](IOReturn raw){state.failApplicationSession(*session);return finish(raw);};
+-            if(state.stage!=Stage::CpuReady || !state.direct_app_publish_attempted || state.direct_client_attempted ||
++            const bool joining=state.direct_app_acquires!=state.direct_app_releases;
++            const unsigned expectedEpoch=joining?6u:4u;
++            if((joining && (!state.direct_physical_held || state.direct_physical_ring!=&ring)) ||
++               state.stage!=Stage::CpuReady || !state.direct_app_publish_attempted || state.direct_client_attempted ||
+                state.host_ring!=&ring || state.native_cx_gpu!=&gpu || state.native_cx_gmu!=&gmu ||
+                state.host_gpu_start_gpu_resource!=&gpuRegisters || state.host_gpu_start_gmu_resource!=&gmuRegisters ||
+-               __atomic_load_n(&state.direct_oob_epoch,__ATOMIC_ACQUIRE)!=4 || !state.direct_hfi ||
++               __atomic_load_n(&state.direct_oob_epoch,__ATOMIC_ACQUIRE)!=expectedEpoch || !state.direct_hfi ||
+                !ring.nativeApplicationBinding(client,task,1,ZornGen7AppOperation26::PrepareTables))return fail(kIOReturnNotReady);
+             uint32_t image[8]{};state.direct_hfi->copyKernelTaskOobObservation(image);
+             if(image[0]!=127 || image[7])return fail(kIOReturnNotReady);
+@@ -5132,7 +5145,7 @@
+             if(IORecursiveLockHaveLock(state.gates.startup))return kIOReturnNotReady;
+             IORecursiveLockLock(state.gates.startup);
+             // Exact Ring binding requires its actual process/VM retirement,
+-            // completed OOB clear and the same serialized clientClose thread.
++            // its logical OOB release and the same serialized clientClose thread.
+             const bool held=state.nativeApplicationWindowHeld(client,opening,3,ZornGen7AppOperation26::Close);
+             auto *retired=held?state.retireApplicationSession(client,opening):nullptr;
+             if(retired && !state.direct_physical_held)__atomic_store_n(&state.direct_oob_epoch,4u,__ATOMIC_RELEASE);

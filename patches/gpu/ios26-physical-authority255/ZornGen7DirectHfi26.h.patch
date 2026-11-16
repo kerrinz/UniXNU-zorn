@@ -1,0 +1,15 @@
+--- a/ZornGen7DirectHfi26.h
++++ b/ZornGen7DirectHfi26.h
+@@ -34,9 +34,9 @@
+     bool kernelClientOobHeld(const class ZornGen7HostRing26 &) const;
+     IOReturn releaseKernelClientOob(class ZornGen7HostRing26 &);
+     void copyKernelClientOobObservation(uint32_t (&)[8]) const;
+-    IOReturn acquireApplicationOob(class ZornGen7HostRing26 &,class ZornGen7AppExecution26 &);
+-    bool applicationOobHeld(const class ZornGen7HostRing26 &,const class ZornGen7AppExecution26 &) const;
+-    IOReturn releaseApplicationOob(class ZornGen7HostRing26 &,class ZornGen7AppExecution26 &);
++    IOReturn acquirePhysicalOob(class ZornGen7HostRing26 &);
++    bool physicalOobHeld(const class ZornGen7HostRing26 &) const;
++    IOReturn releasePhysicalOob(class ZornGen7HostRing26 &);
+     enum class Outcome : uint32_t { Unavailable,Drained,ReturnedAck,NativeAccessFailed,QueueInvalid,
+         UnexpectedAck,Timeout,Busy,NoSpace };
+     struct Reply {Outcome outcome=Outcome::Unavailable;uint32_t words=0,packet[19]{};};

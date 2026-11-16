@@ -1,0 +1,10 @@
+--- a/direct-runtime/ZornGen7AppIo26.h
++++ b/direct-runtime/ZornGen7AppIo26.h
+@@ -33,6 +33,7 @@
+     thread_t closingThread_=THREAD_NULL;
+     ZornGen7HostRing26 *owner_=nullptr;IOLock *serial_=nullptr;
+     ZornGen7AppIoService26 *service_=nullptr;
++    ZornGen7AppIoClient26 *nativeNext_=nullptr;
+     task_t openingTask_=TASK_NULL;
+     OSObject *authorityOwner_=nullptr;ZornGen7AppAuthority26 authority_{};
+     ZornGen7AppExecution26 *execution_=nullptr;ZornGen7ProcessTables26 *process_=nullptr;

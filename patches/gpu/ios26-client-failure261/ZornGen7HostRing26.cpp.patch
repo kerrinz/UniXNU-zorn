@@ -1,0 +1,61 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornClientFailure261.h"
+ #include "ZornClientTrace240.h"
+ extern "C" volatile uint32_t native_adreno_trace_stage;
+ /* SPDX-License-Identifier: BSD-2-Clause-Patent */
+@@ -1367,7 +1368,9 @@
+        p.clientOwner_!=&connection || !p.clientOpen_ || p.clientClosed_ ||
+        !p.submitAttached_ || p.state_.poisoned)return done(kIOReturnNotReady);
+     clock_interval_to_deadline(1000,NSEC_PER_MSEC,&s.deadline);
+-    auto raw=quiesceKernelIo();NativeAdrenoRingClock clock{this,nativeNow,nativeIdle};
++    auto raw=quiesceKernelIo();
++    if(raw)zorn_failure_note261(ZornFailureQuiesce261,uint32_t(raw),ZornFailureBackend261,ZornFailureStatus261,0,0);
++    NativeAdrenoRingClock clock{this,nativeNow,nativeIdle};
+     zorn26_client_event240(21); // original quiesce returned;raw retains its real result
+     if(!raw){
+         IORecursiveLockLock(&s.gate);
+@@ -1375,6 +1378,7 @@
+         // This is neither a native return value nor hardware completion.
+         native_adreno_trace_stage=100;
+         raw=p.clientState_->client.releaseAll(&clock,0);
++        if(raw)zorn_failure_note261(ZornFailureReleaseAll261,uint32_t(raw),ZornFailureBackend261,ZornFailureStatus261,0,0);
+         zorn26_client_event240(22); // original releaseAll returned;no completion inferred
+         if(!raw){p.clientOpen_=false;p.clientClosed_=true;raw=p.clientState_->submit.detach();}
+         if(!raw){
+@@ -1857,14 +1861,21 @@
+     auto *target=s.processSelected;s.physicalContextTarget=target;s.physicalContextGeneration=lease->generation;
+     s.physicalContextAuthorized=false;s.physicalContextRestoring=false;
+     __atomic_store_n(&s.physicalContextThread,current_thread(),__ATOMIC_RELEASE);
++    ZornClientFailureScope261 failureOwner261{};bool failureOwnerSet261=false;
+     auto finish=[&](IOReturn raw){
+         if(raw==kIOReturnBusy && !physicalContextHeld())raw=kIOReturnNotReady;
+         if(raw!=kIOReturnBusy && raw){__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+         __atomic_store_n(&s.physicalContextThread,THREAD_NULL,__ATOMIC_RELEASE);
+         s.physicalContextAuthorized=false;s.physicalContextRestoring=false;s.physicalContextTarget=nullptr;
++        if(failureOwnerSet261)zorn_failure_target_end261(&failureOwner261);
+         s.physicalContextGeneration=0;s.deadline=0;s.unlockIssuer();return raw;
+     };
+     if(!physicalContextIdentity())return finish(kIOReturnNotReady);
++    // CPU attribution follows the exact independently validated retained
++    // process,not the caller asking Root to restore that foreign context.
++    auto *failureClient261=OSDynamicCast(ZornGen7AppIoClient26,target->clientOwner_);
++    zorn_failure_target_begin261(failureClient261?failureClient261->failureToken261_:0,&failureOwner261);
++    failureOwnerSet261=true;
+     auto refresh=[&](){
+         s.physicalContextAuthorized=false;s.unlockIssuer();
+         const auto raw=s.physicalAuthority.physicalContextCheck(s.physicalAuthority.cookie,*this,lease->generation);
+@@ -2075,9 +2086,9 @@
+     if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     zorn26_client_event240(20); // original Close authorization/scope returned successfully
+     raw=closeProcessClient(client,*process); // real process fence/BO/client/submit cleanup
+-    if(!raw)raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::RestoreKernel,process,0,0);
+-    if(!raw)raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::DetachVm,process,0,0);
+-    if(!raw)raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::RetireDetached,process,0,0);
++    if(!raw){raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::RestoreKernel,process,0,0);if(raw)zorn_failure_note261(ZornFailureRestore261,uint32_t(raw),ZornFailureBackend261,ZornFailureContext261,0,0);}
++    if(!raw){raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::DetachVm,process,0,0);if(raw)zorn_failure_note261(ZornFailureDetach261,uint32_t(raw),ZornFailureBackend261,ZornFailureContext261,0,0);}
++    if(!raw){raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::RetireDetached,process,0,0);if(raw)zorn_failure_note261(ZornFailureRetire261,uint32_t(raw),ZornFailureBackend261,ZornFailureContext261,0,0);}
+     if(!raw){auto &s=*storage_;s.lockIssuer();s.appOperationProcess=nullptr;s.unlockIssuer();}
+     return finishApplicationOperation(*scope,raw);
+     // Only complete normal process cleanup permits later actual app OOB

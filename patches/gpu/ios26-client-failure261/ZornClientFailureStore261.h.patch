@@ -1,0 +1,112 @@
+--- /dev/null
++++ b/ZornClientFailureStore261.h
+@@ -0,0 +1,109 @@
++// SPDX-License-Identifier: MIT
++#pragma once
++#include "ZornClientFailure261.h"
++class ZornClientFailureStore261 {
++ struct Slot {uintptr_t owner=0;uint64_t identity=0,completion=0;uint32_t events=0;ZornClientFailure261 record{};};
++ struct Scope {uintptr_t thread=0;uint64_t token=0;uint32_t method=0;};
++ Slot slots_[ZornFailureSlots261]{};Scope scopes_[ZornFailureSlots261]{};
++ uint32_t gate_=0,dropped_=0,records_=0,recycled_=0;uint64_t generation_=0;
++ bool lock(){uint32_t zero=0;return __atomic_compare_exchange_n(&gate_,&zero,1,false,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED);}
++ void unlock(){__atomic_store_n(&gate_,0u,__ATOMIC_RELEASE);}
++ void drop(){__atomic_fetch_add(&dropped_,1u,__ATOMIC_RELAXED);}
++ static uintptr_t scopeThread(const Scope&s){return __atomic_load_n(&s.thread,__ATOMIC_ACQUIRE);}
++ static uint64_t scopeToken(const Scope&s){return __atomic_load_n(&s.token,__ATOMIC_ACQUIRE);}
++ static uint32_t scopeMethod(const Scope&s){return __atomic_load_n(&s.method,__ATOMIC_ACQUIRE);}
++ static uint64_t completion(const Slot&s){return __atomic_load_n(&s.completion,__ATOMIC_ACQUIRE);}
++ Slot *token(uint64_t id){if(!id)return nullptr;auto&s=slots_[id&63u];return __atomic_load_n(&s.identity,__ATOMIC_ACQUIRE)==id?&s:nullptr;}
++ uintptr_t thread(const Slot&s)const{const auto id=__atomic_load_n(&s.identity,__ATOMIC_ACQUIRE);for(const auto&scope:scopes_)if(scopeToken(scope)==id&&scopeThread(scope))return scopeThread(scope);return 0;}
++ void revoke(uintptr_t current){if(current)for(auto&s:scopes_){uintptr_t expected=current;(void)__atomic_compare_exchange_n(&s.thread,&expected,uintptr_t(0),false,__ATOMIC_ACQ_REL,__ATOMIC_RELAXED);}}
++ bool refuse(uintptr_t current){revoke(current);drop();return false;}
++ bool install(uint64_t id,uintptr_t current,uint32_t method,bool closing,bool count){
++  auto*s=token(id);if(!s)return refuse(current);const auto done=completion(*s);
++  if(done && !(method==ZornFailurePhysicalMethod261 && (done&1u) && uint32_t(done>>32)))return refuse(current);
++  for(const auto&scope:scopes_)if(scopeThread(scope)==current)return refuse(current);
++  Scope*free=nullptr;for(auto&scope:scopes_)if(!scopeThread(scope)){free=&scope;break;}
++  if(!free)return refuse(current);
++  if(closing)s->record.flags|=ZornFailureClosing261;
++  if(count){if(s->record.calls!=UINT32_MAX)++s->record.calls;else drop();}
++  __atomic_store_n(&free->token,id,__ATOMIC_RELAXED);__atomic_store_n(&free->method,method,__ATOMIC_RELAXED);__atomic_store_n(&free->thread,current,__ATOMIC_RELEASE);return true;
++ }
++ void note(Slot&s,uint32_t method,uint32_t stage,uint32_t raw,uint32_t kind,uint32_t reason,uint32_t a,uint32_t b){
++  if(!stage||stage>255||kind>ZornFailurePending261){drop();return;}
++  if(s.events!=UINT32_MAX)++s.events;else drop();
++  if((s.record.flags&ZornFailureClosing261) && !(completion(s)&1u)){s.record.closeStage=stage;s.record.closeRaw=raw;}
++  auto*event=kind==ZornFailureReject261?&s.record.reject:kind==ZornFailureBackend261?&s.record.failure:nullptr;
++  if(event&&raw&&!event->sequence)*event={s.events,stage,reason,raw,method,a,b};
++ }
++public:
++ uint64_t bind(uintptr_t owner,uint64_t unique,uint32_t pid){
++  if(!owner||!unique||!pid)return 0;if(!lock()){drop();return 0;}
++  for(auto&s:slots_)if(s.owner==owner&&(!completion(s)||uint32_t(completion(s)>>32))){drop();unlock();return 0;}
++  Slot*chosen=nullptr;unsigned index=0;
++  for(unsigned i=0;i<ZornFailureSlots261;++i)if(!slots_[i].record.id){chosen=&slots_[i];index=i;break;}
++  if(!chosen)for(unsigned i=0;i<ZornFailureSlots261;++i)if(completion(slots_[i])==1&&!thread(slots_[i])){chosen=&slots_[i];index=i;break;}
++  if(!chosen||generation_==(UINT64_MAX>>6)){drop();unlock();return 0;}
++  if(chosen->record.id)++recycled_;else ++records_;
++  chosen->record={};chosen->owner=owner;chosen->events=0;__atomic_store_n(&chosen->completion,UINT64_C(0),__ATOMIC_RELAXED);
++  const uint64_t id=(++generation_<<6)|index;chosen->record.id=id;chosen->record.unique=unique;chosen->record.pid=pid;chosen->record.flags=ZornFailureRegistered261;
++  __atomic_store_n(&chosen->identity,id,__ATOMIC_RELEASE);unlock();return id;
++ }
++ bool begin(uintptr_t owner,uint64_t id,uintptr_t current,uint32_t method,bool closing){
++  if(!owner||!id||!current)return current?refuse(current):false;if(!lock())return refuse(current);
++  auto*s=token(id);if(!s||s->owner!=owner){refuse(current);unlock();return false;}
++  // One admitted client serial mutex owns its ordinary method/Close. A Root
++  // physical observer may additionally target it through targetBegin below.
++  for(const auto&scope:scopes_)if(scopeToken(scope)==id&&scopeThread(scope)&&scopeMethod(scope)!=ZornFailurePhysicalMethod261){refuse(current);unlock();return false;}
++  const bool ok=install(id,current,method,closing,!closing);unlock();return ok;
++ }
++ void end(uint64_t id,uintptr_t current){
++  if(!id||!current)return;bool cleared=false;
++  for(auto&s:scopes_)if(scopeToken(s)==id){uintptr_t expected=current;if(__atomic_compare_exchange_n(&s.thread,&expected,uintptr_t(0),false,__ATOMIC_ACQ_REL,__ATOMIC_RELAXED))cleared=true;}
++  if(!cleared)drop();
++ }
++ void targetBegin(uint64_t id,uintptr_t current,ZornClientFailureScope261&saved){
++  saved={};if(!current)return;
++  // Read only atomic CPU scope fields. Revocation never waits for the writer
++  // gate,so a failed diagnostic switch cannot retain caller attribution.
++  for(const auto&s:scopes_)if(scopeThread(s)==current){
++   if(saved.hadPrevious){saved={};revoke(current);drop();return;}
++   saved.previousToken=scopeToken(s);saved.previousMethod=scopeMethod(s);saved.hadPrevious=1;
++  }
++  revoke(current);if(!lock()){drop();return;}
++  (void)install(id,current,ZornFailurePhysicalMethod261,false,false);unlock();
++ }
++ void targetEnd(uintptr_t current,const ZornClientFailureScope261&saved){
++  revoke(current);if(!saved.hadPrevious)return;if(!lock()){drop();return;}
++  (void)install(saved.previousToken,current,saved.previousMethod,false,false);unlock();
++ }
++ void noteThread(uintptr_t current,uint32_t stage,uint32_t raw,uint32_t kind,uint32_t reason,uint32_t a,uint32_t b){
++  if(!current)return;if(!lock()){drop();return;}const Scope*found=nullptr;
++  for(const auto&s:scopes_)if(scopeThread(s)==current){if(found){drop();unlock();return;}found=&s;}
++  if(found){auto*s=token(scopeToken(*found));if(s&&(!completion(*s)||(scopeMethod(*found)==ZornFailurePhysicalMethod261&&(completion(*s)&1u)&&uint32_t(completion(*s)>>32))))note(*s,scopeMethod(*found),stage,raw,kind,reason,a,b);}unlock();
++ }
++ void noteClient(uintptr_t owner,uint64_t id,uint32_t stage,uint32_t raw,uint32_t kind,uint32_t reason,uint32_t a,uint32_t b){
++  if(!owner||!id)return;if(!lock()){drop();return;}auto*s=token(id);
++  if(s&&s->owner==owner&&!completion(*s))note(*s,0,stage,raw,kind,reason,a,b);unlock();
++ }
++ void finish(uint64_t id,uint32_t raw){
++  auto*s=token(id);if(!s)return;if(thread(*s)){drop();return;}
++  uint64_t expected=0;if(!__atomic_compare_exchange_n(&s->completion,&expected,UINT64_C(2),false,__ATOMIC_ACQ_REL,__ATOMIC_RELAXED)){drop();return;}
++  if(lock()){
++   if(token(id)!=s){drop();unlock();return;}
++   note(*s,0,ZornFailureCloseReturn261,raw,raw?ZornFailureBackend261:ZornFailureInfo261,ZornFailureGeneric261,0,0);unlock();
++  }else drop();
++  // Terminal outcome is published last;only exact normal completion=1 can
++  // recycle CPU metadata. No native reference or hardware object is released.
++  __atomic_store_n(&s->completion,(uint64_t(raw)<<32)|UINT64_C(1),__ATOMIC_RELEASE);
++ }
++ bool snapshot(uint32_t completedFrames,ZornClientFailure261&out){
++  if(!lock())return false;out={};unsigned failures=0,rejects=0;
++  for(const auto&s:slots_){failures+=s.record.failure.sequence!=0;rejects+=s.record.reject.sequence!=0;}
++  const bool wantFailure=failures&&(!(completedFrames&1u)||!rejects),wantReject=rejects&&!wantFailure;
++  const unsigned count=wantFailure?failures:wantReject?rejects:records_;unsigned index=count?completedFrames%count:0;
++  for(const auto&s:slots_){const bool take=wantFailure?s.record.failure.sequence!=0:wantReject?s.record.reject.sequence!=0:s.record.id!=0;
++   if(take&&!index--){out=s.record;const auto done=completion(s);
++    if(done&1u){out.flags|=ZornFailureClosed261;if(uint32_t(done>>32))out.flags|=ZornFailureCloseFailed261;out.closeRaw=uint32_t(done>>32);}
++    else if(thread(s))out.flags|=ZornFailureScope261;break;}}
++  out.records=records_;out.recycled=recycled_;out.dropped=__atomic_load_n(&dropped_,__ATOMIC_RELAXED);unlock();return true;
++ }
++};

@@ -1,0 +1,91 @@
+--- a/ZornGen7DirectHfi26.cpp
++++ b/ZornGen7DirectHfi26.cpp
+@@ -36,7 +36,7 @@
+         bool releaseAttempted=false,releaseWriteReturned=false;
+         uint32_t ack=0,host=0,gx=0,reads=0,writes=0,lastWord=0;int raw=0;
+     } kernelOob,clientOob;
+-    ZornGen7AppExecution26 *activeApp=nullptr; // retained until real OOB clear succeeds
++    ZornGen7HostRing26 *activePhysical=nullptr; // actual Ring retained until physical OOB clear succeeds
+     ZornGen7SmmuDomain26 *domain=nullptr;ZornGen7GmuIrq26 *irq=nullptr;
+     ZornGen7RegisterMaps26 *maps=nullptr;IOWorkLoop *loop=nullptr;
+     // Frozen native mapping belongs to bufferOwner, whose device holds and
+@@ -407,26 +407,26 @@
+ }
+ 
+ 
+-// The actual per-application owner carries its own fresh request history.
++// Actual Ring-owned physical history;separate Board authority is checked per access.
+ // Reuse the retained Gen7 OOB sequence; never inherit a kernel grant.
+-IOReturn ZornGen7DirectHfi26::acquireApplicationOob(ZornGen7HostRing26 &ring,ZornGen7AppExecution26 &execution)
++IOReturn ZornGen7DirectHfi26::acquirePhysicalOob(ZornGen7HostRing26 &ring)
+ {
+     if(!normal() || !healthy() || !ml_get_interrupts_enabled() || !bootstrapOobReleaseReturned())return kIOReturnNotReady;
+     auto &s=*storage_;
+     if(!s.hostStartup || s.loop->onThread() || s.loop->inGate() || IORecursiveLockHaveLock(s.hostStartup) ||
+-       execution.ring_!=&ring || !ring.applicationOobPermission(*this,execution,false))return kIOReturnNotReady;
+-    IOLockLock(s.gate);auto &r=*execution.oob_;const auto &task=s.kernelOob;
++       !ring.physicalOobRecordForTransport(*this) || !ring.physicalOobPermission(*this,false))return kIOReturnNotReady;
++    IOLockLock(s.gate);auto &r=*ring.physicalOobRecordForTransport(*this);const auto &task=s.kernelOob;
+     if(task.owner!=&ring || !task.attempted || !task.requestReturned || !task.ackObserved ||
+        !task.ackCleared || !task.gxOn || !task.releaseAttempted || !task.releaseWriteReturned || task.raw ||
+-       s.clientOob.attempted || r.attempted || s.activeApp || s.commandBusy || s.pending){
++       s.clientOob.attempted || r.attempted || s.activePhysical || s.commandBusy || s.pending){
+         IOLockUnlock(s.gate);return kIOReturnNotReady;}
+-    r.attempted=true;r.owner=this;execution.retain();s.activeApp=&execution;s.commandBusy=true;
++    r.attempted=true;r.owner=this;ring.retain();s.activePhysical=&ring;s.commandBusy=true;
+     auto done=[&](IOReturn raw){s.commandBusy=false;IOLockUnlock(s.gate);if(raw)fail();return raw;};
+     auto permission=[&](){
+-        // Real app authority callbacks run with no HFI/issuer/startup lock.
+-        // commandBusy and activeApp retain the sole transition across reentry.
+-        IOLockUnlock(s.gate);const bool held=ring.applicationOobPermission(*this,execution,false);IOLockLock(s.gate);
+-        return held && healthy() && s.commandBusy && s.activeApp==&execution &&
++        // Real physical Board callbacks run with no HFI/issuer/startup lock.
++        // commandBusy and activePhysical retain the sole transition across reentry.
++        IOLockUnlock(s.gate);const bool held=ring.physicalOobPermission(*this,false);IOLockLock(s.gate);
++        return held && healthy() && s.commandBusy && s.activePhysical==&ring &&
+             r.owner==this && r.attempted && !r.releaseAttempted;
+     };
+     auto read=[&](uint32_t at,uint32_t &v){if(!permission())return false;
+@@ -441,28 +441,28 @@
+     };
+     return done(ZornGen7PhysicalOob26::request(r,read,write,poll)?kIOReturnSuccess:kIOReturnNotReady);
+ }
+-bool ZornGen7DirectHfi26::applicationOobHeld(const ZornGen7HostRing26 &ring,const ZornGen7AppExecution26 &execution) const
+-{
+-    if(!storage_ || !healthy() || !execution.oob_)return false;const auto &r=*execution.oob_;
+-    return execution.ring_==&ring && storage_->activeApp==&execution && r.owner==this && r.attempted &&
++bool ZornGen7DirectHfi26::physicalOobHeld(const ZornGen7HostRing26 &ring) const
++{
++    if(!storage_ || !healthy() || !ring.physicalOobRecordForTransport(*this))return false;const auto &r=*ring.physicalOobRecordForTransport(*this);
++    return storage_->activePhysical==&ring && r.owner==this && r.attempted &&
+         r.requestReturned && r.ackObserved && r.ackCleared && r.gxOn && !r.releaseAttempted;
+ }
+-IOReturn ZornGen7DirectHfi26::releaseApplicationOob(ZornGen7HostRing26 &ring,ZornGen7AppExecution26 &execution)
+-{
+-    if(!normal() || !healthy() || !ml_get_interrupts_enabled() || !applicationOobHeld(ring,execution))return kIOReturnNotReady;
++IOReturn ZornGen7DirectHfi26::releasePhysicalOob(ZornGen7HostRing26 &ring)
++{
++    if(!normal() || !healthy() || !ml_get_interrupts_enabled() || !physicalOobHeld(ring))return kIOReturnNotReady;
+     auto &s=*storage_;
+     if(!s.hostStartup || s.loop->onThread() || s.loop->inGate() || IORecursiveLockHaveLock(s.hostStartup) ||
+-       !ring.applicationOobReleaseReady(*this,execution) || !ring.applicationOobPermission(*this,execution,true))return kIOReturnNotReady;
+-    IOLockLock(s.gate);auto &r=*execution.oob_;
+-    if(s.activeApp!=&execution || r.releaseAttempted || s.commandBusy || s.pending){IOLockUnlock(s.gate);return kIOReturnNotReady;}
++       !ring.physicalOobReleaseReady(*this) || !ring.physicalOobPermission(*this,true))return kIOReturnNotReady;
++    IOLockLock(s.gate);auto &r=*ring.physicalOobRecordForTransport(*this);
++    if(s.activePhysical!=&ring || r.releaseAttempted || s.commandBusy || s.pending){IOLockUnlock(s.gate);return kIOReturnNotReady;}
+     r.releaseAttempted=true;s.commandBusy=true;
+-    IOLockUnlock(s.gate);const bool held=ring.applicationOobPermission(*this,execution,true);IOLockLock(s.gate);
+-    if(!held || !healthy() || s.activeApp!=&execution || !s.commandBusy ||
+-       !ring.applicationOobReleaseReady(*this,execution)){
++    IOLockUnlock(s.gate);const bool held=ring.physicalOobPermission(*this,true);IOLockLock(s.gate);
++    if(!held || !healthy() || s.activePhysical!=&ring || !s.commandBusy ||
++       !ring.physicalOobReleaseReady(*this)){
+         s.commandBusy=false;IOLockUnlock(s.gate);fail();return kIOReturnNotReady;}
+     ZornGen7PhysicalOob26::clear(r,[&](uint32_t at,uint32_t value){
+         return s.maps->accessGmuHfiWord(at,true,value);});
+     if(r.raw || !healthy()) {s.commandBusy=false;IOLockUnlock(s.gate);fail();return kIOReturnNotReady;}
+-    s.activeApp=nullptr;s.commandBusy=false;IOLockUnlock(s.gate);execution.release();
++    s.activePhysical=nullptr;s.commandBusy=false;IOLockUnlock(s.gate);ring.release();
+     return kIOReturnSuccess; // returned clear store only, no DMA-stop or release ACK claim
+ }

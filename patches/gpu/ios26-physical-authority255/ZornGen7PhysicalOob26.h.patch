@@ -1,0 +1,17 @@
+--- a/ZornGen7PhysicalOob26.h
++++ b/ZornGen7PhysicalOob26.h
+@@ -50,6 +50,14 @@
+             !p->retired && p->generation && p->generation==generation_ &&
+             p->transport && p->registerMaps;
+     }
++    Lease *forTransport(const OSObject &transport,const OSObject &registerMaps) const
++    {
++        auto *p=active_;
++        return p && p->physical==this && !p->retired && p->generation &&
++            p->generation==generation_ && p->transport==&transport &&
++            p->registerMaps==&registerMaps?p:nullptr;
++        // Physical identity only. Logical member/task permission is separate.
++    }
+     static bool releaseReturned(const Lease &p)
+     {
+         return p.owner==p.transport && p.attempted && p.requestReturned &&

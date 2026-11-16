@@ -1,0 +1,236 @@
+{
+  "version": 258,
+  "status": "complete-offline-completed-context-handover-kernel-and-boot-unselected",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f",
+  "boot_tag": "719fc4d092574847b2a3fe9de893e76f",
+  "kernel": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/full-link/kernel.ZORN26-CONTEXT258.UNSELECTED.macho",
+    "sha256": "ff82ebce97ab2bdc6848161031db65e8e23bcdbc38befd03d4732b2968db74f5"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/boot-package/boot.ZORN26-GPU-V258-HANDOVER-UNSELECTED.img",
+    "sha256": "c5e7e0070c27affe4e8235b1804b5f5c2c47e7264ceb6c04e54d5703ca8723e1",
+    "bytes": 11857920
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88/root-candidate/ios26-root-system252.UNSELECTED.hfsx",
+    "sha256": "859c7ebae6355ef7e089896680b0b8ffd9a03af8a1f078918feec740b7a06b02",
+    "bytes": 34359738368
+  },
+  "FD": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v257-shared-members-ecb96de011624a6ea8c3d96ee9726dbe/boot-package/inputs/firmware.fd",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/boot-package/inputs/firmware.fd",
+    "sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "bytes": 3145728
+  },
+  "ADT": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/boot-package/k80-context258.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/boot-package/inputs/kernel.adt",
+    "sha256": "98f04ff54b9573ddaa2c4716da0e954fae8192d15b1f105426eba7f216805936",
+    "bytes": 49224
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-context-handover258/source-manifest.json",
+    "sha256": "b03b30b949efd49bcc51ee7642e9878a3b5e054c06159307fa93482b3dfc605c"
+  },
+  "checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-fence-host/result.json",
+      "sha256": "6559ba485cb4766597a864a3fd5aeff3a224e5115258683f3e4f42a55d34e686"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-fence-tsan/result.json",
+      "sha256": "24fe3ce3efefc1b9192f1fc013912b45b1fad3ade2b531e54896012e7be91d72"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-handover-host/result.json",
+      "sha256": "c6b197ebe3b2842d2a9edf5ddc81a34fc50156567d2cb53e9825ff0fe7716a8d"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-handover-tsan/result.json",
+      "sha256": "772c84a3700cb47f138a5fab30f028dfdfc1871d1c27f72b3b7a1337e69afa81"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-physical-host/result.json",
+      "sha256": "c2bc8bb14fe5411ccbca9c16a797f9bd21ac6e59f5a114904c9b2fceecaba37f"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-physical-tsan/result.json",
+      "sha256": "46d5ca339fd5587801e60eaec5f7d679feae51f146bbd6297756d83a621d8d56"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/board-current-host/result.json",
+      "sha256": "2f9ace80233c78c588de0feff0b238f58a35c8b653b42eb6879c7ac2a30980d5"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/board-current-tsan/result.json",
+      "sha256": "ce954d797c45026452d4d5ac1c456c273c0bf073eb119447b36fb596ea9cd7bb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/service-current-host/result.json",
+      "sha256": "1c693b3de452d7f55f5e04aef9a79030309b22a6b4a4e5e6c38a7a1371a33f6b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/service-current-tsan/result.json",
+      "sha256": "1981e1c0b65d0b8b3aee7e492d7260cf48af72c486b5912ce130b04d56bb5086"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/context-source-closure258.json",
+      "sha256": "f7a6984d7809244e99c3d9d0457056c5af7ec4b99f1c6304a3c7801b0358fa77"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/full-build-review.json",
+      "sha256": "30b688bcc5a08668d6483f1394891f5851d7fa5f121eb94cc497fd63f01046ec"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/native-platform-config.json",
+      "sha256": "ca7397c9a13d9aa15f76d593baa988b2fe6f9b697ec2828aec7f905b4f998cb5"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/segment-layout-check.json",
+      "sha256": "59b838ee81d0ca84554511a08a386f2a04c3ce293d2c07d94aa8b030b700b131"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/native-final-rebuild258.json",
+      "sha256": "aa22a5c3038666726f1c76d696d3f5fa1556728257aec3dcf48108a7cd230729"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/root-reuse258.json",
+      "sha256": "bbfb7cd1621a494a240a5c0b20e8d398a6f3884cd6a1d463b2615a7d6407d954"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/patch-replay/result.json",
+      "sha256": "07b5826d190002ed0d14e3e5b71a3b18cfc9fc909b217a460fd6bbb346cf0bb0"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/before-context-handover258.json",
+      "sha256": "b59d3d63ff63153e3fc8c4626292d90159ee52657fa2c44d5c92c10ab50ab6a9"
+    }
+  ],
+  "test_tools": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-context-fence.py",
+      "sha256": "1800aa8c9f3c6a46ae6df933bacddfd132e9489b40acf2c09955fb06e87151f3"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-context-handover.py",
+      "sha256": "74e13f74b066378575909508b8e1b5b0e99ead6fe373b6e62ff672f57083d03e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-context-physical.py",
+      "sha256": "be66df26d4bb35f2de58245e34969304820252e72175125badbfb9cdaf27a7b9"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-shared-members.py",
+      "sha256": "8e8b23bf862c2c33d1c9d79237ec98e82a4d8dd7f5ecb34b7eff71d8b0fdceb5"
+    }
+  ],
+  "boot_package_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/boot-package/verified.json",
+    "sha256": "04b97675eee2feadbf11f7b010a0dbd4388c9201d50186c404d54355f7fac311"
+  },
+  "latest_hardware_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v256-operation-context-21ebf249d0b54cd0b38305c2ce63535a/observed256.json",
+    "sha256": "50ba77770c7ddf69f153aa327effe6bdd0a0e473905ac79af2c2a57ddb253e07"
+  },
+  "root_reuse": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/root-reuse258.json",
+    "sha256": "bbfb7cd1621a494a240a5c0b20e8d398a6f3884cd6a1d463b2615a7d6407d954"
+  },
+  "CPU_page_bytes": 16384,
+  "GPU_page_bytes": 4096,
+  "disk_block_bytes": 4096,
+  "inputs": 1398,
+  "current_full_compile_objects": 32,
+  "effective_header_checks": 106,
+  "header_consumers_rebuilt": {
+    "ZornGen7AppExecution26.h": [
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7StartupOwner26.cpo"
+    ],
+    "ZornGen7HostRing26.h": [
+      "ZornGen7AppExecution26.cpo",
+      "ZornGen7AppIo26.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectHfi26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7HwschedHfi26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7ZapOwner26.cpo"
+    ],
+    "ZornGen7DirectSubmit26.h": [
+      "ZornGen7DirectClient26.cpo",
+      "ZornGen7DirectSubmit26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7SmmuDomain26.cpo"
+    ],
+    "NativeAdrenoRing.h": [
+      "NativeAdrenoRing.cpo",
+      "ZornGen7DarwinBoardOwner.cpo",
+      "ZornGen7DirectClient26.cpo",
+      "ZornGen7DirectSubmit26.cpo",
+      "ZornGen7HostRing26.cpo",
+      "ZornGen7RegisterMaps26.cpo",
+      "ZornGen7SmmuDomain26.cpo",
+      "ZornGen7StartupOwner26.cpo"
+    ]
+  },
+  "undefined_symbols": 0,
+  "root_cause": {
+    "scope": "Source reproduction of257 completed-foreign-context Close refusal;not252 hardware timeout attribution",
+    "before": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v258-context-handover-719fc4d092574847b2a3fe9de893e76f/before-context-handover258.json",
+      "sha256": "b59d3d63ff63153e3fc8c4626292d90159ee52657fa2c44d5c92c10ab50ab6a9"
+    },
+    "cause": "enterApplicationContext refused any foreign selected context even after its real fence completed;IOClient clientClose became closing before receiving Busy and could not automatically resume",
+    "fix": "Independent physical Root scope checks exact retained owner and real Board resources,observes actual fence/cache completion and bounded idle,then permits only exact RestoreKernel;normal caller continues its original own-task Select and close backend",
+    "remaining": "Still-pending clientClose continuation is not yet implemented;this patch fixes already-completed context handover only"
+  },
+  "actual_changes": [
+    "DirectSubmit wait/waitAll explicitly distinguish native fence timeout from release/cache/VM errors;zero budget uses real Ring single cache/fence observation",
+    "New mandatory Board physicalContextCheck validates current held Ring/generation and original full native resource predicate without borrowing old user task authority",
+    "Root permits only physical exact-child RestoreKernel after real all-job/resource drain,idle,second live resource check and original SMMU TLBSYNC/readback;old VM/BO/maps/ASID stay retained",
+    "SMMU entry checks actual operation arguments against Root scope;Select or another child cannot use the physical scope",
+    "Creator,ordinary context entry and close lifecycle can restore an already-completed foreign context before continuing the original per-client backend",
+    "New native Ring object compiled from frozen existing source and current selected header;prior object failed byte reproduction and its equivalence is not asserted"
+  ],
+  "regression": [
+    "Actual Ring wait/observeFence and DirectSubmit wait/waitAll:14 controls including zero-wait cache observation,pending true only for actual fence timeout,completed-fence release Timeout false,and poison",
+    "Actual Root methods:48 controls and48 same-client plus48 two-task operations;already-completed foreign Close resumes,still-pending Busy performs no MMU transition,later Root Close can resume,wrong owner/late fault/physical callback refusals retain",
+    "Actual Board physicalContextCheck/Root release-close/DirectHfi protocol:71 controls including exact generation/resources/startup gate,nonlast and last release;original physical predicate and request-clear retained",
+    "Actual service30/Board member23 controls rerun for current callback ABI;all five test groups pass ASanUBSan and TSan with symbolization disabled",
+    "32 actual native objects/1398 inputs0undefined/106 effective header checks/actual CPU16KiB/full independent offline boot package/11 zero-fuzz source patches pass"
+  ],
+  "risks": [
+    "All host MMIO/SMMU/cache/authority/drain/VM-resource boundaries are explicit fixtures,not native hardware qualification",
+    "No258 phone action/scope/ready/claim;latest actual device remains256 with automatic TWRP return",
+    "Still-pending close/exit requires a bounded continuation with exact phase/ownership evidence;release path can also encounter a new foreign submission between cleanup phases",
+    "No current independent cross-task hardware workload/policy or broad per-client diagnostic coverage",
+    "Ordinary per-frame GPU-write/fence/presentation attribution,complete normal client exit,full FT3683 contacts/gestures and final GPU acceptance remain incomplete"
+  ],
+  "next_work": [
+    "Implement bounded still-pending close continuation with phase-aware Root pending status;never retry ambiguous backend side effects",
+    "Complete per-client diagnostic ownership and exact workload/policy inputs",
+    "Prepare exact fixed-entry bounded hardware regression with receiver-first,new scope/ready/claim and automatic Recovery",
+    "Continue actual ordinary GPU-write/display attribution and complete FT3683 contact/gesture path"
+  ],
+  "hardware_qualified": false,
+  "new_root_or_delta_created": false,
+  "new_scope_or_claim_created": false,
+  "phone_access": false,
+  "new_boot_performed": false,
+  "full_GPU_qualification": false,
+  "FT3683_full_gestures_qualified": false,
+  "sanitizer_symbolization_disabled": true,
+  "no_new_commit_or_push": true,
+  "no_disassembly_or_reverse_engineering": true
+}

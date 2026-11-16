@@ -1,0 +1,12 @@
+--- a/ZornGen7AppExecution26.h
++++ b/ZornGen7AppExecution26.h
+@@ -41,6 +41,9 @@
+     // Normal Ring close retires it after actual authority release;unknown
+     // outcomes keep both the lease and all existing application pins.
+     ZornGen7PhysicalOob26::Lease *oob_=nullptr;
++    // Actual Ring list owns a reference independently of this client/output.
++    ZornGen7AppExecution26 *ringNext_=nullptr;
++    bool oobMemberHeld_=false,oobMemberReleased_=false;
+     static IOReturn create(ZornGen7RegisterMaps26 &,ZornGen7HostRing26 &,IORecursiveLock &,
+         IOUserClient &,task_t,OSObject &actualAuthorityCodeAndStorage,
+         const ZornGen7AppAuthority26 &,IOService &,IOMemoryDescriptor &,IOService &,

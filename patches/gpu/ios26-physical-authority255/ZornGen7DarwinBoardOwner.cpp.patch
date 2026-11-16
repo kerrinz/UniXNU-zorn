@@ -1,0 +1,97 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -398,6 +398,9 @@
+     // before grant and clears its owner before the successful final release.
+     const void *direct_client_identity=nullptr;
+     bool direct_client_attempted=false,direct_client_granted=false,direct_client_release_allowed=false;
++    ZornGen7HostRing26 *direct_physical_ring=nullptr;
++    uint64_t direct_physical_generation=0;
++    bool direct_physical_attempted=false,direct_physical_held=false;
+     // Per-session ownership metadata,not a physical GPU grant. AppExecution
+     // already retains each actual client/task/board across these callbacks.
+     // This owner keeps every uncertain record;normal verified release removes
+@@ -461,10 +464,30 @@
+         // Caller may free this CPU metadata only after the original phase3
+         // Ring/VM/fence/OOB/authority release predicate actually succeeded.
+     }
++    bool nativePhysicalResourcesHeld()
++    {
++        return normal() && IORecursiveLockHaveLock(gates.startup) && stage==Stage::CpuReady &&
++            direct_app_publish_attempted && !direct_client_attempted &&
++            __atomic_load_n(&direct_oob_epoch,__ATOMIC_ACQUIRE)==6 && host_known_image_ready &&
++            direct_task_release_allowed && host_direct_runtime_ready && host_direct_runtime_window_held && host_bootstrap_ready &&
++            host_zap_authenticated && host_zap && host_ring &&
++            host_gpu_start_window_held && host_gpu_mmu_ready && host_gpu_oob_ready &&
++            native_direct_memory_owner && native_cx_maps && native_cx_gpu && native_cx_gmu &&
++            host_gpu_start_gpu==native_cx_gpu && host_gpu_start_gmu==native_cx_gmu &&
++            host_gpu_start_gpu_resource && host_gpu_start_gmu_resource &&
++            host_gpu_irq && !host_gpu_irq->halted() && gmu_irq && gmu_irq->forwardAllowed() &&
++            direct_hfi && direct_hfi->healthy() && smmu_domains && !smmu_domains->faulted() &&
++            rsc_storage && rsc_storage->forwardAllowed() && smmu_pm && smmu_power &&
++            smmu_pm->nativeHeldFor(smmu_power->provider,*gates.startup) &&
++            native_direct_memory_owner->gpuProviderClaimsHeld() &&
++            native_cx_maps->hostGpuStartPairIs(*native_direct_memory_owner,*native_cx_gpu,
++                *host_gpu_start_gpu_resource,*native_cx_gmu,*host_gpu_start_gmu_resource);
++    }
+     bool nativeApplicationWindowHeld(IOUserClient &client,task_t task,unsigned phase,ZornGen7AppOperation26 operation)
+     {
+         return normal() && IORecursiveLockHaveLock(gates.startup) && stage==Stage::CpuReady &&
+             direct_app_publish_attempted && applicationSessionHeld(client,task) && !direct_client_attempted &&
++            (phase==1 || (direct_physical_held && direct_physical_ring==host_ring)) &&
+             __atomic_load_n(&direct_oob_epoch,__ATOMIC_ACQUIRE)==6 && host_known_image_ready &&
+             direct_task_release_allowed && host_direct_runtime_ready && host_direct_runtime_window_held && host_bootstrap_ready &&
+             host_zap_authenticated && host_zap && host_ring && host_ring->nativeApplicationBinding(client,task,phase,operation) &&
+@@ -5031,6 +5054,44 @@
+         s.direct_app_publish_attempted=true;auto *ring=s.host_ring;ring->retain();retain();
+         IORecursiveLockUnlock(s.gates.startup);
+         ZornGen7AppAuthority26 applicationAuthority{};applicationAuthority.cookie=this;
++        applicationAuthority.physicalAcquire=[](void *cookie,ZornGen7HostRing26 &ring,
++            ZornGen7RegisterMaps26 &maps,OSObject &transport,uint64_t generation)->IOReturn{
++            auto *board=static_cast<ZornGen7DarwinBoardOwner *>(cookie);
++            if(!board || !board->storage_ || !normal() || !generation)return kIOReturnNotReady;
++            auto &state=*board->storage_;if(IORecursiveLockHaveLock(state.gates.startup))return kIOReturnNotReady;
++            IORecursiveLockLock(state.gates.startup);
++            auto finish=[&](IOReturn raw){IORecursiveLockUnlock(state.gates.startup);return raw;};
++            if(state.direct_physical_attempted || state.direct_physical_held || state.direct_physical_ring ||
++               state.direct_physical_generation==UINT64_MAX || generation!=state.direct_physical_generation+1)
++                return finish(kIOReturnExclusiveAccess);
++            state.direct_physical_attempted=true;state.direct_physical_ring=&ring;state.direct_physical_generation=generation;
++            if(state.host_ring!=&ring || state.native_cx_maps!=&maps || state.direct_hfi!=&transport ||
++               !state.nativePhysicalResourcesHeld() || !ring.nativePhysicalBinding(1,generation))return finish(kIOReturnNotReady);
++            state.direct_physical_held=true;return finish(kIOReturnSuccess);
++        };
++        applicationAuthority.physicalCheck=[](void *cookie,ZornGen7HostRing26 &ring,uint64_t generation,bool releasing)->IOReturn{
++            auto *board=static_cast<ZornGen7DarwinBoardOwner *>(cookie);
++            if(!board || !board->storage_ || !normal())return kIOReturnNotReady;
++            auto &state=*board->storage_;if(IORecursiveLockHaveLock(state.gates.startup))return kIOReturnNotReady;
++            IORecursiveLockLock(state.gates.startup);
++            const bool held=state.direct_physical_attempted && state.direct_physical_held &&
++                state.direct_physical_ring==&ring && state.direct_physical_generation==generation &&
++                state.nativePhysicalResourcesHeld() && ring.nativePhysicalBinding(2,generation,releasing);
++            IORecursiveLockUnlock(state.gates.startup);return held?kIOReturnSuccess:kIOReturnNotReady;
++        };
++        applicationAuthority.physicalRelease=[](void *cookie,ZornGen7HostRing26 &ring,uint64_t generation)->IOReturn{
++            auto *board=static_cast<ZornGen7DarwinBoardOwner *>(cookie);
++            if(!board || !board->storage_ || !normal())return kIOReturnNotReady;
++            auto &state=*board->storage_;if(IORecursiveLockHaveLock(state.gates.startup))return kIOReturnNotReady;
++            IORecursiveLockLock(state.gates.startup);
++            const bool held=state.direct_physical_attempted && state.direct_physical_held &&
++                state.direct_physical_ring==&ring && state.direct_physical_generation==generation &&
++                !state.direct_app_sessions && !state.direct_app_active && state.direct_app_acquires==state.direct_app_releases &&
++                state.nativePhysicalResourcesHeld() && ring.nativePhysicalBinding(3,generation,true);
++            if(held){state.direct_physical_held=false;state.direct_physical_ring=nullptr;state.direct_physical_attempted=false;
++                __atomic_store_n(&state.direct_oob_epoch,4u,__ATOMIC_RELEASE);}
++            IORecursiveLockUnlock(state.gates.startup);return held?kIOReturnSuccess:kIOReturnNotReady;
++        };
+         applicationAuthority.acquire=[](void *cookie,IOUserClient &client,task_t task,ZornGen7HostRing26 &ring,
+             IOService &gpu,IOMemoryDescriptor &gpuRegisters,IOService &gmu,IOMemoryDescriptor &gmuRegisters)->IOReturn{
+             auto *board=static_cast<ZornGen7DarwinBoardOwner *>(cookie);
+@@ -5074,7 +5135,7 @@
+             // completed OOB clear and the same serialized clientClose thread.
+             const bool held=state.nativeApplicationWindowHeld(client,opening,3,ZornGen7AppOperation26::Close);
+             auto *retired=held?state.retireApplicationSession(client,opening):nullptr;
+-            if(retired)__atomic_store_n(&state.direct_oob_epoch,4u,__ATOMIC_RELEASE);
++            if(retired && !state.direct_physical_held)__atomic_store_n(&state.direct_oob_epoch,4u,__ATOMIC_RELEASE);
+             IORecursiveLockUnlock(state.gates.startup);
+             const bool released=retired!=nullptr;
+             if(retired)IODelete(retired,Storage::ApplicationSession,1);

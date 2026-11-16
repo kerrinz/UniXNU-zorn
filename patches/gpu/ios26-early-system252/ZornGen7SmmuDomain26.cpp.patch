@@ -1,0 +1,15 @@
+--- a/ZornGen7SmmuDomain26.cpp
++++ b/ZornGen7SmmuDomain26.cpp
+@@ -119,6 +119,12 @@
+     zornGmuTcmBoard = &board;
+     zornGmuTcmVerified = verified;
+     zornHostFenceHandoff = fence;
++}
++// Nonconsuming CPU publication observation. The original release store below
++// orders the callback and retained owner; only the original deferred call may
++// exchange/consume it. This is not a GMU/GPU readiness or DMA-stop assertion.
++extern "C" bool zorn26_gmu_deferred_ready252() {
++    return __atomic_load_n(&zornGmuDeferredOwner,__ATOMIC_ACQUIRE)!=nullptr;
+ }
+ extern "C" unsigned zorn26_gmu_validate_smr_after_checkpoint()
+ {

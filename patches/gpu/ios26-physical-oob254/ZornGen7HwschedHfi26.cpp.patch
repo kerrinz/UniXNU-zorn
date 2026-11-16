@@ -1,0 +1,29 @@
+--- a/ZornGen7HwschedHfi26.cpp
++++ b/ZornGen7HwschedHfi26.cpp
+@@ -694,7 +694,7 @@
+        !ring.applicationOobPermission(*this,execution,false))return kIOReturnNotReady;
+     auto &s=*storage_;
+     if(s.loop.onThread() || s.loop.inGate() || IORecursiveLockHaveLock(&s.domainGate))return kIOReturnNotReady;
+-    IOLockLock(s.commandGate);auto &r=execution.oob_;
++    IOLockLock(s.commandGate);auto &r=*execution.oob_;
+     if(!s.hostRoute || !s.hostAttempt || !s.hostAttempt->oobReleaseWriteReturned ||
+        !s.kernelOob.releaseWriteReturned || (s.clientOob.attempted && !s.clientOob.releaseWriteReturned) ||
+        r.attempted || s.activeApp || s.hostActive || s.requests || s.inlineRequest ||
+@@ -729,7 +729,7 @@
+ }
+ bool ZornGen7HwschedHfi26::applicationOobHeld(const ZornGen7HostRing26 &ring,const ZornGen7AppExecution26 &execution) const
+ {
+-    if(!storage_ || !healthy())return false;const auto &r=execution.oob_;
++    if(!storage_ || !healthy() || !execution.oob_)return false;const auto &r=*execution.oob_;
+     return execution.ring_==&ring && storage_->activeApp==&execution && r.owner==this && r.attempted && r.requestReturned &&
+         r.ackObserved && r.ackCleared && r.gxOn && !r.releaseAttempted;
+ }
+@@ -739,7 +739,7 @@
+        !ring.applicationOobReleaseReady(*this,execution) || !ring.applicationOobPermission(*this,execution,true))
+         return kIOReturnNotReady;
+     auto &s=*storage_;if(s.loop.onThread() || s.loop.inGate() || IORecursiveLockHaveLock(&s.domainGate))return kIOReturnNotReady;
+-    IOLockLock(s.commandGate);auto &r=execution.oob_;
++    IOLockLock(s.commandGate);auto &r=*execution.oob_;
+     if(s.activeApp!=&execution || r.releaseAttempted || s.hostActive || s.requests || s.inlineRequest ||
+        __atomic_load_n(&s.async,__ATOMIC_ACQUIRE)){IOLockUnlock(s.commandGate);return kIOReturnNotReady;}
+     r.releaseAttempted=true;s.hostActive=true;

@@ -1,0 +1,15 @@
+--- a/ZornApplicationObservation26.inc
++++ b/ZornApplicationObservation26.inc
+@@ -125,3 +125,12 @@
+   if(stage==1 || appObservation.nativeReturn225.sequence)(void)zorn_native_return225_event(appObservation.nativeReturn225,request,method,stage,raw);
+  appObservationUnlock();
+ }
++
++#include "ZornJournalStore248.h"
++static ZornJournalStore248 zornJournal248{};
++extern "C" int zorn26_journal_begin248(uint64_t u,uint32_t p,uint64_t n,unsigned bad,ZornJournalTicket248 *t)
++{return t && zornJournal248.begin(u,p,n,bad,*t);}
++extern "C" void zorn26_journal_finish248(uint32_t t,unsigned e){zornJournal248.finish(t,e);}
++extern "C" void zorn26_journal_exit248(uint64_t u,uint32_t p,uint32_t s){zornJournal248.exit(u,p,s);}
++extern "C" int zorn26_journal_snapshot248(uint32_t at,void *buf,uint32_t cap,ZornJournalSnapshot248 *out)
++{return out && zornJournal248.snapshot(at,buf,cap,*out);}

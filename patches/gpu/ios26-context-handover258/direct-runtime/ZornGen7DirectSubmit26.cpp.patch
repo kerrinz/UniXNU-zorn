@@ -1,0 +1,48 @@
+--- a/direct-runtime/ZornGen7DirectSubmit26.cpp
++++ b/direct-runtime/ZornGen7DirectSubmit26.cpp
+@@ -308,8 +308,9 @@
+     return kIOReturnSuccess;
+ }
+ IOReturn ZornGen7DirectSubmit26::wait(uint32_t fence,const NativeAdrenoRingClock *clock,
+-    uint32_t timeout_us)
+-{
++    uint32_t timeout_us,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     if(!attached_ || poisoned_)return kIOReturnNotReady;
+     if(!fence)return kIOReturnBadArgument;
+     if(!vm_)return kIOReturnNotReady;
+@@ -327,6 +328,7 @@
+         if(passed==NativeAdrenoRingFencePoisoned)return poison();
+         if(passed==NativeAdrenoRingFenceArgument) {zorn_direct_fence_wait[7]=fence;return kIOReturnBadArgument;}
+         if(passed==NativeAdrenoRingFenceTimeout) {
++            if(pendingFence)*pendingFence=true;
+             ++stats_.timeouts;
+             zorn_direct_fence_wait[1]=zorn_direct_fence_wait[1]+1;zorn_direct_fence_wait[2]=fence;zorn_direct_fence_wait[3]=observed;
+             zorn_direct_fence_wait[4]=ring_->lastSubmitted();zorn_direct_fence_wait[5]=ring_->completedFence();
+@@ -338,6 +340,7 @@
+     if(result==NativeAdrenoRingFencePoisoned)return poison();
+     if(result==NativeAdrenoRingFenceArgument) {zorn_direct_fence_wait[7]=fence;return kIOReturnBadArgument;}
+     if(result==NativeAdrenoRingFenceTimeout) {
++        if(pendingFence)*pendingFence=true;
+         ++stats_.timeouts;
+         zorn_direct_fence_wait[1]=zorn_direct_fence_wait[1]+1;zorn_direct_fence_wait[2]=fence;zorn_direct_fence_wait[3]=observed;
+         zorn_direct_fence_wait[4]=ring_->lastSubmitted();zorn_direct_fence_wait[5]=ring_->completedFence();
+@@ -366,13 +369,14 @@
+     ++stats_.completed;
+     return kIOReturnSuccess;
+ }
+-IOReturn ZornGen7DirectSubmit26::waitAll(const NativeAdrenoRingClock *clock,uint32_t timeout_us)
+-{
++IOReturn ZornGen7DirectSubmit26::waitAll(const NativeAdrenoRingClock *clock,uint32_t timeout_us,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     if(!attached_ || poisoned_)return kIOReturnNotReady;
+     while(outstanding()) {
+         Job *oldest=nullptr;
+         for(auto &job:jobs_)if(job.active && (!oldest || job.fence-oldest->fence>0x80000000u))oldest=&job;
+-        const IOReturn status=wait(oldest->fence,clock,timeout_us);
++        const IOReturn status=wait(oldest->fence,clock,timeout_us,pendingFence);
+         if(status)return status;
+     }
+     return kIOReturnSuccess;

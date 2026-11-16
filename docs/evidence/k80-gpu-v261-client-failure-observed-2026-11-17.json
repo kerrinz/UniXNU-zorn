@@ -1,0 +1,478 @@
+{
+  "version": 261,
+  "status": "one-protected-per-client-failure-shared-context-regression-recovered",
+  "scope": "single-K80-ios26-gpu-v261-client-failure-300s-81683386",
+  "trial": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae",
+  "boot_tag": "186b81acea5f4a5b8424a1d8fded3eae",
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/full-link/kernel.ZORN26-FAILURE261.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/boot-package/inputs/kernel.macho",
+    "sha256": "fd74f710a949b40d1f7076e534d2836106aa140bf45e7365fecf718a9c4de90f",
+    "bytes": 31030408
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/boot-package/boot.ZORN26-GPU-V261-IDENTITY-UNSELECTED.img",
+    "sha256": "0e2b7278b8d5cd54121f11add6a71cf02628d1411620f9e404d2a32b950b7596",
+    "bytes": 11857920
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88/root-candidate/ios26-root-system252.UNSELECTED.hfsx",
+    "sha256": "859c7ebae6355ef7e089896680b0b8ffd9a03af8a1f078918feec740b7a06b02",
+    "bytes": 34359738368
+  },
+  "FD": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v260-platform-identity-81683386ba0d423d817a2b7d0e1c60f0/boot-package/inputs/firmware.fd",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/boot-package/inputs/firmware.fd",
+    "sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "bytes": 3145728
+  },
+  "ADT": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/boot-package/k80-identity261.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/boot-package/inputs/kernel.adt",
+    "sha256": "98f04ff54b9573ddaa2c4716da0e954fae8192d15b1f105426eba7f216805936",
+    "bytes": 49224
+  },
+  "menu_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "bundle": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/bundle.json",
+    "sha256": "583d92e6c7288956e8b47f0bdb9d974b0638a6056a024a0287952f550144e27e"
+  },
+  "owner": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/owner.json",
+    "sha256": "6a147eb3144c1ed47ad1f63dbc082825d1508c972682ab58ef464d9affb6ba13"
+  },
+  "ready": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/ready.json",
+    "sha256": "bde820a2d7c962ff3866af37323493c83a4e3387e625a70d0768c930e169cd3a"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/admission.json",
+    "sha256": "fee6f6a3cff3c6efd86f494bea5774a4f30d734da9dd83c20be93eefd0a60742"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/one-shot.claim.json",
+    "sha256": "97fbf89920890068e8a18b1495a964ff891f7792695936e5a243d93da803c350"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/run.json",
+    "sha256": "a885f59b60cc87bd020fc57b3bca9a7cd9e5029901b0c1f01f8699dda0dd610f"
+  },
+  "launch": {
+    "receiver": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/read-zorn-gpu-system261-cdc.py",
+      "sha256": "5c8ad7ec97dee7cd72e4bb35831c2b6e0d2f7c4de571e710ef500ed726eb0ac8"
+    },
+    "runner_exit": 0,
+    "result_source": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/cdc-capture.json",
+      "sha256": "788d5d0ed0a0af3fd4540e3ea41c8f816603c0c5b935884f6b2c73b2f09b8826"
+    }
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/cdc-capture.json",
+    "sha256": "788d5d0ed0a0af3fd4540e3ea41c8f816603c0c5b935884f6b2c73b2f09b8826"
+  },
+  "raw_CDC": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/cdc.raw",
+    "sha256": "0659d6cdc342df85435196252f3595763dd99ac08da46177ebdc571a7782046b"
+  },
+  "decoded_native_page": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/decoded-native-record.json",
+    "sha256": "340da5446095b2270e350049404186eb9c9e52a6cac6a6c48ebe29ccbd958fdd"
+  },
+  "root_reuse": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/root-reuse261.json",
+    "sha256": "b642aeefcf46b944580422700b2511ba35ef9138dd2e0334189dc97cb0962951"
+  },
+  "native_identity_host": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-client-failure-186b81acea5f4a5b8424a1d8fded3eae/native-identity-host/result.json",
+    "sha256": "998efc7f11ed2eed277c132d1eb5240fed00800d7c7008baa466fbdfb3e69399"
+  },
+  "boot_attempts": 1,
+  "retries": 0,
+  "automatic_recovery_seconds": 333.62836049997713,
+  "recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_pairs": [
+    {
+      "name": "Data",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "byte_equal": true
+    },
+    {
+      "name": "Data_metadata",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "byte_equal": true
+    },
+    {
+      "name": "after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "byte_equal": true
+    },
+    {
+      "name": "before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "byte_equal": true
+    },
+    {
+      "name": "root_after",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "byte_equal": true
+    },
+    {
+      "name": "root_before",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "byte_equal": true
+    },
+    {
+      "name": "root_first_page",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/before-root_first_page.bin",
+        "sha256": "27f047221c5704297394e74002b5d4f85645781fa54547f3df18a5640a9e8a94"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/after-root_first_page.bin",
+        "sha256": "27f047221c5704297394e74002b5d4f85645781fa54547f3df18a5640a9e8a94"
+      },
+      "byte_equal": true
+    }
+  ],
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "current_device_state_idle": true,
+  "stop_device_operations": false,
+  "frame_count": 39,
+  "wire_bytes": 67975,
+  "transport_verified": true,
+  "source_defined_initialization": {
+    "state": 3,
+    "smr": 88,
+    "point": 6,
+    "ack": 6,
+    "failed": 0,
+    "publication": 4294967296
+  },
+  "early_record": {
+    "run_id": "186b81acea5f4a5b8424a1d8fded3eae",
+    "text": "K80 GPU early252: root=1; deferred=1; cpu_online=8; cpu_samples=pending",
+    "freshness": "before and after differ; tag absent before",
+    "status": "fresh-source-defined-root-EL0-early-GPU-checkpoint",
+    "cpu_online": 8,
+    "CPU_samples_pending": true,
+    "deferred_CPU_owner_published": true,
+    "can_support_fresh_trial_when_bound_to_actual_capture_and_bundle": true,
+    "device_execution_proven_by_local_decode": false,
+    "readback_ack_proven_by_record": false,
+    "GPU_firmware_or_rendering_proven": false,
+    "ordinary_GPU_desktop_qualified": false,
+    "scope": "Source branch after actual registered root and deferred-owner publication,before record readback/CDC/GPU work;bind real capture before any hardware claim"
+  },
+  "early_CPU_samples": {
+    "flags": 63,
+    "ready_ticks": 974695264,
+    "cpu_done": 1,
+    "cpu_mask": 255,
+    "cpu_online": 8,
+    "user_mask": 255,
+    "system_mask": 255
+  },
+  "ordinary_process_identity": {
+    "unique": 10,
+    "pid": 10
+  },
+  "ordinary_native_sessions": [
+    {
+      "flags": 255,
+      "calls": 9,
+      "method": 0,
+      "raw": 0,
+      "close_returned": 1,
+      "close_raw": 0,
+      "prepare_stage": 9,
+      "prepare_raw": 0,
+      "prepare_detail": 0,
+      "prepare_events": 71,
+      "prepare_failed": 0,
+      "prepare_mask": 2314849654535160830,
+      "preparation": {
+        "observed": true,
+        "complete": true,
+        "stage": 9,
+        "name": "finish-return",
+        "window_predicate": null,
+        "raw": 0,
+        "detail": 0,
+        "events": 71,
+        "failed": false,
+        "mask": 2314849654535160830,
+        "raw_kind": "IOReturn"
+      }
+    },
+    {
+      "flags": 15,
+      "calls": 3325,
+      "method": 2,
+      "raw": 0,
+      "close_returned": 0,
+      "close_raw": 0,
+      "prepare_stage": 9,
+      "prepare_raw": 0,
+      "prepare_detail": 0,
+      "prepare_events": 71,
+      "prepare_failed": 0,
+      "prepare_mask": 2314849654535160830,
+      "preparation": {
+        "observed": true,
+        "complete": true,
+        "stage": 9,
+        "name": "finish-return",
+        "window_predicate": null,
+        "raw": 0,
+        "detail": 0,
+        "events": 71,
+        "failed": false,
+        "mask": 2314849654535160830,
+        "raw_kind": "IOReturn"
+      }
+    }
+  ],
+  "ordinary_native_last_sample": {
+    "unique": 10,
+    "pid": 10,
+    "flags": 15,
+    "calls": 3325,
+    "method": 2,
+    "raw": 0,
+    "close_returned": 0,
+    "close_raw": 0,
+    "attempts": 60,
+    "copy_errors": 0,
+    "lines": 0,
+    "bytes": 0,
+    "dropped": 5
+  },
+  "ordinary_journal": {
+    "complete": false,
+    "last": {
+      "unique": 10,
+      "seen_bytes": 9621,
+      "pid": 10,
+      "reserved": 9621,
+      "published": 9621,
+      "records": 62,
+      "pending": 0,
+      "gaps": 0,
+      "exited": 0,
+      "exit_status": 0,
+      "crc32": 3900961759,
+      "offset": 9621,
+      "bytes": 0,
+      "available": 1
+    },
+    "received_bytes": 9621,
+    "sha256": "5f2efd381e1a0783f401b611494272f316a033c613957efa72f07916b123d195",
+    "pending_checksum_prefixes": [],
+    "task_detached_exit_observed": false,
+    "fd_sink_readback": false,
+    "raw_file": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/ordinary261-stderr.bin"
+  },
+  "raw_ordinary_stderr": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/trial/ordinary261-stderr.bin",
+    "sha256": "5f2efd381e1a0783f401b611494272f316a033c613957efa72f07916b123d195"
+  },
+  "ordinary_journal_prefix_intact": true,
+  "ordinary_journal_task_exit_observed": false,
+  "legacy_compact_diagnostic_drop": 59,
+  "legacy_application_complete": false,
+  "last_normal_surface_record": {
+    "available": true,
+    "frame": 59,
+    "producer_fence": 63,
+    "lease": 2,
+    "tail": 63,
+    "completed": 63,
+    "surfaces": 1,
+    "first_surface_id": 92,
+    "all_acquires_passed": true,
+    "pixel_copy_returned": true,
+    "completion_ledger_valid": true,
+    "copy_counter_before": 58,
+    "copy_counter_after": 59,
+    "width": 1125,
+    "height": 2436,
+    "GPU_surface_proven": false,
+    "physical_scanout_proven": false,
+    "surface_gpu_access_fence": 63,
+    "matched_GPU_access_completed": true,
+    "GPU_surface_write_proven": false
+  },
+  "known_probe_selected": false,
+  "known_probe_report_not_expected": true,
+  "camera_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/camera/v261-window.json",
+    "sha256": "31104359123dba70b25f66fed36ffef3f4735a374c220e3ecc5b0aef14784993"
+  },
+  "camera_returncode": 0,
+  "camera_error": "[avfoundation @ 0x7acd030000] Stream #0: not enough frames to estimate rate; consider increasing probesize\n[libx264 @ 0x7acdb01c00] MB rate (920000000) > level limit (16711680)\n",
+  "camera_video_available": true,
+  "physical_observation_unavailable": false,
+  "camera_frames": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v261-system-trial-186b81acea5f4a5b8424a1d8fded3eae/root-trial/camera/frames.json",
+    "sha256": "a34c48c5ede98bb2bec2a9360fd9457fec9974aa190e0f922470cc3a862a2e20"
+  },
+  "camera_visual_observation": "8s boot console;95s dark;210s home-style icons/widget visible with blurred text. Owner independently confirms iOS desktop and interaction;known-image pixel correctness/per-frame GPU writes unqualified",
+  "owner_feedback": {
+    "source": "Current conversation owner observation and subsequent corrections",
+    "interface": "iOS lock screen and desktop",
+    "responsive_actions": [
+      "swipe",
+      "tap",
+      "long press",
+      "unlock"
+    ],
+    "failure": "Eventually froze after long pressing Settings icon",
+    "frame_rate": "Both GPU and pure CPU paths are low frame rate;no comparative frame-rate ranking or measured FPS claimed",
+    "stability": "Owner reports GPU path is less stable",
+    "complete_contact_identity_edges_and_lifecycle_qualified": false,
+    "precise_action_timestamp_unknown": true
+  },
+  "raw_panic_files": [],
+  "actual261_native_context_close_source_selected": true,
+  "native_record_identity_matches_current_boot": true,
+  "real_multiple_client_admission_implemented": true,
+  "real_concurrent_or_cross_task_native_isolation_qualified": false,
+  "independent_per_transition_MMIO_oracle_captured": false,
+  "qualification_limits": [
+    "Current native record/CDC identity matches this exact kernel;known stale-parent VFS discrepancy corrected before boot",
+    "Ordinary backboardd reaches current real native path;bounded typed wire covers only original client window and does not independently prove every switch/restore or pending-close branch",
+    "Sequential client close and continued ordinary submissions do not qualify concurrent physical sharing,cross-task ASID isolation,daemon exit or final-resource lifetime",
+    "Preserve original native return values and diagnostic loss;do not infer uncaptured cause or rewrite to success",
+    "Surface completion/acquire/copy ledger does not prove GPU render-attachment write or physical scanout",
+    "240s video available and home-style UI visible late in clip;blur prevents detailed pixel or known-image acceptance",
+    "No complete FT3683 gesture/stability/performance qualification"
+  ],
+  "ordinary_GPU_desktop_qualified": false,
+  "full_GPU_qualification": false,
+  "FT3683_full_gestures_qualified": false,
+  "physical_known_image_proven": false,
+  "no_new_root_installation": true,
+  "no_Android_Data_17_GPT_slot_boot_partition_writes_in_boot": true,
+  "storage_scope": "Read-only retained252 root and existing single4KiB log/boundedBCB;seven sampled protections,not whole root/Data phone hashing",
+  "no_bootstrap_retry_flash_restoration": true,
+  "no_disassembly_symbolization_or_reverse_engineering": true,
+  "no_new_commit_or_push": true,
+  "next_work": [
+    "Locate BoMap NoResources inner branch and extend bounded CDC observation across late Settings-long-press freeze before changing resource capacity",
+    "Prepare exact independent cross-task workload/policy and original-fence isolation observations",
+    "Continue ordinary per-frame GPU-write/presentation attribution and fullFT3683 contact/gesture source integration"
+  ],
+  "clients261": [
+    {
+      "available": 1,
+      "id": 129,
+      "unique": 10,
+      "pid": 10,
+      "flags": 3,
+      "calls": 3323,
+      "records": 2,
+      "recycled": 0,
+      "dropped": 0,
+      "reject": {
+        "sequence": 1,
+        "stage": 10,
+        "reason": 0,
+        "raw": 3758097095,
+        "method": 8,
+        "detail0": 8,
+        "detail1": 0,
+        "raw_kind": "IOReturn",
+        "physical_owner_cleanup": false
+      },
+      "failure": {
+        "sequence": 11,
+        "stage": 10,
+        "reason": 0,
+        "raw": 3758097086,
+        "method": 3,
+        "detail0": 3,
+        "detail1": 0,
+        "raw_kind": "IOReturn",
+        "physical_owner_cleanup": false
+      },
+      "close_stage": 0,
+      "close_raw": 0
+    }
+  ],
+  "client_diagnostic_loss261": false,
+  "all_clients_observed261": false,
+  "actual_first_backend_observation": "Sampled PID10 client129 first recorded backend error:sequence11,stage10 run,method3 BoMap,raw0xe00002be kIOReturnNoResources;exact inner branch is not recorded",
+  "actual_first_reject_observation": "Same client first reject sequence1 method8 GetStatus raw0xe00002c7 Unsupported;not a proven rendering fault",
+  "second_client_close_observed": false,
+  "ordinary_process_exit_observed": false,
+  "first_backend_error_is_not_proven_fatal": true,
+  "old260_Close_IOError_not_reproduced_in_sampled261_close_window": true
+}

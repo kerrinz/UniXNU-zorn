@@ -1,0 +1,39 @@
+--- a/direct-runtime/ZornGen7DirectVm26.cpp
++++ b/direct-runtime/ZornGen7DirectVm26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornClientFailure261.h"
+ #include "ZornSurfaceBacking246.h"
+ /* SPDX-License-Identifier: MIT */
+ #include "ZornGen7DirectVm26.h"
+@@ -441,7 +442,8 @@
+         const Mapping &m=mappings_[i];
+         if(!m.memory || !m.memory->imported() || !(m.permissions&ZornSmmuSparse4KWrite))continue;
+         if(coherentMapping(m.writeback,m.shareability)) {zorn_direct_coherent_skips[3]=zorn_direct_coherent_skips[3]+1;continue;}
+-        if(m.memory->acquireDeviceWrites(0,m.memory->bytes()))return fail(ZornSmmuSparse4KIoError);
++        const auto cacheRaw=m.memory->acquireDeviceWrites(0,m.memory->bytes());
++        if(cacheRaw){zorn_failure_note261(ZornFailureVmCache261,uint32_t(cacheRaw),ZornFailureBackend261,ZornFailureCache261,uint32_t(i),0);return fail(ZornSmmuSparse4KIoError);}
+     }
+     return kIOReturnSuccess;
+ }
+@@ -545,7 +547,7 @@
+ {
+     // The submit owner first observes this job's real fence, retires its IB
+     // references and acquires GPU-written imports. Any failure retains this.
+-    if(!attached_ || poisoned_ || !submission_resources_)return kIOReturnNotReady;
++    if(!attached_ || poisoned_ || !submission_resources_)return zorn_failure_return261(ZornFailureVmResources261,kIOReturnNotReady,ZornFailureBackend261,ZornFailureResources261,submission_resources_,(attached_?1u:0u)|(poisoned_?2u:0u));
+     --submission_resources_;return kIOReturnSuccess;
+ }
+ IOReturn ZornGen7DirectVm26::holdJob(uint64_t handle)
+@@ -558,9 +560,9 @@
+ }
+ IOReturn ZornGen7DirectVm26::retireJobAfterCompletion(uint64_t handle)
+ {
+-    if(!attached_ || poisoned_)return kIOReturnNotReady;
+-    Mapping *record=find(handle);if(!record || !record->jobs)return kIOReturnBadArgument;
+-    IOReturn status=record->memory->retireAfterQuiescence();if(status)return status;
++    if(!attached_ || poisoned_)return zorn_failure_return261(ZornFailureVmJob261,kIOReturnNotReady,ZornFailureBackend261,ZornFailureState261,attached_,poisoned_);
++    Mapping *record=find(handle);if(!record || !record->jobs)return zorn_failure_return261(ZornFailureVmJob261,kIOReturnBadArgument,ZornFailureBackend261,ZornFailureHandle261,record?record->jobs:0,record?1:0);
++    IOReturn status=record->memory->retireAfterQuiescence();if(status)return zorn_failure_return261(ZornFailureVmJob261,status,ZornFailureBackend261,ZornFailureReference261,record->jobs,record->memory->deviceReferences());
+     --record->jobs;return kIOReturnSuccess;
+ }
+ 

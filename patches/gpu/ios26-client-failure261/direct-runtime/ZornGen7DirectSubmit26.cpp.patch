@@ -1,0 +1,139 @@
+--- a/direct-runtime/ZornGen7DirectSubmit26.cpp
++++ b/direct-runtime/ZornGen7DirectSubmit26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornClientFailure261.h"
+ /* SPDX-License-Identifier: MIT */
+ #include "ZornGen7DirectSubmit26.h"
+ #include "AdrenoPM4.h"
+@@ -113,23 +114,23 @@
+     uint32_t queue,uint32_t *fence)
+ {
+     SubmitDiagScope measured(0);
+-    if(!fence)return kIOReturnBadArgument;*fence=0;
+-    if(!attached_ || poisoned_ || !vm_)return kIOReturnNotReady;
++    if(!fence)return zorn_failure_return261(ZornFailureSubmit261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureInput261);*fence=0;
++    if(!attached_ || poisoned_ || !vm_)return zorn_failure_return261(ZornFailureSubmit261,kIOReturnNotReady,ZornFailureBackend261,ZornFailureState261,attached_,poisoned_);
+     DirectSubmitGateScope gate(vm_->streams_);
+-    if(gate.status)return gate.status;
+-    if(!buffers || !count || count>SubmitMaxBuffers)return kIOReturnBadArgument;
++    if(gate.status)return zorn_failure_return261(ZornFailureSubmit261,gate.status,ZornFailureBackend261,ZornFailureGate261);
++    if(!buffers || !count || count>SubmitMaxBuffers)return zorn_failure_return261(ZornFailureSubmit261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureCount261,uint32_t(count),!buffers);
+     /* Every buffer is validated against the live VM before any reference. */
+     uint64_t *handles=scratch_handles_;size_t handle_count=0;
+     uint32_t *words=scratch_words_;size_t word_count=0;
+     for(size_t i=0;i<count;++i) {
+         const ZornGen7DirectSubmit26Buffer &buffer=buffers[i];
+         if(!buffer.handle || !buffer.bytes || (buffer.iova&3) || (buffer.bytes&3) || buffer.bytes>SubmitMaxIbBytes)
+-            return kIOReturnBadArgument;
++            return zorn_failure_return261(ZornFailureSubmit261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureIbBytes261,uint32_t(i),(!buffer.handle?1u:0u)|(!buffer.bytes?2u:0u)|((buffer.iova&3)?4u:0u)|((buffer.bytes&3)?8u:0u)|(buffer.bytes>SubmitMaxIbBytes?16u:0u));
+         uint64_t iova=0;size_t bytes=0;unsigned permissions=0;
+         IOReturn status=vm_->describe(buffer.handle,&iova,&bytes,&permissions);
+-        if(status)return status;
++        if(status)return zorn_failure_return261(ZornFailureDescribe261,status,status==kIOReturnBadArgument?ZornFailureReject261:ZornFailureBackend261,ZornFailureHandle261,uint32_t(i),0);
+         if(!(permissions&ZornSmmuSparse4KRead) || buffer.iova<iova ||
+-            buffer.iova-iova>bytes || buffer.bytes>bytes-(buffer.iova-iova))return kIOReturnBadArgument;
++            buffer.iova-iova>bytes || buffer.bytes>bytes-(buffer.iova-iova))return zorn_failure_return261(ZornFailureSubmit261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureBounds261,uint32_t(i),(!(permissions&ZornSmmuSparse4KRead)?1u:0u)|(buffer.iova<iova?2u:0u));
+         uint32_t header=0;
+         if(AdrenoPM4Type7(SubmitIndirectBuffer,SubmitIbWords,&header)!=AdrenoPM4Success)
+             return poison();
+@@ -142,14 +143,14 @@
+         if(!known)handles[handle_count++]=buffer.handle;
+     }
+     IOReturn swept=retireCompleted();
+-    if(swept)return swept;
++    if(swept)return zorn_failure_return261(ZornFailureSweep261,swept,ZornFailureBackend261,ZornFailureStatus261);
+     Job *job=free();
+-    if(!job)return kIOReturnBusy;
++    if(!job)return zorn_failure_return261(ZornFailureSubmit261,kIOReturnBusy,ZornFailurePending261,ZornFailureNoJob261);
+     for(size_t i=0;i<handle_count;++i) {
+         IOReturn status=vm_->holdJob(handles[i]);
+         if(status) {
+             while(i) {vm_->retireJobAfterCompletion(handles[--i]);++stats_.references_retired;}
+-            return status;
++            return zorn_failure_return261(ZornFailureHoldJob261,status,ZornFailureBackend261,ZornFailureReference261,uint32_t(i),0);
+         }
+         ++stats_.references_held;
+     }
+@@ -162,7 +163,7 @@
+             if(vm_->retireJobAfterCompletion(handles[i]))return poison();
+             ++stats_.references_retired;
+         }
+-        return resources;
++        return zorn_failure_return261(ZornFailureHoldResources261,resources,ZornFailureBackend261,ZornFailureResources261);
+     }
+     uint32_t value=0;
+     /* int-070: the first IB word as the kernel's cacheable alias and DRAM see it before any maintenance, then DRAM after the CPU
+@@ -192,7 +193,7 @@
+             *job=Job{};++stats_.poisoned_jobs;
+             for(size_t i=0;i<handle_count;++i)job->handles[i]=handles[i];
+             job->count=handle_count;job->queue=queue;job->active=true;
+-            (void)poison();return reasserted;
++            (void)poison();return zorn_failure_return261(ZornFailureReassert261,reasserted,ZornFailureBackend261,ZornFailureCache261);
+         }
+         IOReturn audited=kIOReturnSuccess;
+         uint32_t lines=0,dirty=0,stale=0;size_t budget=SubmitAuditBytes;
+@@ -250,14 +251,14 @@
+             *job=Job{};++stats_.poisoned_jobs;
+             for(size_t i=0;i<handle_count;++i)job->handles[i]=handles[i];
+             job->count=handle_count;job->queue=queue;job->active=true;
+-            (void)poison();return status;
++            (void)poison();return zorn_failure_return261(ZornFailurePublish261,status,ZornFailureBackend261,ZornFailureCache261);
+         }
+         if(vm_->cancelUnpublishedSubmissionResources())return poison();
+         for(size_t i=0;i<handle_count;++i) {
+             if(vm_->retireJobAfterCompletion(handles[i]))return poison();
+             ++stats_.references_retired;
+         }
+-        return status;
++        return zorn_failure_return261(ZornFailurePublish261,status,ZornFailureBackend261,ZornFailureCache261);
+     }
+     {
+         const uint32_t slot=zorn_direct_ib_log_count&3;uint32_t head[28];
+@@ -275,14 +276,14 @@
+             *job=Job{};++stats_.poisoned_jobs;
+             for(size_t i=0;i<handle_count;++i)job->handles[i]=handles[i];
+             job->count=handle_count;job->queue=queue;job->active=true;
+-            return poison();
++            return zorn_failure_return261(ZornFailureRing261,poison(),ZornFailureBackend261,ZornFailureInFlight261);
+         }
+         if(vm_->cancelUnpublishedSubmissionResources())return poison();
+         while(handle_count) {
+             if(vm_->retireJobAfterCompletion(handles[--handle_count]))return poison();
+             ++stats_.references_retired;
+         }
+-        return status;
++        return zorn_failure_return261(ZornFailureRing261,status,status==kIOReturnBusy?ZornFailurePending261:ZornFailureBackend261,ZornFailureStatus261);
+     }
+     for(size_t i=0;i<handle_count;++i)job->handles[i]=handles[i];
+     job->count=handle_count;job->fence=value;job->queue=queue;job->active=true;
+@@ -312,7 +313,7 @@
+ {
+     if(pendingFence)*pendingFence=false;
+     if(!attached_ || poisoned_)return kIOReturnNotReady;
+-    if(!fence)return kIOReturnBadArgument;
++    if(!fence)return zorn_failure_return261(ZornFailureWait261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureFence261,fence,0);
+     if(!vm_)return kIOReturnNotReady;
+     bool has_job=false;
+     {
+@@ -325,8 +326,8 @@
+     if(!has_job) {
+         zorn_direct_fence_wait[6]=zorn_direct_fence_wait[6]+1;
+         const NativeAdrenoRingFence passed=ring_->observeFence(fence,clock,timeout_us,&observed);
+-        if(passed==NativeAdrenoRingFencePoisoned)return poison();
+-        if(passed==NativeAdrenoRingFenceArgument) {zorn_direct_fence_wait[7]=fence;return kIOReturnBadArgument;}
++        if(passed==NativeAdrenoRingFencePoisoned)return zorn_failure_return261(ZornFailureWait261,poison(),ZornFailureBackend261,ZornFailureFence261);
++        if(passed==NativeAdrenoRingFenceArgument) {zorn_direct_fence_wait[7]=fence;return zorn_failure_return261(ZornFailureWait261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureFence261,fence,0);}
+         if(passed==NativeAdrenoRingFenceTimeout) {
+             if(pendingFence)*pendingFence=true;
+             ++stats_.timeouts;
+@@ -337,8 +338,8 @@
+         return kIOReturnSuccess;
+     }
+     const NativeAdrenoRingFence result=ring_->wait(fence,clock,timeout_us,&observed);
+-    if(result==NativeAdrenoRingFencePoisoned)return poison();
+-    if(result==NativeAdrenoRingFenceArgument) {zorn_direct_fence_wait[7]=fence;return kIOReturnBadArgument;}
++    if(result==NativeAdrenoRingFencePoisoned)return zorn_failure_return261(ZornFailureWait261,poison(),ZornFailureBackend261,ZornFailureFence261);
++    if(result==NativeAdrenoRingFenceArgument) {zorn_direct_fence_wait[7]=fence;return zorn_failure_return261(ZornFailureWait261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureFence261,fence,0);}
+     if(result==NativeAdrenoRingFenceTimeout) {
+         if(pendingFence)*pendingFence=true;
+         ++stats_.timeouts;

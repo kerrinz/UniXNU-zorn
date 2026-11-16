@@ -1,0 +1,34 @@
+--- a/sys_generic.c
++++ b/sys_generic.c
+@@ -719,6 +719,8 @@
+ 	zorn26_sb_capture_stderr(proc_uniqueid(p),fd,buf,nbyte,*retval,zornNativeError,flags);
+ 	zorn26_reporter_capture_stderr(proc_uniqueid(p),fd,buf,nbyte,*retval,zornNativeError,flags);
+ 	zorn26_application_capture_stderr(p,fd,buf,nbyte,*retval,zornNativeError,flags);
++	const ZornJournalVector248 zornVector248={buf,nbyte};
++	zorn26_journal_capture248(p,fd,&zornVector248,1,*retval,zornNativeError,flags,0);
+ #endif
+ 	return zornNativeError;
+ }
+@@ -810,7 +812,22 @@
+ 		goto out;
+ 	}
+ 
++#if defined(ARM64_BOARD_CONFIG_ZORN)
++	// uio advances its kernel-normalized vectors during the native write.
++	// Save only the bounded original descriptors before that mutation.
++	ZornJournalVector248 zornVectors248[ZornJournalVectors248];
++	const unsigned zornCount248=iovcnt>ZornJournalVectors248?ZornJournalVectors248:(unsigned)iovcnt;
++	const int zornEligible248=zorn26_journal_process248(p,fd);
++	if(zornEligible248)for(unsigned i=0;i<zornCount248;++i){
++		zornVectors248[i].address=iovp[i].iov_base;
++		zornVectors248[i].bytes=iovp[i].iov_len;
++	}
++#endif
+ 	error = writev_internal(p, fd, uio, flags, puguard, retval);
++#if defined(ARM64_BOARD_CONFIG_ZORN)
++	if(zornEligible248)zorn26_journal_capture248(p,fd,zornVectors248,zornCount248,*retval,error,flags,
++	    iovcnt>ZornJournalVectors248);
++#endif
+ 
+ out:
+ 	if (uio != NULL) {

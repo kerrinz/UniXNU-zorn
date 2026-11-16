@@ -1,0 +1,19 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -5089,6 +5089,16 @@
+                 state.nativePhysicalResourcesHeld() && ring.nativePhysicalBinding(2,generation,releasing);
+             IORecursiveLockUnlock(state.gates.startup);return held?kIOReturnSuccess:kIOReturnNotReady;
+         };
++        applicationAuthority.physicalContextCheck=[](void *cookie,ZornGen7HostRing26 &ring,uint64_t generation)->IOReturn{
++            auto *board=static_cast<ZornGen7DarwinBoardOwner *>(cookie);
++            if(!board || !board->storage_ || !normal() || !generation)return kIOReturnNotReady;
++            auto &state=*board->storage_;if(IORecursiveLockHaveLock(state.gates.startup))return kIOReturnNotReady;
++            IORecursiveLockLock(state.gates.startup);
++            const bool held=state.direct_physical_attempted && state.direct_physical_held &&
++                state.direct_physical_ring==&ring && state.direct_physical_generation==generation &&
++                state.nativePhysicalResourcesHeld() && ring.nativePhysicalContextBinding(generation);
++            IORecursiveLockUnlock(state.gates.startup);return held?kIOReturnSuccess:kIOReturnNotReady;
++        };
+         applicationAuthority.physicalRelease=[](void *cookie,ZornGen7HostRing26 &ring,uint64_t generation)->IOReturn{
+             auto *board=static_cast<ZornGen7DarwinBoardOwner *>(cookie);
+             if(!board || !board->storage_ || !normal())return kIOReturnNotReady;

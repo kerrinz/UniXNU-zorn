@@ -1,0 +1,150 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornGpuEarly252.h"
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
+ extern "C" void zorn26_native_known_image_observation(unsigned (&)[32]);
+@@ -543,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC f80eb1403d7e4f958b5eddacb49d98d0 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC f5bb017ece0045d3a06ec1711a1c8b88 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -822,6 +823,21 @@
+     unsigned emittedPoint; // Sole CDC-consumer ownership.
+ };
+ static ZornGpuProgress201 zornProgress201{};
++// One publisher for each immutable sample set; CDC reads only atomic scalars.
++static unsigned zornEarlyFlags252,zornCpuDone252,zornCpuMask252,zornCpuOnline252;
++static unsigned zornCpuUser252,zornCpuSystem252;
++static uint64_t zornEarlyTicks252;
++static unsigned zorn_early_mode252(){return zorn_gpu_early_mode252(PE_parse_boot_argn);}
++static void zorn_cpu_publish252(unsigned valid,unsigned online,const natural_t (&user)[8],const natural_t (&system)[8]){
++ unsigned um=0,sm=0;
++ for(unsigned i=0;i<8;++i){if((valid&(1u<<i)) && user[i])um|=1u<<i;if((valid&(1u<<i)) && system[i])sm|=1u<<i;}
++ __atomic_store_n(&zornCpuMask252,valid,__ATOMIC_RELAXED);
++ __atomic_store_n(&zornCpuOnline252,online,__ATOMIC_RELAXED);
++ __atomic_store_n(&zornCpuUser252,um,__ATOMIC_RELAXED);
++ __atomic_store_n(&zornCpuSystem252,sm,__ATOMIC_RELAXED);
++ __atomic_store_n(&zornCpuDone252,1u,__ATOMIC_RELEASE);
++}
++
+ #include "ZornTerminalContext231.h"
+ // Two bounded atomic source censuses only. This is not a global hardware or
+ // thread-quiescence snapshot;unknown/inconsistent observations remain unknown.
+@@ -932,7 +948,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"f80eb1403d7e4f958b5eddacb49d98d0",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"f5bb017ece0045d3a06ec1711a1c8b88",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -959,6 +975,17 @@
+         if(n<0 || unsigned(n)>=cap-(size-2))return 0;
+         size+=unsigned(n)-2;
+     }
++    if(size>=2 && zorn_early_mode252()==1){
++        const unsigned done=__atomic_load_n(&zornCpuDone252,__ATOMIC_ACQUIRE);
++        const int n=snprintf(line+size-2,cap-(size-2),",ep=%x/%llx/%u/%x/%u/%x/%x\r\n",
++            __atomic_load_n(&zornEarlyFlags252,__ATOMIC_ACQUIRE),
++            static_cast<unsigned long long>(__atomic_load_n(&zornEarlyTicks252,__ATOMIC_ACQUIRE)),done,
++            done?__atomic_load_n(&zornCpuMask252,__ATOMIC_RELAXED):0u,
++            done?__atomic_load_n(&zornCpuOnline252,__ATOMIC_RELAXED):0u,
++            done?__atomic_load_n(&zornCpuUser252,__ATOMIC_RELAXED):0u,
++            done?__atomic_load_n(&zornCpuSystem252,__ATOMIC_RELAXED):0u);
++        if(n<0 || unsigned(n)>=cap-(size-2))return 0;size+=unsigned(n)-2;
++    }
+     static uint32_t journalCursor248=0;
+     size=zorn_journal_append248(line,cap,size,journalCursor248,zorn26_journal_snapshot248,zorn26_base64_encode);
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}
+@@ -981,6 +1008,55 @@
+     IOLog("K80 GPU progress CDC result=%u\n",result);
+ }
+ 
++
++extern "C" bool zorn26_gmu_deferred_ready252();
++static void zorn_gpu_early_worker252(void *context,wait_result_t) {
++ auto *owner=static_cast<ZornUfsOwner26 *>(context);
++ bool entered=false;
++ if(zorn_early_mode252()==1 && preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled()){
++  uint64_t deadline=0;clock_interval_to_deadline(30,NSEC_PER_SEC,&deadline);
++  const bool ready=zorn_gpu_early_wait252(deadline,zorn26_gmu_deferred_ready252,
++      [](){return mach_absolute_time();},[](){IOSleep(10);});
++  if(ready && owner->readStatus().phase==ZornUfsOwner26::Phase::RootRegistered){
++   __atomic_store_n(&zornEarlyTicks252,mach_absolute_time(),__ATOMIC_RELEASE);
++   __atomic_fetch_or(&zornEarlyFlags252,4u,__ATOMIC_RELEASE);
++   Hjt26Reason milestone={};
++   char text[sizeof(milestone.record.text)]{};
++   const unsigned online=__atomic_load_n(&processor_avail_count,__ATOMIC_RELAXED);
++   const int n=snprintf(text,sizeof(text),"K80 GPU early252: root=1; deferred=1; cpu_online=%u; cpu_samples=pending",online);
++   if(n>0 && size_t(n)<sizeof(text)){
++    hjt26_capture(&milestone,text,kZornPlatformRecordTrial);
++    ZornUfsCore26::PlatformRecordObservation observed{};
++    const auto raw=ZornUfsCore26::persistPlatformRecordOnce(milestone.record,observed);
++    if(!raw && observed.writeReturned && observed.readbackReturned && observed.readbackMatched){
++     __atomic_fetch_or(&zornEarlyFlags252,8u|16u,__ATOMIC_RELEASE);
++     // Original physical CDC identity/route check and three actually completed
++     // frames still precede the original worker and every diagnostic handshake.
++     entered=true;__atomic_fetch_or(&zornEarlyFlags252,32u,__ATOMIC_RELEASE);
++     zorn_gpu_progress_cdc201(owner);
++    }
++   }
++  }
++ }
++ if(!entered)__atomic_fetch_or(&zornEarlyFlags252,0x80000000u,__ATOMIC_RELEASE);
++ owner->release();
++ (void)thread_terminate(current_thread());panic("K80 early GPU worker termination returned");
++}
++static void zorn_gpu_early_schedule252(ZornUfsOwner26 *owner){
++ unsigned empty=0;
++ if(!owner || zorn_early_mode252()!=1 ||
++    !__atomic_compare_exchange_n(&zornEarlyFlags252,&empty,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return;
++ owner->retain();thread_t worker=THREAD_NULL;
++ const auto raw=kernel_thread_start(zorn_gpu_early_worker252,owner,&worker);
++ if(raw==KERN_SUCCESS && worker!=THREAD_NULL){
++  __atomic_fetch_or(&zornEarlyFlags252,2u,__ATOMIC_RELEASE);thread_deallocate(worker);
++ }else{
++  __atomic_fetch_or(&zornEarlyFlags252,0x80000000u,__ATOMIC_RELEASE);
++  if(raw!=KERN_SUCCESS)owner->release();
++  // Success without a handle may still have a running worker: retain and do
++  // not retry, reroute CDC or infer it never ran.
++ }
++}
+ 
+ static void zorn_touch_checkpoint_worker26(void *context,wait_result_t)
+ {
+@@ -1009,6 +1085,17 @@
+         valid |= 1u << cpu;
+         user[cpu] = last.cpu_ticks[CPU_STATE_USER] - first[cpu].cpu_ticks[CPU_STATE_USER];
+         system[cpu] = last.cpu_ticks[CPU_STATE_SYSTEM] - first[cpu].cpu_ticks[CPU_STATE_SYSTEM];
++    }
++    if(zorn_early_mode252()!=0){
++        const unsigned online=__atomic_load_n(&processor_avail_count,__ATOMIC_RELAXED);
++        zorn_cpu_publish252(valid,online,user,system);
++        // The early worker owns the single persisted pre-GPU record and CDC.
++        // Keep the actual original 25s/45s samples, with pending explicit before
++        // this point, instead of fabricating their completion at root EL0.
++        IOLog("K80 early252 CPU samples: online=%u valid=%x user=%x/%x/%x/%x/%x/%x/%x/%x system=%x/%x/%x/%x/%x/%x/%x/%x\n",
++          online,valid,user[0],user[1],user[2],user[3],user[4],user[5],user[6],user[7],
++          system[0],system[1],system[2],system[3],system[4],system[5],system[6],system[7]);
++        owner->release();(void)thread_terminate(current_thread());panic("K80 early CPU sampler termination returned");
+     }
+     unsigned checkpoint45=0,cdc=0;
+     // Dedicated GPU-only validation schedule. Original25s/45s CPU samples,
+@@ -1126,8 +1213,10 @@
+        !actual.root.registrationReturned || actual.root.device==static_cast<dev_t>(-1) ||
+        actual.root.device!=static_cast<dev_t>(actualMountedDevice))return;
+     if(wantTouch){
++        if(zorn_early_mode252()==2)return; // malformed early selection never falls back to GPU work
+         uint32_t empty=0;
+         if(!__atomic_compare_exchange_n(&attempted,&empty,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return;
++        if(zorn_early_mode252()==1)zorn_gpu_early_schedule252(owner);
+         owner->retain();thread_t worker=THREAD_NULL;
+         const auto raw=kernel_thread_start(zorn_touch_checkpoint_worker26,owner,&worker);
+         if(raw==KERN_SUCCESS && worker!=THREAD_NULL){thread_deallocate(worker);return;}

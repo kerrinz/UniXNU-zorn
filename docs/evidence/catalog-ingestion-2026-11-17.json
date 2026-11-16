@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "reported_page": "https://unixnu.com/devices/zorn",
+  "reported_error": "Unterminated string (at end of document)",
+  "official_registry_entry": {
+    "name": "zorn",
+    "repository": "kerrinz/UniXNU-zorn",
+    "title": "Redmi K80 (zorn)",
+    "title_zh": "Redmi K80\uff08zorn\uff09",
+    "format": 2,
+    "legacy_page": "preserve",
+    "soc": "SM8650",
+    "summary": "Read-only UFS APFS root; user mapping stops at MEND",
+    "repository_id": 1432118290,
+    "revision": "0ca7f702e30a277371975feef665ec5763f4a43b",
+    "board": "zorn",
+    "os_profile": "ipados-17.7.11-21H461",
+    "components": [
+      "ArmDTPlatform",
+      "ArmCpu",
+      "SoftwareAES",
+      "AppleKeyStoreState",
+      "RamBlock",
+      "VerifiedRoot",
+      "GopFramebuffer",
+      "XnuPrelink",
+      "DarwinBoot"
+    ],
+    "record_state": "invalid",
+    "record_error": "Unterminated string (at end of document)"
+  },
+  "public_complete_record": {
+    "bytes": 610093,
+    "sha256": "a1be071f670b66579a7a1b6480915291b80ac469b1ed54315fcb2ed16267e65a",
+    "full_TOML_valid": true,
+    "equals_local_HEAD_record": true
+  },
+  "upstream_sources": {
+    "repository": "UniXNU/UniXNU",
+    "revision": "991b3223e485edbe5ae1f89c52df9b8b1b3991d2",
+    "files": [
+      {
+        "file": "scripts/sync-devices.py",
+        "bytes": 21847,
+        "sha256": "16fdcf54699c0660a4bdfd860f01b8aba1ecad53b762d8cb1a6d9caa6c2e06ce"
+      },
+      {
+        "file": "scripts/porting-record.py",
+        "bytes": 13665,
+        "sha256": "e677a6c573c06f0927ab8bfe77579031e23b1c0c5d1af08710f9b69f44f95b72"
+      },
+      {
+        "file": "components.toml",
+        "bytes": 20434,
+        "sha256": "6e43f305f388338096c302d867e9f9cbba7bee8a4d19cf61c5bb9e10f3300fa9"
+      }
+    ],
+    "read_only": true
+  },
+  "complete_public_source_is_not_unterminated": true,
+  "ingestion_text_truncation_is_supported_inference": true,
+  "authenticated_GraphQL_response_captured": false,
+  "source_fix": "Concise root record under48KiB;exact historical ledger retained;CI budget/completeness guard",
+  "history": {
+    "schema": 1,
+    "archive": "docs/history/porting-through-v261-2026-11-17.toml",
+    "sha256": "a12d356d3cb0cde5b1cf22529926250653a5331ffee6c84d06e46bdf903127c4",
+    "bytes": 677529,
+    "historical_evidence_entries": 1172,
+    "areas": [
+      "configuration",
+      "firmware",
+      "cpu",
+      "memory",
+      "storage",
+      "display",
+      "input",
+      "gpu",
+      "network",
+      "audio",
+      "power",
+      "packaging",
+      "diagnostics"
+    ],
+    "entry_max_bytes": 49152,
+    "reason": "Keep the catalog input concise and preserve every historical record byte outside the GraphQL text entry"
+  },
+  "actual_official_ingestion_test": {
+    "passed": true,
+    "entry_bytes": 47939,
+    "entry_max_bytes": 49152,
+    "history_bytes": 677529,
+    "history_sha256": "a12d356d3cb0cde5b1cf22529926250653a5331ffee6c84d06e46bdf903127c4",
+    "history_evidence_entries": 1172,
+    "controls": [
+      "oversized-valid-TOML",
+      "unterminated-string"
+    ],
+    "official_ingestion_regression": {
+      "results": {
+        "complete-history": {
+          "record_state": "available",
+          "record_error": null
+        },
+        "truncated-history": {
+          "record_state": "invalid",
+          "record_error": "Unterminated string (at end of document)"
+        },
+        "concise-current": {
+          "record_state": "available",
+          "record_error": null
+        }
+      },
+      "scope": "Actual official ingestion function,synthetic metadata and explicit524288-byte prefix rounded to complete UTF8;not an authenticated GitHub GraphQL response",
+      "sync_source_sha256": "16fdcf54699c0660a4bdfd860f01b8aba1ecad53b762d8cb1a6d9caa6c2e06ce",
+      "validator_source_sha256": "e677a6c573c06f0927ab8bfe77579031e23b1c0c5d1af08710f9b69f44f95b72"
+    },
+    "phone_access": false,
+    "remote_modified": false
+  },
+  "official_EN_ZH_render_preview_passed": true,
+  "preview_revision": "UNPUBLISHED-WORKTREE",
+  "pinned_official_commit": "991b3223e485edbe5ae1f89c52df9b8b1b3991d2",
+  "regression_tool": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-catalog-record.py",
+    "sha256": "6a2cc39cfd16622ee35ef4b858fd0d7628d9b2c139658e2c085aad91cf0dda4b"
+  },
+  "test_archive": "/Volumes/macData/projects/ios-zorn/out/zorn/catalog-parse-20261117-e0e3120094",
+  "new_phone_operations": 0,
+  "new_commit": false,
+  "push": false,
+  "official_rescan_or_deploy": false,
+  "online_resolution_confirmed": false,
+  "risks": [
+    "No authenticated GraphQL truncation payload or exact cutoff was captured",
+    "Compact entry must remain current;all prior records retained in exact archive",
+    "Local repair is not visible to the website until the device revision is published and official catalog rescanned/deployed"
+  ],
+  "current_root": {
+    "bytes": 47939,
+    "sha256": "5b87f8a6fb1a3e3289d5c55990f10b4381ae382e82cccade03d8ba7af79c8363"
+  },
+  "board_sha256": "8dc1096719929ab267678c9031fce9a2381134a7d9ca8305b732f44b664fa0e0"
+}

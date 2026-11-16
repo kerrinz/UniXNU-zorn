@@ -2,23 +2,47 @@
 
 [English](README.md)
 
-红米 K80（`zorn`，SM8650-AB，12 GB + 256 GB）的 UniXNU 设备仓库。目标系统为 iPad7,1 / j120ap 的 iPadOS 17.7.11（21H461，Darwin 23.6 / XNU 10063.141.1）。
+红米 K80（`zorn`，SM8650-AB，12 GB + 256 GB）的 UniXNU 设备仓库。默认format2配置仍为iPad7,1／j120ap的iPadOS17.7.11（21H461，Darwin23.6／XNU10063.141.1）；当前GPU适配主线使用独立固定的iOS26.6.2／23G90输入，保留17基线。
 
 本仓库负责板级配置、DTS、原生板级服务、XNU 补丁、打包集成与诊断。[uefi-zorn](https://github.com/kerrinz/uefi-zorn) 负责 Mu-Silicium 板级包、BootShim 和固件交接。[UniXNU](https://github.com/UniXNU/UniXNU) 提供构建工具、组件目录以及 ARM64 / OS 配置层。
 
 [结构化移植记录](porting.toml) 是各部分状态的权威来源。官网按照[记录与发布指南](https://unixnu.com/zh/porting/records#publishing-and-reuse)，从已发布版本根目录的 `board.toml` 和 `porting.toml` 生成设备文档；README 作为仓库入口。
 
-截至2026-11-16，v247已有同一已校验Metal IOSurface的有界呈现路径证据：frame499/SID35/access fence4及真实acquire/copy。一次启动332.500秒自动回TWRP并通过保护样本/BCB检查。raw诊断丢弃36仍使严格应用判定未通过；物理棋盘画面、完整GPU桌面、FT3683手势与稳定性仍未验收。见[当前进度与构建范围](docs/progress-2026-11-16-ios26.md)。
+截至2026-11-16，v251已取得会话修复的实机证据：两个正常IOKit连接打开、竞争Query被独占检查拒绝、两连接关闭，随后120／120次同表面呈现查询及实际退出0。完整5680字节日志、真机4×4棋盘、332.501秒自动回TWRP和保护／BCB检查均绑定本次kernel9f25532a／booteac7550c／rootc9382b31。原生GPU会话仍独占，普通系统GPU桌面、FT3683完整手势和稳定性尚未验收。见[当前进度](docs/progress-2026-11-16-ios26.md)和[251精确证据](docs/evidence/k80-gpu-v251-lazy-session-observed-2026-11-16.json)。
+
+保留的v252已有普通系统合成器的实机结果：backboardd取得真实原生会话，第一个正常关闭并重新取得后端；正常表面804／SID836的GPU access fence807完成，acquire／copy／账本匹配。摄像头确认物理锁屏和时钟推进；一次受保护启动332.650秒自动回TWRP，39帧串口／9170字节进程观测前缀、8核采样与保护检查通过。这是有界系统客户端／显示证据；并发原生会话、逐帧GPU写入归属、完整生命周期／解锁后桌面和FT3683手势仍未完成。[252交接](docs/handoff-2026-11-16-k80-ios26-gpu-v252-early-system.md)、[精确实机证据](docs/evidence/k80-gpu-v252-early-system-observed-2026-11-16.json)。
+
+v253已完成独立离线Board所有权候选：实际会话记录／generation、失败保留及精确正常退休替换全局身份标量，完整内核／启动包与源码、sanitizer检查通过，root／FD／ADT／配置沿用252。物理会话仍独占，共享执行链路尚未接通，未进行253实机。[253交接](docs/handoff-2026-11-16-k80-ios26-gpu-v253-board-sessions.md)。
+
+v254已把实际OOB状态和transport／maps引用移到Ring拥有的物理租约，并接通原DirectHfi请求／clear与Board释放后的正常退休；当前源码／sanitizer／完整内核和启动包检查通过，8个头文件消费者全部重编。仍为单物理会话，持续共享授权／多上下文调度尚未实现，未进行254实机。[254交接](docs/handoff-2026-11-16-k80-ios26-gpu-v254-physical-oob.md)。
+
+v255已接通独立于客户端的Board物理授权与Ring／maps／HFI／generation；DirectHfi保留Ring并逐次核对该真实授权，正常逻辑关闭后才释放物理授权并退休租约。当前源码／sanitizer／31对象重编完整内核与启动包检查通过，仍为一个逻辑原生会话，未进行255实机。[255交接](docs/handoff-2026-11-16-k80-ios26-gpu-v255-physical-authority.md)。
+
+v256已完成新操作mutex／上下文代码的单次普通系统实机：333.725秒自动回TWRP，首会话关闭0后重开、第二会话末采样3293次调用／method13／返回0；正常表面151／SID183的access fence154完成。39帧58147字节串口、9170字节完整观测前缀、8核采样、保护／BCB及物理锁屏时钟推进通过。逻辑会话仍独占，逐次MMIO切换oracle、每帧GPU写入归属、完整daemon生命周期／全GPU桌面及FT3683手势未验收。[256交接](docs/handoff-2026-11-16-k80-ios26-gpu-v256-operation-context.md)、[精确实机证据](docs/evidence/k80-gpu-v256-operation-context-observed-2026-11-16.json)。
+
+v257已接通服务／Board／Ring真实逻辑成员与连续物理OOB／最后成员释放，源码／sanitizer／完整内核与离线启动包检查通过，首成员退出保留剩余物理所有者。未进行257设备scope／启动，跨任务隔离、待完成上下文关闭及完整GPU／触控验收仍未完成。[257交接](docs/handoff-2026-11-16-k80-ios26-gpu-v257-shared-members.md)。
+
+v258通过独立物理Root检查与精确RestoreKernel恢复已完成的其他成员上下文，再继续调用方原关闭路径；当前源码／完整内核／离线启动包检查通过，未进行258实机启动。未完成fence的clientClose续行及完整GPU／触控验收仍需继续。[258交接](docs/handoff-2026-11-16-k80-ios26-gpu-v258-context-handover.md)。
+
+v259已接通清理前真实pending状态和同一次Close内的有界续行，不重做已完成清理段。当前源码／sanitizer／完整内核／离线启动包通过，未进行259实机启动。实际退出、作业退休／跨任务GPU／呈现及完整触控仍需验收。[259交接](docs/handoff-2026-11-16-k80-ios26-gpu-v259-bounded-close.md)。
+
+v260修复259上机准入前发现的原生VFS身份不一致：平台记录／panic头已固定到候选源码，实际native预处理与旧覆盖层拒绝检查通过。完整内核／离线启动包通过，259共享上下文／关闭正文保持。尚无260实机启动，最新实机256。[260交接](docs/handoff-2026-11-16-k80-ios26-gpu-v260-platform-identity.md)。
+
+260已完成一次精确普通客户端回归，333.19秒自动回TWRP；平台记录／CDC身份、八核及七组保护／BCB通过。第一段Close0，第二段Close0xe00002ca，末次SubmitBatch样本0xe00002c2；相机不可用，正常退出／GPU写入呈现／完整触控未验收。[260实机证据](docs/evidence/k80-gpu-v260-platform-identity-observed-2026-11-16.json)。
+
+v261单次启动约333.63秒自动回核验TWRP，39帧串口与240秒录像成功。用户确认进入iOS桌面，滑动／点按／长按／解锁有响应，最终长按设置卡死；两条路径均低帧率，不比较CPU／GPU高低。首个记录后端错误为BoMap NoResources，内部原因及最终卡死仍待定位。[261交接](docs/handoff-2026-11-17-k80-ios26-gpu-v261-client-failure.md)。
+
+官网收录EOF报错已在本地通过精简入口、完整归档历史记录和CI完整性检查修复；见[收录诊断与验证](docs/catalog-ingestion-2026-11-17.md)。线上页面仍需发布新版本并由官方重新抓取。
 
 ## 当前状态
 
 截至 2026-10-30，机主已确认进入桌面、上滑解锁及图标点按正常。八核身份、定时器、IPI、绑定任务检查和九轮映射检查通过；8 GiB XNU 内存窗口、保留的 8 GiB UFS Data 及面板亮度 64 均有绑定身份的真机结果。已观察到两个独立触点 ID 及正常释放，系统多指手势仍未验收。
 
-历史检查点（2026-11-13）：iOS 26 的 CPU 渲染路径在有界 `b0da41e9` 启动期间进入系统锁屏，机主已目视确认；CPU 内核 SHA-256 为 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`。机主确认此前 GPU 分支曾在 K80 真机上启动测试，但无法进入系统锁屏，因此当时转向 CPU 渲染。这些 GPU 真机尝试曾推进到 GPUCC/PLL 和时钟阶段、保持 masked 的 SMMU IRQ 路由、GMU 冷时钟前缀与 SMMU 全局控制，以及只读 bank/stream census；它们属于分阶段平台初始化结果。GMU 固件/HFI 启动、GPU 提交与 fence、GPU 渲染、Metal 和 GPU 显示仍未验收。最新 v80 GPU 候选仅完成离线完整链接，未选用、未上机；v73 Recovery 停止门仍有效。详见[GPU 进度记录](docs/progress-2026-10-30-gpu.md)。
+历史检查点（2026-11-13）：iOS 26 的 CPU 渲染路径在有界 `b0da41e9` 启动期间进入系统锁屏，机主已目视确认；CPU 内核 SHA-256 为 `9f6474ce789a8ac860417e3e7526ca5e241366c4dd7bd3c8b1731712c409a091`。机主确认此前 GPU 分支曾在 K80 真机上启动测试，但无法进入系统锁屏，因此当时转向 CPU 渲染。这些 GPU 真机尝试曾推进到 GPUCC/PLL 和时钟阶段、保持 masked 的 SMMU IRQ 路由、GMU 冷时钟前缀与 SMMU 全局控制，以及只读 bank/stream census；它们属于分阶段平台初始化结果。GMU 固件/HFI 启动、GPU 提交与 fence、GPU 渲染、Metal 和 GPU 显示仍未验收。最新 v80 GPU 候选仅完成离线完整链接，未选用、未上机；v73 Recovery停止门属于该历史检查点；后续独立scope见当前进度。详见[GPU 进度记录](docs/progress-2026-10-30-gpu.md)。
 
 CPU1 页表根发布修正通过同一完整内核的「0 失败 / 1 通过 / 0 失败 / 1 通过」对照，以及两个相差 16 KiB、无附加早期探针的布局验证。这是该窄修正的有界证据。另一个偶发停苹果标志的 GUI 问题仍未解决。最后一次 `c50ca7ea` 观察显示锁屏，记录到全部八核的 USER / SYSTEM 累计记账进展，并自动回到 recovery；它不构成性能或长期稳定性验收。
 
-默认镜像仍为 `42f3d518`；`3a8ac966` 的两次机主确认桌面结果作为独立基线保留。它们均为会有界自动回收的调试镜像。Wi-Fi、蓝牙、音频、蜂窝通信、相机、传感器和完整电源管理尚未验收。v247已有同一Metal IOSurface排队/acquire/拷贝证据；物理已知图像、完整GPU桌面和稳定性仍未验收，见最新进度。
+默认镜像仍为 `42f3d518`；`3a8ac966` 的两次机主确认桌面结果作为独立基线保留。它们均为会有界自动回收的调试镜像。Wi-Fi、蓝牙、音频、蜂窝通信、相机、传感器和完整电源管理尚未验收。v250有界Metal图像／120帧查询及物理输出已通过；普通系统GPU桌面和稳定性仍未验收，见最新进度。
 
 证据与验收边界见两仓库同步维护的[非 GPU 进度摘要](docs/progress-2026-10-30-non-gpu.md)。
 

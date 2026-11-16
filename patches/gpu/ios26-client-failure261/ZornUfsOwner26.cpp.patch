@@ -1,0 +1,38 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 81683386ba0d423d817a2b7d0e1c60f0 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 186b81acea5f4a5b8424a1d8fded3eae %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -813,6 +813,7 @@
+ 
+ #include "ZornCdcStream201.h"
+ #include "ZornProgressFormat202.h"
++#include "ZornClientFailureWire261.h"
+ #include "ZornProgressGate203.h"
+ extern "C" unsigned zorn26_cdc_stream201(vm_offset_t,ZornCdcNext201,void *);
+ struct ZornGpuProgress201 {
+@@ -948,7 +949,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"81683386ba0d423d817a2b7d0e1c60f0",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"186b81acea5f4a5b8424a1d8fded3eae",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -986,6 +987,9 @@
+             done?__atomic_load_n(&zornCpuSystem252,__ATOMIC_RELAXED):0u);
+         if(n<0 || unsigned(n)>=cap-(size-2))return 0;size+=unsigned(n)-2;
+     }
++    ZornClientFailure261 failure261{};
++    const unsigned haveFailure261=zorn_failure_snapshot261(completedFrames,&failure261)?1u:0u;
++    size=zorn_failure_append261(line,cap,size,haveFailure261,failure261);
+     static uint32_t journalCursor248=0;
+     size=zorn_journal_append248(line,cap,size,journalCursor248,zorn26_journal_snapshot248,zorn26_base64_encode);
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}

@@ -1,0 +1,188 @@
+--- /dev/null
++++ b/ZornGen7BootBuffers26.cpp
+@@ -0,0 +1,185 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include "ZornGen7BootBuffers26.h"
++#include "ZornGen7GmuIrq26.h"
++#include "ZornGen7DirectHfi26.h"
++#include "Adreno740/NativeAdrenoMemory.h"
++#include "vendor/Ace5Gmu/giulia_gpu_memory.h"
++#include <IOKit/IOLib.h>
++#include <IOKit/IOBufferMemoryDescriptor.h>
++#include <libkern/OSByteOrder.h>
++#include <kern/sched_prim.h>
++#include <machine/machine_routines.h>
++OSDefineMetaClassAndStructors(ZornGen7BootBuffers26,OSObject)
++namespace {
++bool normal(){return preemption_enabled() && !ml_at_interrupt_context();}
++constexpr uint32_t table_header_bytes=24,queue_header_bytes=48,queue_header_capacity=17;
++constexpr uint32_t active_queues=3,queue_bytes=4096,table_bytes=24+17*48;
++constexpr uint32_t queue_start=(table_bytes+15u)&~15u;
++constexpr uint32_t hfi_request_bytes=table_bytes+16u+queue_bytes*active_queues;
++constexpr uint32_t hfi_logical_bytes=(hfi_request_bytes+4095u)&~4095u;
++constexpr uint32_t log_logical_bytes=65536;
++static_assert(table_bytes==840 && queue_start==848 && hfi_request_bytes==13144 && hfi_logical_bytes==16384);
++struct VmaState {uint32_t actual_start,actual_bytes,actual_next_va;};
++struct GmuVaInterval {uint32_t actual_start,actual_bytes;};
++struct GmuDynamicReservations {
++    struct Position {uint32_t start;size_t insert_at;};
++    GmuVaInterval *actual_intervals;size_t actual_count,actual_capacity;
++    bool valid(const VmaState &) const;
++    Position firstHole(const VmaState &,uint32_t,uint32_t) const;
++    size_t fixedInsertion(uint32_t,uint32_t) const;
++    void insert(Position,uint32_t);
++};
++#include "ZornGen7BootBufferReservations26.inc"
++}
++struct ZornGen7BootBuffers26::Storage {
++    IORecursiveLock &gate;const unsigned backing_bits;
++    // Exact source NONCACHED_KERNEL VMA, not an assigned buffer VA. Actual
++    // firmware reservations seed its ledger; log then HFI use source first-hole.
++    VmaState vma{0x60000000,0x20000000,0x60000000};
++    GmuVaInterval intervals[GG_FW_MAX_BLOCKS+2]{};
++    GmuDynamicReservations ledger{intervals,0,GG_FW_MAX_BLOCKS+2};
++    NativeAdrenoMemory buffers[2]; // 0log,1direct-ring HFI
++    uint32_t vas[2]{};bool allocated[2]{},wc[2]{},published[2]{},held[2]{};
++    IOReturn native_raw[2]{kIOReturnNotReady,kIOReturnNotReady};
++    // Fresh source gen7_device is kzalloc'ed; sleep retention is never imported
++    // into this one-shot cold owner. No warm/suspend path may reuse this cell.
++    uint32_t retained_log_wptr=0;bool config_attempted=false,configured=false;
++    ZornGen7RegisterConfig::CheckedResult config{};
++    bool receiver_attempted=false,receiver_ready=false;
++    bool ready=false,stopped=false;
++    Storage(IORecursiveLock &g,unsigned bits):gate(g),backing_bits(bits){}
++    static void *operator new(size_t,void *p) noexcept{return p;}
++};
++IOReturn ZornGen7BootBuffers26::createAndPrepare(IORecursiveLock &gate,OSObject &domain,
++    unsigned bits,const gg_reservation *firmware,size_t count,ZornGen7BootBuffers26 *&out)
++{
++    if(out || !normal() || !IORecursiveLockHaveLock(&gate) || !firmware || count!=5)
++        return kIOReturnBadArgument;
++    auto *owner=new ZornGen7BootBuffers26;if(!owner)return kIOReturnNoMemory;
++    if(!owner->init()){owner->release();return kIOReturnNoMemory;}
++    owner->retain();owner->pinned_=true;out=owner;domain.retain();
++    void *memory=IOMallocZero(sizeof(Storage));if(!memory)return kIOReturnNoMemory;
++    owner->storage_=new(memory) Storage(gate,bits);auto &s=*owner->storage_;
++    auto refuse=[&](IOReturn raw){s.stopped=true;return raw;};
++    for(size_t i=0;i<count;++i) {
++        const auto &r=firmware[i];if(r.region!=GG_KERNEL)continue;
++        const uint64_t end=uint64_t(r.iova)+r.bytes;
++        if(!r.bytes || (r.iova&4095u) || (r.bytes&4095u) || r.iova<s.vma.actual_start ||
++           end>uint64_t(s.vma.actual_start)+s.vma.actual_bytes)return refuse(kIOReturnBadArgument);
++        const size_t at=s.ledger.fixedInsertion(r.iova,r.bytes);
++        if(at==SIZE_MAX || s.ledger.actual_count==s.ledger.actual_capacity)return refuse(kIOReturnBadArgument);
++        s.ledger.insert({r.iova,at},r.bytes);
++    }
++    if(!s.ledger.valid(s.vma))return refuse(kIOReturnBadArgument);
++    const uint32_t sizes[2]={log_logical_bytes,hfi_logical_bytes};
++    for(unsigned i=0;i<2;++i) {
++        const size_t budget=NativeAdrenoMemory::backingBudget(sizes[i]);
++        if(!budget)return refuse(kIOReturnUnsupported);
++        auto &m=s.buffers[i];
++        s.native_raw[i]=m.allocate(sizes[i],bits,true,budget,false);
++        if(s.native_raw[i]!=kIOReturnSuccess)return refuse(s.native_raw[i]);
++        s.allocated[i]=true;
++        if(!m.backed() || m.quarantined() || m.imported() || m.pooled() || m.readOnly() ||
++           m.deviceReferences() || m.writeCombined() || !m.mapping() || !m.descriptor() ||
++           m.bytes()!=sizes[i] || m.ownedBytes()!=budget || m.descriptor()->getLength()!=budget ||
++           (m.cpuPageBytes()!=4096 && m.cpuPageBytes()!=16384) || m.spanCount()!=1 || m.ownedSpanCount()!=1 ||
++           !m.spans() || !m.ownedSpans() || m.spans()[0].offset || m.ownedSpans()[0].offset ||
++           m.spans()[0].bytes!=sizes[i] || m.ownedSpans()[0].bytes!=budget ||
++           m.spans()[0].physical!=m.ownedSpans()[0].physical)return refuse(kIOReturnBadArgument);
++        const auto hole=s.ledger.firstHole(s.vma,sizes[i],4096);
++        if(!hole.start || s.ledger.actual_count==s.ledger.actual_capacity)return refuse(kIOReturnNoResources);
++        // Full reservation consumed before subsequent partial operations. A
++        // failed attempt cannot be reconstructed/reused as another allocation.
++        s.ledger.insert(hole,sizes[i]);s.vas[i]=hole.start;
++        s.native_raw[i]=m.makeWriteCombined();if(s.native_raw[i]!=kIOReturnSuccess)return refuse(s.native_raw[i]);
++        s.wc[i]=true;
++        // Only the actual allocated object is touched; entire native backing
++        // and padding must have been zeroed by the native allocator.
++        const auto *cpu=static_cast<const volatile uint8_t *>(m.mapping());
++        for(size_t at=0;at<m.ownedBytes();++at)if(cpu[at])return refuse(kIOReturnBadArgument);
++        if(i==1) {
++            void *cpu=m.mapping();
++            OSWriteLittleInt32(cpu,0,0);OSWriteLittleInt32(cpu,4,table_bytes/4);
++            OSWriteLittleInt32(cpu,8,table_header_bytes/4);OSWriteLittleInt32(cpu,12,queue_header_bytes/4);
++            OSWriteLittleInt32(cpu,16,active_queues);OSWriteLittleInt32(cpu,20,active_queues);
++            for(uint32_t q=0;q<active_queues;++q) {
++                const size_t at=table_header_bytes+q*queue_header_bytes;
++                const uint32_t priority=q==2?40u:10u;
++                OSWriteLittleInt32(cpu,at,1);
++                OSWriteLittleInt32(cpu,at+4,s.vas[i]+queue_start+q*queue_bytes);
++                OSWriteLittleInt32(cpu,at+8,q|(priority<<8));
++                OSWriteLittleInt32(cpu,at+12,queue_bytes/4);
++            }
++            // The remaining14 headers and all payload/index/padding bytes
++            // stay zero. No HWSCHED dispatch queues or warmboot scratch.
++        }
++        s.native_raw[i]=m.publishForDevice(0,m.bytes(),true,true);
++        if(s.native_raw[i]!=kIOReturnSuccess)return refuse(s.native_raw[i]);s.published[i]=true;
++        s.native_raw[i]=m.holdForDevice();if(s.native_raw[i]!=kIOReturnSuccess)return refuse(s.native_raw[i]);
++        s.held[i]=true;
++    }
++    if(!s.ledger.valid(s.vma))return refuse(kIOReturnBadArgument);
++    s.ready=true;return kIOReturnSuccess;
++}
++bool ZornGen7BootBuffers26::copyPreparedRanges(ZornSmmuSparse4KRange (&out)[2]) const
++{
++    if(!storage_ || !normal() || !IORecursiveLockHaveLock(&storage_->gate))return false;
++    const auto &s=*storage_;if(!s.ready || s.stopped || !s.ledger.valid(s.vma))return false;
++    for(unsigned i=0;i<2;++i) {
++        const auto &m=s.buffers[i];
++        if(!s.allocated[i] || !s.wc[i] || !s.published[i] || !s.held[i] ||
++           m.quarantined() || !m.deviceReferences() || !m.writeCombined())return false;
++        out[i]={s.vas[i],m.spans()[0].physical,m.bytes(),
++            ZornSmmuSparse4KRead|ZornSmmuSparse4KWrite|ZornSmmuSparse4KPrivileged|ZornSmmuSparse4KExecute,0,2};
++    }
++    return true;
++}
++
++IOReturn ZornGen7BootBuffers26::configureCold(ZornGen7GmuIrq26 &irq,uint32_t revision,
++    ZornGen7RegisterConfig::KnownState bcl)
++{
++    using namespace ZornGen7RegisterConfig;
++    if(!storage_ || !normal() || !IORecursiveLockHaveLock(&storage_->gate))return kIOReturnNotReady;
++    auto &s=*storage_;ZornSmmuSparse4KRange actual[2]{};
++    if(!copyPreparedRanges(actual) || s.config_attempted || irq.halted() || !revision ||
++       (bcl!=KnownState::Yes && bcl!=KnownState::No))return kIOReturnNotReady;
++    s.config_attempted=true;
++    auto refuse=[&](IOReturn raw){s.stopped=true;return raw;};
++    // The real allocated objects remain owned/published/held throughout this
++    // private consume. Nothing exposes a VA or a successful buffer provider.
++    for(unsigned i=0;i<2;++i) {
++        const auto &m=s.buffers[i];const size_t logical=i==0?log_logical_bytes:hfi_logical_bytes;
++        if(!m.backed() || m.imported() || m.pooled() || m.readOnly() ||
++           !m.mapping() || !m.descriptor() || !m.spans() || !m.ownedSpans() ||
++           m.bytes()!=logical || m.ownedBytes()!=NativeAdrenoMemory::backingBudget(logical) ||
++           m.descriptor()->getLength()!=m.ownedBytes() || m.spanCount()!=1 || m.ownedSpanCount()!=1 ||
++           m.spans()[0].offset || m.ownedSpans()[0].offset || m.spans()[0].bytes!=logical ||
++           m.ownedSpans()[0].bytes!=m.ownedBytes() ||
++           m.spans()[0].physical!=m.ownedSpans()[0].physical)return refuse(kIOReturnNotReady);
++    }
++    // Exact direct Gen7 probe/init allocates log+three-queue HFI and no VRB;
++    // the retained VRB producer belongs to HWSCHED. This describes only this
++    // owner's candidate layout, not firmware/direct-ring qualification.
++    const Parameters parameters{s.vas[1],0,s.vas[0],s.retained_log_wptr,revision,
++        uint64_t(s.buffers[0].bytes()),KnownState::No,bcl,SourceLayout::Gen7Log64KiB};
++    s.config=irq.configure(parameters);
++    if(s.config.source.assessment!=Assessment::StoresReturned ||
++       !s.config.source.shared_fault_cleared || irq.halted())return refuse(kIOReturnNotReady);
++    s.configured=true;return kIOReturnSuccess; // Returned stores, not GMU init/ACK.
++}
++
++void ZornGen7BootBuffers26::free(){if(pinned_)return;OSObject::free();}
++
++IOReturn ZornGen7BootBuffers26::prepareReceiver(ZornGen7SmmuDomain26 &domain,ZornGen7GmuIrq26 &irq,
++    ZornGen7RegisterMaps26 &maps,IOWorkLoop &loop,ZornGen7DirectHfi26 *&out)
++{
++    if(!storage_ || !normal() || !IORecursiveLockHaveLock(&storage_->gate) || out)return kIOReturnNotReady;
++    auto &s=*storage_;ZornSmmuSparse4KRange actual[2]{};
++    if(!s.configured || s.receiver_attempted || !copyPreparedRanges(actual))return kIOReturnNotReady;
++    s.receiver_attempted=true;
++    const auto raw=ZornGen7DirectHfi26::createPrepared(s.buffers[1],s.vas[1],*this,domain,irq,maps,loop,out);
++    if(raw!=kIOReturnSuccess){s.stopped=true;return raw;}
++    s.receiver_ready=true;return kIOReturnSuccess;
++    // Device-held NativeMemory objects are immutable from here until explicit
++    // normal quiesce/drain/retire. They are never reinitialized or reallocated.
++}

@@ -1,0 +1,55 @@
+--- a/ZornGen7DirectHfi26.cpp
++++ b/ZornGen7DirectHfi26.cpp
+@@ -415,7 +415,7 @@
+     auto &s=*storage_;
+     if(!s.hostStartup || s.loop->onThread() || s.loop->inGate() || IORecursiveLockHaveLock(s.hostStartup) ||
+        execution.ring_!=&ring || !ring.applicationOobPermission(*this,execution,false))return kIOReturnNotReady;
+-    IOLockLock(s.gate);auto &r=execution.oob_;const auto &task=s.kernelOob;
++    IOLockLock(s.gate);auto &r=*execution.oob_;const auto &task=s.kernelOob;
+     if(task.owner!=&ring || !task.attempted || !task.requestReturned || !task.ackObserved ||
+        !task.ackCleared || !task.gxOn || !task.releaseAttempted || !task.releaseWriteReturned || task.raw ||
+        s.clientOob.attempted || r.attempted || s.activeApp || s.commandBusy || s.pending){
+@@ -433,23 +433,17 @@
+         r.raw=s.maps->accessGmuHfiWord(at,false,v);return !r.raw && healthy();};
+     auto write=[&](uint32_t at,uint32_t v){if(!permission())return false;
+         r.raw=s.maps->accessGmuHfiWord(at,true,v);return !r.raw && healthy();};
+-    constexpr uint32_t request=1u<<30,ack=1u<<31;
+-    if(!read(0x1f992,r.ack) || !read(0x1f996,r.host) || (r.ack&ack) || (r.host&(request|ack)))return done(kIOReturnNotReady);
+-    if(!write(0x1f994,request))return done(kIOReturnNotReady);r.requestReturned=true;
+     auto poll=[&](uint32_t at,uint32_t mask,uint32_t expected,uint32_t &v){
+         uint64_t deadline=0;clock_interval_to_deadline(100,NSEC_PER_MSEC,&deadline);
+         for(;;){if(!read(at,v))return false;if((v&mask)==expected)return true;
+             uint64_t now=0;clock_get_uptime(&now);if(now>deadline)return read(at,v) && (v&mask)==expected;
+             delay_for_interval_with_leeway(26,74,1000);}
+     };
+-    if(!poll(0x1f992,ack,ack,r.ack))return done(kIOReturnNotReady);r.ackObserved=true;
+-    if(!write(0x1f991,ack) || !read(0x1f992,r.ack) || (r.ack&ack))return done(kIOReturnNotReady);r.ackCleared=true;
+-    if(!poll(0x1f8d0,3u,0u,r.gx))return done(kIOReturnNotReady);r.gxOn=true;
+-    return done(kIOReturnSuccess);
++    return done(ZornGen7PhysicalOob26::request(r,read,write,poll)?kIOReturnSuccess:kIOReturnNotReady);
+ }
+ bool ZornGen7DirectHfi26::applicationOobHeld(const ZornGen7HostRing26 &ring,const ZornGen7AppExecution26 &execution) const
+ {
+-    if(!storage_ || !healthy())return false;const auto &r=execution.oob_;
++    if(!storage_ || !healthy() || !execution.oob_)return false;const auto &r=*execution.oob_;
+     return execution.ring_==&ring && storage_->activeApp==&execution && r.owner==this && r.attempted &&
+         r.requestReturned && r.ackObserved && r.ackCleared && r.gxOn && !r.releaseAttempted;
+ }
+@@ -459,14 +453,15 @@
+     auto &s=*storage_;
+     if(!s.hostStartup || s.loop->onThread() || s.loop->inGate() || IORecursiveLockHaveLock(s.hostStartup) ||
+        !ring.applicationOobReleaseReady(*this,execution) || !ring.applicationOobPermission(*this,execution,true))return kIOReturnNotReady;
+-    IOLockLock(s.gate);auto &r=execution.oob_;
++    IOLockLock(s.gate);auto &r=*execution.oob_;
+     if(s.activeApp!=&execution || r.releaseAttempted || s.commandBusy || s.pending){IOLockUnlock(s.gate);return kIOReturnNotReady;}
+     r.releaseAttempted=true;s.commandBusy=true;
+     IOLockUnlock(s.gate);const bool held=ring.applicationOobPermission(*this,execution,true);IOLockLock(s.gate);
+     if(!held || !healthy() || s.activeApp!=&execution || !s.commandBusy ||
+        !ring.applicationOobReleaseReady(*this,execution)){
+         s.commandBusy=false;IOLockUnlock(s.gate);fail();return kIOReturnNotReady;}
+-    uint32_t clear=1u<<31;r.raw=s.maps->accessGmuHfiWord(0x1f994,true,clear);r.releaseWriteReturned=!r.raw;
++    ZornGen7PhysicalOob26::clear(r,[&](uint32_t at,uint32_t value){
++        return s.maps->accessGmuHfiWord(at,true,value);});
+     if(r.raw || !healthy()) {s.commandBusy=false;IOLockUnlock(s.gate);fail();return kIOReturnNotReady;}
+     s.activeApp=nullptr;s.commandBusy=false;IOLockUnlock(s.gate);execution.release();
+     return kIOReturnSuccess; // returned clear store only, no DMA-stop or release ACK claim

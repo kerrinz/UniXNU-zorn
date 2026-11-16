@@ -1,0 +1,44 @@
+--- a/direct-runtime/ZornGen7AppIo26.cpp
++++ b/direct-runtime/ZornGen7AppIo26.cpp
+@@ -7,6 +7,7 @@
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IOLib.h>
+ #include <kern/task.h>
++#include <kern/clock.h>
+ #include <kern/task_ref.h>
+ #include <kern/sched_prim.h>
+ #include <os/cpp_util.h>
+@@ -261,11 +262,30 @@
+     auto raw=attempted_?attemptRaw_:kIOReturnSuccess;
+     if(!raw)raw=dropViews(0);
+     if(!raw)appObservationEvent(reinterpret_cast<uintptr_t>(this),16,0,0);
+-    if(!raw && attempted_)raw=owner_->closeApplicationProcess(*this,*execution_,process_);
++    // One bounded synchronous completion continuation. Keep this exact
++    // serialized clientClose thread/identity. Root reports pending only
++    // before the chosen cleanup stage has run;never replay a partial release.
++    uint64_t deadline=0;clock_interval_to_deadline(1000,NSEC_PER_MSEC,&deadline);
++    auto completePending=[&](auto operation){
++        for(unsigned observations=0;;++observations){
++            bool pending=false;const auto result=operation(&pending);
++            if(result!=kIOReturnBusy || !pending)return result;
++            // Use the original one-second native close budget,also cap the
++            // number of observations if the clock stops advancing.
++            if(observations>=999 || mach_absolute_time()>=deadline)return kIOReturnTimeout;
++            // No issuer/startup/Root operation lock is held across this sleep.
++            // The client serial lock prevents methods/new maps during Close.
++            IOSleep(1);
++        }
++    };
++    if(!raw && attempted_)raw=completePending([&](bool *pending){
++        return owner_->closeApplicationProcess(*this,*execution_,process_,pending);});
+     if(!raw && attempted_)appObservationEvent(reinterpret_cast<uintptr_t>(this),32,0,0);
+-    if(!raw && attempted_)raw=owner_->releaseApplicationOob(*this,*execution_);
++    if(!raw && attempted_)raw=completePending([&](bool *pending){
++        return owner_->releaseApplicationOob(*this,*execution_,pending);});
+     if(!raw && attempted_)appObservationEvent(reinterpret_cast<uintptr_t>(this),64,0,0);
+-    if(!raw && attempted_)raw=owner_->closeApplicationExecution(*this,execution_);
++    if(!raw && attempted_)raw=completePending([&](bool *pending){
++        return owner_->closeApplicationExecution(*this,execution_,pending);});
+     appObservationEvent(reinterpret_cast<uintptr_t>(this),(!raw && attempted_)?128:0,0,uint32_t(raw),true);
+     task_t task=TASK_NULL;if(!raw){live_=false;task=openingTask_;openingTask_=TASK_NULL;}
+     IOLockUnlock(serial_);

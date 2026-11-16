@@ -1,0 +1,210 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -127,6 +127,13 @@
+     bool appOperationPending=false;thread_t appOperationThread=THREAD_NULL;
+     ZornGen7AppOperation26 appOperationKind=ZornGen7AppOperation26::PrepareTables;
+     bool appFenceWaitExpired=false; // Under issuer; set only by a healthy WaitFence expiration.
++    // Per-client serial -> whole-operation mutex -> issuer -> native domain.
++    // No presentation-registry or foreign authority callback takes this mutex.
++    IOLock *appSerial=nullptr;thread_t appSerialThread=THREAD_NULL;
++    ZornGen7ProcessTables26 *appOperationProcess=nullptr;
++    // Borrowed from the actual live client/process list during this operation.
++    // Successful Close clears it after RetireDetached,before scope completion.
++    ZornGen7ProcessTables26 *appContextTarget=nullptr;thread_t appContextThread=THREAD_NULL;
+     NativeAdrenoMemory imageMemory;uint64_t imageIova=0,imageHandle=0;uint32_t imageFence=0;hgki_result imageResult{};
+     IOService *kernelIoService=nullptr,*applicationIoService=nullptr;bool applicationIoPublishAttempted=false;
+     IOUserClient *kernelIoConnection=nullptr;
+@@ -178,7 +185,8 @@
+     p.retain();v.retain();i.retain();q.retain();h.retain();d.retain();r.retain();o.retain();
+     void *bytes=IOMallocZero(sizeof(Storage));if(!bytes)return kIOReturnNoMemory;
+     n->storage_=new(bytes)Storage(g,f,m,p,v,i,q,h,halted,legacy,d,r,o,authority);n->storage_->waitGate=IOLockAlloc();n->storage_->issuer=IOLockAlloc();
+-    if(!n->storage_->waitGate || !n->storage_->issuer)return kIOReturnNoMemory;
++    n->storage_->appSerial=IOLockAlloc();
++    if(!n->storage_->waitGate || !n->storage_->issuer || !n->storage_->appSerial)return kIOReturnNoMemory;
+     const auto raw=n->prepare();auto &s=*n->storage_;
+     nativeCpObservation[0]=uint32_t(raw);nativeCpObservation[1]=s.phase |
+         (s.grantReturned?1u<<8:0u) | (s.publishReturned?1u<<9:0u);
+@@ -1112,7 +1120,8 @@
+              (s.appOperationKind==ZornGen7AppOperation26::Close &&
+               (s.processTransitionOperation==ZornGen7ProcessTableOperation26::RestoreKernel ||
+                s.processTransitionOperation==ZornGen7ProcessTableOperation26::DetachVm ||
+-               s.processTransitionOperation==ZornGen7ProcessTableOperation26::RetireDetached)));
++               s.processTransitionOperation==ZornGen7ProcessTableOperation26::RetireDetached)) ||
++             applicationContextTransitionHeld(s.processTransitionOperation));
+         if(!s.issuerHeld() || (!kernel && !app) || s.nativeTableLease || s.nativeProcessTableLease ||
+            !s.ring.busy_valid || (s.ring.busy&(1u<<23)) || (s.ring.status&~1u) ||
+            s.ring.irq || s.ring.hwfault)return false;
+@@ -1139,6 +1148,8 @@
+     if(operation==ZornGen7ProcessTableOperation26::Prepare){if(p)return done(kIOReturnBadArgument);}
+     else if(!p || p->ringOwner_!=this)return done(kIOReturnBadArgument);
+     if(operation==ZornGen7ProcessTableOperation26::RestoreKernel && s.processSelected!=p)return done(kIOReturnNotReady);
++    if(s.appContextThread==current_thread() &&
++       (p!=s.appContextTarget || !applicationContextTransitionHeld(operation)))return done(kIOReturnNotReady);
+     ZornGen7ProcessTables26 **membership=&s.processClients;
+     if(p){while(*membership && *membership!=p)membership=&(*membership)->ringNext_;
+         if(!*membership)return done(kIOReturnNotReady);}
+@@ -1666,7 +1677,8 @@
+ bool ZornGen7HostRing26::applicationOperationHeld() const
+ {
+     if(!storage_ || !normal())return false;const auto &s=*storage_;
+-    const bool held=s.appExecution && s.appExecution->client_ && s.appOperationPending &&
++    const bool held=s.appSerial && __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread() &&
++        s.appExecution && s.appExecution->client_ && s.appOperationPending &&
+         s.appOperationThread==current_thread() && s.appOperationThread!=THREAD_NULL &&
+         !s.appExecutionPending && !s.appOobTransition && s.appOobActive && !s.kernelIoActive &&
+         !__atomic_load_n(&s.stopped,__ATOMIC_ACQUIRE) && !s.irq.halted() && !s.gmu.halted() &&
+@@ -1691,46 +1703,131 @@
+     return (s.kernelIoConnection==&client && !s.kernelIoClosing && !s.kernelIoClosed && kernelClientExecutionHealthy()) ||
+         (applicationOperationHeld() && s.appExecution->client_==&client);
+ }
++bool ZornGen7HostRing26::applicationContextTransitionHeld(ZornGen7ProcessTableOperation26 operation) const
++{
++    if(!storage_ || !normal())return false;const auto &s=*storage_;auto *p=s.appContextTarget;
++    if(s.hfi || !p || p!=s.appOperationProcess || s.appContextThread!=current_thread() ||
++       !applicationOperationHeld() || p->ringOwner_!=this || p->domain_!=&s.domain ||
++       p->clientOwner_!=s.appExecution->client_ || p->clientTask_!=s.appExecution->task_ ||
++       !p->clientOpen_ || p->clientClosed_ || !p->vmAttached_ || p->vmDetached_ || p->state_.poisoned)return false;
++    bool member=false;for(auto *q=s.processClients;q;q=q->ringNext_)if(q==p)member=true;
++    return member && (operation==ZornGen7ProcessTableOperation26::Select ||
++        operation==ZornGen7ProcessTableOperation26::RestoreKernel);
++}
++IOReturn ZornGen7HostRing26::enterApplicationContext(IOUserClient &client,ZornGen7AppExecution26 &execution)
++{
++    auto &s=*storage_;s.lockIssuer();
++    auto done=[&](IOReturn raw){s.unlockIssuer();return raw;};
++    if(s.hfi || s.appExecution!=&execution || execution.client_!=&client || !applicationOperationHeld() ||
++       s.appContextThread!=THREAD_NULL || s.appContextTarget || s.appOperationProcess)return done(kIOReturnNotReady);
++    ZornGen7ProcessTables26 *p=nullptr;
++    for(auto *q=s.processClients;q;q=q->ringNext_)if(q->clientOwner_==&client && q->clientTask_==execution.task_){
++        if(p)return done(kIOReturnNotReady);p=q;}
++    if(!p || p->ringOwner_!=this || p->domain_!=&s.domain || !p->clientOpen_ || p->clientClosed_ ||
++       !p->vmAttached_ || p->vmDetached_ || p->state_.poisoned)return done(kIOReturnNotReady);
++    // A retained healthy timeout may leave the previous context selected.
++    // Never switch another task's still-selected work under this task's grant.
++    if(s.processSelected && s.processSelected!=p)return done(kIOReturnBusy);
++    if(s.processSelected==p){if(p->state_.detached)return done(kIOReturnNotReady);
++        s.appOperationProcess=p;return done(kIOReturnSuccess);}
++    if(!p->state_.detached)return done(kIOReturnNotReady);
++    s.appOperationProcess=p;s.appContextTarget=p;s.appContextThread=current_thread();s.unlockIssuer();
++    auto *actual=p;auto raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::Select,actual,0,0);
++    s.lockIssuer();s.appContextThread=THREAD_NULL;s.appContextTarget=nullptr;
++    if(!raw && (actual!=p || s.processSelected!=p || p->state_.detached))raw=kIOReturnNotReady;
++    s.unlockIssuer();return raw;
++}
++IOReturn ZornGen7HostRing26::leaveApplicationContext(ZornGen7AppExecution26 &execution,bool waitExpired)
++{
++    auto &s=*storage_;s.lockIssuer();auto done=[&](IOReturn raw){s.unlockIssuer();return raw;};
++    if(s.hfi || s.appExecution!=&execution || !applicationOperationHeld() || !bootstrapHealthy() ||
++       s.appContextThread!=THREAD_NULL || s.appContextTarget)return done(kIOReturnNotReady);
++    auto *p=s.processSelected;if(!p)return done(kIOReturnSuccess);
++    if(!s.appOperationProcess && s.appOperationKind==ZornGen7AppOperation26::PrepareTables &&
++       p->clientOwner_==execution.client_ && p->clientTask_==execution.task_)s.appOperationProcess=p;
++    // Enter refused a different retained context with Busy:leave it intact.
++    if(!s.appOperationProcess)return done(kIOReturnSuccess);
++    if(p!=s.appOperationProcess || p->ringOwner_!=this || p->domain_!=&s.domain ||
++       p->clientOwner_!=execution.client_ || p->clientTask_!=execution.task_ || !p->clientOpen_ ||
++       p->clientClosed_ || !p->vmAttached_ || p->vmDetached_ || p->state_.poisoned)return done(kIOReturnNotReady);
++    if(waitExpired && (s.native.outstanding() || s.runtimeSubmit.outstanding() ||
++       p->vm_.hasPendingSubmissionResources() ||
++       (p->clientState_ && p->clientState_->submit.outstanding())))return done(kIOReturnSuccess);
++    // Existing transition drains real fences and observes hardware idle,then
++    // writes kernel TTBR,TLBSYNC and reads back. Do not replace it with flags.
++    s.appContextTarget=p;s.appContextThread=current_thread();s.unlockIssuer();
++    auto *actual=p;auto raw=transitionProcessTables(*execution.client_,ZornGen7ProcessTableOperation26::RestoreKernel,actual,0,0);
++    s.lockIssuer();s.appContextThread=THREAD_NULL;s.appContextTarget=nullptr;
++    if(!raw && (actual!=p || s.processSelected || !p->state_.detached))raw=kIOReturnNotReady;
++    s.unlockIssuer();return raw;
++}
++
+ IOReturn ZornGen7HostRing26::beginApplicationOperation(IOUserClient &client,
+     ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope)
+ {
+     if(scope || !storage_ || !normal())return kIOReturnBadArgument;auto &s=*storage_;
+-    if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;s.lockIssuer();
++    if(IORecursiveLockHaveLock(&s.gate) || !s.appSerial ||
++       __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread())return kIOReturnNotReady;
++    // Sleepable PI mutex:wait for the complete current operation,including
++    // its foreign check/drain/context transition. Never wait under issuer.
++    IOLockLock(s.appSerial);__atomic_store_n(&s.appSerialThread,current_thread(),__ATOMIC_RELEASE);
++    s.lockIssuer();
++    auto refused=[&](IOReturn raw){s.unlockIssuer();
++        __atomic_store_n(&s.appSerialThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(s.appSerial);return raw;};
+     auto *execution=s.appExecution;
+     if(!execution || execution->client_!=&client || s.appOperationPending || s.appExecutionPending ||
+-       s.appOobTransition || !s.appOobActive || s.kernelIoActive || !bootstrapHealthy()){
+-        s.unlockIssuer();return kIOReturnNotReady;}
+-    s.appFenceWaitExpired=false;
++       s.appOobTransition || !s.appOobActive || s.kernelIoActive || !bootstrapHealthy())return refused(kIOReturnNotReady);
++    s.appFenceWaitExpired=false;s.appOperationProcess=nullptr;
+     s.appOperationKind=operation;s.appOperationPending=true;execution->retain();s.unlockIssuer();
+-    // Fresh real whole-operation authorization,with no issuer/domain lock.
++    // Same actual whole-operation authority,with no issuer/domain lock.
+     auto raw=checkApplicationExecution(client,*execution,operation);
+     if(operation==ZornGen7AppOperation26::PrepareTables)zorn26_application_prepare_event(reinterpret_cast<uintptr_t>(&client),16,uint32_t(raw),0);
+     s.lockIssuer();
+     if(!raw && s.appExecution==execution && s.appOobActive && !s.appOobTransition &&
+        bootstrapHealthy() && applicationOobHeldForTransport(*execution)){
+-        s.appOperationThread=current_thread();scope=execution;
+-        s.unlockIssuer();return kIOReturnSuccess;
++        s.appOperationThread=current_thread();scope=execution;s.unlockIssuer();
++        // Prepare creates its process in the original body;every retained
++        // ordinary/Close process uses the real existing Select operation.
++        if(!s.hfi && operation!=ZornGen7AppOperation26::PrepareTables){
++            raw=enterApplicationContext(client,*execution);
++            if(raw){scope=nullptr;return finishApplicationOperation(*execution,raw);}}
++        return kIOReturnSuccess;
+     }
+     if(!raw)raw=kIOReturnNotReady;
+     if(operation==ZornGen7AppOperation26::PrepareTables)zorn26_application_prepare_event(reinterpret_cast<uintptr_t>(&client),17,uint32_t(raw),0);
+     s.appOperationPending=false;s.appOperationKind=ZornGen7AppOperation26::PrepareTables;
+-    __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();
+-    s.unlockIssuer();execution->release();return raw;
++    __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();s.unlockIssuer();
++    __atomic_store_n(&s.appSerialThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(s.appSerial);
++    execution->release();return raw;
+ }
+ IOReturn ZornGen7HostRing26::finishApplicationOperation(ZornGen7AppExecution26 &execution,IOReturn raw)
+ {
+     auto &s=*storage_;s.lockIssuer();
+-    const bool matches=s.appExecution==&execution &&
+-        s.appOperationThread==current_thread() && s.appOperationPending;
++    const bool matches=s.appSerial && __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread() &&
++        s.appExecution==&execution && s.appOperationThread==current_thread() && s.appOperationPending;
++    // A wrong/foreign scope cannot clear or unlock the legitimate owner.
++    if(!matches){s.unlockIssuer();return kIOReturnNotReady;}
+     const bool reportedExpiry=raw==kIOReturnTimeout && s.appFenceWaitExpired;
+-    const bool waitExpired=reportedExpiry && matches && applicationOperationHeld() && bootstrapHealthy();
+-    if((!raw && (!matches || !bootstrapHealthy())) || (reportedExpiry && !waitExpired))raw=kIOReturnNotReady;
++    bool waitExpired=reportedExpiry && applicationOperationHeld() && bootstrapHealthy();
++    if((!raw && !bootstrapHealthy()) || (reportedExpiry && !waitExpired))raw=kIOReturnNotReady;
++    const bool fatal=(raw==kIOReturnTimeout && !waitExpired) || raw==kIOReturnIOError ||
++        raw==kIOReturnNotReady || raw==kIOReturnNotPermitted;
++    s.unlockIssuer();
++    if(!fatal && !s.hfi){
++        const auto contextRaw=leaveApplicationContext(execution,waitExpired);
++        if(contextRaw){raw=contextRaw;waitExpired=false;}
++    }
++    s.lockIssuer();
++    if(waitExpired && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
++    if(!raw && !bootstrapHealthy())raw=kIOReturnNotReady;
+     s.appOperationThread=THREAD_NULL;s.appOperationPending=false;s.appFenceWaitExpired=false;
+-    s.appOperationKind=ZornGen7AppOperation26::PrepareTables;
++    s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appOperationProcess=nullptr;
+     if((raw==kIOReturnTimeout && !waitExpired) ||
+        raw==kIOReturnIOError || raw==kIOReturnNotReady || raw==kIOReturnNotPermitted){
+         __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+-    s.unlockIssuer();execution.release();return raw;
++    s.unlockIssuer();
++    __atomic_store_n(&s.appSerialThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(s.appSerial);
++    execution.release();return raw;
+ }
+ IOReturn ZornGen7HostRing26::openApplicationProcess(IOUserClient &client,ZornGen7AppExecution26 &execution,
+     ZornGen7ProcessTables26 *&out)
+@@ -1784,6 +1881,7 @@
+     if(!raw)raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::RestoreKernel,process,0,0);
+     if(!raw)raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::DetachVm,process,0,0);
+     if(!raw)raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::RetireDetached,process,0,0);
++    if(!raw){auto &s=*storage_;s.lockIssuer();s.appOperationProcess=nullptr;s.unlockIssuer();}
+     return finishApplicationOperation(*scope,raw);
+     // Only complete normal process cleanup permits later actual app OOB
+     // clear and independent authority release. No failure rollback/retry.

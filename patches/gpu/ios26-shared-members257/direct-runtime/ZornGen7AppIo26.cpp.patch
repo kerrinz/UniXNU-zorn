@@ -1,0 +1,50 @@
+--- a/direct-runtime/ZornGen7AppIo26.cpp
++++ b/direct-runtime/ZornGen7AppIo26.cpp
+@@ -79,7 +79,7 @@
+     if(serviceAdmission)return serviceAdmission; // no GPU attempt and no consumed session
+     if(!clients_)return kIOReturnNotReady;
+     // Each admitted IOKit connection owns metadata only until its first method.
+-    // Do not reserve the single physical session for an unused connection.
++    // Do not acquire native resources for an unused connection.
+     zorn26_client_event240(5);
+     auto *p=new ZornGen7AppIoClient26;if(!p)return kIOReturnNoMemory;
+     zorn26_client_event240(6);
+@@ -121,14 +121,20 @@
+        !actual.openingTask_ || actual.openingTask_==kernel_task ||
+        actual.openingTask_!=current_task())return kIOReturnNotReady;
+     IOLockLock(clients_);
+-    if(reserved_ || client_){IOLockUnlock(clients_);return kIOReturnExclusiveAccess;}
+-    client_=&actual;reserved_=true;
++    unsigned count=0;
++    for(auto *p=client_;p;p=p->nativeNext_){
++        if(p==&actual || ++count>=64){IOLockUnlock(clients_);return kIOReturnExclusiveAccess;}}
++    if(actual.nativeNext_){IOLockUnlock(clients_);return kIOReturnNotReady;}
++    actual.nativeNext_=client_;client_=&actual;reserved_=true;
+     IOLockUnlock(clients_);return kIOReturnSuccess;
+ }
+ void ZornGen7AppIoService26::returnClientSlot(ZornGen7AppIoClient26 *actual)
+ {
+     if(!clients_)return;IOLockLock(clients_);
+-    if(reserved_ && client_==actual){client_=nullptr;reserved_=false;}
++    auto **slot=&client_;
++    while(*slot && *slot!=actual)slot=&(*slot)->nativeNext_;
++    if(*slot){*slot=actual->nativeNext_;actual->nativeNext_=nullptr;}
++    reserved_=client_!=nullptr;
+     IOLockUnlock(clients_);
+     // Software slot only. Caller must have either attempted no native work,
+     // or completed actual process/OOB/authority close successfully.
+@@ -158,6 +164,14 @@
+     zorn26_client_event240(15);
+     attemptRaw_=owner_->prepareApplicationExecution(*this,openingTask_,0x4147,*authorityOwner_,authority_,execution_);
+     zorn26_client_event240(16);
++    if(attemptRaw_==kIOReturnBusy && !execution_){
++        // The exact Ring refused before createApplicationExecution; actual
++        // AppExecution publishes every partial before its first foreign call.
++        // Only these unused CPU metadata references are returned. This does
++        // not retry an acquisition or unwind any attempted Board/OOB/VM work.
++        attempted_=false;pinned_=false;service_->returnClientSlot(this);release();
++        return attemptRaw_;
++    }
+     if(!attemptRaw_)appObservationEvent(reinterpret_cast<uintptr_t>(this),2,0,0);
+     if(!attemptRaw_)attemptRaw_=owner_->acquireApplicationOob(*this,*execution_);
+     if(!attemptRaw_)appObservationEvent(reinterpret_cast<uintptr_t>(this),4,0,0);

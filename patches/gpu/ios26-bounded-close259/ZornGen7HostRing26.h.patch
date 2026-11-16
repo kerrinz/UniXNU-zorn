@@ -1,0 +1,38 @@
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -29,7 +29,7 @@
+     bool physicalContextIdentity() const;
+     bool physicalContextHeld() const;
+     bool nativePhysicalContextBinding(uint64_t generation) const;
+-    IOReturn restoreCompletedApplicationContext();
++    IOReturn restoreCompletedApplicationContext(bool *pendingFence=nullptr);
+     bool nativePhysicalBinding(unsigned phase,uint64_t generation,bool releasing=false) const;
+     ZornGen7PhysicalOob26::Lease *physicalOobRecordForTransport(const OSObject &) const;
+     bool physicalOobPermission(const OSObject &,bool releasing);
+@@ -41,11 +41,11 @@
+         const struct ZornGen7AppAuthority26 &,class ZornGen7AppExecution26 *&);
+     IOReturn checkApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 &,
+         ZornGen7AppOperation26);
+-    IOReturn closeApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 *&);
+-    IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&);
++    IOReturn closeApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr);
++    IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr);
+     IOReturn finishApplicationOperation(class ZornGen7AppExecution26 &,IOReturn);
+     bool applicationOperationHeld() const;
+-    IOReturn enterApplicationContext(class IOUserClient &,class ZornGen7AppExecution26 &);
++    IOReturn enterApplicationContext(class IOUserClient &,class ZornGen7AppExecution26 &,bool *pendingFence=nullptr);
+     IOReturn leaveApplicationContext(class ZornGen7AppExecution26 &,bool healthyWaitExpired);
+     bool applicationContextTransitionHeld(ZornGen7ProcessTableOperation26) const;
+     bool processExecutionHealthy() const;
+@@ -57,9 +57,9 @@
+         const struct NativeAdrenoAbiBoCpuUnmap &,uint32_t &);
+     IOReturn copyApplicationIoView(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+         uint32_t,class IOMemoryDescriptor *&);
+-    IOReturn closeApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 *&);
++    IOReturn closeApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 *&,bool *pendingFence=nullptr);
+     IOReturn acquireApplicationOob(class IOUserClient &,class ZornGen7AppExecution26 &);
+-    IOReturn releaseApplicationOob(class IOUserClient &,class ZornGen7AppExecution26 &);
++    IOReturn releaseApplicationOob(class IOUserClient &,class ZornGen7AppExecution26 &,bool *pendingFence=nullptr);
+     bool applicationOobPermission(const ZornGen7DirectHfi26 &,class ZornGen7AppExecution26 &,bool release);
+     bool applicationOobReleaseReady(const ZornGen7DirectHfi26 &,const class ZornGen7AppExecution26 &) const;
+     bool applicationOobPermissionForTransport(const OSObject &,class ZornGen7AppExecution26 &,bool release);

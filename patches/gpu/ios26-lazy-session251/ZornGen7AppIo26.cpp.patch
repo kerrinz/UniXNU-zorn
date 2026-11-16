@@ -1,0 +1,67 @@
+--- a/direct-runtime/ZornGen7AppIo26.cpp
++++ b/direct-runtime/ZornGen7AppIo26.cpp
+@@ -77,17 +77,15 @@
+     const auto serviceAdmission=ZornGen7AdmitTaskService26(*this,task,type);
+     zorn26_client_event240(4);
+     if(serviceAdmission)return serviceAdmission; // no GPU attempt and no consumed session
+-    if(!clients_)return kIOReturnNotReady;IOLockLock(clients_);
+-    if(reserved_){IOLockUnlock(clients_);return kIOReturnExclusiveAccess;}
+-    reserved_=true;IOLockUnlock(clients_);
++    if(!clients_)return kIOReturnNotReady;
++    // Each admitted IOKit connection owns metadata only until its first method.
++    // Do not reserve the single physical session for an unused connection.
+     zorn26_client_event240(5);
+-    auto *p=new ZornGen7AppIoClient26;if(!p){returnClientSlot(nullptr);return kIOReturnNoMemory;}
++    auto *p=new ZornGen7AppIoClient26;if(!p)return kIOReturnNoMemory;
+     zorn26_client_event240(6);
+-    if(!p->initWithTask(task,security,type,properties)){p->release();returnClientSlot(nullptr);return kIOReturnNoMemory;}
+-    // Real client identity owns this reservation;ordinary metadata-only
+-    // rejection/free can return it. Failed native acquisition cannot.
++    if(!p->initWithTask(task,security,type,properties)){p->release();return kIOReturnNoMemory;}
+     zorn26_client_event240(7);
+-    retain();p->service_=this;IOLockLock(clients_);client_=p;IOLockUnlock(clients_);
++    retain();p->service_=this;
+     task_reference(task);p->openingTask_=task;
+     p->serial_=IOLockAlloc();p->views_=IONewZero(ZornGen7AppIoClient26::View,ZornGen7AppIoClient26::ViewCount);
+     if(!p->serial_ || !p->views_){p->release();return kIOReturnNoMemory;}
+@@ -108,12 +106,24 @@
+     }
+     zorn26_client_event240(12);
+     p->live_=true;*out=p;
+-    if(auto process=static_cast<proc_t>(get_bsdtask_info(task)))
+-        appObservationBind(reinterpret_cast<uintptr_t>(p),proc_uniqueid(process),uint32_t(proc_pid(process)));
+     zorn26_client_event240(13);
+     return kIOReturnSuccess;
+     // No actual GPU/native operation here. A mandatory real authority provider
+     // is retained,not manufactured;this candidate is not yet published/bound.
++}
++IOReturn ZornGen7AppIoService26::reserveNativeClient(ZornGen7AppIoClient26 &actual)
++{
++    // Called under this admitted client's serial lock,before attempted_/pinning.
++    // Refusal creates no native authority,OOB,VM or BO state and may close normally.
++    if(!clients_ || !owner_ || !actual.serial_ || !actual.views_ || actual.viewError_ ||
++       actual.service_!=this || actual.getProvider()!=this ||
++       actual.owner_!=owner_ || !actual.live_ || actual.closing_ || actual.attempted_ ||
++       !actual.openingTask_ || actual.openingTask_==kernel_task ||
++       actual.openingTask_!=current_task())return kIOReturnNotReady;
++    IOLockLock(clients_);
++    if(reserved_ || client_){IOLockUnlock(clients_);return kIOReturnExclusiveAccess;}
++    client_=&actual;reserved_=true;
++    IOLockUnlock(clients_);return kIOReturnSuccess;
+ }
+ void ZornGen7AppIoService26::returnClientSlot(ZornGen7AppIoClient26 *actual)
+ {
+@@ -138,7 +148,13 @@
+     // Caller holds serial_;there is no acquire retry or failed partial cleanup.
+     zorn26_client_event240(14);
+     if(attempted_)return attemptRaw_;
++    if(!service_)return kIOReturnNotReady;
++    const auto reserved=service_->reserveNativeClient(*this);
++    if(reserved)return reserved; // no attempted flag,pin or permanent native failure
+     retain();pinned_=true;attempted_=true; // keep actual partials from the first authority call onward
++    // Observation follows real hardware sessions,not independent unused metadata.
++    if(auto process=static_cast<proc_t>(get_bsdtask_info(openingTask_)))
++        appObservationBind(reinterpret_cast<uintptr_t>(this),proc_uniqueid(process),uint32_t(proc_pid(process)));
+     zorn26_client_event240(15);
+     attemptRaw_=owner_->prepareApplicationExecution(*this,openingTask_,0x4147,*authorityOwner_,authority_,execution_);
+     zorn26_client_event240(16);

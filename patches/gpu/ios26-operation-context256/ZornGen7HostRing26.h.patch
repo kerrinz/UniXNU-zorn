@@ -1,0 +1,12 @@
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -41,6 +41,9 @@
+     IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&);
+     IOReturn finishApplicationOperation(class ZornGen7AppExecution26 &,IOReturn);
+     bool applicationOperationHeld() const;
++    IOReturn enterApplicationContext(class IOUserClient &,class ZornGen7AppExecution26 &);
++    IOReturn leaveApplicationContext(class ZornGen7AppExecution26 &,bool healthyWaitExpired);
++    bool applicationContextTransitionHeld(ZornGen7ProcessTableOperation26) const;
+     bool processExecutionHealthy() const;
+     bool processConnectionHeld(class IOUserClient &) const;
+     IOReturn openApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 *&);

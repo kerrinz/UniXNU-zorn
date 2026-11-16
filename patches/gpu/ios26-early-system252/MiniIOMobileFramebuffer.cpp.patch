@@ -1,0 +1,20 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -1,3 +1,4 @@
++#include "ZornGpuEarly252.h"
+ /*
+  * MiniIOMobileFramebuffer: a stand-in for Apple's display driver family, as seen by
+  * IOMobileFramebuffer.framework (and through it by CoreAnimation's window server).
+@@ -2745,7 +2746,11 @@
+     if(PE_parse_boot_argn("zorn26_software_accelerator",&software,sizeof(software)) && ZornSoftwareSelected247(software)){
+         // The CPU-only menu selects the inherited service without the Metal
+         // properties, even if a legacy property opt-in was also supplied.
+-        const bool submitted=publishAccelerator(&provider,false);
++        // Early-system candidate exposes only the later real GPU accelerator.
++        // CPU presentation remains registered and usable. Invalid explicit
++        // early inputs also cannot silently publish a competing placeholder.
++        const unsigned early=zorn_gpu_early_mode252(PE_parse_boot_argn);
++        const bool submitted=early==0 && publishAccelerator(&provider,false);
+         __atomic_store_n(&zornSoftwareAccelerator26,submitted?2u:1u,__ATOMIC_RELEASE);
+     }
+     unsigned known=0;

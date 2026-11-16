@@ -1,0 +1,15 @@
+--- a/direct-runtime/ZornGen7DirectSubmit26.h
++++ b/direct-runtime/ZornGen7DirectSubmit26.h
+@@ -77,10 +77,10 @@
+      * job slots just because nobody called wait(). */
+     IOReturn retireCompleted();
+     /* Waits for every outstanding job in submission order and retires its references. */
+-    IOReturn waitAll(const NativeAdrenoRingClock *,uint32_t timeout_us);
++    IOReturn waitAll(const NativeAdrenoRingClock *,uint32_t timeout_us,bool *pendingFence=nullptr);
+     /* Polls the CP timestamp; on completion retires every buffer reference. A fence whose job was already retired (by
+      * wait or retireCompleted) is checked against the ring and succeeds once the CP has passed it. */
+-    IOReturn wait(uint32_t fence,const NativeAdrenoRingClock *,uint32_t timeout_us);
++    IOReturn wait(uint32_t fence,const NativeAdrenoRingClock *,uint32_t timeout_us,bool *pendingFence=nullptr);
+     /* Wait for an earlier fence without touching job references; a timeout
+      * leaves every job and reference exactly as they were. */
+     IOReturn observeFence(uint32_t fence,const NativeAdrenoRingClock *,uint32_t timeout_us);

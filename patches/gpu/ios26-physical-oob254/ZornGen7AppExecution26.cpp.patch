@@ -1,0 +1,11 @@
+--- a/ZornGen7AppExecution26.cpp
++++ b/ZornGen7AppExecution26.cpp
+@@ -53,7 +53,7 @@
+     if(!normal() || !gate_)return kIOReturnNotReady;
+     IOLockLock(gate_);
+     if(phase_!=Phase::Held || client_!=&client || !driverGate_ || IORecursiveLockHaveLock(driverGate_) ||
+-       (oob_.attempted && !oob_.releaseWriteReturned)){
++       (!oob_ || (oob_->attempted && !oob_->releaseWriteReturned))){
+         IOLockUnlock(gate_);return kIOReturnNotReady;}
+     phase_=Phase::Closing;IOLockUnlock(gate_);
+     const auto raw=authority_.release(authority_.cookie,client,task_);

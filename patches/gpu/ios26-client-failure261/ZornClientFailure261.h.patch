@@ -1,0 +1,56 @@
+--- /dev/null
++++ b/ZornClientFailure261.h
+@@ -0,0 +1,53 @@
++// SPDX-License-Identifier: MIT
++#pragma once
++#include <stdint.h>
++// CPU diagnostic metadata only. No entry grants native ownership or proves a fence.
++enum { ZornFailureSlots261=64,ZornFailurePhysicalMethod261=18 };
++enum { ZornFailureInfo261=0,ZornFailureReject261=1,ZornFailureBackend261=2,ZornFailurePending261=3 };
++enum { ZornFailureRegistered261=1,ZornFailureScope261=2,ZornFailureClosing261=4,ZornFailureClosed261=8,ZornFailureCloseFailed261=16 };
++enum {
++ ZornFailureRun261=10,ZornFailurePrepare261=11,ZornFailureViews261=12,
++ ZornFailureCloseProcess261=13,ZornFailureCloseOob261=14,ZornFailureCloseExecution261=15,ZornFailureCloseReturn261=16,
++ ZornFailureDispatch261=40,ZornFailureQuiesce261=41,ZornFailureReleaseAll261=42,
++ ZornFailureRestore261=43,ZornFailureDetach261=44,ZornFailureRetire261=45,
++ ZornFailureClientBatch261=80,ZornFailureClientWait261=81,
++ ZornFailureSubmit261=100,ZornFailureDescribe261=101,ZornFailureSweep261=102,ZornFailureHoldJob261=103,
++ ZornFailureHoldResources261=104,ZornFailureReassert261=105,ZornFailurePublish261=106,ZornFailureRing261=107,
++ ZornFailureWait261=108,ZornFailureRelease261=109,
++ ZornFailureVmJob261=120,ZornFailureVmCache261=121,ZornFailureVmResources261=122,
++ ZornFailureDomainObserve261=160,ZornFailureDomainBegin261=161
++};
++enum { ZornFailureGeneric261=0,ZornFailureInput261=1,ZornFailureState261=2,ZornFailureCount261=3,
++ ZornFailureReserved261=4,ZornFailureQueue261=5,ZornFailureFenceWidth261=6,ZornFailureDependency261=7,
++ ZornFailureIbBytes261=8,ZornFailureEntry261=9,ZornFailureHandle261=10,ZornFailureIova261=11,
++ ZornFailurePermission261=12,ZornFailureBounds261=13,ZornFailureNoJob261=14,ZornFailureCache261=15,
++ ZornFailureReference261=16,ZornFailureResources261=17,ZornFailureFence261=18,ZornFailureGate261=19,
++ ZornFailureStatus261=20,ZornFailureInFlight261=21,ZornFailureScopeReason261=22,ZornFailureContext261=23 };
++typedef struct {uint64_t previousToken;uint32_t previousMethod,hadPrevious;} ZornClientFailureScope261;
++typedef struct {uint32_t sequence,stage,reason,raw,method,detail0,detail1;} ZornClientFailureEvent261;
++typedef struct {
++ uint64_t id,unique;
++ uint32_t pid,flags,calls,records,recycled,dropped;
++ ZornClientFailureEvent261 reject,failure;
++ uint32_t closeStage,closeRaw;
++} ZornClientFailure261;
++#ifdef __cplusplus
++extern "C" {
++#endif
++uint64_t zorn_failure_bind261(uintptr_t,uint64_t,uint32_t);
++int zorn_failure_begin261(uintptr_t,uint64_t,uint32_t,unsigned);
++void zorn_failure_end261(uint64_t);
++void zorn_failure_note261(uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t);
++void zorn_failure_client261(uintptr_t,uint64_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t);
++void zorn_failure_finish261(uint64_t,uint32_t);
++void zorn_failure_target_begin261(uint64_t,ZornClientFailureScope261 *);
++void zorn_failure_target_end261(const ZornClientFailureScope261 *);
++int zorn_failure_snapshot261(uint32_t,ZornClientFailure261 *);
++#ifdef __cplusplus
++}
++template<class R> static inline R zorn_failure_return261(uint32_t stage,R raw,uint32_t kind,
++ uint32_t reason,uint32_t detail0=0,uint32_t detail1=0){
++ if(raw)zorn_failure_note261(stage,uint32_t(raw),kind,reason,detail0,detail1);
++ return raw;
++}
++#endif

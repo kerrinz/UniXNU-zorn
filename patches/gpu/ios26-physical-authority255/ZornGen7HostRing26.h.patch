@@ -1,0 +1,23 @@
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: BSD-2-Clause-Patent */
+ #pragma once
+ #include "ZornGen7CpStartAuthority26.h"
++#include "ZornGen7PhysicalOob26.h"
+ #include <IOKit/IOLocks.h>
+ #include <mach/mach_types.h>
+ #include <libkern/c++/OSObject.h>
+@@ -25,6 +26,12 @@
+     bool bootstrapReadyForOobTransport(const OSObject &) const;
+     bool bootstrapReadyForOob(const ZornGen7HwschedHfi26 &) const;
+     friend class ZornGen7DarwinBoardOwner;friend class ZornGen7ZapOwner26;friend class ZornGen7SmmuDomain26;
++    bool nativePhysicalBinding(unsigned phase,uint64_t generation,bool releasing=false) const;
++    ZornGen7PhysicalOob26::Lease *physicalOobRecordForTransport(const OSObject &) const;
++    bool physicalOobPermission(const OSObject &,bool releasing);
++    bool physicalOobReleaseReady(const OSObject &) const;
++    IOReturn acquirePhysicalAuthority();
++    IOReturn releasePhysicalAuthority();
+     bool nativeApplicationBinding(class IOUserClient &,task_t,unsigned phase,ZornGen7AppOperation26) const;
+     IOReturn prepareApplicationExecution(class IOUserClient &,task_t,UInt32 actualOpenType,OSObject &,
+         const struct ZornGen7AppAuthority26 &,class ZornGen7AppExecution26 *&);

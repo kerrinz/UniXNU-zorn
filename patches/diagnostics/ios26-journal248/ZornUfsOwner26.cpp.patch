@@ -1,0 +1,38 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -291,6 +291,8 @@
+     }
+     *output = 0;
+ }
++
++#include "ZornJournalWire248.h"
+ 
+ static void zorn_userland_progress_worker26(void *context,wait_result_t)
+ {
+@@ -541,7 +543,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC c0bed9d9c79d4aeca33d0ad509f2984d %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 0b6e1744c27f410a9a7fc1030cf45206 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -930,7 +932,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"c0bed9d9c79d4aeca33d0ad509f2984d",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"0b6e1744c27f410a9a7fc1030cf45206",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -957,6 +959,8 @@
+         if(n<0 || unsigned(n)>=cap-(size-2))return 0;
+         size+=unsigned(n)-2;
+     }
++    static uint32_t journalCursor248=0;
++    size=zorn_journal_append248(line,cap,size,journalCursor248,zorn26_journal_snapshot248,zorn26_base64_encode);
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}
+     return size;
+ }

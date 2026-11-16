@@ -8,3 +8,14 @@ permissions:
 jobs:
   porting-record:
     uses: UniXNU/UniXNU/.github/workflows/porting-record.yml@16e592abee8a550dec8154ed1f38b5ebc4f16213
+
+  catalog-input:
+    name: Catalog input completeness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check concise record and preserved history
+        run: python3 -B scripts/check-catalog-record.py

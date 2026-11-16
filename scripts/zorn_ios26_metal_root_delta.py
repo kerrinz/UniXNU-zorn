@@ -63,11 +63,31 @@ METAL213_FLAG = '--ios26-metal213-root-delta'
 METAL214_FLAG = '--ios26-metal214-root-delta'
 METAL215_FLAG = '--ios26-metal215-root-delta'
 METAL224_FLAG = '--ios26-metal224-root-delta'
+METAL252_FLAG = '--ios26-metal252-root-delta'
+METAL251_FLAG = '--ios26-metal251-root-delta'
+METAL250_FLAG = '--ios26-metal250-root-delta'
+METAL249_FLAG = '--ios26-metal249-root-delta'
 METAL247_FLAG = '--ios26-metal247-root-delta'
 METAL229_FLAG = '--ios26-metal229-root-delta'
 METAL228_FLAG = '--ios26-metal228-root-delta'
 METAL226_FLAG = '--ios26-metal226-root-delta'
 INSTALLS = {
+    METAL252_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-metal252-root-delta-review-f5bb017e') / REVIEW.name,
+        'e298cbd5bf8e09cd5428c621cfd317a104ffd8f0b0f607f8411e854db8ab81f5',
+        'K80-persistent-iOS26-Metal252-f5bb017e', 'unattended-phone-connected', True),
+    METAL251_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-metal251-root-delta-review-f80eb140') / REVIEW.name,
+        '516675dd9f5cb93693ed1f3508ca2dcb4732e760eb8fda17253a339f77b7ee36',
+        'K80-persistent-iOS26-Metal251-f80eb140', 'unattended-phone-connected', True),
+    METAL250_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-metal250-root-delta-review-9735df98') / REVIEW.name,
+        '113215ec11fa5acc375d0871c51fe8b781fe0d5b0bec3062cc674af25252d59d',
+        'K80-persistent-iOS26-Metal250-9735df98', 'unattended-phone-connected', True),
+    METAL249_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-metal249-root-delta-review-fe1bff87') / REVIEW.name,
+        'cf9aad78da409201ac92c8f3254f91eaf6b7c2c2f50279ebbe4f20cae46bd6f2',
+        'K80-persistent-iOS26-Metal249-fe1bff87', 'unattended-phone-connected', True),
     METAL247_FLAG: InstallScope(
         REVIEW.parent.with_name('k80-metal247-root-delta-review-c0bed9d9') / REVIEW.name,
         '6087b95bbe49c6e0a65d636a0586f4b57a59605f839ad218140abbddaf500127',

@@ -1,0 +1,136 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -1637,13 +1637,14 @@
+         if(!raw)raw=kIOReturnNotReady;__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+     s.unlockIssuer();execution.release();return raw;
+ }
+-IOReturn ZornGen7HostRing26::closeApplicationExecution(IOUserClient &client,ZornGen7AppExecution26 *&p)
+-{
++IOReturn ZornGen7HostRing26::closeApplicationExecution(IOUserClient &client,ZornGen7AppExecution26 *&p,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     if(!p || !storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+     Storage::AppSerialScope serial(s);if(!serial.held)return kIOReturnNotReady;s.lockIssuer();
+     if(!s.ownsExecution(*p) || p->client_!=&client || s.appExecutionPending || s.appOperationPending ||
+        s.appOobTransition || p->oobMemberHeld_ || !p->oobMemberReleased_ || s.kernelIoActive){s.unlockIssuer();return kIOReturnNotReady;}
+-    if(s.processSelected && !s.hfi){s.unlockIssuer();const auto raw=restoreCompletedApplicationContext();s.lockIssuer();
++    if(s.processSelected && !s.hfi){s.unlockIssuer();const auto raw=restoreCompletedApplicationContext(pendingFence);s.lockIssuer();
+         if(raw){s.unlockIssuer();return raw;}}
+     if(!s.applicationQuiescent()){s.unlockIssuer();return kIOReturnNotReady;}
+     for(auto *q=s.processClients;q;q=q->ringNext_)if(q->clientOwner_==&client){s.unlockIssuer();return kIOReturnNotReady;}
+@@ -1726,17 +1727,18 @@
+     else {if(!raw)raw=kIOReturnNotReady;__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+     s.unlockIssuer();execution.release();return raw;
+ }
+-IOReturn ZornGen7HostRing26::releaseApplicationOob(IOUserClient &client,ZornGen7AppExecution26 &execution)
+-{
++IOReturn ZornGen7HostRing26::releaseApplicationOob(IOUserClient &client,ZornGen7AppExecution26 &execution,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     if(!storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+     Storage::AppSerialScope serial(s);if(!serial.held)return kIOReturnNotReady;s.lockIssuer();
+     if(!s.ownsExecution(execution) || !execution.oobMemberHeld_ || execution.oobMemberReleased_ || execution.client_!=&client || s.appExecutionPending || s.appOperationPending || s.appOobTransition ||
+        !s.appOobActive || s.kernelIoActive ||
+-       s.native.outstanding() || s.runtimeSubmit.outstanding() || s.native.poisoned() || s.runtimeSubmit.poisoned()){
++       s.native.poisoned() || s.runtimeSubmit.poisoned()){
+         s.unlockIssuer();return kIOReturnNotReady;}
+-    if(s.processSelected && !s.hfi){s.unlockIssuer();const auto raw=restoreCompletedApplicationContext();s.lockIssuer();
++    if(s.processSelected && !s.hfi){s.unlockIssuer();const auto raw=restoreCompletedApplicationContext(pendingFence);s.lockIssuer();
+         if(raw){s.unlockIssuer();return raw;}}
+-    if(!s.applicationQuiescent()){s.unlockIssuer();return kIOReturnNotReady;}
++    if(s.native.outstanding() || s.runtimeSubmit.outstanding() || !s.applicationQuiescent()){s.unlockIssuer();return kIOReturnNotReady;}
+     for(auto *p=s.processClients;p;p=p->ringNext_)if(p->clientOwner_==&client){s.unlockIssuer();return kIOReturnNotReady;}
+     const bool last=s.appExecutions==&execution && !execution.ringNext_;s.appExecution=&execution;
+     s.appOobTransition=true;s.appOobThread=current_thread();execution.retain();s.unlockIssuer();
+@@ -1841,8 +1843,9 @@
+     return storage_ && !storage_->issuerHeld() && IORecursiveLockHaveLock(&storage_->gate) &&
+         physicalContextIdentity() && generation==storage_->physicalContextGeneration;
+ }
+-IOReturn ZornGen7HostRing26::restoreCompletedApplicationContext()
+-{
++IOReturn ZornGen7HostRing26::restoreCompletedApplicationContext(bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     if(!storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || !s.appSerialHeld())return kIOReturnNotReady;
+     s.lockIssuer();
+@@ -1873,10 +1876,12 @@
+     // backend explicitly reports pending-fence timeout before any release.
+     // A release/IO/authority error cannot be relabelled as healthy Busy.
+     clock_interval_to_deadline(1000,NSEC_PER_MSEC,&s.deadline);
+-    bool pendingFence=false;raw=quiesceKernelIo(0,&pendingFence);
++    bool nativePending=false;raw=quiesceKernelIo(0,&nativePending);
+     if(raw){
+-        if(raw==kIOReturnTimeout && pendingFence && physicalContextHeld() &&
+-           !s.native.poisoned() && !s.runtimeSubmit.poisoned())return finish(kIOReturnBusy);
++        if(raw==kIOReturnTimeout && nativePending && physicalContextHeld() &&
++           !s.native.poisoned() && !s.runtimeSubmit.poisoned()){
++            const auto result=finish(kIOReturnBusy);
++            if(pendingFence && result==kIOReturnBusy)*pendingFence=true;return result;}
+         return finish(raw);
+     }
+     if(!physicalContextHeld() || s.native.outstanding() || s.runtimeSubmit.outstanding() ||
+@@ -1891,8 +1896,9 @@
+     return finish(raw);
+ }
+ 
+-IOReturn ZornGen7HostRing26::enterApplicationContext(IOUserClient &client,ZornGen7AppExecution26 &execution)
+-{
++IOReturn ZornGen7HostRing26::enterApplicationContext(IOUserClient &client,ZornGen7AppExecution26 &execution,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     auto &s=*storage_;s.lockIssuer();
+     auto done=[&](IOReturn raw){s.unlockIssuer();return raw;};
+     if(s.hfi || s.appExecution!=&execution || execution.client_!=&client || !applicationOperationHeld() ||
+@@ -1905,7 +1911,7 @@
+     // A different retained context is restored only by the independent
+     // physical Root scope,after its real fences/resources and idle complete.
+     if(s.processSelected && s.processSelected!=p){
+-        s.unlockIssuer();const auto raw=restoreCompletedApplicationContext();s.lockIssuer();
++        s.unlockIssuer();const auto raw=restoreCompletedApplicationContext(pendingFence);s.lockIssuer();
+         if(raw)return done(raw);
+         if(!applicationOperationHeld() || s.appExecution!=&execution || s.processSelected ||
+            p->ringOwner_!=this || p->domain_!=&s.domain || p->clientOwner_!=&client ||
+@@ -1946,8 +1952,9 @@
+ }
+ 
+ IOReturn ZornGen7HostRing26::beginApplicationOperation(IOUserClient &client,
+-    ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope)
+-{
++    ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     if(scope || !storage_ || !normal())return kIOReturnBadArgument;auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || !s.appSerial ||
+        __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread())return kIOReturnNotReady;
+@@ -1972,8 +1979,12 @@
+         // Prepare creates its process in the original body;every retained
+         // ordinary/Close process uses the real existing Select operation.
+         if(!s.hfi && operation!=ZornGen7AppOperation26::PrepareTables){
+-            raw=enterApplicationContext(client,*execution);
+-            if(raw){scope=nullptr;return finishApplicationOperation(*execution,raw);}}
++            bool pending=false;raw=enterApplicationContext(client,*execution,&pending);
++            if(raw){scope=nullptr;const auto result=finishApplicationOperation(*execution,raw);
++                // Only real pre-body pending state may resume. A failure in
++                // scope exit clears that evidence and retains all resources.
++                if(pendingFence && pending && result==kIOReturnBusy)*pendingFence=true;
++                return result;}}
+         return kIOReturnSuccess;
+     }
+     if(!raw)raw=kIOReturnNotReady;
+@@ -2055,11 +2066,12 @@
+     if(!raw && outputBytes)memcpy(output,reply,outputBytes);return raw;
+ }
+ IOReturn ZornGen7HostRing26::closeApplicationProcess(IOUserClient &client,ZornGen7AppExecution26 &execution,
+-    ZornGen7ProcessTables26 *&process)
+-{
++    ZornGen7ProcessTables26 *&process,bool *pendingFence)
++{
++    if(pendingFence)*pendingFence=false;
+     zorn26_client_close_reset242(); // new scope for this actual Close invocation
+     if(!process || !storage_ || !normal())return kIOReturnBadArgument;
+-    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,ZornGen7AppOperation26::Close,scope);if(raw)return raw;
++    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,ZornGen7AppOperation26::Close,scope,pendingFence);if(raw)return raw;
+     if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     zorn26_client_event240(20); // original Close authorization/scope returned successfully
+     raw=closeProcessClient(client,*process); // real process fence/BO/client/submit cleanup

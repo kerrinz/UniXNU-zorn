@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "purpose": "Actual K80 Board authority moves client state into retained exact per-session CPU records with generations,failed retention and normal retirement;physical/VM/Ring/OOB checks unchanged",
+  "parent_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88",
+  "parent_kernel_sha256": "8a3e8c257321a3cf7f44290fd1711cd030c0c436ad5bce7ec8d21c6e90b996b4",
+  "parent_hardware_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88/observed252.json",
+    "sha256": "94758157797e2df6625e1f55161214f94fa7ba486e77a82d6b9ee50bd28d1fbf"
+  },
+  "parent_source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-early-system252/source-manifest.json",
+    "sha256": "705b398c02763463fd1ac4caad2fe1fc53f1359b7d297e2f159fa2065c6ae30a"
+  },
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v253-session-records-b7865e69bc1d477c8864d05c51cda033",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v253-session-records-b7865e69bc1d477c8864d05c51cda033",
+  "changes": [
+    {
+      "file": "ZornGen7DarwinBoardOwner.cpp",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88/ZornGen7DarwinBoardOwner.cpp",
+        "sha256": "3e0793571f37374798705e89a988af9afebf104908262647d191233d5f76df36"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v253-session-records-b7865e69bc1d477c8864d05c51cda033/ZornGen7DarwinBoardOwner.cpp",
+        "sha256": "680fc18421fdeba8171a06d594f4ac2d48ab943c3efd4601815178e440c5a692"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-board-sessions253/ZornGen7DarwinBoardOwner.cpp.patch",
+        "sha256": "e18fc161794b522f7276180b0b4164449285690831333d2df40fc0881bc4bf4f"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    },
+    {
+      "file": "ZornUfsOwner26.cpp",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88/ZornUfsOwner26.cpp",
+        "sha256": "be29b7f6a4c03881e50177781edf8beafb4eecb39da6c82313a89a82bd3e4069"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v253-session-records-b7865e69bc1d477c8864d05c51cda033/ZornUfsOwner26.cpp",
+        "sha256": "113c6a947efbe1c14ec463db88e7d1ebd7caac85cf187e4c238f4ed11c79a499"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-board-sessions253/ZornUfsOwner26.cpp.patch",
+        "sha256": "ba99e1d590cb9b74699c6e9b0c571bcbdbde4d0a20fb2024bca009a1e4effd89"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    },
+    {
+      "file": "ZornUsbCdc26.c",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v252-early-system-f5bb017ece0045d3a06ec1711a1c8b88/ZornUsbCdc26.c",
+        "sha256": "26316753f91b070513ae0e4d131a0185b6c6112f5fd82d6b5a3ec59bbea226f9"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v253-session-records-b7865e69bc1d477c8864d05c51cda033/ZornUsbCdc26.c",
+        "sha256": "1bf94f66eff6ee97a81ea9190b524937e7ef7a717a5a0e2907922f87023c5aac"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-board-sessions253/ZornUsbCdc26.c.patch",
+        "sha256": "8dcc6474101e30fd342263c5aacd981d03eac830cad831b264d4fde238b9b864"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    }
+  ],
+  "public_OS_class_and_wire_headers_unchanged": true,
+  "private_board_storage_compiled": true,
+  "physical_exclusivity_retained": true,
+  "shared_physical_OOB_and_multi_context_dispatch_not_implemented": true,
+  "reference_review": {
+    "repository": "/Volumes/macData/projects/ios-zorn/UniXNU-houji",
+    "commit": "98bc0960f96076de8e8d16efcfb0c0603b166b85",
+    "file": "kernel/overlay/iokit/Kernel/houji-ufs-root/Adreno740/NativeAdrenoPublish.cpp",
+    "working_sha256": "2e7b025b3d5b92d1144d80a20f2ad6d82850f204b1265c5129198df5e780cbd6",
+    "HEAD_source_sha256": "2e7b025b3d5b92d1144d80a20f2ad6d82850f204b1265c5129198df5e780cbd6",
+    "working_file_byte_equal_HEAD": true,
+    "scope": "Read-only reference:multi-connection code explicitly lacks per-process GPU page tables;no code/board parameters imported"
+  },
+  "root_payload_changed": false,
+  "root_reuse": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v253-session-records-b7865e69bc1d477c8864d05c51cda033/root-reuse253.json",
+    "sha256": "0436e89bf7a7f5b3952c729eaec3d050a83d2c60f28c186d9390c35ef80e3ba3"
+  },
+  "new_scope_or_claim": false,
+  "phone_access": false,
+  "hardware_qualified": false,
+  "no_reverse_engineering": true
+}

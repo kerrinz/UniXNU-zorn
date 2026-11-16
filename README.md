@@ -2,13 +2,37 @@
 
 [【简体中文】](README_CN.md)
 
-UniXNU device repository for the Redmi K80 (`zorn`, SM8650-AB, 12 GB + 256 GB), targeting iPad7,1 / j120ap, iPadOS 17.7.11 (21H461, Darwin 23.6 / XNU 10063.141.1).
+UniXNU device repository for the Redmi K80 (`zorn`, SM8650-AB, 12 GB + 256 GB), with default format2 profile iPad7,1 / j120ap, iPadOS 17.7.11 (21H461, Darwin 23.6 / XNU 10063.141.1). Active GPU bring-up uses the separate pinned iOS26.6.2/23G90 inputs;the17 baseline is preserved.
 
 This repository owns the board configuration, DTS, native board services, XNU patches, packaging integration and diagnostics. [uefi-zorn](https://github.com/kerrinz/uefi-zorn) owns the Mu-Silicium board package, BootShim and firmware handoff. [UniXNU](https://github.com/UniXNU/UniXNU) supplies the build tools, component catalog and ARM64 / OS profiles.
 
 [Porting record](porting.toml) is the authoritative per-area status. The official site generates device documentation from the published root `board.toml` and `porting.toml`, following the [record and publication guide](https://unixnu.com/zh/porting/records#publishing-and-reuse). README is the repository entry point.
 
-As of2026-11-16,v247 has bounded same-IOSurface presentation evidence:known frame499/SID35/access fence4 and real acquire/copy,following the Metal pixel check. One run returned automatically toTWRP in332.500seconds with protection/BCB checks passing. Raw diagnostic loss36 keeps strict application incomplete;physical known-image output,full GPU desktop,FT3683 gestures and stability remain unqualified. See [current progress and build scope](docs/progress-2026-11-16-ios26.md).
+As of 2026-11-16,v251 has real-device metadata-session evidence:two admitted IOKit opens,one competingQuery correctly refused,two metadata closes,followed by120/120 same-surface presentation queries and actual exit0. Complete5680B journal and camera-visible4×4 checker are bound to kernel9f25532a/booteac7550c/rootc9382b31;automaticTWRP return332.501s and protection/BCB checks pass. Native GPU sessions remain exclusive;ordinary system GPU desktop,completeFT3683 gestures and stability are unqualified. See [current progress](docs/progress-2026-11-16-ios26.md) and [251 exact evidence](docs/evidence/k80-gpu-v251-lazy-session-observed-2026-11-16.json).
+
+The retained v252 has a real ordinary-compositor result:backboardd acquired native sessions,closed the first normally and reused the real backend;normal surface804/SID836 carries completed GPU accessfence807 with acquire/copy/ledger matching. Camera shows a physical lockscreen and advancing clock. One protected boot automatically returnedTWRP332.650s;39CDCframes/9170B observed stderr prefix,eight-core samples and protections passed. This is bounded system-client/display evidence;concurrent native sessions,per-frame GPU-write attribution,complete lifecycle/unlocked desktop andFT3683 gestures remain incomplete. [252 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v252-early-system.md),[exact observed evidence](docs/evidence/k80-gpu-v252-early-system-observed-2026-11-16.json).
+
+v253 adds an independent offline Board ownership candidate:actual per-session records/generations,failed retention and exact normal retirement replace global client identity scalars. Full kernel/boot and source/sanitizer checks pass;root/FD/ADT/menu stay252. Physical sessions remain exclusive and shared execution is still being implemented;no253 device run. [253 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v253-board-sessions.md).
+
+v254 separates actual physical OOB storage/resource references into the real Ring and moves the retained DirectHfi request/clear protocol onto its fresh leases. Actual close retires only after Board release,then frees outside issuer. Current source/sanitizer/full native kernel and boot checks pass;all8 header consumers rebuilt. Still one physical session,no continuous shared authority or multicontext dispatch,no254 device run. [254 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v254-physical-oob.md).
+
+v255 connects actual client-independent Board physical authority to Ring/maps/HFI/generation;DirectHfi retains Ring and checks this real authority per access. Logical close precedes physical release and lease retirement. Current source/sanitizer/full31-replacement kernel and complete boot checks pass;one logical native session remains,no255 device run. [255 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v255-physical-authority.md).
+
+v256 completed one protected real system trial with the new operation mutex/context code:automaticTWRP333.725s,first native close0/reopen,second-session last call3293/method13/return0;normal surface151/SID183 carries completed accessfence154.39CDCframes/58147B,intact9170B observed stderr prefix,eight-core samples,storage/BCB checks and physical lockscreen/clock advance passed. Logical sessions remain exclusive;per-switch MMIO oracle,per-frame GPU-write attribution,complete daemon lifecycle/fullGPU desktop andFT3683 gestures are unqualified. [256 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v256-operation-context.md),[exact observed evidence](docs/evidence/k80-gpu-v256-operation-context-observed-2026-11-16.json).
+
+v257 connects actual service/Board/Ring logical members and continuous Ring-owned physical OOB with final-member release. Source/sanitizer/full native kernel and offline boot checks pass;first-member departure preserves the remaining physical owner. No257 device scope/run;cross-task isolation,pending-context close and fullGPU/touch acceptance remain unqualified. [257 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v257-shared-members.md).
+
+v258 restores an already-completed foreign context through an independently checked physical Root scope and exact RestoreKernel,then continues the caller’s original close path. Current source/native kernel/offline boot checks pass;no258 device run. Still-pending clientClose continuation and fullGPU/touch acceptance remain incomplete. [258 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v258-context-handover.md).
+
+v259 adds explicit pre-cleanup pending-fence status and bounded same-thread close continuation without repeating completed cleanup stages. Current source/sanitizer/full kernel/offline boot checks pass;no259 device run. Actual exit,job retirement/cross-task GPU/display and complete touch acceptance still need evidence. [259 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v259-bounded-close.md).
+
+v260 fixes a native VFS identity mismatch found before259 device admission:record/panic headers are now frozen in candidate source and verified by actual native preprocessing plus stale-VFS refusal. Full kernel/offline boot pass;259 shared-context/close source remains byte-identical. No260 phone run yet;latest hardware256. [260 handoff](docs/handoff-2026-11-16-k80-ios26-gpu-v260-platform-identity.md).
+
+260 one exact ordinary-client regression auto-returned to TWRP in333.19s;native record/CDC identity and eight-core samples match,seven protected pairs/BCB pass. First client closes0;second closes0xe00002ca after a sampled SubmitBatch0xe00002c2. Camera unavailable;exit,GPU-write/display and fulltouch remain unqualified. [260 observed](docs/evidence/k80-gpu-v260-platform-identity-observed-2026-11-16.json).
+
+v261 recovered to verified TWRP after333.63s with one boot/zero retries,39CDC frames and successful240s camera video. Owner confirms iOS desktop,swipe/tap/long-press/unlock responses,then Settings-long-press freeze. Both paths are low frame rate;no CPU/GPU ranking. First recorded backend error is BoMap NoResources;inner cause and final freeze remain unresolved. [261 handoff](docs/handoff-2026-11-17-k80-ios26-gpu-v261-client-failure.md).
+
+The catalog EOF ingestion repair keeps the authoritative entry concise,archives every historical record byte and adds a CI completeness guard. See [catalog diagnosis and validation](docs/catalog-ingestion-2026-11-17.md);the deployed site still requires publication and an official rescan.
 
 ## State
 
@@ -18,7 +42,7 @@ Historical checkpoint (2026-11-13): the CPU-rendered iOS 26 path reached the sys
 
 The CPU1 root-publication change passed the same-kernel 0-fail / 1-pass / 0-fail / 1-pass control and two uninstrumented layouts 16 KiB apart. This is bounded evidence for the narrow fix. A separate intermittent Apple-logo GUI failure remains unresolved. The final `c50ca7ea` observation recovered automatically, showed a lock screen, and recorded USER and SYSTEM accounting progress on all eight cores; it is not a performance or long-term stability result.
 
-The default image remains `42f3d518`; the two owner-confirmed desktop runs of `3a8ac966` remain separate baselines. These are diagnostic images with bounded automatic recovery. Wi-Fi, Bluetooth, audio, cellular, cameras, sensors and complete power management are not qualified. Hardware graphics acceleration remains unqualified; ongoing GPU work is recorded separately below.
+The default image remains `42f3d518`; the two owner-confirmed desktop runs of `3a8ac966` remain separate baselines. These are diagnostic images with bounded automatic recovery. Wi-Fi, Bluetooth, audio, cellular, cameras, sensors and complete power management are not qualified. The v250 bounded Metal test is qualified within its exact scope; ordinary system GPU desktop and stability remain unqualified.
 
 See the shared [non-GPU progress snapshot](docs/progress-2026-10-30-non-gpu.md) for evidence and qualification limits.
 

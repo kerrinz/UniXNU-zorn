@@ -1,0 +1,111 @@
+--- a/direct-runtime/ZornGen7AppIo26.cpp
++++ b/direct-runtime/ZornGen7AppIo26.cpp
+@@ -2,6 +2,7 @@
+ #include "ZornClientTrace240.h"
+ // SPDX-License-Identifier: MIT
+ #include "ZornGen7AppIo26.h"
++#include "ZornClientFailureStore261.h"
+ #include "ZornGen7HostRing26.h"
+ #include "ZornGen7TaskAdmission26.h"
+ #include <IOKit/IOPlatformExpert.h>
+@@ -20,6 +21,20 @@
+ OSDefineMetaClassAndStructors(ZornGen7AppIoClient26,IOUserClient)
+ // Only scalar atomics in resident kernel storage; no object access in snapshot.
+ static uint32_t zornClientEvents240;
++
++// BEGIN_FAILURE261: exported source-owned diagnostic backend,not a GPU provider.
++static ZornClientFailureStore261 zornFailure261;
++extern "C" uint64_t zorn_failure_bind261(uintptr_t client,uint64_t unique,uint32_t pid){return zornFailure261.bind(client,unique,pid);}
++extern "C" int zorn_failure_begin261(uintptr_t client,uint64_t token,uint32_t method,unsigned closing){return zornFailure261.begin(client,token,reinterpret_cast<uintptr_t>(current_thread()),method,closing!=0);}
++extern "C" void zorn_failure_end261(uint64_t token){zornFailure261.end(token,reinterpret_cast<uintptr_t>(current_thread()));}
++extern "C" void zorn_failure_note261(uint32_t stage,uint32_t raw,uint32_t kind,uint32_t reason,uint32_t a,uint32_t b){zornFailure261.noteThread(reinterpret_cast<uintptr_t>(current_thread()),stage,raw,kind,reason,a,b);}
++extern "C" void zorn_failure_client261(uintptr_t client,uint64_t token,uint32_t stage,uint32_t raw,uint32_t kind,uint32_t reason,uint32_t a,uint32_t b){zornFailure261.noteClient(client,token,stage,raw,kind,reason,a,b);}
++extern "C" void zorn_failure_finish261(uint64_t token,uint32_t raw){zornFailure261.finish(token,raw);}
++extern "C" int zorn_failure_snapshot261(uint32_t frame,ZornClientFailure261*out){return out&&zornFailure261.snapshot(frame,*out);}
++extern "C" void zorn_failure_target_begin261(uint64_t token,ZornClientFailureScope261*out){if(out)zornFailure261.targetBegin(token,reinterpret_cast<uintptr_t>(current_thread()),*out);}
++extern "C" void zorn_failure_target_end261(const ZornClientFailureScope261*saved){if(saved)zornFailure261.targetEnd(reinterpret_cast<uintptr_t>(current_thread()),*saved);}
++// END_FAILURE261
++
+ extern "C" void zorn26_client_event240(unsigned event) {
+     if(event<ZornClientTraceEvents240)
+         __atomic_fetch_or(&zornClientEvents240,1u<<event,__ATOMIC_RELAXED);
+@@ -173,6 +188,10 @@
+         attempted_=false;pinned_=false;service_->returnClientSlot(this);release();
+         return attemptRaw_;
+     }
++    // Only the actual native reservation/partial receives a diagnostic token.
++    // Healthy unattempted Busy above has already returned its unused CPU slot.
++    if(auto process=static_cast<proc_t>(get_bsdtask_info(openingTask_)))
++        failureToken261_=zorn_failure_bind261(reinterpret_cast<uintptr_t>(this),proc_uniqueid(process),uint32_t(proc_pid(process)));
+     if(!attemptRaw_)appObservationEvent(reinterpret_cast<uintptr_t>(this),2,0,0);
+     if(!attemptRaw_)attemptRaw_=owner_->acquireApplicationOob(*this,*execution_);
+     if(!attemptRaw_)appObservationEvent(reinterpret_cast<uintptr_t>(this),4,0,0);
+@@ -194,10 +213,18 @@
+ IOReturn ZornGen7AppIoClient26::run(uint32_t method,const void *input,size_t inputBytes,void *output,size_t outputBytes)
+ {
+     zorn26_client_event240(17);
+-    if(!serial_)return kIOReturnNotReady;IOLockLock(serial_);auto done=[&](IOReturn raw){appObservationEvent(reinterpret_cast<uintptr_t>(this),0,method,uint32_t(raw));IOLockUnlock(serial_);return raw;};
++    if(!serial_)return kIOReturnNotReady;IOLockLock(serial_);bool tracing261=false;
++    auto done=[&](IOReturn raw){
++        if(tracing261){if(raw)zorn_failure_note261(ZornFailureRun261,uint32_t(raw),
++            raw==kIOReturnBusy||raw==kIOReturnTimeout?ZornFailurePending261:
++            raw==kIOReturnBadArgument||raw==kIOReturnUnsupported||raw==kIOReturnNotPermitted?ZornFailureReject261:ZornFailureBackend261,
++            ZornFailureGeneric261,method,0);zorn_failure_end261(failureToken261_);}
++        appObservationEvent(reinterpret_cast<uintptr_t>(this),0,method,uint32_t(raw));IOLockUnlock(serial_);return raw;};
+     if(!live_ || closing_ || viewError_ || !owner_ || !openingTask_)return done(kIOReturnNotReady);
+     if(current_task()!=openingTask_)return done(kIOReturnNotPermitted);
+-    const auto prepared=ensureProcess();if(prepared)return done(prepared);
++    const auto prepared=ensureProcess();
++    tracing261=zorn_failure_begin261(reinterpret_cast<uintptr_t>(this),failureToken261_,method,0)!=0;
++    if(prepared){if(tracing261)zorn_failure_note261(ZornFailurePrepare261,uint32_t(prepared),ZornFailureBackend261,ZornFailureState261,method,0);return done(prepared);}
+     if(method==NativeAdrenoMethodBoCpuUnmap && input && inputBytes==sizeof(NativeAdrenoAbiBoCpuUnmap)){
+         NativeAdrenoAbiBoCpuUnmap request{};memcpy(&request,input,sizeof(request));uint32_t leases=0;
+         auto raw=owner_->applicationIoLeases(*this,*execution_,*process_,request,leases);if(raw)return done(raw);
+@@ -257,36 +284,42 @@
+     if(!serial_)return kIOReturnNotReady;IOLockLock(serial_);
+     if(!live_ || closing_ || viewError_){IOLockUnlock(serial_);return kIOReturnNotReady;}
+     closing_=true;closingThread_=current_thread();
++    const bool tracing261=attempted_&&zorn_failure_begin261(reinterpret_cast<uintptr_t>(this),failureToken261_,0,1);
+     // No acquisition attempted means normal metadata-only close. A failed
+     // or partial attempt remains pinned;do not invent a rollback/release.
+     auto raw=attempted_?attemptRaw_:kIOReturnSuccess;
+     if(!raw)raw=dropViews(0);
++    if(tracing261)zorn_failure_note261(ZornFailureViews261,uint32_t(raw),raw?ZornFailureBackend261:ZornFailureInfo261,ZornFailureGeneric261,0,0);
+     if(!raw)appObservationEvent(reinterpret_cast<uintptr_t>(this),16,0,0);
+     // One bounded synchronous completion continuation. Keep this exact
+     // serialized clientClose thread/identity. Root reports pending only
+     // before the chosen cleanup stage has run;never replay a partial release.
+     uint64_t deadline=0;clock_interval_to_deadline(1000,NSEC_PER_MSEC,&deadline);
+-    auto completePending=[&](auto operation){
++    auto completePending=[&](uint32_t stage,auto operation){
+         for(unsigned observations=0;;++observations){
+             bool pending=false;const auto result=operation(&pending);
++            if(tracing261)zorn_failure_note261(stage,uint32_t(result),pending?ZornFailurePending261:result?ZornFailureBackend261:ZornFailureInfo261,ZornFailureGeneric261,observations,0);
+             if(result!=kIOReturnBusy || !pending)return result;
+             // Use the original one-second native close budget,also cap the
+             // number of observations if the clock stops advancing.
+-            if(observations>=999 || mach_absolute_time()>=deadline)return kIOReturnTimeout;
++            if(observations>=999 || mach_absolute_time()>=deadline){
++                if(tracing261)zorn_failure_note261(stage,uint32_t(kIOReturnTimeout),ZornFailureBackend261,ZornFailureInFlight261,observations,0);return kIOReturnTimeout;}
+             // No issuer/startup/Root operation lock is held across this sleep.
+             // The client serial lock prevents methods/new maps during Close.
+             IOSleep(1);
+         }
+     };
+-    if(!raw && attempted_)raw=completePending([&](bool *pending){
++    if(!raw && attempted_)raw=completePending(ZornFailureCloseProcess261,[&](bool *pending){
+         return owner_->closeApplicationProcess(*this,*execution_,process_,pending);});
+     if(!raw && attempted_)appObservationEvent(reinterpret_cast<uintptr_t>(this),32,0,0);
+-    if(!raw && attempted_)raw=completePending([&](bool *pending){
++    if(!raw && attempted_)raw=completePending(ZornFailureCloseOob261,[&](bool *pending){
+         return owner_->releaseApplicationOob(*this,*execution_,pending);});
+     if(!raw && attempted_)appObservationEvent(reinterpret_cast<uintptr_t>(this),64,0,0);
+-    if(!raw && attempted_)raw=completePending([&](bool *pending){
++    if(!raw && attempted_)raw=completePending(ZornFailureCloseExecution261,[&](bool *pending){
+         return owner_->closeApplicationExecution(*this,execution_,pending);});
+     appObservationEvent(reinterpret_cast<uintptr_t>(this),(!raw && attempted_)?128:0,0,uint32_t(raw),true);
++    if(tracing261)zorn_failure_end261(failureToken261_);
++    if(attempted_)zorn_failure_finish261(failureToken261_,uint32_t(raw));
+     task_t task=TASK_NULL;if(!raw){live_=false;task=openingTask_;openingTask_=TASK_NULL;}
+     IOLockUnlock(serial_);
+     if(!raw){if(service_)service_->returnClientSlot(this);if(task)task_deallocate(task);terminate();if(pinned_){pinned_=false;release();}}return raw;

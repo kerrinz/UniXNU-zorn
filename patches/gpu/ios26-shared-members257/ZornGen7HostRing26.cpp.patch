@@ -1,0 +1,419 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -111,7 +111,7 @@
+     OSObject *physicalAuthorityOwner=nullptr;ZornGen7AppAuthority26 physicalAuthority{};
+     bool physicalAuthorityHeld=false,physicalAuthorityPending=false,physicalAuthorityReleasing=false;
+     unsigned physicalAuthorityPhase=0;thread_t physicalAuthorityThread=THREAD_NULL;
+-    ZornGen7AppExecution26 *appExecution=nullptr;bool appExecutionPending=false;
++    ZornGen7AppExecution26 *appExecutions=nullptr,*appExecution=nullptr;bool appExecutionPending=false;
+     IOUserClient *appAuthorityClient=nullptr;task_t appAuthorityTask=TASK_NULL;
+     thread_t appAuthorityThread=THREAD_NULL;unsigned appAuthorityPhase=0;
+     ZornGen7AppOperation26 appAuthorityOperation=ZornGen7AppOperation26::PrepareTables;
+@@ -158,6 +158,46 @@
+     void lockIssuer(){IOLockLock(issuer);__atomic_store_n(&issuerThread,current_thread(),__ATOMIC_RELEASE);}
+     void unlockIssuer(){__atomic_store_n(&issuerThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(issuer);}
+     bool issuerHeld() const{return __atomic_load_n(&issuerThread,__ATOMIC_ACQUIRE)==current_thread() && current_thread()!=THREAD_NULL;}
++    bool appSerialHeld() const {
++        return appSerial && current_thread()!=THREAD_NULL &&
++            __atomic_load_n(&appSerialThread,__ATOMIC_ACQUIRE)==current_thread();
++    }
++    ZornGen7AppExecution26 *applicationMember(const IOUserClient &client) const {
++        if(!appSerialHeld())return nullptr;unsigned count=0;
++        for(auto *p=appExecutions;p;p=p->ringNext_){
++            if(++count>64)return nullptr;if(p->client_==&client)return p;}
++        return nullptr;
++    }
++    bool ownsExecution(const ZornGen7AppExecution26 &p) const {
++        return p.client_ && applicationMember(*p.client_)==&p && p.ring_ && p.ring_->storage_==this &&
++            p.maps_==&maps && physicalOob.owns(p.oob_);
++    }
++    bool applicationQuiescent() const {
++        if(!appSerialHeld() || processSelected || nativeTableLease || nativeTableAcquires!=nativeTableReleases || nativeProcessTableLease ||
++           processTransitionThread!=THREAD_NULL || nativeProcessTableAcquires!=nativeProcessTableReleases ||
++           native.outstanding() || runtimeSubmit.outstanding() || native.poisoned() ||
++           runtimeSubmit.poisoned() || runtimeVm.hasPendingSubmissionResources())return false;
++        for(auto *p=processClients;p;p=p->ringNext_){
++            if(!p->state_.detached || p->state_.poisoned || p->vm_.poisoned() ||
++               p->vm_.hasPendingSubmissionResources() || !p->clientOpen_ || p->clientClosed_ ||
++               !p->clientState_ || p->clientState_->submit.outstanding() || p->clientState_->submit.poisoned())return false;}
++        return true;
++    }
++    // Lifecycle calls use the same mutex as the actual dispatch scope. No
++    // issuer/startup gate is held while waiting or invoking foreign authority.
++    struct AppSerialScope {
++        Storage &s;bool held=false;
++        explicit AppSerialScope(Storage &value):s(value) {
++            if(!s.appSerial || IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || s.appSerialHeld())return;
++            IOLockLock(s.appSerial);
++            __atomic_store_n(&s.appSerialThread,current_thread(),__ATOMIC_RELEASE);held=true;
++        }
++        ~AppSerialScope(){if(held){s.lockIssuer();s.appExecution=nullptr;s.unlockIssuer();
++            __atomic_store_n(&s.appSerialThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(s.appSerial);}}
++        AppSerialScope(const AppSerialScope &)=delete;
++        AppSerialScope &operator=(const AppSerialScope &)=delete;
++    };
++
+     Storage(IORecursiveLock &g,FhgStorage &f,HoujiFullHostNativeMemory &m,ZornGen7InactiveOwner26 &p,
+         ZornGen7RegisterMaps26 &v,ZornGen7GpuIrq26 &i,ZornGen7GmuIrq26 &q,OSObject &h,bool (*halted)(const OSObject &),ZornGen7HwschedHfi26 *legacy,
+         ZornGen7SmmuDomain26 &d,ZornGen7HostGpuRegisters26 &r,OSObject &o,const ZornGen7CpStartAuthority26 &a):
+@@ -515,7 +555,7 @@
+         phase>=1 && phase<=5 && phase==s.kernelPhase && s.runtimeReady && s.bootstrapComplete &&
+         s.nativeAdopted && !s.native.poisoned() && !s.runtimeVm.poisoned() && !s.runtimeSubmit.poisoned() &&
+         !s.kernelTaskComplete && !s.kernelIoPublishAttempted && !s.applicationIoPublishAttempted &&
+-        !s.kernelIoConnection && !s.appExecution && !s.appExecutionPending && !s.processClients && !s.processSelected &&
++        !s.kernelIoConnection && !s.appExecutions && !s.appExecution && !s.appExecutionPending && !s.processClients && !s.processSelected &&
+         !s.appOobActive && !s.appOobTransition && !s.appOperationPending &&
+         s.imageMemory.descriptor()==&image && s.imageMemory.mapping() && !s.imageMemory.quarantined() &&
+         !s.imageMemory.imported() && !s.imageMemory.readOnly() && s.imageMemory.writeCombined() &&
+@@ -713,7 +753,7 @@
+        s.imageMemory.quarantined() || s.imageMemory.deviceReferences() || s.nativeTableLease ||
+        s.nativeTableAcquires!=2 || s.nativeTableReleases!=2 || !s.nativeAdopted || s.native.completedFence()<s.imageFence ||
+        s.native.poisoned() || s.runtimeVm.poisoned() || s.runtimeSubmit.poisoned() ||
+-       s.appExecution || s.appExecutionPending || s.applicationIoPublishAttempted ||
++       s.appExecutions || s.appExecution || s.appExecutionPending || s.applicationIoPublishAttempted ||
+        s.appOobActive || s.appOobTransition || s.appOperationPending ||
+        ((phase==1)==s.kernelIoClosing))return false;
+     const auto grant=__atomic_load_n(&s.kernelClientGrantThread,__ATOMIC_ACQUIRE);
+@@ -911,7 +951,7 @@
+ {
+     if(!storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;s.lockIssuer();
+-    if(s.appExecution || s.appExecutionPending || owningTask!=kernel_task || s.kernelIoAttempted || !s.kernelIoPublishAttempted || !s.kernelTaskComplete || !bootstrapHealthy()){s.unlockIssuer();return kIOReturnNotReady;}
++    if(s.appExecutions || s.appExecution || s.appExecutionPending || owningTask!=kernel_task || s.kernelIoAttempted || !s.kernelIoPublishAttempted || !s.kernelTaskComplete || !bootstrapHealthy()){s.unlockIssuer();return kIOReturnNotReady;}
+     s.kernelIoAttempted=true;connection.retain();s.kernelIoConnection=&connection;s.kernelTaskOwner=owningTask;s.kernelIoPhase=1;
+     __atomic_store_n(&s.kernelClientGrantThread,current_thread(),__ATOMIC_RELEASE);s.unlockIssuer();
+     // The real callback may acquire its own context. No startup/issuer lock
+@@ -1072,7 +1112,7 @@
+     if(s.hfi || &s.domain!=&domain || !s.issuerHeld() || s.nativeTableLease ||
+        p.ringOwner_!=this || p.domain_!=&domain)return false;
+     const bool kernel=current_task()==kernel_task && s.kernelIoActive && kernelClientExecutionHealthy() &&
+-        !s.appExecution && !s.appExecutionPending && !s.appOobActive && !s.appOobTransition && !s.appOperationPending;
++        !s.appExecutions && !s.appExecution && !s.appExecutionPending && !s.appOobActive && !s.appOobTransition && !s.appOperationPending;
+     bool app=applicationOperationHeld();
+     if(app){
+         const bool bound=p.clientOwner_==s.appExecution->client_ && p.clientTask_==s.appExecution->task_;
+@@ -1098,7 +1138,7 @@
+     if(!storage_)return;const auto &s=*storage_;
+     // Capture failures even after a hardware guard stops the owner. This is
+     // the serialized real client's diagnostic identity, never a grant.
+-    if(s.appExecution && s.appExecution->client_ && s.appOperationPending &&
++    if(s.appExecution && s.ownsExecution(*s.appExecution) && s.appExecution->oobMemberHeld_ && s.appExecution->client_ && s.appOperationPending &&
+        s.appOperationKind==ZornGen7AppOperation26::PrepareTables &&
+        s.appOperationThread==current_thread() && s.appOperationThread!=THREAD_NULL)
+         zorn26_application_prepare_event(reinterpret_cast<uintptr_t>(s.appExecution->client_),stage,uint32_t(raw),detail);
+@@ -1111,7 +1151,7 @@
+         if(p->vm_.poisoned() || (p->clientState_ && (p->clientState_->submit.outstanding() || p->clientState_->submit.poisoned())))return false;
+     if(!s.hfi){
+         const bool kernel=current_task()==kernel_task && s.kernelIoActive && kernelClientExecutionHealthy() &&
+-            !s.appExecution && !s.appExecutionPending && !s.appOobActive && !s.appOobTransition && !s.appOperationPending;
++            !s.appExecutions && !s.appExecution && !s.appExecutionPending && !s.appOobActive && !s.appOobTransition && !s.appOperationPending;
+         const bool app=applicationOperationHeld() &&
+             ((s.appOperationKind==ZornGen7AppOperation26::PrepareTables &&
+               (s.processTransitionOperation==ZornGen7ProcessTableOperation26::Prepare ||
+@@ -1407,7 +1447,7 @@
+         !s.appOperationPending && !s.appExecutionPending && !s.processClients && !s.processSelected &&
+         !s.nativeProcessTableLease && !s.native.outstanding() && !s.runtimeSubmit.outstanding() &&
+         (s.appOobActive==releasing);
+-    return phase==3 && releasing && !s.appOobTransition && !s.appOobActive && !s.appOperationPending &&
++    return phase==3 && releasing && !s.appExecutions && !s.appOobTransition && !s.appOobActive && !s.appOperationPending &&
+         !s.appExecutionPending && !s.processClients && !s.processSelected && !s.nativeProcessTableLease &&
+         s.nativeProcessTableAcquires==s.nativeProcessTableReleases &&
+         !s.native.outstanding() && !s.runtimeSubmit.outstanding() && !s.runtimeVm.hasPendingSubmissionResources() &&
+@@ -1495,71 +1535,76 @@
+     if(current_task()!=task && (!closing || current_task()!=kernel_task))return false;
+     auto *actual=OSDynamicCast(ZornGen7AppIoClient26,&client);
+     if(!actual || !actual->matchesOwnedSession(*this,s.applicationIoService,task,closing))return false;
+-    if(phase==1)return !s.appExecution && !s.appOobActive && !s.appOobTransition && !s.appOperationPending &&
+-        !s.processClients && !s.processSelected && !s.nativeProcessTableLease &&
+-        !s.native.outstanding() && !s.runtimeSubmit.outstanding();
++    if(!s.appSerialHeld())return false;
++    if(phase==1)return !s.appExecution && !s.appOobTransition && !s.appOperationPending &&
++        s.applicationQuiescent() && (!s.appExecutions ||
++        (!s.hfi && s.appOobActive && s.physicalAuthorityHeld));
+     auto *execution=s.appExecution;
+-    if(!execution || execution->client_!=&client || execution->task_!=task)return false;
++    if(!execution || !s.ownsExecution(*execution) || execution->client_!=&client || execution->task_!=task)return false;
+     if(phase==2){
+         if(operation==ZornGen7AppOperation26::OobAcquire || operation==ZornGen7AppOperation26::OobRelease)
+             return s.appOobTransition && s.appOobThread==current_thread() && !s.appOperationPending &&
+-                !s.processClients && !s.processSelected && !s.nativeProcessTableLease &&
+-                !s.native.outstanding() && !s.runtimeSubmit.outstanding() &&
+-                (s.appOobActive==(operation==ZornGen7AppOperation26::OobRelease));
++                s.applicationQuiescent() && (operation==ZornGen7AppOperation26::OobRelease?
++                    (execution->oobMemberHeld_ && s.appOobActive):
++                    (!execution->oobMemberHeld_ && !execution->oobMemberReleased_));
+         return s.appOperationPending && s.appOperationKind==operation && s.appOperationThread==THREAD_NULL && !s.appOobTransition &&
+-            s.appOobActive && applicationOobHeldForTransport(*execution) &&
++            execution->oobMemberHeld_ && s.appOobActive && applicationOobHeldForTransport(*execution) &&
+             unsigned(operation)<=unsigned(ZornGen7AppOperation26::Timestamp);
+     }
+-    if(phase!=3 || !s.physicalOob.owns(*execution,execution->oob_))return false;const auto &oob=*execution->oob_;
+-    return !s.appOperationPending && !s.appOobTransition && !s.appOobActive && !s.processClients && !s.processSelected &&
+-        !s.nativeProcessTableLease && s.nativeProcessTableAcquires==s.nativeProcessTableReleases &&
+-        !s.native.outstanding() && !s.runtimeSubmit.outstanding() && !s.runtimeVm.hasPendingSubmissionResources() &&
+-        s.ring.rptr==s.ring.wptr && oob.owner==&s.hfiOwner && oob.attempted && oob.requestReturned &&
+-        oob.ackObserved && oob.ackCleared && oob.gxOn && oob.releaseAttempted && oob.releaseWriteReturned && !oob.raw;
++    if(phase!=3 || execution->oobMemberHeld_ || !execution->oobMemberReleased_ ||
++       !s.applicationQuiescent() || s.appOperationPending || s.appOobTransition)return false;
++    for(auto *p=s.processClients;p;p=p->ringNext_)if(p->clientOwner_==&client)return false;
++    const bool last=s.appExecutions==execution && !execution->ringNext_;
++    const auto &oob=*execution->oob_;
++    return last?(!s.appOobActive && ZornGen7PhysicalOob26::releaseReturned(oob)):
++        (!s.hfi && s.appOobActive && s.physicalAuthorityHeld && applicationOobHeldForTransport(*execution));
+ }
+ 
+ IOReturn ZornGen7HostRing26::prepareApplicationExecution(IOUserClient &client,task_t task,UInt32 openType,
+     OSObject &codeOwner,const ZornGen7AppAuthority26 &authority,ZornGen7AppExecution26 *&out)
+ {
+     if(out || !storage_ || !normal() || !task || task==kernel_task || task!=current_task())return kIOReturnBadArgument;
+-    auto &s=*storage_;if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;
+-    CallerTaskReference caller; // actual opening task remains held across policy/foreign calls
++    auto &s=*storage_;Storage::AppSerialScope serial(s);if(!serial.held)return kIOReturnNotReady;
++    CallerTaskReference caller;
+     auto *provider=client.getProvider();if(!provider)return kIOReturnNotReady;
+     provider->retain();client.retain();
+     auto admission=ZornGen7AdmitTaskService26(*provider,task,openType);
+     if(!admission)admission=ZornGen7AdmitTaskClient26(client,task,openType);
+     client.release();provider->release();if(admission)return admission;
+-    s.lockIssuer();
++    s.lockIssuer();unsigned members=0;
++    for(auto *p=s.appExecutions;p;p=p->ringNext_){if(p->client_==&client || ++members>=64){s.unlockIssuer();return kIOReturnExclusiveAccess;}}
++    const bool first=s.appExecutions==nullptr;
+     if(s.appExecution || s.appExecutionPending || s.kernelIoConnection ||
+-       (s.kernelIoAttempted && !s.kernelIoClosed) || s.kernelIoActive || s.processClients ||
++       (s.kernelIoAttempted && !s.kernelIoClosed) || s.kernelIoActive ||
+        !s.runtimeReady || !s.kernelTaskComplete || !s.imageVerified || !s.imageUnmapped || !s.taskReleaseAllowed ||
+-       !bootstrapHealthy() || s.native.outstanding() || s.runtimeSubmit.outstanding() ||
+-       s.native.poisoned() || s.runtimeSubmit.poisoned()){
++       !bootstrapHealthy() || (!first && (s.hfi || !s.appOobActive || !s.physicalAuthorityHeld))){
+         s.unlockIssuer();return kIOReturnNotReady;}
++    // A healthy previous owner may retain its selected context on bounded
++    // WaitFence expiry. No logical/hardware acquire has been attempted here.
++    if(!s.applicationQuiescent()){s.unlockIssuer();return kIOReturnBusy;}
+     s.appExecutionPending=true;s.setAppAuthorityCall(client,task,1,ZornGen7AppOperation26::PrepareTables);s.unlockIssuer();
+     ZornGen7AppExecution26 *p=nullptr;
+     auto raw=s.maps.createApplicationExecution(*this,s.gate,client,task,codeOwner,authority,p);
+     s.lockIssuer();s.clearAppAuthorityCall();s.appExecutionPending=false;
+-    if(p){p->retain();s.appExecution=p;out=p;} // own reference separate from output/self-pin
+-    // Board acquisition returned before this CPU allocation;it is not an OOB
+-    // grant. Retain the exact real transport/maps in the Ring-owned lease.
+-    // Allocation failure retains the already-acquired Board/application pins.
+-    if(!raw && p)raw=s.physicalOob.reserve(*p,s.hfiOwner,s.maps,p->oob_);
++    if(p){p->retain();p->ringNext_=s.appExecutions;s.appExecutions=p;s.appExecution=p;out=p;}
++    if(!raw && p){
++        if(first)raw=s.physicalOob.reserve(s.hfiOwner,s.maps,p->oob_);
++        else {p->oob_=s.physicalOob.forTransport(s.hfiOwner,s.maps);if(!p->oob_)raw=kIOReturnNotReady;}}
+     if(raw || !bootstrapHealthy()){
+         if(p){__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+         s.unlockIssuer();return raw?raw:kIOReturnNotReady;}
+     s.unlockIssuer();
+-    if(!s.hfi)return acquirePhysicalAuthority();
++    if(first && !s.hfi)return acquirePhysicalAuthority();
++    // Existing powered physical lease is shared only after the fresh actual
++    // logical Board/task acquisition and independent live resource checks.
+     return kIOReturnSuccess;
+-    // Acquires a distinct permission owner only. Application OOB,VM/service
+-    // activation and publication still need their actual separate connection.
+ }
+ IOReturn ZornGen7HostRing26::checkApplicationExecution(IOUserClient &client,
+     ZornGen7AppExecution26 &execution,ZornGen7AppOperation26 operation)
+ {
+     if(!storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;s.lockIssuer();
+-    if(s.appExecution!=&execution || s.appExecutionPending || !bootstrapHealthy()){
++    if(!s.appSerialHeld() || !s.ownsExecution(execution) || s.appExecution!=&execution || s.appExecutionPending || !bootstrapHealthy()){
+         s.unlockIssuer();return kIOReturnNotReady;}
+     s.appExecutionPending=true;s.setAppAuthorityCall(client,execution.task_,2,operation);execution.retain();s.unlockIssuer();
+     auto raw=execution.checkCurrent(client,operation);
+@@ -1571,23 +1616,29 @@
+ IOReturn ZornGen7HostRing26::closeApplicationExecution(IOUserClient &client,ZornGen7AppExecution26 *&p)
+ {
+     if(!p || !storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+-    if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;s.lockIssuer();
+-    // Actual process/VM retirement and actual OOB clear must precede
+-    // relinquishing the independent application execution authority.
+-    if(s.appExecution!=p || s.appExecutionPending || s.appOperationPending || s.appOobTransition || s.appOobActive || s.kernelIoActive || s.processClients ||
+-       s.native.outstanding() || s.runtimeSubmit.outstanding() || s.native.poisoned() || s.runtimeSubmit.poisoned()){
+-        s.unlockIssuer();return kIOReturnNotReady;}
++    Storage::AppSerialScope serial(s);if(!serial.held)return kIOReturnNotReady;s.lockIssuer();
++    if(!s.ownsExecution(*p) || p->client_!=&client || s.appExecutionPending || s.appOperationPending ||
++       s.appOobTransition || p->oobMemberHeld_ || !p->oobMemberReleased_ || s.kernelIoActive ||
++       !s.applicationQuiescent()){s.unlockIssuer();return kIOReturnNotReady;}
++    for(auto *q=s.processClients;q;q=q->ringNext_)if(q->clientOwner_==&client){s.unlockIssuer();return kIOReturnNotReady;}
++    auto *closed=p;auto *physical=p->oob_;s.appExecution=p;
+     s.appExecutionPending=true;s.setAppAuthorityCall(client,p->task_,3,ZornGen7AppOperation26::Close);s.unlockIssuer();
+     auto raw=p->closeAcquiredSession(client);
+     s.lockIssuer();s.clearAppAuthorityCall();s.appExecutionPending=false;
+-    if(!raw && !s.hfi){s.unlockIssuer();raw=releasePhysicalAuthority();s.lockIssuer();}
+-    if(!raw){auto *closed=p;
+-        auto *retired=s.physicalOob.retire(*closed,closed->oob_);
+-        if(retired){s.appExecution=nullptr;p=nullptr;s.unlockIssuer();
+-            ZornGen7PhysicalOob26::disposeRetired(*retired);
+-            closed->release();closed->release();return kIOReturnSuccess;}}
+-    // A contradictory retirement retains the exact objects rather than
+-    // freeing an unaccounted physical lease after foreign release.
++    if(!raw){
++        auto **slot=&s.appExecutions;while(*slot && *slot!=closed)slot=&(*slot)->ringNext_;
++        if(!*slot)raw=kIOReturnNotReady;
++        else {*slot=closed->ringNext_;closed->ringNext_=nullptr;s.appExecution=nullptr;}
++    }
++    if(!raw && !s.appExecutions){
++        s.unlockIssuer();if(!s.hfi)raw=releasePhysicalAuthority();s.lockIssuer();
++        if(!raw){auto *retired=s.physicalOob.retire(physical);
++            if(!retired)raw=kIOReturnNotReady;
++            else {closed->oob_=nullptr;p=nullptr;s.unlockIssuer();
++                ZornGen7PhysicalOob26::disposeRetired(*retired);
++                closed->release();closed->release();return kIOReturnSuccess;}}
++    }else if(!raw){closed->oob_=nullptr;p=nullptr;s.unlockIssuer();
++        closed->release();closed->release();return kIOReturnSuccess;}
+     __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();s.unlockIssuer();return raw?raw:kIOReturnNotReady;
+ }
+ 
+@@ -1602,7 +1653,7 @@
+ bool ZornGen7HostRing26::applicationOobHeldForTransport(const ZornGen7AppExecution26 &execution) const
+ {
+     if(!storage_)return false;const auto &s=*storage_;
+-    if(!s.physicalOob.owns(execution,execution.oob_))return false;
++    if(!s.ownsExecution(execution))return false;
+     if(s.hfi)return s.hfi->applicationOobHeld(*this,execution);
+     auto *direct=OSDynamicCast(ZornGen7DirectHfi26,&s.hfiOwner);
+     return direct && storage_->physicalAuthorityHeld && direct->physicalOobHeld(*this);
+@@ -1611,7 +1662,7 @@
+     ZornGen7AppExecution26 &execution,bool release)
+ {
+     if(!storage_ || !normal() || &storage_->hfiOwner!=&hfi || !execution.client_ ||
+-       !storage_->physicalOob.owns(execution,execution.oob_) || execution.oob_->transport!=&hfi ||
++       !storage_->ownsExecution(execution) || execution.oob_->transport!=&hfi ||
+        execution.oob_->registerMaps!=&storage_->maps)return false;
+     return checkApplicationExecution(*execution.client_,execution,
+         release?ZornGen7AppOperation26::OobRelease:ZornGen7AppOperation26::OobAcquire)==kIOReturnSuccess;
+@@ -1620,7 +1671,7 @@
+     const ZornGen7AppExecution26 &execution) const
+ {
+     if(!storage_ || !normal())return false;const auto &s=*storage_;
+-    return s.physicalOob.owns(execution,execution.oob_) && execution.oob_->transport==&hfi &&
++    return s.ownsExecution(execution) && execution.oob_->transport==&hfi &&
+         execution.oob_->registerMaps==&s.maps && &s.hfiOwner==&hfi && s.appExecution==&execution && s.appOobTransition && s.appOobActive &&
+         s.appReleaseIdleThread==current_thread() && !s.processClients && !s.processSelected &&
+         !s.native.outstanding() && !s.runtimeSubmit.outstanding() && !s.native.poisoned() &&
+@@ -1631,29 +1682,34 @@
+ IOReturn ZornGen7HostRing26::acquireApplicationOob(IOUserClient &client,ZornGen7AppExecution26 &execution)
+ {
+     if(!storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+-    if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;s.lockIssuer();
+-    if(s.appExecution!=&execution || execution.client_!=&client || s.appExecutionPending || s.appOperationPending ||
+-       s.appOobTransition || s.appOobActive || s.kernelIoActive || s.processClients || !bootstrapHealthy()){
++    Storage::AppSerialScope serial(s);if(!serial.held)return kIOReturnNotReady;s.lockIssuer();
++    if(!s.ownsExecution(execution) || execution.client_!=&client || execution.oobMemberHeld_ ||
++       execution.oobMemberReleased_ || s.appExecutionPending || s.appOperationPending || s.appOobTransition ||
++       s.kernelIoActive || !s.applicationQuiescent() || !bootstrapHealthy()){
+         s.unlockIssuer();return kIOReturnNotReady;}
++    const bool first=!s.appOobActive;s.appExecution=&execution;
+     s.appOobTransition=true;s.appOobThread=current_thread();execution.retain();s.unlockIssuer();
+     auto *direct=OSDynamicCast(ZornGen7DirectHfi26,&s.hfiOwner);
+     auto raw=s.hfi?s.hfi->acquireApplicationOob(*this,execution):
+         checkApplicationExecution(client,execution,ZornGen7AppOperation26::OobAcquire);
+-    if(!raw && !s.hfi)raw=direct?direct->acquirePhysicalOob(*this):kIOReturnNotReady;
++    if(!raw && !s.hfi){
++        if(first)raw=direct?direct->acquirePhysicalOob(*this):kIOReturnNotReady;
++        else if(!direct || !s.physicalAuthorityHeld || !direct->physicalOobHeld(*this))raw=kIOReturnNotReady;}
+     s.lockIssuer();s.appOobTransition=false;s.appOobThread=THREAD_NULL;
+-    if(!raw)s.appOobActive=true;
+-    if(raw || !bootstrapHealthy()){
+-        if(!raw)raw=kIOReturnNotReady;__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
++    if(!raw && bootstrapHealthy()){s.appOobActive=true;execution.oobMemberHeld_=true;}
++    else {if(!raw)raw=kIOReturnNotReady;__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+     s.unlockIssuer();execution.release();return raw;
+ }
+ IOReturn ZornGen7HostRing26::releaseApplicationOob(IOUserClient &client,ZornGen7AppExecution26 &execution)
+ {
+     if(!storage_ || !normal())return kIOReturnNotReady;auto &s=*storage_;
+-    if(IORecursiveLockHaveLock(&s.gate))return kIOReturnNotReady;s.lockIssuer();
+-    if(s.appExecution!=&execution || execution.client_!=&client || s.appExecutionPending || s.appOperationPending || s.appOobTransition ||
+-       !s.appOobActive || s.kernelIoActive || s.processClients || s.processSelected ||
++    Storage::AppSerialScope serial(s);if(!serial.held)return kIOReturnNotReady;s.lockIssuer();
++    if(!s.ownsExecution(execution) || !execution.oobMemberHeld_ || execution.oobMemberReleased_ || execution.client_!=&client || s.appExecutionPending || s.appOperationPending || s.appOobTransition ||
++       !s.appOobActive || s.kernelIoActive || !s.applicationQuiescent() ||
+        s.native.outstanding() || s.runtimeSubmit.outstanding() || s.native.poisoned() || s.runtimeSubmit.poisoned()){
+         s.unlockIssuer();return kIOReturnNotReady;}
++    for(auto *p=s.processClients;p;p=p->ringNext_)if(p->clientOwner_==&client){s.unlockIssuer();return kIOReturnNotReady;}
++    const bool last=s.appExecutions==&execution && !execution.ringNext_;s.appExecution=&execution;
+     s.appOobTransition=true;s.appOobThread=current_thread();execution.retain();s.unlockIssuer();
+     struct IdleContext {ZornGen7HostRing26 *ring;ZornGen7AppExecution26 *execution;} context{this,&execution};
+     hhr_io io{};io.cookie=&context;
+@@ -1664,12 +1720,12 @@
+         return read(c.ring,at,value);};
+     io.delay=[](void *cookie,unsigned us){return delay(static_cast<IdleContext *>(cookie)->ring,us);};
+     IOReturn raw=hhr_idle(&io,&s.ring)?kIOReturnNotReady:kIOReturnSuccess;
+-    if(!raw){s.appReleaseIdleThread=current_thread();auto *direct=OSDynamicCast(ZornGen7DirectHfi26,&s.hfiOwner);
++    if(!raw && last){s.appReleaseIdleThread=current_thread();auto *direct=OSDynamicCast(ZornGen7DirectHfi26,&s.hfiOwner);
+         raw=s.hfi?s.hfi->releaseApplicationOob(*this,execution):
+             (direct?direct->releasePhysicalOob(*this):kIOReturnNotReady);}
+     s.lockIssuer();s.appReleaseIdleThread=THREAD_NULL;s.appOobTransition=false;s.appOobThread=THREAD_NULL;
+     if(!raw && !bootstrapHealthy())raw=kIOReturnNotReady;
+-    if(!raw)s.appOobActive=false;
++    if(!raw){if(last)s.appOobActive=false;execution.oobMemberHeld_=false;execution.oobMemberReleased_=true;}
+     else {__atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+     s.unlockIssuer();execution.release();return raw;
+ }
+@@ -1678,7 +1734,7 @@
+ {
+     if(!storage_ || !normal())return false;const auto &s=*storage_;
+     const bool held=s.appSerial && __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread() &&
+-        s.appExecution && s.appExecution->client_ && s.appOperationPending &&
++        s.appExecution && s.ownsExecution(*s.appExecution) && s.appExecution->oobMemberHeld_ && s.appExecution->client_ && s.appOperationPending &&
+         s.appOperationThread==current_thread() && s.appOperationThread!=THREAD_NULL &&
+         !s.appExecutionPending && !s.appOobTransition && s.appOobActive && !s.kernelIoActive &&
+         !__atomic_load_n(&s.stopped,__ATOMIC_ACQUIRE) && !s.irq.halted() && !s.gmu.halted() &&
+@@ -1766,7 +1822,7 @@
+     ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope)
+ {
+     if(scope || !storage_ || !normal())return kIOReturnBadArgument;auto &s=*storage_;
+-    if(IORecursiveLockHaveLock(&s.gate) || !s.appSerial ||
++    if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || !s.appSerial ||
+        __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread())return kIOReturnNotReady;
+     // Sleepable PI mutex:wait for the complete current operation,including
+     // its foreign check/drain/context transition. Never wait under issuer.
+@@ -1774,10 +1830,10 @@
+     s.lockIssuer();
+     auto refused=[&](IOReturn raw){s.unlockIssuer();
+         __atomic_store_n(&s.appSerialThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(s.appSerial);return raw;};
+-    auto *execution=s.appExecution;
+-    if(!execution || execution->client_!=&client || s.appOperationPending || s.appExecutionPending ||
++    auto *execution=s.applicationMember(client);
++    if(!execution || !execution->oobMemberHeld_ || execution->oobMemberReleased_ || s.appExecution || s.appOperationPending || s.appExecutionPending ||
+        s.appOobTransition || !s.appOobActive || s.kernelIoActive || !bootstrapHealthy())return refused(kIOReturnNotReady);
+-    s.appFenceWaitExpired=false;s.appOperationProcess=nullptr;
++    s.appExecution=execution;s.appFenceWaitExpired=false;s.appOperationProcess=nullptr;
+     s.appOperationKind=operation;s.appOperationPending=true;execution->retain();s.unlockIssuer();
+     // Same actual whole-operation authority,with no issuer/domain lock.
+     auto raw=checkApplicationExecution(client,*execution,operation);
+@@ -1795,7 +1851,7 @@
+     }
+     if(!raw)raw=kIOReturnNotReady;
+     if(operation==ZornGen7AppOperation26::PrepareTables)zorn26_application_prepare_event(reinterpret_cast<uintptr_t>(&client),17,uint32_t(raw),0);
+-    s.appOperationPending=false;s.appOperationKind=ZornGen7AppOperation26::PrepareTables;
++    s.appOperationPending=false;s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appExecution=nullptr;
+     __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();s.unlockIssuer();
+     __atomic_store_n(&s.appSerialThread,THREAD_NULL,__ATOMIC_RELEASE);IOLockUnlock(s.appSerial);
+     execution->release();return raw;
+@@ -1821,7 +1877,7 @@
+     if(waitExpired && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
+     if(!raw && !bootstrapHealthy())raw=kIOReturnNotReady;
+     s.appOperationThread=THREAD_NULL;s.appOperationPending=false;s.appFenceWaitExpired=false;
+-    s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appOperationProcess=nullptr;
++    s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appOperationProcess=nullptr;s.appExecution=nullptr;
+     if((raw==kIOReturnTimeout && !waitExpired) ||
+        raw==kIOReturnIOError || raw==kIOReturnNotReady || raw==kIOReturnNotPermitted){
+         __atomic_store_n(&s.stopped,1u,__ATOMIC_RELEASE);s.irq.stopAndMask();}
+@@ -1839,7 +1895,9 @@
+     auto raw=beginApplicationOperation(client,ZornGen7AppOperation26::PrepareTables,scope);observe(2,raw);if(raw)return raw;
+     if(scope!=&execution){observe(3,kIOReturnNotReady);return finishApplicationOperation(*scope,kIOReturnNotReady);}
+     observe(3,0);
+-    auto &s=*storage_;s.lockIssuer();const bool empty=!s.processClients && !s.processSelected;s.unlockIssuer();
++    auto &s=*storage_;s.lockIssuer();bool empty=s.applicationQuiescent();
++    for(auto *p=s.processClients;p;p=p->ringNext_)if(p->clientOwner_==&client)empty=false;
++    s.unlockIssuer();
+     observe(4,empty?kIOReturnSuccess:kIOReturnBusy);
+     if(!empty)return finishApplicationOperation(*scope,kIOReturnBusy);
+     raw=transitionProcessTables(client,ZornGen7ProcessTableOperation26::Prepare,out,s.logical.input_bits,s.runtimeCapacity);observe(5,raw);

@@ -1,0 +1,8 @@
+--- a/ZornApplicationStderr26.inc
++++ b/ZornApplicationStderr26.inc
+@@ -14,3 +14,5 @@
+  char text[384];int error=buf>UINT64_MAX-copied?EFAULT:copyin(buf,text,(size_t)copied);
+  zorn26_application_stderr_commit(unique,text,copied,error);
+ }
++
++#include "ZornJournalCapture248.inc"

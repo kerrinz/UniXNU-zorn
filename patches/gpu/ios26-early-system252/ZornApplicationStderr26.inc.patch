@@ -1,0 +1,11 @@
+--- a/ZornApplicationStderr26.inc
++++ b/ZornApplicationStderr26.inc
+@@ -6,7 +6,7 @@
+  // Actual kernel process identity; this name filter selects diagnostics only.
+  // It never grants IOKit/GPU admission or changes a syscall result.
+  const char *name=proc_best_name(process);
+- static const char expected[]="zorn-metal-probe193";
++ static const char expected[]="backboardd";
+  if(!name || strncmp(name,expected,sizeof(expected)))return;
+  const uint64_t unique=proc_uniqueid(process);const uint32_t pid=(uint32_t)proc_pid(process);
+  if(!zorn26_application_stderr_reserve(unique,pid))return;

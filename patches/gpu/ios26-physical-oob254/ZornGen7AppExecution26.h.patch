@@ -1,0 +1,29 @@
+--- a/ZornGen7AppExecution26.h
++++ b/ZornGen7AppExecution26.h
+@@ -3,6 +3,7 @@
+ #include <IOKit/IOUserClient.h>
+ #include <IOKit/IOMemoryDescriptor.h>
+ #include <IOKit/IOLocks.h>
++#include "ZornGen7PhysicalOob26.h"
+ class ZornGen7HostRing26;class ZornGen7RegisterMaps26;class ZornGen7HwschedHfi26;
+ enum class ZornGen7AppOperation26 : unsigned { PrepareTables,Map,Submit,Wait,CpuView,Close,OobAcquire,OobRelease,Timestamp };
+ // Distinct,mandatory real application-session authority. Never populate this
+@@ -30,14 +31,10 @@
+     void free() override;
+ private:
+     friend class ZornGen7RegisterMaps26;friend class ZornGen7HostRing26;friend class ZornGen7HwschedHfi26;friend class ZornGen7DirectHfi26;
+-    // Per-real-session record. Never reset a failed/consumed attempt or copy
+-    // a kernel OOB result into a new application's permission window.
+-    struct OobRecord {
+-        OSObject *owner=nullptr; // exact retained HWSCHED or DirectHfi transport identity
+-        bool attempted=false,requestReturned=false,ackObserved=false,ackCleared=false,gxOn=false;
+-        bool releaseAttempted=false,releaseWriteReturned=false;
+-        uint32_t ack=0,host=0,gx=0;int raw=0;
+-    } oob_;
++    // Borrowed exact lease identity;Ring owns its physical storage and refs.
++    // Normal Ring close retires it after actual authority release;unknown
++    // outcomes keep both the lease and all existing application pins.
++    ZornGen7PhysicalOob26::Lease *oob_=nullptr;
+     static IOReturn create(ZornGen7RegisterMaps26 &,ZornGen7HostRing26 &,IORecursiveLock &,
+         IOUserClient &,task_t,OSObject &actualAuthorityCodeAndStorage,
+         const ZornGen7AppAuthority26 &,IOService &,IOMemoryDescriptor &,IOService &,

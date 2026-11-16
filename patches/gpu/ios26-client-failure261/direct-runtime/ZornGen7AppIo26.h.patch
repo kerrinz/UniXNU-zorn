@@ -1,0 +1,18 @@
+--- a/direct-runtime/ZornGen7AppIo26.h
++++ b/direct-runtime/ZornGen7AppIo26.h
+@@ -6,6 +6,7 @@
+ #include <IOKit/IOLocks.h>
+ #include "Adreno740/NativeAdrenoABI.h"
+ #include "ZornGen7AppExecution26.h"
++#include "ZornClientFailure261.h"
+ class ZornGen7ProcessTables26;class ZornGen7AppIoClient26;
+ class ZornGen7HostRing26;
+ // Use the already linked OS26 source registry base. Do not define a second
+@@ -31,6 +32,7 @@
+     friend class ZornGen7AppIoService26;friend class ZornGen7HostRing26;
+     bool matchesOwnedSession(const ZornGen7HostRing26 &,const IOService *,task_t,bool closing) const;
+     thread_t closingThread_=THREAD_NULL;
++    uint64_t failureToken261_=0;
+     ZornGen7HostRing26 *owner_=nullptr;IOLock *serial_=nullptr;
+     ZornGen7AppIoService26 *service_=nullptr;
+     ZornGen7AppIoClient26 *nativeNext_=nullptr;

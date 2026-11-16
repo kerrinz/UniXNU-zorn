@@ -1,0 +1,73 @@
+{
+  "version": 259,
+  "status": "additional-actual-source-retirement-chain-host-validation",
+  "kernel": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e/full-link/kernel.ZORN26-CLOSE259.UNSELECTED.macho",
+    "sha256": "7b838014b141a936bafa24583a515b6a2b95bcd2e38c214e89f2e23bd3f8aa3e"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e/boot-package/boot.ZORN26-GPU-V259-CLOSE-UNSELECTED.img",
+    "sha256": "ea6e4b851820328c5548066064473ae7b5d25b6ae2dd92ac3e973aafbe0c5d20"
+  },
+  "existing_full_offline_proof": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e/final-offline-check259.json",
+    "sha256": "c34b1c04020c700d6b02ba1f439b19fd24b0520b4baeecf23d4710e8f0375a65"
+  },
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e",
+  "test_tool": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-retirement-chain.py",
+    "sha256": "00a7549764920001b8a3963105a957ee8a5463420d746bdddb6aafaaed827125"
+  },
+  "checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e/retirement-chain-host/result.json",
+      "sha256": "bd2d84e5ea13c668a13104bb90fcfee5b292bdf9325cfb70d555d50c2b29ab18"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e/retirement-chain-tsan/result.json",
+      "sha256": "eda65767e08f5db5bc32bfbe8731250b928e25dd838780bc70db06ac87289ad0"
+    }
+  ],
+  "inspection_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v259-bounded-close-d302c7f376ae4abc98d2a55184a2e41e/ZornGen7HostRing26.cpp",
+      "sha256": "836359f5c26d555cddf4a014b5c5af05bc5577ccd47ee4803fc1a04e5b709cbe"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate/iokit/Kernel/houji-ufs-root/Adreno740/NativeAdrenoMemory.cpp",
+      "sha256": "6222f9a652e0d39f9acda242f13c58d6b8c1f1e4e01283be065f9b01ee6c27e5"
+    }
+  ],
+  "actual_methods_compiled": [
+    "NativeRing wait/observeFence",
+    "DirectSubmitGateScope constructor/destructor",
+    "Submit find/poison/wait/waitAll/release",
+    "VM find/fail/acquireImported/retireJobAfterCompletion/retireSubmissionResourcesAfterCompletion/noteSurfaceCompletion246",
+    "existing coherent mapping policy"
+  ],
+  "findings": [
+    "Real fence cache reads execute outside actual DirectSubmitGateScope;begin/end route acquisition stays balanced",
+    "Completed job releases actual VM job references,acquires writable imported memory,then retires submission resources and only then publishes surface/fence ledger",
+    "Cache failure quarantines actual VM mappings and preserves pending submission resources/job;memory-retirement failure never becomes healthy pending timeout",
+    "Source inspection does not show the suspected Ring guard call during imported memory cache maintenance;Ring nativeAcquire runs outside gate in the compiled wait path,so no guard permission change was made"
+  ],
+  "host_boundaries": [
+    "Memory backing/cache/ref methods and SMMU route callbacks are explicit fixtures",
+    "No original NativeAdrenoMemory object-source equivalence or hardware cache execution is established by this additional source test",
+    "No physical pixels,MMIO/TLBSYNC,ASID isolation or real client exit are qualified"
+  ],
+  "actual_source_controls": 7,
+  "sanitizers": [
+    "address,undefined",
+    "thread"
+  ],
+  "sanitizer_symbolization_disabled": true,
+  "production_source_changed": false,
+  "native_objects_or_boot_changed": false,
+  "phone_access": false,
+  "new_scope_or_claim": false,
+  "hardware_qualified": false,
+  "goal_complete": false,
+  "no_disassembly_or_reverse_engineering": true,
+  "no_commit_or_push": true
+}

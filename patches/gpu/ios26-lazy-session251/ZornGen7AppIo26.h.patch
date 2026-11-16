@@ -1,0 +1,10 @@
+--- a/direct-runtime/ZornGen7AppIo26.h
++++ b/direct-runtime/ZornGen7AppIo26.h
+@@ -15,6 +15,7 @@
+     friend class ZornGen7AppIoClient26;
+     ZornGen7HostRing26 *owner_=nullptr;IOLock *clients_=nullptr;
+     bool reserved_=false;ZornGen7AppIoClient26 *client_=nullptr;
++    IOReturn reserveNativeClient(ZornGen7AppIoClient26 &actualClient);
+     void returnClientSlot(ZornGen7AppIoClient26 *actualClient);
+     OSObject *authorityOwner_=nullptr;ZornGen7AppAuthority26 authority_{};
+ public:

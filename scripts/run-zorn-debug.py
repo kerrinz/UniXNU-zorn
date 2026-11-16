@@ -287,7 +287,16 @@ def main():
 
 if __name__ == "__main__":
     try:
-        if '--ios26-lockscreen-touch-cpu-trial' in sys.argv:
+        if '--ios26-client-failure261-trial' in sys.argv:
+            from zorn_ios26_gpu_v261_system_trial import main as client_failure261
+            client_failure261()
+        elif '--ios26-platform-identity260-trial' in sys.argv:
+            from zorn_ios26_gpu_v260_system_trial import main as platform_identity260
+            platform_identity260()
+        elif '--ios26-operation-context256-trial' in sys.argv:
+            from zorn_ios26_gpu_v256_system_trial import main as operation_context256
+            operation_context256()
+        elif '--ios26-lockscreen-touch-cpu-trial' in sys.argv:
             from zorn_ios26_lockscreen_touch_cpu_trial import main as lockscreen_touch_cpu
             lockscreen_touch_cpu()
         elif '--ios26-ft3683-trial' in sys.argv:
@@ -416,7 +425,7 @@ if __name__ == "__main__":
         elif '--ios26-finish-recovery' in sys.argv:
             from zorn_ios26_logdirs_boot_trial import finish_recovery
             finish_recovery()
-        elif any(flag in sys.argv for flag in ('--ios26-metal-root-delta', '--ios26-metal-handle-lifetime-delta', '--ios26-cpu-no-sampling-root-delta', '--ios26-cpu-crash-report-root-delta', '--ios26-cpu-two-directory-root-delta', '--ios26-cpu-osanalytics-root-delta', '--ios26-cpu-service-policy-root-delta', '--ios26-cpu-posterboard-reply-root-delta', '--ios26-cpu-posterboard-reply-archive-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-passive-root-delta', '--ios26-gpu-application186-root-delta', '--ios26-metal193-root-delta', '--ios26-metal195-root-delta', '--ios26-metal197-root-delta', '--ios26-metal198-root-delta', '--ios26-metal199-root-delta', '--ios26-metal204-root-delta', '--ios26-metal207-root-delta', '--ios26-metal208-root-delta', '--ios26-metal209-root-delta', '--ios26-metal211-root-delta', '--ios26-metal213-root-delta', '--ios26-metal214-root-delta', '--ios26-metal215-root-delta', '--ios26-metal224-root-delta', '--ios26-metal226-root-delta', '--ios26-metal228-root-delta', '--ios26-metal229-root-delta', '--ios26-metal247-root-delta')):
+        elif any(flag in sys.argv for flag in ('--ios26-metal-root-delta', '--ios26-metal-handle-lifetime-delta', '--ios26-cpu-no-sampling-root-delta', '--ios26-cpu-crash-report-root-delta', '--ios26-cpu-two-directory-root-delta', '--ios26-cpu-osanalytics-root-delta', '--ios26-cpu-service-policy-root-delta', '--ios26-cpu-posterboard-reply-root-delta', '--ios26-cpu-posterboard-reply-archive-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-passive-root-delta', '--ios26-gpu-application186-root-delta', '--ios26-metal193-root-delta', '--ios26-metal195-root-delta', '--ios26-metal197-root-delta', '--ios26-metal198-root-delta', '--ios26-metal199-root-delta', '--ios26-metal204-root-delta', '--ios26-metal207-root-delta', '--ios26-metal208-root-delta', '--ios26-metal209-root-delta', '--ios26-metal211-root-delta', '--ios26-metal213-root-delta', '--ios26-metal214-root-delta', '--ios26-metal215-root-delta', '--ios26-metal224-root-delta', '--ios26-metal226-root-delta', '--ios26-metal228-root-delta', '--ios26-metal229-root-delta', '--ios26-metal247-root-delta', '--ios26-metal249-root-delta', '--ios26-metal250-root-delta', '--ios26-metal251-root-delta', '--ios26-metal252-root-delta')):
             from zorn_ios26_metal_root_delta import main as metal_root_delta
             metal_root_delta()
         elif '--ios26-root-delta' in sys.argv:

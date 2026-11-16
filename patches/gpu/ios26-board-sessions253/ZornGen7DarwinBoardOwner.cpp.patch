@@ -1,0 +1,131 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -398,17 +398,73 @@
+     // before grant and clears its owner before the successful final release.
+     const void *direct_client_identity=nullptr;
+     bool direct_client_attempted=false,direct_client_granted=false,direct_client_release_allowed=false;
+-    // Distinct application session. AppExecution retains the actual client,
+-    // opening task and this board before calling us; these are identity refs.
+-    IOUserClient *direct_app_identity=nullptr;task_t direct_app_task=TASK_NULL;
+-    bool direct_app_publish_attempted=false,direct_app_attempted=false,direct_app_granted=false;
++    // Per-session ownership metadata,not a physical GPU grant. AppExecution
++    // already retains each actual client/task/board across these callbacks.
++    // This owner keeps every uncertain record;normal verified release removes
++    // exactly its record. The physical window remains exclusive until the
++    // shared engine/OOB and logical-context paths are separately implemented.
++    struct ApplicationSession {
++        enum class Phase { Acquiring,Held,Failed,Retired };
++        IOUserClient *client=nullptr;task_t task=TASK_NULL;
++        uint32_t generation=0;Phase phase=Phase::Acquiring;
++        ApplicationSession *next=nullptr;
++    };
++    ApplicationSession *direct_app_sessions=nullptr,*direct_app_active=nullptr;
++    bool direct_app_publish_attempted=false;
+     uint32_t direct_app_acquires=0,direct_app_releases=0;
++    IOReturn reserveApplicationSession(IOUserClient &client,task_t task,ApplicationSession *&out)
++    {
++        if(out || !IORecursiveLockHaveLock(gates.startup) || !task || task==kernel_task ||
++           task!=current_task())return kIOReturnBadArgument;
++        if(direct_app_active || direct_app_sessions || direct_app_acquires!=direct_app_releases ||
++           direct_app_acquires==UINT32_MAX)return kIOReturnExclusiveAccess;
++        auto *record=IONewZero(ApplicationSession,1);if(!record)return kIOReturnNoMemory;
++        // Publish the actual attempted identity BEFORE any resource check can
++        // fail. No failed record or generation is silently reset/recycled.
++        record->client=&client;record->task=task;record->generation=direct_app_acquires+1;
++        record->phase=ApplicationSession::Phase::Acquiring;record->next=direct_app_sessions;
++        direct_app_sessions=record;direct_app_active=record;out=record;
++        return kIOReturnSuccess;
++    }
++    void failApplicationSession(ApplicationSession &record)
++    {
++        if(IORecursiveLockHaveLock(gates.startup) && direct_app_active==&record)
++            record.phase=ApplicationSession::Phase::Failed;
++    }
++    bool grantApplicationSession(ApplicationSession &record)
++    {
++        if(!IORecursiveLockHaveLock(gates.startup) || direct_app_active!=&record ||
++           direct_app_sessions!=&record || record.next ||
++           record.phase!=ApplicationSession::Phase::Acquiring || !record.client || !record.task ||
++           record.generation!=direct_app_acquires+1 || direct_app_acquires!=direct_app_releases ||
++           direct_app_acquires==UINT32_MAX)return false;
++        ++direct_app_acquires;record.phase=ApplicationSession::Phase::Held;return true;
++        // Metadata transition only. Caller still checks the whole real powered
++        // window/Ring binding before returning actual acquisition success.
++    }
++    bool applicationSessionHeld(IOUserClient &client,task_t task) const
++    {
++        const auto *record=direct_app_active;
++        return IORecursiveLockHaveLock(gates.startup) && record &&
++            direct_app_sessions==record && !record->next &&
++            record->client==&client && record->task==task && task && task!=kernel_task &&
++            record->phase==ApplicationSession::Phase::Held &&
++            record->generation && record->generation==direct_app_acquires &&
++            direct_app_releases!=UINT32_MAX && direct_app_acquires==direct_app_releases+1;
++    }
++    ApplicationSession *retireApplicationSession(IOUserClient &client,task_t task)
++    {
++        if(!applicationSessionHeld(client,task))return nullptr;
++        auto *record=direct_app_active;record->phase=ApplicationSession::Phase::Retired;
++        direct_app_active=nullptr;direct_app_sessions=record->next;record->next=nullptr;
++        ++direct_app_releases;return record;
++        // Caller may free this CPU metadata only after the original phase3
++        // Ring/VM/fence/OOB/authority release predicate actually succeeded.
++    }
+     bool nativeApplicationWindowHeld(IOUserClient &client,task_t task,unsigned phase,ZornGen7AppOperation26 operation)
+     {
+         return normal() && IORecursiveLockHaveLock(gates.startup) && stage==Stage::CpuReady &&
+-            direct_app_publish_attempted && direct_app_granted && direct_app_identity==&client &&
+-            direct_app_task==task && task && task!=kernel_task && !direct_client_attempted &&
+-            direct_app_acquires==direct_app_releases+1 &&
++            direct_app_publish_attempted && applicationSessionHeld(client,task) && !direct_client_attempted &&
+             __atomic_load_n(&direct_oob_epoch,__ATOMIC_ACQUIRE)==6 && host_known_image_ready &&
+             direct_task_release_allowed && host_direct_runtime_ready && host_direct_runtime_window_held && host_bootstrap_ready &&
+             host_zap_authenticated && host_zap && host_ring && host_ring->nativeApplicationBinding(client,task,phase,operation) &&
+@@ -4982,21 +5038,21 @@
+             auto &state=*board->storage_;if(IORecursiveLockHaveLock(state.gates.startup))return kIOReturnNotReady;
+             IORecursiveLockLock(state.gates.startup);
+             auto finish=[&](IOReturn raw){IORecursiveLockUnlock(state.gates.startup);return raw;};
+-            if(state.direct_app_attempted || state.direct_app_granted || state.direct_app_identity || state.direct_app_task ||
+-               state.direct_app_acquires!=state.direct_app_releases || state.direct_app_acquires==UINT32_MAX)
+-                return finish(kIOReturnExclusiveAccess);
+-            state.direct_app_attempted=true;
++            Storage::ApplicationSession *session=nullptr;
++            const auto reserved=state.reserveApplicationSession(client,task,session);
++            if(reserved)return finish(reserved);
++            auto fail=[&](IOReturn raw){state.failApplicationSession(*session);return finish(raw);};
+             if(state.stage!=Stage::CpuReady || !state.direct_app_publish_attempted || state.direct_client_attempted ||
+                state.host_ring!=&ring || state.native_cx_gpu!=&gpu || state.native_cx_gmu!=&gmu ||
+                state.host_gpu_start_gpu_resource!=&gpuRegisters || state.host_gpu_start_gmu_resource!=&gmuRegisters ||
+                __atomic_load_n(&state.direct_oob_epoch,__ATOMIC_ACQUIRE)!=4 || !state.direct_hfi ||
+-               !ring.nativeApplicationBinding(client,task,1,ZornGen7AppOperation26::PrepareTables))return finish(kIOReturnNotReady);
++               !ring.nativeApplicationBinding(client,task,1,ZornGen7AppOperation26::PrepareTables))return fail(kIOReturnNotReady);
+             uint32_t image[8]{};state.direct_hfi->copyKernelTaskOobObservation(image);
+-            if(image[0]!=127 || image[7])return finish(kIOReturnNotReady);
+-            state.direct_app_identity=&client;state.direct_app_task=task;state.direct_app_granted=true;++state.direct_app_acquires;
++            if(image[0]!=127 || image[7])return fail(kIOReturnNotReady);
++            if(!state.grantApplicationSession(*session))return fail(kIOReturnNotReady);
+             __atomic_store_n(&state.direct_oob_epoch,6u,__ATOMIC_RELEASE);
+-            if(!state.nativeApplicationWindowHeld(client,task,1,ZornGen7AppOperation26::PrepareTables)){
+-                state.direct_app_granted=false;return finish(kIOReturnNotReady);}
++            if(!state.nativeApplicationWindowHeld(client,task,1,ZornGen7AppOperation26::PrepareTables))
++                return fail(kIOReturnNotReady);
+             return finish(kIOReturnSuccess);
+         };
+         applicationAuthority.check=[](void *cookie,IOUserClient &client,task_t opening,task_t caller,
+@@ -5017,10 +5073,12 @@
+             // Exact Ring binding requires its actual process/VM retirement,
+             // completed OOB clear and the same serialized clientClose thread.
+             const bool held=state.nativeApplicationWindowHeld(client,opening,3,ZornGen7AppOperation26::Close);
+-            if(held){state.direct_app_identity=nullptr;state.direct_app_task=TASK_NULL;state.direct_app_granted=false;
+-                state.direct_app_attempted=false;++state.direct_app_releases;
+-                __atomic_store_n(&state.direct_oob_epoch,4u,__ATOMIC_RELEASE);}
+-            IORecursiveLockUnlock(state.gates.startup);return held?kIOReturnSuccess:kIOReturnNotReady;
++            auto *retired=held?state.retireApplicationSession(client,opening):nullptr;
++            if(retired)__atomic_store_n(&state.direct_oob_epoch,4u,__ATOMIC_RELEASE);
++            IORecursiveLockUnlock(state.gates.startup);
++            const bool released=retired!=nullptr;
++            if(retired)IODelete(retired,Storage::ApplicationSession,1);
++            return released?kIOReturnSuccess:kIOReturnNotReady;
+             // Relinquish only this successful application session. Root PM and
+             // provider claims remain owned; this is no power-off/DMA-stop claim.
+         };

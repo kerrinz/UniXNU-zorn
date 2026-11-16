@@ -1,0 +1,67 @@
+--- a/ZornGen7SmmuDomain26.cpp
++++ b/ZornGen7SmmuDomain26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornClientFailure261.h"
+ static unsigned zornRuntimeObservation[24];
+ extern "C" void Zorn26RecordRuntimeResult(unsigned raw){zornRuntimeObservation[0]=raw;}
+ extern "C" void zorn26_native_runtime_observation(unsigned (&out)[24]){for(unsigned i=0;i<24;i++)out[i]=zornRuntimeObservation[i];}
+@@ -3005,21 +3006,21 @@
+ ZornSmmuSparse4KStatus ZornGen7SmmuDomain26::observeProcessRuntime(void *cookie,bool full)
+ {
+     auto *p=static_cast<ZornGen7ProcessTables26 *>(cookie);
+-    if(!p || !p->domain_ || !p->domain_->storage_ || !normal())return ZornSmmuSparse4KArgument;
++    if(!p || !p->domain_ || !p->domain_->storage_ || !normal())return zorn_failure_return261(ZornFailureDomainObserve261,ZornSmmuSparse4KArgument,ZornFailureBackend261,ZornFailureScopeReason261,0,0);
+     auto &s=*p->domain_->storage_;
+     if(!IORecursiveLockHaveLock(&s.gate) || s.failed() || !s.runtime_ready ||
+        !s.runtime_grant_returned || s.runtime_grant_raw || p->parent_!=s.host_gpu_tables ||
+        !p->bankGrantReturned_ || p->bankGrantRaw_ || !p->vmAttachAttempted_ ||
+-       !s.global_fault_owner || s.global_fault_owner->verifyNoFault())return ZornSmmuSparse4KIoError;
++       !s.global_fault_owner || s.global_fault_owner->verifyNoFault())return zorn_failure_return261(ZornFailureDomainObserve261,ZornSmmuSparse4KIoError,ZornFailureBackend261,ZornFailureGate261,1,0);
+     const bool open=s.native_controller_mode && !s.host_post_cp_access;
+     if(s.native_controller_mode && (!s.runtime_boot ||
+        !s.runtime_boot->nativeProcessContextHeldForDomain(*p->domain_,*p) ||
+-       (open && !s.beginNativeHostPostCpWindow())))return ZornSmmuSparse4KIoError;
++       (open && !s.beginNativeHostPostCpWindow())))return zorn_failure_return261(ZornFailureDomainObserve261,ZornSmmuSparse4KIoError,ZornFailureBackend261,ZornFailureGate261,2,0);
+     if(s.native_controller_mode && (__atomic_load_n(&s.host_context_thread,__ATOMIC_ACQUIRE)!=current_thread() ||
+        (!open && !s.host_process_transition &&
+         !(s.host_runtime_mutation && s.runtime_mapping_halted && s.runtime_process==p &&
+           s.runtime_transaction_thread==current_thread() && s.runtime_process_asid==p->asid_))))
+-        return ZornSmmuSparse4KIoError;
++        return zorn_failure_return261(ZornFailureDomainObserve261,ZornSmmuSparse4KIoError,ZornFailureBackend261,ZornFailureGate261,3,0);
+     const bool wasObservation=s.host_runtime_observation;
+     if(s.native_controller_mode)s.host_runtime_observation=true;
+     auto finish=[&](ZornSmmuSparse4KStatus raw){
+@@ -3029,11 +3030,11 @@
+     for(unsigned i=0;i<2;++i){s.selectNativeHostPostCpBank(i);auto &e=s.endpoints[i];
+         if(!e.fault_owner || !e.stream_owner || e.fault_owner->verifyNoFault() ||
+            (full?e.stream_owner->verifyActiveConflicts():e.stream_owner->verifyActive()) || s.failed())
+-            return finish(ZornSmmuSparse4KIoError);
++            return finish(zorn_failure_return261(ZornFailureDomainObserve261,ZornSmmuSparse4KIoError,ZornFailureBackend261,ZornFailureGate261,4,i));
+     }
+     s.selectNativeHostPostCpBank(0);auto &e=s.endpoints[0];
+     return finish(s.host_gpu_tables->observeProcessTables(*p,e.program_route.io_,e.reservation.bank,e.reservation.context_offset)?
+-        ZornSmmuSparse4KStateMismatch:ZornSmmuSparse4KSuccess);
++        zorn_failure_return261(ZornFailureDomainObserve261,ZornSmmuSparse4KStateMismatch,ZornFailureBackend261,ZornFailureContext261,5,0):ZornSmmuSparse4KSuccess);
+ }
+ 
+ ZornSmmuSparse4KStatus ZornGen7SmmuDomain26::faultProcessRuntime(void *cookie)
+@@ -3108,16 +3109,16 @@
+ IOReturn ZornGen7SmmuDomain26::beginProcessSubmission(void *cookie)
+ {
+     auto *p=static_cast<ZornGen7ProcessTables26 *>(cookie);
+-    if(!p || !p->domain_ || !p->domain_->storage_ || !normal())return kIOReturnNotReady;
++    if(!p || !p->domain_ || !p->domain_->storage_ || !normal())return zorn_failure_return261(ZornFailureDomainBegin261,kIOReturnNotReady,ZornFailureBackend261,ZornFailureScopeReason261);
+     auto &s=*p->domain_->storage_;IORecursiveLockLock(&s.gate);
+     if(s.native_controller_mode && (s.runtime_mapping_halted || s.host_runtime_mutation ||
+        s.host_process_transition || s.runtime_process || s.process_submission_depth==UINT32_MAX ||
+        (s.process_submission_depth && (s.process_submission_owner!=p ||
+         s.process_submission_thread!=current_thread())))){
+-        IORecursiveLockUnlock(&s.gate);return kIOReturnNotPermitted;
++        IORecursiveLockUnlock(&s.gate);return zorn_failure_return261(ZornFailureDomainBegin261,kIOReturnNotPermitted,ZornFailureBackend261,ZornFailureScopeReason261,1,0);
+     }
+     const auto observed=observeProcessRuntime(p,true);
+-    if(observed){IORecursiveLockUnlock(&s.gate);return kIOReturnNotPermitted;}
++    if(observed){IORecursiveLockUnlock(&s.gate);return zorn_failure_return261(ZornFailureDomainBegin261,kIOReturnNotPermitted,ZornFailureBackend261,ZornFailureGate261,2,uint32_t(observed));}
+     if(s.native_controller_mode){
+         // Submit::submit calls retireCompleted recursively. Balance each real
+         // recursive gate acquisition without opening a second process/thread.

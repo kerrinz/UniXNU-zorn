@@ -1,0 +1,20 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC ecb96de011624a6ea8c3d96ee9726dbe %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 719fc4d092574847b2a3fe9de893e76f %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -948,7 +948,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"ecb96de011624a6ea8c3d96ee9726dbe",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"719fc4d092574847b2a3fe9de893e76f",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,

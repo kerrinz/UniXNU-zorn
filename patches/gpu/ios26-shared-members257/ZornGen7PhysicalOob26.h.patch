@@ -1,0 +1,48 @@
+--- a/ZornGen7PhysicalOob26.h
++++ b/ZornGen7PhysicalOob26.h
+@@ -20,7 +20,6 @@
+     friend class ZornGen7HwschedHfi26;
+     struct Lease {
+         ZornGen7PhysicalOob26 *physical=nullptr;
+-        ZornGen7AppExecution26 *member=nullptr;
+         OSObject *transport=nullptr,*registerMaps=nullptr;
+         uint64_t generation=0;
+         bool retired=false;
+@@ -34,19 +33,19 @@
+     uint64_t generation_=0;
+     ZornGen7PhysicalOob26(const ZornGen7PhysicalOob26 &)=delete;
+     ZornGen7PhysicalOob26 &operator=(const ZornGen7PhysicalOob26 &)=delete;
+-    IOReturn reserve(ZornGen7AppExecution26 &member,OSObject &transport,
++    IOReturn reserve(OSObject &transport,
+         OSObject &registerMaps,Lease *&out)
+     {
+         if(out)return kIOReturnBadArgument;
+         if(active_ || generation_==UINT64_MAX)return kIOReturnExclusiveAccess;
+         auto *p=IONewZero(Lease,1);if(!p)return kIOReturnNoMemory;
+         transport.retain();registerMaps.retain();
+-        p->physical=this;p->member=&member;p->transport=&transport;p->registerMaps=&registerMaps;
++        p->physical=this;p->transport=&transport;p->registerMaps=&registerMaps;
+         p->generation=++generation_;active_=p;out=p;return kIOReturnSuccess;
+     }
+-    bool owns(const ZornGen7AppExecution26 &member,const Lease *p) const
++    bool owns(const Lease *p) const
+     {
+-        return p && active_==p && p->physical==this && p->member==&member &&
++        return p && active_==p && p->physical==this &&
+             !p->retired && p->generation && p->generation==generation_ &&
+             p->transport && p->registerMaps;
+     }
+@@ -66,10 +65,10 @@
+     }
+     // Called only AFTER real Board release returned,with actual idle/VM/fence
+     // and per-task close checked by the Ring. No cleanup after partial I/O.
+-    Lease *retire(ZornGen7AppExecution26 &member,Lease *&p)
++    Lease *retire(Lease *&p)
+     {
+-        if(!owns(member,p) || !releaseReturned(*p))return nullptr;
+-        auto *retired=p;retired->retired=true;retired->member=nullptr;
++        if(!owns(p) || !releaseReturned(*p))return nullptr;
++        auto *retired=p;retired->retired=true;
+         active_=nullptr;p=nullptr;return retired;
+     }
+     static void disposeRetired(Lease &p)

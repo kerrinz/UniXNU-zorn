@@ -1,0 +1,12 @@
+--- a/ZornGen7AppExecution26.h
++++ b/ZornGen7AppExecution26.h
+@@ -21,6 +21,9 @@
+     // supplies actual powered-resource checks;these are not success stubs.
+     IOReturn (*physicalAcquire)(void *,ZornGen7HostRing26 &,ZornGen7RegisterMaps26 &,OSObject &,uint64_t)=nullptr;
+     IOReturn (*physicalCheck)(void *,ZornGen7HostRing26 &,uint64_t,bool releasing)=nullptr;
++    // Root may restore only its kernel root after actual completion/idle of
++    // a retained selected child. This is no task/BO/submission permission.
++    IOReturn (*physicalContextCheck)(void *,ZornGen7HostRing26 &,uint64_t)=nullptr;
+     IOReturn (*physicalRelease)(void *,ZornGen7HostRing26 &,uint64_t)=nullptr;
+     IOReturn (*acquire)(void *,IOUserClient &,task_t actualOpeningTask,
+         ZornGen7HostRing26 &,IOService &actualGpu,IOMemoryDescriptor &actualGpuRegisters,

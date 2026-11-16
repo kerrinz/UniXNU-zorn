@@ -1,0 +1,11 @@
+--- a/ZornGen7SmmuDomain26.cpp
++++ b/ZornGen7SmmuDomain26.cpp
+@@ -2885,7 +2885,7 @@
+     auto observe=[&](uint32_t stage,IOReturn raw,uint32_t detail=0){
+         if(operation==ZornGen7ProcessTableOperation26::Prepare)ring.observeApplicationPrepare(stage,raw,detail);
+     };
+-    if(!storage_ || !normal() || !ring.processTransitionHeldForDomain(*this)){observe(40,kIOReturnNotReady);return kIOReturnNotReady;}
++    if(!storage_ || !normal() || !ring.processTransitionArgumentsHeld(*this,operation,p)){observe(40,kIOReturnNotReady);return kIOReturnNotReady;}
+     observe(40,0);
+     auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate)){observe(41,kIOReturnNotReady);return kIOReturnNotReady;}

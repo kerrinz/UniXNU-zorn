@@ -1,0 +1,18 @@
+--- a/kern_exit.c
++++ b/kern_exit.c
+@@ -1,3 +1,4 @@
++#include "ZornApplicationJournal248.h"
+ #include "ZornSBReason26.h"
+ #include "ZornOSFiles26.h"
+ #include "ZornOSAnalytics26.h"
+@@ -2817,6 +2818,10 @@
+ 	proc_set_task(p, TASK_NULL);
+ 	set_bsdtask_info(task, NULL);
+ 	clear_thread_ro_proc(get_machthread(uth));
++#if defined(ARM64_BOARD_CONFIG_ZORN)
++    /* Task detached after file/AIO cleanup;no resource ownership changed. */
++    zorn26_journal_exit248(proc_uniqueid(p),(uint32_t)proc_getpid(p),(uint32_t)p->p_xstat);
++#endif
+ 
+ #if DEVELOPMENT || DEBUG
+ 	proc_exit_lpexit_check(pid, PELS_POS_POST_TASK_DETACH);

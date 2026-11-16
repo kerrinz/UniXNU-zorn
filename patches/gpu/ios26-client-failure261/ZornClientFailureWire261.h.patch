@@ -1,0 +1,17 @@
+--- /dev/null
++++ b/ZornClientFailureWire261.h
+@@ -0,0 +1,14 @@
++// SPDX-License-Identifier: MIT
++#pragma once
++#include "ZornClientFailure261.h"
++// Append before the existing size-adaptive stderr journal. No cursor consumed.
++static unsigned zorn_failure_append261(char*line,unsigned cap,unsigned size,unsigned got,const ZornClientFailure261&r){
++ if(!line || size<2 || size>=cap || got>1 || line[size-2]!='\r' || line[size-1]!='\n')return 0;
++ const auto &a=r.reject;const auto &b=r.failure;
++ const int n=snprintf(line+size-2,cap-(size-2),
++  ",cf=%u/%016llx/%016llx/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x\r\n",
++  got,(unsigned long long)r.id,(unsigned long long)r.unique,r.pid,r.flags,r.calls,r.records,r.recycled,r.dropped,
++  a.sequence,a.stage,a.reason,a.raw,a.method,a.detail0,a.detail1,
++  b.sequence,b.stage,b.reason,b.raw,b.method,b.detail0,b.detail1,r.closeStage,r.closeRaw);
++ if(n<0 || unsigned(n)>=cap-(size-2))return 0;return size+unsigned(n)-2;
++}

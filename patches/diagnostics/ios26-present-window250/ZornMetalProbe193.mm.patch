@@ -1,0 +1,22 @@
+--- a/userland/ZornMetalProbe193.mm
++++ b/userland/ZornMetalProbe193.mm
+@@ -16,7 +16,7 @@
+ #include <time.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-static constexpr char tag[]="fe1bff87a3d943c1aa877cac8e5ddadb";
++static constexpr char tag[]="9735df98f85745cd9f43a43290398656";
+ static uint32_t stages,actualCRC,firstBad=UINT32_MAX;
+ static uint64_t serviceID,deviceID;
+ static uint32_t crc32(const uint8_t *p,size_t n){uint32_t c=~0u;for(size_t i=0;i<n;i++){c^=p[i];for(unsigned j=0;j<8;j++)c=(c>>1)^((0u-(c&1u))&0xedb88320u);}return ~c;}
+@@ -58,8 +58,8 @@
+  const uint32_t sid=IOSurfaceGetID(surface);if(!sid)return false;
+  mach_timebase_info_data_t timebase{};
+  if(mach_timebase_info(&timebase)!=KERN_SUCCESS || !timebase.numer || !timebase.denom ||
+-    UINT64_C(8000000000)>UINT64_MAX/timebase.denom)return false;
+- const uint64_t span=UINT64_C(8000000000)*timebase.denom/timebase.numer;
++    UINT64_C(20000000000)>UINT64_MAX/timebase.denom)return false;
++ const uint64_t span=UINT64_C(20000000000)*timebase.denom/timebase.numer;
+  const uint64_t start=mach_absolute_time();if(!span || start>UINT64_MAX-span)return false;
+  const uint64_t deadline=start+span;
+  io_service_t display=IOServiceGetMatchingService(kIOMainPortDefault,IOServiceMatching("IOMobileFramebuffer"));

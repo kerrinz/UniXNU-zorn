@@ -1,0 +1,29 @@
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -26,6 +26,10 @@
+     bool bootstrapReadyForOobTransport(const OSObject &) const;
+     bool bootstrapReadyForOob(const ZornGen7HwschedHfi26 &) const;
+     friend class ZornGen7DarwinBoardOwner;friend class ZornGen7ZapOwner26;friend class ZornGen7SmmuDomain26;
++    bool physicalContextIdentity() const;
++    bool physicalContextHeld() const;
++    bool nativePhysicalContextBinding(uint64_t generation) const;
++    IOReturn restoreCompletedApplicationContext();
+     bool nativePhysicalBinding(unsigned phase,uint64_t generation,bool releasing=false) const;
+     ZornGen7PhysicalOob26::Lease *physicalOobRecordForTransport(const OSObject &) const;
+     bool physicalOobPermission(const OSObject &,bool releasing);
+@@ -87,13 +91,14 @@
+     bool kernelClientReadyToRelease(const ZornGen7HwschedHfi26 &) const;
+     bool kernelClientReadyToRelease(const ZornGen7DirectHfi26 &) const;
+     bool kernelClientReadyToReleaseForTransport(const OSObject &) const;
+-    IOReturn quiesceKernelIo();
++    IOReturn quiesceKernelIo(uint32_t waitBudgetUs=1000000,bool *pendingFence=nullptr);
+     bool nativeProcessTableLeaseHealthy(const ZornGen7SmmuDomain26 &,const ZornGen7ProcessTables26 &) const;
+     IOReturn beginNativeProcessTableLease(const ZornGen7SmmuDomain26 &,ZornGen7ProcessTables26 &);
+     IOReturn endNativeProcessTableLease(const ZornGen7SmmuDomain26 &,ZornGen7ProcessTables26 &);
+     bool nativeProcessContextHeldForDomain(const ZornGen7SmmuDomain26 &,const ZornGen7ProcessTables26 &) const;
+     // Diagnostic only; no authority or hardware operation.
+     void observeApplicationPrepare(uint32_t stage,IOReturn raw,uint32_t detail);
++    bool processTransitionArgumentsHeld(const ZornGen7SmmuDomain26 &,ZornGen7ProcessTableOperation26,const ZornGen7ProcessTables26 *) const;
+     bool processTransitionHeldForDomain(const ZornGen7SmmuDomain26 &) const;
+     IOReturn openProcessClient(class IOUserClient &,ZornGen7ProcessTables26 &,task_t actualOwningTask);
+     IOReturn dispatchProcessClient(class IOUserClient &,ZornGen7ProcessTables26 &,task_t actualCallingTask,

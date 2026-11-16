@@ -1,0 +1,51 @@
+--- a/direct-runtime/ZornGen7DirectClient26.cpp
++++ b/direct-runtime/ZornGen7DirectClient26.cpp
+@@ -1,3 +1,4 @@
++#include "ZornClientFailure261.h"
+ /* SPDX-License-Identifier: MIT */
+ #include "ZornGen7DirectClient26.h"
+ #include "NativeAdrenoCoherencePolicy.h"
+@@ -361,34 +362,34 @@
+ IOReturn ZornGen7DirectClient26::submitBatch(const NativeAdrenoAbiSubmitBatch *request,
+     NativeAdrenoAbiSubmitReply *reply,const NativeAdrenoRingClock *clock)
+ {
+-    if(!request || !reply)return kIOReturnBadArgument;reply->fence=0;
+-    if(!open_)return kIOReturnNotReady;
++    if(!request || !reply)return zorn_failure_return261(ZornFailureClientBatch261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureInput261);reply->fence=0;
++    if(!open_)return zorn_failure_return261(ZornFailureClientBatch261,kIOReturnNotReady,ZornFailureBackend261,ZornFailureState261);
+     static_assert(NativeAdrenoAbiMaxBatchBuffers==ZornGen7DirectSubmit26MaxBuffers,"ABI and execbuf batch limits");
+     if(!request->buffer_count || request->buffer_count>NativeAdrenoAbiMaxBatchBuffers ||
+-        request->reserved)return kIOReturnBadArgument;
++        request->reserved)return zorn_failure_return261(ZornFailureClientBatch261,kIOReturnBadArgument,ZornFailureReject261,request->reserved?ZornFailureReserved261:ZornFailureCount261,request->buffer_count,request->reserved);
+     if(request->queue>=NativeAdrenoAbiMaxQueues || !queues_[request->queue].active)
+-        return kIOReturnBadArgument;
++        return zorn_failure_return261(ZornFailureClientBatch261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureQueue261,uint32_t(request->queue),0);
+     if(request->wait_fence) {
+-        if(!clock || request->wait_fence>UINT32_MAX)return kIOReturnBadArgument;
++        if(!clock || request->wait_fence>UINT32_MAX)return zorn_failure_return261(ZornFailureClientWait261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureFenceWidth261,!clock,request->wait_fence>UINT32_MAX);
+         const uint32_t wait_us=request->wait_timeout_ns==0?0:
+             (request->wait_timeout_ns>UINT64_C(0xffffffff)*1000u?0xffffffffu:
+             (uint32_t)(request->wait_timeout_ns/1000));
+         const IOReturn waited=submit_->observeFence((uint32_t)request->wait_fence,clock,wait_us);
+-        if(waited)return waited;
++        if(waited)return zorn_failure_return261(ZornFailureClientWait261,waited,waited==kIOReturnTimeout||waited==kIOReturnBusy?ZornFailurePending261:waited==kIOReturnBadArgument?ZornFailureReject261:ZornFailureBackend261,ZornFailureDependency261,uint32_t(request->wait_fence),0);
+     }
+     ZornGen7DirectSubmit26Buffer *buffers=submit_buffers_;
+     for(uint32_t i=0;i<request->buffer_count;++i) {
+         const NativeAdrenoAbiSubmitBuffer &wire=request->buffers[i];
+-        if(!wire.bytes || (wire.bytes&3))return kIOReturnBadArgument;
++        if(!wire.bytes || (wire.bytes&3))return zorn_failure_return261(ZornFailureClientBatch261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureIbBytes261,i,uint32_t(wire.bytes&3));
+         Entry *entry=find(wire.handle);
+-        if(!entry || !entry->mapped_state)return kIOReturnBadArgument;
++        if(!entry || !entry->mapped_state)return zorn_failure_return261(ZornFailureClientBatch261,kIOReturnBadArgument,ZornFailureReject261,ZornFailureEntry261,i,entry?1:0);
+         buffers[i]={entry->mapped,wire.iova,(size_t)wire.bytes};
+     }
+     uint32_t fence=0;
+     used_=true;
+     const IOReturn status=submit_->submit(buffers,request->buffer_count,
+         queue_base_+static_cast<uint32_t>(request->queue),&fence);
+-    if(status)return status;
++    if(status)return zorn_failure_return261(ZornFailureClientBatch261,status,status==kIOReturnBusy||status==kIOReturnTimeout?ZornFailurePending261:status==kIOReturnBadArgument?ZornFailureReject261:ZornFailureBackend261,ZornFailureStatus261,request->buffer_count,0);
+     reply->fence=fence;
+     return kIOReturnSuccess;
+ }
