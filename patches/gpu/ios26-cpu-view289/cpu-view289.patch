@@ -1,0 +1,111 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -46,13 +46,14 @@
+ extern "C" void zorn26_native_known_image_observation(unsigned (&out)[32])
+ {for(unsigned i=0;i<32;++i)out[i]=nativeKnownImageObservation[i];}
+ namespace {
+-// These native methods read their own client metadata/status,or the already
+-// bound global CP always-on timer. None translates an application GPU VA.
++// These native methods use their own metadata,CPU lease counters/physical
++// views,or the bound global CP timer. None translates an application GPU VA.
+ // Native result and all operation/task/provider/MMIO checks remain in force.
+-static bool nativeReadOnlyQuery288(uint32_t method)
++static bool nativeContextFreeMethod289(uint32_t method)
+ {
+     return method==NativeAdrenoMethodQuery || method==NativeAdrenoMethodGetDeviceInfo ||
+-        method==NativeAdrenoMethodGetStatus || method==NativeAdrenoMethodGetTimestamp;
++        method==NativeAdrenoMethodGetStatus || method==NativeAdrenoMethodGetTimestamp ||
++        method==NativeAdrenoMethodBoCpuMap || method==NativeAdrenoMethodBoCpuUnmap;
+ }
+ // This root lives for the actual initialized GPU's lifetime,not a connection.
+ // Registry lock precedes issuer;native operations never acquire the registry
+@@ -1322,10 +1323,12 @@
+         p.clientTask_==s.kernelTaskOwner && !s.kernelProcessClosing && kernelClientExecutionHealthy();
+     const bool app=applicationOperationHeld() && s.appExecution->client_==&connection &&
+         p.clientTask_==s.appExecution->task_;
+-    const bool readOnly=app && !s.hfi && nativeReadOnlyQuery288(method);
+-    if(!callingTask || (!kernel && !app) || !processConnectionHeld(connection) || (!readOnly && s.processSelected!=&p) || p.ringOwner_!=this ||
++    const bool contextFree=app && !s.hfi && nativeContextFreeMethod289(method);
++    if(app && (callingTask!=s.appExecution->task_ ||
++       !applicationProcessIdentity289(connection,*s.appExecution,p)))return done(kIOReturnNotReady);
++    if(!callingTask || (!kernel && !app) || !processConnectionHeld(connection) || (!contextFree && s.processSelected!=&p) || p.ringOwner_!=this ||
+        p.domain_!=&s.domain || p.clientOwner_!=&connection || !p.clientOpen_ || p.clientClosed_ ||
+-       !p.vmAttached_ || p.vmDetached_ || (!readOnly && p.state_.detached) || p.state_.poisoned ||
++       !p.vmAttached_ || p.vmDetached_ || (!contextFree && p.state_.detached) || p.state_.poisoned ||
+        !p.submitAttached_ || !p.clientState_ || p.clientState_->submit.poisoned())return done(kIOReturnNotReady);
+     clock_interval_to_deadline(1000,NSEC_PER_MSEC,&s.deadline);
+     alignas(8) uint8_t reply[sizeof(NativeAdrenoAbiMetadata)]{};
+@@ -2079,7 +2082,7 @@
+     else if(method==NativeAdrenoMethodSubmit || method==NativeAdrenoMethodSubmitBatch)operation=ZornGen7AppOperation26::Submit;
+     else if(method==NativeAdrenoMethodWaitFence)operation=ZornGen7AppOperation26::Wait;
+     else if(method==NativeAdrenoMethodGetTimestamp)operation=ZornGen7AppOperation26::Timestamp;
+-    const bool selectContext=storage_->hfi || !nativeReadOnlyQuery288(method);
++    const bool selectContext=storage_->hfi || !nativeContextFreeMethod289(method);
+     ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,operation,scope,nullptr,selectContext);if(raw)return raw;
+     if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     alignas(8) uint8_t reply[sizeof(NativeAdrenoAbiMetadata)]{};
+@@ -2109,26 +2112,46 @@
+ IOReturn ZornGen7HostRing26::applicationIoLeases(IOUserClient &connection,ZornGen7AppExecution26 &execution,
+     ZornGen7ProcessTables26 &p,const NativeAdrenoAbiBoCpuUnmap &request,uint32_t &out)
+ {
+-    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(connection,ZornGen7AppOperation26::CpuView,scope);
++    if(!storage_ || !normal())return kIOReturnNotReady;
++    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(connection,ZornGen7AppOperation26::CpuView,scope,nullptr,storage_->hfi!=nullptr);
+     if(raw)return raw;if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     auto &s=*storage_;s.lockIssuer();uint32_t leases=0;
+-    const bool ready=processConnectionHeld(connection) && s.processSelected==&p && p.ringOwner_==this &&
+-        p.domain_==&s.domain && p.clientOwner_==&connection && p.clientTask_==execution.task_ &&
+-        p.clientOpen_ && !p.clientClosed_ && p.clientState_ && !p.state_.poisoned;
++    const bool ready=applicationProcessIdentity289(connection,execution,p) &&
++        (!s.hfi || s.processSelected==&p);
+     raw=ready?p.clientState_->client.preflightCpuUnmap(&request,&leases):kIOReturnNotReady;
+     s.unlockIssuer();raw=finishApplicationOperation(*scope,raw);if(!raw)out=leases;return raw;
+ }
++bool ZornGen7HostRing26::applicationProcessIdentity289(IOUserClient &connection,
++    const ZornGen7AppExecution26 &execution,const ZornGen7ProcessTables26 &p) const
++{
++    if(!storage_ || !normal())return false;const auto &s=*storage_;
++    if(!s.issuerHeld() || !applicationOperationHeld() || s.appExecution!=&execution ||
++       execution.client_!=&connection || !processConnectionHeld(connection) ||
++       p.ringOwner_!=this || p.domain_!=&s.domain || p.clientOwner_!=&connection ||
++       p.clientTask_!=execution.task_ || !p.clientOpen_ || p.clientClosed_ ||
++       !p.vmAttached_ || p.vmDetached_ || p.state_.poisoned || p.vm_.poisoned() ||
++       !p.submitAttached_ || !p.clientState_ || p.clientState_->submit.poisoned())return false;
++    bool found=false;
++    for(auto *q=s.processClients;q;q=q->ringNext_){
++        if(q->clientOwner_!=&connection || q->clientTask_!=execution.task_)continue;
++        if(q!=&p || found)return false;found=true;
++    }
++    return found;
++    // Match the exact unique member required by enterApplicationContext even
++    // when a CPU-only operation does not need that hardware context switch.
++}
++
+ IOReturn ZornGen7HostRing26::copyApplicationIoView(IOUserClient &connection,ZornGen7AppExecution26 &execution,
+     ZornGen7ProcessTables26 &p,uint32_t token,IOMemoryDescriptor *&out)
+ {
+     if(out || !token)return kIOReturnBadArgument;
+-    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(connection,ZornGen7AppOperation26::CpuView,scope);
++    if(!storage_ || !normal())return kIOReturnNotReady;
++    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(connection,ZornGen7AppOperation26::CpuView,scope,nullptr,storage_->hfi!=nullptr);
+     if(raw)return raw;if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     auto &s=*storage_;IOMemoryDescriptor *descriptor=nullptr;
+     s.lockIssuer();
+-    const bool ready=processConnectionHeld(connection) && s.processSelected==&p && p.ringOwner_==this &&
+-        p.domain_==&s.domain && p.clientOwner_==&connection && p.clientTask_==execution.task_ &&
+-        p.clientOpen_ && !p.clientClosed_ && p.clientState_ && !p.state_.poisoned;
++    const bool ready=applicationProcessIdentity289(connection,execution,p) &&
++        (!s.hfi || s.processSelected==&p);
+     if(!ready)raw=kIOReturnNotReady;
+     else {
+         auto *memory=p.clientState_->client.memoryForToken(token);NativeAdrenoCpuView view{};
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -55,6 +55,7 @@
+         uint32_t,const void *,size_t,void *,size_t);
+     IOReturn applicationIoLeases(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+         const struct NativeAdrenoAbiBoCpuUnmap &,uint32_t &);
++    bool applicationProcessIdentity289(IOUserClient &,const ZornGen7AppExecution26 &,const ZornGen7ProcessTables26 &) const;
+     IOReturn copyApplicationIoView(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+         uint32_t,class IOMemoryDescriptor *&);
+     IOReturn closeApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 *&,bool *pendingFence=nullptr);

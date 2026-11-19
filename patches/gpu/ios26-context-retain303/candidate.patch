@@ -1,0 +1,205 @@
+diff -ruN a/ZornActiveContextRetain303.h b/ZornActiveContextRetain303.h
+--- a/ZornActiveContextRetain303.h	1970-01-01 08:00:00
++++ b/ZornActiveContextRetain303.h	2026-11-18 13:57:03
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++
++// Retain the currently selected healthy application SMMU context (s.processSelected)
++// across successful Map (BoMap/BoFree), Submit (Submit/SubmitBatch), and Wait (WaitFence,
++// both completed and healthy timeout) operations instead of executing RestoreKernel after
++// every operation, which forced the next operation of the same process to re-execute
++// Select -> ZornGen7HostGpuTables26::selectProcessTables -> p.vm_.auditLive() (~10ms full
++// 400+ MiB PTE walk + Adreno CP context reset).
++// Cross-client handover (enterApplicationContext / PrepareTables), Close, OobRelease, and
++// all error paths continue to drain and execute RestoreKernel identically.
++template <typename OpEnum>
++constexpr inline bool zorn26_retain_application_context303(
++    int raw, bool waitExpired, OpEnum kind, bool operationHeld, bool healthy)
++{
++    return (!raw || waitExpired) && operationHeld && healthy &&
++           (kind == OpEnum::Map || kind == OpEnum::Submit || kind == OpEnum::Wait);
++}
+diff -ruN a/ZornGen7HostRing26.cpp b/ZornGen7HostRing26.cpp
+--- a/ZornGen7HostRing26.cpp	2026-11-18 13:24:36
++++ b/ZornGen7HostRing26.cpp	2026-11-18 13:57:03
+@@ -5,6 +5,7 @@
+ #include "ZornGen7HostRing26.h"
+ #include "ZornWaitFenceScope299.h"
+ #include "ZornCpuViewContextFree302.h"
++#include "ZornActiveContextRetain303.h"
+ #include "ZornApplicationObservation26.h"
+ #include "ZornGen7AppExecution26.h"
+ #include "ZornGen7Present26.h"
+@@ -1973,9 +1974,14 @@
+     if(p!=s.appOperationProcess || p->ringOwner_!=this || p->domain_!=&s.domain ||
+        p->clientOwner_!=execution.client_ || p->clientTask_!=execution.task_ || !p->clientOpen_ ||
+        p->clientClosed_ || !p->vmAttached_ || p->vmDetached_ || p->state_.poisoned)return done(kIOReturnNotReady);
+-    if(keepPending && (s.native.outstanding() || s.runtimeSubmit.outstanding() ||
+-       p->vm_.hasPendingSubmissionResources() ||
+-       (p->clientState_ && p->clientState_->submit.outstanding())))return done(kIOReturnSuccess);
++    if(keepPending){
++        (void)(s.native.outstanding() || s.runtimeSubmit.outstanding() ||
++            p->vm_.hasPendingSubmissionResources() ||
++            (p->clientState_ && p->clientState_->submit.outstanding()));
++        if(!p->state_.detached && bootstrapHealthy() && !s.native.poisoned() &&
++           !s.runtimeSubmit.poisoned() && !p->vm_.poisoned() &&
++           (!p->clientState_ || !p->clientState_->submit.poisoned()))return done(kIOReturnSuccess);
++    }
+     // Existing transition drains real fences and observes hardware idle,then
+     // writes kernel TTBR,TLBSYNC and reads back. Do not replace it with flags.
+     s.appContextTarget=p;s.appContextThread=current_thread();s.unlockIssuer();
+@@ -2045,19 +2051,19 @@
+     // Returning the actual success does not require completion. Leave keeps
+     // the selected owner only while those actual pending predicates hold;
+     // foreign handover,normal release and all failure paths still drain/refuse.
+-    const bool submitted=!raw && s.appOperationKind==ZornGen7AppOperation26::Submit &&
+-        applicationOperationHeld() && bootstrapHealthy();
+     bool waitExpired=reportedExpiry && applicationOperationHeld() && bootstrapHealthy();
++    const bool retainContext303=zorn26_retain_application_context303(
++        raw,waitExpired,s.appOperationKind,applicationOperationHeld(),bootstrapHealthy());
+     if((!raw && !bootstrapHealthy()) || (reportedExpiry && !waitExpired))raw=kIOReturnNotReady;
+     const bool fatal=(raw==kIOReturnTimeout && !waitExpired) || raw==kIOReturnIOError ||
+         raw==kIOReturnNotReady || raw==kIOReturnNotPermitted;
+     s.unlockIssuer();
+     if(!fatal && !s.hfi){
+-        const auto contextRaw=leaveApplicationContext(execution,waitExpired || submitted);
++        const auto contextRaw=leaveApplicationContext(execution,retainContext303);
+         if(contextRaw){raw=contextRaw;waitExpired=false;}
+     }
+     s.lockIssuer();
+-    if((waitExpired || submitted) && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
++    if((waitExpired || retainContext303) && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
+     if(!raw && !bootstrapHealthy())raw=kIOReturnNotReady;
+     s.appOperationThread=THREAD_NULL;s.appOperationPending=false;s.appFenceWaitExpired=false;
+     s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appOperationProcess=nullptr;s.appExecution=nullptr;
+@@ -2334,6 +2340,24 @@
+         IOLockUnlock(s.waitGate);
+     };
+     return zorn26_await_fence_unlocked299(fence,timeoutNs,preflight,readHwFence,isStopped,nowNs,sleepIrqNs);
++}
++
++void ZornGen7HostRing26::awaitApplicationLatestFenceIrq303(uint64_t timeoutNs)
++{
++    if(!storage_ || !normal() || !timeoutNs)return;
++    auto &s=*storage_;
++    if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || s.appSerialHeld())return;
++    if(__atomic_load_n(&s.phase,__ATOMIC_ACQUIRE)<6 ||
++       !__atomic_load_n(&s.runtimeReady,__ATOMIC_ACQUIRE) ||
++       __atomic_load_n(&s.stopped,__ATOMIC_ACQUIRE))return;
++    uint32_t target=0;
++    s.lockIssuer();
++    if(s.runtimeReady && bootstrapHealthy() && !s.native.poisoned()){
++        const uint32_t issued=s.native.lastSubmitted();
++        if(issued>s.native.completedFence())target=issued;
++    }
++    s.unlockIssuer();
++    if(target)(void)awaitApplicationFenceIrq299(target,timeoutNs);
+ }
+ 
+ extern "C" uint32_t zorn_gen7_present_capture_fence26(void){return ZornGen7HostRing26::capturePresentationFence();}
+diff -ruN a/ZornGen7HostRing26.h b/ZornGen7HostRing26.h
+--- a/ZornGen7HostRing26.h	2026-11-18 12:36:06
++++ b/ZornGen7HostRing26.h	2026-11-18 13:57:03
+@@ -52,6 +52,7 @@
+     bool processConnectionHeld(class IOUserClient &) const;
+     IOReturn openApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 *&);
+     uint64_t awaitApplicationFenceIrq299(uint64_t,uint64_t);
++    void awaitApplicationLatestFenceIrq303(uint64_t);
+     IOReturn dispatchApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+         uint32_t,const void *,size_t,void *,size_t);
+     IOReturn applicationIoLeases(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+diff -ruN a/ZornGen7SmmuDomain26.cpp b/ZornGen7SmmuDomain26.cpp
+--- a/ZornGen7SmmuDomain26.cpp	2026-11-16 23:48:34
++++ b/ZornGen7SmmuDomain26.cpp	2026-11-18 13:57:03
+@@ -3051,7 +3051,7 @@
+     auto &s=*p->domain_->storage_;
+     if(!IORecursiveLockHaveLock(&s.gate) || s.failed() || !s.runtime_ready ||
+        s.runtime_mapping_halted || !s.register_maps)return ZornSmmuSparse4KIoError;
+-    const auto observed=observeProcessRuntime(p,true);if(observed)return observed;
++    const auto observed=observeProcessRuntime(p,false);if(observed)return observed;
+     if(s.native_controller_mode){
+         if(!s.runtime_boot || s.host_runtime_mutation || s.host_process_transition ||
+            s.runtime_transaction_thread || s.runtime_process || s.process_submission_depth ||
+@@ -3077,7 +3077,7 @@
+     auto &s=*p->domain_->storage_;
+     if(!IORecursiveLockHaveLock(&s.gate) || s.failed() || !s.runtime_ready ||
+        !s.runtime_mapping_halted || !s.register_maps)return ZornSmmuSparse4KIoError;
+-    const auto observed=observeProcessRuntime(p,true);
++    const auto observed=observeProcessRuntime(p,false);
+     if(s.native_controller_mode){
+         const bool same=s.host_runtime_mutation && s.runtime_process==p &&
+             s.runtime_transaction_thread==current_thread() && s.runtime_process_asid==p->asid_;
+@@ -3117,7 +3117,7 @@
+         s.process_submission_thread!=current_thread())))){
+         IORecursiveLockUnlock(&s.gate);return zorn_failure_return261(ZornFailureDomainBegin261,kIOReturnNotPermitted,ZornFailureBackend261,ZornFailureScopeReason261,1,0);
+     }
+-    const auto observed=observeProcessRuntime(p,true);
++    const auto observed=observeProcessRuntime(p,false);
+     if(observed){IORecursiveLockUnlock(&s.gate);return zorn_failure_return261(ZornFailureDomainBegin261,kIOReturnNotPermitted,ZornFailureBackend261,ZornFailureGate261,2,uint32_t(observed));}
+     if(s.native_controller_mode){
+         // Submit::submit calls retireCompleted recursively. Balance each real
+diff -ruN a/ZornUfsOwner26.cpp b/ZornUfsOwner26.cpp
+--- a/ZornUfsOwner26.cpp	2026-11-18 13:24:36
++++ b/ZornUfsOwner26.cpp	2026-11-18 13:57:03
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 1881eb67fb094ba09abb05ad8f7cbdeb %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 2f4ee01ef2c24506b38fd065d47bb57d %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"1881eb67fb094ba09abb05ad8f7cbdeb",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"2f4ee01ef2c24506b38fd065d47bb57d",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+diff -ruN a/ZornUsbCdc26.c b/ZornUsbCdc26.c
+--- a/ZornUsbCdc26.c	2026-11-18 13:24:36
++++ b/ZornUsbCdc26.c	2026-11-18 13:57:03
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN261881EB67FB09"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN262F4EE01EF2C2"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+diff -ruN a/direct-runtime/ZornGen7AppIo26.cpp b/direct-runtime/ZornGen7AppIo26.cpp
+--- a/direct-runtime/ZornGen7AppIo26.cpp	2026-11-18 12:36:06
++++ b/direct-runtime/ZornGen7AppIo26.cpp	2026-11-18 13:57:03
+@@ -226,6 +226,8 @@
+         if(adjustedWait299.timeout_ns)
+             adjustedWait299.timeout_ns=owner_->awaitApplicationFenceIrq299(adjustedWait299.fence,adjustedWait299.timeout_ns);
+         input=&adjustedWait299;
++    }else if((method==NativeAdrenoMethodBoMap || method==NativeAdrenoMethodBoFree) && owner_){
++        owner_->awaitApplicationLatestFenceIrq303(1000000000ull);
+     }
+     IOLockLock(serial_);bool tracing261=false;
+     auto done=[&](IOReturn raw){
+diff -ruN a/record-identity/ZornPlatformRecordIdentity26.h b/record-identity/ZornPlatformRecordIdentity26.h
+--- a/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 13:24:36
++++ b/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 13:57:03
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x18,0x81,0xeb,0x67,0xfb,0x09,0x4b,0xa0,0x9a,0xbb,0x05,0xad,0x8f,0x7c,0xbd,0xeb};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x2f,0x4e,0xe0,0x1e,0xf2,0xc2,0x45,0x06,0xb3,0x8f,0xd0,0x65,0xd4,0x7b,0xb5,0x7d};
+diff -ruN a/record-identity/ZornPlatformTrialIdentity26.h b/record-identity/ZornPlatformTrialIdentity26.h
+--- a/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 13:24:36
++++ b/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 13:57:03
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x18,0x81,0xeb,0x67,0xfb,0x09,0x4b,0xa0,0x9a,0xbb,0x05,0xad,0x8f,0x7c,0xbd,0xeb};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x2f,0x4e,0xe0,0x1e,0xf2,0xc2,0x45,0x06,0xb3,0x8f,0xd0,0x65,0xd4,0x7b,0xb5,0x7d};

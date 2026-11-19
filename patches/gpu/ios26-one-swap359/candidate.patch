@@ -1,0 +1,89 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -340,7 +340,12 @@
+  */
+ static TUNABLE(uint32_t, gThreads, "fb_threads", 3);
+ #define SWAP_QUEUE              2                       /* frames that may wait for the panel at most (fb_queue) */
++#if defined(ZORN_IOS26)
++// Use the existing one-slot queue policy on the K80 comparison build.
++static TUNABLE(uint32_t, gQueue, "fb_queue", 1);
++#else
+ static TUNABLE(uint32_t, gQueue, "fb_queue", 2);
++#endif
+ static inline unsigned
+ swapQueue(void)
+ {
+@@ -1629,7 +1634,9 @@
+ #endif
+ #if defined(ZORN_IOS26)
+ 	memcpy(fSwapSurfaces[slot], retained, sizeof(retained));
+-    fZornQueuedAt278[slot]=mach_absolute_time();
++    // The admission wait can increase when there is one pending slot. Keep
++    // the timestamp from present() entry so that wait remains in the trace.
++    fZornQueuedAt278[slot] = now;
+ #else
+ 	for (unsigned layer = 0; layer < SWAP_LAYERS; layer++) {
+ 		uint32_t sid = swapWord(swap, SWAP_SURFACE(layer));
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -42,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT358", 8);
++    memcpy(p, "K80FT359", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 358);
++    zorn_panic_le236(p, Bytes - 4, 359);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC f3db4b620bf4493288c963dc5baff5d6 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC e45f6e094e1a442fb4003c951bff7305 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"f3db4b620bf4493288c963dc5baff5d6",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"e45f6e094e1a442fb4003c951bff7305",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26F3DB4B620BF4"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26E45F6E094E1A"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xf3,0xdb,0x4b,0x62,0x0b,0xf4,0x49,0x32,0x88,0xc9,0x63,0xdc,0x5b,0xaf,0xf5,0xd6};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xe4,0x5f,0x6e,0x09,0x4e,0x1a,0x44,0x2f,0xb4,0x00,0x3c,0x95,0x1b,0xff,0x73,0x05};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xf3,0xdb,0x4b,0x62,0x0b,0xf4,0x49,0x32,0x88,0xc9,0x63,0xdc,0x5b,0xaf,0xf5,0xd6};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xe4,0x5f,0x6e,0x09,0x4e,0x1a,0x44,0x2f,0xb4,0x00,0x3c,0x95,0x1b,0xff,0x73,0x05};

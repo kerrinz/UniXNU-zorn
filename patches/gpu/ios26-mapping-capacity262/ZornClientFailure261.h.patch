@@ -1,0 +1,21 @@
+--- a/ZornClientFailure261.h
++++ b/ZornClientFailure261.h
+@@ -15,14 +15,16 @@
+  ZornFailureHoldResources261=104,ZornFailureReassert261=105,ZornFailurePublish261=106,ZornFailureRing261=107,
+  ZornFailureWait261=108,ZornFailureRelease261=109,
+  ZornFailureVmJob261=120,ZornFailureVmCache261=121,ZornFailureVmResources261=122,
+- ZornFailureDomainObserve261=160,ZornFailureDomainBegin261=161
++ ZornFailureDomainObserve261=160,ZornFailureDomainBegin261=161,
++ ZornFailureMapPreflight262=170,ZornFailureMapHandle262=171,ZornFailureMapHold262=172,ZornFailureClientMap262=173
+ };
+ enum { ZornFailureGeneric261=0,ZornFailureInput261=1,ZornFailureState261=2,ZornFailureCount261=3,
+  ZornFailureReserved261=4,ZornFailureQueue261=5,ZornFailureFenceWidth261=6,ZornFailureDependency261=7,
+  ZornFailureIbBytes261=8,ZornFailureEntry261=9,ZornFailureHandle261=10,ZornFailureIova261=11,
+  ZornFailurePermission261=12,ZornFailureBounds261=13,ZornFailureNoJob261=14,ZornFailureCache261=15,
+  ZornFailureReference261=16,ZornFailureResources261=17,ZornFailureFence261=18,ZornFailureGate261=19,
+- ZornFailureStatus261=20,ZornFailureInFlight261=21,ZornFailureScopeReason261=22,ZornFailureContext261=23 };
++ ZornFailureStatus261=20,ZornFailureInFlight261=21,ZornFailureScopeReason261=22,ZornFailureContext261=23,
++ ZornFailureObjectCapacity262=24,ZornFailureSpanCapacity262=25,ZornFailureHandleCapacity262=26 };
+ typedef struct {uint64_t previousToken;uint32_t previousMethod,hadPrevious;} ZornClientFailureScope261;
+ typedef struct {uint32_t sequence,stage,reason,raw,method,detail0,detail1;} ZornClientFailureEvent261;
+ typedef struct {

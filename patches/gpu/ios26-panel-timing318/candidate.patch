@@ -1,0 +1,284 @@
+--- /dev/null
++++ b/ZornDisplayTiming318.h
+@@ -0,0 +1,108 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornDisplayTiming318 {
++
++enum class Window : uint8_t { Gcc, DisplayClock, Interface };
++
++struct Range {
++    uint64_t address;
++    uint32_t bytes;
++};
++
++inline constexpr Range Windows[] = {
++    {0x00127004, 4},       // GCC_DISP_AHB_CLK, gcc-pineapple.c
++    {0x0af08000, 0x1008},  // MDSS branches, BCR and GDSCR/CFG_GDSCR
++    {0x0ae36000, 0x300},   // DSI0's mdp_intf_base in the zorn live FDT
++};
++
++enum Field : unsigned {
++    Status, UptimeMs, GccAhb, CoreDomain, CoreDomainConfig, AhbClock,
++    MdpClock, VsyncClock, InterfaceStatus, TearEnable, TearReadCount,
++    TearWriteLine, InterfaceFrameCount, MdpFrameCount, VideoLine, Words
++};
++
++enum class Result : uint32_t {
++    NotObserved, NoPresentation, MissingMapping, ParentClockOff, DomainInactive,
++    DisplayClockOff, UnstablePower, Observed, StoppedAfterFault
++};
++
++inline bool clockRunning(uint32_t branch)
++{
++    return (branch & 0x80000001) == 1;
++}
++
++// Check that the already running firmware display is accessible. This probe
++// never votes for a clock or power domain. A hardware-controlled domain can
++// lose its clocks between reads, so it is outside the probe's scope.
++template <typename Read>
++Result checkClockState(Read &read, uint32_t (&out)[Words])
++{
++    if (!read(Window::Gcc, 0, out[GccAhb])) return Result::MissingMapping;
++    if (!clockRunning(out[GccAhb])) return Result::ParentClockOff;
++
++    if (!read(Window::DisplayClock, 0x1000, out[CoreDomain]) ||
++        !read(Window::DisplayClock, 0x1004, out[CoreDomainConfig])) {
++        return Result::MissingMapping;
++    }
++    constexpr uint32_t powerOn = 1u << 31;
++    constexpr uint32_t controlOrCollapse = 7u;
++    constexpr uint32_t transition = (1u << 16) | (1u << 15);
++    if ((out[CoreDomain] & (powerOn | controlOrCollapse)) != powerOn ||
++        (out[CoreDomainConfig] & transition) != (1u << 16)) {
++        return Result::DomainInactive;
++    }
++
++    uint32_t reset = 0;
++    if (!read(Window::DisplayClock, 0, reset) ||
++        !read(Window::DisplayClock, 0xa4, out[AhbClock]) ||
++        !read(Window::DisplayClock, 0x0c, out[MdpClock]) ||
++        !read(Window::DisplayClock, 0x24, out[VsyncClock])) {
++        return Result::MissingMapping;
++    }
++    if ((reset & 1) || !clockRunning(out[AhbClock]) || !clockRunning(out[MdpClock]) ||
++        !clockRunning(out[VsyncClock])) {
++        return Result::DisplayClockOff;
++    }
++    return Result::Observed;
++}
++
++// Fixed register reads follow MiCode sde_hw_intf_get_vsync_info and the
++// bounded observer in HoujiDisplayTiming.h. Retain the raw counters separately
++// so a stopped command-mode engine is distinguishable from a running panel.
++template <typename Read>
++void sample(Read &read, bool presented, uint32_t stamp, uint32_t (&out)[Words], bool &stopped)
++{
++    for (auto &word : out) word = 0;
++    out[UptimeMs] = stamp;
++    if (stopped) {
++        out[Status] = uint32_t(Result::StoppedAfterFault);
++        return;
++    }
++    auto status = presented ? checkClockState(read, out) : Result::NoPresentation;
++    if (status == Result::Observed) {
++        constexpr uint32_t offsets[] = {0x26c, 0x284, 0x298, 0x2b0, 0xac, 0xa4, 0xb0};
++        static_assert(sizeof(offsets) / sizeof(offsets[0]) == Words - InterfaceStatus);
++        uint32_t counts[Words - InterfaceStatus]{};
++        for (unsigned i = 0; i < Words - InterfaceStatus; ++i) {
++            if (!read(Window::Interface, offsets[i], counts[i])) {
++                status = Result::MissingMapping;
++                break;
++            }
++        }
++        if (status == Result::Observed) {
++            uint32_t after[Words]{};
++            if (checkClockState(read, after) == Result::Observed) {
++                for (unsigned i = 0; i < Words - InterfaceStatus; ++i) out[InterfaceStatus + i] = counts[i];
++            } else {
++                status = Result::UnstablePower;
++            }
++        }
++    }
++    out[Status] = uint32_t(status);
++    stopped = status == Result::MissingMapping || status == Result::UnstablePower;
++}
++
++} // namespace ZornDisplayTiming318
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -2,6 +2,7 @@
+ #pragma once
+ 
+ #include "ZornUiSceneWire269.h"
++#include "ZornDisplayTiming318.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -9,7 +10,9 @@
+ constexpr unsigned TouchWords = 12;
+ constexpr unsigned TouchEnd = PresentWords + Samples * (1 + TouchWords);
+ constexpr unsigned CostWords = 16;
+-constexpr unsigned Words = TouchEnd + Samples * (1 + CostWords);
++constexpr unsigned TimingStart = TouchEnd + Samples * (1 + CostWords);
++constexpr unsigned TimingWords = ZornDisplayTiming318::Words;
++constexpr unsigned Words = TimingStart + Samples * TimingWords;
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+@@ -18,11 +21,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT317", 8);
++    memcpy(p, "K80FT318", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 317);
++    zorn_panic_le236(p, Bytes - 4, 318);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 210509d2579b4ee8b4b05196397565e3 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 40e40ca097bf4cfa85552460cadb77b7 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"210509d2579b4ee8b4b05196397565e3",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"40e40ca097bf4cfa85552460cadb77b7",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -3,6 +3,8 @@
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IODeviceTreeSupport.h>
+ #include <IOKit/IOLib.h>
++#include <IOKit/IOMemoryDescriptor.h>
++#include <pexpert/pexpert.h>
+ #include <libkern/c++/OSData.h>
+ #include <kern/clock.h>
+ #include <kern/thread.h>
+@@ -40,6 +42,58 @@
+     }
+     OSSafeReleaseNULL(property);return valid&&found;
+ }
++// Access only the fixed K80 read-only windows, on the existing bounded observer thread.
++class DisplayRead318 {
++    IOMemoryMap *maps[3]{};
++
++public:
++    ~DisplayRead318()
++    {
++        for (auto *mapping : maps) {
++            if (mapping) mapping->release();
++        }
++    }
++
++    bool operator()(ZornDisplayTiming318::Window window, uint32_t offset, uint32_t &value)
++    {
++        const unsigned index = unsigned(window);
++        if (index >= sizeof(maps) / sizeof(maps[0])) return false;
++        const auto &range = ZornDisplayTiming318::Windows[index];
++        if ((offset & 3) || offset > range.bytes - sizeof(uint32_t)) return false;
++        if (!maps[index]) {
++            IODeviceMemory *memory = IODeviceMemory::withRange(range.address, range.bytes);
++            if (!memory) return false;
++            auto *map = memory->map(kIOMapAnywhere | kIOMapInhibitCache | kIOMapReadOnly);
++            memory->release();
++            if (!map) return false;
++            if (!map->getVirtualAddress() || (map->getVirtualAddress() & 3) ||
++                map->getLength() < range.bytes || map->getPhysicalAddress() != range.address) {
++                map->release();
++                return false;
++            }
++            maps[index] = map;
++        }
++        const auto *regs = reinterpret_cast<const volatile uint32_t *>(maps[index]->getVirtualAddress());
++        value = regs[offset / sizeof(uint32_t)];
++        __asm__ volatile("dmb oshld" ::: "memory");
++        return true;
++    }
++};
++
++bool inheritedGop318()
++{
++    PE_Video boot{};
++    constexpr uint64_t first = 0xfc400000;
++    constexpr uint64_t end = first + 0x02b00000;
++    if (PE_current_console(&boot) || boot.v_width != 1440 || boot.v_height != 3200 ||
++        boot.v_depth != 32 || boot.v_offset || boot.v_rotate || boot.v_rowBytes < 1440 * 4 ||
++        (boot.v_rowBytes & 3) || boot.v_baseAddr < first || boot.v_baseAddr >= end) {
++        return false;
++    }
++    const uint64_t bytes = end - boot.v_baseAddr;
++    return boot.v_rowBytes <= bytes / boot.v_height;
++}
++
+ void worker(void *context,wait_result_t) {
+     auto *platform=static_cast<IOService *>(context);
+     IOSleep(90000);
+@@ -50,6 +104,8 @@
+     }else{
+         addFlags(4|8|16);store(0,2);store(4,10000);
+         uint32_t phase=6;
++        DisplayRead318 readPanel;
++        bool stopPanelRead = false;
+         // Nine actual snapshots;flat/missing fences and missing readiness remain
+         // observations,never converted into a successful hardware/UI verdict.
+         for(unsigned n=0;n<ZornManualWire313::Samples;++n){
+@@ -70,6 +126,11 @@
+             const bool haveCost=zorn26_present_cost_snapshot278(cost)!=0;
+             store(costAt,haveCost);
+             if(haveCost)for(unsigned i=0;i<ZornManualWire313::CostWords;++i)store(costAt+1+i,cost[i]);
++            uint32_t timing[ZornManualWire313::TimingWords]{};
++            const bool displayed = (values[0] & 1) && values[1] && inheritedGop318();
++            ZornDisplayTiming318::sample(readPanel, displayed, uptimeMs(), timing, stopPanelRead);
++            const unsigned timingAt = ZornManualWire313::TimingStart + n * ZornManualWire313::TimingWords;
++            for (unsigned i = 0; i < ZornManualWire313::TimingWords; ++i) store(timingAt + i, timing[i]);
+             store(3,n+1);
+             if(n+1<ZornManualWire313::Samples)IOSleep(10000);
+         }
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26210509D2579B"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2640E40CA097BF"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x21,0x05,0x09,0xd2,0x57,0x9b,0x4e,0xe8,0xb4,0xb0,0x51,0x96,0x39,0x75,0x65,0xe3};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x40,0xe4,0x0c,0xa0,0x97,0xbf,0x4c,0xfa,0x85,0x55,0x24,0x60,0xca,0xdb,0x77,0xb7};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x21,0x05,0x09,0xd2,0x57,0x9b,0x4e,0xe8,0xb4,0xb0,0x51,0x96,0x39,0x75,0x65,0xe3};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x40,0xe4,0x0c,0xa0,0x97,0xbf,0x4c,0xfa,0x85,0x55,0x24,0x60,0xca,0xdb,0x77,0xb7};

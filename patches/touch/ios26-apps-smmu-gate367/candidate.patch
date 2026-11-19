@@ -1,0 +1,110 @@
+--- a/ZornFt3683AppsSmmuLink26.inc
++++ b/ZornFt3683AppsSmmuLink26.inc
+@@ -10,39 +10,54 @@
+     return displayAperture338.snapshot(inherited) == ZornDisplaySmmu336::Observed && inherited;
+ }
+ 
+-extern "C" void zorn26_touch_apps_smmu_roundtrip363(uint32_t (&out)[5])
++extern "C" void zorn26_touch_apps_smmu_roundtrip363(uint32_t (&out)[7])
+ {
+     namespace Route = ZornFt3683AppsSmmu;
+     // status, attach, detach, bank pair, interrupt that latched a fault
+     out[0] = 1;
+     out[1] = out[2] = UINT32_MAX;
+-    out[3] = out[4] = 0;
++    out[3] = out[4] = out[6] = 0;
++    // Detail only. All preparation and active writes still use the v363 gates.
++    enum Gate : uint32_t {
++        Thread = 1, Aperture, LockMissing, LockBusy, Host, Mapping, Geometry, UfsBank, Attach
++    };
++    out[5] = Thread;
+     if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled()) return;
+     uintptr_t inherited = 0;
++    out[5] = Aperture;
+     if (displayAperture338.snapshot(inherited) != ZornDisplaySmmu336::Observed || !inherited) return;
+     auto *const lock = gHost.lock;
+-    if (!lock || !IOLockTryLock(lock)) return;
++    out[5] = LockMissing;
++    if (!lock) return;
++    out[5] = LockBusy;
++    if (!IOLockTryLock(lock)) return;
+     struct Release {
+         IOLock *lock;
+         ~Release() { IOLockUnlock(lock); }
+     } locked{lock};
++    out[5] = Host;
+     if (!gHost.ready || gHost.poisoned || gHost.smmu != inherited || gHost.cb <= inherited) return;
+ 
+     // Reuse the original mapping for the UFS/display paths. The original
+     // 0xd0000 window omits the end of the advertised register aperture. The
+     // owner independently maps the complete vendor/ADT range with the same
+     // Device attributes and holds both references during configuration.
++    out[5] = Mapping;
+     const auto registerRange = IODeviceMemory::withRange(0x15000000, Route::ApertureBytes);
+     auto full = registerRange ? registerRange->map(kIOMapAnywhere | kIOMapInhibitCache) : nullptr;
+     if (!full) return;
++    out[5] = Geometry;
+     const uint32_t geometry = read32(inherited, 0x24);
++    out[6] = geometry;
+     const size_t cbBase = Route::PageBytes << (((geometry >> 28) & 7u) + 1);
+     const auto ufsContext = gHost.cb - inherited;
+     if (geometry >> 31 || cbBase * 2 != Route::ApertureBytes ||
+         ufsContext < cbBase || ufsContext % Route::PageBytes) return;
+     const size_t ufsBank = (ufsContext - cbBase) / Route::PageBytes;
++    out[5] = UfsBank;
+     if (ufsBank >= (geometry & 255u)) return;
+ 
++    out[5] = Attach;
+     out[1] = touchSmmuOwner363.attachQuiesced(full, unsigned(ufsBank), cacheCivac);
+     const auto &plan = touchSmmuOwner363.plan();
+     out[3] = plan.domains[0].bank | (plan.domains[1].bank << 16);
+--- a/touch-source313/ZornTouchBoard26.cpp
++++ b/touch-source313/ZornTouchBoard26.cpp
+@@ -14,7 +14,7 @@
+ uint32_t staticGpii[3] = {UINT32_MAX, UINT32_MAX, UINT32_MAX};
+ uint32_t staticGpiiReady;
+ uint32_t geniInventory[Geni::Words]{};
+-uint32_t smmuRoundTrip363[5]{};
++uint32_t smmuRoundTrip363[7]{};
+ uint32_t smmuRoundTripReady363;
+ 
+ bool normal() {
+@@ -29,11 +29,11 @@
+ }
+ 
+ extern "C" bool zorn26_touch_apps_smmu_ready363();
+-extern "C" void zorn26_touch_apps_smmu_roundtrip363(uint32_t (&)[5]);
++extern "C" void zorn26_touch_apps_smmu_roundtrip363(uint32_t (&)[7]);
+ extern "C" void zorn26_touch_smmu_report363(uint32_t *out)
+ {
+     const bool ready = __atomic_load_n(&smmuRoundTripReady363, __ATOMIC_ACQUIRE);
+-    for (unsigned i = 0; i < 5; ++i) out[i] = ready ? smmuRoundTrip363[i] : 0;
++    for (unsigned i = 0; i < 7; ++i) out[i] = ready ? smmuRoundTrip363[i] : 0;
+ }
+ 
+ struct ZornTouchBoard26::Storage {
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -36,7 +36,7 @@
+ static_assert(ZornDisplayHeldTiming335::Used + ZornDisplaySmmu336::Words <= ZornDisplayHeldTiming335::Words);
+ constexpr unsigned ScanoutStart = TeStart + ZornRuntimeDisplayCadence344::Words;
+ constexpr unsigned TouchRoundTripStart = TimingStart;
+-constexpr unsigned TouchRoundTripWords = 5;
++constexpr unsigned TouchRoundTripWords = 7;
+ constexpr unsigned LiveTraceStart = TimingStart + TimingWords;
+ static_assert(TouchRoundTripStart + TouchRoundTripWords <= LiveTraceStart);
+ static_assert(LiveTraceStart + ZornScanoutTrace348::Words == ScanoutStart);
+@@ -47,11 +47,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT363", 8);
++    memcpy(p, "K80FT367", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 363);
++    zorn_panic_le236(p, Bytes - 4, 367);
+     return Bytes;
+ }
+ }

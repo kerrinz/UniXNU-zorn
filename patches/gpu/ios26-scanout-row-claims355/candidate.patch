@@ -1,0 +1,207 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -517,6 +517,11 @@
+ 	uint64_t        fHelperGeneration;
+ 	unsigned        fHelpersBusy, fHelpersStarted;
+ 	uint32_t *      fHelperBlend[7];
++#if defined(ZORN_IOS26)
++    ZornGopLiveSession348::RowClaims fZornRowClaims355;
++    unsigned fZornHelperJoins355 = 0;
++    void drawClaimedRows355(const RowJob &job, uint32_t *blendRow);
++#endif
+ 	void record(MiniIOSurface * s);
+ 	/*
+ 	 * dada (dadascan=1): a frame that is one surface of the whole display is copied as it is, row for row, into a
+@@ -1171,6 +1176,9 @@
+ 	int32_t         sx, sy, sw, sh, px0, py0, px1, py1, cx0, cx1;
+ 	int32_t         visibleRowFirst, visibleRowEnd;
+ 	bool            filter, unscaled;
++#if defined(ZORN_IOS26)
++    bool dynamicRows = false;
++#endif
+ };
+ 
+ void
+@@ -1250,6 +1258,21 @@
+ 	}
+ }
+ 
++#if defined(ZORN_IOS26)
++// Enter and return with fHelperLock held. Claim before releasing the lock;
++// no other CPU can write to the same rows of this layer.
++void
++IOMobileFramebuffer::drawClaimedRows355(const RowJob &job, uint32_t *blendRow)
++{
++    int32_t first, last;
++    while (fZornRowClaims355.take(first, last)) {
++        IOLockUnlock(fHelperLock);
++        drawRows(&job, first, last, blendRow);
++        IOLockLock(fHelperLock);
++    }
++}
++#endif
++
+ /* A helper of the scaling (fb_threads): waits for rows to do, does them, says so. */
+ void
+ IOMobileFramebuffer::helperMain(void * self, wait_result_t result __unused)
+@@ -1272,6 +1295,30 @@
+ 		}
+ 		done = fb->fHelperGeneration;
+ 		job = fb->fHelperJob;
++#if defined(ZORN_IOS26)
++        if (!job) {
++            IOLockUnlock(fb->fHelperLock);
++            continue;
++        }
++        if (job->dynamicRows) {
++            if (!fb->fZornRowClaims355.available()) {
++                IOLockUnlock(fb->fHelperLock);
++                continue;
++            }
++            ++fb->fHelpersBusy;
++            ++fb->fZornHelperJoins355;
++            fb->drawClaimedRows355(*job, fb->fHelperBlend[index]);
++            IOLockUnlock(fb->fHelperLock);
++            // Publish this CPU's stores before allowing the presenter to reuse
++            // the stack job, scratch rows, or the destination buffer.
++            __asm__ volatile("dsb sy" ::: "memory");
++            IOLockLock(fb->fHelperLock);
++            if (--fb->fHelpersBusy == 0)
++                IOLockWakeup(fb->fHelperLock, &fb->fHelpersBusy, true);
++            IOLockUnlock(fb->fHelperLock);
++            continue;
++        }
++#endif
+ 		IOLockUnlock(fb->fHelperLock);
+ 		/* share index + 1 of fThreads (the presenter takes share 0) */
+ 		rows = job->visibleRowEnd - job->visibleRowFirst;
+@@ -1417,6 +1464,30 @@
+     if (seedFrom && (cx0 != 0 || cy0 != 0 || uint32_t(cx1) != fPanelWidth || uint32_t(cy1) != fPanelHeight)) {
+         Live348::seed(target, seedFrom);
+         ++fZornLiveScanout348->out[Trace348::SeededCopies];
++    }
++    if (auto *live = fZornLiveScanout348; live && !fDiff && fThreads > 1) {
++        job.dynamicRows = true;
++        IOLockLock(fHelperLock);
++        fZornRowClaims355 = {cy0, cy1};
++        fZornHelperJoins355 = 0;
++        fHelpersBusy = 0;
++        fHelperJob = &job;
++        ++fHelperGeneration;
++        IOLockWakeup(fHelperLock, &fHelperGeneration, false);
++        drawClaimedRows355(job, fBlendRow);
++        fHelperJob = nullptr;
++        const uint64_t joinStart = mach_absolute_time();
++        while (fHelpersBusy)
++            IOLockSleep(fHelperLock, &fHelpersBusy, THREAD_UNINT);
++        const unsigned joins = fZornHelperJoins355;
++        IOLockUnlock(fHelperLock);
++        namespace Phase = ZornScanoutPhase349;
++        ++live->phase[Phase::DynamicRowLayers];
++        live->phase[Phase::DynamicRowHelperJoins] += joins;
++        const uint64_t elapsed = zornDisplayUptimeUs348(mach_absolute_time() - joinStart);
++        if (elapsed > live->phase[Phase::DynamicRowMaxJoinUs])
++            live->phase[Phase::DynamicRowMaxJoinUs] = uint32_t(elapsed);
++        return true;
+     }
+ #endif
+ 	if (fThreads <= 1 || fDiff || fHelpersStarted + 1 < fThreads) {
+--- a/ZornGopLiveSession348.h
++++ b/ZornGopLiveSession348.h
+@@ -7,6 +7,22 @@
+ 
+ namespace ZornGopLiveSession348 {
+ namespace T = ZornScanoutTrace348;
++
++// Access to the row cursor is serialized by the existing helper lock.
++// A participant can join only while there are rows it can claim.
++struct RowClaims {
++    static constexpr int32_t RowsPerClaim = 128;
++    int32_t next = 0, end = 0;
++
++    bool available() const { return next < end; }
++    bool take(int32_t &first, int32_t &last) {
++        if (!available()) return false;
++        first = next;
++        next += end - next < RowsPerClaim ? end - next : RowsPerClaim;
++        last = next;
++        return true;
++    }
++};
+ 
+ struct Session {
+     uint32_t (&out)[T::Words];
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -42,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT354", 8);
++    memcpy(p, "K80FT355", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 354);
++    zorn_panic_le236(p, Bytes - 4, 355);
+     return Bytes;
+ }
+ }
+--- a/ZornScanoutPhase349.h
++++ b/ZornScanoutPhase349.h
+@@ -14,7 +14,7 @@
+ constexpr unsigned RecordWords = 4;
+ enum AdmissionField : unsigned {
+     AdmitStatus = ZornScanoutTrace348::MaxFlips * RecordWords,
+-    LockAttempts, LockWaitUs, WriterFlags, Vig0Source, Vig1Source, SecondBufferCacheOption, PriorDsiWaitAttempts, PriorDsiWaitIdle, PriorDsiWaitMaxUs, SampledRgbChanged, Words,
++    LockAttempts, LockWaitUs, WriterFlags, Vig0Source, Vig1Source, SecondBufferCacheOption, PriorDsiWaitAttempts, PriorDsiWaitIdle, PriorDsiWaitMaxUs, SampledRgbChanged, DynamicRowLayers, DynamicRowHelperJoins, DynamicRowMaxJoinUs, Words,
+ };
+ enum Admission : uint32_t {
+     NotRequested, ContextUnavailable, NoPresenter, RequestPending, Deadline,
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 8c12d48086e14a3385be13043e8a7ce0 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3a359a2cc76741bb8fe6d2479fdba090 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"8c12d48086e14a3385be13043e8a7ce0",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"3a359a2cc76741bb8fe6d2479fdba090",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN268C12D48086E1"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN263A359A2CC767"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x8c,0x12,0xd4,0x80,0x86,0xe1,0x4a,0x33,0x85,0xbe,0x13,0x04,0x3e,0x8a,0x7c,0xe0};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x3a,0x35,0x9a,0x2c,0xc7,0x67,0x41,0xbb,0x8f,0xe6,0xd2,0x47,0x9f,0xdb,0xa0,0x90};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x8c,0x12,0xd4,0x80,0x86,0xe1,0x4a,0x33,0x85,0xbe,0x13,0x04,0x3e,0x8a,0x7c,0xe0};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x3a,0x35,0x9a,0x2c,0xc7,0x67,0x41,0xbb,0x8f,0xe6,0xd2,0x47,0x9f,0xdb,0xa0,0x90};

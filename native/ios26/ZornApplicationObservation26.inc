@@ -3,6 +3,9 @@
 #include "ZornMapGate222.h"
 static unsigned appObservationGate,appObservationDropped;
 static uintptr_t appObservationClient;
+// Filter unrelated clients before the shared diagnostic lock. This is only a
+// published observation identity; it never supplies native GPU authority.
+static uintptr_t appObservationActiveClient;
 static ZornApplicationObservation26 appObservation;
 static bool appObservationLock(){unsigned zero=0;return __atomic_compare_exchange_n(&appObservationGate,&zero,1,false,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED);}
 static void appObservationUnlock(){__atomic_store_n(&appObservationGate,0,__ATOMIC_RELEASE);}
@@ -30,6 +33,7 @@ static void appObservationBind(uintptr_t client,uint64_t unique,uint32_t pid){
  appObservation.closeReturned=0;appObservation.closeRaw=0;appObservation.prepareMask=0;
  appObservation.prepareStage=0;appObservation.prepareRaw=0;appObservation.prepareDetail=0;
  appObservation.prepareEvents=0;appObservation.prepareFailed=0;
+ __atomic_store_n(&appObservationActiveClient,client,__ATOMIC_RELEASE);
  appObservationRemember();appObservationUnlock();
 }
 static void appObservationRemember(){
@@ -41,16 +45,19 @@ static void appObservationRemember(){
  h.prepareDetail=appObservation.prepareDetail;h.prepareEvents=appObservation.prepareEvents;h.prepareFailed=appObservation.prepareFailed;
 }
 static void appObservationEvent(uintptr_t client,uint32_t flags,uint32_t method,uint32_t raw,bool closed=false){
+ if(!client || client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
  if(!appObservationLock()){appObservationDrop();return;}
  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned){appObservation.flags|=flags;appObservation.method=method;appObservation.raw=raw;
   if(appObservation.calls<65535)++appObservation.calls;else appObservationDrop();
-  if(closed){appObservation.closeReturned=1;appObservation.closeRaw=raw;}appObservationRemember();}
+  if(closed){appObservation.closeReturned=1;appObservation.closeRaw=raw;
+   __atomic_store_n(&appObservationActiveClient,uintptr_t(0),__ATOMIC_RELEASE);}appObservationRemember();}
  appObservationUnlock();
 }
 // Bounded software-only observation of actual preparation calls. Latch the
 // first nonzero native result; later wrapper/close errors cannot replace it.
 extern "C" void zorn26_application_prepare_event(uintptr_t client,uint32_t stage,uint32_t raw,uint32_t detail){
  if(!client || !stage || stage>=64)return;
+ if(client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
  if(!appObservationLock()){appObservationDrop();return;}
  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned){
   if(appObservation.prepareEvents<128){
@@ -120,6 +127,7 @@ extern "C" void zorn26_application_stderr_commit(uint64_t unique,const char *tex
 
 extern "C" void zorn26_application_native_return225(uintptr_t client,uintptr_t request,uint32_t method,uint32_t stage,uint32_t raw){
  if(!client || !request)return;
+ if(client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
  if(!appObservationLock()){appObservationDrop();return;}
  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned)
   if(stage==1 || appObservation.nativeReturn225.sequence)(void)zorn_native_return225_event(appObservation.nativeReturn225,request,method,stage,raw);

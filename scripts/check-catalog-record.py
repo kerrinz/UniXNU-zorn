@@ -26,9 +26,13 @@ def main():
     archive=(root/meta['archive']).resolve();assert archive.is_relative_to(root)
     history=archive.read_bytes();assert len(history)==meta['bytes'] and hashlib.sha256(history).hexdigest()==meta['sha256']
     old=tomllib.loads(history.decode());assert sum(len(a.get('evidence',[])) for a in old['area'])==meta['historical_evidence_entries']
-    assert [a['id'] for a in old['area']]==meta['areas']==[a['id'] for a in record['area']]
+    assert [a['id'] for a in old['area']]==meta['areas']
+    assert [a['id'] for a in record['area'] if a['id'] in meta['areas']]==meta['areas']
+    current={area['id']:area for area in record['area']}
+    assert len(current)==len(record['area'])
     # Compaction must not change board inputs,components,configuration or required procedures.
-    for before,after in zip(old['area'],record['area']):
+    for before in old['area']:
+        after=current[before['id']]
         for key in ['id','components','inputs','configuration','procedure','completion']:
             assert before[key]==after[key],(before['id'],key)
         assert set(before['paths'])<=set(after['paths'])

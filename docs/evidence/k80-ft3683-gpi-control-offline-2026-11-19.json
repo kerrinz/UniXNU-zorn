@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "scope": "SM8650 AP GPII command and ring-context programming, host-only",
+  "vendor_revision": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+  "vendor_inputs": [
+    {
+      "source": "drivers/dma/qcom/msm_gpi.c",
+      "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/dma/qcom/msm_gpi.c",
+      "bytes": 119397,
+      "sha256": "f237f665778e2e21e029be16986c186563a767c23dc6c7f18a6737733a2886e9"
+    },
+    {
+      "source": "drivers/dma/qcom/msm_gpi_mmio.h",
+      "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/dma/qcom/msm_gpi_mmio.h",
+      "bytes": 9794,
+      "sha256": "ca3ad5d0414752e504f17eefe003f50b6182a6a9ea40054d20a8acec36dee391"
+    }
+  ],
+  "controller": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/soc/sm8650/GpiSpiControl.h",
+    "bytes": 11434,
+    "sha256": "9a5608c987473d2e7b250ce945e4f8ebbcd8b8709f9f8e7aece5a30de7c13dd6"
+  },
+  "compiler_args": [
+    "xcrun",
+    "--sdk",
+    "macosx",
+    "clang++",
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsanitize=address,undefined",
+    "-fno-sanitize-recover=all"
+  ],
+  "host_tests": {
+    "gpi-spi-control": {
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/soc/sm8650/Test/gpi-spi-control.cpp",
+        "bytes": 7853,
+        "sha256": "4e1f827565dadae2cac962f5562b73a69d8196c9282fd5006914fdb60287f0c0"
+      },
+      "binary": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-gpi-control-host/gpi-spi-control",
+        "bytes": 129760,
+        "sha256": "2f28c43f6d33ce6ecfde0adc41eac785ccac80d7182a87b98e28d4678565e98e"
+      },
+      "exit": 0
+    },
+    "gpi-spi-rings": {
+      "source": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/soc/sm8650/Test/gpi-spi-rings.cpp",
+        "bytes": 6102,
+        "sha256": "cd06de33e4c63cc925dff560b5685935a09e2f8d749fffc8b3a31d01be764ac9"
+      },
+      "binary": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-gpi-control-host/gpi-spi-rings",
+        "bytes": 152912,
+        "sha256": "add22997eb25eeb2d373fadfaf03086a0019b8d553d0b3e22cd98d4d8ee1e0a1"
+      },
+      "exit": 0
+    }
+  },
+  "hardware_qualified": false,
+  "selected_by_runtime": false,
+  "exercised": [
+    "Fresh command IRQ, checked state transition and acknowledgement",
+    "Vendor GPII0 64/64/128 ring programming, SE4 scratch and event doorbell",
+    "Read-only refusal on occupied context or overlapping mappings",
+    "Permit orderly reset only after both channels are stopped",
+    "Accept freshly acknowledged deallocate with stale read-only CNTXT_0",
+    "Retain on timeout, foreign IRQ, readback mismatch, posted write, loss of clock or requests in flight"
+  ],
+  "remaining": [
+    "Bind the checked live MMIO and GIC ownership to the K80 board object.",
+    "Hold the v363 APPs SMMU streams through channel lifetimes and use actual cache maintenance.",
+    "Verify clocks, known transfer, stop and restore on exact device."
+  ]
+}

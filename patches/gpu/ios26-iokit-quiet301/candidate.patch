@@ -1,0 +1,154 @@
+diff -ruN a/ZornIokitDaemonQuiet301.h b/ZornIokitDaemonQuiet301.h
+--- a/ZornIokitDaemonQuiet301.h	1970-01-01 08:00:00
++++ b/ZornIokitDaemonQuiet301.h	2026-11-18 13:07:57
+@@ -0,0 +1,63 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++
++// Monolithic K80 iOS 26 kernels compile with !NO_KEXTD and OSKext::iokitDaemonAvailable() == true,
++// so StartIOKitMatching() calls IOService::getServiceRoot()->adjustBusy(+1) and defers
++// IOService::publishUserResource(gIOResourceIOKitKey) until userland kernelmanagerd runs.
++// Because kernelmanagerd is omitted from the stripped LaunchDaemons set, gIOServiceRoot's busyState
++// never reaches 0, causing configd InterfaceNamer (__wait_for_IOKit_to_quiesce -> IOServiceWaitQuiet)
++// and Preferences.app (SCNetworkInterfaceCopyAllWithPreferences -> dispatch_once_wait) to block 300s.
++// Once PID 1 enters EL0 on the verified root, release that single phantom daemon busy count iff
++// OSKext::iokitDaemonAvailable() is true, IOUserResources has not already published "IOKit", and
++// gIOServiceRoot->getBusyState() > 0.
++struct ZornIokitQuietSnapshot301 {
++    uint32_t attempted = 0;
++    uint32_t applied = 0;
++    uint32_t alreadyPublished = 0;
++    uint32_t beforeBusy = 0;
++    uint32_t afterBusy = 0;
++};
++
++struct ZornIokitQuietTracker301 {
++    uint32_t state_ = 0; // 0 = idle, 1 = running, 2 = done
++    ZornIokitQuietSnapshot301 snap_{};
++
++    template <typename DaemonAvailFn, typename PublishedFn,
++              typename ReadBusyFn, typename DecBusyFn, typename PublishFn>
++    ZornIokitQuietSnapshot301 applyOnce(
++        DaemonAvailFn &&daemonAvailable,
++        PublishedFn &&isUserResourcePublished,
++        ReadBusyFn &&readRootBusy,
++        DecBusyFn &&decrementRootBusy,
++        PublishFn &&publishUserResource)
++    {
++        uint32_t expected = 0;
++        if (!__atomic_compare_exchange_n(&state_, &expected, 1u, false,
++                                         __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {
++            while (__atomic_load_n(&state_, __ATOMIC_ACQUIRE) != 2u) {}
++            return snap_;
++        }
++        snap_.attempted = 1u;
++        const uint32_t before = readRootBusy();
++        snap_.beforeBusy = before;
++        snap_.afterBusy = before;
++        if (daemonAvailable()) {
++            if (isUserResourcePublished()) {
++                snap_.alreadyPublished = 1u;
++            } else if (before > 0) {
++                decrementRootBusy();
++                publishUserResource();
++                snap_.applied = 1u;
++                snap_.afterBusy = readRootBusy();
++            }
++        }
++        __atomic_store_n(&state_, 2u, __ATOMIC_RELEASE);
++        return snap_;
++    }
++
++    ZornIokitQuietSnapshot301 snapshot() const {
++        if (__atomic_load_n(&state_, __ATOMIC_ACQUIRE) != 2u) return {};
++        return snap_;
++    }
++};
+diff -ruN a/ZornUfsOwner26.cpp b/ZornUfsOwner26.cpp
+--- a/ZornUfsOwner26.cpp	2026-11-18 12:36:06
++++ b/ZornUfsOwner26.cpp	2026-11-18 13:07:57
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC db9363f8a0ac496c807f98f3282cf597 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 94bb95fca9e14fa7b26f01d05fb66f8c %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -863,6 +863,27 @@
+ // The existing retained progress owner supplies cadence metadata only.
+ // Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
+ #include "ZornSerialMenu297.h"
++#include "ZornIokitDaemonQuiet301.h"
++#include <libkern/c++/OSKext.h>
++static ZornIokitQuietTracker301 zornIokitQuiet301;
++static void zorn26_quiet_iokit_daemon_busy301() {
++    auto *serviceRoot = IOService::getServiceRoot();
++    if (!serviceRoot || !gIOResourceIOKitKey) return;
++    const auto snap = zornIokitQuiet301.applyOnce(
++        []() { return OSKext::iokitDaemonAvailable(); },
++        [&]() {
++            auto userRes = serviceRoot->childFromPath("IOUserResources", gIOServicePlane);
++            if (!userRes) return false;
++            auto val = userRes->copyProperty(gIOResourceIOKitKey);
++            return static_cast<bool>(val);
++        },
++        [&]() -> uint32_t { return serviceRoot->getBusyState(); },
++        [&]() { serviceRoot->adjustBusy(-1); },
++        [&]() { IOService::publishUserResource(gIOResourceIOKitKey); });
++    IOLog("K80 IOKit quiet301: applied=%u already=%u busy=%u->%u\n",
++          snap.applied, snap.alreadyPublished, snap.beforeBusy, snap.afterBusy);
++}
++
+ extern "C" void zorn26_serial_shot_request265(void);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
+ extern "C" bool zorn26_serial_shot_ready265(void);
+@@ -988,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"db9363f8a0ac496c807f98f3282cf597",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"94bb95fca9e14fa7b26f01d05fb66f8c",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1292,6 +1313,7 @@
+     if(actual.phase!=ZornUfsOwner26::Phase::RootRegistered || !actual.rootBindReturned ||
+        !actual.root.registrationReturned || actual.root.device==static_cast<dev_t>(-1) ||
+        actual.root.device!=static_cast<dev_t>(actualMountedDevice))return;
++    zorn26_quiet_iokit_daemon_busy301();
+     if(wantTouch){
+         if(zorn_early_mode252()==2)return; // malformed early selection never falls back to GPU work
+         uint32_t empty=0;
+diff -ruN a/ZornUsbCdc26.c b/ZornUsbCdc26.c
+--- a/ZornUsbCdc26.c	2026-11-18 12:36:06
++++ b/ZornUsbCdc26.c	2026-11-18 13:07:57
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26DB9363F8A0AC"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2694BB95FCA9E1"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+diff -ruN a/record-identity/ZornPlatformRecordIdentity26.h b/record-identity/ZornPlatformRecordIdentity26.h
+--- a/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 12:36:06
++++ b/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 13:07:57
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xdb,0x93,0x63,0xf8,0xa0,0xac,0x49,0x6c,0x80,0x7f,0x98,0xf3,0x28,0x2c,0xf5,0x97};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x94,0xbb,0x95,0xfc,0xa9,0xe1,0x4f,0xa7,0xb2,0x6f,0x01,0xd0,0x5f,0xb6,0x6f,0x8c};
+diff -ruN a/record-identity/ZornPlatformTrialIdentity26.h b/record-identity/ZornPlatformTrialIdentity26.h
+--- a/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 12:36:06
++++ b/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 13:07:57
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xdb,0x93,0x63,0xf8,0xa0,0xac,0x49,0x6c,0x80,0x7f,0x98,0xf3,0x28,0x2c,0xf5,0x97};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x94,0xbb,0x95,0xfc,0xa9,0xe1,0x4f,0xa7,0xb2,0x6f,0x01,0xd0,0x5f,0xb6,0x6f,0x8c};

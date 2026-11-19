@@ -1,0 +1,117 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -71,6 +71,7 @@
+ #include "ZornSurfaceBacking246.h"
+ static ZornPresentTrace245 zornPresentTrace245;
+ #include "ZornPresentCost278.h"
++#include "ZornGopRowStores319.h"
+ static ZornPresentTrace245 zornPresentCostTrace278;
+ extern "C" int zorn26_present_cost_snapshot278(uint32_t (&out)[16]){return zornPresentCostTrace278.snapshot(out)?1:0;}
+ struct ZornPresentClock278 {
+@@ -1068,15 +1069,28 @@
+ 			const uint16_t * __restrict weights = fColumnWeight + cx0;
+ 			uint32_t * __restrict out = to + cx0;
+ 
++#if defined(ZORN_IOS26)
++			ZornGopRowStores319::store(out, uint32_t(cx1 - cx0), [&](uint32_t i) {
++				const uint32_t c = column[i], w = weights[i], a = from[c];
++				return w == 0 || a == from[c + 1] ? a : blend(a, from[c + 1], w);
++			});
++#else
+ 			for (uint32_t i = 0, n = (uint32_t) (cx1 - cx0); i < n; i++) {
+ 				uint32_t c = column[i], w = weights[i], a = from[c];
+ 
+ 				out[i] = w == 0 || a == from[c + 1] ? a : blend(a, from[c + 1], w);
+ 			}
++#endif
+ 		} else {
++#if defined(ZORN_IOS26)
++			const uint32_t * __restrict column = fColumn + cx0;
++			ZornGopRowStores319::store(to + cx0, uint32_t(cx1 - cx0),
++			    [&](uint32_t i) { return from[column[i]]; });
++#else
+ 			for (int32_t x = cx0; x < cx1; x++) {
+ 				to[x] = from[fColumn[x]];
+ 			}
++#endif
+ 		}
+ 	}
+ }
+--- /dev/null
++++ b/ZornGopRowStores319.h
+@@ -0,0 +1,28 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornGopRowStores319 {
++
++// The selected K80 GOP target is little-endian and 32-bit pixel aligned.
++// Use one aligned write for each complete pair. The caller owns this row and
++// publishes stores with the presenter's existing device store barrier.
++template <typename Pixel>
++void store(volatile uint32_t *destination, uint32_t count, Pixel pixel)
++{
++    static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__, "GOP pixel byte order");
++    uint32_t index = 0;
++    if (count && (reinterpret_cast<uintptr_t>(destination) & 4)) {
++        destination[0] = pixel(0);
++        ++index;
++    }
++    for (; count - index >= 2; index += 2) {
++        const uint64_t low = pixel(index);
++        const uint64_t high = pixel(index + 1);
++        *reinterpret_cast<volatile uint64_t *>(destination + index) = low | (high << 32);
++    }
++    if (index < count) destination[index] = pixel(index);
++}
++
++} // namespace ZornGopRowStores319
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 40e40ca097bf4cfa85552460cadb77b7 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 03ce4489ac3349ccba71b7ea7f2bd777 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"40e40ca097bf4cfa85552460cadb77b7",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"03ce4489ac3349ccba71b7ea7f2bd777",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2640E40CA097BF"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2603CE4489AC33"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x40,0xe4,0x0c,0xa0,0x97,0xbf,0x4c,0xfa,0x85,0x55,0x24,0x60,0xca,0xdb,0x77,0xb7};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x03,0xce,0x44,0x89,0xac,0x33,0x49,0xcc,0xba,0x71,0xb7,0xea,0x7f,0x2b,0xd7,0x77};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x40,0xe4,0x0c,0xa0,0x97,0xbf,0x4c,0xfa,0x85,0x55,0x24,0x60,0xca,0xdb,0x77,0xb7};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x03,0xce,0x44,0x89,0xac,0x33,0x49,0xcc,0xba,0x71,0xb7,0xea,0x7f,0x2b,0xd7,0x77};

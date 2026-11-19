@@ -113,7 +113,7 @@ export XNU_EXTRA_CFLAGS="$zorn_warning_flags -fmacro-prefix-map=$PWD=/Volumes/ma
 
 右侧绝对前缀来自旧基线实际编译记录，仅为复现其内核布局，不要求真实源码放在该路径，也不是通用发布约定。必须从空对象目录编译，核对实际编译记录、对象段及最终符号地址，不能仅改环境后复用旧对象或直接套用既有 ready 身份。找出布局依赖后仍须改为公开、独立的 canonical prefix 并重新验收。
 
-进入新工作区后先运行 `python3 UniXNU-zorn/scripts/prepare-zorn-cpu-profile.py`，只读校验原版 SystemOS 三个固定修正位置并生成当前 profile 绑定；再使用 [完整构建参数](build-and-debug.md#基本桌面触控配置)，明确传入已验证 FD 与 IPSW。构建器核对源码重放清单、实际源码、八核转换和组件清单；归档全部通过才单独启动。仍依赖显式历史 ABI fixture，并非无历史输入 bootstrap。额外 `XNU_EXTRA_CFLAGS` 会记录在 ready 清单，正式启动前还须核对实际对象 / 编译记录。
+该轮 iPadOS 17 的流程使用 `prepare-zorn-cpu-profile.py` 只读校验 SystemOS 的三个固定位置并生成 profile 绑定，随后由固定调试构建器组合已验证的 FD 与 IPSW。构建器核对源码重放清单、实际源码、八核转换和组件清单，依赖显式历史 ABI fixture。额外 `XNU_EXTRA_CFLAGS` 纳入该轮 ready 和编译记录。 [历史 OS 适配记录](archived-os.md)
 
 ## 后续验收
 

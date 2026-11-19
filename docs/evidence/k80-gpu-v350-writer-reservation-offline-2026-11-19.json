@@ -1,0 +1,102 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 350,
+  "boot_tag": "c1c88922eef241c2b21a6acbd0018f60",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/boot-package/boot.ZORN26-GPU-V350-SERIAL-UNSELECTED.img",
+    "sha256": "835764ec38473f0ca316d132b3d9559bb9ef2e9d356f8b90b3dd81267202b4aa",
+    "bytes": 11898880
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/full-link/kernel.ZORN26-WRITER350.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/boot-package/inputs/kernel.macho",
+    "sha256": "2276d0afbb57455798c51ecb61df3842d3875e2ea4155468193b09bc92b4ccd0",
+    "bytes": 31139848
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/boot-package/verified.json",
+    "bytes": 14492,
+    "sha256": "5595b6dd13e28bb325fd1d4dca812b9f7b84f47b76069c02107f6e523f000070"
+  },
+  "link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/full-link/link-result.json",
+    "bytes": 959,
+    "sha256": "cf0e0c9096ea573a81cc0a5aeba6490cf5810d09035a291af68e652f9d781ac1"
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-writer-reservation350/source-manifest.json",
+    "bytes": 10240,
+    "sha256": "e74e0dfa222fabc4fbac3e2101205308d5036ff5a04d766e4449ada838b6af58"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v349-present-phases-device-2026-11-19.json",
+    "bytes": 14596,
+    "sha256": "9555c7a76f6d63e14c9dc4ddfe782a21586e9217439dd488fae30a0bb4a64ebe"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/writer-host-result.json",
+      "bytes": 1207,
+      "sha256": "2b27b4c7a7a649a9c46099909af110acf58c5790be5407e6c1c8dc480cc4ad2e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/patch-replay.json",
+      "bytes": 272,
+      "sha256": "86a4d916ef442310960f1c89b6cb9e86c0ad65bebd7f8d291939873c50802efb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v350-writer-reservation-c1c88922eef241c2b21a6acbd0018f60/writer-archive-host/result.json",
+      "bytes": 4399,
+      "sha256": "ea034c3737a5f286c184ac083065ed54bb5400d5de68e56868277e86c3d49bd4"
+    }
+  ],
+  "enabled_path": "Same one-second live 4-TE compositor and 32 attempts plus one restoration. At entry the existing writer yields only at a frame boundary to one claimant, for at most 250 ms. Separate lock, framebuffer and DPU proofs precede mode change.",
+  "device_only_questions": [
+    "Can the writer acquire the lease after the current frame with same display source and geometry?",
+    "Which per-attempt phases and controller guard dominate the confirmed 4-TE compositor scene?",
+    "Do the restored display, exact TWRP guard and storage protections still pass?"
+  ],
+  "device_protection": {
+    "target": "92988a43/zorn/slot-a",
+    "mode": "unattended-phone-connected",
+    "boot_attempts": 1,
+    "retries": 0,
+    "watchdog_seconds": 300,
+    "recovery_timeout_seconds": 600,
+    "native_root_writes": 0,
+    "physical_contact_required": false
+  },
+  "stop_conditions": [
+    "Do not start a retry or optional reset if any DSI operation has uncertain completion.",
+    "Retain CPU alias and display resources if active back scanout or state is ambiguous.",
+    "No installation, root write or persistent slot change."
+  ],
+  "physical_frame_rate_qualified": false,
+  "hardware_qualified": false,
+  "phone_access": false
+}

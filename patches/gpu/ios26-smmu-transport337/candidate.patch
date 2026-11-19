@@ -1,0 +1,182 @@
+--- /dev/null
++++ b/ZornDisplaySmmuHost337.h
+@@ -0,0 +1,34 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornDisplaySmmu336.h"
++
++namespace ZornDisplaySmmuHost337 {
++
++enum Status : uint32_t { NoThreadContext = 6, MissingLock, LockDeadline, TransportUnavailable,
++                         MissingMapping, MappingBounds, MappingPhysical };
++inline constexpr unsigned LockAttempts = 16;
++inline constexpr uint32_t LockDeadlineMs = 100;
++
++// Wait outside the UFS lock. The display lease stays held and its state is
++// checked again before publication. There is one critical section and no
++// new mapping or UFS command, even if the transport is busy at first.
++template <typename TryLock, typename Unlock, typename Delay, typename Now, typename Sample>
++void withTransport(TryLock tryLock, Unlock unlock, Delay delay, Now now, Sample sample,
++                   uint32_t (&out)[ZornDisplaySmmu336::Words])
++{
++    using ZornDisplaySmmu336::State;
++    const uint32_t started = now();
++    for (unsigned attempt = 0; attempt < LockAttempts; ++attempt) {
++        if (now() - started >= LockDeadlineMs) break;
++        if (tryLock()) {
++            sample(out);
++            unlock();
++            return;
++        }
++        if (attempt + 1 < LockAttempts) delay(2);
++    }
++    out[State] = LockDeadline;
++}
++
++} // namespace ZornDisplaySmmuHost337
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -34,11 +34,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT336", 8);
++    memcpy(p, "K80FT337", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 336);
++    zorn_panic_le236(p, Bytes - 4, 337);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsCore26.cpp
++++ b/ZornUfsCore26.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornUfsCore26.h"
+-#include "ZornDisplaySmmu336.h"
++#include "ZornDisplaySmmuHost337.h"
+ #include <kern/clock.h>
+ #include "TransferPoll.h"
+ #include "ZornDataStorePolicy.h"
+@@ -354,24 +354,55 @@
+ extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&out)[ZornDisplaySmmu336::Words])
+ {
+     namespace Probe = ZornDisplaySmmu336;
++    namespace Transport = ZornDisplaySmmuHost337;
+     for (auto &word : out) word = 0;
+-    out[Probe::State] = Probe::HostUnavailable;
+-    if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled() ||
+-        !gHost.lock || !IOLockTryLock(gHost.lock)) return;
+-    constexpr uint32_t aperture = 0xd0000;
+-    auto *const map = gHost.smmuMap.get();
+-    if (gHost.ready && !gHost.poisoned && map && gHost.smmu &&
+-        map->getPhysicalAddress() == 0x15000000 && map->getVirtualAddress() == gHost.smmu &&
+-        map->getLength() >= aperture) {
+-        auto read = [](uint32_t offset, uint32_t &value) {
++    if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled()) {
++        out[Probe::State] = Transport::NoThreadContext;
++        return;
++    }
++    auto *const lock = gHost.lock;
++    if (!lock) {
++        out[Probe::State] = Transport::MissingLock;
++        return;
++    }
++    auto now = [] {
++        uint64_t ticks = 0, ns = 0;
++        clock_get_uptime(&ticks);
++        absolutetime_to_nanoseconds(ticks, &ns);
++        return uint32_t(ns / 1000000);
++    };
++    auto sample = [](uint32_t (&values)[Probe::Words]) {
++        if (!gHost.ready || gHost.poisoned) {
++            values[Probe::State] = Transport::TransportUnavailable;
++            return;
++        }
++        constexpr uint32_t aperture = 0xd0000;
++        auto *const map = gHost.smmuMap.get();
++        if (!map || !gHost.smmu) {
++            values[Probe::State] = Transport::MissingMapping;
++            return;
++        }
++        if (map->getLength() < aperture || map->getVirtualAddress() != gHost.smmu) {
++            values[Probe::State] = Transport::MappingBounds;
++            return;
++        }
++        IOPhysicalLength contiguous = 0;
++        const auto physical = map->getPhysicalSegment(0, &contiguous, kIOMemoryMapperNone);
++        if (physical != 0x15000000 || contiguous < aperture) {
++            values[Probe::State] = Transport::MappingPhysical;
++            return;
++        }
++        const auto base = gHost.smmu;
++        auto read = [base](uint32_t offset, uint32_t &value) {
+             if ((offset & 3u) || offset > aperture - sizeof(uint32_t)) return false;
+-            value = read32(gHost.smmu, offset);
++            value = read32(base, offset);
+             __asm__ volatile("dmb oshld" ::: "memory");
+             return true;
+         };
+-        Probe::sample(read, aperture, out);
+-    }
+-    IOLockUnlock(gHost.lock);
+-}
+-
+-}
++        Probe::sample(read, aperture, values);
++    };
++    Transport::withTransport([&] { return IOLockTryLock(lock); }, [&] { IOLockUnlock(lock); },
++        [](unsigned ms) { IOSleep(ms); }, now, sample, out);
++}
++
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -552,7 +552,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 79358e64c84e458e8e31428b69abe124 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC f7fda793ad694c57be740bb78a1cd6ce %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1035,7 +1035,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"79358e64c84e458e8e31428b69abe124",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"f7fda793ad694c57be740bb78a1cd6ce",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2679358E64C84E"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26F7FDA793AD69"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x79,0x35,0x8e,0x64,0xc8,0x4e,0x45,0x8e,0x8e,0x31,0x42,0x8b,0x69,0xab,0xe1,0x24};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xf7,0xfd,0xa7,0x93,0xad,0x69,0x4c,0x57,0xbe,0x74,0x0b,0xb7,0x8a,0x1c,0xd6,0xce};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x79,0x35,0x8e,0x64,0xc8,0x4e,0x45,0x8e,0x8e,0x31,0x42,0x8b,0x69,0xab,0xe1,0x24};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xf7,0xfd,0xa7,0x93,0xad,0x69,0x4c,0x57,0xbe,0x74,0x0b,0xb7,0x8a,0x1c,0xd6,0xce};

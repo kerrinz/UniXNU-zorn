@@ -1,0 +1,176 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -59,8 +59,9 @@
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
+-#include "ZornSerialShot265.h"
+-static ZornSerialShot265 zornSerialShot265;
++#include "ZornSerialShot270.h"
++static ZornSerialRoi270 zornSerialShot265;
++extern "C" bool zorn26_ui_menu_capture_ready278();
+ extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+@@ -1482,10 +1483,10 @@
+                     tail,retired,count,firstSid,lease.gpu()?1u:0u,after>before?1u:0u,ledger?1u:0u,
+                     uint32_t(before),uint32_t(after),fWidth,fHeight,count && lease.gpu()?zorn_surface_fence246(firstSid):0};
+                 zornPresentTrace245.publish(record);
+-                const bool knownComplete281=zornKnownPresent247.complete(record);
+-                // Capture only a source-owned known-present completion after real
+-                // CPU copies/helpers. The same retained issuer lease is held.
+-                if(knownComplete281 && record[1]>=64 && record[9] && __atomic_load_n(&zornSerialShot265.state,__ATOMIC_ACQUIRE)==1){
++                zornKnownPresent247.complete(record);
++                // One thumbnail after real CPU copies/helpers and a mature
++                // compositor frame. The same retained issuer lease is held.
++                if(zorn26_ui_menu_capture_ready278() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
+                     IOLockLock(fLock);
+                     (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+                         fPanelWidth,fPanelHeight,fRowBytes,fZornCheckedExtent265,record);
+--- a/ZornApplicationStderr26.inc
++++ b/ZornApplicationStderr26.inc
+@@ -6,7 +6,7 @@
+  // Actual kernel process identity; this name filter selects diagnostics only.
+  // It never grants IOKit/GPU admission or changes a syscall result.
+  const char *name=proc_best_name(process);
+- static const char expected[]="zorn-metal-probe193";
++ static const char expected[]="backboardd";
+  if(!name || strncmp(name,expected,sizeof(expected)))return;
+  const uint64_t unique=proc_uniqueid(process);const uint32_t pid=(uint32_t)proc_pid(process);
+  if(!zorn26_application_stderr_reserve(unique,pid))return;
+--- a/ZornJournalCapture248.inc
++++ b/ZornJournalCapture248.inc
+@@ -3,7 +3,7 @@
+ static int zorn26_journal_process248(proc_t p,int fd){
+  if(!p || fd!=2)return 0;
+  const char *name=proc_best_name(p);
+- static const char expected[]="zorn-metal-probe193";
++ static const char expected[]="backboardd";
+  return name && !strncmp(name,expected,sizeof(expected));
+ }
+ // Observe the actually returned prefix after the original write. User memory
+--- a/ZornRootWindow26.h
++++ b/ZornRootWindow26.h
+@@ -17,7 +17,7 @@
+ static_assert(RelativeByteStart<=PartitionBytes && Bytes<=PartitionBytes-RelativeByteStart);
+ static_assert(!(AbsoluteByteStart&4095) && !(Bytes&4095));
+ static_assert((AbsoluteByteStart>>12)+((Bytes>>12)-1)<=0xffffffffULL);
+-static constexpr uint8_t ImageSha256[] = {0xb8,0x7e,0x13,0x2b,0xbf,0x50,0x9d,0x13,0xff,0x34,0x75,0x60,0x6a,0xbe,0xf0,0x0,0xa1,0xf4,0x34,0x78,0xad,0x48,0x89,0xbd,0xcf,0xbf,0x47,0xeb,0xd,0xb3,0x9e,0x8d};
++static constexpr uint8_t ImageSha256[] = {0xd9,0x85,0x6b,0x43,0x42,0xa3,0x7,0xd9,0x15,0xf4,0x3d,0x8c,0xd7,0xd9,0x54,0xb,0x8a,0x2d,0x39,0x33,0xf0,0x7d,0xfd,0x46,0x75,0xc,0xfe,0x5a,0x32,0xc0,0xc6,0x22};
+ static constexpr uint8_t WindowBytes[] = {0x0,0x0,0x0,0x15,0x33,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+ static constexpr uint8_t NativeCompatible[] = {0x56,0x35,0x33,0x41,0x50,0x0,0x69,0x50,0x68,0x6f,0x6e,0x65,0x31,0x38,0x2c,0x31,0x0,0x41,0x70,0x70,0x6c,0x65,0x41,0x52,0x4d,0x0,0x78,0x69,0x61,0x6f,0x6d,0x69,0x2c,0x7a,0x6f,0x72,0x6e,0x0,0x71,0x63,0x6f,0x6d,0x2c,0x73,0x6d,0x38,0x36,0x35,0x30,0x0};
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC b631a4ee28874ebfaa9c4bfdcf2fc3c4 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 45267e58fff6425eb9ab718191a964b8 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -862,11 +862,22 @@
+ static uint64_t zornCallbackResult222,zornCallbackViewState222,zornCallbackMapState222;
+ // The existing retained progress owner supplies cadence metadata only.
+ // Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
+-#include "ZornSerialShot265.h"
++#include "ZornSerialShot270.h"
+ extern "C" void zorn26_serial_shot_request265(void);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
+ extern "C" bool zorn26_serial_shot_ready265(void);
+-static ZornSerialMux265 zornSerialMux265;
++#include "ZornUiMenuWire278.h"
++extern "C" bool zorn26_ui_menu_done278();
++extern "C" bool zorn26_ui_menu_snapshot278(uint32_t (&)[304]);
++extern "C" void zorn26_ui_menu_schedule278(IOService *);
++struct ZornUiSceneProvider269 {
++    bool ready()const{return zorn26_ui_menu_done278();}
++    unsigned packet(char *out,unsigned cap,const uint8_t (&tag)[16])const{
++        uint32_t snapshot[304]{};
++        return zorn26_ui_menu_snapshot278(snapshot)?ZornUiMenuWire278::packet(out,cap,snapshot,tag):0;
++    }
++};
++static ZornSerialMux270 zornSerialMux265;
+ static bool zorn_serial_idle265(void *context){
+     if(context!=&zornProgress201)return false;
+     const auto &p=zornProgress201;
+@@ -977,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"b631a4ee28874ebfaa9c4bfdcf2fc3c4",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"45267e58fff6425eb9ab718191a964b8",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1045,7 +1056,7 @@
+     return size;
+ }
+ struct ZornSerialProvider265 {
+-    enum {Bytes=ZornSerialShot265::Bytes,PacketHeader=ZornSerialShot265::PacketHeader};
++    enum {Bytes=ZornSerialRoi270::Bytes,PacketHeader=ZornSerialRoi270::PacketHeader};
+     bool ready()const{return zorn26_serial_shot_ready265();}
+     unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{return zorn26_serial_shot_packet265(out,cap,offset,tag);}
+ };
+@@ -1056,7 +1067,7 @@
+     if(idle)zorn26_serial_shot_request265();
+     const ZornSerialProvider265 actual{};
+     return zornSerialMux265.next(cookie,line,cap,completed,zorn_gpu_progress_next201,
+-        actual,kZornPlatformRecordTrial,idle);
++        actual,ZornUiSceneProvider269{},kZornPlatformRecordTrial,idle);
+ }
+ static void zorn_gpu_progress_cdc201(ZornUfsOwner26 *owner){
+     unsigned enabled=0;
+@@ -1242,6 +1253,8 @@
+     owner->release();
+     (void)thread_terminate(current_thread());panic("K80 RSC checkpoint worker returned");
+ }
++#include "ZornUiDesktopGate272.inc"
++#include "ZornUiMenuProgress274.inc"
+ // Actual PID1 EL0 BSD-system-call entry;no syscall result or user arguments logged.
+ extern "C" uint32_t ZornBootPresenterRefusal26(void);
+ extern "C" IOReturn ZornBootPresenterPatternResult26(uint32_t *,uint64_t *);
+@@ -1283,7 +1296,13 @@
+         if(zorn_early_mode252()==2)return; // malformed early selection never falls back to GPU work
+         uint32_t empty=0;
+         if(!__atomic_compare_exchange_n(&attempted,&empty,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return;
+-        if(zorn_early_mode252()==1)zorn_gpu_early_schedule252(owner);
++        if(zorn_early_mode252()==1){
++            zorn_gpu_early_schedule252(owner);
++            // Actual root device/PID1 EL0/preemption checks above still apply.
++            // This prospective profile selects one source-bounded synthetic
++            // scene;the normal FT3683 platform owner remains independent.
++            zorn26_ui_menu_schedule278(IOService::getPlatform());
++        }
+         owner->retain();thread_t worker=THREAD_NULL;
+         const auto raw=kernel_thread_start(zorn_touch_checkpoint_worker26,owner,&worker);
+         if(raw==KERN_SUCCESS && worker!=THREAD_NULL){thread_deallocate(worker);return;}
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B631A4EE2887"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2645267E58FFF6"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb6,0x31,0xa4,0xee,0x28,0x87,0x4e,0xbf,0xaa,0x9c,0x4b,0xfd,0xcf,0x2f,0xc3,0xc4};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x45,0x26,0x7e,0x58,0xff,0xf6,0x42,0x5e,0xb9,0xab,0x71,0x81,0x91,0xa9,0x64,0xb8};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb6,0x31,0xa4,0xee,0x28,0x87,0x4e,0xbf,0xaa,0x9c,0x4b,0xfd,0xcf,0x2f,0xc3,0xc4};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x45,0x26,0x7e,0x58,0xff,0xf6,0x42,0x5e,0xb9,0xab,0x71,0x81,0x91,0xa9,0x64,0xb8};

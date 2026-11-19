@@ -1,0 +1,385 @@
+--- /dev/null
++++ b/ZornDisplayLeaseProbe325.h
+@@ -0,0 +1,63 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornDisplayLeaseProbe325 {
++
++enum Field : unsigned {
++    Status, UptimeMs, AcquireRaw, ReleaseRaw, GccBefore, GccHeld, GccAfter,
++    AcquireSteps, ReleaseSteps, Words
++};
++enum State : uint32_t {
++    NotRun, ClockUnavailable, AcquireFailed, HeldClockUnavailable,
++    ReleaseFailed, AfterClockUnavailable, Returned
++};
++enum Step : uint32_t {
++    CheckedExistingProxies = 1u << 0,
++    PreparedConsumers = 1u << 1,
++    MmcxVoltageReturned = 1u << 2,
++    MmcxReferenceReturned = 1u << 3,
++    MxVoltageReturned = 1u << 4,
++    MxReferenceReturned = 1u << 5,
++    BandwidthReturned = 1u << 6,
++    RemovedConsumers = 1u << 7
++};
++
++// A returned lease means the native operations returned successfully. Only
++// the always-on GCC word was sampled; this cannot authorize a DPU or DSI read.
++// The writer owns all calls and publishes a single immutable result.
++template <typename ReadClock, typename SetLease, typename GetSteps>
++uint32_t run(ReadClock readClock, SetLease setLease, GetSteps getSteps, uint32_t stamp,
++             uint32_t clockUnavailable, uint32_t (&out)[Words])
++{
++    out[UptimeMs] = stamp;
++    if (!readClock(out[GccBefore])) {
++        out[Status] = ClockUnavailable;
++        return clockUnavailable;
++    }
++    out[AcquireRaw] = setLease(true);
++    out[AcquireSteps] = getSteps(true);
++    if (out[AcquireRaw]) {
++        out[Status] = AcquireFailed;
++        return out[AcquireRaw];
++    }
++    if (!readClock(out[GccHeld])) {
++        out[Status] = HeldClockUnavailable;
++        return clockUnavailable;
++    }
++    out[ReleaseRaw] = setLease(false);
++    out[ReleaseSteps] = getSteps(false);
++    if (out[ReleaseRaw]) {
++        out[Status] = ReleaseFailed;
++        return out[ReleaseRaw];
++    }
++    if (!readClock(out[GccAfter])) {
++        out[Status] = AfterClockUnavailable;
++        return clockUnavailable;
++    }
++    out[Status] = Returned;
++    return 0;
++}
++
++} // namespace ZornDisplayLeaseProbe325
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -49,11 +49,14 @@
+ #include "ZornGen7HostBandwidthArithmetic26.h"
+ #include "ZornGen7CommandDbResources26.h"
+ #include "ZornDisplayResources322.h"
++#include "ZornDisplayLeaseProbe325.h"
+ #include "ZornGen7OwnedArcVoltage.h"
+ 
+ namespace {
+ uint32_t displayResourceWords322[ZornDisplayResources322::Words]{};
+ uint32_t displayResourcePhase322 = 0;
++uint32_t displayLeaseWords325[ZornDisplayLeaseProbe325::Words]{};
++uint32_t displayLeasePhase325 = 0;
+ }
+ 
+ extern "C" void zorn26_display_resources322(uint32_t *out)
+@@ -61,6 +64,13 @@
+     if (__atomic_load_n(&displayResourcePhase322, __ATOMIC_ACQUIRE) != 2) return;
+     for (unsigned i = 0; i < ZornDisplayResources322::Words; ++i) out[i] = displayResourceWords322[i];
+ }
++extern "C" void zorn26_display_lease325(uint32_t *out)
++{
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornDisplayLeaseProbe325::Words; ++i) out[i] = displayLeaseWords325[i];
++}
++extern "C" bool zorn26_read_display_gcc325(IOService *, uint32_t &);
++
+ #include "ZornGen7IccInputs26.h"
+ #include "ZornGen7SmmuRuntimePm26.h"
+ #include "ZornGen7SmmuDomain26.h"
+@@ -380,12 +390,14 @@
+     struct Rail {
+         ZornGen7Rpmh::NativeOwnedArcCore *core = nullptr;
+         ZornGen7Rpmh::NativeCoreConsumer consumer{};
++        const ZornGen7Rpmh::NativeCoreConsumer *baseline = nullptr;
+         ZornGen7Rpmh::NativeOwnedArcEnable *enable = nullptr;
+         ZornGen7Rpmh::NativeOwnedArcVoltage *raise = nullptr, *lower = nullptr;
+         ZornGen7Rpmh::UncoupledArcCoreDisable *disable[2]{};
+         size_t disableCount = 0;
+     } rails[2];
+     Phase phase = Phase::Idle;
++    uint32_t acquireSteps = 0, releaseSteps = 0;
+ };
+ }
+ 
+@@ -3874,9 +3886,10 @@
+                             // Actual known-image path above returned success. Keep the
+                             // original startup unlock across this diagnostic wait and callout.
+                             // Timeout retains the existing stopped resources and skips publication.
+-                            if(zorn26_gpu_diagnostic_gate203(2))
+-                                client=owner->publishHostApplicationIo(board,application);
+-                            else client=kIOReturnTimeout;
++                            if (zorn26_gpu_diagnostic_gate203(2)) {
++                                client = board.probeDisplayRegisterResources325();
++                                if (!client) client = owner->publishHostApplicationIo(board, application);
++                            } else client = kIOReturnTimeout;
+                         }
+                         IORecursiveLockLock(s.gates.startup);
+                         if(!client && (s.native_direct_memory_owner!=owner || s.host_ring!=ring ||
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -6,6 +6,7 @@
+ #include "ZornPanelTe320.h"
+ #include "ZornDpuHandoff321.h"
+ #include "ZornDisplayResourceWire322.h"
++#include "ZornDisplayLeaseProbe325.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -18,7 +19,8 @@
+ constexpr unsigned TeStart = TimingStart + Samples * TimingWords;
+ constexpr unsigned HandoffStart = TeStart + ZornPanelTe320::Words;
+ constexpr unsigned ResourcesStart = HandoffStart + ZornDpuHandoff321::Words;
+-constexpr unsigned Words = ResourcesStart + ZornDisplayResources322::Words;
++constexpr unsigned LeaseStart = ResourcesStart + ZornDisplayResources322::Words;
++constexpr unsigned Words = LeaseStart + ZornDisplayLeaseProbe325::Words;
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+@@ -27,11 +29,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT322", 8);
++    memcpy(p, "K80FT325", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 322);
++    zorn_panic_le236(p, Bytes - 4, 325);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 46248feb00914eb08a642a2048e9215d %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 029545879d9c4d6dbec700a4c5948f8e %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"46248feb00914eb08a642a2048e9215d",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"029545879d9c4d6dbec700a4c5948f8e",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -13,6 +13,7 @@
+ extern "C" bool zorn26_ft3683_trace313(uint32_t (&)[ZornManualWire313::TouchWords]);
+ extern "C" void zorn26_ui_menu_progress274(uint32_t (&)[16]);
+ extern "C" void zorn26_display_resources322(uint32_t *);
++extern "C" void zorn26_display_lease325(uint32_t *);
+ extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+@@ -177,6 +178,13 @@
+     (void)thread_terminate(current_thread());panic("K80 manual observation worker termination returned");
+ }
+ }
++extern "C" bool zorn26_read_display_gcc325(IOService *platform, uint32_t &value)
++{
++    if (!normal() || !nativeK80(platform)) return false;
++    DisplayRead318 window;
++    return window(ZornDisplayTiming318::Window::Gcc, 0, value);
++}
++
+ extern "C" void zorn26_panel_handoff321(IOService *provider, uint64_t physical, uint64_t stride)
+ {
+     if (!normal() || !nativeK80(provider) || !inheritedGop318() || physical > UINT32_MAX ||
+@@ -198,6 +206,7 @@
+         }
+     }
+     zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
++    zorn26_display_lease325(out + ZornManualWire313::LeaseStart);
+     return true;
+ }
+ extern "C" void zorn26_ui_menu_schedule313(IOService *platform) {
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2646248FEB0091"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26029545879D9C"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -2,6 +2,7 @@
+ IOReturn ZornGen7DarwinBoardOwner::setDisplayRegisterResources(bool hold)
+ {
+     using namespace ZornGen7Rpmh;
++    using namespace ZornDisplayLeaseProbe325;
+     using Phase = DisplayRegisterResources324::Phase;
+     if (!callable()) return kIOReturnNotReady;
+     auto &s = *storage_;
+@@ -16,6 +17,7 @@
+         !s.rsc_storage || !s.rsc_storage->forwardAllowed() || !s.rsc_cache || !s.rsc_reservation) {
+         return finish(kIOReturnNotReady);
+     }
++    auto &steps = hold ? display.acquireSteps : display.releaseSteps;
+     if ((hold && display.phase != Phase::Idle) || (!hold && display.phase != Phase::Held)) {
+         return finish(kIOReturnNotReady);
+     }
+@@ -30,12 +32,40 @@
+                 return finish(kIOReturnNotReady);
+             }
+         }
++        if (!s.owned_core_supplier_fields) return finish(kIOReturnNotReady);
+         display.rails[0].core = s.upstream_arc_cores[0];
+         display.rails[1].core = s.owned_arc_cores[1];
+         if (!display.rails[0].core || !display.rails[1].core ||
+             !display.rails[0].core->supply_ || display.rails[1].core->supply_) return finish(kIOReturnNotReady);
++        auto *mmcx = s.live_supplied_proxies;
++        if (!mmcx || mmcx->live_next || !mmcx->consumer.supplier ||
++            mmcx->consumer.supplier->fields != &display.rails[0].core->supplier_) return finish(kIOReturnNotReady);
++        display.rails[0].baseline = &mmcx->consumer.projection;
++        for (auto *proxy = s.live_regulator_proxies; proxy; proxy = proxy->live_next) {
++            if (proxy->consumer.supplier && proxy->consumer.supplier->fields == &s.owned_core_supplier_fields[1]) {
++                if (display.rails[1].baseline) return finish(kIOReturnNotReady);
++                display.rails[1].baseline = &proxy->consumer.projection;
++            }
++        }
+     }
+-
++    auto baselineHeld = [] (const DisplayRegisterResources324::Rail &rail) {
++        auto &core = *rail.core;
++        IOLockLock(core.dependent_);
++        const auto *member = core.consumers_;
++        while (member && member != rail.baseline) member = member->next;
++        const bool held = member && member->enable_count && core.use_count_ &&
++            member->min_value >= 48 && member->max_value >= member->min_value;
++        IOLockUnlock(core.dependent_);
++        return held;
++    };
++    // Keep the actual native proxy floor before modifying either lease.
++    // The IPC/ARC calls use separate consumers; no boot firmware vote is removed.
++    if (!s.owned_core_supplier_fields || !s.regulator_proxies_returned || !s.mmcx_proxy_returned ||
++        s.regulator_proxies_removed || !baselineHeld(display.rails[0]) || !baselineHeld(display.rails[1])) {
++        if (!hold) display.phase = Phase::Retained;
++        return finish(kIOReturnNotReady);
++    }
++    steps |= CheckedExistingProxies;
+     display.phase = Phase::Transition;
+     auto retainFailure = [&](IOReturn result) {
+         display.phase = Phase::Retained;
+@@ -72,17 +102,20 @@
+             IOLockUnlock(core.dependent_);
+             if (!rail.enable->prepareActualHeldStartup()) return retainFailure(kIOReturnNotReady);
+         }
++        steps |= PreparedConsumers;
+     } else {
+         // The display caller must retire its register accesses before this
+         // entry. It releases the SDE bus vote before the DISP_CC rail votes.
+         const auto raw = s.gpu_icc_inputs->setDisplayRegisterBandwidth(0);
+         if (raw != kIOReturnSuccess) return retainFailure(raw);
++        steps |= BandwidthReturned;
+     }
+ 
+     IORecursiveLockUnlock(s.gates.startup);
+     IOLockLock(s.owned_global_vdd_gate);
+     bool returned = true;
+     for (auto &rail : display.rails) {
++        const bool mmcx = &rail == &display.rails[0];
+         if (!s.rsc_storage->forwardAllowed()) { returned = false; break; }
+         // qcom_cc_runtime_resume votes level 1 (MIN_SVS = 48). The existing
+         // native regulator applies the real constraints and ARC selector.
+@@ -92,6 +125,7 @@
+             returned = false;
+             break;
+         }
++        steps |= mmcx ? MmcxVoltageReturned : MxVoltageReturned;
+         if (hold) {
+             const auto result = rail.enable->enableActual();
+             returned = result.source_return_available && !result.source_return;
+@@ -100,6 +134,7 @@
+             returned = result.source_return_available && !result.source_return && result.last.consumer_decremented;
+         }
+         if (!returned) break;
++        steps |= mmcx ? MmcxReferenceReturned : MxReferenceReturned;
+     }
+     IOLockUnlock(s.owned_global_vdd_gate);
+     IORecursiveLockLock(s.gates.startup);
+@@ -110,6 +145,7 @@
+         // (14,000 kB/s). DISP_CC itself has no interconnect edge in zorn FDT.
+         const auto raw = s.gpu_icc_inputs->setDisplayRegisterBandwidth(14000);
+         if (raw != kIOReturnSuccess) return retainFailure(raw);
++        steps |= BandwidthReturned;
+         display.phase = Phase::Held;
+     } else {
+         for (auto &rail : display.rails) {
+@@ -128,7 +164,30 @@
+         }
+         // The membership is retired. The board still owns these one-shot
+         // request frames until their asynchronous transports permit disposal.
++        steps |= RemovedConsumers;
+         display.phase = Phase::Released;
+     }
+     return finish(kIOReturnSuccess);
+ }
++
++IOReturn ZornGen7DarwinBoardOwner::probeDisplayRegisterResources325()
++{
++    if (!callable()) return kIOReturnNotReady;
++    uint32_t idle = 0;
++    if (!__atomic_compare_exchange_n(&displayLeasePhase325, &idle, 1u, false,
++            __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) return kIOReturnExclusiveAccess;
++    uint64_t now = 0, ns = 0;
++    clock_get_uptime(&now);
++    absolutetime_to_nanoseconds(now, &ns);
++    auto &state = *storage_;
++    auto readClock = [&](uint32_t &value) { return zorn26_read_display_gcc325(state.platform, value); };
++    auto setLease = [&](bool hold) { return uint32_t(setDisplayRegisterResources(hold)); };
++    auto getSteps = [&](bool hold) {
++        const auto &probe = state.display_register_resources;
++        return hold ? probe.acquireSteps : probe.releaseSteps;
++    };
++    const auto raw = ZornDisplayLeaseProbe325::run(readClock, setLease, getSteps,
++        uint32_t(ns / 1000000), uint32_t(kIOReturnIOError), displayLeaseWords325);
++    __atomic_store_n(&displayLeasePhase325, 2u, __ATOMIC_RELEASE);
++    return IOReturn(raw);
++}
+--- a/arc-runtime/ZornGen7DarwinBoardOwner.h
++++ b/arc-runtime/ZornGen7DarwinBoardOwner.h
+@@ -369,6 +369,7 @@
+     IOReturn bindActualArcNodeOwner(IOService &,OSObject &,IOService *const (&groups)[5]);
+     bool actualArcParentBound(size_t group,IOService &actual_parent) const;
+     IOReturn setDisplayRegisterResources(bool hold);
++    IOReturn probeDisplayRegisterResources325();
+     friend class ZornGen7ClockResources26;
+     friend class ZornGen7CommandDbSnapshot26;
+     friend class ZornGen7CommandDbResources26;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x46,0x24,0x8f,0xeb,0x00,0x91,0x4e,0xb0,0x8a,0x64,0x2a,0x20,0x48,0xe9,0x21,0x5d};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x02,0x95,0x45,0x87,0x9d,0x9c,0x4d,0x6d,0xbe,0xc7,0x00,0xa4,0xc5,0x94,0x8f,0x8e};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x46,0x24,0x8f,0xeb,0x00,0x91,0x4e,0xb0,0x8a,0x64,0x2a,0x20,0x48,0xe9,0x21,0x5d};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x02,0x95,0x45,0x87,0x9d,0x9c,0x4d,0x6d,0xbe,0xc7,0x00,0xa4,0xc5,0x94,0x8f,0x8e};

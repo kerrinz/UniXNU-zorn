@@ -1,0 +1,22 @@
+--- a/NativeBridgeMetalFrontend.mm
++++ b/NativeBridgeMetalFrontend.mm
+@@ -137,16 +137,16 @@
+  }
+ }
+ // NATIVE_METAL_TIMING=1: the telemetry table (where the CPU side's time went: pipelines, libraries, compiles and the shader cache)
+-// written to standard error every 20 s (an app the system ends at the end of a test never reaches atexit).
++// K80:two bounded scalar reports20/60s after the actual Metal device is published.
+ extern "C" size_t native_bridge_metal_telemetry(char *out,size_t size);
+ static void *reportTiming(void *) {
+  static char table[6144];
+- const unsigned delays[2]={20,100};
++ const unsigned delays[2]={20,40};
+  for(unsigned sample=0;sample<2;++sample) {
+   sleep(delays[sample]);
+   const size_t length=native_bridge_metal_telemetry(table,sizeof table);
+   char title[160];
+-  const int n=snprintf(title,sizeof title,"ZORN285COUNTERS run=%s sample=%u uptime_us=%llu bytes=%zu\n",
++  const int n=snprintf(title,sizeof title,"ZORN286COUNTERS run=%s sample=%u uptime_us=%llu bytes=%zu\n",
+    getenv("NATIVE_METAL_BOOT_SESSION")?:"unbound",sample,
+    (unsigned long long)(clock_gettime_nsec_np(CLOCK_UPTIME_RAW)/1000),length);
+   if(n<=0 || (size_t)n>=sizeof title || length>=sizeof table)break;

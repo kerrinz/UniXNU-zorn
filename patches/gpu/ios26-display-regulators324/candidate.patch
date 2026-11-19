@@ -1,0 +1,389 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -49,6 +49,7 @@
+ #include "ZornGen7HostBandwidthArithmetic26.h"
+ #include "ZornGen7CommandDbResources26.h"
+ #include "ZornDisplayResources322.h"
++#include "ZornGen7OwnedArcVoltage.h"
+ 
+ namespace {
+ uint32_t displayResourceWords322[ZornDisplayResources322::Words]{};
+@@ -373,6 +374,21 @@
+ struct alignas(8) SupplyPending {uint32_t group=0,voter=0;bool present=false;};
+ 
+ }
++namespace {
++struct DisplayRegisterResources324 {
++    enum class Phase { Idle, Transition, Held, Released, Retained };
++    struct Rail {
++        ZornGen7Rpmh::NativeOwnedArcCore *core = nullptr;
++        ZornGen7Rpmh::NativeCoreConsumer consumer{};
++        ZornGen7Rpmh::NativeOwnedArcEnable *enable = nullptr;
++        ZornGen7Rpmh::NativeOwnedArcVoltage *raise = nullptr, *lower = nullptr;
++        ZornGen7Rpmh::UncoupledArcCoreDisable *disable[2]{};
++        size_t disableCount = 0;
++    } rails[2];
++    Phase phase = Phase::Idle;
++};
++}
++
+ struct ZornGen7DarwinBoardOwner::Storage {
+     CpuGates gates{};
+     IOService *platform=nullptr;
+@@ -569,6 +585,7 @@
+     bool host_irq_arm_attempted=false,host_irq_armed=false;
+     bool host_gmu_start_attempted=false,host_first_query_ready=false;
+     ZornGen7HwschedHfi26 *hwsched_hfi=nullptr;bool hwsched_hfi_attempted=false,hwsched_hfi_ready=false;bool direct_hfi_attempted=false,direct_hfi_ready=false;
++    DisplayRegisterResources324 display_register_resources;
+     ZornGen7IccInputs26 *gpu_icc_inputs=nullptr;bool gpu_icc_inputs_attempted=false,gpu_icc_inputs_ready=false;
+     bool gpu_icc_initial_attempted=false,gpu_icc_initial_ready=false,gpu_icc_qos_attempted=false,gpu_icc_qos_ready=false;
+     bool gpu_bootstrap_bw_attempted=false,gpu_bootstrap_bw_ready=false;
+@@ -4025,6 +4042,8 @@
+     s.direct_hfi_ready=true;s.stage=Stage::CpuReady;return finish(kIOReturnSuccess);
+ }
+ 
++#include "arc-runtime/ZornDisplayRegisterResources324.inc"
++
+ IOReturn ZornGen7DarwinBoardOwner::prepareOwnedGpuIccInputs(IOService &platform,
+     IORegistryEntry &root,IOService &gpu,OSObject &treeOwner)
+ {
+--- a/ZornGen7IccInputs26.cpp
++++ b/ZornGen7IccInputs26.cpp
+@@ -426,6 +426,13 @@
+     s.tbuReleaseAttempted=true;const auto raw=s.voter->setTbuPowerBandwidth(s.startupGate,false);
+     if(raw!=kIOReturnSuccess)return raw;s.tbuHeld=false;return kIOReturnSuccess;
+ }
++IOReturn ZornGen7IccInputs26::setDisplayRegisterBandwidth(uint32_t peakKbps)
++{
++    if (!normal() || !voterReady() || !storage_->startupGate ||
++        !IORecursiveLockHaveLock(storage_->startupGate) || !storage_->qosReady) return kIOReturnNotReady;
++    return storage_->voter->setDisplayRegisterBandwidth(storage_->startupGate, peakKbps);
++}
++
+ IOReturn ZornGen7IccInputs26::applyBootstrapBandwidth()
+ {
+     if(!normal() || !voterReady() || !storage_->startupGate || !IORecursiveLockHaveLock(storage_->startupGate) ||
+--- a/ZornGen7IccInputs26.h
++++ b/ZornGen7IccInputs26.h
+@@ -39,6 +39,7 @@
+         ZornGen7Rpmh::NativeReservation &,const ZornGen7Rpmh::ActualXoCommandDbSnapshot &,OSObject &);
+     bool voterReady() const;
+     IOReturn initializeInitialVotes();
++    IOReturn setDisplayRegisterBandwidth(uint32_t peakKbps);
+     IOReturn applyBootstrapBandwidth();
+     IOReturn finishHostBootstrap();
+     IOReturn applyHostAverageMbps(uint32_t actualSourceAverage);
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC bb2efc47019348abbfbe57d98401fcd2 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 46248feb00914eb08a642a2048e9215d %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"bb2efc47019348abbfbe57d98401fcd2",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"46248feb00914eb08a642a2048e9215d",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BB2EFC470193"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2646248FEB0091"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbb,0x2e,0xfc,0x47,0x01,0x93,0x48,0xab,0xbf,0xbe,0x57,0xd9,0x84,0x01,0xfc,0xd2};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x46,0x24,0x8f,0xeb,0x00,0x91,0x4e,0xb0,0x8a,0x64,0x2a,0x20,0x48,0xe9,0x21,0x5d};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbb,0x2e,0xfc,0x47,0x01,0x93,0x48,0xab,0xbf,0xbe,0x57,0xd9,0x84,0x01,0xfc,0xd2};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x46,0x24,0x8f,0xeb,0x00,0x91,0x4e,0xb0,0x8a,0x64,0x2a,0x20,0x48,0xe9,0x21,0x5d};
+--- /dev/null
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -0,0 +1,134 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++IOReturn ZornGen7DarwinBoardOwner::setDisplayRegisterResources(bool hold)
++{
++    using namespace ZornGen7Rpmh;
++    using Phase = DisplayRegisterResources324::Phase;
++    if (!callable()) return kIOReturnNotReady;
++    auto &s = *storage_;
++    IORecursiveLockLock(s.gates.startup);
++    auto finish = [&](IOReturn result) {
++        IORecursiveLockUnlock(s.gates.startup);
++        return result;
++    };
++    auto &display = s.display_register_resources;
++    if (s.stage != Stage::CpuReady || !s.arc_startup || !s.arc_startup->result.source_forward_returned ||
++        !s.gpu_icc_inputs_ready || !s.gpu_icc_inputs || !s.owned_global_vdd_gate ||
++        !s.rsc_storage || !s.rsc_storage->forwardAllowed() || !s.rsc_cache || !s.rsc_reservation) {
++        return finish(kIOReturnNotReady);
++    }
++    if ((hold && display.phase != Phase::Idle) || (!hold && display.phase != Phase::Held)) {
++        return finish(kIOReturnNotReady);
++    }
++
++    // DISP_CC runtime resume names VDD_MM and VDD_MXA in this order.
++    // Group 3 is the registered supplied MMCX core. Group 1 is the same MX
++    // core used by the GPU and GCC. Display owns separate consumers on both.
++    if (hold) {
++        constexpr size_t groups[] = {3, 1};
++        for (const size_t group : groups) {
++            if (!s.arc_parent_devices[group] || !actualArcParentBound(group, *s.arc_parent_devices[group])) {
++                return finish(kIOReturnNotReady);
++            }
++        }
++        display.rails[0].core = s.upstream_arc_cores[0];
++        display.rails[1].core = s.owned_arc_cores[1];
++        if (!display.rails[0].core || !display.rails[1].core ||
++            !display.rails[0].core->supply_ || display.rails[1].core->supply_) return finish(kIOReturnNotReady);
++    }
++
++    display.phase = Phase::Transition;
++    auto retainFailure = [&](IOReturn result) {
++        display.phase = Phase::Retained;
++        return finish(result);
++    };
++    if (hold) {
++        for (auto &rail : display.rails) {
++            auto &core = *rail.core;
++            void *enable = allocate(sizeof(NativeOwnedArcEnable), alignof(NativeOwnedArcEnable));
++            void *raise = allocate(sizeof(NativeOwnedArcVoltage), alignof(NativeOwnedArcVoltage));
++            void *lower = allocate(sizeof(NativeOwnedArcVoltage), alignof(NativeOwnedArcVoltage));
++            if (!enable || !raise || !lower) return retainFailure(kIOReturnNoMemory);
++            rail.enable = ::new(enable) NativeOwnedArcEnable(core, rail.consumer,
++                *s.rsc_cache, *s.rsc_reservation, s.gates.startup);
++            rail.raise = ::new(raise) NativeOwnedArcVoltage(*rail.enable, *s.rsc_cache, *s.rsc_reservation);
++            rail.lower = ::new(lower) NativeOwnedArcVoltage(*rail.enable, *s.rsc_cache, *s.rsc_reservation);
++            for (auto *node = &core; node; node = node->supply_) {
++                if (rail.disableCount == 2) return retainFailure(kIOReturnNotReady);
++                auto *consumer = node == &core ? &rail.consumer : &core.supply_consumer_;
++                void *memory = allocate(sizeof(UncoupledArcCoreDisable), alignof(UncoupledArcCoreDisable));
++                if (!memory) return retainFailure(kIOReturnNoMemory);
++                rail.disable[rail.disableCount++] = ::new(memory) UncoupledArcCoreDisable(
++                    node->voltage_, node->enable_, node->disable_, consumer, node->supplier_.arc,
++                    &node->supplier_.voter, *s.rsc_cache, *s.rsc_reservation, node->notifiers_);
++            }
++            IOLockLock(core.dependent_);
++            if (core.exclusive_ || core.open_count_ == UINT32_MAX) {
++                IOLockUnlock(core.dependent_);
++                return retainFailure(kIOReturnNotReady);
++            }
++            rail.consumer.next = core.consumers_;
++            core.consumers_ = &rail.consumer;
++            ++core.open_count_;
++            IOLockUnlock(core.dependent_);
++            if (!rail.enable->prepareActualHeldStartup()) return retainFailure(kIOReturnNotReady);
++        }
++    } else {
++        // The display caller must retire its register accesses before this
++        // entry. It releases the SDE bus vote before the DISP_CC rail votes.
++        const auto raw = s.gpu_icc_inputs->setDisplayRegisterBandwidth(0);
++        if (raw != kIOReturnSuccess) return retainFailure(raw);
++    }
++
++    IORecursiveLockUnlock(s.gates.startup);
++    IOLockLock(s.owned_global_vdd_gate);
++    bool returned = true;
++    for (auto &rail : display.rails) {
++        if (!s.rsc_storage->forwardAllowed()) { returned = false; break; }
++        // qcom_cc_runtime_resume votes level 1 (MIN_SVS = 48). The existing
++        // native regulator applies the real constraints and ARC selector.
++        // Normal unvote sets level 0 before the matching disable.
++        auto voltage = (hold ? rail.raise : rail.lower)->setActualRange(hold ? 48 : 0, INT32_MAX);
++        if (!voltage.source_return_available || voltage.source_return || !s.rsc_storage->forwardAllowed()) {
++            returned = false;
++            break;
++        }
++        if (hold) {
++            const auto result = rail.enable->enableActual();
++            returned = result.source_return_available && !result.source_return;
++        } else {
++            const auto result = rail.enable->disableActual(rail.disable, rail.disableCount);
++            returned = result.source_return_available && !result.source_return && result.last.consumer_decremented;
++        }
++        if (!returned) break;
++    }
++    IOLockUnlock(s.owned_global_vdd_gate);
++    IORecursiveLockLock(s.gates.startup);
++    if (!returned || !s.rsc_storage->forwardAllowed()) return retainFailure(kIOReturnNotReady);
++
++    if (hold) {
++        // This is the independent SDE register path's first nonzero vector
++        // (14,000 kB/s). DISP_CC itself has no interconnect edge in zorn FDT.
++        const auto raw = s.gpu_icc_inputs->setDisplayRegisterBandwidth(14000);
++        if (raw != kIOReturnSuccess) return retainFailure(raw);
++        display.phase = Phase::Held;
++    } else {
++        for (auto &rail : display.rails) {
++            auto &core = *rail.core;
++            IOLockLock(core.dependent_);
++            auto **slot = &core.consumers_;
++            while (*slot && *slot != &rail.consumer) slot = &(*slot)->next;
++            if (!*slot || rail.consumer.enable_count || !core.open_count_) {
++                IOLockUnlock(core.dependent_);
++                return retainFailure(kIOReturnNotReady);
++            }
++            *slot = rail.consumer.next;
++            rail.consumer.next = nullptr;
++            --core.open_count_;
++            IOLockUnlock(core.dependent_);
++        }
++        // The membership is retired. The board still owns these one-shot
++        // request frames until their asynchronous transports permit disposal.
++        display.phase = Phase::Released;
++    }
++    return finish(kIOReturnSuccess);
++}
+--- a/arc-runtime/ZornGen7ArcCoreDisable.cpp
++++ b/arc-runtime/ZornGen7ArcCoreDisable.cpp
+@@ -66,9 +66,18 @@
+ CoreDisableResult UncoupledArcCoreDisable::disableActual()
+ {
+     constexpr uint64_t aif=(uint64_t(1)<<6)|(uint64_t(1)<<7)|(uint64_t(1)<<8);
+-    if ((__builtin_arm_rsr64("DAIF")&aif)!=0 || attempted_) return {};attempted_=true;
+-    if (!core_.dependent_lock) return result_;IOLockLock(core_.dependent_lock);
+-    auto finish=[&] {const CoreDisableResult saved=result_;IOLockUnlock(core_.dependent_lock);return saved;};
++    if ((__builtin_arm_rsr64("DAIF")&aif)!=0 || attempted_) return {};
++    if (!core_.dependent_lock) {attempted_=true;return result_;}
++    IOLockLock(core_.dependent_lock);
++    const CoreDisableResult saved=disableActualLocked();
++    IOLockUnlock(core_.dependent_lock);
++    return saved;
++}
++CoreDisableResult UncoupledArcCoreDisable::disableActualLocked()
++{
++    if (attempted_) return {};
++    attempted_=true;
++    auto finish=[&] {return result_;};
+     if (!inputs()) return finish();const uint32_t count=*enable_.use_count;
+     if (!count) {returned(-5);return finish();}
+     bool may_disable=false;
+--- a/arc-runtime/ZornGen7ArcCoreDisable.h
++++ b/arc-runtime/ZornGen7ArcCoreDisable.h
+@@ -51,6 +51,8 @@
+     CoreDisableResult disableActual();
+ private:
+     friend class NativeVddRail;
++    friend class NativeOwnedArcEnable;
++    CoreDisableResult disableActualLocked();
+     const ActualCoreVoltageFields core_;const ActualCoreEnableFields enable_;const ActualCoreDisableFields disable_;
+     NativeCoreConsumer *const consumer_;const ActualArcFields fields_;ArcVoter *const voter_;
+     NativeCommandCache &cache_;NativeReservation &reservation_;NativeRegulatorNotifiers &notifiers_;ArcOperation driver_;
+--- a/arc-runtime/ZornGen7DarwinBoardOwner.h
++++ b/arc-runtime/ZornGen7DarwinBoardOwner.h
+@@ -368,6 +368,7 @@
+     bool arcNativeInputsAdmitted(IOService &,const uint8_t (&sourceDigest)[32]) const;
+     IOReturn bindActualArcNodeOwner(IOService &,OSObject &,IOService *const (&groups)[5]);
+     bool actualArcParentBound(size_t group,IOService &actual_parent) const;
++    IOReturn setDisplayRegisterResources(bool hold);
+     friend class ZornGen7ClockResources26;
+     friend class ZornGen7CommandDbSnapshot26;
+     friend class ZornGen7CommandDbResources26;
+--- a/arc-runtime/ZornGen7OwnedArcEnable.cpp
++++ b/arc-runtime/ZornGen7OwnedArcEnable.cpp
+@@ -74,6 +74,49 @@
+     }
+     unlockActualDependencies();return result_;
+ }
++OwnedSupplyDisableResult NativeOwnedArcEnable::disableActual(
++    UncoupledArcCoreDisable *const *operations, size_t count)
++{
++    OwnedSupplyDisableResult out{};
++    if (!operations || count != count_ || !count ||
++        result_.assessment != OwnedSupplyEnableAssessment::ForwardReturned ||
++        !result_.source_return_available || result_.source_return || !lockActualDependencies()) return out;
++
++    // Validate the full normal-release chain before allowing a leaf change.
++    // Its locks stay held across the leaf's use-count transition and the
++    // corresponding disable of the real parent consumer, if triggered.
++    for (size_t i = 0; i < count; ++i) {
++        auto &frame = *frames_[i];
++        auto *operation = operations[i];
++        if (!operation || operation->attempted_ ||
++            !operation->sameActualBindings(frame.core.voltage_, frame.core.enable_, &frame.consumer,
++                frame.core.supplier_.arc, &frame.core.supplier_.voter, cache_, reservation_, frame.core.notifiers_) ||
++            operation->disable_.has_constraints != frame.core.disable_.has_constraints ||
++            operation->disable_.constraint_always_on != frame.core.disable_.constraint_always_on ||
++            !operation->inputs()) {
++            unlockActualDependencies();
++            return out;
++        }
++    }
++    for (size_t i = 0; i < count; ++i) {
++        auto &frame = *frames_[i];
++        out.last = operations[i]->disableActualLocked();
++        if (out.last.source_return_available) {
++            ++out.calls_returned;
++            out.source_return_available = true;
++            out.source_return = out.last.source_return;
++            break;
++        }
++        if (out.last.assessment != CoreDisableAssessment::NeedsActualSupplyDisable ||
++            !out.last.consumer_decremented || !out.last.use_count_published || frame.core.use_count_ ||
++            i + 1 == count || frame.core.supply_ != &frames_[i + 1]->core ||
++            &frame.core.supply_consumer_ != &frames_[i + 1]->consumer) break;
++        ++out.calls_returned;
++    }
++    unlockActualDependencies();
++    return out;
++}
++
+ bool NativeOwnedArcEnable::lockActualDependencies()
+ {
+     constexpr uint64_t aif=(uint64_t(1)<<6)|(uint64_t(1)<<7)|(uint64_t(1)<<8);
+--- a/arc-runtime/ZornGen7OwnedArcEnable.h
++++ b/arc-runtime/ZornGen7OwnedArcEnable.h
+@@ -12,6 +12,12 @@
+     bool source_return_available;int32_t source_return;
+     uint32_t dependencies_locked,enable_calls_returned;
+     CoreEnableResult last;
++};
++struct OwnedSupplyDisableResult {
++    bool source_return_available;
++    int32_t source_return;
++    uint32_t calls_returned;
++    CoreDisableResult last;
+ };
+ struct OwnedSuppliedCoreResult {
+     OwnedCoreResult core;OwnedSupplyEnableResult upstream_enable;
+@@ -46,6 +52,7 @@
+         NativeCommandCache &,NativeReservation &,IORecursiveLock *);
+     bool prepareActualHeldStartup();
+     OwnedSupplyEnableResult enableActual();
++    OwnedSupplyDisableResult disableActual(UncoupledArcCoreDisable *const *operations, size_t count);
+     // Exact retained source family has13 distinct voter/core nodes. This is a
+     // CPU composition extent, never a K80 resource or mapping limit.
+     static constexpr size_t capacity=13;
+--- a/arc-runtime/ZornGen7OwnedArcVoltage.h
++++ b/arc-runtime/ZornGen7OwnedArcVoltage.h
+@@ -22,6 +22,7 @@
+ class NativeOwnedArcVoltage final {
+ private:
+     friend class NativeOwnedSuppliedRegulatorProxy;
++    friend class ::ZornGen7DarwinBoardOwner;
+     NativeOwnedArcVoltage(NativeOwnedArcEnable &,NativeCommandCache &,NativeReservation &);
+     OwnedSupplyVoltageResult setActualRange(int32_t,int32_t);
+     NativeOwnedArcEnable &dependencies_;

@@ -1,0 +1,11 @@
+--- a/direct-runtime/ZornGen7DirectClient26.cpp
++++ b/direct-runtime/ZornGen7DirectClient26.cpp
+@@ -307,7 +307,7 @@
+         status=vm_->map(&entry->memory,0,request->iova,permissions,request->writeback,request->shareability,&handle);
+         if(!status)++zorn_direct_coherent_import_fallbacks;
+     }
+-    if(status)return status;
++    if(status)return zorn_failure_return261(ZornFailureClientMap262,status,status==kIOReturnBadArgument?ZornFailureReject261:status==kIOReturnBusy||status==kIOReturnTimeout?ZornFailurePending261:ZornFailureBackend261,ZornFailureStatus261);
+     entry->mapped=handle;entry->iova=request->iova;entry->mapped_state=true;
+     if(end>window_peak_)window_peak_=end;
+     if(window_bytes_ && window_peak_>window_start_)clientStats(queue_base_,window_bytes_)[5]=(uint32_t)((window_peak_-window_start_)>>20);

@@ -1,0 +1,222 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -59,9 +59,9 @@
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
+-#include "ZornSerialShot270.h"
+-static ZornSerialRoi270 zornSerialShot265;
+-extern "C" bool zorn26_ui_menu_capture_ready274();
++#include "ZornSerialDock296.h"
++static ZornSerialDock296 zornSerialShot265;
++extern "C" bool zorn26_ui_dock_capture_ready296();
+ extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+@@ -1486,9 +1486,10 @@
+                 zornKnownPresent247.complete(record);
+                 // One thumbnail after real CPU copies/helpers and a mature
+                 // compositor frame. The same retained issuer lease is held.
+-                if(zorn26_ui_menu_capture_ready274() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
++                if(zorn26_ui_dock_capture_ready296() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
+                     IOLockLock(fLock);
+-                    (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
++                    if (zorn26_ui_dock_capture_ready296())
++                        (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+                         fPanelWidth,fPanelHeight,fRowBytes,fZornCheckedExtent265,record);
+                     IOLockUnlock(fLock);
+                 }
+--- a/ZornSerialShot265.h
++++ b/ZornSerialShot265.h
+@@ -9,8 +9,8 @@
+ #include <string.h>
+ #include "ZornPanicPacket236.h" // Reuse existing checked LE/CRC primitives.
+ #include "ZornCdcStream201.h"
+-struct ZornSerialShot265 {
+-    enum { Width=48,Height=104,Stride=Width*4,Pixels=Stride*Height,
++template<unsigned Width, unsigned Height> struct ZornSerialShot {
++    enum { Stride=Width*4,Pixels=Stride*Height,
+            ShotBytes=16+Pixels,Bytes=ShotBytes+16*4,PacketHeader=48 };
+     unsigned state=0; // 0 unrequested,1 requested,2 sole writer,3 immutable published
+     uint32_t crc=0;
+@@ -52,6 +52,7 @@
+         zorn_panic_le236(p,44,265);memcpy(p+PacketHeader,bytes+offset,n);return PacketHeader+n;
+     }
+ };
++using ZornSerialShot265 = ZornSerialShot<48, 104>;
+ struct ZornSerialMux265 {
+     unsigned wire=0,normal=0,offset=0;
+     bool previousShot=false;
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC c46b8de4c09e4922af79b91e3693aae6 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 30ac366e5e2f4c3ca42d18fa4fdd8866 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -862,7 +862,7 @@
+ static uint64_t zornCallbackResult222,zornCallbackViewState222,zornCallbackMapState222;
+ // The existing retained progress owner supplies cadence metadata only.
+ // Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
+-#include "ZornSerialShot270.h"
++#include "ZornSerialDock296.h"
+ extern "C" void zorn26_serial_shot_request265(void);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
+ extern "C" bool zorn26_serial_shot_ready265(void);
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"c46b8de4c09e4922af79b91e3693aae6",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"30ac366e5e2f4c3ca42d18fa4fdd8866",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1056,7 +1056,7 @@
+     return size;
+ }
+ struct ZornSerialProvider265 {
+-    enum {Bytes=ZornSerialRoi270::Bytes,PacketHeader=ZornSerialRoi270::PacketHeader};
++    enum {Bytes=ZornSerialDock296::Bytes,PacketHeader=ZornSerialDock296::PacketHeader};
+     bool ready()const{return zorn26_serial_shot_ready265();}
+     unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{return zorn26_serial_shot_packet265(out,cap,offset,tag);}
+ };
+--- a/ZornUiMenuPlan274.h
++++ b/ZornUiMenuPlan274.h
+@@ -15,6 +15,7 @@
+     const auto age=[&](){const auto now=io.nowMs();return now>=start?now-start:UINT64_MAX;};
+     s.swipe=ZornUiScene269::run(io);
+     if(s.swipe.outcome!=Outcome::Complete)return s;
++    io.afterSwipe();
+     const auto settled=age();
+     while(age()-settled<SettleMs){
+         const auto elapsed=age();
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -35,10 +35,10 @@
+ namespace {
+ uint32_t scheduled269=0,done269=0,schedulingReturned269=0;
+ uint32_t status269[64]{};
+-uint64_t captureDeadline270=0;
++uint64_t dockCaptureStart296=0;
+ void store(unsigned i,uint32_t value){__atomic_store_n(status269+i,value,__ATOMIC_RELAXED);}
+ void addFlags(uint32_t flags){__atomic_fetch_or(status269+2,flags,__ATOMIC_RELAXED);}
+-void finish(uint32_t phase){uint64_t deadline=0;clock_interval_to_deadline(20,NSEC_PER_SEC,&deadline);__atomic_store_n(&captureDeadline270,deadline,__ATOMIC_RELEASE);store(0,phase);__atomic_store_n(&done269,1u,__ATOMIC_RELEASE);}
++void finish(uint32_t phase){__atomic_store_n(&dockCaptureStart296,0,__ATOMIC_RELEASE);store(0,phase);__atomic_store_n(&done269,1u,__ATOMIC_RELEASE);}
+ bool normal(){return preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled();}
+ bool nativeK80(IOService *platform) {
+     if(!OSDynamicCast(IODTPlatformExpert,platform))return false;
+@@ -63,7 +63,14 @@
+     bool ready(){return service.hasSubscriber() && zorn26_ui_desktop_ready272();}
+     uint32_t send(const ZornContacts::Frame &frame){return uint32_t(service.submitFrame(frame));}
+     void sleepMs(uint32_t ms){IOSleep(ms);}
+-    void beforeMenu(){store(30,uint32_t(nowMs()));uint32_t values[16]{};zorn26_ui_menu_progress274(values);for(unsigned i=0;i<16;++i)store(32+i,values[i]);}
++    void afterSwipe(){
++        uint64_t start=0;
++        clock_interval_to_deadline(5,NSEC_PER_SEC,&start);
++        __atomic_store_n(&dockCaptureStart296,start,__ATOMIC_RELEASE);
++    }
++    void beforeMenu(){
++        __atomic_store_n(&dockCaptureStart296,0,__ATOMIC_RELEASE);
++        store(30,uint32_t(nowMs()));uint32_t values[16]{};zorn26_ui_menu_progress274(values);for(unsigned i=0;i<16;++i)store(32+i,values[i]);}
+ };
+ void worker(void *context,wait_result_t) {
+     auto *platform=static_cast<IOService *>(context);
+@@ -126,7 +133,10 @@
+ }
+ }
+ extern "C" bool zorn26_ui_menu_done274() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
+-extern "C" bool zorn26_ui_menu_capture_ready274(){return zorn26_ui_menu_done274() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
++extern "C" bool zorn26_ui_dock_capture_ready296(){
++    const uint64_t start=__atomic_load_n(&dockCaptureStart296,__ATOMIC_ACQUIRE);
++    return start && mach_absolute_time()>=start;
++}
+ extern "C" bool zorn26_ui_menu_snapshot274(uint32_t (&out)[64]) {
+     if(!zorn26_ui_menu_done274())return false;
+     for(unsigned i=0;i<64;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C46B8DE4C09E"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2630AC366E5E2F"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc4,0x6b,0x8d,0xe4,0xc0,0x9e,0x49,0x22,0xaf,0x79,0xb9,0x1e,0x36,0x93,0xaa,0xe6};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x30,0xac,0x36,0x6e,0x5e,0x2f,0x4c,0x3c,0xa4,0x2d,0x18,0xfa,0x4f,0xdd,0x88,0x66};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc4,0x6b,0x8d,0xe4,0xc0,0x9e,0x49,0x22,0xaf,0x79,0xb9,0x1e,0x36,0x93,0xaa,0xe6};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x30,0xac,0x36,0x6e,0x5e,0x2f,0x4c,0x3c,0xa4,0x2d,0x18,0xfa,0x4f,0xdd,0x88,0x66};
+--- /dev/null
++++ b/ZornSerialDock296.h
+@@ -0,0 +1,52 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include "ZornSerialShot270.h"
++
++// Use the same bounded immutable payload as SHOT270. A wider sample of the
++// bottom quarter retains Dock pixels and the adjacent wallpaper.
++struct ZornSerialDock296 {
++    using Shot = ZornSerialShot<104, 48>;
++    enum { Bytes=Shot::Bytes, PacketHeader=68 };
++
++private:
++    Shot image_;
++    uint32_t publication_=0,roi_[4]{};
++
++public:
++    bool request(){return image_.request();}
++    bool pending()const{
++        return __atomic_load_n(&image_.state,__ATOMIC_ACQUIRE)==1 &&
++               __atomic_load_n(&publication_,__ATOMIC_ACQUIRE)==0;
++    }
++    bool ready()const{return __atomic_load_n(&publication_,__ATOMIC_ACQUIRE)==2 && image_.ready();}
++    bool capture(const volatile uint32_t *base,uint32_t w,uint32_t h,uint32_t stride,
++                 size_t available,const uint32_t (&record)[16]){
++        const uintptr_t address=reinterpret_cast<uintptr_t>(base);
++        const uint64_t extent=uint64_t(stride)*h;
++        if(!base || (address&3u) || w<104 || h<192 || (h&3u) || w>16384 || h>16384 ||
++           (stride&3u) || uint64_t(stride)<uint64_t(w)*4 || !extent || extent>available ||
++           extent-1>UINTPTR_MAX-address)return false;
++        uint32_t empty=0;
++        if(!__atomic_compare_exchange_n(&publication_,&empty,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return false;
++        const uint32_t rows=h/4,y=h-rows;
++        const size_t offset=size_t(y)*stride;
++        roi_[0]=0;roi_[1]=y;roi_[2]=w;roi_[3]=rows;
++        const auto *crop=reinterpret_cast<const volatile uint32_t *>(
++            reinterpret_cast<const volatile uint8_t *>(base)+offset);
++        const bool ok=image_.capture(crop,w,rows,stride,available-offset,record);
++        __atomic_store_n(&publication_,ok?2u:0u,__ATOMIC_RELEASE);
++        return ok;
++    }
++    unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{
++        if(!out || cap>3072 || cap<=PacketHeader || !ready())return 0;
++        const unsigned n=image_.packet(out,cap-20,offset,tag);
++        if(n<=48)return 0;
++        memmove(out+PacketHeader,out+48,n-48);
++        memcpy(out,"K80SH296",8);
++        auto *p=reinterpret_cast<uint8_t *>(out);
++        zorn_panic_le236(p,44,296);
++        for(unsigned i=0;i<4;++i)zorn_panic_le236(p,48+4*i,roi_[i]);
++        zorn_panic_le236(p,64,zorn_panic_crc236(p,64));
++        return n+20;
++    }
++};

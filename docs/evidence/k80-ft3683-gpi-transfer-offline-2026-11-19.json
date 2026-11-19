@@ -1,0 +1,143 @@
+{
+  "live_capability": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v361-touch-geni-kernel-abi-device-2026-11-19.json",
+    "bytes": 16414,
+    "sha256": "3ec6ad87f960e6eb901edd50852952be2397fa94407d1b624d2ef62d61073796"
+  },
+  "sources": {
+    "kernel": {
+      "revision": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+      "remote": "https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git",
+      "files": [
+        {
+          "source": "drivers/spi/spi-msm-geni.c",
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/spi/spi-msm-geni.c",
+          "bytes": 85781,
+          "sha256": "b8e822b885922fea82c6b8680629b15abee4af1335f639e6c38d88c66c4af48e"
+        },
+        {
+          "source": "drivers/dma/qcom/msm_gpi.c",
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/dma/qcom/msm_gpi.c",
+          "bytes": 119397,
+          "sha256": "f237f665778e2e21e029be16986c186563a767c23dc6c7f18a6737733a2886e9"
+        },
+        {
+          "source": "drivers/dma/qcom/msm_gpi_mmio.h",
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/dma/qcom/msm_gpi_mmio.h",
+          "bytes": 9794,
+          "sha256": "ca3ad5d0414752e504f17eefe003f50b6182a6a9ea40054d20a8acec36dee391"
+        },
+        {
+          "source": "include/linux/msm_gpi.h",
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/include/linux/msm_gpi.h",
+          "bytes": 15036,
+          "sha256": "ebccb4dbc725a3c1ffbe19cc19a464d7a03ec4384835b9363fd8d08c1c95fd82"
+        },
+        {
+          "source": "include/linux/qcom-geni-se-common.h",
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/include/linux/qcom-geni-se-common.h",
+          "bytes": 15697,
+          "sha256": "06af9b89ee53bcb1662f00263809f76b508e9765b77a64dcfe9cb8bc3dffc768"
+        },
+        {
+          "source": "include/linux/soc/qcom/geni-se.h",
+          "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/include/linux/soc/qcom/geni-se.h",
+          "bytes": 15354,
+          "sha256": "fe7ef24d9cd994742d98f523578b71067334e5edd0d2825863221ff7899c9b5c"
+        }
+      ]
+    },
+    "devicetree": {
+      "revision": "e6826f9350752ebceebee4d1d4ed20e0edf4d3a4",
+      "remote": "https://github.com/MiCode/kernel_devicetree.git",
+      "files": [
+        {
+          "source": "qcom/pineapple-qupv3.dtsi",
+          "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/pineapple-qupv3.dtsi",
+          "bytes": 43106,
+          "sha256": "be7715ca9c31fda6407489c8a29d9128aa7aaf6426e2d3b40fd2c04f2abac1b5"
+        },
+        {
+          "source": "qcom/zorn-sm8650.dtsi",
+          "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/zorn-sm8650.dtsi",
+          "bytes": 16188,
+          "sha256": "cfebb6b5629928440bc2d64bbc834bbf4003cd617d553b586555d755b7537fb1"
+        }
+      ]
+    }
+  },
+  "board_route": {
+    "SE": 4,
+    "engine_MMIO": "0xa90000",
+    "gpi_MMIO": "0xa00000",
+    "gpi_span": "0x60000",
+    "gpi_ee_offset": "0x10000",
+    "gpii": 0,
+    "tx_channel": 0,
+    "rx_channel": 1,
+    "gpi_GIC_SPI": 279,
+    "SE_GIC_SPI": 357,
+    "gpi_stream": "0xb6",
+    "wrapper_stream": "0xa3",
+    "static_gpii_mask": "0x3",
+    "dynamic_gpii_mask": "0xc",
+    "tx_specifier": [
+      0,
+      4,
+      1,
+      64,
+      2
+    ],
+    "rx_specifier": [
+      1,
+      4,
+      1,
+      64,
+      2
+    ],
+    "route_source": "Fifth DMA cell 2 decoded with static mask 0x1e and shift 1 yields static selector 1; the vendor decrements to GPII 0.",
+    "maximum_sensor_hz": 15000000,
+    "chip_select": 0,
+    "gpi_ring_pool": {
+      "base": "0x100000",
+      "size": "0x100000"
+    }
+  },
+  "implementation": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/soc/sm8650/GpiSpiTransfer.h",
+    "bytes": 2831,
+    "sha256": "583d7323ca35fef6c22c597dda9aa077d31f06156736fcbf73b9d8a5b9aaa55e"
+  },
+  "scope": "Portable full-duplex mode 0, 8-bit, CS0 CONFIG0 / GO / TX DMA / RX DMA descriptors and exact terminal TRE event matching. Both DMA payload mappings and ring ownership are caller responsibilities.",
+  "checks": {
+    "source_comparison": "96 full descriptors comparisons against unchanged selected ARM64 vendor macros over FT lengths 10/93/1513/3129, all 8 source selectors, extreme and typical divisors, and >32-bit IOVAs. Invalid values and vendor completion record mutations rejected.",
+    "address_and_undefined_sanitizers": "passed",
+    "fixture": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-gpi-transfer-host/vendor-fixture.h",
+      "bytes": 1858,
+      "sha256": "35ecc3d90392b137fca0dfda60a1ce5e7bfdb5c6bcdc2ca7da6cbd0d0234666f"
+    },
+    "host_source": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-gpi-transfer-host/check.cpp",
+      "bytes": 3346,
+      "sha256": "f50ab770902de480536bd4549b0839f88436f23f8d5a83d0eca96440a7abaded"
+    },
+    "native_recipe": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-gpi-transfer-host/kernel-compile.json",
+      "bytes": 16544,
+      "sha256": "6f9bcac81cc950bb5aafce062e70d67f4fec538e49286dab198cefd06122f6ab"
+    },
+    "native_object": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-gpi-transfer-host/GpiSpiTransferKernel.cpo",
+      "bytes": 7264,
+      "sha256": "8a083a9da17aa60e7aa9084d3dd0d5adb15536a268b03224e3a5a6f43a98a746"
+    }
+  },
+  "remaining": [
+    "Resolve APPs SMMU stream ownership, coherent ring mapping and payload addressability. The vendor GPI provider owns rings on 0xb6 but the SPI client maps buffers through the QUP wrapper device described with 0xa3.",
+    "Use the fixed route to implement resource acquisition, bounded channel/event start, event ownership and CPU cache synchronization. Validate real completion and retain mappings on unknown state.",
+    "Use actual GPIO interrupt, selected FT3683 protocol and HID caller for physical contact qualification."
+  ],
+  "selected_by_runtime": false,
+  "hardware_qualified": false
+}

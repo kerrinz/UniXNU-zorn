@@ -1,0 +1,102 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 353,
+  "boot_tag": "0256ab875cf54733bcdef1fb131f359c",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/boot-package/boot.ZORN26-GPU-V353-SERIAL-UNSELECTED.img",
+    "sha256": "5e3a001ce2dc81d8b974371652df07da36cece6702fe95a826b26b70c84ac453",
+    "bytes": 11898880
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/full-link/kernel.ZORN26-DSIIDLE353.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/boot-package/inputs/kernel.macho",
+    "sha256": "a0b1363e734073d41c8d752060617249e26a7feec79c1e8b56dfba1014749ee1",
+    "bytes": 31140248
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/boot-package/verified.json",
+    "bytes": 14554,
+    "sha256": "db73895e519957d9138547edbec59ef29e23ce1121b0f2a31d4e4e1a6cb7db4f"
+  },
+  "link": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/full-link/link-result.json",
+    "bytes": 954,
+    "sha256": "6623709b84a9a9eaa31ac8ac42273f0fdb6007a1f696a6c791ce042c1b419560"
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-dsi-idle-window353/source-manifest.json",
+    "bytes": 9826,
+    "sha256": "a4db823e4bf73276fe4f70eea279c366538d840498d0b8ed40158b0fe61f3178"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v352-topology-guard-device-2026-11-19.json",
+    "bytes": 33232,
+    "sha256": "b2756cbc12add0ac4cce56a842472a4105a5fe4a77b0667cb4faa0532b3d0a11"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/dsi-idle-native-host/result.json",
+      "bytes": 2090,
+      "sha256": "4f9e013d4bcbd83239b7f661cd36576d87c8e53c3619bb52d168011cab49521e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/patch-replay.json",
+      "bytes": 729,
+      "sha256": "d00b71ecbd10ffad80dd043660dc3fe549b6a25aa01c099122113b42b603bc64"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v353-dsi-idle-window-0256ab875cf54733bcdef1fb131f359c/dsi-idle-archive-host/result.json",
+      "bytes": 4393,
+      "sha256": "c5b8b1171772536f0de260bf0e6d3381612a46adde04801eda9cd6f52e3de242"
+    }
+  ],
+  "enabled_path": "The v352 one-second 4-TE double-buffer trial with a read-only wait for an older transfer only on a lone lane-state mismatch. At most 8 one-millisecond polls within an 8000 us monotonic deadline and the observation window. Recheck all existing topology, unchanged IRQ ownership/underruns and command MDP idle. No VIG/CTL or IRQ ACK before preflight passes.",
+  "device_only_questions": [
+    "Do lone DSI lane-state refusals now clear before the bounded wait?",
+    "What are fixed-window DSI-confirmed swaps, frame interval tails, and number of failed waits?",
+    "Is the original GOP and 60-TE state restored and the entire test automatically recovered in verified TWRP?"
+  ],
+  "device_protection": {
+    "target": "92988a43/zorn/slot-a",
+    "mode": "unattended-phone-connected",
+    "boot_attempts": 1,
+    "retries": 0,
+    "watchdog_seconds": 300,
+    "recovery_timeout_seconds": 600,
+    "native_root_writes": 0,
+    "physical_contact_required": false
+  },
+  "stop_conditions": [
+    "Do not start a retry or optional reset if any DSI operation has uncertain completion.",
+    "Retain CPU alias and display resources if active back scanout or state is ambiguous.",
+    "No installation, root write or persistent slot change."
+  ],
+  "physical_frame_rate_qualified": false,
+  "hardware_qualified": false,
+  "phone_access": false
+}

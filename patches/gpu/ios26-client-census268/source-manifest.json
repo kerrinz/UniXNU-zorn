@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "purpose": "Prevent sticky diagnostic reject records from starving normal native client close evidence;reserve one in three source snapshots for round-robin all-client census,retain failure/reject slots;no GPU backend/root/probe changes",
+  "parent_source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-metal-probe267/source-manifest.json",
+    "sha256": "403eb90ff14c50e680fdd653c2cc4d618eb7aff06fa5be678cbcd4bab73ed5c5"
+  },
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v268-client-census-68353193691144bd9bae517b08d3770a",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v268-client-census-68353193691144bd9bae517b08d3770a",
+  "changes": [
+    {
+      "file": "ZornClientFailureStore261.h",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-v267-shared-probe-ddb9c8640ab544cd85cae684e0fb8f66/ZornClientFailureStore261.h",
+        "sha256": "3a970205fefe7d65f5babd8881bea36dcff63697a37ba37e2f95c4022662f4d5"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v268-client-census-68353193691144bd9bae517b08d3770a/ZornClientFailureStore261.h",
+        "sha256": "85749f8ff48b1bafafedf152192a57dcb10294c4638c88208d805ebcbb714318"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-client-census268/ZornClientFailureStore261.h.patch",
+        "sha256": "6668545600242792770828faf948b650799896c3f46f22210dce33dfe6812483"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    },
+    {
+      "file": "ZornUfsOwner26.cpp",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-v267-shared-probe-ddb9c8640ab544cd85cae684e0fb8f66/ZornUfsOwner26.cpp",
+        "sha256": "cdf32986fc7055e9e1b41b867f027c1f4c2b8e110c2d51ec01120aeb9b84dc78"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v268-client-census-68353193691144bd9bae517b08d3770a/ZornUfsOwner26.cpp",
+        "sha256": "f362817471153029ce0fc5e2ad173e667fbf6fff3539b0500dbc6c55342c3902"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-client-census268/ZornUfsOwner26.cpp.patch",
+        "sha256": "1ffcd1c32d9eb2892d6ba43d76a72d606786b1f3b837b3c81768cc2ca7d2db6b"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    },
+    {
+      "file": "ZornUsbCdc26.c",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-v267-shared-probe-ddb9c8640ab544cd85cae684e0fb8f66/ZornUsbCdc26.c",
+        "sha256": "31cdd45cad0bf01a49118c78a4e786fc56511fe07325ed1d72c3e7029cef2d7e"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v268-client-census-68353193691144bd9bae517b08d3770a/ZornUsbCdc26.c",
+        "sha256": "f3c88b1b48740d793c1245cbd433b87f0caecfca6d20f6ac964e1e4f721042be"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-client-census268/ZornUsbCdc26.c.patch",
+        "sha256": "0d33e1104d90b488dbe3ba1d93fad2a573be215ae279a7a33c99a4e1e0f95bfb"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    },
+    {
+      "file": "record-identity/ZornPlatformRecordIdentity26.h",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-v267-shared-probe-ddb9c8640ab544cd85cae684e0fb8f66/record-identity/ZornPlatformRecordIdentity26.h",
+        "sha256": "605f4aaa53dc77e14a474c37113e83247771247fc3fff3e6510ca0874c1ee845"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v268-client-census-68353193691144bd9bae517b08d3770a/record-identity/ZornPlatformRecordIdentity26.h",
+        "sha256": "8502299eb9a86e0d0c8d8ca2f12b093566b73845f48896251a53db0da694db93"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-client-census268/record-identity/ZornPlatformRecordIdentity26.h.patch",
+        "sha256": "bfc031d6c0a28e873a64e94e3e93c29e03537cacfffcb63f0082b83f53a00882"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    },
+    {
+      "file": "record-identity/ZornPlatformTrialIdentity26.h",
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/metal-v267-shared-probe-ddb9c8640ab544cd85cae684e0fb8f66/record-identity/ZornPlatformTrialIdentity26.h",
+        "sha256": "028fe2a11caa8e345ac28847d1ea1e8e62944ca4d39a2d36482e089069bb51c6"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v268-client-census-68353193691144bd9bae517b08d3770a/record-identity/ZornPlatformTrialIdentity26.h",
+        "sha256": "106b7a30117d4c5d6120f664a50d36fe6cf1ce0ec79c14cf1d4f67a84da0b364"
+      },
+      "patch": {
+        "path": "patches/gpu/ios26-client-census268/record-identity/ZornPlatformTrialIdentity26.h.patch",
+        "sha256": "ad920df97ece4c9e0395f27c67771eaae7a37896ebed9728246465a044c78d51"
+      },
+      "zero_fuzz_replay_byte_equal": true
+    }
+  ],
+  "current_source_projection": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v268-client-census-68353193691144bd9bae517b08d3770a/source-projection268.json",
+    "sha256": "332f61510a738aec68d6b48a6c40162a10af579335cbb4731b315c1f0be9426f"
+  },
+  "actual267_result": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-metal-v267-shared-probe-ddb9c8640ab544cd85cae684e0fb8f66/observed267.json",
+    "sha256": "8b5b4ed3b7baee28db5e3cc459a5a2986fd22f2de5a4e7335f61b1b8526efa09"
+  },
+  "source_checkpoint": "8067bd3836bde6a201f657109818562c3aa3f790 plus pinned262through268 patches;uncommitted,not invented tested Git revision",
+  "no_GPU_root_probe_or_native_lifecycle_change": true,
+  "Store261_ABI_layout_unchanged": true,
+  "no_disassembly_or_reverse_engineering": true,
+  "phone_access": false,
+  "hardware_qualified": false
+}

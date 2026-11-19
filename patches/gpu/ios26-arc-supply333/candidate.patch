@@ -1,0 +1,114 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -552,7 +552,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 2478447336e64832ba3daa2286739b46 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 040fa8c3eef941cb93fae9455b16dcb5 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1035,7 +1035,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"2478447336e64832ba3daa2286739b46",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"040fa8c3eef941cb93fae9455b16dcb5",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN262478447336E6"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26040FA8C3EEF9"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- /dev/null
++++ b/arc-runtime/ZornGen7CoreSupplyPresence333.h
+@@ -0,0 +1,42 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#pragma once
++
++#include "ZornGen7CoreSourceMetadata.inc"
++
++namespace ZornGen7CoreSourceMetadata {
++struct SupplyPresence {
++    unsigned char masks[group_count]{};
++};
++
++constexpr bool supplyCountsFit()
++{
++    for (size_t count : counts) {
++        if (count > 8) return false;
++    }
++    return true;
++}
++
++static_assert(sizeof(counts) / sizeof(counts[0]) == group_count);
++static_assert(supplyCountsFit());
++
++// Keep the native metadata as the only source of supply relationships.
++// Startup needs presence only, so it does not load metadata pointers at runtime.
++constexpr SupplyPresence supplyPresence = [] {
++    SupplyPresence presence{};
++    for (size_t group = 0; group < group_count; ++group) {
++        for (size_t voter = 0; voter < counts[group]; ++voter) {
++            if (groups[group][voter].upstream) {
++                presence.masks[group] |= static_cast<unsigned char>(1u << voter);
++            }
++        }
++    }
++    return presence;
++}();
++
++inline bool readSupplyPresence(size_t group, size_t voter, bool &hasUpstream)
++{
++    if (group >= group_count || voter >= counts[group]) return false;
++    hasUpstream = (supplyPresence.masks[group] & (1u << voter)) != 0;
++    return true;
++}
++}
+--- a/arc-runtime/ZornGen7OwnedArcEnable.cpp
++++ b/arc-runtime/ZornGen7OwnedArcEnable.cpp
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ #include "ZornGen7OwnedArcEnable.h"
+-#include "ZornGen7CoreSourceMetadata.inc"
++#include "ZornGen7CoreSupplyPresence333.h"
+ namespace ZornGen7Rpmh {
+ NativeOwnedArcEnable::Frame::Frame(NativeOwnedArcCore &c,NativeCoreConsumer &consumer,
+     NativeCommandCache &cache,NativeReservation &reservation):core(c),consumer(consumer),
+@@ -22,8 +22,9 @@
+         for(size_t i=0;i<count_;++i)if(&frames_[i]->core==core || locks_[i]==core->dependent_)return false;
+         // The metadata and live registered supply fields must agree. Missing
+         // acquisition cannot be hidden by passing an absent-supply view.
+-        const auto &source=ZornGen7CoreSourceMetadata::groups[core->arc_.group_][core->voter_];
+-        if(bool(source.upstream)!=core->has_supply_ || core->has_supply_!=(core->supply_!=nullptr)) {
++        bool hasUpstream = false;
++        if (!ZornGen7CoreSourceMetadata::readSupplyPresence(core->arc_.group_, core->voter_, hasUpstream) ||
++            hasUpstream != core->has_supply_ || core->has_supply_ != (core->supply_ != nullptr)) {
+             result_.assessment=OwnedSupplyEnableAssessment::NeedsActualSupply;return false;
+         }
+         frames_[count_]=::new(slots_[count_].bytes) Frame(*core,*consumer,cache_,reservation_);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x24,0x78,0x44,0x73,0x36,0xe6,0x48,0x32,0xba,0x3d,0xaa,0x22,0x86,0x73,0x9b,0x46};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x04,0x0f,0xa8,0xc3,0xee,0xf9,0x41,0xcb,0x93,0xfa,0xe9,0x45,0x5b,0x16,0xdc,0xb5};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x24,0x78,0x44,0x73,0x36,0xe6,0x48,0x32,0xba,0x3d,0xaa,0x22,0x86,0x73,0x9b,0x46};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x04,0x0f,0xa8,0xc3,0xee,0xf9,0x41,0xcb,0x93,0xfa,0xe9,0x45,0x5b,0x16,0xdc,0xb5};

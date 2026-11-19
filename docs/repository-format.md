@@ -8,7 +8,9 @@ The [official record guide](https://unixnu.com/zh/porting/records#publishing-and
 
 [UniXNU-alioth](https://github.com/FFT-infra/UniXNU-alioth) is a publication/layout reference, not K80 hardware evidence. No component or hardware completion level is inherited from another board.
 
-## Root format2 route
+## Catalog and release profiles
+
+The catalog default remains `ipados-17.7.11-21H461`. The active iOS 26 port resolves the explicit `ios-26.6.2-23G90` profile and separate defconfig. The [build guide](build-and-debug.md#23g90-原生-release) shows how to prepare the pinned upstream checkout and run the local native release. The details below describe the historical default and its migration.
 
 - `board.toml` selects ARM64, `zorn-sm8650`, `ipados-17.7.11-21H461`, and the device layer.
 - `feeds.toml` selects tracked `soc/sm8650/`. This board-local resource slice is pinned by the enclosing device commit, not an invented external SoC repository or independent source revision.

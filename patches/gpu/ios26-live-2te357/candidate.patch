@@ -1,0 +1,130 @@
+--- a/ZornDpuAutoRefreshTransfer340.h
++++ b/ZornDpuAutoRefreshTransfer340.h
+@@ -28,7 +28,8 @@
+ };
+ inline constexpr uint32_t DeadlineUs = 1350000;
+ inline constexpr uint32_t MaxPolls = 1350;
+-enum class Mode : uint32_t { Inherited = InheritedAutoConfig, FourTe = 0x80000004 };
++constexpr uint32_t LiveAutoConfig = 0x80000002;
++enum class Mode : uint32_t { Inherited = InheritedAutoConfig, Live = LiveAutoConfig };
+ enum Refusal : uint32_t {
+     CtlBusy = 1, AutoBusy = 2, TearOwned = 4, DsiOwnedOrError = 8,
+     ArmLease = 16, ArmAck = 32, ArmRead = 64, ArmDirty = 128, ArmDeadline = 256,
+@@ -64,9 +65,9 @@
+     if (timing) *timing = {};
+     const uint32_t configExpected = uint32_t(mode);
+     out[Status] = AutoConfigChanged;
+-    if (mode != Mode::Inherited && (mode != Mode::FourTe || !target)) return;
+-    const uint32_t deadlineUs = mode == Mode::FourTe ? 100000 : DeadlineUs;
+-    const uint32_t maxPolls = mode == Mode::FourTe ? 100 : MaxPolls;
++    if (mode != Mode::Inherited && (mode != Mode::Live || !target)) return;
++    const uint32_t deadlineUs = mode == Mode::Live ? 100000 : DeadlineUs;
++    const uint32_t maxPolls = mode == Mode::Live ? 100 : MaxPolls;
+     out[Status] = LeaseUnavailable;
+     if (!port.lease()) return;
+     uint32_t ctl = 0, active = 0, fetch = 0, addr0 = 0, addr1 = 0, stride0 = 0, stride1 = 0;
+@@ -114,7 +115,7 @@
+     // The live path saw DSI lane stop-state change during the inherited
+     // periodic transfer. Wait for the existing transfer, with no writes or
+     // ownership changes. A static route mismatch never enters the wait.
+-    if (mode == Mode::FourTe && deadline && topology == DsiLaneStateMismatch &&
++    if (mode == Mode::Live && deadline && topology == DsiLaneStateMismatch &&
+         out[InitialAutoConfig] == configExpected && !transportOwned()) {
+         const uint32_t originalUnderruns = underruns, originalTearEnable = out[InitialTearEnable];
+         const uint32_t originalDsiEnable = out[InitialDsi] & Cmd::DsiEnableMask;
+--- a/ZornK80AutorefreshPeriod347.h
++++ b/ZornK80AutorefreshPeriod347.h
+@@ -10,7 +10,7 @@
+ namespace Cmd = Auto::Cmd;
+ constexpr uint32_t Enabled = 1u << 31, ExternalTe = 1u << 20;
+ constexpr uint32_t TearSyncVsync = 0x288;
+-constexpr uint32_t Inherited = Enabled | 60, Comparison = Enabled | 4;
++constexpr uint32_t Inherited = Enabled | 60, Comparison = Auto::LiveAutoConfig;
+ constexpr unsigned DrainPolls = 25, DrainPollMs = 2;
+ 
+ enum class State { NotQualified, StartChanged, TeDetached, Disabled, Drained, TeRestored, Applied };
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -42,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT355", 8);
++    memcpy(p, "K80FT357", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 355);
++    zorn_panic_le236(p, Bytes - 4, 357);
+     return Bytes;
+ }
+ }
+--- a/ZornScanoutLive348.h
++++ b/ZornScanoutLive348.h
+@@ -21,7 +21,7 @@
+     if (!buffers.stage(seq, swap, target, queued, ready)) return false;
+     const uint32_t current = target == ZORN_SCANOUT_BACK ? ZORN_SCANOUT_FRONT : ZORN_SCANOUT_BACK;
+     Dpu::Timing times{};
+-    Dpu::run(port, current, ZORN_SCANOUT_STRIDE, report, target, Dpu::Mode::FourTe, &times, deadline);
++    Dpu::run(port, current, ZORN_SCANOUT_STRIDE, report, target, Dpu::Mode::Live, &times, deadline);
+     if (guard) *guard = times.guard;
+     if (wait) *wait = times.wait;
+     if (!report[Dpu::Sequence]) {
+--- a/ZornScanoutTrace348.h
++++ b/ZornScanoutTrace348.h
+@@ -3,7 +3,7 @@
+ #include <stdint.h>
+ 
+ namespace ZornScanoutTrace348 {
+-constexpr unsigned WindowUs = 1000000;
++constexpr unsigned WindowUs = 500000;
+ constexpr unsigned MaxFlips = 32;
+ constexpr unsigned FrameWords = 4;
+ enum Field : unsigned {
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3a359a2cc76741bb8fe6d2479fdba090 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 64a3b41d79624622876ac6ab52f2940e %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"3a359a2cc76741bb8fe6d2479fdba090",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"64a3b41d79624622876ac6ab52f2940e",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN263A359A2CC767"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2664A3B41D7962"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x3a,0x35,0x9a,0x2c,0xc7,0x67,0x41,0xbb,0x8f,0xe6,0xd2,0x47,0x9f,0xdb,0xa0,0x90};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x64,0xa3,0xb4,0x1d,0x79,0x62,0x46,0x22,0x87,0x6a,0xc6,0xab,0x52,0xf2,0x94,0x0e};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x3a,0x35,0x9a,0x2c,0xc7,0x67,0x41,0xbb,0x8f,0xe6,0xd2,0x47,0x9f,0xdb,0xa0,0x90};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x64,0xa3,0xb4,0x1d,0x79,0x62,0x46,0x22,0x87,0x6a,0xc6,0xab,0x52,0xf2,0x94,0x0e};

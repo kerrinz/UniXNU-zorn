@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": 304,
+  "date": "2026-11-18",
+  "status": "offline_candidate_built_and_host_verified_unselected",
+  "hardware_executed": false,
+  "hardware_qualified": false,
+  "purpose": "Regress known-image CRC718ed2ce (16 Metal 32x32 draws + 120 checkerboard presents) and 4-client Close lifecycle on top of the complete v298..v303 GPU/IOKit backend.",
+  "boot_tag": "0be155cdfde4411f93520b789b400071",
+  "probe_program_tag": "6935d159a82f4f439220151fdfda884a",
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-known-lifecycle304/source-manifest.json",
+    "sha256": "c10398ba078ef5b598c20026d2adae2b4b650f2bbeb3c4aeb90c35f3b253e35b"
+  },
+  "candidate_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-known-lifecycle304/candidate.patch",
+    "sha256": "132f453f6d7547c3123a248eeb214779b67a7df4eea06c958363c6461f000b7e"
+  },
+  "kernel": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v304-known-lifecycle-0be155cdfde4411f93520b789b400071/full-link/kernel.ZORN26-ASYNC290.UNSELECTED.macho",
+    "sha256": "c47b3b152343db0e11e6de5c8511c294d8b09949468a6f0ec7b139198b02f615",
+    "bytes": 31051152,
+    "compiled_objects": 33,
+    "link_inputs": 1399,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v304-known-lifecycle-0be155cdfde4411f93520b789b400071/boot-package/boot.ZORN26-GPU-V304-KNOWN-UNSELECTED.img",
+    "sha256": "3ce925a9a05d69ce171eecb1b31e52eec413071424ed6ea8b9c3b582083d6e80",
+    "bytes": 11866112
+  },
+  "ADT": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v294-compact-observer-lock-d5b866f0c9854baa9cdf97e878dd6e5a/boot-package/inputs/kernel.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v304-known-lifecycle-0be155cdfde4411f93520b789b400071/boot-package/inputs/kernel.adt",
+    "sha256": "fdfc0ae79e37314543f10061d56a35c76d010f897107b54e39978fc5caa24a01",
+    "bytes": 49224
+  },
+  "FD": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v294-compact-observer-lock-d5b866f0c9854baa9cdf97e878dd6e5a/boot-package/inputs/firmware.fd",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v304-known-lifecycle-0be155cdfde4411f93520b789b400071/boot-package/inputs/firmware.fd",
+    "sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "bytes": 3145728
+  },
+  "root": {
+    "target_image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v293-fixed-work-92a822b29de345b6ae033dd0149c5388/root-candidate/ios26-root-fixed-work293.UNSELECTED.hfsx",
+    "target_sha256": "933476094a89d0e373392ec144b48bab1cbe537e3eeef44635d7693873570de5",
+    "delta_from_installed_v297_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "changed_pages": 40,
+    "write_groups": 19,
+    "layout_and_replay": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v304-known-lifecycle-0be155cdfde4411f93520b789b400071/root-delta-from-v297/layout-and-replay-result.json",
+      "sha256": "6e65929ee54aeb84185f128b09b59fb4d2286260ee755bc8d8f9b27a401a54c2"
+    }
+  },
+  "native_closure": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v304-known-lifecycle-0be155cdfde4411f93520b789b400071/close-source-closure304.json",
+    "sha256": "3593bd055f328083f46c5504fffd4a1f2a0273aceb3d5dab6fd07cb4610fed7e"
+  }
+}

@@ -36,6 +36,7 @@ ACTUAL_COHERENCE
 ACTUAL_COHERENT_MAPPING
 struct MemoryFixture {unsigned refs=1,cacheReads=0;bool isImport=false,quarantined=false;IOReturn retireRaw=0,cacheRaw=0;
  IOReturn retireAfterQuiescence(){assert(routeGateHeld);if(retireRaw)return retireRaw;assert(refs);--refs;return 0;}
+ unsigned deviceReferences()const{return refs;}
  bool imported()const{return isImport;}size_t bytes()const{return 4096;}
  IOReturn acquireDeviceWrites(size_t at,size_t n){assert(routeGateHeld&&at==0&&n==4096);++cacheReads;return cacheRaw;}
  void quarantine(){quarantined=true;}
@@ -62,6 +63,10 @@ ACTUAL_GATE
  methods='\n'.join(extract(ring,n) for n in ['NativeAdrenoRingFence NativeAdrenoRing::wait(','NativeAdrenoRingFence NativeAdrenoRing::observeFence('])+'\n'+'\n'.join(extract(submit,n) for n in ['IOReturn ZornGen7DirectSubmit26::poison(','ZornGen7DirectSubmit26::Job *ZornGen7DirectSubmit26::find(','IOReturn ZornGen7DirectSubmit26::release(','IOReturn ZornGen7DirectSubmit26::wait(','IOReturn ZornGen7DirectSubmit26::waitAll('])+'\n'+'\n'.join(extract(vm,n) for n in ['ZornGen7DirectVm26::Mapping *ZornGen7DirectVm26::find(','IOReturn ZornGen7DirectVm26::fail(','IOReturn ZornGen7DirectVm26::acquireImported(','IOReturn ZornGen7DirectVm26::retireJobAfterCompletion(','IOReturn ZornGen7DirectVm26::retireSubmissionResourcesAfterCompletion(','void ZornGen7DirectVm26::noteSurfaceCompletion246('])
  methods=methods.replace('ZornSmmuSparse4KStatus status','unsigned status')
  code=code.replace('ACTUAL_METHODS',methods)
+ if 'zorn_failure_' in methods:
+  paths.append(S/'ZornClientFailure261.h')
+  code=('#include '+json.dumps(str(paths[-1]))+'\n'
+        'extern "C" void zorn_failure_note261(uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t) {}\n'+code)
  tests=r'''
 struct Fixture {ZornGen7DirectSubmit26 s;MemoryFixture ib,output,readOnly;
  Fixture(){begins=ends=cacheInsideGate=surfaceCalls=0;surfaceFence=0;zorn_direct_io_coherent=0;assert(!routeGateHeld);

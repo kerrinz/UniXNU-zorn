@@ -1,0 +1,20 @@
+--- a/ZornClientFailureStore261.h
++++ b/ZornClientFailureStore261.h
+@@ -98,8 +98,15 @@
+  bool snapshot(uint32_t completedFrames,ZornClientFailure261&out){
+   if(!lock())return false;out={};unsigned failures=0,rejects=0;
+   for(const auto&s:slots_){failures+=s.record.failure.sequence!=0;rejects+=s.record.reject.sequence!=0;}
+-  const bool wantFailure=failures&&(!(completedFrames&1u)||!rejects),wantReject=rejects&&!wantFailure;
+-  const unsigned count=wantFailure?failures:wantReject?rejects:records_;unsigned index=count?completedFrames%count:0;
++  // A sticky unsupported capability query must not hide every other client's
++  // successful Close. Keep dedicated failure/reject priority snapshots and
++  // reserve every third snapshot for all registered clients,including closes.
++  // Advance the per-class cursor independently of its phase to avoid modulo
++  // aliasing when the client count shares factors with the three-phase cycle.
++  const unsigned phase=completedFrames%3u,round=completedFrames/3u;
++  const bool wantFailure=phase!=2u&&failures&&(phase==0u||!rejects);
++  const bool wantReject=phase!=2u&&rejects&&!wantFailure;
++  const unsigned count=wantFailure?failures:wantReject?rejects:records_;unsigned index=count?round%count:0;
+   for(const auto&s:slots_){const bool take=wantFailure?s.record.failure.sequence!=0:wantReject?s.record.reject.sequence!=0:s.record.id!=0;
+    if(take&&!index--){out=s.record;const auto done=completion(s);
+     if(done&1u){out.flags|=ZornFailureClosed261;if(uint32_t(done>>32))out.flags|=ZornFailureCloseFailed261;out.closeRaw=uint32_t(done>>32);}

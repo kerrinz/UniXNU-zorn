@@ -1,0 +1,99 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -2009,10 +2009,22 @@
+             return true;
+         }
+         const unsigned index = live->out[Trace348::Attempts];
++        const unsigned completion = live->out[Trace348::Completed];
+         const uint32_t swapId = swapWord(swap, SWAP_ID);
++        // Under the writer lock, the visible and newly written buffers are
++        // distinct, stable and cover the same validated K80 scanout geometry.
++        // The signature samples visible RGB only, and adds no framebuffer stores.
++        const uint32_t visibleRgb = RuntimeFrame341::signature(previousPixels, fRowBytes);
++        const uint32_t readyRgb = RuntimeFrame341::signature(target, fRowBytes);
++        if (mach_absolute_time() >= live->deadline) {
++            IOLockUnlock(fLock);
++            return true;
++        }
+         uint32_t guard = 0;
+         wrotePixels = live->transfer(*live, swapId, targetAddress,
+             phase ? zornDisplayUptimeUs348(phase->queued) : 0, zornDisplayUptimeUs348(drawn), guard);
++        if (wrotePixels && visibleRgb != readyRgb && completion < Trace348::MaxFlips)
++            live->phase[ZornScanoutPhase349::SampledRgbChanged] |= 1u << completion;
+         ZornScanoutPhase349::pack(live->phase + index * ZornScanoutPhase349::RecordWords, swapId,
+             phase ? *phase : ZornSwapPhases349{}, drawStarted, drawn,
+             live->out[Trace348::LastTransfer], guard, wrotePixels, zornDisplayUptimeUs348);
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -42,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT353", 8);
++    memcpy(p, "K80FT354", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 353);
++    zorn_panic_le236(p, Bytes - 4, 354);
+     return Bytes;
+ }
+ }
+--- a/ZornScanoutPhase349.h
++++ b/ZornScanoutPhase349.h
+@@ -14,7 +14,7 @@
+ constexpr unsigned RecordWords = 4;
+ enum AdmissionField : unsigned {
+     AdmitStatus = ZornScanoutTrace348::MaxFlips * RecordWords,
+-    LockAttempts, LockWaitUs, WriterFlags, Vig0Source, Vig1Source, SecondBufferCacheOption, PriorDsiWaitAttempts, PriorDsiWaitIdle, PriorDsiWaitMaxUs, Words,
++    LockAttempts, LockWaitUs, WriterFlags, Vig0Source, Vig1Source, SecondBufferCacheOption, PriorDsiWaitAttempts, PriorDsiWaitIdle, PriorDsiWaitMaxUs, SampledRgbChanged, Words,
+ };
+ enum Admission : uint32_t {
+     NotRequested, ContextUnavailable, NoPresenter, RequestPending, Deadline,
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 0256ab875cf54733bcdef1fb131f359c %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 8c12d48086e14a3385be13043e8a7ce0 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"0256ab875cf54733bcdef1fb131f359c",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"8c12d48086e14a3385be13043e8a7ce0",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN260256AB875CF5"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN268C12D48086E1"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x02,0x56,0xab,0x87,0x5c,0xf5,0x47,0x33,0xbc,0xde,0xf1,0xfb,0x13,0x1f,0x35,0x9c};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x8c,0x12,0xd4,0x80,0x86,0xe1,0x4a,0x33,0x85,0xbe,0x13,0x04,0x3e,0x8a,0x7c,0xe0};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x02,0x56,0xab,0x87,0x5c,0xf5,0x47,0x33,0xbc,0xde,0xf1,0xfb,0x13,0x1f,0x35,0x9c};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x8c,0x12,0xd4,0x80,0x86,0xe1,0x4a,0x33,0x85,0xbe,0x13,0x04,0x3e,0x8a,0x7c,0xe0};

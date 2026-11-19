@@ -1,0 +1,401 @@
+--- a/ZornGen7IccHlosSource26.inc
++++ b/ZornGen7IccHlosSource26.inc
+@@ -22,6 +22,65 @@
+ constexpr uint32_t links_16[]={16u};
+ constexpr uint32_t links_17[]={512u};
+ constexpr uint32_t links_18[]={0u};
++constexpr uint32_t display_links_qnm_gemnoc_cnoc[]={515u,532u,533u,552u,570u,571u,572u,579u,581u};
++constexpr uint32_t display_links_qnm_gemnoc_pcie[]={584u};
++constexpr uint32_t display_links_qhs_aoss[]={0u};
++constexpr uint32_t display_links_qhs_ipa[]={0u};
++constexpr uint32_t display_links_qhs_ipc_router[]={0u};
++constexpr uint32_t display_links_qhs_tme_cfg[]={0u};
++constexpr uint32_t display_links_qss_apss[]={0u};
++constexpr uint32_t display_links_qss_cfg[]={35u};
++constexpr uint32_t display_links_qss_ddrss_cfg[]={0u};
++constexpr uint32_t display_links_qxs_imem[]={0u};
++constexpr uint32_t display_links_srvc_cnoc_main[]={0u};
++constexpr uint32_t display_links_xs_pcie_0[]={0u};
++constexpr uint32_t display_links_qsm_cfg[]={513u,514u,516u,517u,518u,519u,520u,521u,522u,523u,524u,525u,526u,527u,528u,529u,530u,531u,534u,535u,536u,537u,538u,539u,540u,541u,542u,543u,544u,545u,546u,547u,548u,549u,550u,551u,553u,554u,555u,556u,573u,574u,575u,580u,585u,586u};
++constexpr uint32_t display_links_qhs_ahb2phy0[]={0u};
++constexpr uint32_t display_links_qhs_ahb2phy1[]={0u};
++constexpr uint32_t display_links_qhs_camera_cfg[]={0u};
++constexpr uint32_t display_links_qhs_clk_ctl[]={0u};
++constexpr uint32_t display_links_qhs_cpr_cx[]={0u};
++constexpr uint32_t display_links_qhs_cpr_hmx[]={0u};
++constexpr uint32_t display_links_qhs_cpr_mmcx[]={0u};
++constexpr uint32_t display_links_qhs_cpr_mxa[]={0u};
++constexpr uint32_t display_links_qhs_cpr_mxc[]={0u};
++constexpr uint32_t display_links_qhs_cpr_nspcx[]={0u};
++constexpr uint32_t display_links_qhs_crypto0_cfg[]={0u};
++constexpr uint32_t display_links_qhs_cx_rdpm[]={0u};
++constexpr uint32_t display_links_qhs_display_cfg[]={0u};
++constexpr uint32_t display_links_qhs_gpuss_cfg[]={0u};
++constexpr uint32_t display_links_qhs_i2c[]={0u};
++constexpr uint32_t display_links_qhs_i3c_ibi0_cfg[]={0u};
++constexpr uint32_t display_links_qhs_i3c_ibi1_cfg[]={0u};
++constexpr uint32_t display_links_qhs_imem_cfg[]={0u};
++constexpr uint32_t display_links_qhs_mss_cfg[]={0u};
++constexpr uint32_t display_links_qhs_mx_2_rdpm[]={0u};
++constexpr uint32_t display_links_qhs_mx_rdpm[]={0u};
++constexpr uint32_t display_links_qhs_pcie0_cfg[]={0u};
++constexpr uint32_t display_links_qhs_pcie1_cfg[]={0u};
++constexpr uint32_t display_links_qhs_pcie_rscc[]={0u};
++constexpr uint32_t display_links_qhs_pdm[]={0u};
++constexpr uint32_t display_links_qhs_prng[]={0u};
++constexpr uint32_t display_links_qhs_qdss_cfg[]={0u};
++constexpr uint32_t display_links_qhs_qspi[]={0u};
++constexpr uint32_t display_links_qhs_qup02[]={0u};
++constexpr uint32_t display_links_qhs_qup1[]={0u};
++constexpr uint32_t display_links_qhs_qup2[]={0u};
++constexpr uint32_t display_links_qhs_sdc2[]={0u};
++constexpr uint32_t display_links_qhs_sdc4[]={0u};
++constexpr uint32_t display_links_qhs_spss_cfg[]={0u};
++constexpr uint32_t display_links_qhs_tcsr[]={0u};
++constexpr uint32_t display_links_qhs_tlmm[]={0u};
++constexpr uint32_t display_links_qhs_ufs_mem_cfg[]={0u};
++constexpr uint32_t display_links_qhs_usb3_0[]={0u};
++constexpr uint32_t display_links_qhs_venus_cfg[]={0u};
++constexpr uint32_t display_links_qhs_vsense_ctrl_cfg[]={0u};
++constexpr uint32_t display_links_qss_mnoc_cfg[]={36u};
++constexpr uint32_t display_links_qss_nsp_qtb_cfg[]={0u};
++constexpr uint32_t display_links_qss_pcie_anoc_cfg[]={37u};
++constexpr uint32_t display_links_srvc_cnoc_cfg[]={0u};
++constexpr uint32_t display_links_xs_qdss_stm[]={0u};
++constexpr uint32_t display_links_xs_sys_tcu_cfg[]={0u};
+ constexpr Node nodes[]={
+  {"alm_gpu_tcu",0u,0u,1u,8u,0u,0u,false,false,true,links_0,2},
+  {"alm_sys_tcu",1u,0u,1u,8u,0u,0u,false,false,true,links_1,2},
+@@ -42,20 +101,86 @@
+  {"qns_pcie",568u,0u,1u,8u,0u,0u,false,false,false,links_16,1},
+  {"llcc_mc",4u,1u,4u,4u,0u,0u,false,false,false,links_17,1},
+  {"ebi",512u,1u,4u,4u,0u,0u,false,false,false,links_18,0},
++ {"qnm_gemnoc_cnoc",15u,2u,1u,16u,0u,0u,false,false,false,display_links_qnm_gemnoc_cnoc,9},
++ {"qnm_gemnoc_pcie",16u,2u,1u,8u,0u,0u,false,false,false,display_links_qnm_gemnoc_pcie,1},
++ {"qhs_aoss",515u,2u,1u,4u,0u,0u,false,false,false,display_links_qhs_aoss,0},
++ {"qhs_ipa",532u,2u,1u,4u,0u,0u,false,false,false,display_links_qhs_ipa,0},
++ {"qhs_ipc_router",533u,2u,1u,4u,0u,0u,false,false,false,display_links_qhs_ipc_router,0},
++ {"qhs_tme_cfg",552u,2u,1u,4u,0u,0u,false,false,false,display_links_qhs_tme_cfg,0},
++ {"qss_apss",570u,2u,1u,4u,0u,0u,false,false,false,display_links_qss_apss,0},
++ {"qss_cfg",571u,2u,1u,4u,0u,0u,false,false,false,display_links_qss_cfg,1},
++ {"qss_ddrss_cfg",572u,2u,1u,4u,0u,0u,false,false,false,display_links_qss_ddrss_cfg,0},
++ {"qxs_imem",579u,2u,1u,8u,0u,0u,false,false,false,display_links_qxs_imem,0},
++ {"srvc_cnoc_main",581u,2u,1u,4u,0u,0u,false,false,false,display_links_srvc_cnoc_main,0},
++ {"xs_pcie_0",584u,2u,1u,8u,0u,0u,false,false,false,display_links_xs_pcie_0,0},
++ {"qsm_cfg",35u,3u,1u,4u,0u,0u,false,false,false,display_links_qsm_cfg,46},
++ {"qhs_ahb2phy0",513u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_ahb2phy0,0},
++ {"qhs_ahb2phy1",514u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_ahb2phy1,0},
++ {"qhs_camera_cfg",516u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_camera_cfg,0},
++ {"qhs_clk_ctl",517u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_clk_ctl,0},
++ {"qhs_cpr_cx",518u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cpr_cx,0},
++ {"qhs_cpr_hmx",519u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cpr_hmx,0},
++ {"qhs_cpr_mmcx",520u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cpr_mmcx,0},
++ {"qhs_cpr_mxa",521u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cpr_mxa,0},
++ {"qhs_cpr_mxc",522u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cpr_mxc,0},
++ {"qhs_cpr_nspcx",523u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cpr_nspcx,0},
++ {"qhs_crypto0_cfg",524u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_crypto0_cfg,0},
++ {"qhs_cx_rdpm",525u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_cx_rdpm,0},
++ {"qhs_display_cfg",526u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_display_cfg,0},
++ {"qhs_gpuss_cfg",527u,3u,1u,8u,0u,0u,false,false,false,display_links_qhs_gpuss_cfg,0},
++ {"qhs_i2c",528u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_i2c,0},
++ {"qhs_i3c_ibi0_cfg",529u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_i3c_ibi0_cfg,0},
++ {"qhs_i3c_ibi1_cfg",530u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_i3c_ibi1_cfg,0},
++ {"qhs_imem_cfg",531u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_imem_cfg,0},
++ {"qhs_mss_cfg",534u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_mss_cfg,0},
++ {"qhs_mx_2_rdpm",535u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_mx_2_rdpm,0},
++ {"qhs_mx_rdpm",536u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_mx_rdpm,0},
++ {"qhs_pcie0_cfg",537u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_pcie0_cfg,0},
++ {"qhs_pcie1_cfg",538u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_pcie1_cfg,0},
++ {"qhs_pcie_rscc",539u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_pcie_rscc,0},
++ {"qhs_pdm",540u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_pdm,0},
++ {"qhs_prng",541u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_prng,0},
++ {"qhs_qdss_cfg",542u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_qdss_cfg,0},
++ {"qhs_qspi",543u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_qspi,0},
++ {"qhs_qup02",544u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_qup02,0},
++ {"qhs_qup1",545u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_qup1,0},
++ {"qhs_qup2",546u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_qup2,0},
++ {"qhs_sdc2",547u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_sdc2,0},
++ {"qhs_sdc4",548u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_sdc4,0},
++ {"qhs_spss_cfg",549u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_spss_cfg,0},
++ {"qhs_tcsr",550u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_tcsr,0},
++ {"qhs_tlmm",551u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_tlmm,0},
++ {"qhs_ufs_mem_cfg",553u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_ufs_mem_cfg,0},
++ {"qhs_usb3_0",554u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_usb3_0,0},
++ {"qhs_venus_cfg",555u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_venus_cfg,0},
++ {"qhs_vsense_ctrl_cfg",556u,3u,1u,4u,0u,0u,false,false,false,display_links_qhs_vsense_ctrl_cfg,0},
++ {"qss_mnoc_cfg",573u,3u,1u,4u,0u,0u,false,false,false,display_links_qss_mnoc_cfg,1},
++ {"qss_nsp_qtb_cfg",574u,3u,1u,4u,0u,0u,false,false,false,display_links_qss_nsp_qtb_cfg,0},
++ {"qss_pcie_anoc_cfg",575u,3u,1u,4u,0u,0u,false,false,false,display_links_qss_pcie_anoc_cfg,1},
++ {"srvc_cnoc_cfg",580u,3u,1u,4u,0u,0u,false,false,false,display_links_srvc_cnoc_cfg,0},
++ {"xs_qdss_stm",585u,3u,1u,4u,0u,0u,false,false,false,display_links_xs_qdss_stm,0},
++ {"xs_sys_tcu_cfg",586u,3u,1u,8u,0u,0u,false,false,false,display_links_xs_sys_tcu_cfg,0},
+ };
+ constexpr size_t bcm_nodes_0[]={15u};
+ constexpr size_t bcm_nodes_1[]={0u,1u,2u,3u,4u,6u,7u,8u,9u,10u,11u,12u,13u,14u,16u};
+ constexpr size_t bcm_nodes_2[]={18u};
+ constexpr size_t bcm_nodes_3[]={18u};
++constexpr size_t display_members_CN0[]={31u,32u,33u,34u,35u,36u,37u,38u,39u,40u,41u,42u,43u,45u,47u,48u,49u,50u,51u,52u,53u,54u,55u,56u,57u,58u,59u,63u,64u,65u,66u,67u,68u,69u,70u,71u,72u,73u,74u,75u,76u,77u,19u,20u,21u,22u,23u,24u,25u,26u,27u,28u,29u,30u};
++constexpr size_t display_members_CN1[]={44u,46u,60u,61u,62u};
+ constexpr Bcm bcms[]={
+  {"SH0",0u,0u,0u,0u,true,false,false,bcm_nodes_0,1},
+  {"SH1",0u,1u,0u,0u,false,false,true,bcm_nodes_1,15},
+  {"ACV",1u,1u,2u,0u,false,false,false,bcm_nodes_2,1},
+  {"MC0",1u,0u,0u,0u,true,false,false,bcm_nodes_3,1},
++ {"CN0",2u,1u,0u,0u,true,false,false,display_members_CN0,54},
++ {"CN1",3u,0u,0u,0u,false,false,false,display_members_CN1,5},
+ };
+ constexpr uint32_t gpu_path[]={17u,561u,4u,512u};
+ // Actual K80 QTB interconnect:MASTER_GPU_TCU -> SLAVE_LLCC -> MASTER_LLCC -> EBI1.
+ constexpr uint32_t tbu_path[]={0u,561u,4u,512u};
+ constexpr size_t tbu_path_count=sizeof(tbu_path)/sizeof(*tbu_path);
+-constexpr size_t node_count=19,bcm_count=4,path_count=4;
++constexpr uint32_t display_path[]={3u,559u,15u,571u,35u,526u};
++constexpr uint32_t bcm_provider_masks[]={1u,1u,2u,2u,12u,8u};
++constexpr size_t provider_count=4,node_count=78,bcm_count=6,max_bcm_members=54,path_count=4;
++constexpr size_t display_path_count=6,gpu_startup_bcm_count=4;
+ }
+--- a/ZornGen7IccVoter26.cpp
++++ b/ZornGen7IccVoter26.cpp
+@@ -53,7 +53,7 @@
+ };
+ struct BcmRecord {
+     const Source::Bcm &source;
+-    NativeNode *nodes[15]{};size_t count;
++    NativeNode *nodes[Source::max_bcm_members]{};size_t count;
+     uint32_t address,unit,enable,perf;uint16_t width;uint8_t vcd,reserved;
+     uint64_t scale;bool keepalive,early,qosProxy;
+     ActualBcmFields fields;NativeBcm bcm;NativeBcmVoterOperation::Owner *operation=nullptr;
+@@ -63,7 +63,7 @@
+         source(s),count(s.count),address(address),unit(le32(aux)?le32(aux):1u),enable(s.enable),perf(s.perf),
+         width(uint16_t(aux[4]|uint16_t(aux[5])<<8)),vcd(aux[6]),reserved(aux[7]),scale(s.scale?s.scale:1000u),
+         keepalive(s.keepalive),early(s.early),qosProxy(s.qosProxy),
+-        fields{nodes,15,&count,&enable,&perf,&unit,&width,&scale,&keepalive,&early},bcm(v,fields)
++        fields{nodes,Source::max_bcm_members,&count,&enable,&perf,&unit,&width,&scale,&keepalive,&early},bcm(v,fields)
+         {if(!width)width=1;} // Exact qcom_icc_bcm_init normalization,not guessed hardware data.
+     static void *operator new(size_t,void *p)noexcept{return p;}
+ };
+@@ -90,7 +90,7 @@
+     Domain *domain=nullptr;ZornGen7Icc::NativeVoter *voter=nullptr;
+     ZornGen7Rpmh::NativeBatchSlot sleep,wake;
+     ZornGen7Rpmh::NativeBatchController *batch=nullptr;
+-    ProviderRecord *providers[2]{};NodeRecord *nodes[Source::node_count]{};
++    ProviderRecord *providers[Source::provider_count]{};NodeRecord *nodes[Source::node_count]{};
+     BcmRecord *bcms[Source::bcm_count]{};
+     ZornGen7Icc::ActualBcmCommandFields commands[Source::bcm_count]{};
+     ZornGen7Icc::ActualVoterRpmhFields transport{};
+@@ -100,6 +100,9 @@
+     ZornGen7Icc::NativeRequest *tbuRequests[Source::tbu_path_count]{};
+     ZornGen7Icc::NativePath *tbuPath=nullptr;
+     ZornGen7Icc::NativeConstraintApplication::Owner *tbuBandwidth=nullptr;
++    NativeRequest *displayRequests[Source::display_path_count]{};
++    NativeConstraintApplication::Owner *displayBandwidth=nullptr;
++    bool displayHeld=false,displayRetained=false;
+     bool tbuRaiseAttempted=false,tbuRaised=false,tbuLowerAttempted=false,tbuLowered=false;
+     IccApplyResult tbuRaiseResult{},tbuLowerResult{};
+     bool attempted=false,ready=false,graphAttempted=false,graphReady=false;
+@@ -203,7 +206,7 @@
+     // version-qualified snapshot before publishing any native BCM command row.
+     for(size_t i=0;i<Source::bcm_count;++i) {
+         const auto &src=Source::bcms[i];const size_t len=strlen(src.name);
+-        if(!len || len>8 || !src.count || src.count>15 || src.provider>=2)return false;
++        if(!len || len>8 || !src.count || src.count>Source::max_bcm_members || src.provider>=Source::provider_count)return false;
+         uint32_t address=0;uint8_t copiedAux[8]{};const uint8_t *actualAux=nullptr;
+         if(s.resourceRoute){
+             uint8_t id[8]{};for(size_t k=0;k<len;++k)id[k]=uint8_t(src.name[k]);
+@@ -229,13 +232,13 @@
+         s.commands[i]={&s.bcms[i]->bcm,&s.bcms[i]->address,&s.bcms[i]->vcd};
+     }
+     s.transport={&s.crmPresent,&s.hasAmc,&s.tcsWait,s.commands,Source::bcm_count,Source::bcm_count};
+-    for(size_t i=0;i<2;++i) {
++    for(size_t i=0;i<Source::provider_count;++i) {
+         void *memory=IOMallocZero(sizeof(ProviderRecord));if(!memory)return false;
+         s.providers[i]=new(memory)ProviderRecord(*s.domain,s.voter,*s.batch,s.transport);
+         if(!s.domain->bind(s.providers[i]->provider))return false;
+     }
+     for(size_t i=0;i<Source::node_count;++i) {
+-        const auto &src=Source::nodes[i];if(src.provider>=2 || !src.buswidth || !src.channels)return false;
++        const auto &src=Source::nodes[i];if(src.provider>=Source::provider_count || !src.buswidth || !src.channels)return false;
+         for(size_t j=0;j<i;++j)if(Source::nodes[j].id==src.id)return false;
+         void *memory=IOMallocZero(sizeof(NodeRecord));if(!memory)return false;
+         s.nodes[i]=new(memory)NodeRecord(*s.domain,s.providers[src.provider]->provider,src,s.ubwcClock);
+@@ -245,47 +248,52 @@
+         auto &b=*s.bcms[i];
+         for(size_t j=0;j<b.count;++j) {
+             const size_t index=b.source.nodes[j];if(index>=Source::node_count)return false;
+-            auto &n=*s.nodes[index];if(n.source.provider!=b.source.provider || n.bcmCount>=3)return false;
++            auto &n=*s.nodes[index];if(!(Source::bcm_provider_masks[i] & (1u << n.source.provider)) || n.bcmCount>=3)return false;
+             for(size_t k=0;k<j;++k)if(b.source.nodes[k]==index)return false;
+             b.nodes[j]=&n.node;n.bcms[n.bcmCount++]=&b.bcm; // Same canonical objects in both source membership directions.
+         }
+         void *memory=IOMallocZero(sizeof(NativeBcmVoterOperation::Owner));if(!memory)return false;
+         b.operation=::new(memory)NativeBcmVoterOperation::Owner(b.bcm,*s.batch,s.transport,&b.keepalive,&b.qosProxy);
+     }
+-    for(size_t i=0;i<Source::path_count;++i) {
+-        NodeRecord *node=nullptr;
+-        for(size_t j=0;j<Source::node_count;++j)if(s.nodes[j]->source.id==Source::gpu_path[i])node=s.nodes[j];
+-        if(!node)return false;
+-        if(i+1<Source::path_count) {
+-            bool edge=false;for(size_t j=0;j<node->source.linkCount;++j)if(node->source.links[j]==Source::gpu_path[i+1])edge=true;
+-            if(!edge)return false;
++    auto bindPath = [&](const uint32_t *ids, size_t count, NativeRequest **requests,
++                        NativePath *&pathOut) -> NativeConstraintApplication::Owner * {
++        for (size_t i = 0; i < count; ++i) {
++            NodeRecord *node = nullptr;
++            for (auto *candidate : s.nodes) {
++                if (candidate->source.id == ids[i]) {
++                    node = candidate;
++                    break;
++                }
++            }
++            if (!node) return nullptr;
++            if (i + 1 < count) {
++                bool linked = false;
++                for (size_t link = 0; link < node->source.linkCount; ++link) {
++                    if (node->source.links[link] == ids[i + 1]) linked = true;
++                }
++                if (!linked) return nullptr;
++            }
++            void *memory = IOMallocZero(sizeof(NativeRequest));
++            if (!memory) return nullptr;
++            requests[i] = ::new(memory) NativeRequest(node->node);
+         }
+-        void *memory=IOMallocZero(sizeof(NativeRequest));if(!memory)return false;
+-        s.requests[i]=::new(memory)NativeRequest(node->node);
+-    }
+-    void *path=IOMallocZero(sizeof(NativePath));if(!path)return false;
+-    s.path=::new(path)NativePath(*s.domain,s.requests,Source::path_count,Source::path_count);
+-    if(!s.domain->bind(*s.path))return false;
+-    void *owner=IOMallocZero(sizeof(NativeConstraintApplication::Owner));if(!owner)return false;
+-    s.bandwidth=::new(owner)NativeConstraintApplication::Owner(*s.path);
+-    // Distinct real requests on SAME canonical nodes/domain/voter/BCMs.
+-    // Never clone a private graph whose zero vote could erase the GPU request.
+-    for(size_t i=0;i<Source::tbu_path_count;++i){
+-        NodeRecord *node=nullptr;
+-        for(size_t j=0;j<Source::node_count;++j)if(s.nodes[j]->source.id==Source::tbu_path[i])node=s.nodes[j];
+-        if(!node)return false;
+-        if(i+1<Source::tbu_path_count){bool edge=false;
+-            for(size_t j=0;j<node->source.linkCount;++j)if(node->source.links[j]==Source::tbu_path[i+1])edge=true;
+-            if(!edge)return false;
+-        }
+-        void *memory=IOMallocZero(sizeof(NativeRequest));if(!memory)return false;
+-        s.tbuRequests[i]=::new(memory)NativeRequest(node->node);
+-    }
+-    void *tbuPath=IOMallocZero(sizeof(NativePath));if(!tbuPath)return false;
+-    s.tbuPath=::new(tbuPath)NativePath(*s.domain,s.tbuRequests,Source::tbu_path_count,Source::tbu_path_count);
+-    if(!s.domain->bind(*s.tbuPath))return false;
+-    void *tbuOwner=IOMallocZero(sizeof(NativeConstraintApplication::Owner));if(!tbuOwner)return false;
+-    s.tbuBandwidth=::new(tbuOwner)NativeConstraintApplication::Owner(*s.tbuPath);
++        void *pathMemory = IOMallocZero(sizeof(NativePath));
++        if (!pathMemory) return nullptr;
++        pathOut = ::new(pathMemory) NativePath(*s.domain, requests, count, count);
++        if (!s.domain->bind(*pathOut)) return nullptr;
++        void *owner = IOMallocZero(sizeof(NativeConstraintApplication::Owner));
++        return owner ? ::new(owner) NativeConstraintApplication::Owner(*pathOut) : nullptr;
++    };
++    // Each path owns distinct requests against the same domain, voter and
++    // canonical nodes. Removing a display request preserves GPU/TBU demand.
++    s.bandwidth = bindPath(Source::gpu_path, Source::path_count, s.requests, s.path);
++    if (!s.bandwidth) return false;
++    s.tbuBandwidth = bindPath(Source::tbu_path, Source::tbu_path_count, s.tbuRequests, s.tbuPath);
++    if (!s.tbuBandwidth) return false;
++    NativePath *displayPath = nullptr;
++    s.displayBandwidth = bindPath(Source::display_path, Source::display_path_count,
++                                  s.displayRequests, displayPath);
++    if (!s.displayBandwidth) return false;
+     s.graphReady=true;return true;
+     // Private HLOS GPU bootstrap namespace only. Other OEM source voters are
+     // neither emulated nor claimed disabled. No init/QoS/bandwidth operation,
+@@ -298,7 +306,8 @@
+ {
+     if(!sourceReady() || !normal() || !startup || !IORecursiveLockHaveLock(startup))return kIOReturnNotReady;
+     auto &s=*storage_;if(s.initialAttempted)return kIOReturnNotReady;s.initialAttempted=true;
+-    for(size_t i=0;i<Source::bcm_count;++i) {
++    // Display BCMs enter the existing voter only through the display request.
++    for(size_t i=0;i<Source::gpu_startup_bcm_count;++i) {
+         auto *b=s.bcms[i];if(!b || !b->operation || !s.rsc.forwardAllowed())return kIOReturnNotReady;
+         if(!b->source.keepalive && !b->source.early)continue;
+         b->initialResult=b->operation->initializeKeepalive();b->initialReturned=true;
+@@ -362,6 +371,26 @@
+     if(raise)s.tbuRaised=true;else s.tbuLowered=true;
+     return kIOReturnSuccess;
+ }
++IOReturn ZornGen7IccVoter26::setDisplayRegisterBandwidth(IORecursiveLock *startup, uint32_t peak)
++{
++    if (!sourceReady() || !normal() || !startup || !IORecursiveLockHaveLock(startup)) return kIOReturnNotReady;
++    auto &s = *storage_;
++    if (!s.recommitReady || !s.displayBandwidth || s.displayRetained || !s.rsc.forwardAllowed()) {
++        return kIOReturnNotReady;
++    }
++    if (peak != 0 && peak != 14000 && peak != 140000 && peak != 310000) return kIOReturnBadArgument;
++    if (peak && s.displayHeld) return kIOReturnExclusiveAccess;
++    if (!peak && !s.displayHeld) return kIOReturnNotOpen;
++    const auto result = s.displayBandwidth->setActualBandwidth(0, peak);
++    if (result.assessment != IccApplyAssessment::SourceReturned || !result.source_return_available ||
++        result.source_return || !s.rsc.forwardAllowed()) {
++        s.displayRetained = true;
++        return kIOReturnNotReady;
++    }
++    s.displayHeld = peak != 0;
++    return kIOReturnSuccess;
++}
++
+ IOReturn ZornGen7IccVoter26::applyBootstrapBandwidth(IORecursiveLock *startup,uint32_t peak)
+ {
+     if(!sourceReady() || !normal() || !startup || !IORecursiveLockHaveLock(startup) || !peak)return kIOReturnNotReady;
+--- a/ZornGen7IccVoter26.h
++++ b/ZornGen7IccVoter26.h
+@@ -30,6 +30,7 @@
+     IOReturn acquireQosProxy(IORecursiveLock *actualStartupGate);
+     IOReturn recommitNormalQos(IORecursiveLock *actualStartupGate);
+     IOReturn setTbuPowerBandwidth(IORecursiveLock *,bool raise);
++    IOReturn setDisplayRegisterBandwidth(IORecursiveLock *actualStartupGate, uint32_t peakKbps);
+     IOReturn applyBootstrapBandwidth(IORecursiveLock *actualStartupGate,uint32_t actualSourcePeak);
+     IOReturn finishHostBootstrap(IORecursiveLock *actualStartupGate);
+     IOReturn applyHostAverageMbps(IORecursiveLock *actualStartupGate,uint32_t actualSourceAverage);
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 740be74752fe4fd68d5633a4a9c9e4c6 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC bb2efc47019348abbfbe57d98401fcd2 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"740be74752fe4fd68d5633a4a9c9e4c6",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"bb2efc47019348abbfbe57d98401fcd2",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26740BE74752FE"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BB2EFC470193"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x74,0x0b,0xe7,0x47,0x52,0xfe,0x4f,0xd6,0x8d,0x56,0x33,0xa4,0xa9,0xc9,0xe4,0xc6};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbb,0x2e,0xfc,0x47,0x01,0x93,0x48,0xab,0xbf,0xbe,0x57,0xd9,0x84,0x01,0xfc,0xd2};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x74,0x0b,0xe7,0x47,0x52,0xfe,0x4f,0xd6,0x8d,0x56,0x33,0xa4,0xa9,0xc9,0xe4,0xc6};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbb,0x2e,0xfc,0x47,0x01,0x93,0x48,0xab,0xbf,0xbe,0x57,0xd9,0x84,0x01,0xfc,0xd2};

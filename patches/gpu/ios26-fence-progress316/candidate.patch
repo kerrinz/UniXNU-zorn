@@ -1,0 +1,93 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 1aca8228542b4b3bad2fb1e5f4dbce9e %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 39a0aa1b81e548e593f7831bf8eaf017 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"1aca8228542b4b3bad2fb1e5f4dbce9e",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"39a0aa1b81e548e593f7831bf8eaf017",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN261ACA8228542B"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2639A0AA1B81E5"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/direct-ring/NativeAdrenoRing.cpp
++++ b/direct-ring/NativeAdrenoRing.cpp
+@@ -234,6 +234,9 @@
+     if(!fence)return kIOReturnBadArgument;*fence=0;
+     if(!attached_ || poisoned_)return kIOReturnNotReady;
+     if(!words || !word_count || word_count>SIZE_MAX/sizeof(uint32_t))return kIOReturnBadArgument;
++    // Zero is reserved and completion is ordered within this attached epoch.
++    // Keep the final issued fence drainable without publishing wrapped work.
++    if(seqno_==UINT32_MAX)return kIOReturnNoResources;
+     const uint32_t size_words=(uint32_t)(ring_bytes_/4),mask=size_words-1;
+     const bool reset=framed && reset_pending_;
+     const uint32_t extra=framed?RingPrologueWords+(reset?RingResetWords:0)+RingFramedFenceWords:RingFenceWords;
+@@ -280,7 +283,7 @@
+         if(cache_.acquire(cache_.cookie,fence_,fence_bytes_)) {poison();return NativeAdrenoRingFencePoisoned;}
+         const uint32_t value=fence_[1];
+         if(observed)*observed=value;
+-        if(value>seqno_) {poison();return NativeAdrenoRingFencePoisoned;}
++        if(value>seqno_ || value<completed_) {poison();return NativeAdrenoRingFencePoisoned;}
+         if(value>=fence)return NativeAdrenoRingFenceComplete;
+         if(!clock || !clock->now_us)return NativeAdrenoRingFenceTimeout;
+         if(clock->now_us(clock->cookie)-start>=timeout_us)return NativeAdrenoRingFenceTimeout;
+@@ -298,8 +301,8 @@
+         if(cache_.acquire(cache_.cookie,fence_,fence_bytes_)) {poison();return NativeAdrenoRingFencePoisoned;}
+         const uint32_t value=fence_[1];
+         if(observed)*observed=value;
+-        if(value>=fence) {if(value>seqno_) {poison();return NativeAdrenoRingFencePoisoned;}completed_=value;
+-            return NativeAdrenoRingFenceComplete;}
++        if(value>seqno_ || value<completed_) {poison();return NativeAdrenoRingFencePoisoned;}
++        if(value>=fence) {completed_=value;return NativeAdrenoRingFenceComplete;}
+         if(!clock || !clock->now_us)return NativeAdrenoRingFenceTimeout;
+         if(clock->now_us(clock->cookie)-start>=timeout_us)return NativeAdrenoRingFenceTimeout;
+         if(clock->idle && clock->idle(clock->cookie))return NativeAdrenoRingFenceTimeout;
+--- a/direct-runtime/ZornGen7DirectSubmit26.cpp
++++ b/direct-runtime/ZornGen7DirectSubmit26.cpp
+@@ -420,7 +420,10 @@
+     if(gate.status)return gate.status;
+     for(auto &job:jobs_) {
+         if(!job.active)continue;
+-        const NativeAdrenoRingFence state=ring_->observeFence(job.fence,nullptr,0,nullptr);
++        // This is a serialized retirement sweep, not a read-only waiter.
++        // Publish the same real CP timestamp to the ring ledger even when
++        // the job will disappear before a later WaitFence sees it.
++        const NativeAdrenoRingFence state=ring_->wait(job.fence,nullptr,0,nullptr);
+         if(state==NativeAdrenoRingFencePoisoned)return poison();
+         if(state!=NativeAdrenoRingFenceComplete)continue;
+         const IOReturn status=release(job);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x1a,0xca,0x82,0x28,0x54,0x2b,0x4b,0x3b,0xad,0x2f,0xb1,0xe5,0xf4,0xdb,0xce,0x9e};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x39,0xa0,0xaa,0x1b,0x81,0xe5,0x48,0xe5,0x93,0xf7,0x83,0x1b,0xf8,0xea,0xf0,0x17};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x1a,0xca,0x82,0x28,0x54,0x2b,0x4b,0x3b,0xad,0x2f,0xb1,0xe5,0xf4,0xdb,0xce,0x9e};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x39,0xa0,0xaa,0x1b,0x81,0xe5,0x48,0xe5,0x93,0xf7,0x83,0x1b,0xf8,0xea,0xf0,0x17};

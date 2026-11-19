@@ -1,0 +1,472 @@
+--- a/ZornDpuAutoRefreshTransfer340.h
++++ b/ZornDpuAutoRefreshTransfer340.h
+@@ -2,6 +2,7 @@
+ #pragma once
+ 
+ #include "ZornDpuCommandTransfer339.h"
++#include "ZornScanoutHandoff345.h"
+ 
+ namespace ZornDpuAutoRefreshTransfer340 {
+ 
+@@ -33,7 +34,7 @@
+ // the interrupt enables, and the scanout address unchanged. The caller holds
+ // the existing display lease and the GOP writer lock.
+ template <typename Port>
+-void run(Port &port, uint32_t address, uint32_t stride, uint32_t (&out)[Words])
++void run(Port &port, uint32_t address, uint32_t stride, uint32_t (&out)[Words], uint32_t target = 0)
+ {
+     out[Status] = LeaseUnavailable;
+     if (!port.lease()) return;
+@@ -51,8 +52,14 @@
+         !port.readTear(TearEnable, out[InitialTearEnable]) || !port.readTear(TearStatus, out[InitialTear]) ||
+         !port.readDsi(0, dsiVersion) || !port.readDsi(4, dsiControl) ||
+         !port.readDsi(0xa8, laneStatus) || !port.readDsi(Cmd::DsiInterrupt, out[InitialDsi])) return;
++    // The caller has locked the real GOP writer and made the requested
++    // destination immutable and DMA-visible. Only a cross-buffer transition
++    // inside the witnessed K80 splash reservation is supported.
++    const bool bufferPair = !target ? address == ZORN_SCANOUT_FRONT :
++        (address == ZORN_SCANOUT_FRONT && target == ZORN_SCANOUT_BACK) ||
++        (address == ZORN_SCANOUT_BACK && target == ZORN_SCANOUT_FRONT);
+     if (dpuVersion != 0xa0000000 || !(ctl & (1u << 17)) || active != 2 || fetch != 0x30000 ||
+-        address != 0xfc400000 || stride != 5760 || addr0 != address || addr1 != address ||
++        !bufferPair || stride != ZORN_SCANOUT_STRIDE || addr0 != address || addr1 != address ||
+         (stride0 & 0xffff) != stride || (stride1 & 0xffff) != stride || dsiVersion != 0x20080000 ||
+         dsiControl != 0x1f5 || (laneStatus & 0x1f1f) != 0x1f1f) {
+         out[Status] = WrongTopology;
+@@ -103,6 +110,10 @@
+     out[Sequence] = out[Retain] = 1;
+     const uint64_t began = port.nowUs();
+     out[StartMs] = uint32_t(began / 1000);
++    // After the first attempted source store, a refusal retains the two
++    // buffers and all controller resources. Never retry unknown scanout.
++    if (target && (!port.writeMdp(Cmd::Vig0Source, target) ||
++                   !port.writeMdp(Cmd::Vig1Source, target))) return;
+     if (!port.writeMdp(Cmd::CtlFlush, Cmd::VigFlush) || !sample() || flush != Cmd::VigFlush || !clean() ||
+         out[LastWriteLine] != out[InitialWriteLine]) return;
+     out[Evidence] = PendingFlush;
+@@ -139,6 +150,9 @@
+             if (!port.readIntf(Cmd::AutoRefreshStatus, autoStatus) || autoStatus ||
+                 !port.readIntf(Cmd::InterfaceFrames, currentFrames) || !port.lease() || !acknowledge()) return;
+             out[FrameDelta] = currentFrames - out[InitialInterfaceFrame];
++            if (target && (out[FrameDelta] != 1 ||
++                           !port.readMdp(Cmd::Vig0Source, addr0) || addr0 != target ||
++                           !port.readMdp(Cmd::Vig1Source, addr1) || addr1 != target)) return;
+             out[Retain] = 0;
+             out[Status] = TransferObserved;
+             return;
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -54,6 +54,7 @@
+ #include "ZornDisplayHeldTiming335.h"
+ #include "ZornRuntimeDisplayCadence344.h"
+ #include "ZornScanoutHandoff345.h"
++#include "ZornScanoutFlipWire346.h"
+ #include "touch-source313/ZornTouchThread26.h"
+ #include "ZornGen7OwnedArcVoltage.h"
+ 
+@@ -67,6 +68,7 @@
+ uint32_t displayCadenceWords344[ZornRuntimeDisplayCadence344::Words]{};
+ uint32_t displayRuntimePublication341 = 0;
+ uint32_t displayScanoutWords345[ZornScanoutAlias345::Words]{};
++uint32_t displayFlipWords346[ZornScanoutFlipWire346::Words]{};
+ uint64_t displayRuntimeDeadline341 = 0;
+ }
+ 
+@@ -104,9 +106,15 @@
+     for (unsigned i = 0; i < ZornScanoutAlias345::Words; ++i) out[i] = displayScanoutWords345[i];
+ }
+ extern "C" void zorn26_observe_scanout_alias345(IOService *, uint32_t (&)[ZornScanoutAlias345::Words]);
++extern "C" void zorn26_flip_snapshot346(uint32_t *out)
++{
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornScanoutFlipWire346::Words; ++i) out[i] = displayFlipWords346[i];
++}
++
+ extern "C" void zorn26_run_display_cadence344(
+     IOService *, const uint32_t (&)[ZornDisplayHeldTiming335::Words], uint32_t (&)[ZornRuntimeDisplayCadence344::Words],
+-    uint64_t, const uint32_t &);
++    uint64_t, const uint32_t &, uint32_t (&)[ZornScanoutFlipWire346::Words]);
+ extern "C" bool zorn26_read_display_gcc325(IOService *, uint32_t &);
+ extern "C" void zorn26_capture_display_clocks334(IOService *, uint32_t (&)[ZornDisplayClockRead334::Words]);
+ 
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -12,6 +12,7 @@
+ #include "ZornDisplaySmmu336.h"
+ #include "ZornRuntimeDisplayCadence344.h"
+ #include "ZornScanoutHandoff345.h"
++#include "ZornScanoutFlipWire346.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -30,7 +31,8 @@
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(ZornDisplayHeldTiming335::Used + ZornDisplaySmmu336::Words <= ZornDisplayHeldTiming335::Words);
+ constexpr unsigned ScanoutStart = TeStart + ZornRuntimeDisplayCadence344::Words;
+-static_assert(ScanoutStart + ZornScanoutAlias345::Words <= HeldTimingStart);
++constexpr unsigned FlipStart = ScanoutStart + ZornScanoutAlias345::Words;
++static_assert(FlipStart + ZornScanoutFlipWire346::Words <= HeldTimingStart);
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+ inline unsigned packet(char *out, unsigned cap, const uint32_t (&values)[Words],
+@@ -38,11 +40,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT345", 8);
++    memcpy(p, "K80FT346", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 345);
++    zorn_panic_le236(p, Bytes - 4, 346);
+     return Bytes;
+ }
+ }
+--- a/ZornScanoutAlias345.h
++++ b/ZornScanoutAlias345.h
+@@ -13,8 +13,12 @@
+ 
+ namespace ZornScanoutAlias345 {
+ 
+-inline void observe(uint32_t (&out)[Words])
++// A caller requesting the writer alias must have excluded the back buffer
++// from every live fetch before calling this function and through its first store.
++// The caller owns a returned alias and retains it until final scanout retirement.
++inline void observe(uint32_t (&out)[Words], IOMemoryMap **writer = nullptr)
+ {
++    if (writer && *writer) return;
+     out[Status] = ZornScanoutPropertyMissing;
+     DTEntry chosen;
+     const void *data = nullptr;
+@@ -37,7 +41,7 @@
+     out[Extent] = ZORN_SCANOUT_BYTES;
+     out[Status] = ZornScanoutDescriptorFailed;
+     auto *descriptor = IOMemoryDescriptor::withPhysicalAddress(ZORN_SCANOUT_BACK, ZORN_SCANOUT_BYTES,
+-                                                                kIODirectionIn | kIOMemoryMapperNone);
++                                                                (writer ? kIODirectionInOut : kIODirectionIn) | kIOMemoryMapperNone);
+     if (!descriptor) return;
+     IOByteCount contiguous = 0;
+     if (descriptor->getLength() != ZORN_SCANOUT_BYTES ||
+@@ -48,7 +52,7 @@
+     }
+     out[Status] = ZornScanoutMappingFailed;
+     auto *map = descriptor->createMappingInTask(kernel_task, 0,
+-        kIOMapAnywhere | kIOMapInhibitCache | kIOMapReadOnly, 0, ZORN_SCANOUT_BYTES);
++        kIOMapAnywhere | kIOMapInhibitCache | (writer ? 0 : kIOMapReadOnly), 0, ZORN_SCANOUT_BYTES);
+     if (map) {
+         out[Status] = ZornScanoutWrongAlias;
+         const auto start = map->getVirtualAddress();
+@@ -62,8 +66,8 @@
+                 kvtophys(start + ZORN_SCANOUT_BYTES - 1) == ZORN_SCANOUT_BACK + ZORN_SCANOUT_BYTES - 1)
+                 out[Status] = ZornScanoutAliasVerified;
+         }
+-        // No byte of the target was read or written, and DPU never had the alias.
+-        map->release();
++        if (writer && out[Status] == ZornScanoutAliasVerified) *writer = map;
++        else map->release();
+     }
+     descriptor->release();
+ }
+--- /dev/null
++++ b/ZornScanoutFlipWire346.h
+@@ -0,0 +1,9 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++namespace ZornScanoutFlipWire346 {
++enum Field : unsigned { Status, Retain, PatternSamples, Forward, Restore, DsiForwardUs, DsiRestoreUs,
++                         HoldStartedMs, Words };
++enum State : unsigned { NotRun, WriterUnavailable, OriginalSourceUnavailable, MapUnavailable,
++                         PatternReadbackFailed, Incomplete, Restored };
++}
+--- /dev/null
++++ b/ZornScanoutRoundTrip346.h
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornDpuAutoRefreshTransfer340.h"
++
++namespace ZornScanoutRoundTrip346 {
++namespace Dpu = ZornDpuAutoRefreshTransfer340;
++struct Report {
++    uint32_t forward[Dpu::Words]{};
++    uint32_t restore[Dpu::Words]{};
++
++    bool restored() const { return restore[Dpu::Status] == Dpu::TransferObserved; }
++
++    // After a successful forward flip the back buffer remains the active
++    // scanout until the original address retires an independently proven frame.
++    bool mustRetain() const
++    {
++        return forward[Dpu::Retain] || restore[Dpu::Retain] ||
++            (forward[Dpu::Status] == Dpu::TransferObserved && !restored());
++    }
++};
++
++// Both allocations and the MMIO lease must already be held. The caller
++// keeps both frame buffers immutable through the round trip. holdBack()
++// may observe the still frame while the hardware uses it.
++template<class Port, class HoldBack>
++Report flipAndRestore(Port &port, HoldBack holdBack)
++{
++    Report report;
++    Dpu::run(port, ZORN_SCANOUT_FRONT, ZORN_SCANOUT_STRIDE, report.forward, ZORN_SCANOUT_BACK);
++    if (report.forward[Dpu::Status] == Dpu::TransferObserved && holdBack()) {
++        Dpu::run(port, ZORN_SCANOUT_BACK, ZORN_SCANOUT_STRIDE, report.restore, ZORN_SCANOUT_FRONT);
++    }
++    return report;
++}
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC c1b3270b1de54826a60207facafd5f79 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC be1d2a4481a54c529f9eca320751a1fd %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"c1b3270b1de54826a60207facafd5f79",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"be1d2a4481a54c529f9eca320751a1fd",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornManualWire313.h"
+ #include "ZornScanoutAlias345.h"
++#include "ZornScanoutRoundTrip346.h"
+ #include "ZornK80PassiveDsi343.h"
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IODeviceTreeSupport.h>
+@@ -21,6 +22,8 @@
+ extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&)[ZornDisplaySmmu336::Words]);
+ extern "C" void zorn26_display_cadence_snapshot344(uint32_t *);
+ extern "C" void zorn26_scanout_reservation_snapshot345(uint32_t *);
++extern "C" void zorn26_flip_snapshot346(uint32_t *);
++extern "C" bool zorn26_with_gop_writer339(uint32_t, uint32_t, bool (*)(void *), void *);
+ extern "C" bool zorn26_ui_desktop_ready272();
+ extern "C" void zorn26_enable_gop_epoch343(bool);
+ extern "C" void zorn26_gop_diagnostics344(uint32_t *);
+@@ -63,11 +66,28 @@
+     static constexpr unsigned kGccDisplayWindow = 5;
+     static constexpr unsigned kDsiWindow = 6;
+     static constexpr unsigned kTearIrqWindow = 7;
+-    IOMemoryMap *maps[8]{};
+-    bool writable_;
++    static constexpr unsigned kVigSourcePage = 8;
++    static constexpr unsigned kCtlFlushPage = 9;
++    IOMemoryMap *maps[10]{};
++    bool writable_, bufferSwitch_;
+ 
+ public:
+-    explicit DisplayRead318(bool writable = false) : writable_(writable) {}
++    explicit DisplayRead318(bool writable = false, bool bufferSwitch = false)
++        : writable_(writable), bufferSwitch_(bufferSwitch) {}
++    bool writeDpuForFlip(uint32_t offset, uint32_t value)
++    {
++        using namespace ZornDpuCommandTransfer339;
++        const bool source = (offset == Vig0Source || offset == Vig1Source) &&
++            (value == ZORN_SCANOUT_FRONT || value == ZORN_SCANOUT_BACK);
++        if (!bufferSwitch_ || !(source || (offset == CtlFlush && value == VigFlush))) return false;
++        constexpr uint32_t pageBytes = 16384;
++        const unsigned index = source ? kVigSourcePage : kCtlFlushPage;
++        const uint32_t base = offset & ~(pageBytes - 1);
++        const uint32_t at = offset - base;
++        uint32_t observed = 0;
++        return read(index, {ZornDpuHandoff321::Mdp + base, pageBytes}, at, observed) &&
++            storeWord(index, at, value);
++    }
+     bool readDsi(uint32_t offset, uint32_t &value)
+     {
+         return read(kDsiWindow, {0x0ae94000, 0x1000}, offset, value);
+@@ -97,7 +117,7 @@
+ 
+     void retainControllerMappings()
+     {
+-        const unsigned windows[] = {kMdpWindow, kDsiWindow, kTearIrqWindow};
++        const unsigned windows[] = {kMdpWindow, kDsiWindow, kTearIrqWindow, kVigSourcePage, kCtlFlushPage};
+         for (unsigned index : windows) {
+             if (maps[index]) maps[index]->retain();
+         }
+@@ -148,7 +168,8 @@
+         if (!maps[index]) {
+             IODeviceMemory *memory = IODeviceMemory::withRange(range.address, range.bytes);
+             if (!memory) return false;
+-            const bool writes = writable_ && (index == kDsiWindow || index == kTearIrqWindow);
++            const bool writes = writable_ && (index == kDsiWindow || index == kTearIrqWindow ||
++                                                (bufferSwitch_ && (index == kVigSourcePage || index == kCtlFlushPage)));
+             auto *map = memory->map(kIOMapAnywhere | kIOMapInhibitCache | (writes ? 0 : kIOMapReadOnly));
+             memory->release();
+             if (!map) return false;
+@@ -287,7 +308,8 @@
+ 
+ extern "C" void zorn26_run_display_cadence344(
+     IOService *platform, const uint32_t (&held)[ZornDisplayHeldTiming335::Words],
+-    uint32_t (&out)[ZornRuntimeDisplayCadence344::Words], uint64_t deadline, const uint32_t &publication)
++    uint32_t (&out)[ZornRuntimeDisplayCadence344::Words], uint64_t deadline, const uint32_t &publication,
++    uint32_t (&flip)[ZornScanoutFlipWire346::Words])
+ {
+     namespace H = ZornDisplayHeldTiming335;
+     namespace S = ZornDisplaySmmu336;
+@@ -305,7 +327,7 @@
+     }
+ 
+     uint64_t reserve = 0;
+-    nanoseconds_to_absolutetime(uint64_t(R::SampleWindowUs + 1000000) * 1000, &reserve);
++    nanoseconds_to_absolutetime(uint64_t(R::SampleWindowUs + 5000000) * 1000, &reserve);
+     out[R::Status] = R::ProducerDeadline;
+     bool live = false;
+     while (out[R::ReadinessChecks] < 350) {
+@@ -326,7 +348,7 @@
+     if (!live) return;
+ 
+     struct Port {
+-        DisplayRead318 mmio{true};
++        DisplayRead318 mmio{true, true};
+         bool lease() {
+             using ZornDisplayClockRead334::Bank;
+             using ZornDisplayTiming318::Window;
+@@ -345,6 +367,7 @@
+             return ready;
+         }
+         bool readMdp(uint32_t off, uint32_t &value) { return mmio.readDpu(off, value); }
++        bool writeMdp(uint32_t off, uint32_t value) { return lease() && mmio.writeDpuForFlip(off, value); }
+         bool readIntf(uint32_t off, uint32_t &value) {
+             return mmio(ZornDisplayTiming318::Window::Interface, off, value);
+         }
+@@ -384,6 +407,78 @@
+                 route[S::S2cr] != 3 || route[S::Slot] != 3) return;
+         }
+     }
++    namespace F = ZornScanoutFlipWire346;
++    flip[F::Status] = F::WriterUnavailable;
++    struct FlipContext {
++        Port &port;
++        uint32_t (&out)[F::Words];
++    } context{port, flip};
++    zorn26_with_gop_writer339(address, stride, [](void *cookie) {
++        namespace A = ZornScanoutAlias345;
++        namespace D = ZornDpuAutoRefreshTransfer340;
++        using namespace D::Cmd;
++        auto &ctx = *static_cast<FlipContext *>(cookie);
++        auto &f = ctx.out;
++        auto &p = ctx.port;
++        f[F::Status] = F::OriginalSourceUnavailable;
++        uint32_t a = 0, b = 0;
++        if (!p.lease() || !p.readMdp(Vig0Source, a) || !p.readMdp(Vig1Source, b) ||
++            a != ZORN_SCANOUT_FRONT || b != ZORN_SCANOUT_FRONT) return false;
++
++        f[F::Status] = F::MapUnavailable;
++        uint32_t mapped[A::Words]{};
++        IOMemoryMap *back = nullptr;
++        A::observe(mapped, &back);
++        if (!back) return false;
++        auto *pixels = reinterpret_cast<volatile uint64_t *>(back->getVirtualAddress());
++        constexpr uint64_t colours[] = {0xffff3200ffff3200ull, 0xff36ff36ff36ff36ull, 0xff0060ffff0060ffull};
++        constexpr unsigned pairsPerRow = ZORN_SCANOUT_WIDTH / 2;
++        for (unsigned row = 0; row < ZORN_SCANOUT_HEIGHT; ++row) {
++            const auto colour = colours[(row * 3) / ZORN_SCANOUT_HEIGHT];
++            for (unsigned x = 0; x < pairsPerRow; ++x)
++                pixels[row * pairsPerRow + x] = colour;
++        }
++        __asm__ volatile("dsb oshst" ::: "memory");
++        constexpr unsigned patternRows[] = {20, 1600, 3180};
++        for (unsigned i = 0; i < 3; ++i) {
++            if (pixels[patternRows[i] * pairsPerRow + 17] == colours[i] &&
++                pixels[patternRows[i] * pairsPerRow + pairsPerRow - 17] == colours[i])
++                ++f[F::PatternSamples];
++        }
++        if (f[F::PatternSamples] != 3) {
++            f[F::Status] = F::PatternReadbackFailed;
++            back->release();
++            return false;
++        }
++
++        const auto report = ZornScanoutRoundTrip346::flipAndRestore(p, [&] {
++            f[F::HoldStartedMs] = uptimeMs();
++            IOSleep(750);
++            return p.lease();
++        });
++        f[F::Forward] = report.forward[D::Status];
++        f[F::Restore] = report.restore[D::Status];
++        f[F::DsiForwardUs] = report.forward[D::DsiUs];
++        f[F::DsiRestoreUs] = report.restore[D::DsiUs];
++        f[F::Status] = report.restored() ? F::Restored : F::Incomplete;
++        const bool retain = report.mustRetain();
++        f[F::Retain] = retain;
++        if (retain) {
++            // The mapping reference is held indefinitely because DPU may
++            // still read this reserved address after the caller returns.
++            p.mmio.retainControllerMappings();
++        } else {
++            back->release();
++        }
++        return retain;
++    }, &context);
++    if (flip[F::Retain]) {
++        out[R::Status] = R::ArmUnavailable;
++        out[R::Retain] = 1;
++        out[R::StartedMs] = uptimeMs();
++        return;
++    }
++
+     struct Source {
+         mutable T::Stamp::Frame latest;
+         T::Stamp::Frame poll() const {
+@@ -460,6 +555,7 @@
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     zorn26_display_cadence_snapshot344(out + ZornManualWire313::TeStart);
+     zorn26_scanout_reservation_snapshot345(out + ZornManualWire313::ScanoutStart);
++    zorn26_flip_snapshot346(out + ZornManualWire313::FlipStart);
+     zorn26_display_held_timing335(out + ZornManualWire313::HeldTimingStart);
+     zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
+     zorn26_display_lease325(out + ZornManualWire313::LeaseStart);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C1B3270B1DE5"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BE1D2A4481A5"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -215,7 +215,7 @@
+             auto *owner = static_cast<ZornGen7DarwinBoardOwner *>(context);
+             auto &state = *owner->storage_;
+             zorn26_run_display_cadence344(state.platform, displayHeldTimingWords335, displayCadenceWords344,
+-                displayRuntimeDeadline341, displayRuntimePublication341);
++                displayRuntimeDeadline341, displayRuntimePublication341, displayFlipWords346);
+             auto &record = displayLeaseWords325;
+             const auto raw = displayCadenceWords344[R::Retain] ? kIOReturnNotReady :
+                 owner->setDisplayRegisterResources(false);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc1,0xb3,0x27,0x0b,0x1d,0xe5,0x48,0x26,0xa6,0x02,0x07,0xfa,0xca,0xfd,0x5f,0x79};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbe,0x1d,0x2a,0x44,0x81,0xa5,0x4c,0x52,0x9f,0x9e,0xca,0x32,0x07,0x51,0xa1,0xfd};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc1,0xb3,0x27,0x0b,0x1d,0xe5,0x48,0x26,0xa6,0x02,0x07,0xfa,0xca,0xfd,0x5f,0x79};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbe,0x1d,0x2a,0x44,0x81,0xa5,0x4c,0x52,0x9f,0x9e,0xca,0x32,0x07,0x51,0xa1,0xfd};

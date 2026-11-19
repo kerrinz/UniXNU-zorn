@@ -1,0 +1,58 @@
+--- a/ZornRootWindow26.h
++++ b/ZornRootWindow26.h
+@@ -17,7 +17,7 @@
+ static_assert(RelativeByteStart<=PartitionBytes && Bytes<=PartitionBytes-RelativeByteStart);
+ static_assert(!(AbsoluteByteStart&4095) && !(Bytes&4095));
+ static_assert((AbsoluteByteStart>>12)+((Bytes>>12)-1)<=0xffffffffULL);
+-static constexpr uint8_t ImageSha256[] = {0xd8,0x67,0xd7,0x41,0x2,0xb6,0xb3,0x2e,0x60,0x72,0x97,0x4e,0xff,0x8c,0xb3,0xbd,0x5,0xab,0x55,0x46,0xea,0x55,0x54,0x17,0xa3,0x80,0x80,0x6,0x5,0x8a,0x82,0xe5};
++static constexpr uint8_t ImageSha256[] = {0x3,0x59,0x3e,0xbb,0xc6,0x19,0x61,0xb2,0x2a,0x75,0xf5,0x72,0xa7,0xd3,0x49,0x6f,0x1,0x67,0xcc,0xc,0xd3,0x32,0x26,0x2b,0xd5,0xf6,0x45,0xb0,0xd0,0xa9,0x22,0x6a};
+ static constexpr uint8_t WindowBytes[] = {0x0,0x0,0x0,0x15,0x33,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+ static constexpr uint8_t NativeCompatible[] = {0x56,0x35,0x33,0x41,0x50,0x0,0x69,0x50,0x68,0x6f,0x6e,0x65,0x31,0x38,0x2c,0x31,0x0,0x41,0x70,0x70,0x6c,0x65,0x41,0x52,0x4d,0x0,0x78,0x69,0x61,0x6f,0x6d,0x69,0x2c,0x7a,0x6f,0x72,0x6e,0x0,0x71,0x63,0x6f,0x6d,0x2c,0x73,0x6d,0x38,0x36,0x35,0x30,0x0};
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC f9280b9be3f64115b32e35a609264720 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC b6847f4ed03640479d36d04e18f44160 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"f9280b9be3f64115b32e35a609264720",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"b6847f4ed03640479d36d04e18f44160",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26F9280B9BE3F6"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B6847F4ED036"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xf9,0x28,0x0b,0x9b,0xe3,0xf6,0x41,0x15,0xb3,0x2e,0x35,0xa6,0x09,0x26,0x47,0x20};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb6,0x84,0x7f,0x4e,0xd0,0x36,0x40,0x47,0x9d,0x36,0xd0,0x4e,0x18,0xf4,0x41,0x60};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xf9,0x28,0x0b,0x9b,0xe3,0xf6,0x41,0x15,0xb3,0x2e,0x35,0xa6,0x09,0x26,0x47,0x20};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb6,0x84,0x7f,0x4e,0xd0,0x36,0x40,0x47,0x9d,0x36,0xd0,0x4e,0x18,0xf4,0x41,0x60};

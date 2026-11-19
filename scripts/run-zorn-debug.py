@@ -287,7 +287,118 @@ def main():
 
 if __name__ == "__main__":
     try:
-        if '--ios26-client-failure261-trial' in sys.argv:
+        if '--ios26-known306-trial' in sys.argv:
+            from zorn_ios26_gpu_v306_system_trial import main as known306
+            known306()
+        elif '--ios26-opp305-trial' in sys.argv:
+            from zorn_ios26_gpu_v305_system_trial import main as opp305
+            opp305()
+        elif '--ios26-ret303-trial' in sys.argv:
+            from zorn_ios26_gpu_v303_system_trial import main as ret303
+            ret303()
+        elif '--ios26-ctx302-trial' in sys.argv:
+            from zorn_ios26_gpu_v302_system_trial import main as ctx302
+            ctx302()
+        elif '--ios26-wait299-trial' in sys.argv:
+            from zorn_ios26_gpu_v299_system_trial import main as wait299
+            wait299()
+        elif '--ios26-pres298-trial' in sys.argv:
+            from zorn_ios26_gpu_v298_system_trial import main as pres298
+            pres298()
+        elif '--ios26-glass297-trial' in sys.argv:
+            from zorn_ios26_gpu_v297_system_trial import main as glass297
+            glass297()
+        elif '--ios26-dock296-trial' in sys.argv:
+            from zorn_ios26_gpu_v296_system_trial import main as dock296
+            dock296()
+        elif '--ios26-known294-trial' in sys.argv:
+            from zorn_ios26_gpu_v294_system_trial import main as known294
+            known294()
+        elif '--ios26-known293-trial' in sys.argv:
+            from zorn_ios26_gpu_v293_system_trial import main as known293
+            known293()
+        elif '--ios26-known292-trial' in sys.argv:
+            from zorn_ios26_gpu_v292_system_trial import main as known292
+            known292()
+        elif '--ios26-known291-trial' in sys.argv:
+            from zorn_ios26_gpu_v291_system_trial import main as known291
+            known291()
+        elif '--ios26-perf290-trial' in sys.argv:
+            from zorn_ios26_gpu_v290_system_trial import main as perf290
+            perf290()
+        elif '--ios26-perf289-trial' in sys.argv:
+            from zorn_ios26_gpu_v289_system_trial import main as perf289
+            perf289()
+        elif '--ios26-perf288-trial' in sys.argv:
+            from zorn_ios26_gpu_v288_system_trial import main as perf288
+            perf288()
+        elif '--ios26-perf287-trial' in sys.argv:
+            from zorn_ios26_gpu_v287_system_trial import main as perf287
+            perf287()
+        elif '--ios26-perf286-trial' in sys.argv:
+            from zorn_ios26_gpu_v286_system_trial import main as perf286
+            perf286()
+        elif '--ios26-perf285-trial' in sys.argv:
+            from zorn_ios26_gpu_v285_system_trial import main as perf285
+            perf285()
+        elif '--ios26-perf284-trial' in sys.argv:
+            from zorn_ios26_gpu_v284_system_trial import main as perf284
+            perf284()
+        elif '--ios26-perf283-trial' in sys.argv:
+            from zorn_ios26_gpu_v283_system_trial import main as perf283
+            perf283()
+        elif '--ios26-known282-trial' in sys.argv:
+            from zorn_ios26_gpu_v282_system_trial import main as known282
+            known282()
+        elif '--ios26-known281-trial' in sys.argv:
+            from zorn_ios26_gpu_v281_system_trial import main as known281
+            known281()
+        elif '--ios26-perf278-trial' in sys.argv:
+            from zorn_ios26_gpu_v278_system_trial import main as perf278
+            perf278()
+        elif '--ios26-manual277-trial' in sys.argv:
+            from zorn_ios26_gpu_v277_system_trial import main as manual277
+            manual277()
+        elif '--ios26-menu-dismiss275-trial' in sys.argv:
+            from zorn_ios26_gpu_v275_system_trial import main as menu_dismiss275
+            menu_dismiss275()
+        elif '--ios26-glass-menu274-trial' in sys.argv:
+            from zorn_ios26_gpu_v274_system_trial import main as glass_menu274
+            glass_menu274()
+        elif '--ios26-glass-menu273-trial' in sys.argv:
+            from zorn_ios26_gpu_v273_system_trial import main as glass_menu273
+            glass_menu273()
+        elif '--ios26-desktop-scene271-trial' in sys.argv:
+            from zorn_ios26_gpu_v271_system_trial import main as desktop_scene271
+            desktop_scene271()
+        elif '--ios26-serial-roi270-trial' in sys.argv:
+            from zorn_ios26_gpu_v270_system_trial import main as serial_roi270
+            serial_roi270()
+        elif '--ios26-ui-scene269-trial' in sys.argv:
+            from zorn_ios26_gpu_v269_system_trial import main as ui_scene269
+            ui_scene269()
+        elif '--ios26-client-census268-trial' in sys.argv:
+            from zorn_ios26_gpu_v268_system_trial import main as client_census268
+            client_census268()
+        elif '--ios26-shared-probe267-trial' in sys.argv:
+            from zorn_ios26_metal_v267_system_trial import main as metal_shared_probe267
+            metal_shared_probe267()
+        elif '--ios26-known-readback266-trial' in sys.argv:
+            from zorn_ios26_gpu_v266_system_trial import main as known_readback266
+            known_readback266()
+        elif '--ios26-serial-shot265-trial' in sys.argv:
+            from zorn_ios26_gpu_v265_system_trial import main as serial_shot265
+            serial_shot265()
+        elif '--ios26-pool-capacity264-trial' in sys.argv:
+            from zorn_ios26_gpu_v264_system_trial import main as pool_capacity264
+            pool_capacity264()
+        elif '--ios26-span-room263-trial' in sys.argv:
+            from zorn_ios26_gpu_v263_system_trial import main as span_room263
+            span_room263()
+        elif '--ios26-mapping-capacity262-trial' in sys.argv:
+            from zorn_ios26_gpu_v262_system_trial import main as mapping_capacity262
+            mapping_capacity262()
+        elif '--ios26-client-failure261-trial' in sys.argv:
             from zorn_ios26_gpu_v261_system_trial import main as client_failure261
             client_failure261()
         elif '--ios26-platform-identity260-trial' in sys.argv:
@@ -425,7 +536,7 @@ if __name__ == "__main__":
         elif '--ios26-finish-recovery' in sys.argv:
             from zorn_ios26_logdirs_boot_trial import finish_recovery
             finish_recovery()
-        elif any(flag in sys.argv for flag in ('--ios26-metal-root-delta', '--ios26-metal-handle-lifetime-delta', '--ios26-cpu-no-sampling-root-delta', '--ios26-cpu-crash-report-root-delta', '--ios26-cpu-two-directory-root-delta', '--ios26-cpu-osanalytics-root-delta', '--ios26-cpu-service-policy-root-delta', '--ios26-cpu-posterboard-reply-root-delta', '--ios26-cpu-posterboard-reply-archive-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-passive-root-delta', '--ios26-gpu-application186-root-delta', '--ios26-metal193-root-delta', '--ios26-metal195-root-delta', '--ios26-metal197-root-delta', '--ios26-metal198-root-delta', '--ios26-metal199-root-delta', '--ios26-metal204-root-delta', '--ios26-metal207-root-delta', '--ios26-metal208-root-delta', '--ios26-metal209-root-delta', '--ios26-metal211-root-delta', '--ios26-metal213-root-delta', '--ios26-metal214-root-delta', '--ios26-metal215-root-delta', '--ios26-metal224-root-delta', '--ios26-metal226-root-delta', '--ios26-metal228-root-delta', '--ios26-metal229-root-delta', '--ios26-metal247-root-delta', '--ios26-metal249-root-delta', '--ios26-metal250-root-delta', '--ios26-metal251-root-delta', '--ios26-metal252-root-delta')):
+        elif any(flag in sys.argv for flag in ('--ios26-metal-root-delta', '--ios26-metal-handle-lifetime-delta', '--ios26-cpu-no-sampling-root-delta', '--ios26-cpu-crash-report-root-delta', '--ios26-cpu-two-directory-root-delta', '--ios26-cpu-osanalytics-root-delta', '--ios26-cpu-service-policy-root-delta', '--ios26-cpu-posterboard-reply-root-delta', '--ios26-cpu-posterboard-reply-archive-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-entry-root-delta', '--ios26-cpu-posterboard-passive-root-delta', '--ios26-gpu-application186-root-delta', '--ios26-metal193-root-delta', '--ios26-metal195-root-delta', '--ios26-metal197-root-delta', '--ios26-metal198-root-delta', '--ios26-metal199-root-delta', '--ios26-metal204-root-delta', '--ios26-metal207-root-delta', '--ios26-metal208-root-delta', '--ios26-metal209-root-delta', '--ios26-metal211-root-delta', '--ios26-metal213-root-delta', '--ios26-metal214-root-delta', '--ios26-metal215-root-delta', '--ios26-metal224-root-delta', '--ios26-metal226-root-delta', '--ios26-metal228-root-delta', '--ios26-metal229-root-delta', '--ios26-metal247-root-delta', '--ios26-metal249-root-delta', '--ios26-metal250-root-delta', '--ios26-metal251-root-delta', '--ios26-metal252-root-delta', '--ios26-metal267-root-delta', '--ios26-desktop271-root-delta', '--ios26-upstream280-root-delta', '--ios26-known281-root-delta', '--ios26-desktop283-root-delta', '--ios26-scalar285-root-delta', '--ios26-scalar286-root-delta', '--ios26-rpc287-root-delta', '--ios26-query288-root-delta', '--ios26-cpu289-root-delta', '--ios26-async290-root-delta', '--ios26-known291-root-delta', '--ios26-frame293-root-delta', '--ios26-dock296-root-delta', '--ios26-glass297-root-delta', '--ios26-known306-root-delta', '--ios26-glass307-root-delta')):
             from zorn_ios26_metal_root_delta import main as metal_root_delta
             metal_root_delta()
         elif '--ios26-root-delta' in sys.argv:

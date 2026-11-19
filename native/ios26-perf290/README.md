@@ -1,0 +1,7 @@
+# iOS26 RPC observation
+
+`ZornDarwinCallCost287.h` keeps the private28796-word wire format used by the real Turnip exporter and Metal reporter. The290 implementation replaces the old update trylock with a short userland pthread mutex around counter metadata only. The actual IOKit operation runs before recording and never holds this mutex; the exporter samples its monotonic clock after acquiring it. Clock, saturation, unknown-method and real mutex failures invalidate observation. No backend result, payload, fence or GPU resource is supplied by this observer.
+
+`check-ios26-native-rpc290.py` executes the actual selected RPC source and header with real host pthread concurrency, explicit clock/IOKit/error boundaries and the retained287 loss counterexample. The actual iOS26 frontend and Turnip are recompiled against matching header bytes; native Rust/PAC and kernel ABI1 remain unchanged. The290 device receipt independently records both zero-loss snapshots. Those aggregate CPU-wall durations are not GPU timestamps or physical FPS.
+
+The separate290 kernel change retains a selected process only after an actual successful Submit while real queue/resource predicates remain pending. Normal Wait, close, MMIO, firmware and memory backends are preserved. Its host close/release boundary is explicit and does not qualify hardware teardown. Exact source, compiler dependencies, image, device and Recovery evidence are in the matching290 manifest and progress record; fullGPU/Metal/display/FT acceptance remains incomplete.

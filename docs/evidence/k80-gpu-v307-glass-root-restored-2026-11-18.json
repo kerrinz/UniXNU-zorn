@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": 307,
+  "date": "2026-11-18",
+  "scope": "restore verified v297 Liquid Glass desktop root on K80 after v306 lifecycle proof; no boot",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a"
+  },
+  "old_root_sha256": "933476094a89d0e373392ec144b48bab1cbe537e3eeef44635d7693873570de5",
+  "new_root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+  "matching_desktop_kernel_sha256": "b1ee73d63e402a76cfdf685911e74b01170c8ada4911d40b19f08e3bf64e6641",
+  "matching_desktop_boot_sha256": "eba8bd8bc3b672d97ae5ff9aefc7152dacdfc745dbff072d1692b5abd4f2c4aa",
+  "changed_pages": 40,
+  "changed_bytes": 163840,
+  "write_groups": 19,
+  "retained_actual_parent_pages_verified": 13755,
+  "layout_change": false,
+  "readback": {
+    "scope": "written4KiB-root-pages-only",
+    "blocks": 40,
+    "bytes": 163840,
+    "sha256": "4db6f551915f12ff78c3bbe4d2206cb9c46ca1f075587c1a5bebb8e0a4045724"
+  },
+  "protected_metadata_and_fences_unchanged": true,
+  "BCB_full_page_and_tail_verified": true,
+  "recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "automatic_boot_by_install": false,
+  "retries": 0,
+  "timeout_seconds": 600,
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass307-restore-root-delta-review-ad7f16b4/review-inputs.json",
+    "sha256": "c739480619199c047104ab2b63ee64137bba6af1a945b0f778177ada5c632f11",
+    "bytes": 52886
+  },
+  "actual_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass307-restore-root-delta-review-ad7f16b4/admission/run/result.json",
+    "sha256": "83ea2474eab3203ca922cb28f0dc12e783e55d2c132ca1fd8481836fa559355d",
+    "bytes": 1227
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass307-restore-root-delta-review-ad7f16b4/admission/admission.json",
+    "sha256": "1cec2a24416606e39356ffa5d53bd9e07ab73f2c2ab8cdba82651de8b723f0f6",
+    "bytes": 1385
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass307-restore-root-delta-review-ad7f16b4/admission/run/one-shot.claim.json",
+    "sha256": "3a87b4b5d271329c9977ad4295739a5d21201d55f6e83ecce45c428f5525bfce",
+    "bytes": 204
+  }
+}

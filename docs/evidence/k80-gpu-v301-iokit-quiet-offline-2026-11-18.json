@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": 301,
+  "date": "2026-11-18",
+  "status": "offline_candidate_built_and_host_verified_unselected",
+  "hardware_executed": false,
+  "hardware_qualified": false,
+  "purpose": "Release phantom StartIOKitMatching() kernelmanagerd busy count on gIOServiceRoot and publish gIOResourceIOKitKey on IOUserResources once PID 1 enters EL0 via ZornIokitDaemonQuiet301 (resolving Preferences.app SCNetworkInterfaceCopyAllWithPreferences / __wait_for_IOKit_to_quiesce 300s main-thread scroll freeze), reusing installed v297 root.",
+  "root_cause_analysis": {
+    "symptom_reported_in_v277": "Preferences.app opens and renders initial list, cannot scroll list on either CPU or GPU rendering, while bottom Home-bar swipe back to SpringBoard Home screen works normally.",
+    "cross_device_reference": "UniXNU-houji/archive/docs/display-performance.md:30-35 (Preferences main thread blocked in SCNetworkInterfaceCopyAllWithPreferences -> dispatch_once_wait -> configd InterfaceNamer __wait_for_IOKit_to_quiesce)",
+    "xnu_source_chain": [
+      "libkern/c++/OSKext.cpp:1598-1634 \u2014 OSKext::driverkitEnabled() and OSKext::iokitDaemonAvailable() unconditionally return true on iOS (!XNU_TARGET_OS_WATCH).",
+      "iokit/Kernel/IOStartIOKit.cpp:187-196 \u2014 under !NO_KEXTD (verified linked via gIOMatchDeferList / iokitDaemonLaunched), StartIOKitMatching() calls IOService::getServiceRoot()->adjustBusy(+1).",
+      "iokit/Kernel/IOService.cpp:1229-1239 & 1654-1657 \u2014 adjustBusy(-1) and IOService::publishUserResource(gIOResourceIOKitKey) are deferred to IOService::iokitDaemonLaunched(), which is only invoked when userland kernelmanagerd calls into OSKext.",
+      "root-result295.json / root-result297.json \u2014 com.apple.kernelmanagerd.plist is absent in the monolithic-kernel LaunchDaemons set, leaving gIOServiceRoot busyState >= 1 for the entire 300s trial window."
+    ],
+    "minimal_fix": "ZornIokitDaemonQuiet301.h invoked once at PID 1 EL0 on verified K80 root: checks OSKext::iokitDaemonAvailable(), verifies IOUserResources lacks gIOResourceIOKitKey and gIOServiceRoot->getBusyState() > 0, then executes adjustBusy(-1) and publishUserResource(gIOResourceIOKitKey)."
+  },
+  "boot_tag": "94bb95fca9e14fa7b26f01d05fb66f8c",
+  "ordinary_timing_session": "9c37385967304b6fae92874309c81104",
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-iokit-quiet301/source-manifest.json",
+    "sha256": "2bf3cd6960e21cc7c5d9e4acee405b64f0d339568577cb5832708ee4b1ebe6ca"
+  },
+  "candidate_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-iokit-quiet301/candidate.patch",
+    "sha256": "2c1eddfc2ade0ac4a5c3c59c0bed072a6420163a9ab35abb2badcdc8f9ce4ff4"
+  },
+  "kernel": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v301-iokit-quiet-94bb95fca9e14fa7b26f01d05fb66f8c/full-link/kernel.ZORN26-ASYNC290.UNSELECTED.macho",
+    "sha256": "19a7732281c9ac417e6ab175f05c8ccf45185d44e93b8f6f1d5605ce6eb3e126",
+    "bytes": 31053920,
+    "compiled_objects": 33,
+    "link_inputs": 1399,
+    "undefined_symbols": 0
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v301-iokit-quiet-94bb95fca9e14fa7b26f01d05fb66f8c/boot-package/boot.ZORN26-GPU-V301-IOKIT-UNSELECTED.img",
+    "sha256": "4512c7ee8da5b6a119e59c5310bf4562454bc10e6a357ac0e0959d192cd4f806",
+    "bytes": 11874304
+  },
+  "ADT": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v299-waitfence-unlock-db9363f8a0ac496c807f98f3282cf597/boot-package/inputs/kernel.adt",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v301-iokit-quiet-94bb95fca9e14fa7b26f01d05fb66f8c/boot-package/inputs/kernel.adt",
+    "sha256": "fd7862371d38feb3f095c0afd47dead14e3f54781522c0c1b652228a75ac246a",
+    "bytes": 49224
+  },
+  "FD": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v299-waitfence-unlock-db9363f8a0ac496c807f98f3282cf597/boot-package/inputs/firmware.fd",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v301-iokit-quiet-94bb95fca9e14fa7b26f01d05fb66f8c/boot-package/inputs/firmware.fd",
+    "sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "bytes": 3145728
+  },
+  "root": {
+    "reuses_installed_v297_image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "root_installation_required": false
+  },
+  "native_closure": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v301-iokit-quiet-94bb95fca9e14fa7b26f01d05fb66f8c/close-source-closure301.json",
+    "sha256": "cd929f88c70f069b99988cd2692160835e88efa25ae9fbb657185b36b6a6d45f"
+  }
+}

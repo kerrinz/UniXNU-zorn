@@ -1,0 +1,241 @@
+{
+  "version": 343,
+  "scope": "single-K80-ios26-v343-runtime-cadence-dcf118d95360",
+  "boot_tag": "315732a45d8b44adb7744c381b2bc9d7",
+  "inputs": {
+    "kernel": {
+      "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/full-link/kernel.ZORN26-CADENCE343.UNSELECTED.macho",
+      "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/boot-package/inputs/kernel.macho",
+      "sha256": "b5ccaaa7e7ac203ba784db522968f9448c7026179e73f59ea5f7cedb699cf45b",
+      "bytes": 31120296
+    },
+    "boot": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/boot-package/boot.ZORN26-GPU-V343-SERIAL-UNSELECTED.img",
+      "sha256": "c42fb679c3a8b75d7f28b69e77f6bfa5dd448243d5217da8d66b386824488de6",
+      "bytes": 11890688
+    },
+    "root": {
+      "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+      "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+      "bytes": 34359738368
+    },
+    "exact_package": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/boot-package/verified.json",
+      "bytes": 13707,
+      "sha256": "ca36939230ec7a579c4039288e5a591d92948e02c3d7de1189ae1c2129dbda7a"
+    }
+  },
+  "analysis": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/passive-panel-trial-dcf118d95360/analysis/analysis.json",
+    "sha256": "6f8d9f9879f38a0c5931f0abee73ecb7485c11112643c9bc095ded6892963be7",
+    "offline_replay_byte_identical": true,
+    "serial_and_recovery_bound": true,
+    "fresh_native_page_verified": true,
+    "serial": {
+      "bytes": 78496,
+      "sha256": "d86bd101d33450c253b594d664390de47c384ba5bb989095afe66a6e7b887dc4"
+    },
+    "serial_frames": 30,
+    "physical_packets": 9
+  },
+  "recovery": {
+    "identities": {
+      "before": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      },
+      "after": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      }
+    },
+    "duration_seconds": 334.1864348329982,
+    "protected_pairs": 7,
+    "adb_server_port": 5039,
+    "protected_GPT_and_root_manifest": true,
+    "BCB_before_boot_checked": true,
+    "run": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/passive-panel-trial-dcf118d95360/trial/run.json",
+      "bytes": 1647,
+      "sha256": "e6c2cccfd023fddbbe71d0733cb25e130272b1a08598b55fa96468964141e44f"
+    }
+  },
+  "boot_attempts": 1,
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "native_root_writes": 0,
+  "CTL_commands_issued_by_observer": 0,
+  "GPU_known_task": {
+    "raw": 0,
+    "phase": 6,
+    "flags": 63,
+    "grant_raw": 0,
+    "ring_read": 101,
+    "ring_write": 101,
+    "fence": 2,
+    "completed_fence": 2,
+    "native_outstanding": 0,
+    "submit_outstanding": 0,
+    "VM_poisoned": 0,
+    "submit_poisoned": 0,
+    "device_references": 0,
+    "output_crc": 3896750698,
+    "first_bad": 4294967295,
+    "expected_bad_byte": 0,
+    "actual_bad_byte": 0,
+    "table_acquires": 2,
+    "table_releases": 2,
+    "ring_busy": 1895825408,
+    "ring_status": 1,
+    "io_raw": 0,
+    "task_OOB_flags": 127,
+    "task_OOB_raw": 0,
+    "available": true,
+    "task_complete": true,
+    "checks": {
+      "completed_worker": true,
+      "actual_snapshot": true,
+      "original_task_completed": true,
+      "grant_returned_success": true,
+      "ring_idle_record": true,
+      "real_fence_completed": true,
+      "no_task_outstanding": true,
+      "not_poisoned": true,
+      "unmapped_no_device_references": true,
+      "actual_RGBA_readback": true,
+      "table_lease_balance": true,
+      "native_IO_success": true,
+      "actual_task_OOB_release": true
+    },
+    "scope": "Initial retained native kernel known-image task only;not a Metal frontend/ordinary surface/physical scanout or long-term stability oracle"
+  },
+  "display_Apps_SMMU": {
+    "status": 5,
+    "control": 2950150,
+    "id0": 1275166315,
+    "id1": 1610612807,
+    "result": "observed",
+    "streams": [
+      {
+        "mode": 5,
+        "slot": 3,
+        "smr": 2147621888,
+        "s2cr": 3,
+        "cbar": 126976,
+        "cba2r": 1,
+        "sctlr": 224,
+        "ttbr0_low": 0,
+        "ttbr0_high": 0,
+        "tcr": 0,
+        "sid": 7168,
+        "interpretation": "context_bypass"
+      },
+      {
+        "mode": 5,
+        "slot": 3,
+        "smr": 2147621888,
+        "s2cr": 3,
+        "cbar": 126976,
+        "cba2r": 1,
+        "sctlr": 224,
+        "ttbr0_low": 0,
+        "ttbr0_high": 0,
+        "tcr": 0,
+        "sid": 7170,
+        "interpretation": "context_bypass"
+      }
+    ]
+  },
+  "display_register_resource_lease": {
+    "status": 6,
+    "uptime_ms": 72304,
+    "acquire_raw": 0,
+    "release_raw": 0,
+    "gcc_before": 2147483651,
+    "gcc_held": 2147483651,
+    "gcc_after": 2147483651,
+    "acquire_steps": 127,
+    "release_steps": 253,
+    "result": "returned",
+    "gcc_ahb_running": {
+      "gcc_before": false,
+      "gcc_held": false,
+      "gcc_after": false
+    }
+  },
+  "held_DPU_counter_window": {
+    "first_uptime_ms": 72304,
+    "second_uptime_ms": 72424,
+    "elapsed_ms": 120,
+    "raw_frame_deltas": {
+      "intf": 0,
+      "mdp": 0,
+      "tear_read": 14
+    }
+  },
+  "runtime_DSI_cadence": {
+    "status": 4,
+    "retain": 0,
+    "started_ms": 0,
+    "elapsed_us": 0,
+    "ready_checks": 149,
+    "interface_advances": 0,
+    "fresh_dsi": 0,
+    "unknown_content": 0,
+    "changed_content": 0,
+    "repeated_content": 0,
+    "first_content": 0,
+    "polling_gaps": 0,
+    "first_dsi_us": 0,
+    "last_dsi_us": 0,
+    "last_known_swap": 0,
+    "last_known_fence": 0,
+    "result": "GOP_unavailable"
+  },
+  "first_sampled_compositor_present": {
+    "uptime_ms": 140750,
+    "available": 7,
+    "present_frame": 1017,
+    "producer_fence": 1698,
+    "completed_fence": 1700,
+    "surface_access_fence": 1700,
+    "surface_id": 1049,
+    "CF_dropped": 0,
+    "backend_sequence": 0,
+    "backend_stage": 0,
+    "backend_raw": 0,
+    "native_client_low32": 129,
+    "native_client_flags": 3,
+    "compact_dropped": 0,
+    "application_calls": 12322,
+    "application_unique_low32": 10,
+    "application_pid": 10
+  },
+  "CPU_GOP_copy": {
+    "windows": 8,
+    "missing_windows": 0,
+    "measured_seconds": 79.991,
+    "copied_frames": 2394,
+    "copies_per_second": 29.928366941280895,
+    "window_copies_per_second_min": 25.720576461168935,
+    "window_copies_per_second_max": 36.67481662591687,
+    "show_mean_ms": 20.2016888053467
+  },
+  "unique_complete_panel_frames_per_second": null,
+  "full_GPU_qualification": false,
+  "finding": "The hardware route checks passed, then the readiness gate found no qualified GOP writer epoch. The cadence window never started. The zero event counters have no rate interpretation. Existing serial samples begin later and confirm software copies. They cannot identify the failed readiness subpredicate or establish per-frame DSI completion or panel visibility."
+}

@@ -1,0 +1,136 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 338,
+  "boot_tag": "b4bff8cd10764bbbb448d01c47ddf552",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/boot-package/boot.ZORN26-GPU-V338-SERIAL-UNSELECTED.img",
+    "sha256": "16f09ad50f0e1a83eae514d59236dfd6d8db39437372a203538a989e32990c70",
+    "bytes": 11886592
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/full-link/kernel.ZORN26-APPS-SMMU-APERTURE338.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/boot-package/inputs/kernel.macho",
+    "sha256": "55f3780bcbcff8d8dda51b4dd020a1393616efbd5207a80d0c4ffdc82faa5d2a",
+    "bytes": 31115648
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/boot-package/verified.json",
+    "bytes": 13480,
+    "sha256": "d0f883d967babc73eb883ba401283ecbf3d9c9c21eda0e9b19cc8ec2d41cae56"
+  },
+  "link": {
+    "passed": true,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/full-link/kernel.ZORN26-APPS-SMMU-APERTURE338.UNSELECTED.macho",
+      "sha256": "55f3780bcbcff8d8dda51b4dd020a1393616efbd5207a80d0c4ffdc82faa5d2a"
+    },
+    "bytes": 31115648,
+    "inputs": 1399,
+    "replaced": 41,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/full-link/exact-inputs.json",
+      "sha256": "29a3624dc3d7f3f717ec5ffebbb474047694fa1d29df01842e38e857dbfc2b76"
+    },
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "hardware_qualified": false,
+    "device_access": false,
+    "sha256": "55f3780bcbcff8d8dda51b4dd020a1393616efbd5207a80d0c4ffdc82faa5d2a",
+    "undefined_symbols": 0
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-apps-smmu-aperture338/source-manifest.json",
+    "bytes": 4106,
+    "sha256": "4308da35efa0d21db32e5902d00a2dd5c8b83189587c1b6e229eb4e299a07bc4"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v337-smmu-transport-device-2026-11-19.json",
+    "bytes": 10452,
+    "sha256": "d635b8c978958e380c8485372aaf78e70251e0608817739172dacdfe80113907"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/host-apps-aperture/result.json",
+      "bytes": 255,
+      "sha256": "c617622d1f126744a6c305b139b3e26e8a9c770801402626886273403620f114"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/patch-replay.json",
+      "bytes": 774,
+      "sha256": "fb73d0089ae615615afb1f050ceec8700b93f09f614c9e1ce1bc2937d50912c9"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/display-smmu-archive-host/result.json",
+      "bytes": 4127,
+      "sha256": "618d9bdf2c461cd0d30955cfdb2d7bfa5992586bfa77aa0a7c7c1c619f977fcb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/retained-actual-v337-replay/result.json",
+      "bytes": 72,
+      "sha256": "6c9645d17f1d4c5f9fd2c2214a294a7e467ad76cd275523dd080bafc66802a32"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/display-smmu-board-inputs.json",
+      "bytes": 1813,
+      "sha256": "d8f382a5a1d8b61237f9fd3290129fc1e29116e1bfcdbac3426445685a1a5db1"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/ufs-dependency-review.json",
+      "bytes": 252,
+      "sha256": "6a177cef7c90cd2fe71f06e2476fc013980ffb0af901e20a93f37357bf2a71f9"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/retained-ufs-owner-source-review.json",
+      "bytes": 1401,
+      "sha256": "e89815c834fd650076ec155656a3c7f3bf028d306c622d232e293b82d1710f18"
+    }
+  ],
+  "enabled_path": "The selected root initializer verifies its existing mapping, pins it for the boot, and publishes only the checked aperture. The existing held display lease reads two snapshots with no UFS command lock, no new mapping, and no register writes.",
+  "device_only_questions": [
+    "Does the actual root initializer publish the expected descriptor span?",
+    "Do the two stable Apps SMMU snapshots identify both display streams?",
+    "Do CDC and watchdog recovery complete?"
+  ],
+  "device_protection": {
+    "target": "92988a43/zorn/slot-a",
+    "mode": "unattended-phone-connected",
+    "boot_attempts": 1,
+    "retries": 0,
+    "watchdog_seconds": 300,
+    "recovery_timeout_seconds": 600,
+    "native_root_writes": 0,
+    "physical_contact_required": false
+  },
+  "stop_conditions": [
+    "No boot without current verified Recovery, exclusive reviewed ADB ownership, matching protected storage, and BCB full-page readback.",
+    "No additional attempt or device operation if Recovery fails.",
+    "Read path returns a bounded failure without publishing partial results for unverified mapping, ambiguous stream, or changing snapshot."
+  ],
+  "physical_frame_rate_qualified": false,
+  "hardware_qualified": false,
+  "phone_access": false
+}

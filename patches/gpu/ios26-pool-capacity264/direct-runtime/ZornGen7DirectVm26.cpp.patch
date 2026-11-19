@@ -1,0 +1,30 @@
+--- a/direct-runtime/ZornGen7DirectVm26.cpp
++++ b/direct-runtime/ZornGen7DirectVm26.cpp
+@@ -63,6 +63,17 @@
+ /* Board hook and per-phase time of the two table transactions, for the log: [0] map, [1] unmap; each row is count, the phases in order, the slowest call
+  * and the bytes mapped (int-134: BoMap averaged 135 ms and the desktop crawled). */
+ extern "C" {volatile uint64_t zorn_direct_vm_phase_us[2][8];}
++// Successful map/unmap cumulative CPU counters only. They are not a live-PTE
++// snapshot or permission to release resources. No per-object pointer is exported.
++extern "C" void zorn26_vm_completed_totals264(uint64_t *out)
++{
++    if(!out)return;
++    out[0]=__atomic_load_n(&zorn_direct_vm_phase_us[0][0],__ATOMIC_RELAXED);
++    out[1]=__atomic_load_n(&zorn_direct_vm_phase_us[1][0],__ATOMIC_RELAXED);
++    out[2]=__atomic_load_n(&zorn_direct_vm_phase_us[0][7],__ATOMIC_RELAXED);
++    out[3]=__atomic_load_n(&zorn_direct_vm_phase_us[1][7],__ATOMIC_RELAXED);
++}
++
+ extern "C" {uint64_t zorn_direct_vm_phase_max_us[2][6];}
+ extern "C" {uint64_t zorn_direct_vm_alias_paths[2];} // indexed / pairwise preflight
+ namespace {
+@@ -76,7 +87,8 @@
+     }
+     void done(unsigned row,uint64_t bytes) {
+         const uint64_t total=zorn_direct_vm_now_us()-began;
+-        zorn_direct_vm_phase_us[row][0]+=1;zorn_direct_vm_phase_us[row][7]+=bytes;
++        __atomic_fetch_add(&zorn_direct_vm_phase_us[row][0],UINT64_C(1),__ATOMIC_RELAXED);
++        __atomic_fetch_add(&zorn_direct_vm_phase_us[row][7],uint64_t(bytes),__ATOMIC_RELAXED);
+         if(total>zorn_direct_vm_phase_us[row][6])zorn_direct_vm_phase_us[row][6]=total;
+     }
+ };

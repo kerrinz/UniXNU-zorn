@@ -1,0 +1,89 @@
+{
+  "device": "92988a43/zorn",
+  "recovery_FDT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-recovery-resume-20261031/current-recovery-fdt.dtb",
+    "bytes": 900407,
+    "sha256": "dfafb7be0363b11538f6ccd0d1aa19c6f88b7bf365b1935d9264f9e8c4d214cf"
+  },
+  "stock_DTBO": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/dtbo/fdt-00000040.dtb",
+    "bytes": 415429,
+    "sha256": "7e22223883f1a318806920a5fdaeddf1276d58fcb4a7f02e276c40c10fd4f459"
+  },
+  "selected_display": "Primary DSI display",
+  "gpio": 86,
+  "te_source": 0,
+  "default_panel_phandle_distinct_from_observed_selection": true,
+  "pinctrl": {
+    "compatible": "qcom,pineapple-pinctrl",
+    "phandle": 197,
+    "base": "0x0f000000",
+    "window_bytes": 16777216,
+    "pad_address": "0x0f156000",
+    "pad_bytes": 8,
+    "control_offset": 0,
+    "io_offset": 4,
+    "input_bit": 0,
+    "mux_selector": 1,
+    "mux_function": "mdp_vsync"
+  },
+  "linux": {
+    "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+    "files": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/pinctrl/qcom/pinctrl-pineapple.c",
+        "bytes": 76447,
+        "sha256": "c405e5182c69dfe8c7df5d1d6e9ab073104804eff51e784230d445c040a896b6"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/pinctrl/qcom/pinctrl-msm.c",
+        "bytes": 61194,
+        "sha256": "68975985ba4f1a7b408aa6fe4571a2f3a47097323026e4524503d22216ae70c4"
+      }
+    ]
+  },
+  "device_tree": {
+    "commit": "25446a168427695fed4adecb61fd63926f12bc17",
+    "files": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/pineapple.dtsi",
+        "bytes": 91063,
+        "sha256": "60cabffe3e606f8216066aca9ba1ee35ea428b4169d3f7b02bfeee980bc4b2eb"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/display/display/pineapple-sde-display-common.dtsi",
+        "bytes": 37396,
+        "sha256": "bb19f12ccb7d799499531c0783d68e9a8d64b6ec93cfdca53652ee169f73c149"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/display/display/pineapple-sde-display-pinctrl.dtsi",
+        "bytes": 1876,
+        "sha256": "d6b8564098452070e4297d540bf10b50693ccb9d92d82ddca4be908796ae5c5a"
+      }
+    ]
+  },
+  "vendor": {
+    "commit": "3f527f3e55ef27f240507ace3181d13900c3ed7f",
+    "git_blob": "0a51e972f2e4834b0d63895ec08342229420b885",
+    "file": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/brightness/source/vendor_opensource_display-drivers/msm/dsi/dsi_display.c",
+      "bytes": 253366,
+      "sha256": "f7540cb15a0019dac1189af9442c89dafb61a0a9f1b13ddf0fcb31cf049b6e7c"
+    },
+    "tree": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/brightness/display-tree.json",
+      "bytes": 123875,
+      "sha256": "30f285f8be4aeadd9c901832656756e17375cfba2c2f8cc70d216998258f640e"
+    },
+    "reference": "dsi_display_register_te_irq uses IRQF_TRIGGER_FALLING and disables the ESD IRQ outside its check."
+  },
+  "experiment": {
+    "pulse_window_us": 160000,
+    "delay_us": 10,
+    "maximum_reads_of_input": 16001,
+    "register_writes": false,
+    "interrupt_registration": false,
+    "pinmux_change": false
+  },
+  "remaining": "The running firmware must actually retain the mux and a live TE signal. TE cadence does not certify new-frame scanout."
+}

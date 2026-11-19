@@ -1,0 +1,134 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -547,7 +547,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 47abb87a7be149e0b3eb69b471045c92 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC fbbcc2def5474fbebb544b49ab945c1c %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1012,7 +1012,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"47abb87a7be149e0b3eb69b471045c92",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"fbbcc2def5474fbebb544b49ab945c1c",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2647ABB87A7BE1"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26FBBCC2DEF547"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/debug.c
++++ b/debug.c
+@@ -1284,6 +1284,10 @@
+ 			loader_log_line("\n== EARLY PANIC: ");
+ 			loader_log_line(buf);
+ 			loader_log_line(" ==\n");
++#if UNIXNU_IOS26
++			extern void zorn26_early_panic_screen329(void);
++			zorn26_early_panic_screen329();
++#endif
+ 		}
+ 		paniclog_append_noflush("Kernel panicked very early before serial init, spinning forever...\n");
+ 		panic_spin_forever();
+@@ -1304,6 +1308,10 @@
+ 		loader_log_line("\n== PANIC: ");
+ 		loader_log_line(rbuf);
+ 		loader_log_line(" ==\n");
++#if UNIXNU_IOS26
++		extern void zorn26_early_panic_screen329(void);
++		zorn26_early_panic_screen329();
++#endif
+ 	}
+ 
+ 	/* optionally call sync, to reduce lost logs on restart, avoid on recursive panic. Unsafe due to unbounded sync() duration */
+--- a/houji_recovery26.c
++++ b/houji_recovery26.c
+@@ -163,6 +163,46 @@
+     if(stage>=0xa0 && stage<=0xaf)draw_stage(stage);
+ }
+ 
++// The panic formatter already owns the first message. Use its published
++// bytes and the existing console mapping. Do not enter IOKit, locks or storage.
++void zorn26_early_panic_screen329(void);
++void zorn26_early_panic_screen329(void)
++{
++    if (__atomic_load_n(&panicReason236.state, __ATOMIC_ACQUIRE) != 2 || !panicReason236.bytes) return;
++    Hjt26Surface surface;
++    uintptr_t base = (uintptr_t)vinfo.v_baseaddr;
++    size_t capacity = (size_t)vinfo.v_rowbytes * vinfo.v_height;
++    if ((base >> 48) != 0xffff || !hjt26_surface(&surface, base, vinfo.v_width,
++        vinfo.v_height, vinfo.v_rowbytes, vinfo.v_depth, capacity) ||
++        surface.width < 960 || surface.height < 1200) return;
++
++    const unsigned scale = 6;
++    const unsigned glyph_width = 8 * scale, glyph_height = 16 * scale;
++    const unsigned columns = (surface.width - 32) / glyph_width;
++    const unsigned rows = 8, x_start = (surface.width - columns * glyph_width) / 2;
++    const unsigned y_start = surface.height / 3;
++    if (y_start + rows * glyph_height > surface.height) return;
++    rsc_stage_rect(&surface, x_start, y_start, columns * glyph_width, rows * glyph_height, 0xff000000u);
++    unsigned row = 0, column = 0;
++    for (unsigned i = 0; i < panicReason236.bytes && i < 224 && row < rows; ++i) {
++        unsigned char ch = (unsigned char)panicReason236.text[i];
++        if (ch == '\r') continue;
++        if (ch == '\n') { ++row; column = 0; continue; }
++        if (column == columns) { ++row; column = 0; }
++        if (row == rows) break;
++        if (ch < 32 || ch > 126) ch = '?';
++        const unsigned x = x_start + column * glyph_width, y = y_start + row * glyph_height;
++        for (unsigned r = 0; r < 16; ++r) {
++            const unsigned bits = iso_font[(unsigned)ch * 16 + r];
++            for (unsigned c = 0; c < 8; ++c)
++                if (bits & (1u << c))
++                    rsc_stage_rect(&surface, x+c*scale, y+r*scale, scale, scale, 0xffeeeeeeu);
++        }
++        ++column;
++    }
++    __asm__ volatile("dsb sy" ::: "memory");
++}
++
+ const void *houji26_panic_record(void) { return &first_panic.record; }
+ static void flush_panic_record(void) {
+     /* Normal RAM only. A reset may preserve this exact tagged record; the
+--- a/pe_init.c
++++ b/pe_init.c
+@@ -453,8 +453,11 @@
+ #endif
+ 	}
+ 
++	zorn26_boot_stage328(0xa7);
+ 	InitIOKit(PE_state.deviceTreeHead);
++	zorn26_boot_stage328(0xa8);
+ 	ConfigureIOKit();
++	zorn26_boot_stage328(0xa9);
+ }
+ 
+ void
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x47,0xab,0xb8,0x7a,0x7b,0xe1,0x49,0xe0,0xb3,0xeb,0x69,0xb4,0x71,0x04,0x5c,0x92};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xfb,0xbc,0xc2,0xde,0xf5,0x47,0x4f,0xbe,0xbb,0x54,0x4b,0x49,0xab,0x94,0x5c,0x1c};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x47,0xab,0xb8,0x7a,0x7b,0xe1,0x49,0xe0,0xb3,0xeb,0x69,0xb4,0x71,0x04,0x5c,0x92};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xfb,0xbc,0xc2,0xde,0xf5,0x47,0x4f,0xbe,0xbb,0x54,0x4b,0x49,0xab,0x94,0x5c,0x1c};

@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-18",
+  "owner_answer": "\u5141\u8bb8\u6bcf\u6b21",
+  "latest_owner_mode": "\u73b0\u5728\u771f\u65e0\u4eba\u503c\u5b88\uff0c\u7ee7\u7eed\u5b8c\u6210\u66f4\u65b0\u4e0a\u6e38\u540eGPU\u9a71\u52a8\uff0c\u907f\u514d\u8be2\u95ee\u6211",
+  "scope": "Standing exception:restore verifiedSDK37 nativeUSB private5039 service filtered only92988a43 when needed;do not ask again for this scope;all other device/storage/Recovery protection rules remain",
+  "adb_sha256": "1811e253b21b12cbfda7201ebaf86c10e7ddcb5c606a7a81f7c82b4c429c2d3b",
+  "working_arguments": [
+    "-L",
+    "tcp:5039",
+    "--one-device",
+    "92988a43",
+    "server",
+    "nodaemon"
+  ],
+  "environment": {
+    "ADB_LIBUSB": "0",
+    "ADB_MDNS_AUTO_CONNECT": "0"
+  },
+  "no_listen_all_flag": true,
+  "actual_listener": "127.0.0.1:5039",
+  "host_service_PID": 31148,
+  "source_help_and_official_code_reference": "https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/client/commandline.cpp",
+  "official_source_blob": "5cd3ab66dd0a7ba0173b01f954fbe76c21269483",
+  "scope_limits": "No other devices,bootstrap,flash,automatic identical retry or Recovery expansion. Only release a conflicting host service after proving it owns solely92988a43 and has no active clients.",
+  "service_start_does_not_itself_install_or_boot_iOS": true
+}

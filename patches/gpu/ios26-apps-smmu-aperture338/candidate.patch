@@ -1,0 +1,250 @@
+--- /dev/null
++++ b/ZornAppsSmmuAperture338.h
+@@ -0,0 +1,41 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornDisplaySmmuHost337.h"
++
++namespace ZornAppsSmmuAperture338 {
++
++inline constexpr uint64_t PhysicalBase = 0x15000000;
++inline constexpr uint32_t ApertureBytes = 0xd0000;
++inline constexpr uint32_t Unpublished = 13;
++
++// The UFS initializer publishes once, before root registration starts I/O.
++// Its caller must retain the real mapping before committing the virtual base.
++// Publication never lends the mutable UFS command state to the display path.
++class Publication {
++    uintptr_t address_ = 0;
++    uint32_t status_ = 0;
++
++public:
++    bool begin()
++    {
++        uint32_t expected = 0;
++        return __atomic_compare_exchange_n(&status_, &expected, Unpublished, false,
++                                          __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
++    }
++
++    void finish(uint32_t status, uintptr_t base = 0)
++    {
++        address_ = base;
++        __atomic_store_n(&status_, status, __ATOMIC_RELEASE);
++    }
++
++    uint32_t snapshot(uintptr_t &base) const
++    {
++        const uint32_t status = __atomic_load_n(&status_, __ATOMIC_ACQUIRE);
++        base = status == ZornDisplaySmmu336::Observed ? address_ : 0;
++        return status ? status : Unpublished;
++    }
++};
++
++} // namespace ZornAppsSmmuAperture338
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -34,11 +34,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT337", 8);
++    memcpy(p, "K80FT338", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 337);
++    zorn_panic_le236(p, Bytes - 4, 338);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsCore26.cpp
++++ b/ZornUfsCore26.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornUfsCore26.h"
+-#include "ZornDisplaySmmuHost337.h"
++#include "ZornAppsSmmuAperture338.h"
+ #include <kern/clock.h>
+ #include "TransferPoll.h"
+ #include "ZornDataStorePolicy.h"
+@@ -351,58 +351,67 @@
+ 
+ #include "ZornPlatformRecordIo26.inc"
+ 
++namespace {
++ZornAppsSmmuAperture338::Publication displayAperture338;
++}
++
++extern "C" void zorn26_publish_apps_display_aperture338()
++{
++    namespace Aperture = ZornAppsSmmuAperture338;
++    namespace Transport = ZornDisplaySmmuHost337;
++    if (!displayAperture338.begin()) return;
++    if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled()) {
++        displayAperture338.finish(Transport::NoThreadContext);
++        return;
++    }
++    if (!gHost.ready || gHost.poisoned) {
++        displayAperture338.finish(Transport::TransportUnavailable);
++        return;
++    }
++    auto *const map = gHost.smmuMap.get();
++    const auto base = gHost.smmu;
++    if (!map || !base) {
++        displayAperture338.finish(Transport::MissingMapping);
++        return;
++    }
++    if (map->getLength() < Aperture::ApertureBytes || map->getVirtualAddress() != base) {
++        displayAperture338.finish(Transport::MappingBounds);
++        return;
++    }
++    IOPhysicalLength contiguous = 0;
++    const auto physical = map->getPhysicalSegment(0, &contiguous, kIOMemoryMapperNone);
++    if (physical != Aperture::PhysicalBase || contiguous < Aperture::ApertureBytes) {
++        displayAperture338.finish(Transport::MappingPhysical);
++        return;
++    }
++    // Keep the actual checked virtual mapping alive until kernel shutdown.
++    // After initialization, the UFS command path does not program this SMMU.
++    map->retain();
++    displayAperture338.finish(ZornDisplaySmmu336::Observed, base);
++}
++
+ extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&out)[ZornDisplaySmmu336::Words])
+ {
+     namespace Probe = ZornDisplaySmmu336;
+-    namespace Transport = ZornDisplaySmmuHost337;
++    namespace Aperture = ZornAppsSmmuAperture338;
+     for (auto &word : out) word = 0;
+     if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled()) {
+-        out[Probe::State] = Transport::NoThreadContext;
+-        return;
+-    }
+-    auto *const lock = gHost.lock;
+-    if (!lock) {
+-        out[Probe::State] = Transport::MissingLock;
+-        return;
+-    }
+-    auto now = [] {
+-        uint64_t ticks = 0, ns = 0;
+-        clock_get_uptime(&ticks);
+-        absolutetime_to_nanoseconds(ticks, &ns);
+-        return uint32_t(ns / 1000000);
++        out[Probe::State] = ZornDisplaySmmuHost337::NoThreadContext;
++        return;
++    }
++    uintptr_t base = 0;
++    const auto published = displayAperture338.snapshot(base);
++    if (published != Probe::Observed || !base) {
++        out[Probe::State] = published;
++        return;
++    }
++    auto read = [base](uint32_t offset, uint32_t &value) {
++        if ((offset & 3u) || offset > Aperture::ApertureBytes - sizeof(uint32_t)) return false;
++        value = read32(base, offset);
++        __asm__ volatile("dmb oshld" ::: "memory");
++        return true;
+     };
+-    auto sample = [](uint32_t (&values)[Probe::Words]) {
+-        if (!gHost.ready || gHost.poisoned) {
+-            values[Probe::State] = Transport::TransportUnavailable;
+-            return;
+-        }
+-        constexpr uint32_t aperture = 0xd0000;
+-        auto *const map = gHost.smmuMap.get();
+-        if (!map || !gHost.smmu) {
+-            values[Probe::State] = Transport::MissingMapping;
+-            return;
+-        }
+-        if (map->getLength() < aperture || map->getVirtualAddress() != gHost.smmu) {
+-            values[Probe::State] = Transport::MappingBounds;
+-            return;
+-        }
+-        IOPhysicalLength contiguous = 0;
+-        const auto physical = map->getPhysicalSegment(0, &contiguous, kIOMemoryMapperNone);
+-        if (physical != 0x15000000 || contiguous < aperture) {
+-            values[Probe::State] = Transport::MappingPhysical;
+-            return;
+-        }
+-        const auto base = gHost.smmu;
+-        auto read = [base](uint32_t offset, uint32_t &value) {
+-            if ((offset & 3u) || offset > aperture - sizeof(uint32_t)) return false;
+-            value = read32(base, offset);
+-            __asm__ volatile("dmb oshld" ::: "memory");
+-            return true;
+-        };
+-        Probe::sample(read, aperture, values);
+-    };
+-    Transport::withTransport([&] { return IOLockTryLock(lock); }, [&] { IOLockUnlock(lock); },
+-        [](unsigned ms) { IOSleep(ms); }, now, sample, out);
+-}
+-
+-}
++    Probe::sample(read, Aperture::ApertureBytes, out);
++}
++
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -31,6 +31,7 @@
+ #include "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/cpu-posterboard-passive-cc9fbb3b86364db19e8f2ec90256040b/native/ZornSBLifecycle26.h"
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornUfsOwner26.h"
++extern "C" void zorn26_publish_apps_display_aperture338();
+ #include "ZornPresenterStartup26.h"
+ #include "ZornFramebufferProgress26.h"
+ #include "ZornTouchTrialSnapshot26.h"
+@@ -142,6 +143,7 @@
+     ZornUfsCore26::PreparationObservation observation;
+     const bool completed = ZornUfsCore26::hostBringUp(
+         &reason, *traceOwner_, trace_, observation);
++    if (completed) zorn26_publish_apps_display_aperture338();
+     IOLockLock(gate_);
+     status_.initializerReturned = true;
+     status_.initializerSucceeded = completed;
+@@ -552,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC f7fda793ad694c57be740bb78a1cd6ce %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC b4bff8cd10764bbbb448d01c47ddf552 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1035,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"f7fda793ad694c57be740bb78a1cd6ce",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"b4bff8cd10764bbbb448d01c47ddf552",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26F7FDA793AD69"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B4BFF8CD1076"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xf7,0xfd,0xa7,0x93,0xad,0x69,0x4c,0x57,0xbe,0x74,0x0b,0xb7,0x8a,0x1c,0xd6,0xce};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb4,0xbf,0xf8,0xcd,0x10,0x76,0x4b,0xbb,0xb4,0x48,0xd0,0x1c,0x47,0xdd,0xf5,0x52};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xf7,0xfd,0xa7,0x93,0xad,0x69,0x4c,0x57,0xbe,0x74,0x0b,0xb7,0x8a,0x1c,0xd6,0xce};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb4,0xbf,0xf8,0xcd,0x10,0x76,0x4b,0xbb,0xb4,0x48,0xd0,0x1c,0x47,0xdd,0xf5,0x52};

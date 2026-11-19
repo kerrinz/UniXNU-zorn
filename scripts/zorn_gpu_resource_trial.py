@@ -15,6 +15,8 @@ import sys
 import time
 import zlib
 
+from zorn_adb_endpoint import device_arguments, port_number
+
 ROOT = Path(__file__).resolve().parents[2]
 CANDIDATE = ROOT / 'out/zorn/gpu-resource-observation-candidate'
 SCOPE = 'single-unixnu64-UEFI-resource-observation-terminal-before-payload'
@@ -189,9 +191,7 @@ def claim_once(verified):
 
 class Transport:
     def __init__(self, *, adb_server_port=None):
-        if adb_server_port is not None and (type(adb_server_port) is not int or adb_server_port != 5039):
-            raise ValueError('only the reviewed existing ADB server5039 is selectable')
-        self.adb_server_port = adb_server_port
+        self.adb_server_port = None if adb_server_port is None else port_number(adb_server_port)
         self.adb = os.environ.get('UNIXNU_ADB', 'adb')
         self.fastboot = os.environ.get('UNIXNU_FASTBOOT', 'fastboot')
         self.deadline = time.monotonic()+180
@@ -213,8 +213,9 @@ class Transport:
         return p.stdout if binary else (p.stdout+p.stderr).decode().strip()
 
     def adb_call(self, *args, **kw):
-        server = () if self.adb_server_port is None else ('-H', '127.0.0.1', '-P', str(self.adb_server_port))
-        return self.call(self.adb, *server, '-s', SERIAL, *args, **kw)
+        if self.adb_server_port is None:
+            return self.call(self.adb, '-s', SERIAL, *args, **kw)
+        return self.call(*device_arguments(self.adb, self.adb_server_port, SERIAL, *args), **kw)
 
     def read(self, device, lba, count):
         if device not in (PARTITION, '/dev/block/sda', '/dev/block/by-name/misc') or lba < 0 or not 0 < count <= 65:

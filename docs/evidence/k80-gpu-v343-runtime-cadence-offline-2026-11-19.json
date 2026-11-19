@@ -1,0 +1,121 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 343,
+  "boot_tag": "315732a45d8b44adb7744c381b2bc9d7",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/boot-package/boot.ZORN26-GPU-V343-SERIAL-UNSELECTED.img",
+    "sha256": "c42fb679c3a8b75d7f28b69e77f6bfa5dd448243d5217da8d66b386824488de6",
+    "bytes": 11890688
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/full-link/kernel.ZORN26-CADENCE343.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/boot-package/inputs/kernel.macho",
+    "sha256": "b5ccaaa7e7ac203ba784db522968f9448c7026179e73f59ea5f7cedb699cf45b",
+    "bytes": 31120296
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/boot-package/verified.json",
+    "bytes": 13707,
+    "sha256": "ca36939230ec7a579c4039288e5a591d92948e02c3d7de1189ae1c2129dbda7a"
+  },
+  "link": {
+    "passed": true,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/full-link/kernel.ZORN26-CADENCE343.UNSELECTED.macho",
+      "sha256": "b5ccaaa7e7ac203ba784db522968f9448c7026179e73f59ea5f7cedb699cf45b"
+    },
+    "bytes": 31120296,
+    "inputs": 1399,
+    "replaced": 41,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/full-link/exact-inputs.json",
+      "sha256": "ff18ef6542c37cabfa3518ccd35cdee7d682171323cb9ac6e95f055fd50361c9"
+    },
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "hardware_qualified": false,
+    "device_access": false,
+    "sha256": "b5ccaaa7e7ac203ba784db522968f9448c7026179e73f59ea5f7cedb699cf45b",
+    "undefined_symbols": 0
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-runtime-cadence343/source-manifest.json",
+    "bytes": 5797,
+    "sha256": "48a3f51161d48edfac3f0bc412f110b257fa5539c9f8af10b296c95f48b15843"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v342-swipe-dsi-device-2026-11-19.json",
+    "bytes": 11557,
+    "sha256": "f2d57edec361df1c85db12cc17c0f6670ecf4ebd08e5074c30dbbe8e53e98519"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/host-cadence/result.json",
+      "bytes": 1749,
+      "sha256": "873e07945ac714ac12c1c6119f94a6db944b5bf07751907d11c1edb7b19be712"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/patch-replay.json",
+      "bytes": 1003,
+      "sha256": "832921b6bbb5012a89aa9371f635cb839f37c96e6f6564293bc411100768ae2c"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/cadence-archive-host/result.json",
+      "bytes": 4109,
+      "sha256": "fb39840bd8f43261838551e91e22b942c91d5fff3e2e5696f39428d78f5fa2ad"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v343-runtime-cadence-315732a45d8b44adb7744c381b2bc9d7/cadence-inputs343.json",
+      "bytes": 1419,
+      "sha256": "08b5ef87dc9981e8cc1f58df04435290c0ef4aa49766112f329697a510ec2b56"
+    }
+  ],
+  "enabled_path": "Observe an eight-second natural ordinary-GPU window after the real registered compositor gate. MDP is read-only. Acknowledge only the owned existing INTF1 and DSI0 sticky completion status. Do not issue CTL commands, modify a framebuffer or synthesize input.",
+  "device_only_questions": [
+    "Does the ordinary compositor, checked runtime display route and live hardware lease reach the sampling window?",
+    "Do INTF1 and DSI0 counters advance with no instructed CTL kickoff, and can native writer epochs bind the sampled content?",
+    "Does the lease retire normally and Recovery return with storage protected?"
+  ],
+  "device_protection": {
+    "target": "92988a43/zorn/slot-a",
+    "mode": "unattended-phone-connected",
+    "boot_attempts": 1,
+    "retries": 0,
+    "watchdog_seconds": 300,
+    "recovery_timeout_seconds": 600,
+    "native_root_writes": 0,
+    "physical_contact_required": false
+  },
+  "stop_conditions": [
+    "No status acknowledgement on changed topology, clock/config or IRQ ownership.",
+    "When an observed transfer does not retire within the bounded drain, retain its resources. Never retry a device boot.",
+    "Do not treat repeated, unknown, or software-copy observations as new physical full frames."
+  ],
+  "physical_frame_rate_qualified": false,
+  "hardware_qualified": false,
+  "phone_access": false
+}

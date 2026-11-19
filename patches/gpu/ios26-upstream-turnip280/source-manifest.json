@@ -1,0 +1,241 @@
+{
+  "version": 280,
+  "upstream_core": "630b85a307f19c8d8a4699d5bfc12f6796b874aa",
+  "upstream_Mesa": {
+    "repository": "https://gitlab.freedesktop.org/mesa/mesa",
+    "mirror": "https://chromium.googlesource.com/external/gitlab.freedesktop.org/mesa/mesa",
+    "commit": "85fda3b36405bcaea8bffc64aa4f2651dc90770d",
+    "tree": "b72ff1eb2138026ed6aba524770899faabf7d7c8",
+    "sparse_directories": [
+      "bin",
+      "include",
+      "build-support",
+      "subprojects",
+      "src/compiler",
+      "src/freedreno",
+      "src/util",
+      "src/c11",
+      "src/getopt",
+      "src/gtest",
+      "src/gallium/include",
+      "src/gallium/auxiliary/util",
+      "src/gallium/auxiliary/nir",
+      "src/gallium/auxiliary/tgsi",
+      "src/loader",
+      "src/mesa/main",
+      "src/android_stub",
+      "src/amd/common",
+      "src/amd/vulkan/bvh",
+      "src/amd/vulkan/tools",
+      "src/tool",
+      "src/virtio/virtio-gpu",
+      "src/gallium/frontends",
+      "src/gallium/drivers/llvmpipe",
+      "src/vulkan/runtime/bvh",
+      "src/mesa/program",
+      "src/vulkan/util",
+      "src/vulkan",
+      "src/gallium/auxiliary",
+      "src/gbm"
+    ]
+  },
+  "ordered_upstream_patches": [
+    {
+      "path": "patches/mesa/freedreno-tools-nir.patch",
+      "sha256": "77e966b6e9a725892d10889a4d8deeefb03a32ae3a007904868132e56350191f"
+    },
+    {
+      "path": "patches/mesa/ir3-darwin-build-id.patch",
+      "sha256": "be3ca7840a16cb7696d8d7e67195c8d097cf0e38a3b5011edc674a5aed9c6975"
+    },
+    {
+      "path": "patches/mesa/ir3-portable-asm-roundtrip.patch",
+      "sha256": "bfc5552bc2bd6e1668d75773cce7bf62fd19065e6281bf7da49f9ddfc2e79339"
+    },
+    {
+      "path": "patches/mesa/offline-adreno-compiler-probe.patch",
+      "sha256": "b7d7a113beb5ef99edea24858d906194d4b4755c987520545ad2f7f3136bb4fb"
+    },
+    {
+      "path": "patches/mesa/turnip-darwin-kmd.patch",
+      "sha256": "300a6be0b076c10e15c701a7d5c5f89f89fbe0bab44837329ed35474bf173861"
+    },
+    {
+      "path": "patches/mesa/turnip-graphics-cache-feedback.patch",
+      "sha256": "07f397e38d9acfb0085db4c19567c84fd8a3bcd63d6fd05192857abfbde5aed2"
+    },
+    {
+      "path": "patches/mesa/turnip-empty-scissor.patch",
+      "sha256": "dec657626dcd8e8d3f1447e44574f31e4afb8c90b6ebf7d589ba10ee0f8b6461"
+    },
+    {
+      "path": "patches/mesa/turnip-builtin-shader-pack.patch",
+      "sha256": "3c606dc99643c3ca3e4736c5783348cd85cbff3fbc55161e53226ab459f34473"
+    },
+    {
+      "path": "patches/mesa/turnip-host-import-images.patch",
+      "sha256": "8bc141db41848a59b16493b4ca8a359e0f18f1cad5f14147ff18d15f79c0c3c4"
+    },
+    {
+      "path": "patches/mesa/turnip-render-mode-for-attachment-memory.patch",
+      "sha256": "47779b6c8c3b14b6c276f30a252d9730a3e338ba9f8e976fc4b2c63a0e060fc9"
+    },
+    {
+      "path": "patches/mesa/turnip-gmem-mutable-swap.patch",
+      "sha256": "98c576038cb0a6ddfd3ee871ebb830639056606819138e1f2de96603fa059767"
+    },
+    {
+      "path": "patches/mesa/turnip-current-queue-priorities.patch",
+      "sha256": "25a64d842b26336b052720ababd5fa00ef4c6507351e5b75f51492b768593588"
+    },
+    {
+      "path": "patches/mesa/turnip-frame-diagnostics.patch",
+      "sha256": "cd15bbb8f932d564a99300e63d3d6c5a6a714b311596e80619092c5d3fa5e25a"
+    },
+    {
+      "path": "patches/mesa/turnip-transient-attachments-in-gmem.patch",
+      "sha256": "afc6a9b2417d4e2ad56f2965971a039c186e37d59fb72352c2de9959edea8f4e"
+    },
+    {
+      "path": "patches/mesa/turnip-gmem-swap-trace.patch",
+      "sha256": "e0ffcf1508c2c441d4ad27775219980bcfb6d014fa6017a417ce69f944c0195f"
+    },
+    {
+      "path": "patches/mesa/turnip-thread-render-mode.patch",
+      "sha256": "5a567d4c136dae860f0be4880d7446b862c2d1cd48e09b618c761034512c597e"
+    },
+    {
+      "path": "patches/mesa/turnip-gmem-memory-side-swap.patch",
+      "sha256": "79168ffd251bfd90bc88027c49bc9eaaab93779e69331bb499f874f6e4e2d183"
+    },
+    {
+      "path": "patches/mesa/turnip-darwin-submit-cuts.patch",
+      "sha256": "d8df7d7bd35ded5612e83ded065f0aaba70f1466cfcd9f5bcebeb4aeedbfea33"
+    },
+    {
+      "path": "patches/mesa/turnip-render-mode-turns.patch",
+      "sha256": "c9985686bd37840eccd96a0f2872972ba5576a5d5c06afbfbbef313e23b98eec"
+    },
+    {
+      "path": "patches/mesa/turnip-darwin-keep-device-after-restart.patch",
+      "sha256": "55824a09087c6efd9eef9d4f505f2edf80441c000f721c7ac31a1b4d68794d65"
+    },
+    {
+      "path": "patches/mesa/ir3-fragment-consts-leave-pipeline-space.patch",
+      "sha256": "da2562e395fc3701e0c3d40089e8bdd02862b9fa50e6453af817e9b01de81561"
+    },
+    {
+      "path": "patches/mesa/turnip-shaders-shared-across-pipeline-caches.patch",
+      "sha256": "54b2438548f90ee0f9a187725d4d58c31988f24b150f1020d1a9472284f0acee"
+    },
+    {
+      "path": "patches/mesa/turnip-darwin-sweep-retired-on-cache-miss.patch",
+      "sha256": "acf17b799ee6954609d370a4a79a9758d82d331ecb1e10704ac658ed4d1c0872"
+    },
+    {
+      "path": "patches/mesa/turnip-darwin-bo-finish-clears-under-lock.patch",
+      "sha256": "76fc6000bc62f278d321fa98dfbbbd3139e5018bb7b6e282a0958182d2f7b3d8"
+    }
+  ],
+  "K80_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-upstream-turnip280/K80-ABI-v1-transport280.patch",
+    "sha256": "dab3e140503c4a2b979b1177419e9e68f39abd85e537a1e5c3c3357d4fbc31d6"
+  },
+  "ABI_header_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/Adreno740/NativeAdrenoABI.h",
+  "ABI_header_sha256": "0a37fb621488b410e2f1206a161e5d537313c2eed7e27bd9c46817c09d81bc13",
+  "guard": "native/ios26-upstream279/ZornAdrenoAbiV1Selection279.h",
+  "guard_install_path": "k80-abi280/ZornAdrenoAbiV1Selection279.h",
+  "guard_ABI_install_path": "k80-abi280/NativeAdrenoABI.h",
+  "actual_v1_backend_reused": {
+    "reused_backend": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/graphics/turnip-app-registry-r2-candidate/tu_knl_darwin.cc",
+    "reused_sha256": "93a7f3e157e0b8733857dbee5fd0a8fe6f110bd3d012d01e0e7a9c84bd6a8e4f",
+    "actual_kernel_ABI": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/kernel/houji26-build-reference/iokit/Kernel/houji-ufs-root/Adreno740/NativeAdrenoABI.h",
+    "ABI_sha256": "0a37fb621488b410e2f1206a161e5d537313c2eed7e27bd9c46817c09d81bc13",
+    "reused_functions": [
+      "dw_call",
+      "dw_open_connection",
+      "tu_darwin_set_priority",
+      "tu_darwin_note",
+      "tu_darwin_frame_diagnostic"
+    ],
+    "upstream_common_allocator_retirement_and_submit_boundary_changes_retained": true,
+    "automatic_restart_replay_assumed": false,
+    "v2_priority_or_note_dispatch": false,
+    "CPU_cache": "ABI-v1 WriteCombine;flag2 is SubmitBatch",
+    "kernel_abi": 1,
+    "phone_access": false
+  },
+  "source_identity": "46eaab9f64f27591953f11bf0b666f47c5f9dfbb294802349c22e910cef70e5a",
+  "build_id": "9a57f888a0469d12a0154297c85b952294411fa463216cdaeba661e3417a9e5c",
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/selected-source280.json",
+    "sha256": "c93507b094497c6a0984b6b83d7e030c699910cd9a45ebf16ee5b2087c7d7052"
+  },
+  "exact_local_recipes": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/prepare-zorn-turnip280.py",
+      "sha256": "9d97c3bba730d554aa409b208d0e5b57af233285b2fd4d49d6176fada29354ae"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/rebase-zorn-turnip280.py",
+      "sha256": "0362d7ccc21c2f3abfe14f22fab1e35c1bc0cda43697237657002e56687fd5ad"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/build-zorn-turnip280.py",
+      "sha256": "8471b6ddd734fa296b0dba0e8f9b7368c7fe3a33e233fd8a2a48cce19a8b11a2"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/package-zorn-turnip280.py",
+      "sha256": "88c06624b73d7301d072ee1564e53bf012e4a73a69c29b57f2b8d503715e6f78"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/verify-zorn-turnip280.py",
+      "sha256": "ca095ba966422265fda73647af814a0047e8fa1643fb15bf85e3a5a7635e61e0"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/prepare-platform280.py",
+      "sha256": "fe467ad351fde773e6dfc307eca6fea1637bc22e71b4e66c4563493f583b2cd1"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/bind-root280.py",
+      "sha256": "1b7418ec4527d88f93f916d919b420956a35c3280a2e162eaca9051e80cfa8de"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/build280.py",
+      "sha256": "c2e277d91d46b192460b29d459f41b56722d03716c4dd39cbcdfcf9aa39df571"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/review280-full.py",
+      "sha256": "902acebeaa83ce9240bd3d746dbc9013abeb2ff06fe64274f34b9c21da0f3e48"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/package-upstream280.py",
+      "sha256": "b057222de469cfc4b6c35b74a4c353c533ad634c883f25f89e699e43b1ebdb88"
+    }
+  ],
+  "target": "arm64e-apple-ios26.0",
+  "CPU_page_bytes": 16384,
+  "GPU_page_bytes": 4096,
+  "scope": "Offline source/binary candidate,not selected,installed or hardware qualified",
+  "phone_access": false,
+  "platform_patch": {
+    "patch": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-upstream-turnip280/K80-platform-root-binding280.patch",
+      "sha256": "bf207f052155d6109230b653baa5b0ea431377f75a0dbfbfa410c24873753f50"
+    },
+    "series": "platform-series",
+    "target": "Frozen platform278 source tree;independent280 root/record identity only",
+    "files": [
+      "ZornRootWindow26.h",
+      "ZornUfsOwner26.cpp",
+      "ZornUsbCdc26.c",
+      "record-identity/ZornPlatformRecordIdentity26.h",
+      "record-identity/ZornPlatformTrialIdentity26.h"
+    ],
+    "parent_exact_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v278-present-cost-840cdc02db2b41919a8fc2ba68dcccb3",
+    "replay": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v280-upstream-turnip-434fe1f2f3be4ee89e7166d9b61cf1d9/platform-patch-replay280/result.json",
+      "sha256": "d7ad37c400411bcc82aadf5dbe2437b7a63d74ae8c0e0b2e70cf7b11670a29c6"
+    }
+  }
+}

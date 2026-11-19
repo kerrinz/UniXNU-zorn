@@ -1,0 +1,114 @@
+diff -ruN a/ZornGen7DarwinBoardOwner.cpp b/ZornGen7DarwinBoardOwner.cpp
+--- a/ZornGen7DarwinBoardOwner.cpp	2026-11-17 02:44:06
++++ b/ZornGen7DarwinBoardOwner.cpp	2026-11-18 14:18:30
+@@ -1,4 +1,5 @@
+ #include "ZornProgressGate203.h"
++#include "ZornNominalOpp305.h"
+ extern "C" void Zorn26RecordRuntimeResult(unsigned);
+ extern "C" void Zorn26RecordKnownImageResult(unsigned);
+ #include "ZornGen7CpBootstrapAuthority26.h"
+@@ -3632,16 +3633,12 @@
+                     state.stage=Stage::CpuReady;
+                     if(mode==19)return 50;
+ 
+-                    // Proven bound AB SKU bin 3 has 12 levels and selects
+-                    // row 11 as its default. PERF prepends the zero row.
+-                    constexpr uint32_t activeRows=12,defaultLevel=11;
++                    // K80 stock SKU bin 3 (stock_0_power_3) nominal row 6:
++                    // 578 MHz (0x80 NOM), bus_freq=5 (stock_0_ddr[5]=8171875 kbps).
++                    constexpr uint32_t activeRows=ZornNominalOpp305::kActiveRows,defaultLevel=ZornNominalOpp305::kSelectedRow;
+                     constexpr uint32_t perfIndex=activeRows-defaultLevel;
+                     constexpr uint32_t invalidClock=0xffu,invalidAB=0xffff00ffu;
+-                    // The source's first AXI bus request has fresh zero
+-                    // bus state and the same default row's qcom,bus-freq=1.
+-                    // Before its AB query the GMU sees the unsupported-AB
+-                    // sentinel. The host average and AB query are a later step.
+-                    constexpr uint32_t initialBus=1;
++                    constexpr uint32_t initialBus=ZornNominalOpp305::kBusLevel;
+                     const uint32_t clockVote[]={1,perfIndex,invalidAB};
+                     const uint32_t busVote[]={1,invalidClock,0xffff0000u|initialBus};
+                     const uint32_t abQuery[]={122,0};
+@@ -3674,7 +3671,7 @@
+ 
+                     // Complete source bootstrap unvote with average preserved
+                     // as the default bus request originally delegated to HLOS.
+-                    constexpr uint32_t firstDdr=2136718u,lastDdr=16500000u;
++                    constexpr uint32_t firstDdr=ZornNominalOpp305::kDdrKbps,lastDdr=ZornNominalOpp305::kMaxDdrKbps;
+                     const uint32_t average=ZornGen7HostBandwidth26::freshAverageMbps(firstDdr);
+                     uint32_t bandwidthWord=0;
+                     state.stage=Stage::StoppedRetained;
+diff -ruN a/ZornNominalOpp305.h b/ZornNominalOpp305.h
+--- a/ZornNominalOpp305.h	1970-01-01 08:00:00
++++ b/ZornNominalOpp305.h	2026-11-18 14:18:30
+@@ -0,0 +1,20 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++
++// Exact K80 (zorn / SM8650 / Adreno 750v2) stock_0_power_3[6] & stock_0_ddr[5]
++// nominal operating point from ZornGen791StockVoteData.inc (qcom,gpu-pwrlevels-3):
++//   row 6: gpu_freq_hz = 578,000,000 (0x22739480), voltage = 0x80 (NOM), bus_freq = 5
++//   stock_0_ddr[5] = 8,171,875 kbps (0x7cb163), stock_0_ddr[9] = 16,500,000 kbps (0xfbc520)
++// Replaces the 231 MHz MIN_SVS idle boot floor (row 11 / bus 1) so 25-pass
++// Liquid Glass desktop compositing runs at K80's stock nominal corner.
++namespace ZornNominalOpp305 {
++constexpr uint32_t kActiveRows = 12u;
++constexpr uint32_t kSelectedRow = 6u;
++constexpr uint32_t kPerfIndex = kActiveRows - kSelectedRow; // 6u
++constexpr uint32_t kGpuFreqHz = 578000000u;
++constexpr uint32_t kVoltageCornerNom = 0x80u;
++constexpr uint32_t kBusLevel = 5u;
++constexpr uint32_t kDdrKbps = 8171875u;
++constexpr uint32_t kMaxDdrKbps = 16500000u;
++}
+diff -ruN a/ZornUfsOwner26.cpp b/ZornUfsOwner26.cpp
+--- a/ZornUfsOwner26.cpp	2026-11-18 13:57:03
++++ b/ZornUfsOwner26.cpp	2026-11-18 14:18:30
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 2f4ee01ef2c24506b38fd065d47bb57d %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 78871e9ec441484592f84b6bacab8dfa %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"2f4ee01ef2c24506b38fd065d47bb57d",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"78871e9ec441484592f84b6bacab8dfa",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+diff -ruN a/ZornUsbCdc26.c b/ZornUsbCdc26.c
+--- a/ZornUsbCdc26.c	2026-11-18 13:57:03
++++ b/ZornUsbCdc26.c	2026-11-18 14:18:30
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN262F4EE01EF2C2"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2678871E9EC441"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+diff -ruN a/record-identity/ZornPlatformRecordIdentity26.h b/record-identity/ZornPlatformRecordIdentity26.h
+--- a/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 13:57:03
++++ b/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 14:18:30
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x2f,0x4e,0xe0,0x1e,0xf2,0xc2,0x45,0x06,0xb3,0x8f,0xd0,0x65,0xd4,0x7b,0xb5,0x7d};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x78,0x87,0x1e,0x9e,0xc4,0x41,0x48,0x45,0x92,0xf8,0x4b,0x6b,0xac,0xab,0x8d,0xfa};
+diff -ruN a/record-identity/ZornPlatformTrialIdentity26.h b/record-identity/ZornPlatformTrialIdentity26.h
+--- a/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 13:57:03
++++ b/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 14:18:30
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x2f,0x4e,0xe0,0x1e,0xf2,0xc2,0x45,0x06,0xb3,0x8f,0xd0,0x65,0xd4,0x7b,0xb5,0x7d};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x78,0x87,0x1e,0x9e,0xc4,0x41,0x48,0x45,0x92,0xf8,0x4b,0x6b,0xac,0xab,0x8d,0xfa};

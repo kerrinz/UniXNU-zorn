@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""Fixed CDC receiver entry for the single bounded298 presenter-unlock trial."""
+import zorn_ios26_gpu_v298_system_trial as trial
+from zorn_ios26_pres298_receiver import run_capture
+
+if __name__ == '__main__':
+    raise SystemExit(run_capture(trial))

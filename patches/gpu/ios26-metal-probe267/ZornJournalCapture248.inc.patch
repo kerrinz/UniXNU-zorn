@@ -1,0 +1,11 @@
+--- a/ZornJournalCapture248.inc
++++ b/ZornJournalCapture248.inc
+@@ -3,7 +3,7 @@
+ static int zorn26_journal_process248(proc_t p,int fd){
+  if(!p || fd!=2)return 0;
+  const char *name=proc_best_name(p);
+- static const char expected[]="backboardd";
++ static const char expected[]="zorn-metal-probe193";
+  return name && !strncmp(name,expected,sizeof(expected));
+ }
+ // Observe the actually returned prefix after the original write. User memory

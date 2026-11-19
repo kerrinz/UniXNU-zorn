@@ -1,0 +1,128 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 358,
+  "boot_tag": "f3db4b620bf4493288c963dc5baff5d6",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/boot-package/boot.ZORN26-GPU-V358-SERIAL-UNSELECTED.img",
+    "sha256": "b05164f7a8fc30ebbe3af18bf5db0cd7a9c2b2f0dc9d05e3a0cdfbc8a295b127",
+    "bytes": 11902976
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/full-link/kernel.ZORN26-HWPACING358.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/boot-package/inputs/kernel.macho",
+    "sha256": "9a5123af5d7095cbe9f7a074089053c53652d35eabc5723507940c730de7ff7b",
+    "bytes": 31140680
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/boot-package/verified.json",
+    "bytes": 14727,
+    "sha256": "658782089c4094c315ba0950e3092c8c4af605c3319a5ac789a9279c5f5f560a"
+  },
+  "link": {
+    "passed": true,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/full-link/kernel.ZORN26-HWPACING358.UNSELECTED.macho",
+      "sha256": "9a5123af5d7095cbe9f7a074089053c53652d35eabc5723507940c730de7ff7b"
+    },
+    "bytes": 31140680,
+    "inputs": 1399,
+    "replaced": 41,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/full-link/exact-inputs.json",
+      "sha256": "92cc579dab64feaca2a05d73894f2f0ada7f19d4426d61bdd9c9ca9d59766943"
+    },
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "hardware_qualified": false,
+    "device_access": false,
+    "sha256": "9a5123af5d7095cbe9f7a074089053c53652d35eabc5723507940c730de7ff7b",
+    "undefined_symbols": 0
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-dsi-hardware-pacing358/source-manifest.json",
+    "bytes": 7701,
+    "sha256": "15b25fcce0a63c4a8d86f63233f91b5172c3745804b6f59a07824b33efc5fc7a"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v357-live-2te-device-2026-11-19.json",
+    "bytes": 27676,
+    "sha256": "22df1441a766c2fd302efa98117730dc7f61ee10f5c1555c9569e04c72d5a246"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/hardware-pacing-native-host/result.json",
+      "bytes": 1209,
+      "sha256": "d1ab86615e6cf081ec682af8283ac7540e7d005aeaf29788e403d4e776bcadfe"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/patch-replay.json",
+      "bytes": 777,
+      "sha256": "2cb8dbaa845445722117e563ea14445f206040b4a15dbc60b0f67a1e0d8e297d"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/hardware-pacing-archive-host/result.json",
+      "bytes": 4567,
+      "sha256": "fb6c122b64e84fbec9bdb6e2a6520bdc6d730613a769699067eca53c43ceed99"
+    }
+  ],
+  "enabled_path": "Skip the software beat sleep only when the checked 500 ms live 2-TE double-buffer session is active and under cap. Inspect the borrowed session under the writer lock. Keep original pacing when no session, uncertain, expired, at cap or lock busy. Restore software phase after session.",
+  "device_only_questions": [
+    "Does dropping the software pace wait remove the measured 16 ms tail while preserving DSI pairing and genuine GPU swaps?",
+    "Do confirmed sampled RGB changes and queued-to-selection latency improve over v357 at the same window duration?",
+    "Does the device restore original GOP and 60 TE, return the display lease and safely auto-recover to TWRP?"
+  ],
+  "device_protection": {
+    "target": "92988a43/zorn/slot-a",
+    "mode": "unattended-phone-connected",
+    "boot_attempts": 1,
+    "retries": 0,
+    "watchdog_seconds": 300,
+    "recovery_timeout_seconds": 600,
+    "native_root_writes": 0,
+    "physical_contact_required": false
+  },
+  "stop_conditions": [
+    "Do not start a retry or optional reset if any DSI operation has uncertain completion.",
+    "Retain CPU alias and display resources if active back scanout or state is ambiguous.",
+    "No installation, root write or persistent slot change."
+  ],
+  "physical_frame_rate_qualified": false,
+  "hardware_qualified": false,
+  "phone_access": false,
+  "comparison_baseline": {
+    "device": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v357-live-2te-device-2026-11-19.json",
+      "bytes": 27676,
+      "sha256": "22df1441a766c2fd302efa98117730dc7f61ee10f5c1555c9569e04c72d5a246"
+    },
+    "metrics": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v357-live-2te-64a3b41d79624622876ac6ab52f2940e/actual-v357-fps.json",
+      "bytes": 3900,
+      "sha256": "d5ff7996a761d4e5a34a5918b99b2c422fa449dc52322bf29735b10ff2032fcb"
+    }
+  }
+}

@@ -1,0 +1,219 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -59,9 +59,9 @@
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
+-#include "ZornSerialShot265.h"
+-static ZornSerialShot265 zornSerialShot265;
+-extern "C" bool zorn26_ui_scene_done269();
++#include "ZornSerialShot270.h"
++static ZornSerialRoi270 zornSerialShot265;
++extern "C" bool zorn26_ui_scene_capture_ready270();
+ extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+@@ -1440,7 +1440,7 @@
+                 zornKnownPresent247.complete(record);
+                 // One thumbnail after real CPU copies/helpers and a mature
+                 // compositor frame. The same retained issuer lease is held.
+-                if(zorn26_ui_scene_done269() && record[1]>=64 && record[9] && __atomic_load_n(&zornSerialShot265.state,__ATOMIC_ACQUIRE)==1){
++                if(zorn26_ui_scene_capture_ready270() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
+                     IOLockLock(fLock);
+                     (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+                         fPanelWidth,fPanelHeight,fRowBytes,fZornCheckedExtent265,record);
+--- /dev/null
++++ b/ZornCdcLate270.h
+@@ -0,0 +1,23 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include "ZornCdcStream201.h"
++// Selected late diagnostic producer only. Ordinary0 still means end/error.
++#define ZORN_CDC_PENDING270 UINT32_MAX
++typedef struct {ZornCdcNext201 next;void *context;bool pending;} ZornCdcLate270;
++static inline unsigned zorn_cdc_late_next270(void *cookie,char *out,unsigned cap,unsigned completed) {
++    ZornCdcLate270 *p=(ZornCdcLate270 *)cookie;
++    const unsigned n=p->next(p->context,out,cap,completed);
++    if(n==ZORN_CDC_PENDING270){p->pending=true;return 0;}
++    return n;
++}
++// Reuse the original completion/busy/size/frame/byte checks and stream layout.
++// Its invalid0 path mutates no stream counters. Only an explicit late Pending
++// marker after a genuine first frame may defer the next transfer until ready.
++// No frame/point is acknowledged,no USB START and no in-flight buffer reuse.
++static inline int zorn_cdc_next270(ZornCdcStream201 *s,bool ready,bool busy,
++    unsigned completed,ZornCdcNext201 next,void *context) {
++    if(!next)return -1;
++    ZornCdcLate270 proxy={next,context,false};
++    const int result=zorn_cdc_next201(s,ready,busy,completed,zorn_cdc_late_next270,&proxy);
++    return result<0 && proxy.pending && s && s->frames?0:result;
++}
+--- /dev/null
++++ b/ZornSerialShot270.h
+@@ -0,0 +1,53 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include "ZornSerialShot265.h"
++#include "ZornUiSceneWire269.h"
++#include "ZornCdcLate270.h"
++
++// Reuse265 actual checked sampler,immutable image buffer,payload CRC and packet
++// producer. Select the upper-right quadrant for observed home-screen icons;
++// the new source-bound ROI header prevents treating it as a full-screen image.
++struct ZornSerialRoi270 {
++    enum {Bytes=ZornSerialShot265::Bytes,PacketHeader=68};
++private:
++    ZornSerialShot265 image_;
++    uint32_t publication_=0,roi_[4]{};
++public:
++    bool request(){return image_.request();}
++    bool pending()const{return __atomic_load_n(&image_.state,__ATOMIC_ACQUIRE)==1 && __atomic_load_n(&publication_,__ATOMIC_ACQUIRE)==0;}
++    bool ready()const{return __atomic_load_n(&publication_,__ATOMIC_ACQUIRE)==2 && image_.ready();}
++    bool capture(const volatile uint32_t *base,uint32_t w,uint32_t h,uint32_t stride,
++                 size_t available,const uint32_t (&record)[16]) {
++        const uintptr_t address=reinterpret_cast<uintptr_t>(base);
++        const uint64_t extent=uint64_t(stride)*h;
++        if(!base || (address&3u) || (w&1u) || (h&1u) || w<96 || h<208 ||
++           w>16384 || h>16384 || (stride&3u) || uint64_t(stride)<uint64_t(w)*4 ||
++           !extent || extent>available || extent-1>UINTPTR_MAX-address)return false;
++        uint32_t empty=0;
++        if(!__atomic_compare_exchange_n(&publication_,&empty,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return false;
++        const uint32_t x=w/2,rows=h/2;const size_t offset=size_t(x)*4;
++        roi_[0]=x;roi_[1]=0;roi_[2]=w/2;roi_[3]=rows;
++        const bool ok=image_.capture(base+x,w/2,rows,stride,available-offset,record);
++        __atomic_store_n(&publication_,ok?2u:0u,__ATOMIC_RELEASE);return ok;
++    }
++    unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const {
++        if(!out || cap>3072 || cap<=PacketHeader || !ready())return 0;
++        // Original48byte header + data,leaving20bytes for ROI and header CRC.
++        const unsigned n=image_.packet(out,cap-20,offset,tag);
++        if(n<=48)return 0;
++        memmove(out+PacketHeader,out+48,n-48);memcpy(out,"K80SH270",8);
++        auto *p=reinterpret_cast<uint8_t *>(out);zorn_panic_le236(p,44,270);
++        for(unsigned i=0;i<4;++i)zorn_panic_le236(p,48+4*i,roi_[i]);
++        zorn_panic_le236(p,64,zorn_panic_crc236(p,64));return n+20;
++    }
++};
++
++struct ZornSerialMux270 : ZornUiSceneMux269 {
++    template<class Shot,class Ui> unsigned next(void *context,char *out,unsigned cap,unsigned completed,
++        ZornCdcNext201 normalNext,const Shot &shot,const Ui &ui,const uint8_t (&tag)[16],bool idle) {
++        if(normalNext && completed==wire && wire<38 && normal>=30 && idle &&
++           ((!sentUi&&!ui.ready()) || (offset<shot.Bytes&&!shot.ready())))
++            return ZORN_CDC_PENDING270;
++        return ZornUiSceneMux269::next(context,out,cap,completed,normalNext,shot,ui,tag,idle);
++    }
++};
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC fc312a9aa2c04015b536ec5af59242df %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC be48c59f862d43c49b41047053bece60 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -862,7 +862,7 @@
+ static uint64_t zornCallbackResult222,zornCallbackViewState222,zornCallbackMapState222;
+ // The existing retained progress owner supplies cadence metadata only.
+ // Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
+-#include "ZornSerialShot265.h"
++#include "ZornSerialShot270.h"
+ extern "C" void zorn26_serial_shot_request265(void);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
+ extern "C" bool zorn26_serial_shot_ready265(void);
+@@ -877,7 +877,7 @@
+         return zorn26_ui_scene_snapshot269(snapshot)?ZornUiSceneWire269::packet(out,cap,snapshot,tag):0;
+     }
+ };
+-static ZornUiSceneMux269 zornSerialMux265;
++static ZornSerialMux270 zornSerialMux265;
+ static bool zorn_serial_idle265(void *context){
+     if(context!=&zornProgress201)return false;
+     const auto &p=zornProgress201;
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"fc312a9aa2c04015b536ec5af59242df",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"be48c59f862d43c49b41047053bece60",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1056,7 +1056,7 @@
+     return size;
+ }
+ struct ZornSerialProvider265 {
+-    enum {Bytes=ZornSerialShot265::Bytes,PacketHeader=ZornSerialShot265::PacketHeader};
++    enum {Bytes=ZornSerialRoi270::Bytes,PacketHeader=ZornSerialRoi270::PacketHeader};
+     bool ready()const{return zorn26_serial_shot_ready265();}
+     unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{return zorn26_serial_shot_packet265(out,cap,offset,tag);}
+ };
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -33,9 +33,10 @@
+ namespace {
+ uint32_t scheduled269=0,done269=0,schedulingReturned269=0;
+ uint32_t status269[16]{};
++uint64_t captureDeadline270=0;
+ void store(unsigned i,uint32_t value){__atomic_store_n(status269+i,value,__ATOMIC_RELAXED);}
+ void addFlags(uint32_t flags){__atomic_fetch_or(status269+2,flags,__ATOMIC_RELAXED);}
+-void finish(uint32_t phase){store(0,phase);__atomic_store_n(&done269,1u,__ATOMIC_RELEASE);}
++void finish(uint32_t phase){uint64_t deadline=0;clock_interval_to_deadline(30,NSEC_PER_SEC,&deadline);__atomic_store_n(&captureDeadline270,deadline,__ATOMIC_RELEASE);store(0,phase);__atomic_store_n(&done269,1u,__ATOMIC_RELEASE);}
+ bool normal(){return preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled();}
+ bool nativeK80(IOService *platform) {
+     if(!OSDynamicCast(IODTPlatformExpert,platform))return false;
+@@ -111,6 +112,7 @@
+ }
+ }
+ extern "C" bool zorn26_ui_scene_done269() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
++extern "C" bool zorn26_ui_scene_capture_ready270(){return zorn26_ui_scene_done269() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
+ extern "C" bool zorn26_ui_scene_snapshot269(uint32_t (&out)[16]) {
+     if(!zorn26_ui_scene_done269())return false;
+     for(unsigned i=0;i<16;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -16,6 +16,7 @@
+ #define HOUJI_HOST_TEST 1
+ #include "houji_usb_protocol.h"
+ #include "ZornCdcStream201.h"
++#include "ZornCdcLate270.h"
+ #include "ZornCdcTerminal230.h"
+ #include "ZornTerminalContext231.h"
+ 
+@@ -83,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26FC312A9AA2C0"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BE48C59F862D"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+@@ -574,7 +575,7 @@
+             }
+             if(next && stream.frames<38 && !u.failed && u.configured && u.dtr && u.phase==SETUP_PHASE &&
+                !u.busy[3] && u.completed==u.length && mach_absolute_time()>=next_frame){
+-                const int step=zorn_cdc_next201(&stream,true,u.busy[3],u.completed,next,context);
++                const int step=zorn_cdc_next270(&stream,true,u.busy[3],u.completed,next,context);
+                 if(step<0)fail("progress frame bounds");
+                 else if(step>0){u.marker=stream.bytes;u.length=stream.length;u.completed=0;u.frame_count=stream.frames;u.wire_bytes=stream.total;}
+                 clock_interval_to_deadline(interval262,NSEC_PER_SEC,&next_frame);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xfc,0x31,0x2a,0x9a,0xa2,0xc0,0x40,0x15,0xb5,0x36,0xec,0x5a,0xf5,0x92,0x42,0xdf};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbe,0x48,0xc5,0x9f,0x86,0x2d,0x43,0xc4,0x9b,0x41,0x04,0x70,0x53,0xbe,0xce,0x60};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xfc,0x31,0x2a,0x9a,0xa2,0xc0,0x40,0x15,0xb5,0x36,0xec,0x5a,0xf5,0x92,0x42,0xdf};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbe,0x48,0xc5,0x9f,0x86,0x2d,0x43,0xc4,0x9b,0x41,0x04,0x70,0x53,0xbe,0xce,0x60};

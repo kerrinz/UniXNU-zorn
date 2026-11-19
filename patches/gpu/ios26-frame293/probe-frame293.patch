@@ -1,0 +1,69 @@
+--- a/userland/ZornMetalProbe193.mm
++++ b/userland/ZornMetalProbe193.mm
+@@ -17,7 +17,7 @@
+ #include <time.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-static constexpr char tag[]="ddb9c8640ab544cd85cae684e0fb8f66";
++static constexpr char tag[]="6935d159a82f4f439220151fdfda884a";
+ static uint32_t stages,actualCRC,firstBad=UINT32_MAX;
+ static uint64_t serviceID,deviceID;
+ static uint32_t crc32(const uint8_t *p,size_t n){uint32_t c=~0u;for(size_t i=0;i<n;i++){c^=p[i];for(unsigned j=0;j<8;j++)c=(c>>1)^((0u-(c&1u))&0xedb88320u);}return ~c;}
+@@ -144,6 +144,49 @@
+  return opened[0]==KERN_SUCCESS && opened[1]==KERN_SUCCESS && equal &&
+   closed[0]==KERN_SUCCESS && closed[1]==KERN_SUCCESS;
+ }
++
++// Fixed public-Metal workload:each iteration poisons the real shared IOSurface,
++// submits a fresh command buffer,waits for its actual completed handler,and
++// verifies both independent CPU views. Times are CPU uptime,not GPU cycles/FPS.
++static bool repeatKnownFrames293(id<MTLCommandQueue> queue,id<MTLRenderPipelineState> pipeline,
++ id<MTLTexture> texture,IOSurfaceRef surface){
++ mach_timebase_info_data_t timebase{};
++ if(mach_timebase_info(&timebase)!=KERN_SUCCESS || !timebase.numer || !timebase.denom)return false;
++ for(unsigned frame=0;frame<16;++frame){@autoreleasepool {
++  const uint64_t begin=mach_absolute_time();uint32_t seed=0;
++  auto raw=IOSurfaceLock(surface,0,&seed);if(raw)return false;
++  const bool poisoned=accessSurface224(surface,nullptr);raw=IOSurfaceUnlock(surface,0,&seed);
++  if(!poisoned || raw)return false;
++  id<MTLCommandBuffer> command=[queue commandBuffer];if(!command)return false;
++  MTLRenderPassDescriptor *pass=[MTLRenderPassDescriptor renderPassDescriptor];
++  pass.colorAttachments[0].texture=texture;pass.colorAttachments[0].loadAction=MTLLoadActionClear;
++  pass.colorAttachments[0].storeAction=MTLStoreActionStore;pass.colorAttachments[0].clearColor=MTLClearColorMake(0,0,0,0);
++  id<MTLRenderCommandEncoder> encoder=[command renderCommandEncoderWithDescriptor:pass];if(!encoder)return false;
++  [encoder setRenderPipelineState:pipeline];[encoder setCullMode:MTLCullModeNone];
++  [encoder setViewport:(MTLViewport){0,0,32,32,0,1}];
++  [encoder drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];[encoder endEncoding];
++  dispatch_semaphore_t done=dispatch_semaphore_create(0);
++  [command addCompletedHandler:^(id<MTLCommandBuffer> finished){(void)finished;dispatch_semaphore_signal(done);}];
++  const uint64_t encoded=mach_absolute_time();[command commit];const uint64_t committed=mach_absolute_time();
++  const long wait=dispatch_semaphore_wait(done,dispatch_time(DISPATCH_TIME_NOW,3LL*NSEC_PER_SEC));
++  const uint64_t completed=mach_absolute_time();
++  if(wait || command.status!=MTLCommandBufferStatusCompleted){errorReport(command.error);report(10,(long)command.status,2931);retainUntilWatchdog();}
++  uint8_t pixels[32*32*4],metalPixels[32*32*4];memset(pixels,0x5a,sizeof(pixels));memset(metalPixels,0xa5,sizeof(metalPixels));
++  [texture getBytes:metalPixels bytesPerRow:32*4 fromRegion:MTLRegionMake2D(0,0,32,32) mipmapLevel:0];
++  raw=IOSurfaceLock(surface,kIOSurfaceLockReadOnly,&seed);if(raw)return false;
++  const bool copied=accessSurface224(surface,pixels);raw=IOSurfaceUnlock(surface,kIOSurfaceLockReadOnly,&seed);
++  if(!copied || raw || memcmp(pixels,metalPixels,sizeof(pixels)) || crc32(pixels,sizeof(pixels))!=0x718ed2ce)return false;
++  const uint64_t checked=mach_absolute_time();
++  if(!(begin<=encoded && encoded<=committed && committed<=completed && completed<=checked))return false;
++  char line[384];const int n=snprintf(line,sizeof(line),"ZORN293FRAME run=%s index=%u begin=%llu encoded=%llu committed=%llu completed=%llu checked=%llu numer=%u denom=%u crc=718ed2ce status=4\n",tag,frame,(unsigned long long)begin,(unsigned long long)encoded,(unsigned long long)committed,(unsigned long long)completed,(unsigned long long)checked,timebase.numer,timebase.denom);
++  if(n<=0 || (size_t)n>=sizeof(line))return false;
++  ssize_t wrote;do{wrote=write(2,line,(size_t)n);}while(wrote<0 && errno==EINTR);
++  if(wrote!=n)return false;
++  encoder=nil;command=nil;pass=nil;
++ }}
++ return true;
++}
++
+ static int probe(){
+  report(1,0);
+  io_service_t service=IO_OBJECT_NULL;
+@@ -254,6 +297,7 @@
+  }
+  if(firstBad!=UINT32_MAX){report(10,(long)status,1);return 10;}
+  stages|=256;report(10,(long)status);
++ if(!repeatKnownFrames293(queue,pipeline,texture,surface.value)){report(10,(long)status,2932);return 10;}
+  if(!sharedQueries267()){report(10,(long)status,9);retainUntilWatchdog();}
+  // Keep texture and its real IOSurface alive until actual acquire/show acknowledgement.
+  if(!presentKnown249(surface.value)){report(10,(long)status,8);return 10;}

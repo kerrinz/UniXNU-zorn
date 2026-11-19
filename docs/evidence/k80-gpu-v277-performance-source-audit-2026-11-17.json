@@ -1,0 +1,51 @@
+{
+  "version": 277,
+  "scope": "Source-only performance-observability audit after one protected manual run;not FPS measurement or a bottleneck diagnosis",
+  "source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v277-manual-acceptance-e13cccee337c43fc8020baea055232ae/MiniIOMobileFramebuffer.cpp",
+    "sha256": "66c86b88bb4bfe910e1fe24a61dbd713b163b0956a259bc4954d195c724b9d67"
+  },
+  "kernel_sha256": "c2ccd636cd55da3a1587c5c1d8e0353beef337b86648a6c26127d2a5437e9745",
+  "observed_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v277-manual-acceptance-e13cccee337c43fc8020baea055232ae/observed277.json",
+    "sha256": "52d3c7281c226a759911ae4f3ca557f6aff1e1ed1ac3c13418985788dece2b02"
+  },
+  "facts": [
+    {
+      "code": "native-present-wait-outside-show-stat",
+      "source_lines": [
+        1406,
+        1430,
+        1518,
+        1571
+      ],
+      "finding": "K80 constructs and checks its real present lease before show;fStatWaiting starts inside show and cannot account for the preceding lease/readiness retries. Existing printed wait statistic must not be presented as total K80 GPU wait."
+    },
+    {
+      "code": "CPU-pixel-present-path",
+      "source_lines": [
+        1687,
+        1704,
+        1715
+      ],
+      "finding": "Selected ZORN_IOS26 path calls CPU drawLayer and completes CPU stores before advancing pixel-copy counter. The non-ZORN scanout path is excluded. GPU rendering success does not imply direct panel scanout or cheap presentation."
+    },
+    {
+      "code": "stats-default-disabled",
+      "source_lines": [
+        320,
+        1743
+      ],
+      "finding": "Existing houji_fb_stats default0 gates IOLog reporting;current1022byte args omit it. Source counters alone do not produce serial stage timing."
+    },
+    {
+      "code": "reuse-render-cost-warnings",
+      "finding": "Exact277 backboardd journal retains render-pass-split/memoryless-backed/shadowed-texture warnings. Their existence is not measured time attribution or Settings/LiquidGlass root-cause proof."
+    }
+  ],
+  "next": "Prepare a separate offline candidate that exports bounded CPU timing for swap queue,lease wait/acquire,pixel copy/scale and completed presents through the existing checked serial path;reuse actual clock conversion and counters,keep all ownership and WDT/Recovery conditions. Then measure a fixed non-Settings workload;do not infer FPS from nine coarse snapshots or alter clocks first.",
+  "device_access": false,
+  "source_modified": false,
+  "hardware_claim": false,
+  "no_disassembly_reverse_engineering_or_symbolization": true
+}

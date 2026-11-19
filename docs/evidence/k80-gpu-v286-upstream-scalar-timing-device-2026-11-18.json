@@ -1,0 +1,1207 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a"
+  },
+  "scope": "single-K80-ios26-gpu-v286-perf-300s-f9280b9b",
+  "boot_tag": "f9280b9be3f64115b32e35a609264720",
+  "kernel": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/boot-package/inputs/kernel.macho",
+    "sha256": "bd9e561be43d50b8c08e9634cf98b821fa7fb46f15b670d9105938abafbce9e6"
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/boot-package/boot.ZORN26-GPU-V286-SCALAR-UNSELECTED.img",
+    "sha256": "f13a987782ed3a144e0b9e34a3079964c9770a1d042c49d95f6c2ab80bb5ea6f",
+    "bytes": 11866112
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-candidate/ios26-root-scalar-timing286.UNSELECTED.hfsx",
+    "sha256": "d867d74102b6b32e6072974eff8cb3bd05ab5546ea555417a3808006058a82e5",
+    "bytes": 34359738368
+  },
+  "ADT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/boot-package/inputs/kernel.adt",
+    "sha256": "c2e6af9c54626ba33d1f2eb0c22e02c33bbdb5f0eaca60e3bb2b282eb3a1e67a"
+  },
+  "FD": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/boot-package/inputs/firmware.fd",
+    "sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab"
+  },
+  "loader": {
+    "sha256": "ccae7c1d2d7934812a5668c9b33c409ae3850d21aa20999259d592a533b021d8",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/archive/loader"
+  },
+  "manager": {
+    "sha256": "ff9c6d7ed60b8d93976a736422cbfd2a4200f44c9cee0e3cd3a211a7cd19ae49",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/archive/manager"
+  },
+  "source_state": "Uncommitted working snapshot;no Git revision attribution",
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-scalar-timing286/source-manifest.json",
+    "sha256": "697fd0ec57e3b3494c2ede0551f18e875f5778eacbff935bbc60f0240cd031f2"
+  },
+  "root_installation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-scalar286-root-delta-review-f9280b9b/admission/run/result.json",
+    "sha256": "82a0513dd3574f357fbee0ea28027ee145107d36f826e9bf73ccf9e27f80728c"
+  },
+  "source_change": "Move second scalar report to60seconds after device publication;retain20seconds first report,upstream counter logic,native Rust/Turnip and native GPU/rendering/clock policy. Both actual reports fully captured.",
+  "source_controls": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/scalar-reporter-host/result.json",
+      "sha256": "d16f562424aabf35cd9dd103c1f227fbfee7f6cd0bcb0c2b573d699e18010d91"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/scalar-reporter-tsan/result.json",
+      "sha256": "56c9de267b6ed222c96df1bf20234d35abc1260f669e4f9de5982c100601f8b1"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/scalar-decoder-host/result.json",
+      "sha256": "af8ce6a9f7479ca2d841337ef4fcf1c5538a315a3233e67ba2b3e6f126d86552"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-adapter-current-host/result.json",
+      "sha256": "7a22c18776aa9802d4623e8f048d13c668997447ff0a56b60d7e00a7c4983c7f"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/native-identity-current-host/result.json",
+      "sha256": "a901dc113f8f2c67b88cc0750b48a45ce8ac1edbe7968b72dcebce9299c70b35"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/perf-io-host286/result.json",
+      "sha256": "006063907f5e39f76b181a9cc9541358295d0b2ba56fa649b4aa7f3f41b34135"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/perf-camera-host286/result.json",
+      "sha256": "57f767c4dcef38b317d6dc12d4d8478e886f52d198076c95acbdb87743659fc8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/perf-entry-host286/result.json",
+      "sha256": "18bcd063aa224a0f4482aa59fd7fd06a4292752dd767abcda15c51920be5e404"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/perf-archive-host286/result.json",
+      "sha256": "43297d525449ed2e16aa4817fc9977b59788a961c24ae0fc18b439066d3c5f96"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/perf-admission-host286/result.json",
+      "sha256": "93872ce652f35e1cd00775c10117bdd673347125d09c6a78bf8ff0efadf6a917"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/record-role-current-regression286/result.json",
+      "sha256": "ff928afce56d512b3afaa0f99b8d9dad356f618a1db6ea95f09a11d606853ac2"
+    }
+  ],
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/run.json",
+    "sha256": "c3f0cbf32c59f2a242be1b9d3ca325ef8de7cdec27c37453b0b4c819b4323fa1"
+  },
+  "capture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/cdc-capture.json",
+    "sha256": "58bceb4e1f067545798bc7d00e7e11ba7e62a11c655778794ff34741068faf82"
+  },
+  "raw_wire": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/cdc.raw",
+    "sha256": "02288168d7c7b42b4a9e9f239db0eaab655c1026a51a5a4c8b2b5c40934feb25"
+  },
+  "journal": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/ordinary286-stderr.bin",
+    "sha256": "72b32fdb045c51355630317c81c1a8e0694c9b2fff08580a22308c54bf250bcd"
+  },
+  "native_record": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/decoded-native-record.json",
+    "sha256": "2e0db06632816e88412b1a5fda9b048ca0814d5b7a6d9b8ecde01c7a0e056f23"
+  },
+  "boot_attempts": 1,
+  "retries": 0,
+  "root_writes_during_boot": false,
+  "automatic_Recovery_return_seconds": 332.9083784579998,
+  "independent_watchdog_seconds": 300,
+  "recovery_limit_seconds": 600,
+  "protections": {
+    "Data": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-Data.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "unchanged": true
+    },
+    "Data_metadata": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-Data_metadata.bin",
+        "sha256": "c0e97aa04664934c02336391204760f9e09979a43ce9b86991be2b9b32f2d300"
+      },
+      "unchanged": true
+    },
+    "root_first_page": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-root_first_page.bin",
+        "sha256": "516498ca9205e73d0d119a8a45cb31a4dc242c5f1e0d66d8552ef11e1cfdee1d"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-root_first_page.bin",
+        "sha256": "516498ca9205e73d0d119a8a45cb31a4dc242c5f1e0d66d8552ef11e1cfdee1d"
+      },
+      "unchanged": true
+    },
+    "root_before": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-root_before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "unchanged": true
+    },
+    "root_after": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-root_after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "unchanged": true
+    },
+    "before": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-before.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "unchanged": true
+    },
+    "after": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/before-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/after-after.bin",
+        "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+      },
+      "unchanged": true
+    },
+    "primary_GPT": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-018.stdout",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-079.stdout",
+        "sha256": "ebe6365fefb07e8693e5f4e32e3b4e7fc065a73518becd9b0de7e16318ead967"
+      },
+      "commands": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-018.json",
+          "sha256": "3339c01ba0d739bd3d62f274114717047381f253c7545ece7699d3b577841e13"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-050.json",
+          "sha256": "3339c01ba0d739bd3d62f274114717047381f253c7545ece7699d3b577841e13"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-079.json",
+          "sha256": "3339c01ba0d739bd3d62f274114717047381f253c7545ece7699d3b577841e13"
+        }
+      ],
+      "unchanged": true
+    },
+    "backup_GPT": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-019.stdout",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-080.stdout",
+        "sha256": "c659f0aecb0f237147a8810adc540f4c26b4d31c467985471bf4179f2cb4c054"
+      },
+      "commands": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-019.json",
+          "sha256": "b84df9eaf7dff2fee93f5dc9a8e534b85f03494d507e212e76537a8c4fba96f0"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-051.json",
+          "sha256": "b84df9eaf7dff2fee93f5dc9a8e534b85f03494d507e212e76537a8c4fba96f0"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-080.json",
+          "sha256": "b84df9eaf7dff2fee93f5dc9a8e534b85f03494d507e212e76537a8c4fba96f0"
+        }
+      ],
+      "unchanged": true
+    },
+    "root_manifest": {
+      "before": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-020.stdout",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d"
+      },
+      "after": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-081.stdout",
+        "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d"
+      },
+      "commands": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-020.json",
+          "sha256": "7a0059aff229c5b4bc58dab6b33d626462d5658da3f0f63bd4a1f5a28b5b28b2"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-052.json",
+          "sha256": "7a0059aff229c5b4bc58dab6b33d626462d5658da3f0f63bd4a1f5a28b5b28b2"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/trial/command-081.json",
+          "sha256": "7a0059aff229c5b4bc58dab6b33d626462d5658da3f0f63bd4a1f5a28b5b28b2"
+        }
+      ],
+      "unchanged": true
+    }
+  },
+  "BCB": {
+    "tail_preserved": true,
+    "full_page_readback": true,
+    "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+    "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+  },
+  "observations": {
+    "initial_kernel_task_and_fence": true,
+    "normal_backboardd_clients": {
+      "reported_registered_records": 2,
+      "observed_client_ids": [
+        64,
+        129
+      ],
+      "all_records_observed": true,
+      "all_task_bound": true,
+      "all_actual_close_returned_success": false,
+      "no_backend_failure_or_diagnostic_loss": true,
+      "complete": false,
+      "scope": "Actual live backboardd clients;manual observation does not require daemon exit."
+    },
+    "passive_observer_completed": true,
+    "sampled_backend_failure": false,
+    "CF_diagnostic_loss": false,
+    "legacy_compact_loss": true,
+    "legacy_compact_dropped_values": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "present_cost_faults": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "journal": {
+      "unique": 10,
+      "seen_bytes": 8017,
+      "pid": 10,
+      "reserved": 8017,
+      "published": 8017,
+      "records": 6,
+      "pending": 0,
+      "gaps": 0,
+      "exited": 0,
+      "exit_status": 0,
+      "crc32": 1944877403,
+      "offset": 8017,
+      "bytes": 0,
+      "available": 1
+    },
+    "daemon_exit_required": false,
+    "daemon_exit_observed": false
+  },
+  "scalar_timing": {
+    "reports": [
+      {
+        "sample": 0,
+        "uptime_us": 109181998,
+        "bytes": 3126,
+        "values": {
+          "pipeline": {
+            "count": 62,
+            "total_ms": 2973,
+            "max_ms": 327
+          },
+          "library": {
+            "count": 5,
+            "total_ms": 21,
+            "max_ms": 5
+          },
+          "compile": {
+            "count": 0,
+            "total_ms": 0,
+            "max_ms": 0,
+            "cached": 0
+          },
+          "function": {
+            "count": 96,
+            "total_ms": 1,
+            "max_ms": 0
+          },
+          "commit-to-complete": {
+            "count": 2,
+            "total_ms": 7173,
+            "max_ms": 6828,
+            "mean_us": 3586904
+          },
+          "scheduled wait": {
+            "count": 2,
+            "total_ms": 294,
+            "max_ms": 239
+          },
+          "completed wait": {
+            "count": 0,
+            "total_ms": 0,
+            "max_ms": 0,
+            "timeouts": 0
+          },
+          "resource wait": {
+            "count": 0,
+            "total_ms": 0,
+            "max_ms": 0
+          },
+          "surface cache": {
+            "count": 4,
+            "bytes": 55574528,
+            "duplicates": 0,
+            "total_us": 3,
+            "max_us": 1
+          }
+        },
+        "other_rows": [
+          "MEM pool 76(43) empty 136 ded 0 imp 26 alloc 212 | blk 3/0 gp 0-0 | tuc 0/0 n15/6",
+          "TUC look 169 hit 9 put 15 evict 6 flush 0",
+          "MK 16/32/40/48/56/64/+ pool 1/1/1/0/0/0/0 empty 2/0/0/0/0/2/0",
+          "MKb spare 0/0/0/0/0/0/0 0M | dedi 0/0/0/0/0/0/0 0M",
+          "MKc dedb 0/0/0/0/0/0/0 0M | own pages 0 0M",
+          "ML lazy used 2 72M backed 0 0M | kept 2 8M backed 0 0M",
+          "PG req 2/0/0 | vol 0M empty 0M | to 0M back 0M big 0M",
+          "PGb out 0M | pres 0M age 0M | again 0M use 0M | empty 0",
+          "PGc decl 0M pin 0M | left use 0M tie 0M young 0M | fail 0",
+          "PE warn 0 crit 0 freed 0 | imports held 2 26M | tuc flush 0",
+          "RM gmem 0 0M | sys auto 0 0M other 0 0M | exact 0",
+          "PS ins 28 inl 0 | bar 0 tile 0 ml 0 pend 0 | sti 0 0M cp 0/0",
+          "VP made 28 create 28/2 step 0 | drv gfx 1046ms cmp 39ms | fn 34 mod 32",
+          "V cache hit0 miss62 wr34 | msg i0 w602",
+          "SC fn 0/34 data 0/7 rp 0/28 rej 0 rd-fail 0",
+          "SCb wr 34 q 137 thr 0 2424K wfail 0 evict 0 qhit 0 | drv load 0 save 36 hit 7 miss 36",
+          "SCc drv truncated 0 mismatched 0",
+          "PR compiling=0 libs=0/0 made=0 rate=0 resumed=0",
+          "PRc state=0 failed=0 refused=0 bad=0 missing=0",
+          "PRb scope=0 primed=0 left=0 | system 0 pub 0/0K",
+          "FP group 0/0 pools 2/2 linear 0/0 evict 0",
+          "CM calls 2 us 167/0/0/0/1/0/0",
+          "FL w 0/0/0 0K cm 2/2 lw 0 le 34",
+          "TH cpu 16179ms in 0ms | m2v-submit-chec:8809 #00f5:3021 m2v-lowering:1756",
+          "THb native-metal-en:1527 #018b:534 ca.display.prim:175",
+          "P0 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv",
+          "P0b eMiss { function: \"luma_boost_lph\", pipeline: Render }) | frag luma_boost_lph linked 0",
+          "P1 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv",
+          "P1b eMiss { function: \"attachment_clear_frag_lph\", pipeline: Render }) | frag attachment_c",
+          "F tex x0 s2/0 p0 b0 f115 550 554 80 43 30 10 23 ",
+          "W metal2vulkan: a command buffer's GPU times: the device's calibration pair stated a dev",
+          "Wb iation of 9903127 ns, the least of its readings (4 at most), more than the",
+          "S c2/0 d2 p28 x40 R44 D4 F2 M2676k C0 B7",
+          "SA big 2 whole 2 empty 0 | target 5M scissors 5M | tile pipelines 0 dispatches 0",
+          "H frame-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=2",
+          "H other-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=0",
+          "H frame-enc <1=1 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=1",
+          "J resource checks=0 skipped=0",
+          "N no-copy 1 dealloc 0/0 surface 0/2",
+          "N no-copy ranges checked 3 remapped 0",
+          "L inp 3/3 rf 0/0 sh 0 cp 0 bk 0 rt 0",
+          "GM s3d 0/0/0/0 l3d 0/0/0/0",
+          "GMb s2d 0/0/0/0 in 120/8/0/4",
+          "DF p80 s80 l2 SB n4",
+          "ROT imports 0=2 1=0 2=0 3=0 4=0",
+          "Q timing v2: per-buffer API counts; ctc=commit-to-callback; age includes caller idle",
+          "K2 t=99.606s rp1 dr2 kpx2676 cs0 bl0 ctc=345620us",
+          "E2 age=231us scheduled=240419us",
+          "K1 t=92.839s rp1 dr2 kpx2676 cs0 bl0 ctc=6828188us",
+          "E1 age=288878us scheduled=6708655us"
+        ],
+        "raw_table": "MEM pool 76(43) empty 136 ded 0 imp 26 alloc 212 | blk 3/0 gp 0-0 | tuc 0/0 n15/6\nTUC look 169 hit 9 put 15 evict 6 flush 0\nMK 16/32/40/48/56/64/+ pool 1/1/1/0/0/0/0 empty 2/0/0/0/0/2/0\nMKb spare 0/0/0/0/0/0/0 0M | dedi 0/0/0/0/0/0/0 0M\nMKc dedb 0/0/0/0/0/0/0 0M | own pages 0 0M\nML lazy used 2 72M backed 0 0M | kept 2 8M backed 0 0M\nPG req 2/0/0 | vol 0M empty 0M | to 0M back 0M big 0M\nPGb out 0M | pres 0M age 0M | again 0M use 0M | empty 0\nPGc decl 0M pin 0M | left use 0M tie 0M young 0M | fail 0\nPE warn 0 crit 0 freed 0 | imports held 2 26M | tuc flush 0\nRM gmem 0 0M | sys auto 0 0M other 0 0M | exact 0\nPS ins 28 inl 0 | bar 0 tile 0 ml 0 pend 0 | sti 0 0M cp 0/0\nT pipeline n=62 total=2973ms max=327ms\nT library n=5 total=21ms max=5ms\nT compile n=0 total=0ms max=0ms cached=0\nT function n=96 total=1ms max=0ms\nVP made 28 create 28/2 step 0 | drv gfx 1046ms cmp 39ms | fn 34 mod 32\nV cache hit0 miss62 wr34 | msg i0 w602\nSC fn 0/34 data 0/7 rp 0/28 rej 0 rd-fail 0\nSCb wr 34 q 137 thr 0 2424K wfail 0 evict 0 qhit 0 | drv load 0 save 36 hit 7 miss 36\nSCc drv truncated 0 mismatched 0\nPR compiling=0 libs=0/0 made=0 rate=0 resumed=0\nPRc state=0 failed=0 refused=0 bad=0 missing=0\nPRb scope=0 primed=0 left=0 | system 0 pub 0/0K\nFP group 0/0 pools 2/2 linear 0/0 evict 0\nCM calls 2 us 167/0/0/0/1/0/0\nFL w 0/0/0 0K cm 2/2 lw 0 le 34\nTH cpu 16179ms in 0ms | m2v-submit-chec:8809 #00f5:3021 m2v-lowering:1756\nTHb native-metal-en:1527 #018b:534 ca.display.prim:175\nP0 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv\nP0b eMiss { function: \"luma_boost_lph\", pipeline: Render }) | frag luma_boost_lph linked 0\nP1 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv\nP1b eMiss { function: \"attachment_clear_frag_lph\", pipeline: Render }) | frag attachment_c\nF tex x0 s2/0 p0 b0 f115 550 554 80 43 30 10 23 \nW metal2vulkan: a command buffer's GPU times: the device's calibration pair stated a dev\nWb iation of 9903127 ns, the least of its readings (4 at most), more than the\nS c2/0 d2 p28 x40 R44 D4 F2 M2676k C0 B7\nSA big 2 whole 2 empty 0 | target 5M scissors 5M | tile pipelines 0 dispatches 0\nG commit-to-complete n=2 total=7173ms max=6828ms mean=3586904us\nH frame-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=2\nH other-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=0\nH frame-enc <1=1 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=1\nJ scheduled wait n=2 total=294ms max=239ms\nJ completed wait n=0 total=0ms max=0ms t=0\nJ resource wait n=0 total=0ms max=0ms\nJ resource checks=0 skipped=0\nJ surface cache n=4 bytes=55574528 dup=0 us=3 max=1\nN no-copy 1 dealloc 0/0 surface 0/2\nN no-copy ranges checked 3 remapped 0\nL inp 3/3 rf 0/0 sh 0 cp 0 bk 0 rt 0\nGM s3d 0/0/0/0 l3d 0/0/0/0\nGMb s2d 0/0/0/0 in 120/8/0/4\nDF p80 s80 l2 SB n4\nROT imports 0=2 1=0 2=0 3=0 4=0\nQ timing v2: per-buffer API counts; ctc=commit-to-callback; age includes caller idle\nK2 t=99.606s rp1 dr2 kpx2676 cs0 bl0 ctc=345620us\nE2 age=231us scheduled=240419us\nK1 t=92.839s rp1 dr2 kpx2676 cs0 bl0 ctc=6828188us\nE1 age=288878us scheduled=6708655us\n"
+      },
+      {
+        "sample": 1,
+        "uptime_us": 149184698,
+        "bytes": 4438,
+        "values": {
+          "pipeline": {
+            "count": 91,
+            "total_ms": 3696,
+            "max_ms": 327
+          },
+          "library": {
+            "count": 5,
+            "total_ms": 21,
+            "max_ms": 5
+          },
+          "compile": {
+            "count": 0,
+            "total_ms": 0,
+            "max_ms": 0,
+            "cached": 0
+          },
+          "function": {
+            "count": 120,
+            "total_ms": 2,
+            "max_ms": 0
+          },
+          "commit-to-complete": {
+            "count": 185,
+            "total_ms": 31988,
+            "max_ms": 6828,
+            "mean_us": 172909
+          },
+          "scheduled wait": {
+            "count": 185,
+            "total_ms": 5473,
+            "max_ms": 239
+          },
+          "completed wait": {
+            "count": 0,
+            "total_ms": 0,
+            "max_ms": 0,
+            "timeouts": 0
+          },
+          "resource wait": {
+            "count": 0,
+            "total_ms": 0,
+            "max_ms": 0
+          },
+          "surface cache": {
+            "count": 594,
+            "bytes": 5183766528,
+            "duplicates": 0,
+            "total_us": 115,
+            "max_us": 1
+          }
+        },
+        "other_rows": [
+          "MEM pool 272(131) empty 64 ded 0 imp 120 alloc 340 | blk 7/0 gp 0-0 | tuc 0/0 n266/179",
+          "TUC look 334 hit 87 put 266 evict 179 flush 0",
+          "MK 16/32/40/48/56/64/+ pool 2/1/1/0/0/3/0 empty 0/0/0/0/0/1/0",
+          "MKb spare 0/0/0/0/0/0/0 0M | dedi 0/0/0/0/0/0/0 0M",
+          "MKc dedb 0/0/0/0/0/0/0 0M | own pages 0 0M",
+          "ML lazy used 4 140M backed 0 0M | kept 0 0M backed 0 0M",
+          "PG req 26/0/392 | vol 0M empty 0M | to 45M back 45M big 21M",
+          "PGb out 0M | pres 0M age 0M | again 0M use 0M | empty 0",
+          "PGc decl 45M pin 3M | left use 0M tie 0M young 0M | fail 0",
+          "PE warn 0 crit 0 freed 0 | imports held 10 119M | tuc flush 0",
+          "RM gmem 0 0M | sys auto 0 0M other 0 0M | exact 0",
+          "PS ins 219 inl 181 | bar 0 tile 0 ml 181 pend 0 | sti 0 0M cp 0/0",
+          "VP made 58 create 57/30 step 0 | drv gfx 1468ms cmp 39ms | fn 62 mod 59",
+          "V cache hit0 miss119 wr62 | msg i0 w610",
+          "SC fn 0/62 data 0/11 rp 0/57 rej 0 rd-fail 0",
+          "SCb wr 62 q 261 thr 0 2935K wfail 0 evict 0 qhit 0 | drv load 0 save 73 hit 11 miss 73",
+          "SCc drv truncated 0 mismatched 0",
+          "PR compiling=0 libs=0/0 made=0 rate=0 resumed=0",
+          "PRc state=0 failed=0 refused=0 bad=0 missing=0",
+          "PRb scope=0 primed=0 left=0 | system 0 pub 0/0K",
+          "FP group 0/0 pools 4/195 linear 0/0 evict 0",
+          "CM calls 186 us 1133279/973/73174/0/222/1479/1048704",
+          "FL w 0/0/0 0K cm 186/15 lw 0 le 38",
+          "TH cpu 30049ms in 40002ms | ca.display.prim:13132 m2v-queue-wait-:7867 m2v-scheduler:3425",
+          "THb native-metal-en:2725 m2v-frees:2202 m2v-lowering:225",
+          "P0 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv",
+          "P0b eMiss { function: \"luma_boost_lph\", pipeline: Render }) | frag luma_boost_lph linked 0",
+          "P1 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv",
+          "P1b eMiss { function: \"attachment_clear_frag_lph\", pipeline: Render }) | frag attachment_c",
+          "F tex x0 s187/0 p0 b0 f115 550 554 80 43 30 10 23 ",
+          "W metal2vulkan: color attachment 0 of a render pass, loaded with `DontCare` and stored: ",
+          "Wb Metal clears only the tiles a draw's primitives touch, which depend on whe",
+          "S c186/0 d185 p57 x40 R634 D6726 F383 M2678k C0 B7",
+          "SA big 383 whole 383 empty 0 | target 1049M scissors 1049M | tile pipelines 0 dispatches 0",
+          "H frame-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=53 <128=47 <256=71 more=14",
+          "H other-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=0",
+          "H frame-enc <1=140 <2=3 <4=9 <8=2 <16=1 <32=12 <64=13 <128=3 <256=0 more=2",
+          "J resource checks=0 skipped=0",
+          "N no-copy 11 dealloc 0/0 surface 177/187",
+          "N no-copy ranges checked 198 remapped 112",
+          "L inp 197/192 rf 0/0 sh 1 cp 181 bk 0 rt 0",
+          "GM s3d 0/0/0/0 l3d 0/0/0/0",
+          "GMb s2d 0/0/0/0 in 3204/440/0/1114",
+          "DF p80 s80 l2 SB n3033",
+          "DF p80 s80 l1 SB n1810",
+          "DF p80 s80 l0 -- n181",
+          "DF p80 s80 l2 -- n29",
+          "DF p80 s80 l1 -- n28",
+          "ROT imports 0=187 1=0 2=0 3=0 4=0",
+          "Q timing v2: per-buffer API counts; ctc=commit-to-callback; age includes caller idle",
+          "FA3 n149 I122043 pg104809 enc5414 res11819 kpx5605 hv0",
+          "K186 t=149.175s rp3 dr38 kpx5480 cs0 bl0 ctc=0us",
+          "E186 age=719us scheduled=-1us",
+          "K185 t=149.058s rp3 dr38 kpx5480 cs0 bl0 ctc=49640us",
+          "E185 age=48873us scheduled=33029us",
+          "K184 t=148.929s rp3 dr38 kpx5480 cs0 bl0 ctc=136154us",
+          "E184 age=688us scheduled=27028us",
+          "K183 t=148.812s rp3 dr38 kpx5480 cs0 bl0 ctc=46407us",
+          "E183 age=699us scheduled=31017us",
+          "K182 t=148.670s rp3 dr38 kpx5480 cs0 bl0 ctc=148444us",
+          "K181 t=148.525s rp3 dr38 kpx5480 cs0 bl0 ctc=44758us",
+          "K180 t=148.395s rp3 dr38 kpx5480 cs0 bl0 ctc=135997us",
+          "K179 t=148.298s rp3 dr38 kpx5480 cs0 bl0 ctc=55953us",
+          "K178 t=148.155s rp3 dr38 kpx5480 cs0 bl0 ctc=154599us",
+          "K177 t=148.027s rp3 dr38 kpx5480 cs0 bl0 ctc=108697us",
+          "K176 t=147.920s rp3 dr38 kpx5480 cs0 bl0 ctc=148094us",
+          "K175 t=147.826s rp3 dr38 kpx5480 cs0 bl0 ctc=54904us",
+          "K174 t=147.697s rp3 dr37 kpx5480 cs0 bl0 ctc=134694us",
+          "K173 t=147.606s rp3 dr37 kpx5480 cs0 bl0 ctc=49227us",
+          "K172 t=147.479s rp3 dr37 kpx5480 cs0 bl0 ctc=132986us",
+          "K171 t=147.388s rp3 dr37 kpx5480 cs0 bl0 ctc=53679us",
+          "K170 t=147.272s rp3 dr33 kpx5480 cs0 bl0 ctc=122855us",
+          "K169 t=147.181s rp3 dr33 kpx5480 cs0 bl0 ctc=46028us",
+          "K168 t=147.039s rp3 dr33 kpx5480 cs0 bl0 ctc=148470us",
+          "K167 t=146.907s rp3 dr33 kpx5480 cs0 bl0 ctc=79940us"
+        ],
+        "raw_table": "MEM pool 272(131) empty 64 ded 0 imp 120 alloc 340 | blk 7/0 gp 0-0 | tuc 0/0 n266/179\nTUC look 334 hit 87 put 266 evict 179 flush 0\nMK 16/32/40/48/56/64/+ pool 2/1/1/0/0/3/0 empty 0/0/0/0/0/1/0\nMKb spare 0/0/0/0/0/0/0 0M | dedi 0/0/0/0/0/0/0 0M\nMKc dedb 0/0/0/0/0/0/0 0M | own pages 0 0M\nML lazy used 4 140M backed 0 0M | kept 0 0M backed 0 0M\nPG req 26/0/392 | vol 0M empty 0M | to 45M back 45M big 21M\nPGb out 0M | pres 0M age 0M | again 0M use 0M | empty 0\nPGc decl 45M pin 3M | left use 0M tie 0M young 0M | fail 0\nPE warn 0 crit 0 freed 0 | imports held 10 119M | tuc flush 0\nRM gmem 0 0M | sys auto 0 0M other 0 0M | exact 0\nPS ins 219 inl 181 | bar 0 tile 0 ml 181 pend 0 | sti 0 0M cp 0/0\nT pipeline n=91 total=3696ms max=327ms\nT library n=5 total=21ms max=5ms\nT compile n=0 total=0ms max=0ms cached=0\nT function n=120 total=2ms max=0ms\nVP made 58 create 57/30 step 0 | drv gfx 1468ms cmp 39ms | fn 62 mod 59\nV cache hit0 miss119 wr62 | msg i0 w610\nSC fn 0/62 data 0/11 rp 0/57 rej 0 rd-fail 0\nSCb wr 62 q 261 thr 0 2935K wfail 0 evict 0 qhit 0 | drv load 0 save 73 hit 11 miss 73\nSCc drv truncated 0 mismatched 0\nPR compiling=0 libs=0/0 made=0 rate=0 resumed=0\nPRc state=0 failed=0 refused=0 bad=0 missing=0\nPRb scope=0 primed=0 left=0 | system 0 pub 0/0K\nFP group 0/0 pools 4/195 linear 0/0 evict 0\nCM calls 186 us 1133279/973/73174/0/222/1479/1048704\nFL w 0/0/0 0K cm 186/15 lw 0 le 38\nTH cpu 30049ms in 40002ms | ca.display.prim:13132 m2v-queue-wait-:7867 m2v-scheduler:3425\nTHb native-metal-en:2725 m2v-frees:2202 m2v-lowering:225\nP0 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv\nP0b eMiss { function: \"luma_boost_lph\", pipeline: Render }) | frag luma_boost_lph linked 0\nP1 native-metal: render pipeline refused: render pipeline: BinaryArchiveMiss(BinaryArchiv\nP1b eMiss { function: \"attachment_clear_frag_lph\", pipeline: Render }) | frag attachment_c\nF tex x0 s187/0 p0 b0 f115 550 554 80 43 30 10 23 \nW metal2vulkan: color attachment 0 of a render pass, loaded with `DontCare` and stored: \nWb Metal clears only the tiles a draw's primitives touch, which depend on whe\nS c186/0 d185 p57 x40 R634 D6726 F383 M2678k C0 B7\nSA big 383 whole 383 empty 0 | target 1049M scissors 1049M | tile pipelines 0 dispatches 0\nG commit-to-complete n=185 total=31988ms max=6828ms mean=172909us\nH frame-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=53 <128=47 <256=71 more=14\nH other-gpu <1=0 <2=0 <4=0 <8=0 <16=0 <32=0 <64=0 <128=0 <256=0 more=0\nH frame-enc <1=140 <2=3 <4=9 <8=2 <16=1 <32=12 <64=13 <128=3 <256=0 more=2\nJ scheduled wait n=185 total=5473ms max=239ms\nJ completed wait n=0 total=0ms max=0ms t=0\nJ resource wait n=0 total=0ms max=0ms\nJ resource checks=0 skipped=0\nJ surface cache n=594 bytes=5183766528 dup=0 us=115 max=1\nN no-copy 11 dealloc 0/0 surface 177/187\nN no-copy ranges checked 198 remapped 112\nL inp 197/192 rf 0/0 sh 1 cp 181 bk 0 rt 0\nGM s3d 0/0/0/0 l3d 0/0/0/0\nGMb s2d 0/0/0/0 in 3204/440/0/1114\nDF p80 s80 l2 SB n3033\nDF p80 s80 l1 SB n1810\nDF p80 s80 l0 -- n181\nDF p80 s80 l2 -- n29\nDF p80 s80 l1 -- n28\nROT imports 0=187 1=0 2=0 3=0 4=0\nQ timing v2: per-buffer API counts; ctc=commit-to-callback; age includes caller idle\nFA3 n149 I122043 pg104809 enc5414 res11819 kpx5605 hv0\nK186 t=149.175s rp3 dr38 kpx5480 cs0 bl0 ctc=0us\nE186 age=719us scheduled=-1us\nK185 t=149.058s rp3 dr38 kpx5480 cs0 bl0 ctc=49640us\nE185 age=48873us scheduled=33029us\nK184 t=148.929s rp3 dr38 kpx5480 cs0 bl0 ctc=136154us\nE184 age=688us scheduled=27028us\nK183 t=148.812s rp3 dr38 kpx5480 cs0 bl0 ctc=46407us\nE183 age=699us scheduled=31017us\nK182 t=148.670s rp3 dr38 kpx5480 cs0 bl0 ctc=148444us\nK181 t=148.525s rp3 dr38 kpx5480 cs0 bl0 ctc=44758us\nK180 t=148.395s rp3 dr38 kpx5480 cs0 bl0 ctc=135997us\nK179 t=148.298s rp3 dr38 kpx5480 cs0 bl0 ctc=55953us\nK178 t=148.155s rp3 dr38 kpx5480 cs0 bl0 ctc=154599us\nK177 t=148.027s rp3 dr38 kpx5480 cs0 bl0 ctc=108697us\nK176 t=147.920s rp3 dr38 kpx5480 cs0 bl0 ctc=148094us\nK175 t=147.826s rp3 dr38 kpx5480 cs0 bl0 ctc=54904us\nK174 t=147.697s rp3 dr37 kpx5480 cs0 bl0 ctc=134694us\nK173 t=147.606s rp3 dr37 kpx5480 cs0 bl0 ctc=49227us\nK172 t=147.479s rp3 dr37 kpx5480 cs0 bl0 ctc=132986us\nK171 t=147.388s rp3 dr37 kpx5480 cs0 bl0 ctc=53679us\nK170 t=147.272s rp3 dr33 kpx5480 cs0 bl0 ctc=122855us\nK169 t=147.181s rp3 dr33 kpx5480 cs0 bl0 ctc=46028us\nK168 t=147.039s rp3 dr33 kpx5480 cs0 bl0 ctc=148470us\nK167 t=146.907s rp3 dr33 kpx5480 cs0 bl0 ctc=79940us\n"
+      }
+    ],
+    "report_count": 2,
+    "partial_bytes": 0,
+    "complete": true,
+    "source": "Actual upstream process counters;two bounded reports,scalar rows only",
+    "scope": "CPU-clock/aggregate upstream values;not GPU hardware timestamps or physicalFPS. Other rows remain uninterpreted,including possibly truncated histograms.",
+    "hardware_or_performance_qualified": false
+  },
+  "scalar_timing_complete_with_recovery": true,
+  "samples": [
+    {
+      "uptime_ms": 140761,
+      "available": 7,
+      "present_frame": 115,
+      "producer_fence": 724,
+      "completed_fence": 724,
+      "surface_access_fence": 724,
+      "surface_id": 147,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 4421,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 115,
+        "published_uptime_ms": 140738,
+        "frame": 115,
+        "stage": 2,
+        "queue_us": 1550,
+        "beat_us": 0,
+        "lease_wall_us": 560996,
+        "lease_call_us": 516719,
+        "acquire_us": 42444,
+        "show_us": 1543345,
+        "attempts": 154,
+        "pending": 39,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 724
+      }
+    },
+    {
+      "uptime_ms": 150762,
+      "available": 7,
+      "present_frame": 198,
+      "producer_fence": 807,
+      "completed_fence": 807,
+      "surface_access_fence": 807,
+      "surface_id": 230,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 5172,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 198,
+        "published_uptime_ms": 150634,
+        "frame": 198,
+        "stage": 2,
+        "queue_us": 2563,
+        "beat_us": 1,
+        "lease_wall_us": 901361,
+        "lease_call_us": 830878,
+        "acquire_us": 73563,
+        "show_us": 2836453,
+        "attempts": 260,
+        "pending": 62,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 807
+      }
+    },
+    {
+      "uptime_ms": 160763,
+      "available": 7,
+      "present_frame": 259,
+      "producer_fence": 868,
+      "completed_fence": 868,
+      "surface_access_fence": 868,
+      "surface_id": 291,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 5725,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 259,
+        "published_uptime_ms": 160629,
+        "frame": 259,
+        "stage": 2,
+        "queue_us": 3318,
+        "beat_us": 1,
+        "lease_wall_us": 1112649,
+        "lease_call_us": 1027342,
+        "acquire_us": 97486,
+        "show_us": 3717968,
+        "attempts": 334,
+        "pending": 75,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 868
+      }
+    },
+    {
+      "uptime_ms": 170763,
+      "available": 7,
+      "present_frame": 318,
+      "producer_fence": 927,
+      "completed_fence": 927,
+      "surface_access_fence": 927,
+      "surface_id": 350,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 6252,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 318,
+        "published_uptime_ms": 170663,
+        "frame": 318,
+        "stage": 2,
+        "queue_us": 4007,
+        "beat_us": 1,
+        "lease_wall_us": 1356046,
+        "lease_call_us": 1253714,
+        "acquire_us": 119997,
+        "show_us": 4730741,
+        "attempts": 408,
+        "pending": 90,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 927
+      }
+    },
+    {
+      "uptime_ms": 180764,
+      "available": 7,
+      "present_frame": 391,
+      "producer_fence": 1000,
+      "completed_fence": 1000,
+      "surface_access_fence": 1000,
+      "surface_id": 423,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 7020,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 391,
+        "published_uptime_ms": 180679,
+        "frame": 391,
+        "stage": 2,
+        "queue_us": 4940,
+        "beat_us": 2,
+        "lease_wall_us": 1623454,
+        "lease_call_us": 1506293,
+        "acquire_us": 149984,
+        "show_us": 5959559,
+        "attempts": 494,
+        "pending": 103,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 1000
+      }
+    },
+    {
+      "uptime_ms": 190765,
+      "available": 7,
+      "present_frame": 429,
+      "producer_fence": 1038,
+      "completed_fence": 1038,
+      "surface_access_fence": 1038,
+      "surface_id": 461,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 7626,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 429,
+        "published_uptime_ms": 190733,
+        "frame": 429,
+        "stage": 2,
+        "queue_us": 5454,
+        "beat_us": 3,
+        "lease_wall_us": 1810426,
+        "lease_call_us": 1676161,
+        "acquire_us": 163251,
+        "show_us": 6383078,
+        "attempts": 547,
+        "pending": 118,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 1038
+      }
+    },
+    {
+      "uptime_ms": 200765,
+      "available": 7,
+      "present_frame": 476,
+      "producer_fence": 1085,
+      "completed_fence": 1085,
+      "surface_access_fence": 1085,
+      "surface_id": 508,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 8166,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 476,
+        "published_uptime_ms": 200698,
+        "frame": 476,
+        "stage": 2,
+        "queue_us": 6011,
+        "beat_us": 4,
+        "lease_wall_us": 2006922,
+        "lease_call_us": 1860181,
+        "acquire_us": 180740,
+        "show_us": 7119506,
+        "attempts": 605,
+        "pending": 129,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 1085
+      }
+    },
+    {
+      "uptime_ms": 210766,
+      "available": 7,
+      "present_frame": 561,
+      "producer_fence": 1170,
+      "completed_fence": 1170,
+      "surface_access_fence": 1170,
+      "surface_id": 593,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 8923,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 561,
+        "published_uptime_ms": 210760,
+        "frame": 561,
+        "stage": 2,
+        "queue_us": 7110,
+        "beat_us": 4,
+        "lease_wall_us": 2375214,
+        "lease_call_us": 2207927,
+        "acquire_us": 213601,
+        "show_us": 8325869,
+        "attempts": 708,
+        "pending": 147,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 1170
+      }
+    },
+    {
+      "uptime_ms": 220767,
+      "available": 7,
+      "present_frame": 623,
+      "producer_fence": 1232,
+      "completed_fence": 1232,
+      "surface_access_fence": 1232,
+      "surface_id": 655,
+      "CF_dropped": 0,
+      "backend_sequence": 0,
+      "backend_stage": 0,
+      "backend_raw": 0,
+      "native_client_low32": 129,
+      "native_client_flags": 3,
+      "compact_dropped": 6,
+      "application_calls": 9487,
+      "application_unique_low32": 10,
+      "application_pid": 10,
+      "present_cost": {
+        "schema": 278,
+        "completed_pixel_copies": 623,
+        "published_uptime_ms": 220740,
+        "frame": 623,
+        "stage": 2,
+        "queue_us": 7866,
+        "beat_us": 4,
+        "lease_wall_us": 2555439,
+        "lease_call_us": 2376781,
+        "acquire_us": 235096,
+        "show_us": 9073586,
+        "attempts": 780,
+        "pending": 157,
+        "terminals": 0,
+        "faults": 0,
+        "producer_fence": 1232
+      }
+    }
+  ],
+  "measurement": {
+    "publication_interval_ms": 80002,
+    "completed_CPU_pixel_copies": 508,
+    "completed_copy_rate_per_second": 6.349841253968651,
+    "delta": {
+      "completed_pixel_copies": 508,
+      "queue_us": 6316,
+      "beat_us": 4,
+      "lease_wall_us": 1994443,
+      "lease_call_us": 1860062,
+      "acquire_us": 192652,
+      "show_us": 7530241,
+      "attempts": 626,
+      "pending": 118,
+      "terminals": 0
+    },
+    "mean_per_completed_copy_ms": {
+      "queue_us": 0.012433070866141732,
+      "beat_us": 7.874015748031496e-06,
+      "lease_wall_us": 3.926068897637795,
+      "lease_call_us": 3.6615393700787404,
+      "acquire_us": 0.37923622047244093,
+      "show_us": 14.823309055118111
+    },
+    "scope": "CPU-clock cumulative presenter wall time;includes idle in rate. LeaseCall is a subset of LeaseWall,not additive. Neither GPU timestamp duration nor physical FPS nor fixed-workload benchmark.",
+    "inference": "Small queue residence and measured completed show cannot alone attribute the observed average copy interval. GPU work before present,userspace/scheduling and idle need separate measurement;no claimed performance improvement."
+  },
+  "performance_windows": [
+    {
+      "observer_start_uptime_ms": 140761,
+      "observer_end_uptime_ms": 150762,
+      "valid": true,
+      "completed_copy_rate_per_second": 8.387227162489895,
+      "delta": {
+        "completed_pixel_copies": 83,
+        "queue_us": 1013,
+        "beat_us": 1,
+        "lease_wall_us": 340365,
+        "lease_call_us": 314159,
+        "acquire_us": 31119,
+        "show_us": 1293108,
+        "attempts": 106,
+        "pending": 23,
+        "terminals": 0
+      },
+      "published_interval_ms": 9896,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 150762,
+      "observer_end_uptime_ms": 160763,
+      "valid": true,
+      "completed_copy_rate_per_second": 6.103051525762881,
+      "delta": {
+        "completed_pixel_copies": 61,
+        "queue_us": 755,
+        "beat_us": 0,
+        "lease_wall_us": 211288,
+        "lease_call_us": 196464,
+        "acquire_us": 23923,
+        "show_us": 881515,
+        "attempts": 74,
+        "pending": 13,
+        "terminals": 0
+      },
+      "published_interval_ms": 9995,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 160763,
+      "observer_end_uptime_ms": 170763,
+      "valid": true,
+      "completed_copy_rate_per_second": 5.880007972892167,
+      "delta": {
+        "completed_pixel_copies": 59,
+        "queue_us": 689,
+        "beat_us": 0,
+        "lease_wall_us": 243397,
+        "lease_call_us": 226372,
+        "acquire_us": 22511,
+        "show_us": 1012773,
+        "attempts": 74,
+        "pending": 15,
+        "terminals": 0
+      },
+      "published_interval_ms": 10034,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 170763,
+      "observer_end_uptime_ms": 180764,
+      "valid": true,
+      "completed_copy_rate_per_second": 7.288338658146965,
+      "delta": {
+        "completed_pixel_copies": 73,
+        "queue_us": 933,
+        "beat_us": 1,
+        "lease_wall_us": 267408,
+        "lease_call_us": 252579,
+        "acquire_us": 29987,
+        "show_us": 1228818,
+        "attempts": 86,
+        "pending": 13,
+        "terminals": 0
+      },
+      "published_interval_ms": 10016,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 180764,
+      "observer_end_uptime_ms": 190765,
+      "valid": true,
+      "completed_copy_rate_per_second": 3.7795902128506067,
+      "delta": {
+        "completed_pixel_copies": 38,
+        "queue_us": 514,
+        "beat_us": 1,
+        "lease_wall_us": 186972,
+        "lease_call_us": 169868,
+        "acquire_us": 13267,
+        "show_us": 423519,
+        "attempts": 53,
+        "pending": 15,
+        "terminals": 0
+      },
+      "published_interval_ms": 10054,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 190765,
+      "observer_end_uptime_ms": 200765,
+      "valid": true,
+      "completed_copy_rate_per_second": 4.716507777220271,
+      "delta": {
+        "completed_pixel_copies": 47,
+        "queue_us": 557,
+        "beat_us": 1,
+        "lease_wall_us": 196496,
+        "lease_call_us": 184020,
+        "acquire_us": 17489,
+        "show_us": 736428,
+        "attempts": 58,
+        "pending": 11,
+        "terminals": 0
+      },
+      "published_interval_ms": 9965,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 200765,
+      "observer_end_uptime_ms": 210766,
+      "valid": true,
+      "completed_copy_rate_per_second": 8.447624726694494,
+      "delta": {
+        "completed_pixel_copies": 85,
+        "queue_us": 1099,
+        "beat_us": 0,
+        "lease_wall_us": 368292,
+        "lease_call_us": 347746,
+        "acquire_us": 32861,
+        "show_us": 1206363,
+        "attempts": 103,
+        "pending": 18,
+        "terminals": 0
+      },
+      "published_interval_ms": 10062,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    },
+    {
+      "observer_start_uptime_ms": 210766,
+      "observer_end_uptime_ms": 220767,
+      "valid": true,
+      "completed_copy_rate_per_second": 6.212424849699399,
+      "delta": {
+        "completed_pixel_copies": 62,
+        "queue_us": 756,
+        "beat_us": 0,
+        "lease_wall_us": 180225,
+        "lease_call_us": 168854,
+        "acquire_us": 21495,
+        "show_us": 747717,
+        "attempts": 72,
+        "pending": 10,
+        "terminals": 0
+      },
+      "published_interval_ms": 9980,
+      "scope": "Cumulative completed CPU pixel copies per publication interval,including idle. Not physical FPS,GPU timestamp duration or a fixed-workload performance benchmark. LeaseCall is a subset of LeaseWall and must not be added to it."
+    }
+  ],
+  "physical": {
+    "camera": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/camera/v268-window.json",
+      "sha256": "e04363e3dca722d9d6b989d04f8b9fe0deb7fc55ffce0d2a75a3f2a596cc060f"
+    },
+    "video": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/root-trial/camera/v268-window.mp4",
+      "sha256": "7f0121be614b4da95c729e1298bd22148f7c1e77fa5f0b9c479690e4b0a74b0c"
+    },
+    "frame": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v286-earlier-scalar-window-f9280b9be3f64115b32e35a609264720/physical-screen-at145s.png",
+      "sha256": "b9bfd3312ac886bb2e99d90c064b487e6dce8b883bb7a799ca8aefc4b12a3582"
+    },
+    "frame_time_seconds": 145,
+    "observed": "Physical lock screen with clock and Home indicator;no human input or unlocked desktop observation"
+  },
+  "limits": [
+    "Legacy compact telemetry dropped6;do not infer absence of all failures from sampled zero backend records. Independent present-cost snapshots have zero clock/saturation/publication faults.",
+    "Live backboardd clients need not exit for this passive observation;their full teardown is not qualified.",
+    "No synthetic touch,unlock,Settings/menu or FT3683 edge/identity acceptance.",
+    "Two complete aggregate process reports are CPU-wall counters,not pure GPU time. Their window includes uncontrolled lockscreen work and overlapping phases;do not add stage totals or claim a fixed-workload FPS gain.",
+    "No GPU-clock-frequency measurement,hardware timestamps,desktopFPS benchmark or optimization gain.",
+    "282 exact known-image/lifecycle proof remains its own tuple;not requalified as284."
+  ],
+  "full_GPU_Metal_display_and_FT_acceptance": false,
+  "next_action": "Measure actual IOKit Submit/Wait/memory RPC duration to separate driver serialization/context transitions from rendering and callback scheduling;no frequency tuning based on another DTS",
+  "upstream_counter_window": {
+    "elapsed_us": 40002700,
+    "increments": {
+      "pipeline": {
+        "count": 29,
+        "total_ms": 723,
+        "mean_per_new_call_ms": 24.93103448275862
+      },
+      "library": {
+        "count": 0,
+        "total_ms": 0
+      },
+      "compile": {
+        "count": 0,
+        "total_ms": 0,
+        "cached": 0
+      },
+      "function": {
+        "count": 24,
+        "total_ms": 1,
+        "mean_per_new_call_ms": 0.041666666666666664
+      },
+      "commit-to-complete": {
+        "count": 183,
+        "total_ms": 24815,
+        "mean_per_new_call_ms": 135.60109289617486
+      },
+      "scheduled wait": {
+        "count": 183,
+        "total_ms": 5179,
+        "mean_per_new_call_ms": 28.30054644808743
+      },
+      "completed wait": {
+        "count": 0,
+        "total_ms": 0,
+        "timeouts": 0
+      },
+      "resource wait": {
+        "count": 0,
+        "total_ms": 0
+      },
+      "surface cache": {
+        "count": 590,
+        "bytes": 5128192000,
+        "duplicates": 0,
+        "total_us": 112,
+        "max_us": 0
+      }
+    },
+    "scope": "Difference of two process-aggregate CPU-wall samples. Maxima remain cumulative in the original reports and are not subtracted. Counts overlap across pipeline stages;neither pureGPU time norFPS nor a controlled benchmark.",
+    "TH_rows": [
+      "TH cpu 30049ms in 40002ms | ca.display.prim:13132 m2v-queue-wait-:7867 m2v-scheduler:3425",
+      "THb native-metal-en:2725 m2v-frees:2202 m2v-lowering:225"
+    ],
+    "driver_pipeline_rows": [
+      "VP made 58 create 57/30 step 0 | drv gfx 1468ms cmp 39ms | fn 62 mod 59"
+    ]
+  }
+}

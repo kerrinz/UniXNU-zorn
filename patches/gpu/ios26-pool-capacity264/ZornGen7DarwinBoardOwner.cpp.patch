@@ -1,0 +1,11 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -3821,7 +3821,7 @@
+                     const auto complete=s.native_direct_memory_owner->completeHostBootstrap(board,bootstrap);
+                     Zorn26RecordBootstrapResult(complete);if(complete)return 79;
+                     ZornGen7DirectRuntimeAuthority26 runtime{};
+-                    const auto attached=s.native_direct_memory_owner->prepareHostDirectRuntime(board,runtime,8192);
++                    const auto attached=s.native_direct_memory_owner->prepareHostDirectRuntime(board,runtime,131072);
+                     Zorn26RecordRuntimeResult(attached);if(attached)return 81;
+                     const auto image=s.native_direct_memory_owner->runHostKnownImage();
+                     Zorn26RecordKnownImageResult(image);if(image)return 83;

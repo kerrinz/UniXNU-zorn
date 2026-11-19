@@ -1,0 +1,416 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -61,7 +61,7 @@
+ #include "ZornKnownPresent247.h"
+ #include "ZornSerialShot270.h"
+ static ZornSerialRoi270 zornSerialShot265;
+-extern "C" bool zorn26_ui_scene_capture_ready270();
++extern "C" bool zorn26_ui_desktop_capture_ready271();
+ extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+@@ -1440,7 +1440,7 @@
+                 zornKnownPresent247.complete(record);
+                 // One thumbnail after real CPU copies/helpers and a mature
+                 // compositor frame. The same retained issuer lease is held.
+-                if(zorn26_ui_scene_capture_ready270() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
++                if(zorn26_ui_desktop_capture_ready271() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
+                     IOLockLock(fLock);
+                     (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+                         fPanelWidth,fPanelHeight,fRowBytes,fZornCheckedExtent265,record);
+--- a/ZornApplicationStderr26.inc
++++ b/ZornApplicationStderr26.inc
+@@ -6,7 +6,7 @@
+  // Actual kernel process identity; this name filter selects diagnostics only.
+  // It never grants IOKit/GPU admission or changes a syscall result.
+  const char *name=proc_best_name(process);
+- static const char expected[]="zorn-metal-probe193";
++ static const char expected[]="backboardd";
+  if(!name || strncmp(name,expected,sizeof(expected)))return;
+  const uint64_t unique=proc_uniqueid(process);const uint32_t pid=(uint32_t)proc_pid(process);
+  if(!zorn26_application_stderr_reserve(unique,pid))return;
+--- /dev/null
++++ b/ZornDesktopIdentity271.h
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++#include <string.h>
++
++// Read-only diagnostic identity from the actual admitted openingTask proc.
++// No task,port,client pointer or reference is retained or granted here.
++class ZornDesktopIdentity271 {
++    uint32_t gate_=0,pid_=0,conflict_=0;uint64_t unique_=0;
++    bool lock(){uint32_t zero=0;return __atomic_compare_exchange_n(&gate_,&zero,1u,false,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED);}
++    void unlock(){__atomic_store_n(&gate_,0u,__ATOMIC_RELEASE);}
++public:
++    void observe(const char *name,uint64_t unique,uint32_t pid){
++        if(!name || strcmp(name,"backboardd") || !unique || !pid)return;
++        if(!lock())return;
++        if(!unique_){unique_=unique;pid_=pid;}
++        else if(unique_!=unique || pid_!=pid)conflict_=1;
++        unlock();
++    }
++    bool snapshot(uint64_t &unique,uint32_t &pid){
++        if(!lock())return false;
++        const bool ok=unique_ && pid_ && !conflict_;
++        if(ok){unique=unique_;pid=pid_;}
++        unlock();return ok;
++    }
++};
++extern "C" int zorn26_desktop_identity271(uint64_t *,uint32_t *);
+--- a/ZornJournalCapture248.inc
++++ b/ZornJournalCapture248.inc
+@@ -3,7 +3,7 @@
+ static int zorn26_journal_process248(proc_t p,int fd){
+  if(!p || fd!=2)return 0;
+  const char *name=proc_best_name(p);
+- static const char expected[]="zorn-metal-probe193";
++ static const char expected[]="backboardd";
+  return name && !strncmp(name,expected,sizeof(expected));
+ }
+ // Observe the actually returned prefix after the original write. User memory
+--- a/ZornRootWindow26.h
++++ b/ZornRootWindow26.h
+@@ -17,7 +17,7 @@
+ static_assert(RelativeByteStart<=PartitionBytes && Bytes<=PartitionBytes-RelativeByteStart);
+ static_assert(!(AbsoluteByteStart&4095) && !(Bytes&4095));
+ static_assert((AbsoluteByteStart>>12)+((Bytes>>12)-1)<=0xffffffffULL);
+-static constexpr uint8_t ImageSha256[] = {0xf3,0xad,0x6b,0x7b,0x6b,0xae,0x2f,0xfd,0x8a,0xaa,0x83,0x54,0x27,0xe0,0xb4,0xac,0xe8,0x23,0xf5,0x2b,0xd6,0x14,0xa2,0x98,0xd2,0xb7,0xd1,0x91,0xda,0x33,0xdd,0x26};
++static constexpr uint8_t ImageSha256[] = {0xc6,0xb,0x19,0x8d,0xed,0x30,0xa9,0x82,0xcf,0x96,0xee,0x9c,0xb6,0x62,0x11,0xa8,0xf7,0x4c,0x7d,0x8f,0xa8,0xf,0x5b,0x6d,0xd8,0xe0,0x83,0x9e,0x12,0x13,0x4,0xfc};
+ static constexpr uint8_t WindowBytes[] = {0x0,0x0,0x0,0x15,0x33,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+ static constexpr uint8_t NativeCompatible[] = {0x56,0x35,0x33,0x41,0x50,0x0,0x69,0x50,0x68,0x6f,0x6e,0x65,0x31,0x38,0x2c,0x31,0x0,0x41,0x70,0x70,0x6c,0x65,0x41,0x52,0x4d,0x0,0x78,0x69,0x61,0x6f,0x6d,0x69,0x2c,0x7a,0x6f,0x72,0x6e,0x0,0x71,0x63,0x6f,0x6d,0x2c,0x73,0x6d,0x38,0x36,0x35,0x30,0x0};
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC be48c59f862d43c49b41047053bece60 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 2073ff1494c64d61a0f63ce88573ceab %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -866,15 +866,15 @@
+ extern "C" void zorn26_serial_shot_request265(void);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
+ extern "C" bool zorn26_serial_shot_ready265(void);
+-#include "ZornUiSceneWire269.h"
+-extern "C" bool zorn26_ui_scene_done269();
+-extern "C" bool zorn26_ui_scene_snapshot269(uint32_t (&)[16]);
+-extern "C" void zorn26_ui_scene_schedule269(IOService *);
++#include "ZornUiDesktopWire271.h"
++extern "C" bool zorn26_ui_desktop_done271();
++extern "C" bool zorn26_ui_desktop_snapshot271(uint32_t (&)[32]);
++extern "C" void zorn26_ui_desktop_schedule271(IOService *);
+ struct ZornUiSceneProvider269 {
+-    bool ready()const{return zorn26_ui_scene_done269();}
++    bool ready()const{return zorn26_ui_desktop_done271();}
+     unsigned packet(char *out,unsigned cap,const uint8_t (&tag)[16])const{
+-        uint32_t snapshot[16]{};
+-        return zorn26_ui_scene_snapshot269(snapshot)?ZornUiSceneWire269::packet(out,cap,snapshot,tag):0;
++        uint32_t snapshot[32]{};
++        return zorn26_ui_desktop_snapshot271(snapshot)?ZornUiDesktopWire271::packet(out,cap,snapshot,tag):0;
+     }
+ };
+ static ZornSerialMux270 zornSerialMux265;
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"be48c59f862d43c49b41047053bece60",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"2073ff1494c64d61a0f63ce88573ceab",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1253,7 +1253,7 @@
+     owner->release();
+     (void)thread_terminate(current_thread());panic("K80 RSC checkpoint worker returned");
+ }
+-#include "ZornUiSceneGpuGate269.inc"
++#include "ZornUiDesktopGate271.inc"
+ // Actual PID1 EL0 BSD-system-call entry;no syscall result or user arguments logged.
+ extern "C" uint32_t ZornBootPresenterRefusal26(void);
+ extern "C" IOReturn ZornBootPresenterPatternResult26(uint32_t *,uint64_t *);
+@@ -1300,7 +1300,7 @@
+             // Actual root device/PID1 EL0/preemption checks above still apply.
+             // This prospective profile selects one source-bounded synthetic
+             // scene;the normal FT3683 platform owner remains independent.
+-            zorn26_ui_scene_schedule269(IOService::getPlatform());
++            zorn26_ui_desktop_schedule271(IOService::getPlatform());
+         }
+         owner->retain();thread_t worker=THREAD_NULL;
+         const auto raw=kernel_thread_start(zorn_touch_checkpoint_worker26,owner,&worker);
+--- /dev/null
++++ b/ZornUiDesktopGate271.inc
+@@ -0,0 +1,51 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#include "ZornDesktopIdentity271.h"
++// Synthetic-input admission only. CPU metadata never stops DMA or authorizes
++// native release/reset. A live compositor cannot use269's probe-exit gate.
++extern "C" bool zorn26_ui_desktop_ready271() {
++    if(__atomic_load_n(&zornProgress201.state,__ATOMIC_ACQUIRE)!=3 ||
++       __atomic_load_n(&zornProgress201.result,__ATOMIC_RELAXED)!=88 ||
++       __atomic_load_n(&zornProgress201.gate.failed,__ATOMIC_ACQUIRE) ||
++       __atomic_load_n(&zornCallbackGate222.failed,__ATOMIC_ACQUIRE))return false;
++    // Exact retained266 initial known-task contract;not later DMA-stop proof.
++    uint32_t k[32]{};zorn26_native_known_image_observation(k);
++    if(k[0] || k[1]!=6 || (k[2]&63u)!=63u || k[3] || k[4]!=k[5] ||
++       !k[6] || k[6]!=k[7] || k[8] || k[9] || k[10] || k[11] || k[12] ||
++       k[15]!=0xe843b26au || k[16]!=UINT32_MAX || k[17] || k[18] ||
++       k[19]!=k[20] || (k[21]&(1u<<23)) || (k[22]&~1u) || k[23] ||
++       k[24]!=127 || k[31])return false;
++    uint64_t unique=0;uint32_t pid=0;
++    if(!zorn26_desktop_identity271(&unique,&pid))return false;
++    ZornApplicationObservation26 app{};
++    if(!zorn26_application_snapshot(&app) || app.unique!=unique || app.pid!=pid ||
++       (app.flags&15u)!=15u || !app.calls || app.closeReturned ||
++       app.prepareFailed || app.dropped)return false;
++    uint32_t p[16]{};
++    // Exact245 actual presenter:lease2 alone also occurs for CPU surfaces.
++    // Require the surface's real GPU access fence and completed ledger/copy.
++    if(!zorn26_present_snapshot245(p) || p[0]!=2 || p[1]<64 || !p[2] ||
++       p[3]!=2 || !p[4] || p[4]!=p[5] || p[2]>p[5] || !p[6] || !p[7] ||
++       p[8]!=1 || p[9]!=1 || p[10]!=1 || p[12]!=p[11]+1u ||
++       !p[13] || p[13]>16384 || !p[14] || p[14]>16384 ||
++       !p[15] || p[15]>p[5])return false;
++    ZornClientFailure261 first{};
++    if(!zorn_failure_snapshot261(2,&first) || !first.records ||
++       first.records>ZornFailureSlots261)return false;
++    const uint32_t count=first.records,recycled=first.recycled;bool live=false;
++    uint64_t ids[ZornFailureSlots261]{};
++    for(unsigned i=0;i<count;++i){
++        ZornClientFailure261 c{};
++        if(!zorn_failure_snapshot261(2u+3u*i,&c) || c.records!=count ||
++           c.recycled!=recycled || c.dropped || !c.id || c.unique!=unique || c.pid!=pid ||
++           !(c.flags&ZornFailureRegistered261) || c.failure.sequence ||
++           (c.flags&ZornFailureCloseFailed261))return false;
++        for(unsigned j=0;j<i;++j)if(ids[j]==c.id)return false;
++        ids[i]=c.id;
++        if((c.flags&ZornFailureClosed261) &&
++           (c.closeStage!=ZornFailureCloseReturn261 || c.closeRaw))return false;
++        if(c.calls && !(c.flags&(ZornFailureClosing261|ZornFailureClosed261)))live=true;
++    }
++    // Active Scope is a normal serialized method,not a backend failure.
++    // Capability rejects remain visible but do not impersonate backend errors.
++    return live;
++}
+--- /dev/null
++++ b/ZornUiDesktopPlan271.h
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include "ZornUiScenePlan269.h"
++namespace ZornUiDesktop271 {
++using Outcome=ZornUiScene269::Outcome;
++using Result=ZornUiScene269::Result;
++enum : uint32_t { X=28330,Y=3938,Reports=6,IntervalMs=400,SettleMs=30000,BudgetMs=70000 };
++struct Scene {Result swipe,press;};
++// Coordinates are the visually identified actual270 Settings gear sample35,25
++// in its720x1600 upper-right ROI of1440x3200. Not a foreign board parameter.
++// Returned void dispatch is not queue delivery,Settings-menu or FT3683 proof.
++template<class Backend> Scene run(Backend &io){
++    Scene s;const uint64_t start=io.nowMs();
++    const auto age=[&](){const auto now=io.nowMs();return now>=start?now-start:UINT64_MAX;};
++    s.swipe=ZornUiScene269::run(io);
++    if(s.swipe.outcome!=Outcome::Complete)return s;
++    const auto settled=age();
++    while(age()-settled<SettleMs){
++        const auto elapsed=age();
++        if(elapsed>=BudgetMs){s.press.outcome=Outcome::Deadline;return s;}
++        if(!io.ready())return s;
++        const auto remain=SettleMs-(elapsed-settled);
++        io.sleepMs(uint32_t(remain<250?remain:250));
++    }
++    s.press.outcome=Outcome::Complete;
++    const uint64_t pressStart=io.nowMs();
++    for(unsigned i=0;i<Reports;++i){
++        if(age()>=BudgetMs){s.press.outcome=Outcome::Deadline;break;}
++        if(!io.ready()){s.press.outcome=Outcome::NoClient;break;}
++        ZornContacts::Frame frame{};frame.count=1;
++        frame.points[0].x=X;frame.points[0].y=Y;
++        frame.points[0].strength=1;frame.points[0].id=ZornUiScene269::Identity;
++        ++s.press.attempted;const auto raw=io.send(frame);++s.press.returned;
++        if(raw){s.press.firstRaw=raw;s.press.outcome=Outcome::Dispatch;break;}
++        const auto elapsed=age();
++        if(elapsed>=BudgetMs){s.press.outcome=Outcome::Deadline;break;}
++        io.sleepMs(uint32_t(BudgetMs-elapsed<IntervalMs?BudgetMs-elapsed:IntervalMs));
++    }
++    if(s.press.attempted){
++        ZornContacts::Frame lift{};s.press.liftAttempted=1;s.press.liftRaw=io.send(lift);
++        if(s.press.liftRaw){if(!s.press.firstRaw)s.press.firstRaw=s.press.liftRaw;s.press.outcome=Outcome::Dispatch;}
++    }
++    const auto end=io.nowMs();const auto elapsed=end>=pressStart?end-pressStart:UINT64_MAX;
++    s.press.elapsedMs=elapsed>UINT32_MAX?UINT32_MAX:uint32_t(elapsed);return s;
++}
++}
+--- /dev/null
++++ b/ZornUiDesktopWire271.h
+@@ -0,0 +1,14 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include "ZornUiSceneWire269.h"
++// New schema:flag512 means live backboardd/GPU-surface admission,not269's
++// exited probe/four closed clients. No old packet is relabeled as this one.
++struct ZornUiDesktopWire271 {
++    enum { Words=32,Bytes=160 };
++    static unsigned packet(char *out,unsigned cap,const uint32_t (&v)[Words],const uint8_t (&tag)[16]){
++        if(!out || cap<Bytes)return 0;
++        auto *p=reinterpret_cast<uint8_t *>(out);memcpy(p,"K80UI271",8);memcpy(p+8,tag,16);
++        for(unsigned i=0;i<Words;++i)zorn_panic_le236(p,24+4*i,v[i]);
++        zorn_panic_le236(p,152,zorn_panic_crc236(p,152));zorn_panic_le236(p,156,271);return Bytes;
++    }
++};
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornTouchEventService26.h"
+-#include "ZornUiScenePlan269.h"
++#include "ZornUiDesktopPlan271.h"
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IODeviceTreeSupport.h>
+ #include <IOKit/IOLib.h>
+@@ -10,7 +10,7 @@
+ #include <kern/thread.h>
+ #include <kern/sched_prim.h>
+ #include <machine/machine_routines.h>
+-extern "C" bool zorn26_ui_scene_gpu_ready269();
++extern "C" bool zorn26_ui_desktop_ready271();
+ 
+ // A separate normal HID service. No FT3683 provider open, GPIO, bus, IRQ,
+ // physical frame state, touchscreen identity or sampled contact is borrowed.
+@@ -32,7 +32,7 @@
+ 
+ namespace {
+ uint32_t scheduled269=0,done269=0,schedulingReturned269=0;
+-uint32_t status269[16]{};
++uint32_t status269[32]{};
+ uint64_t captureDeadline270=0;
+ void store(unsigned i,uint32_t value){__atomic_store_n(status269+i,value,__ATOMIC_RELAXED);}
+ void addFlags(uint32_t flags){__atomic_fetch_or(status269+2,flags,__ATOMIC_RELAXED);}
+@@ -58,7 +58,7 @@
+ struct Backend {
+     ZornUiSceneService269 &service;
+     uint64_t nowMs() {uint64_t ns=0;absolutetime_to_nanoseconds(mach_absolute_time(),&ns);return ns/1000000;}
+-    bool ready(){return service.hasSubscriber();}
++    bool ready(){return service.hasSubscriber() && zorn26_ui_desktop_ready271();}
+     uint32_t send(const ZornContacts::Frame &frame){return uint32_t(service.submitFrame(frame));}
+     void sleepMs(uint32_t ms){IOSleep(ms);}
+ };
+@@ -67,13 +67,15 @@
+     // Fixed prospective candidate:one scene after real PID1 EL0,well before
+     // the independent300s WDT. No boot-argument extension of the1022byte line.
+     IOSleep(120000);
++    // Bounded CPU-snapshot wait before any virtual service/input. Not GPU or boot retry.
++    for(unsigned i=0;i<120 && normal() && nativeK80(platform) && !zorn26_ui_desktop_ready271();++i)IOSleep(250);
+     if(!__atomic_load_n(&schedulingReturned269,__ATOMIC_ACQUIRE)) {
+         store(7,uint32_t(kIOReturnNotReady));finish(7);
+     } else if(!normal() || !nativeK80(platform)) {
+         store(7,uint32_t(kIOReturnUnsupported));finish(7);
+-    } else if(!zorn26_ui_scene_gpu_ready269()) {
+-        // No new input or service registration after an incomplete/failed GPU
+-        // probe. This predicate grants no DMA-stop or resource-release authority.
++    } else if(!zorn26_ui_desktop_ready271()) {
++        // No new service/input without actual live backboardd and completed
++        // GPU-surface evidence. No DMA-stop or resource-release authority.
+         store(7,uint32_t(kIOReturnNotReady));finish(7);
+     } else {
+         addFlags(512);
+@@ -85,7 +87,13 @@
+         if(attached){addFlags(8);started=service->start(platform);}
+         if(started) {
+             addFlags(16);service->registerService();addFlags(32);store(0,3);
+-            Backend io{*service};const auto r=ZornUiScene269::run(io);
++            Backend io{*service};const auto scene=ZornUiDesktop271::run(io);const auto &r=scene.swipe;
++            const auto &press=scene.press;
++            store(16,uint32_t(press.outcome));store(17,press.attempted);store(18,press.returned);
++            store(19,press.firstRaw);store(20,press.liftAttempted);store(21,press.liftRaw);
++            store(22,press.elapsedMs);store(23,ZornUiDesktop271::X);store(24,ZornUiDesktop271::Y);
++            store(25,ZornUiDesktop271::Reports);store(26,ZornUiDesktop271::IntervalMs);
++            store(27,ZornUiDesktop271::SettleMs);store(28,ZornUiDesktop271::BudgetMs);
+             store(3,r.polls);store(4,uint32_t(service->hasSubscriber()));
+             store(5,r.attempted);store(6,r.returned);store(7,r.firstRaw);
+             store(8,r.liftRaw);store(9,r.elapsedMs);
+@@ -99,7 +107,7 @@
+             // normal IOKit termination owns stop/detach/free. No force-close of
+             // user clients, guessed callback drain or physical driver teardown.
+             service->release();service=nullptr;addFlags(256);
+-            finish(r.outcome==ZornUiScene269::Outcome::Complete?6u:7u);
++            finish(r.outcome==ZornUiScene269::Outcome::Complete && press.outcome==ZornUiScene269::Outcome::Complete?6u:7u);
+         } else {
+             store(7,uint32_t(kIOReturnNotReady));
+             // Not published,no worker/client callback can borrow this object.
+@@ -111,14 +119,14 @@
+     (void)thread_terminate(current_thread());panic("K80 synthetic UI worker termination returned");
+ }
+ }
+-extern "C" bool zorn26_ui_scene_done269() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
+-extern "C" bool zorn26_ui_scene_capture_ready270(){return zorn26_ui_scene_done269() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
+-extern "C" bool zorn26_ui_scene_snapshot269(uint32_t (&out)[16]) {
+-    if(!zorn26_ui_scene_done269())return false;
+-    for(unsigned i=0;i<16;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
++extern "C" bool zorn26_ui_desktop_done271() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
++extern "C" bool zorn26_ui_desktop_capture_ready271(){return zorn26_ui_desktop_done271() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
++extern "C" bool zorn26_ui_desktop_snapshot271(uint32_t (&out)[32]) {
++    if(!zorn26_ui_desktop_done271())return false;
++    for(unsigned i=0;i<32;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     return true;
+ }
+-extern "C" void zorn26_ui_scene_schedule269(IOService *platform) {
++extern "C" void zorn26_ui_desktop_schedule271(IOService *platform) {
+     if(!normal() || !nativeK80(platform))return;
+     uint32_t zero=0;
+     if(!__atomic_compare_exchange_n(&scheduled269,&zero,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return;
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BE48C59F862D"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN262073FF1494C6"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/direct-runtime/ZornGen7AppIo26.cpp
++++ b/direct-runtime/ZornGen7AppIo26.cpp
+@@ -17,6 +17,9 @@
+ #include <sys/proc_private.h>
+ #include "ZornApplicationObservation26.h"
+ #include "ZornApplicationObservation26.inc"
++#include "ZornDesktopIdentity271.h"
++static ZornDesktopIdentity271 desktopIdentity271;
++extern "C" int zorn26_desktop_identity271(uint64_t *unique,uint32_t *pid){return unique&&pid&&desktopIdentity271.snapshot(*unique,*pid);}
+ OSDefineMetaClassAndStructors(ZornGen7AppIoService26,IOAcceleratorES)
+ OSDefineMetaClassAndStructors(ZornGen7AppIoClient26,IOUserClient)
+ // Only scalar atomics in resident kernel storage; no object access in snapshot.
+@@ -175,8 +178,10 @@
+     if(reserved)return reserved; // no attempted flag,pin or permanent native failure
+     retain();pinned_=true;attempted_=true; // keep actual partials from the first authority call onward
+     // Observation follows real hardware sessions,not independent unused metadata.
+-    if(auto process=static_cast<proc_t>(get_bsdtask_info(openingTask_)))
++    if(auto process=static_cast<proc_t>(get_bsdtask_info(openingTask_))){
++        desktopIdentity271.observe(proc_best_name(process),proc_uniqueid(process),uint32_t(proc_pid(process)));
+         appObservationBind(reinterpret_cast<uintptr_t>(this),proc_uniqueid(process),uint32_t(proc_pid(process)));
++    }
+     zorn26_client_event240(15);
+     attemptRaw_=owner_->prepareApplicationExecution(*this,openingTask_,0x4147,*authorityOwner_,authority_,execution_);
+     zorn26_client_event240(16);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbe,0x48,0xc5,0x9f,0x86,0x2d,0x43,0xc4,0x9b,0x41,0x04,0x70,0x53,0xbe,0xce,0x60};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x20,0x73,0xff,0x14,0x94,0xc6,0x4d,0x61,0xa0,0xf6,0x3c,0xe8,0x85,0x73,0xce,0xab};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbe,0x48,0xc5,0x9f,0x86,0x2d,0x43,0xc4,0x9b,0x41,0x04,0x70,0x53,0xbe,0xce,0x60};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x20,0x73,0xff,0x14,0x94,0xc6,0x4d,0x61,0xa0,0xf6,0x3c,0xe8,0x85,0x73,0xce,0xab};

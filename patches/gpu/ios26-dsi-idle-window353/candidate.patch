@@ -1,0 +1,256 @@
+--- a/ZornDpuAutoRefreshTransfer340.h
++++ b/ZornDpuAutoRefreshTransfer340.h
+@@ -18,7 +18,7 @@
+ enum Result : uint32_t {
+     NotRun, RouteUnavailable, GopBusy, LeaseUnavailable, ReadUnavailable,
+     ExistingActivity, WrongTopology, AutoConfigChanged, ArmFailed,
+-    ProgramUncertain, ObservationLost, Timeout, TransferObserved,
++    ProgramUncertain, ObservationLost, Timeout, TransferObserved, PriorDsiNotIdle,
+ };
+ enum Field : unsigned {
+     Status, Sequence, Retain, StartMs, LatchUs, KickoffUs, DsiUs, Polls, FrameDelta,
+@@ -40,9 +40,17 @@
+     BufferPairMismatch = 8, ActiveSourceMismatch = 16, StrideMismatch = 32,
+     DsiVersionMismatch = 64, DsiControlMismatch = 128, DsiLaneStateMismatch = 256,
+ };
++// DSI host 2.8 uses the vendor command-mode MDP busy bit at DSI_STATUS.
++constexpr uint32_t DsiStatus = 0x08, DsiCmdMdpBusy = 1u << 2;
++constexpr uint32_t PriorDsiWaitUs = 8000, MaxIdlePolls = 8;
++struct IdleWait {
++    uint32_t elapsedUs = 0;
++    bool attempted = false, idle = false;
++};
+ struct Timing {
+     uint64_t programmed = 0, completed = 0;
+     uint32_t source0 = 0, source1 = 0, guard = 0;
++    IdleWait wait;
+ };
+ inline constexpr uint32_t ObservationGapUs = 50000;
+ 
+@@ -64,34 +72,90 @@
+     uint32_t ctl = 0, active = 0, fetch = 0, addr0 = 0, addr1 = 0, stride0 = 0, stride1 = 0;
+     uint32_t underruns = 0, start = 0, flush = 0, dpuVersion = 0, dsiVersion = 0, dsiControl = 0, laneStatus = 0;
+     out[Status] = ReadUnavailable;
+-    if (!port.readMdp(0, dpuVersion) || !port.readMdp(Cmd::CtlTop, ctl) ||
+-        !port.readMdp(Cmd::CtlIntfActive, active) || !port.readMdp(Cmd::CtlFetchActive, fetch) ||
+-        !port.readMdp(Cmd::CtlFlush, flush) || !port.readMdp(Cmd::CtlStart, start) ||
+-        !port.readMdp(Cmd::Vig0Source, addr0) || !port.readMdp(Cmd::Vig1Source, addr1) ||
+-        !port.readMdp(Cmd::Vig0Stride, stride0) || !port.readMdp(Cmd::Vig1Stride, stride1) ||
+-        !port.readIntf(Cmd::AutoRefreshConfig, out[InitialAutoConfig]) ||
+-        !port.readIntf(Cmd::AutoRefreshStatus, out[InitialAutoStatus]) ||
+-        !port.readIntf(Cmd::UnderrunCount, underruns) || !port.readIntf(Cmd::InterfaceFrames, out[InitialInterfaceFrame]) ||
+-        !port.readTear(TearEnable, out[InitialTearEnable]) || !port.readTear(TearStatus, out[InitialTear]) ||
+-        !port.readDsi(0, dsiVersion) || !port.readDsi(4, dsiControl) ||
+-        !port.readDsi(0xa8, laneStatus) || !port.readDsi(Cmd::DsiInterrupt, out[InitialDsi])) return;
++    auto snapshot = [&] {
++        return port.readMdp(0, dpuVersion) && port.readMdp(Cmd::CtlTop, ctl) &&
++            port.readMdp(Cmd::CtlIntfActive, active) && port.readMdp(Cmd::CtlFetchActive, fetch) &&
++            port.readMdp(Cmd::CtlFlush, flush) && port.readMdp(Cmd::CtlStart, start) &&
++            port.readMdp(Cmd::Vig0Source, addr0) && port.readMdp(Cmd::Vig1Source, addr1) &&
++            port.readMdp(Cmd::Vig0Stride, stride0) && port.readMdp(Cmd::Vig1Stride, stride1) &&
++            port.readIntf(Cmd::AutoRefreshConfig, out[InitialAutoConfig]) &&
++            port.readIntf(Cmd::AutoRefreshStatus, out[InitialAutoStatus]) &&
++            port.readIntf(Cmd::UnderrunCount, underruns) && port.readIntf(Cmd::InterfaceFrames, out[InitialInterfaceFrame]) &&
++            port.readTear(TearEnable, out[InitialTearEnable]) && port.readTear(TearStatus, out[InitialTear]) &&
++            port.readDsi(0, dsiVersion) && port.readDsi(4, dsiControl) &&
++            port.readDsi(0xa8, laneStatus) && port.readDsi(Cmd::DsiInterrupt, out[InitialDsi]);
++    };
++    if (!snapshot()) return;
+     // The caller has locked the real GOP writer and made the requested
+     // destination immutable and DMA-visible. Only a cross-buffer transition
+     // inside the witnessed K80 splash reservation is supported.
+     const bool bufferPair = !target ? address == ZORN_SCANOUT_FRONT :
+         (address == ZORN_SCANOUT_FRONT && target == ZORN_SCANOUT_BACK) ||
+         (address == ZORN_SCANOUT_BACK && target == ZORN_SCANOUT_FRONT);
+-    uint32_t topology = 0;
+-    if (dpuVersion != 0xa0000000) topology |= DpuVersionMismatch;
+-    if (!(ctl & (1u << 17))) topology |= CtlModeMismatch;
+-    if (active != 2 || fetch != 0x30000) topology |= CtlRouteMismatch;
+-    if (!bufferPair) topology |= BufferPairMismatch;
+-    if (addr0 != address || addr1 != address) topology |= ActiveSourceMismatch;
+-    if (stride != ZORN_SCANOUT_STRIDE || (stride0 & 0xffff) != stride || (stride1 & 0xffff) != stride)
+-        topology |= StrideMismatch;
+-    if (dsiVersion != 0x20080000) topology |= DsiVersionMismatch;
+-    if (dsiControl != 0x1f5) topology |= DsiControlMismatch;
+-    if ((laneStatus & 0x1f1f) != 0x1f1f) topology |= DsiLaneStateMismatch;
++    auto failures = [&] {
++        uint32_t topology = 0;
++        if (dpuVersion != 0xa0000000) topology |= DpuVersionMismatch;
++        if (!(ctl & (1u << 17))) topology |= CtlModeMismatch;
++        if (active != 2 || fetch != 0x30000) topology |= CtlRouteMismatch;
++        if (!bufferPair) topology |= BufferPairMismatch;
++        if (addr0 != address || addr1 != address) topology |= ActiveSourceMismatch;
++        if (stride != ZORN_SCANOUT_STRIDE || (stride0 & 0xffff) != stride || (stride1 & 0xffff) != stride)
++            topology |= StrideMismatch;
++        if (dsiVersion != 0x20080000) topology |= DsiVersionMismatch;
++        if (dsiControl != 0x1f5) topology |= DsiControlMismatch;
++        if ((laneStatus & 0x1f1f) != 0x1f1f) topology |= DsiLaneStateMismatch;
++        return topology;
++    };
++    auto transportOwned = [&] {
++        return start || flush || (out[InitialTearEnable] & TearDoneMask) ||
++            (out[InitialDsi] & (Cmd::DsiDoneEnabled | Cmd::DsiError));
++    };
++    uint32_t topology = failures();
++    // The live path saw DSI lane stop-state change during the inherited
++    // periodic transfer. Wait for the existing transfer, with no writes or
++    // ownership changes. A static route mismatch never enters the wait.
++    if (mode == Mode::FourTe && deadline && topology == DsiLaneStateMismatch &&
++        out[InitialAutoConfig] == configExpected && !transportOwned()) {
++        const uint32_t originalUnderruns = underruns, originalTearEnable = out[InitialTearEnable];
++        const uint32_t originalDsiEnable = out[InitialDsi] & Cmd::DsiEnableMask;
++        const uint64_t since = port.nowUs();
++        const uint64_t remaining = deadline > since ? deadline - since : 0;
++        const uint64_t limit = since + (remaining < PriorDsiWaitUs ? remaining : PriorDsiWaitUs);
++        if (timing) timing->wait.attempted = true;
++        bool idle = false;
++        uint64_t now = since;
++        for (uint32_t n = 0; n < MaxIdlePolls && now < limit; ++n) {
++            port.delayMs(1);
++            now = port.nowUs();
++            if (now < since) break;
++            if (timing) timing->wait.elapsedUs = now - since > UINT32_MAX ? UINT32_MAX : uint32_t(now - since);
++            if (now >= limit) break;
++            out[Status] = LeaseUnavailable;
++            if (!port.lease()) return;
++            out[Status] = ReadUnavailable;
++            uint32_t activity = 0;
++            if (!snapshot() || !port.readDsi(DsiStatus, activity)) return;
++            topology = failures();
++            if (topology & ~DsiLaneStateMismatch) break;
++            if (out[InitialAutoConfig] != configExpected || transportOwned() || underruns != originalUnderruns ||
++                out[InitialTearEnable] != originalTearEnable || (out[InitialDsi] & Cmd::DsiEnableMask) != originalDsiEnable)
++                break;
++            const uint64_t checked = port.nowUs();
++            if (checked < now || checked >= limit) break;
++            if (timing) timing->wait.elapsedUs = uint32_t(checked - since);
++            if (!topology && !out[InitialAutoStatus] && !(activity & DsiCmdMdpBusy)) {
++                idle = true;
++                break;
++            }
++            now = checked;
++        }
++        if (idle && port.nowUs() >= deadline) idle = false;
++        if (timing) timing->wait.idle = idle;
++        if (!idle && !(topology & ~DsiLaneStateMismatch)) {
++            out[Status] = PriorDsiNotIdle;
++            return;
++        }
++    }
+     if (topology) {
+         out[Status] = WrongTopology;
+         if (timing) timing->guard = topology;
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -42,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT352", 8);
++    memcpy(p, "K80FT353", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 352);
++    zorn_panic_le236(p, Bytes - 4, 353);
+     return Bytes;
+ }
+ }
+--- a/ZornScanoutLive348.h
++++ b/ZornScanoutLive348.h
+@@ -13,15 +13,17 @@
+ // registers, full-frame advance, a fresh DSI completion and its acknowledgement.
+ template<class Port>
+ bool present(Port &port, Ownership &buffers, uint64_t seq, uint32_t swap,
+-             uint32_t target, uint64_t queued, uint64_t ready, uint32_t (&report)[Dpu::Words], uint64_t deadline = 0, uint32_t *guard = nullptr)
++             uint32_t target, uint64_t queued, uint64_t ready, uint32_t (&report)[Dpu::Words], uint64_t deadline = 0, uint32_t *guard = nullptr, Dpu::IdleWait *wait = nullptr)
+ {
+     if (guard) *guard = 0;
++    if (wait) *wait = {};
+     for (auto &word : report) word = 0;
+     if (!buffers.stage(seq, swap, target, queued, ready)) return false;
+     const uint32_t current = target == ZORN_SCANOUT_BACK ? ZORN_SCANOUT_FRONT : ZORN_SCANOUT_BACK;
+     Dpu::Timing times{};
+     Dpu::run(port, current, ZORN_SCANOUT_STRIDE, report, target, Dpu::Mode::FourTe, &times, deadline);
+     if (guard) *guard = times.guard;
++    if (wait) *wait = times.wait;
+     if (!report[Dpu::Sequence]) {
+         buffers.rejectBeforeProgram(seq);
+         return false;
+--- a/ZornScanoutPhase349.h
++++ b/ZornScanoutPhase349.h
+@@ -14,7 +14,7 @@
+ constexpr unsigned RecordWords = 4;
+ enum AdmissionField : unsigned {
+     AdmitStatus = ZornScanoutTrace348::MaxFlips * RecordWords,
+-    LockAttempts, LockWaitUs, WriterFlags, Vig0Source, Vig1Source, SecondBufferCacheOption, Words,
++    LockAttempts, LockWaitUs, WriterFlags, Vig0Source, Vig1Source, SecondBufferCacheOption, PriorDsiWaitAttempts, PriorDsiWaitIdle, PriorDsiWaitMaxUs, Words,
+ };
+ enum Admission : uint32_t {
+     NotRequested, ContextUnavailable, NoPresenter, RequestPending, Deadline,
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 9d825afd5e7c4fcb8e32c8f193b336a7 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 0256ab875cf54733bcdef1fb131f359c %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"9d825afd5e7c4fcb8e32c8f193b336a7",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"0256ab875cf54733bcdef1fb131f359c",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -462,7 +462,15 @@
+             auto &p = static_cast<Context *>(s.context)->port;
+             const uint32_t seq = ++s.out[R::Attempts];
+             uint32_t result[D::Words]{};
+-            const bool transferred = ZornScanoutLive348::present(p, s.buffers, seq, swap, target, queued, ready, result, s.deadlineUs, &guard);
++            D::IdleWait prior;
++            const bool transferred = ZornScanoutLive348::present(p, s.buffers, seq, swap, target, queued, ready,
++                result, s.deadlineUs, &guard, &prior);
++            if (prior.attempted) {
++                namespace A = ZornScanoutPhase349;
++                ++s.phase[A::PriorDsiWaitAttempts];
++                s.phase[A::PriorDsiWaitIdle] += prior.idle;
++                if (prior.elapsedUs > s.phase[A::PriorDsiWaitMaxUs]) s.phase[A::PriorDsiWaitMaxUs] = prior.elapsedUs;
++            }
+             s.out[R::LastTransfer] = result[D::Status];
+             if (transferred) {
+                 Live::record(s.out, s.buffers.shown());
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN269D825AFD5E7C"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN260256AB875CF5"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x9d,0x82,0x5a,0xfd,0x5e,0x7c,0x4f,0xcb,0x8e,0x32,0xc8,0xf1,0x93,0xb3,0x36,0xa7};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x02,0x56,0xab,0x87,0x5c,0xf5,0x47,0x33,0xbc,0xde,0xf1,0xfb,0x13,0x1f,0x35,0x9c};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x9d,0x82,0x5a,0xfd,0x5e,0x7c,0x4f,0xcb,0x8e,0x32,0xc8,0xf1,0x93,0xb3,0x36,0xa7};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x02,0x56,0xab,0x87,0x5c,0xf5,0x47,0x33,0xbc,0xde,0xf1,0xfb,0x13,0x1f,0x35,0x9c};

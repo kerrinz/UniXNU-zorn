@@ -1,0 +1,268 @@
+diff -ruN a/MiniIOMobileFramebuffer.cpp b/MiniIOMobileFramebuffer.cpp
+--- a/MiniIOMobileFramebuffer.cpp	2026-11-18 11:02:38
++++ b/MiniIOMobileFramebuffer.cpp	2026-11-18 12:09:44
+@@ -60,6 +60,7 @@
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
+ #include "ZornSerialMenu297.h"
++#include "ZornPresenterScope298.h"
+ static ZornSerialMenu297 zornSerialShot265;
+ extern "C" bool zorn26_ui_menu_capture_ready297();
+ extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+@@ -1428,75 +1429,43 @@
+         bool completed = false;
+ #if defined(ZORN_IOS26)
+         bool terminal = false;
+-        bool copied278=false;
+-#endif
+-        {
+-#if defined(ZORN_IOS26)
+-            const uint64_t leaseBegan278=clock278.now();cost278.attempt();
+-            ZornGen7PresentLease26 lease(producerFence);
++        bool copied278 = false;
++        const ZornPresenterOutcome298 outcome298 = zorn26_present_frame298<SWAP_LAYERS, ZornGen7PresentLease26>(
++            swapWord(swap, SWAP_ID), producerFence, fWidth, fHeight, surfaces,
++            leaseObserved278, clock278, cost278,
++            [](MiniIOSurface *s) { return houji26AcquireSurface(s); },
++            [](uint32_t *t, uint32_t *r) { return zorn_gen7_present_ledger245(t, r) != 0; },
++            [](uint32_t sid) { return zorn_surface_fence246(sid); },
++            []() { return __atomic_load_n(&houji26Presents, __ATOMIC_ACQUIRE); },
++            [&]() { show(swap, surfaces); });
++        completed = outcome298.completed;
++        terminal = outcome298.terminal;
++        copied278 = outcome298.copied;
++        if (outcome298.readable) {
++            zornPresentTrace245.publish(outcome298.record);
++            zornKnownPresent247.complete(outcome298.record);
++            if (zorn26_ui_menu_capture_ready297() && outcome298.record[1] >= 64 && outcome298.record[9] && zornSerialShot265.pending()) {
++                IOLockLock(fLock);
++                if (zorn26_ui_menu_capture_ready297())
++                    (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
++                    fPanelWidth, fPanelHeight, fRowBytes, fZornCheckedExtent265, outcome298.record);
++                IOLockUnlock(fLock);
++            }
++        }
+ #else
++        {
+             HoujiPresentLease26 lease(producerFence);
+-#endif
+             bool readable = lease.ready();
+-#if defined(ZORN_IOS26)
+-            terminal = lease.failed();
+-            const uint64_t leaseEnded278=clock278.now();
+-            cost278.measure(ZornPresentCost278::LeaseCall,leaseBegan278,leaseEnded278,clock278);
+-            cost278.measure(ZornPresentCost278::LeaseWall,leaseObserved278,leaseEnded278,clock278);
+-            leaseObserved278=leaseEnded278;
+-            const uint64_t acquireBegan278=clock278.now();
+-
+-#endif
+             if (readable && lease.gpu()) for (unsigned layer = 0; layer < SWAP_LAYERS; ++layer)
+                 if (surfaces[layer] && !houji26AcquireSurface(surfaces[layer])) {
+                     readable = false;
+-#if defined(ZORN_IOS26)
+-                    terminal = true; // Actual cache/acquire refusal,not a busy GPU.
+-#endif
+                     break;
+                 }
+-#if defined(ZORN_IOS26)
+-            cost278.measure(ZornPresentCost278::Acquire,acquireBegan278,clock278.now(),clock278);
+-#endif
+             if (readable) {
+-#if defined(ZORN_IOS26)
+-                uint32_t tail=0,retired=0;
+-                const bool ledger=lease.gpu() && zorn_gen7_present_ledger245(&tail,&retired);
+-                uint32_t count=0,firstSid=0;
+-                for(unsigned i=0;i<SWAP_LAYERS;++i)if(surfaces[i]){if(!count)firstSid=surfaces[i]->sid;++count;}
+-                const uint64_t before=__atomic_load_n(&houji26Presents,__ATOMIC_ACQUIRE);
+-#endif
+-                #if defined(ZORN_IOS26)
+-                const uint64_t showBegan278=clock278.now();
+-#endif
+                 show(swap, surfaces); completed = true;
+-#if defined(ZORN_IOS26)
+-                cost278.measure(ZornPresentCost278::Show,showBegan278,clock278.now(),clock278);
+-#endif
+-#if defined(ZORN_IOS26)
+-                const uint64_t after=__atomic_load_n(&houji26Presents,__ATOMIC_ACQUIRE);
+-                copied278=after>before;
+-                // Schema,frame,producer,lease,tail,completed,surfaces,first SID,
+-                // all-surface acquire passed,pixel-copy counter advanced,ledger valid,
+-                // counter before/after low words,width,height,reserved.
+-                const uint32_t record[16]={2,swapWord(swap,SWAP_ID),producerFence,lease.gpu()?2u:1u,
+-                    tail,retired,count,firstSid,lease.gpu()?1u:0u,after>before?1u:0u,ledger?1u:0u,
+-                    uint32_t(before),uint32_t(after),fWidth,fHeight,count && lease.gpu()?zorn_surface_fence246(firstSid):0};
+-                zornPresentTrace245.publish(record);
+-                zornKnownPresent247.complete(record);
+-                // One thumbnail after real CPU copies/helpers and a mature
+-                // compositor frame. The same retained issuer lease is held.
+-                if(zorn26_ui_menu_capture_ready297() && record[1]>=64 && record[9] && zornSerialShot265.pending()){
+-                    IOLockLock(fLock);
+-                    if (zorn26_ui_menu_capture_ready297())
+-                        (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+-                        fPanelWidth,fPanelHeight,fRowBytes,fZornCheckedExtent265,record);
+-                    IOLockUnlock(fLock);
+-                }
+-
+-#endif
+             }
+-        } /* Drop the issuer gate before sleeping, surface destruction or allocator work. */
++        }
++#endif
+ #if defined(ZORN_IOS26)
+         // Publish after the real lease destructor. Observation never holds or
+         // releases a device resource and never changes the retry/terminal path.
+diff -ruN a/ZornPresenterScope298.h b/ZornPresenterScope298.h
+--- a/ZornPresenterScope298.h	1970-01-01 08:00:00
++++ b/ZornPresenterScope298.h	2026-11-18 12:09:44
+@@ -0,0 +1,100 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++
++struct ZornPresenterOutcome298 {
++    bool completed = false;
++    bool terminal = false;
++    bool copied = false;
++    bool readable = false;
++    uint32_t record[16]{};
++};
++
++// Acquire surface caches and snapshot the completion ledger under the GPU
++// presentation lease, then release issuer + presentationRegistry BEFORE the
++// full-screen CPU panel copy (show) on GPU frames (lease.gpu() == true).
++// Early CPU-only frames (!lease.gpu()) retain the registry lease across show().
++template <unsigned Layers, typename Lease, typename Surface, typename Clock, typename Cost,
++          typename AcquireFn, typename LedgerFn, typename SurfaceFenceFn,
++          typename CounterFn, typename ShowFn>
++inline ZornPresenterOutcome298 zorn26_present_frame298(
++    uint32_t frameId,
++    uint32_t producerFence,
++    uint32_t width,
++    uint32_t height,
++    Surface *const (&surfaces)[Layers],
++    uint64_t &leaseObserved,
++    Clock &clock,
++    Cost &cost,
++    AcquireFn &&acquireSurface,
++    LedgerFn &&readLedger,
++    SurfaceFenceFn &&readSurfaceFence,
++    CounterFn &&readPresentCounter,
++    ShowFn &&runShow)
++{
++    ZornPresenterOutcome298 out{};
++    bool leaseGpu = false;
++    uint32_t tail = 0, retired = 0, count = 0, firstSid = 0, firstFence = 0;
++    bool ledger = false;
++    uint64_t before = 0, after = 0;
++    {
++        const uint64_t leaseBegan = clock.now();
++        cost.attempt();
++        Lease lease(producerFence);
++        out.readable = lease.ready();
++        leaseGpu = lease.gpu();
++        out.terminal = lease.failed();
++        const uint64_t leaseEnded = clock.now();
++        cost.measure(Cost::LeaseCall, leaseBegan, leaseEnded, clock);
++        cost.measure(Cost::LeaseWall, leaseObserved, leaseEnded, clock);
++        leaseObserved = leaseEnded;
++        const uint64_t acquireBegan = clock.now();
++        if (out.readable && leaseGpu) {
++            for (unsigned layer = 0; layer < Layers; ++layer) {
++                if (surfaces[layer] && !acquireSurface(surfaces[layer])) {
++                    out.readable = false;
++                    out.terminal = true;
++                    break;
++                }
++            }
++        }
++        cost.measure(Cost::Acquire, acquireBegan, clock.now(), clock);
++        if (out.readable) {
++            ledger = leaseGpu && readLedger(&tail, &retired);
++            for (unsigned i = 0; i < Layers; ++i) {
++                if (surfaces[i]) {
++                    if (!count) firstSid = surfaces[i]->sid;
++                    ++count;
++                }
++            }
++            firstFence = (count && leaseGpu) ? readSurfaceFence(firstSid) : 0;
++            if (!leaseGpu) {
++                before = readPresentCounter();
++                const uint64_t showBegan = clock.now();
++                runShow();
++                out.completed = true;
++                cost.measure(Cost::Show, showBegan, clock.now(), clock);
++                after = readPresentCounter();
++            }
++        }
++    }
++    if (out.readable && leaseGpu) {
++        before = readPresentCounter();
++        const uint64_t showBegan = clock.now();
++        runShow();
++        out.completed = true;
++        cost.measure(Cost::Show, showBegan, clock.now(), clock);
++        after = readPresentCounter();
++    }
++    if (out.readable) {
++        out.copied = after > before;
++        const uint32_t rec[16] = {
++            2u, frameId, producerFence, leaseGpu ? 2u : 1u,
++            tail, retired, count, firstSid,
++            leaseGpu ? 1u : 0u, out.copied ? 1u : 0u, ledger ? 1u : 0u,
++            uint32_t(before), uint32_t(after), width, height, firstFence
++        };
++        for (unsigned i = 0; i < 16; ++i) out.record[i] = rec[i];
++    }
++    return out;
++}
+diff -ruN a/ZornUfsOwner26.cpp b/ZornUfsOwner26.cpp
+--- a/ZornUfsOwner26.cpp	2026-11-18 11:02:38
++++ b/ZornUfsOwner26.cpp	2026-11-18 12:09:44
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 9c37385967304b6fae92874309c81104 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 5968f06ef28b4046b0ba8c9e4c49056c %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"9c37385967304b6fae92874309c81104",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"5968f06ef28b4046b0ba8c9e4c49056c",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+diff -ruN a/ZornUsbCdc26.c b/ZornUsbCdc26.c
+--- a/ZornUsbCdc26.c	2026-11-18 11:02:38
++++ b/ZornUsbCdc26.c	2026-11-18 12:09:44
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN269C3738596730"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN265968F06EF28B"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+diff -ruN a/record-identity/ZornPlatformRecordIdentity26.h b/record-identity/ZornPlatformRecordIdentity26.h
+--- a/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 11:02:38
++++ b/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 12:09:44
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x9c,0x37,0x38,0x59,0x67,0x30,0x4b,0x6f,0xae,0x92,0x87,0x43,0x09,0xc8,0x11,0x04};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x59,0x68,0xf0,0x6e,0xf2,0x8b,0x40,0x46,0xb0,0xba,0x8c,0x9e,0x4c,0x49,0x05,0x6c};
+diff -ruN a/record-identity/ZornPlatformTrialIdentity26.h b/record-identity/ZornPlatformTrialIdentity26.h
+--- a/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 11:02:38
++++ b/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 12:09:44
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x9c,0x37,0x38,0x59,0x67,0x30,0x4b,0x6f,0xae,0x92,0x87,0x43,0x09,0xc8,0x11,0x04};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x59,0x68,0xf0,0x6e,0xf2,0x8b,0x40,0x46,0xb0,0xba,0x8c,0x9e,0x4c,0x49,0x05,0x6c};

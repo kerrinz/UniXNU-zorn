@@ -1,0 +1,46 @@
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -1,3 +1,4 @@
++extern unsigned zorn26_cdc_interval262(void *);
+ /* Derived from the pinned houji CDC ACM endpoint implementation. */
+ #include <stdint.h>
+ #include <stdbool.h>
+@@ -82,7 +83,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26186B81ACEA5F"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN263DF21CBD4E97"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+@@ -557,19 +558,26 @@
+     for (i=0;i<500 && (rd(DSTS)&HALTED);i++) delay(1000);
+     if (rd(DSTS)&HALTED) { fail("controller run timeout"); }
+     uint64_t deadline, next_frame=0;
+-    clock_interval_to_deadline(120,NSEC_PER_SEC,&deadline);
++    clock_interval_to_deadline(next?285:120,NSEC_PER_SEC,&deadline);
+     while (mach_absolute_time()<deadline) {
+         if(__atomic_load_n(&cdcTerminal230,__ATOMIC_ACQUIRE))return 16; // resources retained
+         if(cdc_owner_enter230()){
+             if(__atomic_load_n(&cdcTerminal230,__ATOMIC_ACQUIRE)){cdc_owner_leave230();return 16;}
+             if(u.failed){__atomic_store_n(&cdcReady230,0,__ATOMIC_RELEASE);cdc_owner_leave230();break;}
+             poll_events();
+-            if(next && !u.failed && u.configured && u.dtr && u.phase==SETUP_PHASE &&
++            // A newly pending source gate shortens a previously scheduled9s
++            // interval. Two delivered observations still fit its original10s.
++            const unsigned interval262=next?zorn26_cdc_interval262(context):3;
++            if(next && interval262==3){
++                uint64_t expedited262=0;clock_interval_to_deadline(3,NSEC_PER_SEC,&expedited262);
++                if(next_frame>expedited262)next_frame=expedited262;
++            }
++            if(next && stream.frames<38 && !u.failed && u.configured && u.dtr && u.phase==SETUP_PHASE &&
+                !u.busy[3] && u.completed==u.length && mach_absolute_time()>=next_frame){
+                 const int step=zorn_cdc_next201(&stream,true,u.busy[3],u.completed,next,context);
+                 if(step<0)fail("progress frame bounds");
+                 else if(step>0){u.marker=stream.bytes;u.length=stream.length;u.completed=0;u.frame_count=stream.frames;u.wire_bytes=stream.total;}
+-                clock_interval_to_deadline(3,NSEC_PER_SEC,&next_frame);
++                clock_interval_to_deadline(interval262,NSEC_PER_SEC,&next_frame);
+             }
+             transmit();
+             const bool failed=u.failed;

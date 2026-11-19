@@ -1,0 +1,111 @@
+{
+  "passed": true,
+  "hardware_qualified": false,
+  "selected_by_v362": false,
+  "board_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v362-touch-gpi-route-device-2026-11-19.json",
+    "bytes": 16354,
+    "sha256": "64bf5e7c7cb6568ff37ccea757131056ad945bdd90b94c29b0aa195d87b9d2c6"
+  },
+  "arm_smmu_component": {
+    "revision": "8bb168ad058c28d5c04f179ba407875eacba7ef3",
+    "sources": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4K.c",
+        "bytes": 5786,
+        "sha256": "0adb19b483e56e723014ed6cfe2c29f9d9735ae2770f62cf0057b22937dbd157"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4K.h",
+        "bytes": 3161,
+        "sha256": "e25063b9134afc7eb79e7c030bc2858608cf0ade5da714d5dfd600fee5007e8e"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KAudit.c",
+        "bytes": 9848,
+        "sha256": "594739cebc43926b1cb0a0e965867bcf1edfb90fab9c51465b65fa47be3755c1"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KAudit.h",
+        "bytes": 3203,
+        "sha256": "1f313acd46db3dfecc115b8c885c5c43f7d23f73690a6157f900dfc77b2c9f6a"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KProgram.c",
+        "bytes": 10776,
+        "sha256": "3b1d4911b0a48f90b09c721ffd2eb95dbfc02e96165009b23f8c98841f36e2b0"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KProgram.h",
+        "bytes": 4451,
+        "sha256": "171900c3ed400b805c3a1587959f66bc4a19db18aedc8111e862651a90bb8d8f"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KContext.c",
+        "bytes": 4753,
+        "sha256": "b8e32e32d1f07e71de65f31b12963ab8b01c05755f8c60c2d6f40cb03fe4eca8"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4KContext.h",
+        "bytes": 2163,
+        "sha256": "c842e78f37eab2e7cbba28cb89f4b993d9202503e75fee9e49a871101b936e53"
+      }
+    ]
+  },
+  "code": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/display/ZornFt3683DmaMemory.h",
+    "bytes": 4333,
+    "sha256": "5ac9024f8dbf4581f534a576b28d12a42cd68b7eff0d790daf9048b9fb8b229d"
+  },
+  "test": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/soc/sm8650/Test/ft3683-dma-memory.cpp",
+    "bytes": 3330,
+    "sha256": "58fcceaade1a42bf517c913cb139d697448243f44274fc4ef7c5e2cb5505fbaa"
+  },
+  "native_kernel_ABI_objects": [
+    {
+      "input": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-dma-memory-host/DmaMemoryKernel.cpp",
+        "bytes": 331,
+        "sha256": "78f3ad16765115bfa960660c0b04d7bd52d254e79881069ea44804294de903d1"
+      },
+      "object": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-dma-memory-host/DmaMemoryKernel.cpo",
+        "bytes": 9464,
+        "sha256": "d7157f7f8d74957deadf0c7349d92ff4d82b80b5ca72587c8455a5cc44c8853a"
+      },
+      "recipe": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-dma-memory-host/DmaMemoryKernel.cpo.command.json",
+        "bytes": 16963,
+        "sha256": "78a4de33528189a2edc063d7a44692ddd21c43247a005da68790207ccd3fe386"
+      },
+      "cpu_subtype": "0xc0000002"
+    },
+    {
+      "input": {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU/kits/ArmSmmu4K/ArmSmmu4K.c",
+        "bytes": 5786,
+        "sha256": "0adb19b483e56e723014ed6cfe2c29f9d9735ae2770f62cf0057b22937dbd157"
+      },
+      "object": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-dma-memory-host/ArmSmmu4KKernel.o",
+        "bytes": 9400,
+        "sha256": "9d632d304d0ee02823969b51683bc79eef947a9a05d09331f4fb15bed760a8bb"
+      },
+      "recipe": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-dma-memory-host/ArmSmmu4KKernel.o.command.json",
+        "bytes": 55673,
+        "sha256": "929a2413d1de517eff3d20146e226f11f5f7830572666027ccac454690371202"
+      },
+      "cpu_subtype": "0xc0000002"
+    }
+  ],
+  "host_ASan_UBSan_test": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/ft3683-dma-memory-host/check-memory",
+    "bytes": 194096,
+    "sha256": "29fa868be84af04d89812ee686d12042a49d8ef3c1601f724bf7269626acbf76"
+  },
+  "scheme": "One 16 KiB CPU page split into four 4 KiB DMA-backed leaves; two independent tables. SID 0xb6 admits TREs read-only and the event ring read/write. SID 0xa3 admits TX read-only and RX read/write. IOVA bases from the K80 GPI and QUP DT pools.",
+  "validation": "Official builder and auditor read both table images, verify actual byte-level leaves and reject damaged trees, invalid alignment, aliased physical pools and over-width physical pages.",
+  "remaining": "Reserve live, unused SMRs/context banks through the existing APPs SMMU owner. Verify coherent allocation, fault sources, channel startup and stoppage before attaching the streams."
+}

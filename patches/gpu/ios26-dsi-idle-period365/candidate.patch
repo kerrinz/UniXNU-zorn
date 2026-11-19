@@ -1,0 +1,14 @@
+--- a/ZornDpuAutoRefreshTransfer340.h
++++ b/ZornDpuAutoRefreshTransfer340.h
+@@ -43,7 +43,10 @@
+ };
+ // DSI host 2.8 uses the vendor command-mode MDP busy bit at DSI_STATUS.
+ constexpr uint32_t DsiStatus = 0x08, DsiCmdMdpBusy = 1u << 2;
+-constexpr uint32_t PriorDsiWaitUs = 8000, MaxIdlePolls = 8;
++// Allow one observed 2-TE refresh period (approximately 60 Hz on K80).
++// The absolute live-window deadline and all pre-program checks still apply.
++constexpr uint32_t PriorDsiWaitUs = 16667;
++constexpr uint32_t MaxIdlePolls = (PriorDsiWaitUs + 999) / 1000;
+ struct IdleWait {
+     uint32_t elapsedUs = 0;
+     bool attempted = false, idle = false;

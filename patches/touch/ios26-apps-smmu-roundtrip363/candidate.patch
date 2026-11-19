@@ -1,0 +1,711 @@
+--- a/ZornUfsCore26.cpp
++++ b/ZornUfsCore26.cpp
+@@ -2,6 +2,7 @@
+ #include "ZornUfsCore26.h"
+ #include "ZornAppsSmmuAperture338.h"
+ #include "ZornFt3683GpiRoute.h"
++#include "ZornFt3683KernelSmmu26.h"
+ #include <kern/clock.h>
+ #include "TransferPoll.h"
+ #include "ZornDataStorePolicy.h"
+@@ -391,6 +392,8 @@
+     displayAperture338.finish(ZornDisplaySmmu336::Observed, base);
+ }
+ 
++#include "ZornFt3683AppsSmmuLink26.inc"
++
+ static void sampleAppsSmmu(const uint32_t (&streams)[2], uint32_t (&out)[ZornDisplaySmmu336::Words])
+ {
+     namespace Probe = ZornDisplaySmmu336;
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -234,8 +234,6 @@
+     }else{
+         addFlags(4|8|16);store(0,2);store(4,10000);
+         uint32_t phase=6;
+-        DisplayRead318 readPanel;
+-        bool stopPanelRead = false;
+         // Nine actual snapshots;flat/missing fences and missing readiness remain
+         // observations,never converted into a successful hardware/UI verdict.
+         for(unsigned n=0;n<ZornManualWire313::Samples;++n){
+@@ -250,11 +248,6 @@
+             store(begin,zorn26_ft3683_trace313(touch));
+             for(unsigned i=0;i<ZornManualWire313::TouchWords;++i)store(begin+1+i,touch[i]);
+ 
+-            uint32_t timing[ZornManualWire313::TimingWords]{};
+-            const bool displayed = (values[0] & 1) && values[1] && inheritedGop318();
+-            ZornDisplayTiming318::sample(readPanel, displayed, uptimeMs(), timing, stopPanelRead);
+-            const unsigned timingAt = ZornManualWire313::TimingStart + n * ZornManualWire313::TimingWords;
+-            for (unsigned i = 0; i < ZornManualWire313::TimingWords; ++i) store(timingAt + i, timing[i]);
+             store(3,n+1);
+             if(n+1<ZornManualWire313::Samples)IOSleep(10000);
+         }
+@@ -528,11 +521,13 @@
+ extern "C" bool zorn26_ui_menu_done313() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
+ extern "C" bool zorn26_ui_menu_capture_ready313(){return zorn26_ui_menu_done313() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
+ extern "C" void zorn26_touch_static_gpii362(uint32_t *);
++extern "C" void zorn26_touch_smmu_report363(uint32_t *);
+ extern "C" void zorn26_sample_apps_touch_smmu362(uint32_t *);
+ extern "C" bool zorn26_ui_menu_snapshot313(uint32_t (&out)[ZornManualWire313::Words]) {
+     if(!zorn26_ui_menu_done313())return false;
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     zorn26_display_live_trace348(out + ZornManualWire313::LiveTraceStart);
++    zorn26_touch_smmu_report363(out + ZornManualWire313::TouchRoundTripStart);
+     zorn26_touch_static_gpii362(out + ZornManualWire313::TouchGpiStart);
+     zorn26_sample_apps_touch_smmu362(out + ZornManualWire313::TouchSmmuStart);
+     zorn26_display_live_phase349(out + ZornManualWire313::TouchEnd);
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -35,7 +35,10 @@
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(ZornDisplayHeldTiming335::Used + ZornDisplaySmmu336::Words <= ZornDisplayHeldTiming335::Words);
+ constexpr unsigned ScanoutStart = TeStart + ZornRuntimeDisplayCadence344::Words;
++constexpr unsigned TouchRoundTripStart = TimingStart;
++constexpr unsigned TouchRoundTripWords = 5;
+ constexpr unsigned LiveTraceStart = TimingStart + TimingWords;
++static_assert(TouchRoundTripStart + TouchRoundTripWords <= LiveTraceStart);
+ static_assert(LiveTraceStart + ZornScanoutTrace348::Words == ScanoutStart);
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+@@ -44,11 +47,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT362", 8);
++    memcpy(p, "K80FT363", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 362);
++    zorn_panic_le236(p, Bytes - 4, 363);
+     return Bytes;
+ }
+ }
+--- a/touch-source313/ZornTouchBoard26.cpp
++++ b/touch-source313/ZornTouchBoard26.cpp
+@@ -14,6 +14,8 @@
+ uint32_t staticGpii[3] = {UINT32_MAX, UINT32_MAX, UINT32_MAX};
+ uint32_t staticGpiiReady;
+ uint32_t geniInventory[Geni::Words]{};
++uint32_t smmuRoundTrip363[5]{};
++uint32_t smmuRoundTripReady363;
+ 
+ bool normal() {
+     return preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled();
+@@ -24,6 +26,14 @@
+ {
+     const bool ready = __atomic_load_n(&staticGpiiReady, __ATOMIC_ACQUIRE);
+     for (unsigned i = 0; i < 3; ++i) out[i] = ready ? staticGpii[i] : UINT32_MAX;
++}
++
++extern "C" bool zorn26_touch_apps_smmu_ready363();
++extern "C" void zorn26_touch_apps_smmu_roundtrip363(uint32_t (&)[5]);
++extern "C" void zorn26_touch_smmu_report363(uint32_t *out)
++{
++    const bool ready = __atomic_load_n(&smmuRoundTripReady363, __ATOMIC_ACQUIRE);
++    for (unsigned i = 0; i < 5; ++i) out[i] = ready ? smmuRoundTrip363[i] : 0;
+ }
+ 
+ struct ZornTouchBoard26::Storage {
+@@ -138,6 +148,16 @@
+     } port{s.reader};
+     Geni::capture(port, geniInventory);
+ 
++    // The platform stages root inputs before creating this worker. UFS
++    // publishes the aperture later, after its initializer returns. Bound
++    // the observation before sampling quiescence or touching GPIO.
++    for (unsigned i = 0; i < 250 && !zorn26_touch_apps_smmu_ready363(); ++i) {
++        IOLockLock(gate_);
++        const bool stopped = s.stopRequested;
++        IOLockUnlock(gate_);
++        if (stopped) return readStatus();
++        IOSleep(20);
++    }
+     ZornTouch::Snapshot capture;
+     const unsigned captured = ZornTouch::capture(s.reader, capture);
+     IOLockLock(gate_);
+@@ -166,7 +186,17 @@
+     const bool engineReadable = geniInventory[Geni::Status] >= Geni::BusyOrDmaMode;
+     const bool staticIdle = engineReadable && Gpi::staticGpiiUnallocated(gpiPort);
+     __atomic_store_n(&staticGpiiReady, 1u, __ATOMIC_RELEASE);
+-    const unsigned prepared = staticIdle ? s.bus.prepare(capture,s.reader.gpioMaps) : 11;
++    if (staticIdle && ZornTouchIdBus::engineQuiescent(capture) && s.bus.idleGpi()) {
++        zorn26_touch_apps_smmu_roundtrip363(smmuRoundTrip363);
++        __atomic_store_n(&smmuRoundTripReady363, 1u, __ATOMIC_RELEASE);
++    }
++    IOLockLock(gate_);
++    const bool stopAfterSmmu = s.stopRequested;
++    IOLockUnlock(gate_);
++    // A retained translation or IRQ can still have a live owner. Leave the
++    // GPIO and GPI masters untouched until the watchdog returns to Recovery.
++    const unsigned prepared = staticIdle && smmuRoundTrip363[0] != 3 && !stopAfterSmmu
++        ? s.bus.prepare(capture,s.reader.gpioMaps) : 11;
+     IOLockLock(gate_);
+     s.status.preparationRaw = prepared; s.status.preparationReturned = true;
+     s.status.phase = prepared ? Phase::BusRefused : Phase::Identifying;
+--- a/touch-source313/ZornTouchGpioBus.h
++++ b/touch-source313/ZornTouchGpioBus.h
+@@ -61,9 +61,12 @@
+         }
+         return true;
+     }
++    static bool engineQuiescent(const ZornTouch::Snapshot &s) {
++        return !s.result && ((s.se[0] >> 8) & 255) == 1 && !(s.se[2] & 0x1001) &&
++            !(s.se[4] & 0xfffffff) && !(s.se[5] & 0x1ffffff) && !(s.se[6] & 3);
++    }
+     unsigned prepare(const ZornTouch::Snapshot &s,IOMemoryMap *const (&capturedGpio)[6]) {
+-        if(s.result || ((s.se[0]>>8)&255)!=1 || (s.se[2]&0x1001) ||
+-           (s.se[4]&0xfffffff) || (s.se[5]&0x1ffffff) || (s.se[6]&3))return failure=10;
++        if(!engineQuiescent(s))return failure=10;
+         if(!idleGpi())return failure=11;
+         for(unsigned i=0;i<6;++i) {
+             uint32_t pa=0xf100000+ZornTouch::pins[i]*0x1000;
+--- /dev/null
++++ b/ZornFt3683KernelSmmu26.h
+@@ -0,0 +1,179 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ArmSmmu4KMmio.h"
++#include "ZornFt3683AppsSmmuLease.h"
++#include <IOKit/IOBufferMemoryDescriptor.h>
++#include <IOKit/IOLib.h>
++#include <kern/task.h>
++
++extern "C" kern_return_t gic_v3_spi_attach_masked(uint32_t, bool, void (*)(void *, uint32_t), void *);
++extern "C" kern_return_t gic_v3_spi_set_enabled_checked(uint32_t, void *, bool);
++extern "C" void gic_v3_spi_detach(uint32_t);
++
++namespace ZornFt3683KernelSmmu26 {
++
++namespace Smmu = ZornFt3683AppsSmmu;
++namespace Dma = ZornFt3683DmaMemory;
++
++// Stable lifetime, normally the kernel APPs SMMU owner. Its configuration
++// lock serializes attach and detach; interrupt state is separately atomic.
++// The actual board owner proves GPII 0/SE4 quiescent before supplying the map.
++class Owner {
++    OSSharedPtr<IOMemoryMap> aperture_;
++    OSSharedPtr<IOBufferMemoryDescriptor> pages_[3];
++    Dma::Page tablePages_[2]{};
++    Dma::Mapping mapping_{};
++    Smmu::Lease lease_;
++    ArmSmmu4KMmio mmio_{};
++    ArmSmmu4KIo raw_{};
++    ArmSmmu4KIo guarded_{};
++    uint32_t intids_[3]{};
++    uint32_t faultOffsets_[3]{};
++    uint32_t fault_ = 0;
++    bool live_ = false;
++    bool retained_ = false;
++
++    static void interrupt(void *cookie, uint32_t intid)
++    {
++        auto &owner = *static_cast<Owner *>(cookie);
++        for (unsigned i = 0; i < 3; ++i) {
++            if (owner.intids_[i] != intid) continue;
++            uint32_t value = 0;
++            const auto &io = owner.raw_;
++            const uint32_t mask = i ? 0xc00001fe : UINT32_MAX;
++            if (io.read32(io.cookie, owner.faultOffsets_[i], &value) || (value & mask)) {
++                uint32_t none = 0;
++                __atomic_compare_exchange_n(&owner.fault_, &none, i + 1, false,
++                                            __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE);
++                gic_v3_spi_set_enabled_checked(intid, &owner, false);
++            }
++            return;
++        }
++    }
++
++    bool bind()
++    {
++        if (ArmSmmu4KBindMmio(&mmio_, &raw_) != ArmSmmu4KSuccess) return false;
++        guarded_ = {this, raw_.register_bytes,
++            [](void *cookie, size_t at, uint32_t *value) {
++                const auto &owner = *static_cast<Owner *>(cookie);
++                return owner.raw_.read32(owner.raw_.cookie, at, value);
++            },
++            [](void *cookie, size_t at, uint64_t *value) {
++                const auto &owner = *static_cast<Owner *>(cookie);
++                return owner.raw_.read64(owner.raw_.cookie, at, value);
++            },
++            [](void *cookie, size_t at, uint32_t value) {
++                const auto &owner = *static_cast<Owner *>(cookie);
++                return owner.fault() ? -1 : owner.raw_.write32(owner.raw_.cookie, at, value);
++            },
++            [](void *cookie, size_t at, uint64_t value) {
++                const auto &owner = *static_cast<Owner *>(cookie);
++                return owner.fault() ? -1 : owner.raw_.write64(owner.raw_.cookie, at, value);
++            },
++            [](void *cookie) {
++                const auto &owner = *static_cast<Owner *>(cookie);
++                return owner.fault() ? -1 : owner.raw_.barrier(owner.raw_.cookie);
++            }};
++        return true;
++    }
++
++    bool allocate(unsigned index, Dma::Page &page)
++    {
++        pages_[index] = IOBufferMemoryDescriptor::inTaskWithOptions(kernel_task,
++            IOOptionBits(kIODirectionInOut) | IOOptionBits(kIOMemoryPhysicallyContiguous) |
++            IOOptionBits(kIOMemoryMapperNone), Dma::CpuPageBytes, Dma::CpuPageBytes);
++        if (!pages_[index]) return false;
++        IOByteCount count = 0;
++        page = {static_cast<uint8_t *>(pages_[index]->getBytesNoCopy()),
++                pages_[index]->getPhysicalSegment(0, &count, kIOMemoryMapperNone)};
++        if (count < Dma::CpuPageBytes || !Dma::valid(page)) return false;
++        bzero(page.cpu, Dma::CpuPageBytes);
++        return true;
++    }
++
++    ArmSmmu4KStatus refuse(ArmSmmu4KStatus result)
++    {
++        aperture_.reset();
++        for (auto &page : pages_) page.reset();
++        mapping_ = {};
++        return result;
++    }
++
++public:
++    uint32_t fault() const { return __atomic_load_n(&fault_, __ATOMIC_ACQUIRE); }
++    bool retainsHardware() const { return retained_; }
++    const Smmu::Plan &plan() const { return lease_.plan(); }
++    const Dma::Mapping *mapping() const { return live_ && !fault() ? &mapping_ : nullptr; }
++
++    ArmSmmu4KStatus attachQuiesced(OSSharedPtr<IOMemoryMap> aperture, unsigned ufsBank,
++                                  void (*publish)(const void *, size_t))
++    {
++        if (retained_ || live_) return ArmSmmu4KBusy;
++        IOPhysicalLength contiguous = 0;
++        if (!aperture || !publish || aperture->getLength() != Smmu::ApertureBytes ||
++            aperture->getPhysicalSegment(0, &contiguous, kIOMemoryMapperNone) != 0x15000000 ||
++            contiguous < Smmu::ApertureBytes || !aperture->getVirtualAddress())
++            return ArmSmmu4KArgument;
++        aperture_ = aperture;
++        mmio_ = {reinterpret_cast<volatile unsigned char *>(aperture_->getVirtualAddress()), Smmu::ApertureBytes};
++        if (!bind()) return refuse(ArmSmmu4KArgument);
++        auto status = lease_.prepare(guarded_, ufsBank);
++        if (status != ArmSmmu4KSuccess) return refuse(status);
++        constexpr unsigned widths[] = {32, 36, 40, 42, 44, 48};
++        const auto code = (plan().id2 >> 4) & 15;
++        if (code >= sizeof(widths) / sizeof(widths[0])) return refuse(ArmSmmu4KUnsupported);
++        Dma::Page data{};
++        if (!allocate(0, data) || !allocate(1, tablePages_[0]) || !allocate(2, tablePages_[1]))
++            return refuse(ArmSmmu4KCapacity);
++        status = Dma::build(data, tablePages_[0], tablePages_[1], widths[code], mapping_);
++        if (status != ArmSmmu4KSuccess) return refuse(status);
++        for (const auto &page : tablePages_) publish(page.cpu, Dma::CpuPageBytes);
++        publish(data.cpu, Dma::CpuPageBytes);
++
++        intids_[0] = Smmu::GlobalFaultSpi + 32;
++        faultOffsets_[0] = 0x48;
++        for (unsigned i = 0; i < 2; ++i) {
++            const unsigned bank = plan().domains[i].bank;
++            intids_[i + 1] = Smmu::ContextFaultSpis[bank] + 32;
++            faultOffsets_[i + 1] = uint32_t(plan().contextBase + bank * Smmu::PageBytes + 0x58);
++        }
++        // One attach failure can already have published a masked callback.
++        // Retain the stable IRQ cookie, mapping and pages starting here.
++        retained_ = true;
++        for (auto intid : intids_) {
++            if (gic_v3_spi_attach_masked(intid, false, interrupt, this) != KERN_SUCCESS)
++                return ArmSmmu4KIoError;
++        }
++        for (auto intid : intids_) {
++            if (fault() || gic_v3_spi_set_enabled_checked(intid, this, true) != KERN_SUCCESS)
++                return ArmSmmu4KIoError;
++        }
++        if (fault()) return ArmSmmu4KFault;
++        status = lease_.attachQuiesced(guarded_, mapping_, tablePages_, 4096);
++        if (status != ArmSmmu4KSuccess || fault())
++            return fault() ? ArmSmmu4KFault : status;
++        live_ = true;
++        return ArmSmmu4KSuccess;
++    }
++
++    ArmSmmu4KStatus detachStopped()
++    {
++        if (!live_ || fault()) return ArmSmmu4KBusy;
++        live_ = false;
++        auto status = lease_.detachStopped(guarded_, 4096);
++        if (status != ArmSmmu4KSuccess || fault())
++            return fault() ? ArmSmmu4KFault : status;
++        for (auto intid : intids_) {
++            if (gic_v3_spi_set_enabled_checked(intid, this, false) != KERN_SUCCESS)
++                return ArmSmmu4KIoError;
++        }
++        if (fault()) return ArmSmmu4KFault;
++        for (auto intid : intids_) gic_v3_spi_detach(intid);
++        retained_ = false;
++        return refuse(ArmSmmu4KSuccess);
++    }
++};
++
++} // namespace ZornFt3683KernelSmmu26
+--- /dev/null
++++ b/ZornFt3683AppsSmmuLease.h
+@@ -0,0 +1,305 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ArmSmmu4KAudit.h"
++#include "ArmSmmu4KStreams.h"
++#include "ZornFt3683DmaMemory.h"
++#include "ZornFt3683GpiRoute.h"
++
++namespace ZornFt3683AppsSmmu {
++
++constexpr size_t ApertureBytes = 0x100000;
++constexpr size_t PageBytes = 0x1000;
++constexpr uint32_t Fault = 2u << 16;
++constexpr uint32_t GlobalFaultSpi = 65;
++// Context order is the OEM APPs SMMU interrupt array after its one global SPI.
++constexpr uint16_t ContextFaultSpis[] = {
++    97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112,
++    113, 114, 115, 116, 117, 118, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190,
++    191, 192, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328,
++    329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344,
++    345, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409,
++    418, 419, 412, 421, 706, 423, 424, 425, 689, 690, 691, 692, 693, 694, 695, 696
++};
++constexpr unsigned ContextCount = sizeof(ContextFaultSpis) / sizeof(ContextFaultSpis[0]);
++
++struct Domain {
++    ArmSmmu4KStream route;
++    unsigned bank;
++    uint32_t originalS2cr;
++    ArmSmmu4KContextImage originalContext;
++};
++
++struct Plan {
++    Domain domains[2];
++    uint32_t control, id0, id1, id2;
++    size_t contextBase;
++};
++
++inline bool readImage(const ArmSmmu4KIo &io, size_t base, unsigned bank, ArmSmmu4KContextImage &image)
++{
++    const auto cb = base + bank * PageBytes;
++    return !io.read32(io.cookie, 0x1000 + bank * 4, &image.cbar) &&
++           !io.read32(io.cookie, 0x1800 + bank * 4, &image.cba2r) &&
++           !io.read32(io.cookie, cb + 0x30, &image.tcr) &&
++           !io.read32(io.cookie, cb + 0x10, &image.tcr2) &&
++           !io.read64(io.cookie, cb + 0x20, &image.ttbr0) &&
++           !io.read64(io.cookie, cb + 0x28, &image.ttbr1) &&
++           !io.read32(io.cookie, cb + 0x38, &image.mair0) &&
++           !io.read32(io.cookie, cb + 0x3c, &image.mair1) &&
++           !io.read32(io.cookie, cb, &image.sctlr);
++}
++
++inline bool sameImage(const ArmSmmu4KContextImage &a, const ArmSmmu4KContextImage &b)
++{
++    return a.cbar == b.cbar && a.cba2r == b.cba2r && a.tcr == b.tcr && a.tcr2 == b.tcr2 &&
++           a.ttbr0 == b.ttbr0 && a.ttbr1 == b.ttbr1 && a.mair0 == b.mair0 &&
++           a.mair1 == b.mair1 && a.sctlr == b.sctlr;
++}
++
++inline ArmSmmu4KStatus select(const ArmSmmu4KIo &io, unsigned ufsBank, Plan &out)
++{
++    out = {};
++    if (io.register_bytes != ApertureBytes || !io.read32 || !io.read64) return ArmSmmu4KArgument;
++    Plan plan{};
++    uint32_t faults = 0;
++    if (io.read32(io.cookie, 0, &plan.control) || io.read32(io.cookie, 0x20, &plan.id0) ||
++        io.read32(io.cookie, 0x24, &plan.id1) || io.read32(io.cookie, 0x28, &plan.id2) ||
++        io.read32(io.cookie, 0x48, &faults)) return ArmSmmu4KIoError;
++    if (faults) return ArmSmmu4KFault;
++    const unsigned groups = plan.id0 & 255u, banks = plan.id1 & 255u;
++    const unsigned stage2 = (plan.id1 >> 16) & 255u;
++    plan.contextBase = PageBytes << (((plan.id1 >> 28) & 7u) + 1);
++    // v362 observes legacy stream matching with unmatched access faulted.
++    // Preserve the existing global policy and every inherited occupied slot.
++    if ((plan.control & 0x40f) != 0x406 || (plan.id0 & (1u << 8)) ||
++        (plan.id0 & 0x48004000) != 0x48004000 || !(plan.id2 & (1u << 12)) ||
++        (plan.id1 >> 31) || plan.contextBase * 2 != ApertureBytes ||
++        !groups || banks > ContextCount || stage2 >= banks || ufsBank >= banks) return ArmSmmu4KUnsupported;
++
++    bool occupied[ContextCount]{};
++    bool asids[ContextCount]{};
++    occupied[ufsBank] = true;
++    unsigned slots = 0;
++    for (unsigned i = 0; i < groups; ++i) {
++        uint32_t smr = 0, s2cr = 0;
++        if (io.read32(io.cookie, 0x800 + 4 * i, &smr) || io.read32(io.cookie, 0xc00 + 4 * i, &s2cr))
++            return ArmSmmu4KIoError;
++        if (smr & (1u << 31)) {
++            const uint32_t mask = (smr >> 16) & 0x7fffu;
++            for (const auto sid : ZornFt3683GpiRoute::StreamIds)
++                if (!((sid ^ smr) & 0xffffu & ~mask)) return ArmSmmu4KOverlap;
++            const unsigned bank = s2cr & 255u;
++            if (!(s2cr & (3u << 16)) && bank < banks) occupied[bank] = true;
++        } else if (slots < 2 && !smr && (!s2cr || s2cr == Fault)) {
++            plan.domains[slots].route = {i, uint16_t(ZornFt3683GpiRoute::StreamIds[slots])};
++            plan.domains[slots++].originalS2cr = s2cr;
++        }
++    }
++    if (slots != 2) return ArmSmmu4KCapacity;
++    // ASIDs follow the vendor bank-index convention. Protect inherited
++    // active stage-1 contexts even if firmware chose a different ASID.
++    for (unsigned bank = stage2; bank < banks; ++bank) {
++        uint32_t ctl = 0, cba2r = 0;
++        const auto cb = plan.contextBase + bank * PageBytes;
++        if (io.read32(io.cookie, cb, &ctl) || ctl == UINT32_MAX) return ArmSmmu4KIoError;
++        if (!(ctl & 1u)) continue;
++        occupied[bank] = true;
++        if (io.read32(io.cookie, 0x1800 + bank * 4, &cba2r)) return ArmSmmu4KIoError;
++        if (cba2r & 1u) {
++            uint64_t ttbr0 = 0, ttbr1 = 0;
++            if (io.read64(io.cookie, cb + 0x20, &ttbr0) || io.read64(io.cookie, cb + 0x28, &ttbr1))
++                return ArmSmmu4KIoError;
++            if ((ttbr0 >> 48) < ContextCount) asids[ttbr0 >> 48] = true;
++            if ((ttbr1 >> 48) < ContextCount) asids[ttbr1 >> 48] = true;
++        } else {
++            uint32_t contextId = 0;
++            if (io.read32(io.cookie, cb + 0x34, &contextId)) return ArmSmmu4KIoError;
++            if ((contextId & 255u) < ContextCount) asids[contextId & 255u] = true;
++        }
++    }
++    unsigned selected = 0;
++    for (unsigned bank = banks; bank-- > stage2 && selected < 2;) {
++        if (occupied[bank] || asids[bank]) continue;
++        ArmSmmu4KContextImage saved{};
++        uint32_t fault = 0, actlr = 0;
++        const auto cb = plan.contextBase + bank * PageBytes;
++        if (!readImage(io, plan.contextBase, bank, saved) || io.read32(io.cookie, cb + 0x58, &fault) ||
++            io.read32(io.cookie, cb + 4, &actlr)) return ArmSmmu4KIoError;
++        if (saved.sctlr || saved.ttbr0 || saved.ttbr1 || fault || actlr) continue;
++        plan.domains[selected].bank = bank;
++        plan.domains[selected++].originalContext = saved;
++    }
++    if (selected != 2) return ArmSmmu4KCapacity;
++    out = plan;
++    return ArmSmmu4KSuccess;
++}
++
++inline bool samePlan(const Plan &a, const Plan &b)
++{
++    if (a.control != b.control || a.id0 != b.id0 || a.id1 != b.id1 ||
++        a.id2 != b.id2 || a.contextBase != b.contextBase) return false;
++    for (unsigned i = 0; i < 2; ++i) {
++        const auto &before = a.domains[i];
++        const auto &after = b.domains[i];
++        if (before.bank != after.bank || before.route.sid != after.route.sid ||
++            before.route.slot != after.route.slot || before.originalS2cr != after.originalS2cr ||
++            !sameImage(before.originalContext, after.originalContext)) return false;
++    }
++    return true;
++}
++
++inline ArmSmmu4KStatus audit(const ArmSmmu4KContextConfig &config, const ArmSmmu4KRange (&ranges)[2],
++                            ZornFt3683DmaMemory::Page page)
++{
++    using namespace ZornFt3683DmaMemory;
++    if (!valid(page) || !config.lower || !config.lower_tables ||
++        page.physical != config.lower->table_physical) return ArmSmmu4KArgument;
++    const ArmSmmu4KTableIo tableIo{&page, [](void *cookie, uint64_t pa, uint64_t *value) {
++        const auto &pool = *static_cast<const Page *>(cookie);
++        if (pa < pool.physical || (pa & 7) || pa - pool.physical > CpuPageBytes - 8) return -1;
++        *value = *reinterpret_cast<const uint64_t *>(pool.cpu + (pa - pool.physical));
++        return 0;
++    }};
++    unsigned char visited[CpuPageBytes / SmmuPageBytes]{};
++    const ArmSmmu4KAuditRegion region{ranges, 2, sizeof(visited), 4 * 512, visited, sizeof(visited)};
++    ArmSmmu4KTableAuditResult result{};
++    return ArmSmmu4KAuditTables(&tableIo, config.lower, config.lower_tables, &region,
++                                page.physical, &result);
++}
++
++enum class Phase : uint32_t { Empty, Planned, Retained, Active, Released };
++
++// One real APPs SMMU owner serializes selection, attach and detach with all
++// other config writers. Attach requires stopped masters, coherent owned RAM,
++// and live handlers for the global and two selected context fault sources.
++// The owner holds every resource on Retained, including the fault handlers.
++class Lease {
++    Plan plan_{};
++    Phase phase_ = Phase::Empty;
++    unsigned ufsBank_ = 0;
++    ArmSmmu4KConfig configs_[2]{};
++    ArmSmmu4KResult tables_[2]{};
++    ArmSmmu4KContextConfig contexts_[2]{};
++    ArmSmmu4KStreamState streams_[2]{};
++
++    bool restore(const ArmSmmu4KIo &io, const Domain &domain)
++    {
++        const auto cb = plan_.contextBase + domain.bank * PageBytes;
++        const auto &saved = domain.originalContext;
++        const auto smr = 0x800 + domain.route.slot * 4;
++        const auto s2cr = 0xc00 + domain.route.slot * 4;
++        uint32_t value = 0;
++        // FaultStreams has already blocked this SID; removing its valid SMR
++        // returns the SID to global unmatched-fault before restoring S2CR.
++        if (io.write32(io.cookie, smr, 0) || io.barrier(io.cookie) ||
++            io.read32(io.cookie, smr, &value) || value ||
++            io.write32(io.cookie, s2cr, domain.originalS2cr) || io.barrier(io.cookie) ||
++            io.read32(io.cookie, s2cr, &value) || value != domain.originalS2cr) return false;
++        if (io.write32(io.cookie, 0x1800 + domain.bank * 4, saved.cba2r) ||
++            io.write32(io.cookie, 0x1000 + domain.bank * 4, saved.cbar) ||
++            io.write32(io.cookie, cb + 0x10, saved.tcr2) ||
++            io.write32(io.cookie, cb + 0x30, saved.tcr) ||
++            io.write64(io.cookie, cb + 0x20, saved.ttbr0) ||
++            io.write64(io.cookie, cb + 0x28, saved.ttbr1) ||
++            io.write32(io.cookie, cb + 0x38, saved.mair0) ||
++            io.write32(io.cookie, cb + 0x3c, saved.mair1) || io.barrier(io.cookie)) return false;
++        ArmSmmu4KContextImage image{};
++        return readImage(io, plan_.contextBase, domain.bank, image) && sameImage(saved, image);
++    }
++
++public:
++    Lease() = default;
++    Lease(const Lease &) = delete;
++    Lease &operator=(const Lease &) = delete;
++
++    Phase phase() const { return phase_; }
++    const Plan &plan() const { return plan_; }
++
++    ArmSmmu4KStatus prepare(const ArmSmmu4KIo &io, unsigned ufsBank)
++    {
++        if (phase_ != Phase::Empty) return ArmSmmu4KBusy;
++        const auto status = select(io, ufsBank, plan_);
++        if (status != ArmSmmu4KSuccess) return status;
++        ufsBank_ = ufsBank;
++        phase_ = Phase::Planned;
++        return ArmSmmu4KSuccess;
++    }
++
++    ArmSmmu4KStatus attachQuiesced(const ArmSmmu4KIo &io, const ZornFt3683DmaMemory::Mapping &map,
++                                 const ZornFt3683DmaMemory::Page (&tablePages)[2], unsigned pollBudget)
++    {
++        if (phase_ != Phase::Planned) return ArmSmmu4KBusy;
++        if (!io.write32 || !io.write64 || !io.barrier || !pollBudget || pollBudget > 1048576 ||
++            !ZornFt3683DmaMemory::distinct(tablePages[0], tablePages[1])) return ArmSmmu4KArgument;
++        configs_[0] = map.gpi;
++        configs_[1] = map.qup;
++        tables_[0] = map.gpiTables;
++        tables_[1] = map.qupTables;
++        for (unsigned i = 0; i < 2; ++i) {
++            contexts_[i] = {&configs_[i], nullptr, &tables_[i], nullptr, plan_.id0, plan_.id2,
++                            plan_.domains[i].bank, 1, 0, 0};
++            ArmSmmu4KContextImage image{};
++            auto status = ArmSmmu4KEncodeContext(&contexts_[i], &image);
++            if (status != ArmSmmu4KSuccess) return status;
++            status = audit(contexts_[i], i ? map.qupRanges : map.gpiRanges, tablePages[i]);
++            if (status != ArmSmmu4KSuccess) return status;
++        }
++        Plan current{};
++        auto status = select(io, ufsBank_, current);
++        if (status != ArmSmmu4KSuccess) return status;
++        if (!samePlan(plan_, current)) return ArmSmmu4KStateMismatch;
++
++        phase_ = Phase::Retained;
++        for (const auto &domain : plan_.domains) {
++            const auto at = 0xc00 + domain.route.slot * 4;
++            uint32_t value = 0;
++            if (io.write32(io.cookie, at, Fault) || io.barrier(io.cookie) ||
++                io.read32(io.cookie, at, &value) || value != Fault) return ArmSmmu4KIoError;
++        }
++        for (unsigned i = 0; i < 2; ++i) {
++            const auto &domain = plan_.domains[i];
++            ArmSmmu4KStreamResult stream{};
++            status = ArmSmmu4KCheckFaultedStreams(&io, &domain.route, 1, domain.bank, &stream);
++            if (status != ArmSmmu4KSuccess) return status;
++            ArmSmmu4KProgramResult context{};
++            status = ArmSmmu4KProgramDisabledContext(&io, domain.bank, &contexts_[i], pollBudget, &context);
++            if (status != ArmSmmu4KSuccess) return status;
++            status = ArmSmmu4KAttachStreams(&io, &streams_[i], &domain.route, 1, domain.bank,
++                                           &contexts_[i], &stream);
++            if (status != ArmSmmu4KSuccess) return status;
++        }
++        phase_ = Phase::Active;
++        return ArmSmmu4KSuccess;
++    }
++
++    ArmSmmu4KStatus detachStopped(const ArmSmmu4KIo &io, unsigned pollBudget)
++    {
++        if (phase_ != Phase::Active) return ArmSmmu4KBusy;
++        if (!io.write32 || !io.write64 || !io.barrier || !pollBudget || pollBudget > 1048576)
++            return ArmSmmu4KArgument;
++        phase_ = Phase::Retained;
++        for (unsigned i = 0; i < 2; ++i) {
++            ArmSmmu4KStreamResult stream{};
++            const auto status = ArmSmmu4KObserveStreams(&io, &streams_[i], &contexts_[i], &stream);
++            if (status != ArmSmmu4KSuccess) return status;
++        }
++        for (auto &state : streams_) {
++            ArmSmmu4KStreamResult stream{};
++            const auto status = ArmSmmu4KFaultStreams(&io, &state, &stream);
++            if (status != ArmSmmu4KSuccess) return status;
++        }
++        for (unsigned i = 0; i < 2; ++i) {
++            const auto &domain = plan_.domains[i];
++            ArmSmmu4KProgramResult context{};
++            const auto status = ArmSmmu4KDisableOwnedContext(&io, domain.bank, &contexts_[i], pollBudget, &context);
++            if (status != ArmSmmu4KSuccess) return status;
++            if (!context.disabled_verified || !context.tlb_synchronized || !restore(io, domain))
++                return ArmSmmu4KStateMismatch;
++        }
++        phase_ = Phase::Released;
++        return ArmSmmu4KSuccess;
++    }
++};
++
++} // namespace ZornFt3683AppsSmmu
+--- /dev/null
++++ b/ZornFt3683AppsSmmuLink26.inc
+@@ -0,0 +1,56 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++// Included inside ZornUfsCore26 after the checked APPs-aperture publication.
++namespace {
++ZornFt3683KernelSmmu26::Owner touchSmmuOwner363;
++}
++
++extern "C" bool zorn26_touch_apps_smmu_ready363()
++{
++    uintptr_t inherited = 0;
++    return displayAperture338.snapshot(inherited) == ZornDisplaySmmu336::Observed && inherited;
++}
++
++extern "C" void zorn26_touch_apps_smmu_roundtrip363(uint32_t (&out)[5])
++{
++    namespace Route = ZornFt3683AppsSmmu;
++    // status, attach, detach, bank pair, interrupt that latched a fault
++    out[0] = 1;
++    out[1] = out[2] = UINT32_MAX;
++    out[3] = out[4] = 0;
++    if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled()) return;
++    uintptr_t inherited = 0;
++    if (displayAperture338.snapshot(inherited) != ZornDisplaySmmu336::Observed || !inherited) return;
++    auto *const lock = gHost.lock;
++    if (!lock || !IOLockTryLock(lock)) return;
++    struct Release {
++        IOLock *lock;
++        ~Release() { IOLockUnlock(lock); }
++    } locked{lock};
++    if (!gHost.ready || gHost.poisoned || gHost.smmu != inherited || gHost.cb <= inherited) return;
++
++    // Reuse the original mapping for the UFS/display paths. The original
++    // 0xd0000 window omits the end of the advertised register aperture. The
++    // owner independently maps the complete vendor/ADT range with the same
++    // Device attributes and holds both references during configuration.
++    const auto registerRange = IODeviceMemory::withRange(0x15000000, Route::ApertureBytes);
++    auto full = registerRange ? registerRange->map(kIOMapAnywhere | kIOMapInhibitCache) : nullptr;
++    if (!full) return;
++    const uint32_t geometry = read32(inherited, 0x24);
++    const size_t cbBase = Route::PageBytes << (((geometry >> 28) & 7u) + 1);
++    const auto ufsContext = gHost.cb - inherited;
++    if (geometry >> 31 || cbBase * 2 != Route::ApertureBytes ||
++        ufsContext < cbBase || ufsContext % Route::PageBytes) return;
++    const size_t ufsBank = (ufsContext - cbBase) / Route::PageBytes;
++    if (ufsBank >= (geometry & 255u)) return;
++
++    out[1] = touchSmmuOwner363.attachQuiesced(full, unsigned(ufsBank), cacheCivac);
++    const auto &plan = touchSmmuOwner363.plan();
++    out[3] = plan.domains[0].bank | (plan.domains[1].bank << 16);
++    if (out[1] == ArmSmmu4KSuccess) out[2] = touchSmmuOwner363.detachStopped();
++    out[4] = touchSmmuOwner363.fault();
++    if (touchSmmuOwner363.retainsHardware()) {
++        out[0] = 3;
++    } else if (out[1] == ArmSmmu4KSuccess && out[2] == ArmSmmu4KSuccess) {
++        out[0] = 2;
++    }
++}

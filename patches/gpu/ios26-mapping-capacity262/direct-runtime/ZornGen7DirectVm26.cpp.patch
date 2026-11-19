@@ -1,0 +1,35 @@
+--- a/direct-runtime/ZornGen7DirectVm26.cpp
++++ b/direct-runtime/ZornGen7DirectVm26.cpp
+@@ -216,7 +216,17 @@
+     const ZornSmmuSparse4KLiveArena *a=regions_[upper].arena;
+     if((iova&4095) || iova<a->iova || iova-a->iova>=a->bytes || memory->bytes()>a->bytes-(iova-a->iova))
+         return kIOReturnBadArgument;
+-    if(objects_>=ZornGen7DirectVm26MaxObjects || memory->spanCount()>capacity_-spanCount())return kIOReturnNoResources;
++    if(objects_>=ZornGen7DirectVm26MaxObjects || memory->spanCount()>capacity_-spanCount()){
++        // The exact existing preflight refusal,not a larger resource allowance.
++        // CPU scalar sizes only:no IOVA/PA/task pointers or hardware access.
++        const bool objectLimit262=objects_>=ZornGen7DirectVm26MaxObjects;
++        const size_t first262=objectLimit262?objects_:capacity_-spanCount();
++        const size_t second262=objectLimit262?ZornGen7DirectVm26MaxObjects:memory->spanCount();
++        zorn_failure_note261(ZornFailureMapPreflight262,uint32_t(kIOReturnNoResources),ZornFailureBackend261,
++            objectLimit262?ZornFailureObjectCapacity262:ZornFailureSpanCapacity262,
++            first262>UINT32_MAX?UINT32_MAX:uint32_t(first262),second262>UINT32_MAX?UINT32_MAX:uint32_t(second262));
++        return kIOReturnNoResources;
++    }
+     for(size_t i=0;i<spanCount();++i) {
+         /* Native addresses may end at 2^64; compare offsets in the region. */
+         if((i<lower_count_)==!upper && iova<=ranges_[i].iova+(ranges_[i].bytes-1) &&
+@@ -301,11 +311,11 @@
+     if(submission_resources_)return kIOReturnBusy;
+     PhaseClock clock;
+     IOReturn checked=preflight(memory,upper,iova,permissions,writeback,shareability);if(checked)return checked;
+-    if(next_handle_==UINT64_MAX)return kIOReturnNoResources;
++    if(next_handle_==UINT64_MAX)return zorn_failure_return261(ZornFailureMapHandle262,kIOReturnNoResources,ZornFailureBackend261,ZornFailureHandleCapacity262);
+     clock.lap(0,5); /* Previously omitted preflight; map slot 5 was unused. */
+     ZornSmmuSparse4KStatus status=observeCheap();if(status)return fail(status);
+     clock.lap(0,1);
+-    checked=memory->holdForDevice();if(checked)return checked;
++    checked=memory->holdForDevice();if(checked)return zorn_failure_return261(ZornFailureMapHold262,checked,ZornFailureBackend261,ZornFailureReference261);
+     Mapping *record=nullptr;for(size_t i=0;i<ZornGen7DirectVm26MaxObjects;++i)if(!mappings_[i].memory){record=&mappings_[i];break;}
+     if(!record) {memory->quarantine();return fail(ZornSmmuSparse4KStateMismatch);}
+     *record={memory,0,iova,memory->spanCount(),0,permissions,writeback,shareability,0};++objects_;

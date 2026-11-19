@@ -1,0 +1,207 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -63,7 +63,6 @@
+ #include "ZornPresenterScope298.h"
+ static ZornSerialMenu297 zornSerialShot265;
+ extern "C" bool zorn26_ui_menu_capture_ready276();
+-extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+ 
+@@ -406,6 +405,8 @@
+ 	uint8_t *       fBase;                  /* the boot framebuffer: the panel */
+ #if defined(ZORN_IOS26)
+     size_t fZornCheckedExtent265=0; // Actual factory-checked retained alias size.
++    uint32_t fZornLastShownRecord310[16]{}; // Protected with the pixel alias by fLock.
++    void captureSerialFrame310();
+ #endif
+ 
+ 	uint32_t        fPanelWidth, fPanelHeight, fRowBytes;
+@@ -531,6 +532,32 @@
+ }
+ static IOMobileFramebuffer * gFramebuffer;      /* (for MiniIOMobileFramebufferEnd) */
+ 
++#if defined(ZORN_IOS26)
++void IOMobileFramebuffer::captureSerialFrame310()
++{
++    // Caller holds fLock. Pixels and the completed present ledger are paired.
++    if (zorn26_ui_menu_capture_ready276() && fZornLastShownRecord310[1] >= 64 &&
++        fZornLastShownRecord310[9] && zornSerialShot265.pending()) {
++        (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
++            fPanelWidth, fPanelHeight, fRowBytes, fZornCheckedExtent265, fZornLastShownRecord310);
++    }
++}
++
++extern "C" void zorn26_serial_shot_request265(void)
++{
++    (void)zornSerialShot265.request();
++    if (!zornSerialShot265.pending() || !zorn26_ui_menu_capture_ready276() ||
++        !preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled() ||
++        !__atomic_load_n(&houji26FBPublished, __ATOMIC_ACQUIRE)) return;
++    // The one-shot factory and active presenter retain this published instance.
++    // CDC polls without waiting on display or GPU work.
++    auto *fb = gFramebuffer;
++    if (!fb || !IOLockTryLock(fb->fLock)) return;
++    fb->captureSerialFrame310();
++    IOLockUnlock(fb->fLock);
++}
++#endif
++
+ static void
+ setNumber(OSDictionary * dict, const char * key, uint64_t value)
+ {
+@@ -1444,11 +1471,10 @@
+         if (outcome298.readable) {
+             zornPresentTrace245.publish(outcome298.record);
+             zornKnownPresent247.complete(outcome298.record);
+-            if (zorn26_ui_menu_capture_ready276() && outcome298.record[1] >= 64 && outcome298.record[9] && zornSerialShot265.pending()) {
++            if (outcome298.copied) {
+                 IOLockLock(fLock);
+-                if (zorn26_ui_menu_capture_ready276())
+-                    (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+-                    fPanelWidth, fPanelHeight, fRowBytes, fZornCheckedExtent265, outcome298.record);
++                memcpy(fZornLastShownRecord310, outcome298.record, sizeof(fZornLastShownRecord310));
++                captureSerialFrame310();
+                 IOLockUnlock(fLock);
+             }
+         }
+@@ -1603,6 +1629,10 @@
+ 	IOLockWakeup(fSwapLock, &fSwapsWaiting, true);
+ 	IOLockUnlock(fSwapLock);
+ 	IOLockLock(fLock);
++#if defined(ZORN_IOS26)
++    // Invalidate the ledger before touching destination pixels.
++    fZornLastShownRecord310[9] = 0;
++#endif
+ 	if (fLastFrame != 0) {
+ 		absolutetime_to_nanoseconds(began - fLastFrame, &nanos);
+ 		nanos /= NSEC_PER_MSEC;
+@@ -2715,6 +2745,7 @@
+        vinfo.v_width!=width || vinfo.v_height!=height || vinfo.v_rowbytes!=live.v_rowbytes || vinfo.v_depth!=32 || vinfo.v_rotate){
+         IOLockUnlock(fb.fLock);IOFree(pixels,bytes);return kIOReturnNotReady;
+     }
++    fb.fZornLastShownRecord310[9] = 0;
+     MiniIOMobileFramebufferShow(reinterpret_cast<const uint8_t *>(pixels),uint32_t(width),uint32_t(height),uint32_t(width*4));
+     flags|=2; // The synchronous existing copy function actually returned.
+     __asm__ volatile("dsb sy" ::: "memory");
+--- /dev/null
++++ b/ZornHidParentLead310.h
+@@ -0,0 +1,11 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++
++namespace ZornHidParentLead310 {
++// K80's retained logical HID range is 0..32767, corresponding to 0..1 in 16.16.
++constexpr int32_t normalized(uint16_t value)
++{
++    return static_cast<int32_t>((uint64_t(value) << 16) / 32767U);
++}
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 7540e9fe84de4a8b8a8a8be81f765ced %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC c06dac87382c4426a006c2b801d2271f %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"7540e9fe84de4a8b8a8a8be81f765ced",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"c06dac87382c4426a006c2b801d2271f",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN267540E9FE84DE"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C06DAC87382C"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x75,0x40,0xe9,0xfe,0x84,0xde,0x4a,0x8b,0x8a,0x8a,0x8b,0xe8,0x1f,0x76,0x5c,0xed};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc0,0x6d,0xac,0x87,0x38,0x2c,0x44,0x26,0xa0,0x06,0xc2,0xb8,0x01,0xd2,0x27,0x1f};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x75,0x40,0xe9,0xfe,0x84,0xde,0x4a,0x8b,0x8a,0x8a,0x8b,0xe8,0x1f,0x76,0x5c,0xed};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc0,0x6d,0xac,0x87,0x38,0x2c,0x44,0x26,0xa0,0x06,0xc2,0xb8,0x01,0xd2,0x27,0x1f};
+--- a/touch-frame310/ZornTouchFrameEvent26.cpp
++++ b/touch-frame310/ZornTouchFrameEvent26.cpp
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornTouchFrameEvent26.h"
+ #include "ZornTouchRollover26.h"
++#include "../ZornHidParentLead310.h"
+ #include <libkern/c++/OSArray.h>
+ 
+ static_assert(ZornEdgePolicy::TouchChanged == kIOHIDDigitizerEventTouch);
+@@ -38,11 +39,7 @@
+     return nullptr;
+ }
+ 
+-static IOFixed normalized(uint16_t value)
+-{
+-    // Same logical 0..32767 range as the retained K80 HID report descriptor.
+-    return static_cast<IOFixed>((uint64_t(value) << 16) / 32767U);
+-}
++using ZornHidParentLead310::normalized;
+ 
+ static IOReturn collection(const ZornContacts::Frame &active,
+     const ZornContacts::Frame &lifted, const ZornContacts::Frame &previous,
+@@ -52,6 +49,12 @@
+     IOHIDEvent *parent = IOHIDEvent::digitizerEvent(timestamp, 0,
+         kIOHIDDigitizerTransducerTypeHand, false, 0, 0, 0);
+     if (!parent) return kIOReturnNoMemory;
++    // collection() is called only with contacts. All-lift reports keep the
++    // released item's location instead of moving the Hand to the origin.
++    const auto &lead = active.count ? active.points[0] : lifted.points[0];
++    parent->setFixedValue(kIOHIDEventFieldDigitizerX, normalized(lead.x));
++    parent->setFixedValue(kIOHIDEventFieldDigitizerY, normalized(lead.y));
++    parent->setIntegerValue(kIOHIDEventFieldIsBuiltIn, true);
+     parent->setIntegerValue(kIOHIDEventFieldDigitizerCollection, true);
+     parent->setIntegerValue(kIOHIDEventFieldDigitizerIsDisplayIntegrated, true);
+     uint32_t combined = 0;
+@@ -71,11 +74,13 @@
+                 mask |= kIOHIDDigitizerEventPosition;
+             if (edges.mark(p.id, mask, down, x, y))
+                 mask |= kIOHIDDigitizerEventFromEdgeTip;
+-            IOHIDEvent *child = IOHIDEvent::digitizerEvent(timestamp, p.id,
++            // Reserve Hand identity zero; retain the original FT slot index.
++            const uint32_t identity = uint32_t(p.id) + 2U;
++            IOHIDEvent *child = IOHIDEvent::digitizerEvent(timestamp, identity,
+                 kIOHIDDigitizerTransducerTypeFinger, down, down ? 1 : 0, x, y);
+             if (!child) { parent->release(); return kIOReturnNoMemory; }
+             child->setIntegerValue(kIOHIDEventFieldDigitizerIndex, p.id);
+-            child->setIntegerValue(kIOHIDEventFieldDigitizerIdentity, p.id);
++            child->setIntegerValue(kIOHIDEventFieldDigitizerIdentity, static_cast<SInt32>(identity));
+             child->setIntegerValue(kIOHIDEventFieldDigitizerTouch, down);
+             child->setIntegerValue(kIOHIDEventFieldDigitizerIsDisplayIntegrated, true);
+             child->setIntegerValue(kIOHIDEventFieldDigitizerEventMask, static_cast<SInt32>(mask));
+@@ -93,6 +98,7 @@
+     parent->setIntegerValue(kIOHIDEventFieldDigitizerTouch, active.count != 0);
+     parent->setIntegerValue(kIOHIDEventFieldDigitizerButtonMask, active.count ? 1 : 0);
+     parent->setIntegerValue(kIOHIDEventFieldDigitizerEventMask, static_cast<SInt32>(combined));
++    parent->setIntegerValue(kIOHIDEventFieldDigitizerChildEventMask, static_cast<SInt32>(combined));
+     *output = parent;
+     return kIOReturnSuccess;
+ }

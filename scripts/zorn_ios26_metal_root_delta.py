@@ -63,6 +63,23 @@ METAL213_FLAG = '--ios26-metal213-root-delta'
 METAL214_FLAG = '--ios26-metal214-root-delta'
 METAL215_FLAG = '--ios26-metal215-root-delta'
 METAL224_FLAG = '--ios26-metal224-root-delta'
+KNOWN281_FLAG = '--ios26-known281-root-delta'
+GLASS307_FLAG = '--ios26-glass307-root-delta'
+KNOWN306_FLAG = '--ios26-known306-root-delta'
+GLASS297_FLAG = '--ios26-glass297-root-delta'
+DOCK296_FLAG = '--ios26-dock296-root-delta'
+FRAME293_FLAG = '--ios26-frame293-root-delta'
+KNOWN291_FLAG = '--ios26-known291-root-delta'
+ASYNC290_FLAG = '--ios26-async290-root-delta'
+CPU289_FLAG = '--ios26-cpu289-root-delta'
+QUERY288_FLAG = '--ios26-query288-root-delta'
+RPC287_FLAG = '--ios26-rpc287-root-delta'
+SCALAR286_FLAG = '--ios26-scalar286-root-delta'
+SCALAR285_FLAG = '--ios26-scalar285-root-delta'
+DESKTOP283_FLAG = '--ios26-desktop283-root-delta'
+UPSTREAM280_FLAG = '--ios26-upstream280-root-delta'
+DESKTOP271_FLAG = '--ios26-desktop271-root-delta'
+METAL267_FLAG = '--ios26-metal267-root-delta'
 METAL252_FLAG = '--ios26-metal252-root-delta'
 METAL251_FLAG = '--ios26-metal251-root-delta'
 METAL250_FLAG = '--ios26-metal250-root-delta'
@@ -72,6 +89,64 @@ METAL229_FLAG = '--ios26-metal229-root-delta'
 METAL228_FLAG = '--ios26-metal228-root-delta'
 METAL226_FLAG = '--ios26-metal226-root-delta'
 INSTALLS = {
+    GLASS307_FLAG: InstallScope(REVIEW.parent.with_name('k80-glass307-restore-root-delta-review-ad7f16b4') / REVIEW.name,
+        'c739480619199c047104ab2b63ee64137bba6af1a945b0f778177ada5c632f11', 'K80-persistent-iOS26-glass307-ad7f16b4', 'unattended-phone-connected', True),
+    KNOWN306_FLAG: InstallScope(REVIEW.parent.with_name('k80-known306-root-delta-review-ba667cc7') / REVIEW.name,
+        'b7028c014e0cca22f30d428c4b3d6e3d689218ac551c21576be911939558fd04', 'K80-persistent-iOS26-known306-ba667cc7', 'unattended-phone-connected', True),
+    GLASS297_FLAG: InstallScope(REVIEW.parent.with_name('k80-glass297-root-delta-review-9c373859') / REVIEW.name,
+        '1bc9c826900924d4e48c4ad58cbd3d26c1ca1c75f0046746e0c8e5d395e70ae6', 'K80-persistent-iOS26-glass297-9c373859', 'unattended-phone-connected', True),
+    DOCK296_FLAG: InstallScope(REVIEW.parent.with_name('k80-dock296-root-delta-review-30ac366e') / REVIEW.name,
+        '4a8cf15a015ce01b8076a2381974c40e96532ed0c66c7ae19651c3df08935b43', 'K80-persistent-iOS26-dock296-30ac366e', 'unattended-phone-connected', True),
+    FRAME293_FLAG: InstallScope(REVIEW.parent.with_name('k80-frame293-root-delta-review-92a822b2') / REVIEW.name,
+        '4ea342237467ac12c4fe671e9aef4810ee5306b0ad468af6c4e3f0d743f9c541', 'K80-persistent-iOS26-frame293-92a822b2', 'unattended-phone-connected', True),
+    KNOWN291_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-known291-root-delta-review-ea69910e') / REVIEW.name,
+        '92e69719b2fc4b3a08fa400d24ad90e0f11f44b1e67e45586cd8c79d4d6dad5e',
+        'K80-persistent-iOS26-known291-ea69910e', 'unattended-phone-connected', True),
+    ASYNC290_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-async290-root-delta-review-71e14658') / REVIEW.name,
+        '7a2a696c8cc345defad04b406850f9d59ec56cf882e9e137b50dbe2e4313fe68',
+        'K80-persistent-iOS26-async290-71e14658', 'unattended-phone-connected', True),
+    CPU289_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-cpu289-root-delta-review-b584642f') / REVIEW.name,
+        '34a6f19742d71af2bf53c6668a26cbc047b7784e4f80dc735761522daedb6df7',
+        'K80-persistent-iOS26-cpu289-b584642f', 'unattended-phone-connected', True),
+    QUERY288_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-query288-root-delta-review-9f68f2c1') / REVIEW.name,
+        'ba11099cba193dc7ecea57903bd9850fc359687349bde73de83f87817b9c1861',
+        'K80-persistent-iOS26-query288-9f68f2c1', 'unattended-phone-connected', True),
+    RPC287_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-rpc287-root-delta-review-b6847f4e') / REVIEW.name,
+        '2ed7b822a3fbeda1611a3e856cb5136e9e340aee40980e59fd84443efa12c88f',
+        'K80-persistent-iOS26-rpc287-b6847f4e', 'unattended-phone-connected', True),
+    SCALAR286_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-scalar286-root-delta-review-f9280b9b') / REVIEW.name,
+        'f3bec719c16e0bbfefffa9ddd35c3be094f90bb84546c1fd02df86bb9be63049',
+        'K80-persistent-iOS26-scalar286-f9280b9b', 'unattended-phone-connected', True),
+    SCALAR285_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-scalar285-root-delta-review-878c2b95') / REVIEW.name,
+        'bdc63f4de9937197673d8d1cac508f9962342a45aae5ec2f41d08ad0b981770a',
+        'K80-persistent-iOS26-scalar285-878c2b95', 'unattended-phone-connected', True),
+    DESKTOP283_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-desktop283-root-delta-review-45267e58') / REVIEW.name,
+        '751288c0c55e84ca5939979f1c1e9f6e8cd40e6e2e5dc4e8de93184d056b06bf',
+        'K80-persistent-iOS26-desktop283-45267e58', 'unattended-phone-connected', True),
+    KNOWN281_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-known281-root-delta-review-36e46149') / REVIEW.name,
+        '680b0ec4db336248fcdfe402958bb63a22e03f8262d19d3e624bd2efa1c7fe94',
+        'K80-persistent-iOS26-known281-36e46149', 'unattended-phone-connected', True),
+    UPSTREAM280_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-upstream280-root-delta-review-434fe1f2') / REVIEW.name,
+        '6629293a398d57e563d2fffd393b25c9fec3e3d3ebbd6cadc485c654910124cd',
+        'K80-persistent-iOS26-upstream280-434fe1f2', 'unattended-phone-connected', True),
+    DESKTOP271_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-desktop271-root-delta-review-2073ff14') / REVIEW.name,
+        'f76f0756dd294dfde0d94209fe3931784d28ce7ca2eaee6be5d1bba2be94f87d',
+        'K80-persistent-iOS26-desktop271-2073ff14', 'unattended-phone-connected', True),
+    METAL267_FLAG: InstallScope(
+        REVIEW.parent.with_name('k80-metal267-root-delta-review-ddb9c864') / REVIEW.name,
+        '57064ffa047be7dc648f66c95b0496be5f5a8d6f36c9e02c5386d0ee873c62a1',
+        'K80-persistent-iOS26-Metal267-ddb9c864', 'unattended-phone-connected', True),
     METAL252_FLAG: InstallScope(
         REVIEW.parent.with_name('k80-metal252-root-delta-review-f5bb017e') / REVIEW.name,
         'e298cbd5bf8e09cd5428c621cfd317a104ffd8f0b0f607f8411e854db8ab81f5',
@@ -332,6 +407,11 @@ def inspect_misc_page(misc, prior):
 def run(review, admission_path, scope):
     binding = validate_admission(admission_path, review, scope)
     run_dir = scope.run
+    # Host-only availability check precedes the one-shot claim and state changes.
+    # Never consume an installation admission merely because its existing server
+    # is absent;this does not start a server or send an ADB request.
+    with socket.create_connection(('127.0.0.1', 5039), timeout=.2):
+        pass
     adapter = reviewed_module(review, 'recovery_adapter', 'recovery_metal_root_delta')
     from zorn_ios26_root_install import Recovery
 
@@ -360,8 +440,6 @@ def run(review, admission_path, scope):
     current['active_run'] = str(run_dir)
     save_current(current)
     try:
-        with socket.create_connection(('127.0.0.1', 5039), timeout=.2):
-            pass
         pins = review['pins']
         transport = ReviewedRecovery(dict(pins={key: pins['previous_' + key]
             for key in ('adb', 'primary_GPT', 'backup_GPT', 'Data', 'root_manifest')},

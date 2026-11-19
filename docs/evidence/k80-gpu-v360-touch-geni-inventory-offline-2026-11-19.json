@@ -1,0 +1,124 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 360,
+  "boot_tag": "3347de2837fb462f9ea02a89a684c397",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/boot-package/boot.ZORN26-GPU-V360-SERIAL-UNSELECTED.img",
+    "sha256": "3db6f2f68db9f7935393564664a8097f91e3b4d7fb62985faffe1a51be10f145",
+    "bytes": 11907072
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/full-link/kernel.ZORN26-TOUCHGENI360.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/boot-package/inputs/kernel.macho",
+    "sha256": "47e117bf1e9443b39ea20e3a67b4785218abc1fcfd87e551cfcadefc3b29e076",
+    "bytes": 31158872
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/boot-package/verified.json",
+    "bytes": 14854,
+    "sha256": "96ba637b7369ac216b119b1dea521bc2ad1197eb79a42fbf35820da19b4b1caa"
+  },
+  "link": {
+    "passed": true,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/full-link/kernel.ZORN26-TOUCHGENI360.UNSELECTED.macho",
+      "sha256": "47e117bf1e9443b39ea20e3a67b4785218abc1fcfd87e551cfcadefc3b29e076"
+    },
+    "bytes": 31158872,
+    "inputs": 1400,
+    "replaced": 42,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/full-link/exact-inputs.json",
+      "sha256": "90985a36eb2bc27499439179e0950c19bfdf9e0dae315ca1ebe220f4a851678d"
+    },
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "hardware_qualified": false,
+    "device_access": false,
+    "sha256": "47e117bf1e9443b39ea20e3a67b4785218abc1fcfd87e551cfcadefc3b29e076",
+    "undefined_symbols": 0
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-touch-geni-inventory360/source-manifest.json",
+    "bytes": 11105,
+    "sha256": "9bd3d4b16e5e3b9ce41093e500f43f9fcb8ef5ef10b263894a71fbdb57e83045"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v359-one-swap-device-2026-11-19.json",
+    "bytes": 29503,
+    "sha256": "dd2481032dee419d85801b6db64c80e8212443af0d04769ce665d1361a39e4c9"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/ft-geni-native-host/result.json",
+      "bytes": 1142,
+      "sha256": "7fe31a78303df81482d2278621c91a9b3c396d99d821d6e0e8f7575533d80057"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/patch-replay.json",
+      "bytes": 646,
+      "sha256": "d478ab47d50a4d1296819520d3be198188d0cf2626db72abe863ea962c5a7601"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/touch-geni-archive-host/result.json",
+      "bytes": 4635,
+      "sha256": "0f2845cbda6bbcfcd0a7b55e43f7af4ab0f49ff60027414fac48733a62319c06"
+    }
+  ],
+  "enabled_path": "Only read GENI SE4 capability and stable status before the existing GPIO claim, under the existing exclusive K80 owner and inherited checked clock votes. Capture through CDC. Keep normal GPIO touch and v359 GPU presentation.",
+  "device_only_questions": [
+    "Do inherited GCC clock votes and branch readbacks permit real SE4 inventory?",
+    "Does the actual SE identify as SPI, idle with FIFO enabled, and report valid geometry?",
+    "Does the observer leave GPIO touch and v359 display operational and recover to TWRP?"
+  ],
+  "device_protection": {
+    "target": "92988a43/zorn/slot-a",
+    "mode": "unattended-phone-connected",
+    "boot_attempts": 1,
+    "retries": 0,
+    "watchdog_seconds": 300,
+    "recovery_timeout_seconds": 600,
+    "native_root_writes": 0,
+    "physical_contact_required": false
+  },
+  "stop_conditions": [
+    "Do not start a retry or optional reset if any DSI operation has uncertain completion.",
+    "Retain CPU alias and display resources if active back scanout or state is ambiguous.",
+    "No installation, root write or persistent slot change."
+  ],
+  "physical_frame_rate_qualified": false,
+  "hardware_qualified": false,
+  "phone_access": false,
+  "comparison_baseline": {
+    "device": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v359-one-swap-device-2026-11-19.json",
+      "bytes": 29503,
+      "sha256": "dd2481032dee419d85801b6db64c80e8212443af0d04769ce665d1361a39e4c9"
+    },
+    "scope": "same one-slot display path and existing GPIO touch"
+  }
+}

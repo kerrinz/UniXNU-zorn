@@ -1,0 +1,313 @@
+--- a/ZornDisplaySmmu336.h
++++ b/ZornDisplaySmmu336.h
+@@ -17,7 +17,7 @@
+ enum Field : unsigned { State, GlobalControl, Id0, Id1, Streams, Words = Streams + 2 * EntryWords };
+ 
+ template <typename Read>
+-Status scan(Read &read, uint32_t aperture, uint32_t (&out)[Words])
++Status scan(Read &read, uint32_t aperture, const uint32_t (&streams)[2], uint32_t (&out)[Words])
+ {
+     if (!read(0, out[GlobalControl]) || !read(0x20, out[Id0]) || !read(0x24, out[Id1])) {
+         return ReadFailed;
+@@ -42,7 +42,7 @@
+         if (!read(0x800 + 4 * slot, smr) || !read(0xc00 + 4 * slot, s2cr)) return ReadFailed;
+         if (!(extended ? s2cr & (1u << 10) : smr & (1u << 31))) continue;
+         for (unsigned n = 0; n < 2; ++n) {
+-            if ((Sid[n] ^ smr) & 0xffffu & ~((smr >> 16) & matchMask)) continue;
++            if ((streams[n] ^ smr) & 0xffffu & ~((smr >> 16) & matchMask)) continue;
+             auto *entry = out + Streams + n * EntryWords;
+             if (entry[Slot] != NoSlot) return Unsupported;
+             entry[Slot] = slot;
+@@ -80,12 +80,12 @@
+ // Publish only a stable complete pair. This observes translation controls;
+ // it does not walk a page table or assert an IOVA resolves to the GOP PA.
+ template <typename Read>
+-void sample(Read &read, uint32_t aperture, uint32_t (&out)[Words])
++void sample(Read &read, uint32_t aperture, const uint32_t (&streams)[2], uint32_t (&out)[Words])
+ {
+     for (auto &word : out) word = 0;
+     uint32_t first[Words]{}, second[Words]{};
+-    Status status = scan(read, aperture, first);
+-    if (status == Observed) status = scan(read, aperture, second);
++    Status status = scan(read, aperture, streams, first);
++    if (status == Observed) status = scan(read, aperture, streams, second);
+     if (status == Observed) {
+         for (unsigned i = 1; i < Words; ++i) {
+             if (first[i] != second[i]) {
+@@ -99,4 +99,10 @@
+         for (unsigned i = 1; i < Words; ++i) out[i] = second[i];
+ }
+ 
++template <typename Read>
++void sample(Read &read, uint32_t aperture, uint32_t (&out)[Words])
++{
++    sample(read, aperture, Sid, out);
++}
++
+ } // namespace ZornDisplaySmmu336
+--- /dev/null
++++ b/ZornFt3683GpiRoute.h
+@@ -0,0 +1,31 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornFt3683GpiRoute {
++
++// Pineapple QUP1 SE4 selects static GPII 0 through the fifth DMA specifier.
++// The vendor GPI offset is relative to gpi-top minus its 0x10000 EE offset.
++constexpr uint32_t GpiTop = 0x00a00000;
++constexpr uint32_t ChannelPage = GpiTop + 0x10000;
++constexpr uint32_t EventPage = ChannelPage + 0x1000;
++constexpr uint32_t TxConfig = ChannelPage;
++constexpr uint32_t RxConfig = ChannelPage + 0x80;
++constexpr uint32_t EventConfig = EventPage;
++constexpr uint32_t ContextRegisters[] = {TxConfig, RxConfig, EventConfig};
++constexpr uint32_t StreamIds[] = {0xb6, 0xa3};
++
++template<class Port>
++bool staticGpiiUnallocated(Port &port)
++{
++    // A stopped or allocated channel still belongs to its previous owner.
++    // Both channels and the event context must be free before touching GPIO.
++    for (const auto address : ContextRegisters) {
++        uint32_t value = 0;
++        if (!port.read(address, value) || value == UINT32_MAX || (value & (0xfu << 20))) return false;
++    }
++    return true;
++}
++
++} // namespace ZornFt3683GpiRoute
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -14,7 +14,6 @@
+ #include "ZornScanoutHandoff345.h"
+ #include "ZornScanoutTrace348.h"
+ #include "ZornScanoutPhase349.h"
+-#include "ZornFt3683GeniInventory26.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -23,8 +22,9 @@
+ constexpr unsigned TouchEnd = PresentWords + Samples * (1 + TouchWords);
+ constexpr unsigned CostWords = 16;
+ constexpr unsigned TimingStart = TouchEnd + Samples * (1 + CostWords);
+-constexpr unsigned TouchGeniStart = TouchEnd + ZornScanoutPhase349::Words;
+-static_assert(TouchGeniStart + ZornFt3683GeniInventory26::Words == TimingStart);
++constexpr unsigned TouchGpiStart = TouchEnd + ZornScanoutPhase349::Words;
++constexpr unsigned TouchSmmuStart = TouchGpiStart + 3;
++static_assert(TouchSmmuStart + 8 == TimingStart);
+ constexpr unsigned TimingWords = ZornDisplayTiming318::Words;
+ constexpr unsigned TeStart = TimingStart + Samples * TimingWords;
+ constexpr unsigned HeldTimingStart = TeStart + ZornPanelTe320::Words;
+@@ -44,11 +44,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT361", 8);
++    memcpy(p, "K80FT362", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 361);
++    zorn_panic_le236(p, Bytes - 4, 362);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsCore26.cpp
++++ b/ZornUfsCore26.cpp
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornUfsCore26.h"
+ #include "ZornAppsSmmuAperture338.h"
++#include "ZornFt3683GpiRoute.h"
+ #include <kern/clock.h>
+ #include "TransferPoll.h"
+ #include "ZornDataStorePolicy.h"
+@@ -390,7 +391,7 @@
+     displayAperture338.finish(ZornDisplaySmmu336::Observed, base);
+ }
+ 
+-extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&out)[ZornDisplaySmmu336::Words])
++static void sampleAppsSmmu(const uint32_t (&streams)[2], uint32_t (&out)[ZornDisplaySmmu336::Words])
+ {
+     namespace Probe = ZornDisplaySmmu336;
+     namespace Aperture = ZornAppsSmmuAperture338;
+@@ -411,7 +412,29 @@
+         __asm__ volatile("dmb oshld" ::: "memory");
+         return true;
+     };
+-    Probe::sample(read, Aperture::ApertureBytes, out);
+-}
+-
+-}
++    Probe::sample(read, Aperture::ApertureBytes, streams, out);
++}
++
++extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&out)[ZornDisplaySmmu336::Words])
++{
++    sampleAppsSmmu(ZornDisplaySmmu336::Sid, out);
++}
++
++extern "C" void zorn26_sample_apps_touch_smmu362(uint32_t *out)
++{
++    namespace Probe = ZornDisplaySmmu336;
++    uint32_t sample[Probe::Words]{};
++    sampleAppsSmmu(ZornFt3683GpiRoute::StreamIds, sample);
++    out[0] = sample[Probe::State];
++    out[1] = sample[Probe::GlobalControl];
++    for (unsigned i = 0; i < 2; ++i) {
++        const auto *entry = sample + Probe::Streams + i * Probe::EntryWords;
++        auto *result = out + 2 + i * 3;
++        const uint32_t slot = entry[Probe::Slot] == Probe::NoSlot ? 255u : entry[Probe::Slot];
++        result[0] = entry[Probe::Route] | (slot << 8);
++        result[1] = entry[Probe::Smr];
++        result[2] = entry[Probe::S2cr];
++    }
++}
++
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 82b343c9333a45efb7257d6f7b33f02a %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC cd199165bd424eb6aaa24e02d83f2d59 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"82b343c9333a45efb7257d6f7b33f02a",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"cd199165bd424eb6aaa24e02d83f2d59",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -527,12 +527,14 @@
+ 
+ extern "C" bool zorn26_ui_menu_done313() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
+ extern "C" bool zorn26_ui_menu_capture_ready313(){return zorn26_ui_menu_done313() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
+-extern "C" void zorn26_touch_geni_inventory360(uint32_t *);
++extern "C" void zorn26_touch_static_gpii362(uint32_t *);
++extern "C" void zorn26_sample_apps_touch_smmu362(uint32_t *);
+ extern "C" bool zorn26_ui_menu_snapshot313(uint32_t (&out)[ZornManualWire313::Words]) {
+     if(!zorn26_ui_menu_done313())return false;
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     zorn26_display_live_trace348(out + ZornManualWire313::LiveTraceStart);
+-    zorn26_touch_geni_inventory360(out + ZornManualWire313::TouchGeniStart);
++    zorn26_touch_static_gpii362(out + ZornManualWire313::TouchGpiStart);
++    zorn26_sample_apps_touch_smmu362(out + ZornManualWire313::TouchSmmuStart);
+     zorn26_display_live_phase349(out + ZornManualWire313::TouchEnd);
+     zorn26_scanout_reservation_snapshot345(out + ZornManualWire313::ScanoutStart);
+     zorn26_display_held_timing335(out + ZornManualWire313::HeldTimingStart);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2682B343C9333A"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26CD199165BD42"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x82,0xb3,0x43,0xc9,0x33,0x3a,0x45,0xef,0xb7,0x25,0x7d,0x6f,0x7b,0x33,0xf0,0x2a};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xcd,0x19,0x91,0x65,0xbd,0x42,0x4e,0xb6,0xaa,0xa2,0x4e,0x02,0xd8,0x3f,0x2d,0x59};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x82,0xb3,0x43,0xc9,0x33,0x3a,0x45,0xef,0xb7,0x25,0x7d,0x6f,0x7b,0x33,0xf0,0x2a};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xcd,0x19,0x91,0x65,0xbd,0x42,0x4e,0xb6,0xaa,0xa2,0x4e,0x02,0xd8,0x3f,0x2d,0x59};
+--- a/touch-source313/ZornTouchBoard26.cpp
++++ b/touch-source313/ZornTouchBoard26.cpp
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornTouchBoard26.h"
+ #include "../ZornFt3683GeniInventory26.h"
++#include "../ZornFt3683GpiRoute.h"
+ #include "../../../board/zorn/platform-base/display/ZornTouchPacing.h"
+ #include <machine/machine_routines.h>
+ #include <kern/sched_prim.h>
+@@ -9,18 +10,20 @@
+ namespace {
+ ZornTouchBoard26 *volatile physicalBusOwner = nullptr;
+ namespace Geni = ZornFt3683GeniInventory26;
++namespace Gpi = ZornFt3683GpiRoute;
++uint32_t staticGpii[3] = {UINT32_MAX, UINT32_MAX, UINT32_MAX};
++uint32_t staticGpiiReady;
+ uint32_t geniInventory[Geni::Words]{};
+-uint32_t geniInventoryReady;
+ 
+ bool normal() {
+     return preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled();
+ }
+ }
+ 
+-extern "C" void zorn26_touch_geni_inventory360(uint32_t *out)
++extern "C" void zorn26_touch_static_gpii362(uint32_t *out)
+ {
+-    if (!__atomic_load_n(&geniInventoryReady, __ATOMIC_ACQUIRE)) return;
+-    for (unsigned i = 0; i < Geni::Words; ++i) out[i] = geniInventory[i];
++    const bool ready = __atomic_load_n(&staticGpiiReady, __ATOMIC_ACQUIRE);
++    for (unsigned i = 0; i < 3; ++i) out[i] = ready ? staticGpii[i] : UINT32_MAX;
+ }
+ 
+ struct ZornTouchBoard26::Storage {
+@@ -35,7 +38,7 @@
+     // transport. The existing read-only clock, engine and display inventory
+     // remains separate from the six writable GPIO pages.
+     struct Reader {
+-        static constexpr unsigned MaxPages = 4 + 9 + 7 + 2;
++        static constexpr unsigned MaxPages = 4 + 9 + 7 + 2 + 2;
+         IOMemoryDescriptor *gpioDescriptors[6] = {};
+         IOMemoryMap *gpioMaps[6] = {};
+         uint32_t pages[MaxPages] = {};
+@@ -134,7 +137,6 @@
+         bool read(uint32_t address, uint32_t &value) { return reader.readGeni(address, value); }
+     } port{s.reader};
+     Geni::capture(port, geniInventory);
+-    __atomic_store_n(&geniInventoryReady, 1u, __ATOMIC_RELEASE);
+ 
+     ZornTouch::Snapshot capture;
+     const unsigned captured = ZornTouch::capture(s.reader, capture);
+@@ -148,7 +150,23 @@
+     // Reuse the actual K80 preparation and its live GENI/GPI/owned-pin gates,
+     // latch-before-direction/reset sequence. Do not borrow houji TouchCom.
+     s.bus.cooperateEvery = pacing.cooperateBytes;
+-    const unsigned prepared = s.bus.prepare(capture,s.reader.gpioMaps);
++    struct StaticGpiPort {
++        Storage::Reader &reader;
++        bool read(uint32_t address, uint32_t &value)
++        {
++            for (unsigned i = 0; i < 3; ++i) {
++                if (address != Gpi::ContextRegisters[i]) continue;
++                if (!reader.readMapped(address, value)) return false;
++                staticGpii[i] = value;
++                return true;
++            }
++            return false;
++        }
++    } gpiPort{s.reader};
++    const bool engineReadable = geniInventory[Geni::Status] >= Geni::BusyOrDmaMode;
++    const bool staticIdle = engineReadable && Gpi::staticGpiiUnallocated(gpiPort);
++    __atomic_store_n(&staticGpiiReady, 1u, __ATOMIC_RELEASE);
++    const unsigned prepared = staticIdle ? s.bus.prepare(capture,s.reader.gpioMaps) : 11;
+     IOLockLock(gate_);
+     s.status.preparationRaw = prepared; s.status.preparationReturned = true;
+     s.status.phase = prepared ? Phase::BusRefused : Phase::Identifying;

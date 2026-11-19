@@ -1,0 +1,149 @@
+--- a/NativeBridgeMetalFrontend.mm
++++ b/NativeBridgeMetalFrontend.mm
+@@ -41,6 +41,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <sys/time.h>
++#include <sys/uio.h>
+ #include <sys/sysctl.h>
+ #include <signal.h>
+ #include <stdlib.h>
+@@ -140,15 +141,25 @@
+ extern "C" size_t native_bridge_metal_telemetry(char *out,size_t size);
+ static void *reportTiming(void *) {
+  static char table[6144];
+- for(;;) {
+-  sleep(20);
++ const unsigned delays[2]={20,100};
++ for(unsigned sample=0;sample<2;++sample) {
++  sleep(delays[sample]);
+   const size_t length=native_bridge_metal_telemetry(table,sizeof table);
+-  const char *title="native-metal timing:\n";
+-  (void)!write(2,title,strlen(title));(void)!write(2,table,length);
+- }
+-}
+-__attribute__((constructor)) static void installTimingReport() {
++  char title[160];
++  const int n=snprintf(title,sizeof title,"ZORN285COUNTERS run=%s sample=%u uptime_us=%llu bytes=%zu\n",
++   getenv("NATIVE_METAL_BOOT_SESSION")?:"unbound",sample,
++   (unsigned long long)(clock_gettime_nsec_np(CLOCK_UPTIME_RAW)/1000),length);
++  if(n<=0 || (size_t)n>=sizeof title || length>=sizeof table)break;
++  const struct iovec parts[2]={{title,(size_t)n},{table,length}};
++  const ssize_t wrote=writev(2,parts,2);
++  if(wrote<0 || (size_t)wrote!=(size_t)n+length)break;
++ }
++ return nullptr;
++}
++static void installTimingReport() {
+  if(!getenv("NATIVE_METAL_TIMING"))return;
++ static std::atomic<bool> started{false};bool expected=false;
++ if(!started.compare_exchange_strong(expected,true))return;
+  pthread_t thread;
+  if(!pthread_create(&thread,nullptr,reportTiming,nullptr))pthread_detach(thread);
+ }
+@@ -1568,7 +1579,7 @@
+ }
+ @implementation NBBuffer (Textures)
+ - (id<MTLTexture>)newTextureWithDescriptor:(MTLTextureDescriptor *)d offset:(NSUInteger)offset bytesPerRow:(NSUInteger)row {
+- if(self.wrapped)noteUnalignedTexture(d,offset,row,__builtin_return_address(0));
++ // K80 scalar timing: texture creation below is unchanged;no caller attribution.
+  NBTexture *texture=textureOnBuffer(self,d,offset,row,false);
+  if(gLogTextures && self.wrapped)logTexture("no-copy",d,nullptr,0,self.wrapped,offset,row,texture!=nil);
+  return (id<MTLTexture>)texture;
+@@ -3735,7 +3746,7 @@
+   TraceRec rec={};rec.type=2;rec.t0=began;rec.t1=nowUs();rec.tid=threadIdLow();rec.a=(uint32_t)(uintptr_t)__builtin_return_address(0);
+   rec.cpu0=cpuStart;rec.cpu1=threadCpuUs();traceNote(rec.tid);tracePush(rec);
+  }
+- noteWaitCaller((uint64_t)__builtin_return_address(0)&0xfffffffffull,(uint64_t)__builtin_return_address(0),nowUs()-began);
++ // K80 scalar timing: aggregate wait counters above remain active.
+  gTimeWaitCompleted.add(began);
+ }
+ - (void)waitUntilScheduled {
+@@ -5368,6 +5379,9 @@
+   for(const auto &c:conformances){Class k=objc_getClass(c[0]);Protocol *pr=objc_getProtocol(c[1]);if(k&&pr)class_addProtocol(k,pr);}}
+  objc_registerClassPair(cls);
+  gDeviceObject=[cls new];
++ // Start only after publishing the actual singleton;pthread creation makes
++ // its initialized immutable device/loader state visible to the reporter.
++ if(gDeviceObject)installTimingReport();
+  if(gDeviceObject && iconMetalTrace()) {
+   char text[88];
+   snprintf(text,sizeof(text),"metal-device %s reg=%llx %.42s",class_getName(cls),(unsigned long long)registryID,name);
+@@ -5606,16 +5620,8 @@
+   }
+   // Commands that named a discarded resource whose caller had not set it NonVolatile (noteLateUse): how many in all, then the first
+   // two distinct callers, each with its count and its return addresses as image+offset. No row while there was none.
+-  if(gLateUseCount.load()) {
+-   LateUse sites[2];unsigned n;
+-   {std::lock_guard<std::mutex> lock(gLateUseLock);n=std::min(gLateUseSites,2u);memcpy(sites,gLateUses,sizeof(LateUse)*n);}
+-   for(unsigned i=0;i<n;i++) {
+-    char text[10][32]={};
+-    for(int f=0;f<sites[i].depth;f++)lateUseFrame(sites[i].frames[f],text[f],sizeof text[f]);
+-    row("PU%u all %llu n%llu %s %s %s",i,(ull)gLateUseCount.load(),(ull)sites[i].count,text[0],text[1],text[2]);
+-    row("PU%ub %s %s %s %s",i,text[3],text[4],text[5],text[6]);
+-   }
+-  }
++  // K80 scalar timing omits optional caller/address attribution.
++
+   // The system's memory pressure events this process got (warnings, critical ones) and the blocks the runtime gave back at them;
+   // then the surface imports held between frames and their MiB, which go back at such an event, and how often Turnip emptied its BO
+   // cache (at its own pressure events and when an allocation failed).
+@@ -5652,26 +5658,8 @@
+   if(nmb_device_pass_counts(gDevice,pc))
+    row("PS ins %llu inl %llu | bar %llu tile %llu ml %llu pend %llu | sti %llu %lluM cp %llu/%llu",(ull)pc[0],(ull)pc[1],(ull)pc[2],
+     (ull)pc[3],(ull)pc[4],(ull)pc[5],(ull)pc[6],(ull)(pc[7]>>20),(ull)pc[8],(ull)pc[9]);
+-  // Who allocated the device memory (4 MiB or more at once, so far, freed since or not): the three call stacks with the most bytes,
+-  // as MiB, allocations and return addresses relative to their image (+offset in the plugin, whose link map NativeAdrenoMetal.map
+-  // names them; *offset in another).
+-  {
+-   uint64_t sites[3*12]={};
+-   const size_t n=nmb_allocation_sites(sites,3);
+-   for(size_t i=0;i<n;++i) {
+-    const uint64_t *site=sites+i*12;
+-    char frames[10][12]={};
+-    for(unsigned f=0;f<10 && site[2+f];++f) {
+-     Dl_info info={};
+-     const bool found=dladdr((const void *)site[2+f],&info) && info.dli_fbase;
+-     static Dl_info self={};static bool selfFound=dladdr((const void *)&nmb_allocation_sites,&self);
+-     const bool mine=found && selfFound && info.dli_fbase==self.dli_fbase;
+-     snprintf(frames[f],sizeof frames[f],"%c%llx",mine?'+':'*',(ull)(found?site[2+f]-(uint64_t)info.dli_fbase:site[2+f]));
+-    }
+-    row("MA%zu %lluM n%llu %s %s %s %s %s",i,(ull)(site[0]>>20),(ull)site[1],frames[0],frames[1],frames[2],frames[3],frames[4]);
+-    row("MA%zub %s %s %s %s %s",i,frames[5],frames[6],frames[7],frames[8],frames[9]);
+-   }
+-  }
++  // K80 scalar timing omits optional caller/address attribution.
++
+  }
+  // ---- what was compiled, and what it cost ----
+  row("T pipeline n=%llu total=%llums max=%llums",(ull)gTimePipeline.count.load(),ms(gTimePipeline.total.load()),ms(gTimePipeline.slowest.load()));
+@@ -5810,13 +5798,8 @@
+   if(nmb_device_texture_counts(gDevice,tc))
+    row("L inp %llu/%llu rf %llu/%llu sh %llu cp %llu bk %llu rt %llu",(ull)tc[0],(ull)tc[1],(ull)tc[2],
+     (ull)tc[3],(ull)tc[4],(ull)tc[5],(ull)tc[6],(ull)tc[7]);
+-  // Textures over host pages at rows or offsets this GPU's linear images cannot take: how many, MiB, the largest and who made it.
+-  {
+-   std::lock_guard<std::mutex> lock(gUnalignedLock);
+-   if(gUnalignedCount)
+-    row("TB n%llu %lluM big %ux%u row%u %.20s+%llx",(ull)gUnalignedCount,(ull)(gUnalignedBytes>>20),
+-     gUnalignedSize[0],gUnalignedSize[1],gUnalignedSize[2],gUnalignedImage,(ull)gUnalignedCaller);
+-  }
++  // K80 scalar timing omits optional caller/address attribution.
++
+   // The tile-memory side of GMEM loads and stores (tu_gmem_side_stats), per site: 3D store source, 3D load source, 2D store source, input attachment; each
+   // transfers / of them with a swap other than WZYX / with MUTABLEEN / of a linear image. The second number must stay 0 for linear images.
+   {
+@@ -5855,11 +5838,8 @@
+   std::lock_guard<std::mutex> lock(gCommitLock);
+   const uint32_t newest=(uint32_t)gCommits.load();
+   row("%s","Q timing v2: per-buffer API counts; ctc=commit-to-callback; age includes caller idle");
+-  for(unsigned i=0;i<8;i++) {
+-   const WaitCaller &w=gWaitCallers[i];
+-   if(!w.n.load())continue;
+-   row("WC%u lr=%llx n%u us%llu t=%.23s s=%.27s",i,(ull)w.lr.load(),w.n.load(),(ull)w.us.load(),w.thread,w.symbol);
+-  }
++  // K80 scalar timing omits optional caller/address attribution.
++
+   for(unsigned i=0;i<4;i++) {
+    const FrameAttribution::Bin &b=gAttribution.bins[i];
+    if(!b.n)continue;

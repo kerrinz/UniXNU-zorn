@@ -1,0 +1,104 @@
+--- a/ZornDpuAutoRefreshTransfer340.h
++++ b/ZornDpuAutoRefreshTransfer340.h
+@@ -32,6 +32,13 @@
+ enum Refusal : uint32_t {
+     CtlBusy = 1, AutoBusy = 2, TearOwned = 4, DsiOwnedOrError = 8,
+     ArmLease = 16, ArmAck = 32, ArmRead = 64, ArmDirty = 128, ArmDeadline = 256,
++};
++// Bits are interpreted in the context of the result. WrongTopology uses
++// these bits; ExistingActivity and ArmFailed retain their refusal masks.
++enum TopologyRefusal : uint32_t {
++    DpuVersionMismatch = 1, CtlModeMismatch = 2, CtlRouteMismatch = 4,
++    BufferPairMismatch = 8, ActiveSourceMismatch = 16, StrideMismatch = 32,
++    DsiVersionMismatch = 64, DsiControlMismatch = 128, DsiLaneStateMismatch = 256,
+ };
+ struct Timing {
+     uint64_t programmed = 0, completed = 0;
+@@ -74,11 +81,20 @@
+     const bool bufferPair = !target ? address == ZORN_SCANOUT_FRONT :
+         (address == ZORN_SCANOUT_FRONT && target == ZORN_SCANOUT_BACK) ||
+         (address == ZORN_SCANOUT_BACK && target == ZORN_SCANOUT_FRONT);
+-    if (dpuVersion != 0xa0000000 || !(ctl & (1u << 17)) || active != 2 || fetch != 0x30000 ||
+-        !bufferPair || stride != ZORN_SCANOUT_STRIDE || addr0 != address || addr1 != address ||
+-        (stride0 & 0xffff) != stride || (stride1 & 0xffff) != stride || dsiVersion != 0x20080000 ||
+-        dsiControl != 0x1f5 || (laneStatus & 0x1f1f) != 0x1f1f) {
++    uint32_t topology = 0;
++    if (dpuVersion != 0xa0000000) topology |= DpuVersionMismatch;
++    if (!(ctl & (1u << 17))) topology |= CtlModeMismatch;
++    if (active != 2 || fetch != 0x30000) topology |= CtlRouteMismatch;
++    if (!bufferPair) topology |= BufferPairMismatch;
++    if (addr0 != address || addr1 != address) topology |= ActiveSourceMismatch;
++    if (stride != ZORN_SCANOUT_STRIDE || (stride0 & 0xffff) != stride || (stride1 & 0xffff) != stride)
++        topology |= StrideMismatch;
++    if (dsiVersion != 0x20080000) topology |= DsiVersionMismatch;
++    if (dsiControl != 0x1f5) topology |= DsiControlMismatch;
++    if ((laneStatus & 0x1f1f) != 0x1f1f) topology |= DsiLaneStateMismatch;
++    if (topology) {
+         out[Status] = WrongTopology;
++        if (timing) timing->guard = topology;
+         return;
+     }
+     if (out[InitialAutoConfig] != configExpected) {
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -42,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT351", 8);
++    memcpy(p, "K80FT352", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 351);
++    zorn_panic_le236(p, Bytes - 4, 352);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC c26ac32bf196479e8307edbf6322e819 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 9d825afd5e7c4fcb8e32c8f193b336a7 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"c26ac32bf196479e8307edbf6322e819",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"9d825afd5e7c4fcb8e32c8f193b336a7",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C26AC32BF196"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN269D825AFD5E7C"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc2,0x6a,0xc3,0x2b,0xf1,0x96,0x47,0x9e,0x83,0x07,0xed,0xbf,0x63,0x22,0xe8,0x19};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x9d,0x82,0x5a,0xfd,0x5e,0x7c,0x4f,0xcb,0x8e,0x32,0xc8,0xf1,0x93,0xb3,0x36,0xa7};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc2,0x6a,0xc3,0x2b,0xf1,0x96,0x47,0x9e,0x83,0x07,0xed,0xbf,0x63,0x22,0xe8,0x19};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x9d,0x82,0x5a,0xfd,0x5e,0x7c,0x4f,0xcb,0x8e,0x32,0xc8,0xf1,0x93,0xb3,0x36,0xa7};

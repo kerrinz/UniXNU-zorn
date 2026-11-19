@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "scope": "Host-only v313/v314 physical-capture archive analysis",
+  "physical_observer_candidate": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/boot-package/verified.json",
+    "sha256": "46c4d74f55161f325060e908e3d65eacc0f941cd6b7659d660af0785cd1660ea"
+  },
+  "boot_tag": "47bfe9bd7337476d83b113716083b03a",
+  "boot_sha256": "82c4d0ba4fe70af27663f3bea3cc22e5992bdcfbe582f27fd6d0dae2666d1209",
+  "tools": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/analyze-ios26-ft-capture.py",
+      "sha256": "ba072ee87aa1480f2dc7a99553723eac20ef87d00a108ee502c5201fbb5cf0d8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-ft-capture-archive.py",
+      "sha256": "f6550d2c01fb0b133adb8446aba1d354e160f98f176dd2bcae1bc21e47ca90a8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/inspect_ios26_ft313.py",
+      "sha256": "f49d7bb43283e90d252333ab2de58f198d3588d596df5e6f5c98cce9ad06731d"
+    }
+  ],
+  "replay_output": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/physical-archive-verified-host/result.json",
+    "sha256": "6ebe3fbfdc983743dce20c6938858e46d8daa079a3e90ea149f7996db46d52e1"
+  },
+  "checked_cases": {
+    "archived_v305_success_accepted": true,
+    "archived_v312_stop_refused": true,
+    "mixed_observation_and_archive_bound": true,
+    "complete_panic_kept_separate_from_clean_return": true,
+    "stale_native_page_keeps_independent_evidence": true,
+    "truncated_screenshot_refused": true,
+    "unequal_protected_pair_refused": true,
+    "damaged_BCB_refused": true,
+    "bool_boot_count_refused": true,
+    "fake_recovery_family_refused": true,
+    "damaged_GPT_readback_refused": true,
+    "extra_boot_refused": true,
+    "changed_ADT_archive_refused": true,
+    "foreign_or_repeated_FT_tag_refused": true
+  },
+  "source_native_observer_regression": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/ft313-capture-api-regression/result.json",
+    "sha256": "2e00fad4dd3d6c2f56777f9c0b6f3e554987aa99097c6815031d6083ba4f7234"
+  },
+  "replay_command": [
+    "python3",
+    "-B",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-ft-capture-archive.py",
+    "--candidate",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/boot-package/verified.json",
+    "--known-recovery",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v305-nominal-opp-78871e9ec441484592f84b6bacab8dfa/root-trial",
+    "--stopped-trial",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v312-hid-parent-8f07cdbb9a17475aa97ad9e8e579be07/root-trial",
+    "--physical-packet",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v313-physical-ft-33bbfcc946e24edeaba1579079b0b01a/ft313-complete-asan/SYNTHETIC-ft313.bin",
+    "--out",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/physical-archive-verified-host"
+  ],
+  "previously_observed_v305_recovery_seconds": 332.19113245799963,
+  "previously_observed_v305_recovery_family": "TWRP",
+  "full_protected_before_after_pairs": 7,
+  "fixture_limits": "FT observation and abnormal archive controls are synthetic. The v305 and v312 Recovery replays use their actual archived inputs. Archive consistency does not prove new device execution or visible gesture delivery.",
+  "driver_recompiled": false,
+  "phone_access": false,
+  "device_stop_preserved": true,
+  "scope_or_claim_created": false,
+  "physical_FT3683_qualified": false,
+  "full_GPU_qualification": false
+}

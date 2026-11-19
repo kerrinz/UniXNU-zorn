@@ -1,0 +1,81 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC a1d69e45450e4415aa5b23c975a011bc %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC dc48e662130d4dc28186229f33c6aa7e %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -862,8 +862,13 @@
+ static uint64_t zornCallbackResult222,zornCallbackViewState222,zornCallbackMapState222;
+ // The existing retained progress owner supplies cadence metadata only.
+ // Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
+-extern "C" unsigned zorn26_cdc_interval262(void *context){
+-    if(context!=&zornProgress201)return 3;
++#include "ZornSerialShot265.h"
++extern "C" void zorn26_serial_shot_request265(void);
++extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
++extern "C" bool zorn26_serial_shot_ready265(void);
++static ZornSerialMux265 zornSerialMux265;
++static bool zorn_serial_idle265(void *context){
++    if(context!=&zornProgress201)return false;
+     const auto &p=zornProgress201;
+     return __atomic_load_n(&p.state,__ATOMIC_ACQUIRE)==3 &&
+         __atomic_load_n(&p.result,__ATOMIC_ACQUIRE)==88 &&
+@@ -872,7 +877,13 @@
+         !__atomic_load_n(&p.gate.failed,__ATOMIC_ACQUIRE) &&
+         __atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE)==
+             __atomic_load_n(&zornCallbackGate222.acknowledged,__ATOMIC_ACQUIRE) &&
+-        !__atomic_load_n(&zornCallbackGate222.failed,__ATOMIC_ACQUIRE)?9:3;
++        !__atomic_load_n(&zornCallbackGate222.failed,__ATOMIC_ACQUIRE)?true:false;
++}
++extern "C" unsigned zorn26_cdc_interval262(void *context){
++    if(!zorn_serial_idle265(context))return 3;
++    // Only the seven ready screenshot chunks use a bounded temporary3s cadence.
++    // Actual GPU gates,normal frame completions and285s/38frame caps are intact.
++    return zorn26_serial_shot_ready265() && zornSerialMux265.offset<ZornSerialShot265::Bytes?3:9;
+ }
+ 
+ static unsigned zornCallbackEmitted222; // Sole USB consumer owns this field.
+@@ -965,7 +976,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"a1d69e45450e4415aa5b23c975a011bc",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"dc48e662130d4dc28186229f33c6aa7e",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1026,6 +1037,20 @@
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}
+     return size;
+ }
++struct ZornSerialProvider265 {
++    enum {Bytes=ZornSerialShot265::Bytes,PacketHeader=ZornSerialShot265::PacketHeader};
++    bool ready()const{return zorn26_serial_shot_ready265();}
++    unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{return zorn26_serial_shot_packet265(out,cap,offset,tag);}
++};
++static unsigned zorn_gpu_serial_next265(void *cookie,char *line,unsigned cap,unsigned completed){
++    unsigned enabled=0;
++    const bool selected=PE_parse_boot_argn("zorn26_gpu_cdc",&enabled,sizeof(enabled)) && enabled==1;
++    const bool idle=selected && zorn_serial_idle265(cookie);
++    if(idle)zorn26_serial_shot_request265();
++    const ZornSerialProvider265 actual{};
++    return zornSerialMux265.next(cookie,line,cap,completed,zorn_gpu_progress_next201,
++        actual,kZornPlatformRecordTrial,idle);
++}
+ static void zorn_gpu_progress_cdc201(ZornUfsOwner26 *owner){
+     unsigned enabled=0;
+     if(!PE_parse_boot_argn("zorn26_gpu_cdc",&enabled,sizeof(enabled)) || enabled!=1)return;
+@@ -1039,7 +1064,7 @@
+     ZornUsbCdcProbe26::Snapshot snapshot{};
+     if(ZornUsbCdcProbe26::inspect(regs,snapshot)!=ZornUsbCdcProbe26::Result::IdentityRoute)return;
+     zornProgress201.owner=owner;
+-    const unsigned result=zorn26_cdc_stream201(regs.dwc,zorn_gpu_progress_next201,&zornProgress201);
++    const unsigned result=zorn26_cdc_stream201(regs.dwc,zorn_gpu_serial_next265,&zornProgress201);
+     IOLog("K80 GPU progress CDC result=%u\n",result);
+ }
+ 

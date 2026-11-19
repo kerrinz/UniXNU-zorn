@@ -1,0 +1,144 @@
+{
+  "scope": "K80 FT3683 QUP1 SE4 bounded PIO source candidate",
+  "hardware_qualified": false,
+  "selected_by_runtime": false,
+  "component": {
+    "repository": "https://github.com/UniXNU/QcomGeniSpi",
+    "revision": "eac47baefe6a5d2368a70351e6ad1b6361bedbe2",
+    "sources": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/ft3683-geni-source-check/GeniSpi.c",
+        "bytes": 15536,
+        "sha256": "2042cfc9647391e24d5a558202046425ac62a05adfc73afe769367b8374e3f91",
+        "git_blob": "ec6705cf15eb8dfd1a70e938bcb07f3e549d6bb9"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/ft3683-geni-source-check/GeniSpi.h",
+        "bytes": 9152,
+        "sha256": "e73891e4571c5323bca27aaf987bafa002856dfa1dcee156ff31b119e2d3ae3c",
+        "git_blob": "f2fdcc981babc913ac6d708861f906637e59a811"
+      }
+    ]
+  },
+  "k80_board": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/native/display/zorn-touch-board.json",
+    "bytes": 1173,
+    "sha256": "e563847bec83809a61a8186bd5ec9e5563632a1014ae54a6771220e7dff24632"
+  },
+  "references": {
+    "micode-k80-devicetree": {
+      "revision": {
+        "name": "micode-k80-devicetree",
+        "repository": "MiCode/kernel_devicetree",
+        "branch": "bsp-zorn-v-oss",
+        "commit": "e6826f9350752ebceebee4d1d4ed20e0edf4d3a4",
+        "tree": "477fd5a3570e2b5bba09af78be68c280230e7677",
+        "url": "https://github.com/MiCode/kernel_devicetree",
+        "resolved_at": "2026-11-04T12:06:12.552020+00:00"
+      },
+      "files": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/pineapple-qupv3.dtsi",
+          "bytes": 43106,
+          "sha256": "be7715ca9c31fda6407489c8a29d9128aa7aaf6426e2d3b40fd2c04f2abac1b5",
+          "git_blob": "b2ab76ac8d4c7da69920ab912ee683123a2206de"
+        },
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-devicetree/qcom/pineapple-pinctrl.dtsi",
+          "bytes": 60295,
+          "sha256": "986c36e2e5bc487ca10b56fb9a087f64113f8501142228bd657d3a2d00ede29e",
+          "git_blob": "7b74f7362300f69dcb525e405beefe7c768336e4"
+        }
+      ]
+    },
+    "micode-k80-kernel": {
+      "revision": {
+        "name": "micode-k80-kernel",
+        "repository": "MiCode/Xiaomi_Kernel_OpenSource",
+        "branch": "bsp-zorn-v-oss",
+        "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+        "tree": "d77dd4a1e6649e90a61ff3b1605b65c03607a9fb",
+        "url": "https://github.com/MiCode/Xiaomi_Kernel_OpenSource",
+        "resolved_at": "2026-11-04T12:06:10.056561+00:00"
+      },
+      "files": [
+        {
+          "path": "/Volumes/macData/projects/ios-zorn/references/k80-gpu-upstreams-20261104/micode-k80-kernel/drivers/clk/qcom/gcc-pineapple.c",
+          "bytes": 120443,
+          "sha256": "5f52b2c960a94a1385c571748ab54eb83aac079038850c5ffdbe44ec937efb59",
+          "git_blob": "add85801886d105802662436d6adf812323a36c8"
+        }
+      ]
+    }
+  },
+  "board_inputs": {
+    "engine": "QUP wrapper 1 SE4",
+    "wrapper_base": 11272192,
+    "wrapper_span": 8192,
+    "engine_base": 11075584,
+    "engine_span": 16384,
+    "dts_GIC_SPI": 357,
+    "cs": 0,
+    "mode": 0,
+    "max_Hz": 15000000,
+    "pin_numbers": [
+      48,
+      49,
+      50,
+      51
+    ],
+    "sensor_irq": 162,
+    "sensor_reset": 161,
+    "branch": "GCC_QUPV3_WRAP1_S4_CLK",
+    "RCGR": 99272,
+    "halt": 99260,
+    "vote_register": 335880,
+    "vote_bit": 26
+  },
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/touch/k80-geni-pio-retain/candidate.patch",
+    "bytes": 3784,
+    "sha256": "0b2ae6807ef68f0483b610d3d795d6dc776203467ade753dbeff577411ced141"
+  },
+  "zero_fuzz_replay": true,
+  "host_checks": {
+    "exact_PIO_lengths": [
+      93,
+      1513,
+      3129
+    ],
+    "stock_model": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/ft3683-geni-source-check/check.stdout",
+      "bytes": 111,
+      "sha256": "19df1b0a6b23208d17291814cc3822483d87739b2dd837d8125f622b0e17289d"
+    },
+    "retained_PIO_model": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/ft3683-geni-source-check/retained-pio/check.stdout",
+      "bytes": 111,
+      "sha256": "19df1b0a6b23208d17291814cc3822483d87739b2dd837d8125f622b0e17289d"
+    },
+    "model_source": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/ft3683-geni-source-check/retained-pio/Test/k80-geni-spi.c",
+      "bytes": 18562,
+      "sha256": "1ddc9f16168eef9cb718f3721cd19968ddf1cc4e34ba6f66a83a7e546d92c0db"
+    },
+    "ASan_UBSan": true,
+    "freestanding_iOS26_arm64e_object": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v358-dsi-hardware-pacing-f3db4b620bf4493288c963dc5baff5d6/ft3683-geni-source-check/retained-pio/GeniSpi-arm64e.o",
+      "bytes": 9352,
+      "sha256": "bdf8027a0e9d5bf583efab393f2e950882ecba2f0c4af6063b74b179f2547112"
+    },
+    "cases": [
+      "active engine rejected before writes",
+      "stuck transfer retained without cancel/abort",
+      "error IRQ retained",
+      "subsequent init/setup/clock/transfer refuse writes",
+      "default component regressions pass"
+    ]
+  },
+  "remaining": [
+    "Connect a board clock, power, mux and provider owner under exclusive access.",
+    "Read actual engine protocol, FIFO enablement and geometry in a bounded clocked preflight.",
+    "Qualify complete CRC-checked sensor frames and HID gestures on the exact build."
+  ]
+}

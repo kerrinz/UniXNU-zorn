@@ -26,14 +26,16 @@ def inspect_progress(data, tag, program_tag):
         bases = (16,16,10,16,10,16,16)
         keys = ('flags','ready_ticks','cpu_done','cpu_mask','cpu_online','user_mask','system_mask')
         r = dict(zip(keys, (int(v, b) for v, b in zip(match.groups(), bases))))
-        if (r['flags'] & ~0x8000003f or r['flags'] & 0x3d != 0x3d or
+        before_board = bool(r['flags'] & 0x40)
+        required = 0x79 if before_board else 0x3d
+        if (r['flags'] & ~0x8000007f or r['flags'] & required != required or
                 not r['ready_ticks'] or r['cpu_online'] > 8 or
                 (r['user_mask'] | r['system_mask']) & ~r['cpu_mask'] or
                 (not r['cpu_done'] and any(r[k] for k in keys[3:]))):
             raise ValueError('early252 sample bounds differ')
         if records:
             old = records[-1]
-            if (r['flags'] & old['flags'] != old['flags'] or
+            if (r['flags'] & old['flags'] != old['flags'] or (r['flags'] ^ old['flags']) & 0x40 or
                     r['ready_ticks'] != old['ready_ticks'] or
                     r['cpu_done'] < old['cpu_done'] or
                     (old['cpu_done'] and any(r[k] != old[k] for k in keys[2:]))):
@@ -45,6 +47,7 @@ def inspect_progress(data, tag, program_tag):
         raise ValueError('early252 frame count differs')
     result['early252'] = records
     result['last_early252'] = records[-1] if records else None
+    result['checkpoint_precedes_gpu_board'] = bool(records and records[0]['flags'] & 0x40)
     result['early_launch_observed252'] = bool(records and not records[-1]['flags'] & 0x80000000)
     last = records[-1] if records else None
     result['CPU_samples_valid252'] = bool(last and last['cpu_done'] and last['cpu_mask'] == 255 and last['cpu_online'] == 8)

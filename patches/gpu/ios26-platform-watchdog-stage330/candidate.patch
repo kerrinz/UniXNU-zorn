@@ -1,0 +1,132 @@
+--- a/GenericARMPE.cpp
++++ b/GenericARMPE.cpp
+@@ -218,16 +218,28 @@
+ 	return this;
+ }
+ 
++extern "C" void zorn26_boot_stage328(unsigned stage);
++
+ bool
+ GenericARMPE::start(IOService * provider)
+ {
+-	if (!zorn26_platform_trial_admit()) return false;
++	zorn26_boot_stage328(0xb0);
++	if (!zorn26_platform_trial_admit()) {
++		zorn26_boot_stage328(0xb1);
++		return false;
++	}
+ 	if (!super::start(provider)) {
++		zorn26_boot_stage328(0xb2);
+ 		return false;
+ 	}
+ 	IOLog("GenericARMPE: platform \"%s\"\n", provider->getName());
+ 
+-	if (!zorn26_platform_trial_start()) return false;
++	zorn26_boot_stage328(0xa1);
++	if (!zorn26_platform_trial_start()) {
++		zorn26_boot_stage328(0xad);
++		return false;
++	}
++	zorn26_boot_stage328(0xa2);
+ 
+ 	/*
+ 	 * super::start() published the /cpus children as nubs. Attach a CPU driver to each
+@@ -305,7 +317,9 @@
+     // Stage selected root inputs before publishing this expert to BSD class
+     // lookup. On refusal retain partials and skip publication/other creators;
+     // no UFS operation or successful root readiness is inferred here.
++    zorn26_boot_stage328(0xb3);
+     if(!zorn26_root_platform_start(this))return true;
++    zorn26_boot_stage328(0xb4);
+ 
+ 	/* BSD looks the platform expert up by class (IOSecureBSDRoot). */
+ 	registerService();
+@@ -317,6 +331,7 @@
+     zorn26_platform_record_start(this);
+     // Existing root platform owner holds the real preparation inputs/locks.
+     if(!zorn26_gpu_board_platform_start(this))return true;
++    zorn26_boot_stage328(0xb5);
+     // Use the reference platform ordering for the software display path.
+     unsigned cpuPresenter=0;
+     if(PE_parse_boot_argn("zorn26_cpu_presenter",&cpuPresenter,sizeof(cpuPresenter)) && cpuPresenter==1){
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -547,7 +547,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC fbbcc2def5474fbebb544b49ab945c1c %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC c14a643a7a2a4afc8104a19a16e75bc0 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1012,7 +1012,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"fbbcc2def5474fbebb544b49ab945c1c",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"c14a643a7a2a4afc8104a19a16e75bc0",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26FBBCC2DEF547"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C14A643A7A2A"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/houji_recovery26.c
++++ b/houji_recovery26.c
+@@ -160,7 +160,7 @@
+ void zorn26_boot_stage328(unsigned stage);
+ void zorn26_boot_stage328(unsigned stage)
+ {
+-    if(stage>=0xa0 && stage<=0xaf)draw_stage(stage);
++    if(stage>=0xa0 && stage<=0xb5)draw_stage(stage);
+ }
+ 
+ // The panic formatter already owns the first message. Use its published
+@@ -287,7 +287,5 @@
+     __atomic_store_n(&trial_deadline,actual_deadline,__ATOMIC_RELEASE);
+ }
+ void houji26_start_recovery_timer(void) {
+-    zorn26_boot_stage328(0xa1);
+     if(!zorn26_platform_trial_start())panic("K80 platform trial admission/start refused");
+-    zorn26_boot_stage328(0xa2);
+-}
++}
+--- a/pe_init.c
++++ b/pe_init.c
+@@ -475,8 +475,11 @@
+ 	 * against a kernel which has not yet enabled the full set of available
+ 	 * hardware protections.
+ 	 */
++	zorn26_boot_stage328(0xaa);
+ 	zalloc_iokit_lockdown();
++	zorn26_boot_stage328(0xab);
+ 	StartIOKitMatching();
++	zorn26_boot_stage328(0xac);
+ }
+ 
+ void
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xfb,0xbc,0xc2,0xde,0xf5,0x47,0x4f,0xbe,0xbb,0x54,0x4b,0x49,0xab,0x94,0x5c,0x1c};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc1,0x4a,0x64,0x3a,0x7a,0x2a,0x4a,0xfc,0x81,0x04,0xa1,0x9a,0x16,0xe7,0x5b,0xc0};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xfb,0xbc,0xc2,0xde,0xf5,0x47,0x4f,0xbe,0xbb,0x54,0x4b,0x49,0xab,0x94,0x5c,0x1c};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc1,0x4a,0x64,0x3a,0x7a,0x2a,0x4a,0xfc,0x81,0x04,0xa1,0x9a,0x16,0xe7,0x5b,0xc0};

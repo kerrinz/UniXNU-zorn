@@ -1,0 +1,139 @@
+--- a/ZornApplicationObservation26.inc
++++ b/ZornApplicationObservation26.inc
+@@ -1,18 +1,24 @@
+ // SPDX-License-Identifier: MIT
+-// Diagnostic only; try-lock never waits and never influences native results.
++// Diagnostic only. Writers serialize short copies and scalar updates.
++// CDC and the map observer retain nonblocking reads.
+ #include "ZornMapGate222.h"
+-static unsigned appObservationGate,appObservationDropped;
++#include <kern/locks.h>
++static LCK_GRP_DECLARE(appObservationLockGroup294, "zorn_gpu_observe");
++static LCK_SPIN_DECLARE(appObservationGate, &appObservationLockGroup294);
++static unsigned appObservationDropped;
+ static uintptr_t appObservationClient;
+ // Filter unrelated clients before the shared diagnostic lock. This is only a
+ // published observation identity; it never supplies native GPU authority.
+ static uintptr_t appObservationActiveClient;
+ static ZornApplicationObservation26 appObservation;
+-static bool appObservationLock(){unsigned zero=0;return __atomic_compare_exchange_n(&appObservationGate,&zero,1,false,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED);}
+-static void appObservationUnlock(){__atomic_store_n(&appObservationGate,0,__ATOMIC_RELEASE);}
++// No allocation, copyin, I/O, scheduler call or native callback under this lock.
++static bool appObservationTryLock(){ return lck_spin_try_lock(&appObservationGate); }
++static void appObservationLock(){ lck_spin_lock(&appObservationGate); }
++static void appObservationUnlock(){ lck_spin_unlock(&appObservationGate); }
+ static void appObservationDrop(){__atomic_fetch_add(&appObservationDropped,1,__ATOMIC_RELAXED);}
+ static void appObservationRemember();
+ extern "C" int zorn26_application_observes_map222(uintptr_t client){
+- if(!client || !appObservationLock())return 0;
++ if(!client || !appObservationTryLock())return 0;
+  const bool take=client==appObservationClient && appObservation.unique &&
+   appObservation.sessions && !appObservation.closeReturned &&
+   (appObservation.flags&15u)==15u && appObservation.method==13 && !appObservation.raw;
+@@ -20,7 +26,7 @@
+ }
+ static void appObservationBind(uintptr_t client,uint64_t unique,uint32_t pid){
+  if(!client || !unique || !pid)return;
+- if(!appObservationLock()){appObservationDrop();return;}
++ appObservationLock();
+  // Diagnostics follow up to four sequential sessions of the same actual task.
+  // This cannot grant or change native ownership, and never hides prior sessions.
+  if(appObservation.sessions && (unique!=appObservation.unique || !appObservation.closeReturned || appObservation.closeRaw)){
+@@ -46,7 +52,7 @@
+ }
+ static void appObservationEvent(uintptr_t client,uint32_t flags,uint32_t method,uint32_t raw,bool closed=false){
+  if(!client || client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
+- if(!appObservationLock()){appObservationDrop();return;}
++ appObservationLock();
+  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned){appObservation.flags|=flags;appObservation.method=method;appObservation.raw=raw;
+   if(appObservation.calls<65535)++appObservation.calls;else appObservationDrop();
+   if(closed){appObservation.closeReturned=1;appObservation.closeRaw=raw;
+@@ -58,7 +64,7 @@
+ extern "C" void zorn26_application_prepare_event(uintptr_t client,uint32_t stage,uint32_t raw,uint32_t detail){
+  if(!client || !stage || stage>=64)return;
+  if(client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
+- if(!appObservationLock()){appObservationDrop();return;}
++ appObservationLock();
+  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned){
+   if(appObservation.prepareEvents<128){
+    ++appObservation.prepareEvents;appObservation.prepareMask|=UINT64_C(1)<<stage;
+@@ -70,11 +76,12 @@
+  appObservationUnlock();
+ }
+ extern "C" int zorn26_application_snapshot(ZornApplicationObservation26 *out){
+- if(!out || !appObservationLock())return 0;
++ if(!out || !appObservationTryLock())return 0;
+  *out=appObservation;out->dropped=__atomic_load_n(&appObservationDropped,__ATOMIC_RELAXED);appObservationUnlock();return 1;
+ }
+ extern "C" int zorn26_application_stderr_reserve(uint64_t unique,uint32_t pid){
+- if(!unique || !pid || !appObservationLock())return 0;
++ if(!unique || !pid)return 0;
++ appObservationLock();
+  if(appObservation.unique && unique!=appObservation.unique){appObservationDrop();appObservationUnlock();return 0;}
+  if(!appObservation.reportUnique){appObservation.reportUnique=unique;appObservation.reportPid=pid;}
+  const bool take=unique==appObservation.reportUnique && pid==appObservation.reportPid &&
+@@ -82,7 +89,7 @@
+  if(take)++appObservation.attempts;else appObservationDrop();appObservationUnlock();return take;
+ }
+ extern "C" void zorn26_application_stderr_commit(uint64_t unique,const char *text,uint32_t bytes,int error){
+- if(!appObservationLock()){appObservationDrop();return;}
++ appObservationLock();
+  if(unique==appObservation.reportUnique && unique){
+   if(error)++appObservation.copyErrors;
+   else if(text && bytes>0 && bytes<sizeof(appObservation.text)){
+@@ -128,7 +135,7 @@
+ extern "C" void zorn26_application_native_return225(uintptr_t client,uintptr_t request,uint32_t method,uint32_t stage,uint32_t raw){
+  if(!client || !request)return;
+  if(client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
+- if(!appObservationLock()){appObservationDrop();return;}
++ appObservationLock();
+  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned)
+   if(stage==1 || appObservation.nativeReturn225.sequence)(void)zorn_native_return225_event(appObservation.nativeReturn225,request,method,stage,raw);
+  appObservationUnlock();
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 92a822b29de345b6ae033dd0149c5388 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC d5b866f0c9854baa9cdf97e878dd6e5a %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"92a822b29de345b6ae033dd0149c5388",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"d5b866f0c9854baa9cdf97e878dd6e5a",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2692A822B29DE3"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26D5B866F0C985"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x92,0xa8,0x22,0xb2,0x9d,0xe3,0x45,0xb6,0xae,0x03,0x3d,0xd0,0x14,0x9c,0x53,0x88};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xd5,0xb8,0x66,0xf0,0xc9,0x85,0x4b,0xaa,0x9c,0xdf,0x97,0xe8,0x78,0xdd,0x6e,0x5a};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x92,0xa8,0x22,0xb2,0x9d,0xe3,0x45,0xb6,0xae,0x03,0x3d,0xd0,0x14,0x9c,0x53,0x88};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xd5,0xb8,0x66,0xf0,0xc9,0x85,0x4b,0xaa,0x9c,0xdf,0x97,0xe8,0x78,0xdd,0x6e,0x5a};

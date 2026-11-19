@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "scope": "K80-persistent-iOS26-desktop283-45267e58",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a"
+  },
+  "status": "dedicated-iOS26-root-policy-installed-in-verified-Recovery-no-boot",
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-desktop283-root-delta-review-45267e58/review-inputs.json",
+    "sha256": "751288c0c55e84ca5939979f1c1e9f6e8cd40e6e2e5dc4e8de93184d056b06bf"
+  },
+  "installation": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-desktop283-root-delta-review-45267e58/admission/run/result.json",
+    "sha256": "ac0185e123d8c9cf83e901d64ad62d2f9cdf58ef082fe4e8cbb9a7043a93fd9e"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-desktop283-root-delta-review-45267e58/admission/admission.json",
+    "sha256": "31f5ce31f2dc2dfd8d1bc4581b1d61e42d84786d64ef0f047e03359c0fbcb3f5"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-desktop283-root-delta-review-45267e58/admission/run/one-shot.claim.json",
+    "sha256": "ead31f8b67823f3672f24e7db8a2b763f7fd87520190b86176b93e1407bb1546"
+  },
+  "pages_written": 22,
+  "write_groups": 11,
+  "bytes_written": 90112,
+  "retained_actual_parent_pages_verified": 13716,
+  "base_sha256": "b87e132bbf509d13ff3475606abef000a1f43478ad4889bdcfbf47eb0db39e8d",
+  "target_sha256": "d9856b4342a307d915f43d8cd7d9540b8a2d3933f07dfd46750cfe5a32c0c622",
+  "readback": {
+    "scope": "written4KiB-root-pages-only",
+    "blocks": 22,
+    "bytes": 90112,
+    "sha256": "e76e6d86b240c8b544672a3621e9fbe279902ca314ff9ed58f54ccdaf97ebf33"
+  },
+  "recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "protected_metadata_and_fences_unchanged": true,
+  "changed_files": [
+    "System/Library/Extensions/NativeAdrenoMetal.clients",
+    "System/Library/LaunchDaemons/org.unixnu.zorn.metal-probe193.plist"
+  ],
+  "effect": "Select ordinary backboardd and disable probe;new upstream signed Metal/runtime/Turnip files stay byte-identical to known-image281/282",
+  "storage": {
+    "partition": "unixnu",
+    "relative_first_lba4096": 6291712,
+    "blocks4096": 8388608,
+    "layout_changed": false,
+    "Android_17_Data_GPT_Recovery_and_boot_partitions_not_written": true
+  },
+  "kernel283_boot_attempts": 0,
+  "unbooted_reason": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v283-upstream-desktop-cost-45267e58fff6425eb9ab718191a964b8/unselected-before-boot-ROI-gate-audit283.json",
+    "sha256": "7a4230ec9fadda743c101c63e74abc90b69ec3a7a5e034df95cbc879ac6dfbbf"
+  },
+  "next_kernel": "independent284 cost-mux fix;separate boot scope",
+  "full_GPU_or_performance_qualification": false,
+  "source_snapshot": "Uncommitted;no invented Git revision"
+}

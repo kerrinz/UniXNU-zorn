@@ -1,0 +1,253 @@
+--- /dev/null
++++ b/ZornDisplayResourceWire322.h
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornDisplayResources322 {
++
++inline constexpr unsigned BcmCount = 3;
++inline constexpr unsigned ArcCount = 3;
++inline constexpr unsigned BcmWords = 5;
++inline constexpr unsigned ArcWords = 12;
++inline constexpr unsigned MaxArcLevels = 16;
++inline constexpr unsigned ArcStart = BcmCount * BcmWords;
++inline constexpr unsigned Words = ArcStart + ArcCount * ArcWords;
++
++enum Resolution : uint32_t { Missing = 1, Available, Invalid };
++
++} // namespace ZornDisplayResources322
+--- /dev/null
++++ b/ZornDisplayResources322.h
+@@ -0,0 +1,93 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornDisplayResourceWire322.h"
++#include "ZornGen7CommandDbResourceReader.h"
++
++namespace ZornDisplayResources322 {
++
++// K80's qcom,sde-reg-bus path and Pineapple DISPCC supplies. MMCX's
++// pm_v8_s1_level also has a consumer of CX as its parent supply.
++inline constexpr uint8_t BcmIds[][8] = {{'S','H','1'}, {'C','N','0'}, {'C','N','1'}};
++inline constexpr uint8_t ArcIds[][8] = {
++    {'c','x','.','l','v','l'}, {'m','m','c','x','.','l','v','l'}, {'m','x','.','l','v','l'}
++};
++static_assert(BcmCount == sizeof(BcmIds) / sizeof(BcmIds[0]));
++static_assert(ArcCount == sizeof(ArcIds) / sizeof(ArcIds[0]));
++
++inline bool hasUniqueAddress(const ZornGen7Rpmh::CommandDbResource &resource)
++{
++    return resource.matchingEntries == 1 && resource.address && !(resource.address & 3);
++}
++
++inline uint32_t littleEndianWord(const uint8_t *bytes)
++{
++    return uint32_t(bytes[0]) | uint32_t(bytes[1]) << 8 | uint32_t(bytes[2]) << 16 |
++           uint32_t(bytes[3]) << 24;
++}
++
++inline void bcm(ZornGen7Rpmh::NativeCommandDbResourceReader &reader, const uint8_t (&id)[8], uint32_t *out)
++{
++    ZornGen7Rpmh::CommandDbResource info{};
++    uint8_t aux[8]{};
++    const auto result = reader.copyActualAuxPrefix(id, info, aux, sizeof(aux), sizeof(aux));
++    if (result != ZornGen7Rpmh::CommandDbReadStatus::Available) {
++        out[0] = result == ZornGen7Rpmh::CommandDbReadStatus::Missing ? Missing : Invalid;
++        return;
++    }
++    if (!hasUniqueAddress(info) || info.auxBytes < sizeof(aux)) {
++        out[0] = Invalid;
++        return;
++    }
++    out[0] = Available;
++    out[1] = info.address;
++    out[2] = info.auxBytes;
++    out[3] = littleEndianWord(aux);
++    out[4] = littleEndianWord(aux + 4); // Raw width, VCD, reserved.
++}
++
++inline void arc(ZornGen7Rpmh::NativeCommandDbResourceReader &reader, const uint8_t (&id)[8], uint32_t *out)
++{
++    ZornGen7Rpmh::CommandDbResource info{};
++    uint8_t aux[2 * MaxArcLevels]{};
++    const auto result = reader.copyActualResource(id, info, aux, sizeof(aux));
++    if (result != ZornGen7Rpmh::CommandDbReadStatus::Available) {
++        out[0] = result == ZornGen7Rpmh::CommandDbReadStatus::Missing ? Missing : Invalid;
++        return;
++    }
++    if (!hasUniqueAddress(info) || !info.auxBytes || info.auxBytes > sizeof(aux) || (info.auxBytes & 1)) {
++        out[0] = Invalid;
++        return;
++    }
++    unsigned count = info.auxBytes / 2;
++    uint16_t levels[MaxArcLevels]{};
++    // Match rpmh_regulator_load_arc_level_mapping: after index zero,
++    // a zero level denotes padding. The rest is not a voltage vote.
++    for (unsigned i = 0; i < count; ++i) {
++        const auto level = uint16_t(aux[2 * i] | uint16_t(aux[2 * i + 1]) << 8);
++        if (i && !level) {
++            count = i;
++            break;
++        }
++        if (i && level < levels[i - 1]) {
++            out[0] = Invalid;
++            return;
++        }
++        levels[i] = level;
++    }
++    out[0] = Available;
++    out[1] = info.address;
++    out[2] = info.auxBytes;
++    out[3] = count;
++    for (unsigned i = 0; i < MaxArcLevels / 2; ++i)
++        out[4 + i] = levels[2 * i] | uint32_t(levels[2 * i + 1]) << 16;
++}
++
++inline void resolve(ZornGen7Rpmh::NativeCommandDbResourceReader &reader, uint32_t (&out)[Words])
++{
++    for (auto &word : out) word = 0;
++    for (unsigned i = 0; i < BcmCount; ++i) bcm(reader, BcmIds[i], out + BcmWords * i);
++    for (unsigned i = 0; i < ArcCount; ++i) arc(reader, ArcIds[i], out + ArcStart + ArcWords * i);
++}
++
++} // namespace ZornDisplayResources322
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -48,6 +48,18 @@
+ #include "ZornGen7HostTables26.h"
+ #include "ZornGen7HostBandwidthArithmetic26.h"
+ #include "ZornGen7CommandDbResources26.h"
++#include "ZornDisplayResources322.h"
++
++namespace {
++uint32_t displayResourceWords322[ZornDisplayResources322::Words]{};
++uint32_t displayResourcePhase322 = 0;
++}
++
++extern "C" void zorn26_display_resources322(uint32_t *out)
++{
++    if (__atomic_load_n(&displayResourcePhase322, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornDisplayResources322::Words; ++i) out[i] = displayResourceWords322[i];
++}
+ #include "ZornGen7IccInputs26.h"
+ #include "ZornGen7SmmuRuntimePm26.h"
+ #include "ZornGen7SmmuDomain26.h"
+@@ -2525,7 +2537,14 @@
+     if(s.platform!=&platform || s.stage!=Stage::CpuReady || s.command_db_storage ||
+        s.arc_source_attempted || s.arc_startup_attempted || s.physical_attempted || s.clocks->graph_attempted_)return finish(kIOReturnNotReady);
+     if(!retainDependency(reader)){s.stage=Stage::StoppedRetained;return finish(kIOReturnNoMemory);}
+-    s.command_db_storage=&reader;s.command_db_reader=&reader;return finish(kIOReturnSuccess);
++    s.command_db_storage=&reader;s.command_db_reader=&reader;
++    uint32_t idle = 0;
++    if (__atomic_compare_exchange_n(&displayResourcePhase322, &idle, 1u, false,
++                                    __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {
++        ZornDisplayResources322::resolve(reader, displayResourceWords322);
++        __atomic_store_n(&displayResourcePhase322, 2u, __ATOMIC_RELEASE);
++    }
++    return finish(kIOReturnSuccess);
+ }
+ IOReturn ZornGen7DarwinBoardOwner::bindActualCommandDbSnapshot(IOService &platform,OSObject &snapshot_owner,
+     const ZornGen7Rpmh::ActualXoCommandDbSnapshot &snapshot)
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -5,6 +5,7 @@
+ #include "ZornDisplayTiming318.h"
+ #include "ZornPanelTe320.h"
+ #include "ZornDpuHandoff321.h"
++#include "ZornDisplayResourceWire322.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -16,7 +17,8 @@
+ constexpr unsigned TimingWords = ZornDisplayTiming318::Words;
+ constexpr unsigned TeStart = TimingStart + Samples * TimingWords;
+ constexpr unsigned HandoffStart = TeStart + ZornPanelTe320::Words;
+-constexpr unsigned Words = HandoffStart + ZornDpuHandoff321::Words;
++constexpr unsigned ResourcesStart = HandoffStart + ZornDpuHandoff321::Words;
++constexpr unsigned Words = ResourcesStart + ZornDisplayResources322::Words;
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+@@ -25,11 +27,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT321", 8);
++    memcpy(p, "K80FT322", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 321);
++    zorn_panic_le236(p, Bytes - 4, 322);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 1d4ad7f909c74a07aaf378ba1762b770 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 740be74752fe4fd68d5633a4a9c9e4c6 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"1d4ad7f909c74a07aaf378ba1762b770",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"740be74752fe4fd68d5633a4a9c9e4c6",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -12,6 +12,7 @@
+ #include <machine/machine_routines.h>
+ extern "C" bool zorn26_ft3683_trace313(uint32_t (&)[ZornManualWire313::TouchWords]);
+ extern "C" void zorn26_ui_menu_progress274(uint32_t (&)[16]);
++extern "C" void zorn26_display_resources322(uint32_t *);
+ extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+@@ -196,6 +197,7 @@
+             out[ZornManualWire313::HandoffStart + i] = handoff321[i];
+         }
+     }
++    zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
+     return true;
+ }
+ extern "C" void zorn26_ui_menu_schedule313(IOService *platform) {
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN261D4AD7F909C7"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26740BE74752FE"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x1d,0x4a,0xd7,0xf9,0x09,0xc7,0x4a,0x07,0xaa,0xf3,0x78,0xba,0x17,0x62,0xb7,0x70};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x74,0x0b,0xe7,0x47,0x52,0xfe,0x4f,0xd6,0x8d,0x56,0x33,0xa4,0xa9,0xc9,0xe4,0xc6};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x1d,0x4a,0xd7,0xf9,0x09,0xc7,0x4a,0x07,0xaa,0xf3,0x78,0xba,0x17,0x62,0xb7,0x70};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x74,0x0b,0xe7,0x47,0x52,0xfe,0x4f,0xd6,0x8d,0x56,0x33,0xa4,0xa9,0xc9,0xe4,0xc6};

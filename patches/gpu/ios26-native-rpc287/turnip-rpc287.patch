@@ -1,0 +1,46 @@
+--- a/src/freedreno/vulkan/tu_knl_darwin.cc
++++ b/src/freedreno/vulkan/tu_knl_darwin.cc
+@@ -154,23 +154,38 @@
+ /* The priority the driver was last given for this process (NativeAdrenoMethodSetPriority). */
+ #include "ZornAdrenoAbiV1Selection279.h"
+ 
++#include "ZornDarwinCallCost287.h"
++static ZornDarwinCallCost287 darwin_call_cost287;
++extern "C" __attribute__((visibility("default"))) bool tu_darwin_call_cost287(uint64_t *,uint32_t);
++extern "C" __attribute__((visibility("default"))) bool
++ tu_darwin_call_cost287(uint64_t *out,uint32_t words)
++{
++   return darwin_call_cost287.snapshot(out,words,os_time_get_nano());
++}
++
+ static kern_return_t
+ dw_call(uint32_t method, const void *in, size_t in_size, void *out,
+         size_t out_size)
+ {
++   const int64_t began287=os_time_get_nano();
++   auto finish287=[&](kern_return_t actual) {
++      darwin_call_cost287.record(method,began287,os_time_get_nano(),
++         actual!=KERN_SUCCESS && actual!=kIOReturnTimeout,actual==kIOReturnTimeout);
++      return actual;
++   };
+    size_t out_bytes = out_size;
+    if (!dw.tunnel)
+-      return IOConnectCallStructMethod(dw.conn, method, in, in_size, out_size ? out : NULL,
+-                                       out_size ? &out_bytes : NULL);
++      return finish287(IOConnectCallStructMethod(dw.conn, method, in, in_size, out_size ? out : NULL,
++                                       out_size ? &out_bytes : NULL));
+    uint8_t buffer[8 + sizeof(NativeAdrenoAbiSubmitBatch)];
+    if (in_size > sizeof(NativeAdrenoAbiSubmitBatch))
+-      return kIOReturnBadArgument;
++      return finish287(kIOReturnBadArgument);
+    const uint32_t header[2] = {DW_TUNNEL_MAGIC, method};
+    memcpy(buffer, header, sizeof(header));
+    if (in_size)
+       memcpy(buffer + sizeof(header), in, in_size);
+-   return IOConnectCallStructMethod(dw.conn, dw.selector, buffer, sizeof(header) + in_size, out_size ? out : NULL,
+-                                    out_size ? &out_bytes : NULL);
++   return finish287(IOConnectCallStructMethod(dw.conn, dw.selector, buffer, sizeof(header) + in_size, out_size ? out : NULL,
++                                    out_size ? &out_bytes : NULL));
+ }
+ 
+ /* Finds an admitted selector: the driver answers a tunnel probe (method 0xffffffff) with success for every selector the sandbox lets through. */

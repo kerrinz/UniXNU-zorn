@@ -1,0 +1,285 @@
+{
+  "version": 335,
+  "date": "2026-11-19",
+  "device": "92988a43/zorn/slot-a",
+  "scope": "single-K80-ios26-v335-held-dpu-f04563b13560",
+  "boot_tag": "3d121da95ebf47fd8e870dc8e013f0ad",
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/full-link/kernel.ZORN26-DPUHELD335.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/boot-package/inputs/kernel.macho",
+    "sha256": "e2f4c21662cdb40931b197d42cb31f61ba5fc80c3bc4a5b7d16b49fcaba77ba4",
+    "bytes": 31098024
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/boot-package/boot.ZORN26-GPU-V335-SERIAL-UNSELECTED.img",
+    "sha256": "679ae578e1fe62a5f27b55bb3d3b3ac41feccf238fb0545be66e3762b8e8435a",
+    "bytes": 11886592
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/boot-package/verified.json",
+    "bytes": 13166,
+    "sha256": "856da63ec6f015b1a7a889589a714c4711a5a3a9a7c38aec56aaf939a8ae3f12"
+  },
+  "offline": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v335-held-dpu-offline-2026-11-19.json",
+    "sha256": "b95c974a473eed2845aaf504f8541fedce73381ee4f341456d6fdcfcaaa486a2",
+    "bytes": 7948
+  },
+  "boot_attempts": 1,
+  "retries": 0,
+  "native_root_writes": 0,
+  "watchdog_seconds": 300,
+  "recovery_timeout_seconds": 600,
+  "CDC": {
+    "frames": 30,
+    "physical_samples": 9,
+    "capture": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/passive-panel-trial-f04563b13560/trial/cdc.raw",
+      "sha256": "378c812c8895f1db8d67cbbfae448649c7c259006d74763cbf567ff23453cfa7",
+      "bytes": 78522
+    },
+    "verified": true,
+    "terminal_panic_observed": false,
+    "errors": {},
+    "serial_errors": []
+  },
+  "recovery": {
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "identities": {
+      "before": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      },
+      "after": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      }
+    },
+    "duration_seconds": 332.2115460000059,
+    "protected_pairs": 7,
+    "adb_server_port": 5039,
+    "protected_GPT_and_root_manifest": true,
+    "BCB_before_boot_checked": true
+  },
+  "prerender_checkpoint": {
+    "run_id": "3d121da95ebf47fd8e870dc8e013f0ad",
+    "text": "K80 GPU early332: root=1; cpu_online=8; gpu=pending",
+    "freshness": "before and after differ; tag absent before",
+    "status": "fresh-root-EL0-before-GPU",
+    "cpu_online": 8,
+    "deferred_CPU_owner_published": null,
+    "GPU_board_scheduled_at_checkpoint": false,
+    "GPU_firmware_or_rendering_proven": false
+  },
+  "GPU_startup": {
+    "deferred_call_returned": true,
+    "native_known_task": {
+      "raw": 0,
+      "phase": 6,
+      "flags": 63,
+      "grant_raw": 0,
+      "ring_read": 101,
+      "ring_write": 101,
+      "fence": 2,
+      "completed_fence": 2,
+      "native_outstanding": 0,
+      "submit_outstanding": 0,
+      "VM_poisoned": 0,
+      "submit_poisoned": 0,
+      "device_references": 0,
+      "output_crc": 3896750698,
+      "first_bad": 4294967295,
+      "expected_bad_byte": 0,
+      "actual_bad_byte": 0,
+      "table_acquires": 2,
+      "table_releases": 2,
+      "ring_busy": 1895825408,
+      "ring_status": 1,
+      "io_raw": 0,
+      "task_OOB_flags": 127,
+      "task_OOB_raw": 0,
+      "available": true,
+      "task_complete": true,
+      "checks": {
+        "completed_worker": true,
+        "actual_snapshot": true,
+        "original_task_completed": true,
+        "grant_returned_success": true,
+        "ring_idle_record": true,
+        "real_fence_completed": true,
+        "no_task_outstanding": true,
+        "not_poisoned": true,
+        "unmapped_no_device_references": true,
+        "actual_RGBA_readback": true,
+        "table_lease_balance": true,
+        "native_IO_success": true,
+        "actual_task_OOB_release": true
+      },
+      "scope": "Initial retained native kernel known-image task only;not a Metal frontend/ordinary surface/physical scanout or long-term stability oracle"
+    }
+  },
+  "display": {
+    "lease": {
+      "status": 6,
+      "uptime_ms": 72490,
+      "acquire_raw": 0,
+      "release_raw": 0,
+      "gcc_before": 2147483651,
+      "gcc_held": 2147483651,
+      "gcc_after": 2147483651,
+      "acquire_steps": 127,
+      "release_steps": 253,
+      "result": "returned",
+      "gcc_ahb_running": {
+        "gcc_before": false,
+        "gcc_held": false,
+        "gcc_after": false
+      }
+    },
+    "held_state": {
+      "status": 5,
+      "gcc_ahb_before": 2147483651,
+      "gcc_axi": 2097153,
+      "core_domain": 4163041280,
+      "core_domain_config": 67567616,
+      "ahb_clock": 1,
+      "mdp_clock": 1,
+      "vsync_clock": 1,
+      "gcc_ahb_after": 2147483651,
+      "result": "sampled",
+      "gcc_ahb_running_before": false,
+      "gcc_ahb_running_after": false
+    },
+    "held_DPU": {
+      "first_status": 9,
+      "second_status": 9,
+      "first_uptime_ms": 72491,
+      "second_uptime_ms": 72611,
+      "first_intf_frames": 139,
+      "first_mdp_frames": 139,
+      "first_tear_count": 1904084,
+      "first_line_count": 1,
+      "second_intf_frames": 139,
+      "second_mdp_frames": 139,
+      "second_tear_count": 2823125,
+      "second_line_count": 1,
+      "route_status": 7,
+      "GOP_physical": 4232052736,
+      "GOP_stride": 5760,
+      "active_ctl_mask": 1,
+      "active_fetch_mask": 196608,
+      "first_result": "observed",
+      "second_result": "observed",
+      "elapsed_ms": 120,
+      "raw_frame_deltas": {
+        "intf": 0,
+        "mdp": 0,
+        "tear_read": 14
+      },
+      "controllers": [
+        {
+          "interface_active": 2,
+          "fetch_active": 196608,
+          "top": 4026662912,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        }
+      ],
+      "active_pipes": {
+        "0": {
+          "address": 4232052736,
+          "stride": 5760
+        },
+        "1": {
+          "address": 4232052736,
+          "stride": 5760
+        }
+      },
+      "equal_numeric_GOP_addresses": [
+        "0",
+        "1"
+      ]
+    },
+    "held_counter_windows": 1,
+    "GOP_copy": {
+      "windows": 8,
+      "completed_copies": 2386,
+      "elapsed_ms": 80019,
+      "copies_per_second": 29.81791824441695,
+      "mean_show_ms": 20.160428331936295
+    },
+    "new_panel_frame_rate": null,
+    "display_latency_ms": null,
+    "conclusion": "Tear synchronization advanced while both frame counters stayed at 139. CTL0 selected DSI0 with two active VIG pipes. The equal numeric fetch and GOP addresses leave the SMMU mode and actual transfer timing unresolved."
+  },
+  "upstream_display_source_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/upstream-display-next/exact-inputs.json",
+    "sha256": "079592b098b6294b969e46dff991ad00cac9178a7d496e46f2a6542d051fd7df",
+    "bytes": 1268
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/passive-panel-trial-f04563b13560/trial/run.json",
+    "sha256": "7b82d3c9947bac53f7ac2fb6f7a1294a91ece3d7f063dac81b1e1687a3766f0c",
+    "bytes": 1640
+  },
+  "analysis": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v335-held-dpu-3d121da95ebf47fd8e870dc8e013f0ad/passive-panel-trial-f04563b13560/analysis/analysis.json",
+    "sha256": "c62c5449f1e5c66b1319dde5c1c9759f3012e2c8199906825fdb7c5bec664f52",
+    "bytes": 262644
+  },
+  "qualification": {
+    "GPU_desktop": false,
+    "physical_presentation": false,
+    "physical_FT3683": false,
+    "full_GPU": false
+  }
+}

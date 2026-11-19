@@ -1,0 +1,344 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -53,6 +53,7 @@
+ #include "ZornDisplayClockRead334.h"
+ #include "ZornDisplayHeldTiming335.h"
+ #include "ZornRuntimeDisplayCadence344.h"
++#include "ZornScanoutHandoff345.h"
+ #include "touch-source313/ZornTouchThread26.h"
+ #include "ZornGen7OwnedArcVoltage.h"
+ 
+@@ -65,6 +66,7 @@
+ uint32_t displayHeldTimingWords335[ZornDisplayHeldTiming335::Words]{};
+ uint32_t displayCadenceWords344[ZornRuntimeDisplayCadence344::Words]{};
+ uint32_t displayRuntimePublication341 = 0;
++uint32_t displayScanoutWords345[ZornScanoutAlias345::Words]{};
+ uint64_t displayRuntimeDeadline341 = 0;
+ }
+ 
+@@ -96,6 +98,12 @@
+     if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
+     for (unsigned i = 0; i < ZornRuntimeDisplayCadence344::Words; ++i) out[i] = displayCadenceWords344[i];
+ }
++extern "C" void zorn26_scanout_reservation_snapshot345(uint32_t *out)
++{
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornScanoutAlias345::Words; ++i) out[i] = displayScanoutWords345[i];
++}
++extern "C" void zorn26_observe_scanout_alias345(IOService *, uint32_t (&)[ZornScanoutAlias345::Words]);
+ extern "C" void zorn26_run_display_cadence344(
+     IOService *, const uint32_t (&)[ZornDisplayHeldTiming335::Words], uint32_t (&)[ZornRuntimeDisplayCadence344::Words],
+     uint64_t, const uint32_t &);
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -11,6 +11,7 @@
+ #include "ZornDisplayHeldTiming335.h"
+ #include "ZornDisplaySmmu336.h"
+ #include "ZornRuntimeDisplayCadence344.h"
++#include "ZornScanoutHandoff345.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -28,7 +29,8 @@
+ constexpr unsigned Words = ClockStart + ZornDisplayClockRead334::Words;
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(ZornDisplayHeldTiming335::Used + ZornDisplaySmmu336::Words <= ZornDisplayHeldTiming335::Words);
+-static_assert(TeStart + ZornRuntimeDisplayCadence344::Words <= HeldTimingStart);
++constexpr unsigned ScanoutStart = TeStart + ZornRuntimeDisplayCadence344::Words;
++static_assert(ScanoutStart + ZornScanoutAlias345::Words <= HeldTimingStart);
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+ inline unsigned packet(char *out, unsigned cap, const uint32_t (&values)[Words],
+@@ -36,11 +38,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT344", 8);
++    memcpy(p, "K80FT345", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 344);
++    zorn_panic_le236(p, Bytes - 4, 345);
+     return Bytes;
+ }
+ }
+--- /dev/null
++++ b/ZornScanoutAlias345.h
+@@ -0,0 +1,70 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornScanoutHandoff345.h"
++#include <IOKit/IOMemoryDescriptor.h>
++#include <kern/task.h>
++#include <mach/vm_param.h>
++#include <machine/machine_routines.h>
++#include <pexpert/device_tree.h>
++
++extern unsigned long gPhysBase, gPhysSize;
++extern "C" uint64_t kvtophys(vm_offset_t);
++
++namespace ZornScanoutAlias345 {
++
++inline void observe(uint32_t (&out)[Words])
++{
++    out[Status] = ZornScanoutPropertyMissing;
++    DTEntry chosen;
++    const void *data = nullptr;
++    unsigned size = 0;
++    if (SecureDTLookupEntry(nullptr, "/chosen", &chosen) != kSuccess ||
++        SecureDTGetProperty(chosen, ZORN_SCANOUT_PROPERTY, &data, &size) != kSuccess) return;
++
++    enum ZornScanoutFirmwareStatus witness = ZornScanoutNoWitness;
++    out[Status] = ZornScanoutPropertyInvalid;
++    if (!zorn_scanout_decode(data, size, &witness)) return;
++    out[FirmwareStatus] = witness;
++    out[Status] = ZornScanoutFirmwareDenied;
++    if (witness != ZornScanoutReserved) return;
++
++    out[Status] = ZornScanoutKernelGeometryMismatch;
++    if (PAGE_SIZE != 16384 || !zorn_scanout_matches_window(gPhysBase, gPhysSize)) return;
++
++    out[PageBytes] = PAGE_SIZE;
++    out[PhysicalBase] = ZORN_SCANOUT_BACK;
++    out[Extent] = ZORN_SCANOUT_BYTES;
++    out[Status] = ZornScanoutDescriptorFailed;
++    auto *descriptor = IOMemoryDescriptor::withPhysicalAddress(ZORN_SCANOUT_BACK, ZORN_SCANOUT_BYTES,
++                                                                kIODirectionIn | kIOMemoryMapperNone);
++    if (!descriptor) return;
++    IOByteCount contiguous = 0;
++    if (descriptor->getLength() != ZORN_SCANOUT_BYTES ||
++        descriptor->getPhysicalSegment(0, &contiguous, kIOMemoryMapperNone) != ZORN_SCANOUT_BACK ||
++        contiguous < ZORN_SCANOUT_BYTES) {
++        descriptor->release();
++        return;
++    }
++    out[Status] = ZornScanoutMappingFailed;
++    auto *map = descriptor->createMappingInTask(kernel_task, 0,
++        kIOMapAnywhere | kIOMapInhibitCache | kIOMapReadOnly, 0, ZORN_SCANOUT_BYTES);
++    if (map) {
++        out[Status] = ZornScanoutWrongAlias;
++        const auto start = map->getVirtualAddress();
++        if (start && !(start & (PAGE_SIZE - 1)) && map->getLength() == ZORN_SCANOUT_BYTES &&
++            start <= UINTPTR_MAX - ZORN_SCANOUT_BYTES) {
++            for (size_t off = 0; off < ZORN_SCANOUT_BYTES; off += PAGE_SIZE) {
++                if (kvtophys(start + off) != ZORN_SCANOUT_BACK + off) break;
++                ++out[VerifiedPages];
++            }
++            if (out[VerifiedPages] == ZORN_SCANOUT_BYTES / PAGE_SIZE &&
++                kvtophys(start + ZORN_SCANOUT_BYTES - 1) == ZORN_SCANOUT_BACK + ZORN_SCANOUT_BYTES - 1)
++                out[Status] = ZornScanoutAliasVerified;
++        }
++        // No byte of the target was read or written, and DPU never had the alias.
++        map->release();
++    }
++    descriptor->release();
++}
++} // namespace ZornScanoutAlias345
+--- /dev/null
++++ b/ZornScanoutHandoff345.h
+@@ -0,0 +1,103 @@
++/* SPDX-License-Identifier: BSD-2-Clause-Patent */
++#ifndef ZORN_SCANOUT_HANDOFF_345_H
++#define ZORN_SCANOUT_HANDOFF_345_H
++
++#include <stddef.h>
++#include <stdint.h>
++
++#define ZORN_SCANOUT_PROPERTY "zorn,scanout-reservation"
++#define ZORN_SCANOUT_MAGIC UINT32_C(0x3146535a) /* ZSF1 */
++#define ZORN_SCANOUT_FRONT UINT64_C(0xfc400000)
++#define ZORN_SCANOUT_BACK  UINT64_C(0xfd800000)
++#define ZORN_SCANOUT_END   UINT64_C(0xfef00000)
++#define ZORN_SCANOUT_WIDTH 1440
++#define ZORN_SCANOUT_HEIGHT 3200
++#define ZORN_SCANOUT_STRIDE (ZORN_SCANOUT_WIDTH * 4)
++#define ZORN_SCANOUT_BYTES (ZORN_SCANOUT_STRIDE * ZORN_SCANOUT_HEIGHT)
++#define ZORN_SCANOUT_WORDS 8
++
++enum ZornScanoutFirmwareStatus {
++    ZornScanoutNoWitness,
++    ZornScanoutWrongGop,
++    ZornScanoutXnuOverlap,
++    ZornScanoutGcdUnavailable,
++    ZornScanoutGcdConflict,
++    ZornScanoutEfiMapInvalid,
++    ZornScanoutEfiMapConflict,
++    ZornScanoutEfiMapUncovered,
++    ZornScanoutReserved,
++};
++
++enum ZornScanoutKernelStatus {
++    ZornScanoutNotChecked,
++    ZornScanoutPropertyMissing,
++    ZornScanoutPropertyInvalid,
++    ZornScanoutFirmwareDenied,
++    ZornScanoutKernelGeometryMismatch,
++    ZornScanoutDescriptorFailed,
++    ZornScanoutMappingFailed,
++    ZornScanoutWrongAlias,
++    ZornScanoutAliasVerified,
++};
++
++static inline int zorn_scanout_span(uint64_t base, uint64_t length)
++{
++    return length && length <= UINT64_MAX - base;
++}
++
++static inline int zorn_scanout_matches_window(uint64_t base, uint64_t length)
++{
++    const uint64_t end = ZORN_SCANOUT_BACK + ZORN_SCANOUT_BYTES;
++    return zorn_scanout_span(base, length) &&
++        (base >= end || base + length <= ZORN_SCANOUT_FRONT);
++}
++
++static inline uint32_t zorn_scanout_load(const uint8_t *data)
++{
++    return (uint32_t)data[0] | ((uint32_t)data[1] << 8) |
++        ((uint32_t)data[2] << 16) | ((uint32_t)data[3] << 24);
++}
++
++static inline void zorn_scanout_write(uint8_t *data, unsigned word, uint32_t value)
++{
++    for (unsigned i = 0; i != 4; ++i)
++        data[word * 4 + i] = (uint8_t)(value >> (i * 8));
++}
++
++static inline void zorn_scanout_record(uint8_t *data, enum ZornScanoutFirmwareStatus status)
++{
++    zorn_scanout_write(data, 0, ZORN_SCANOUT_MAGIC);
++    zorn_scanout_write(data, 1, (uint32_t)status);
++    const int reserved = status == ZornScanoutReserved;
++    zorn_scanout_write(data, 2, reserved ? ZORN_SCANOUT_FRONT : 0);
++    zorn_scanout_write(data, 3, reserved ? ZORN_SCANOUT_BACK : 0);
++    zorn_scanout_write(data, 4, reserved ? ZORN_SCANOUT_BYTES : 0);
++    zorn_scanout_write(data, 5, reserved ? ZORN_SCANOUT_STRIDE : 0);
++    zorn_scanout_write(data, 6, reserved ? ZORN_SCANOUT_WIDTH : 0);
++    zorn_scanout_write(data, 7, reserved ? ZORN_SCANOUT_HEIGHT : 0);
++}
++
++static inline int zorn_scanout_decode(const void *property, size_t size,
++                                      enum ZornScanoutFirmwareStatus *status)
++{
++    if (!property || size != ZORN_SCANOUT_WORDS * 4) return 0;
++    const uint8_t *data = (const uint8_t *)property;
++    const uint32_t raw = zorn_scanout_load(data + 4);
++    if (zorn_scanout_load(data) != ZORN_SCANOUT_MAGIC || !raw || raw > ZornScanoutReserved)
++        return 0;
++    uint8_t expected[ZORN_SCANOUT_WORDS * 4];
++    zorn_scanout_record(expected, (enum ZornScanoutFirmwareStatus)raw);
++    for (unsigned i = 0; i != sizeof(expected); ++i) {
++        if (data[i] != expected[i]) return 0;
++    }
++    *status = (enum ZornScanoutFirmwareStatus)raw;
++    return 1;
++}
++
++#ifdef __cplusplus
++namespace ZornScanoutAlias345 {
++enum Field : unsigned { Status, FirmwareStatus, PageBytes, VerifiedPages, PhysicalBase, Extent, Words };
++}
++#endif
++
++#endif
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC f9c8d25e22f94078bc5eb38fc9bc93d6 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC c1b3270b1de54826a60207facafd5f79 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"f9c8d25e22f94078bc5eb38fc9bc93d6",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"c1b3270b1de54826a60207facafd5f79",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornManualWire313.h"
++#include "ZornScanoutAlias345.h"
+ #include "ZornK80PassiveDsi343.h"
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IODeviceTreeSupport.h>
+@@ -19,6 +20,7 @@
+ extern "C" void zorn26_display_held_timing335(uint32_t *);
+ extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&)[ZornDisplaySmmu336::Words]);
+ extern "C" void zorn26_display_cadence_snapshot344(uint32_t *);
++extern "C" void zorn26_scanout_reservation_snapshot345(uint32_t *);
+ extern "C" bool zorn26_ui_desktop_ready272();
+ extern "C" void zorn26_enable_gop_epoch343(bool);
+ extern "C" void zorn26_gop_diagnostics344(uint32_t *);
+@@ -272,6 +274,17 @@
+     for (unsigned i = 0; i < Smmu::Words; ++i) out[Used + i] = smmu[i];
+ }
+ 
++extern "C" void zorn26_observe_scanout_alias345(IOService *platform, uint32_t (&out)[ZornScanoutAlias345::Words])
++{
++    PE_Video video{};
++    if (!normal() || !nativeK80(platform) || !inheritedGop318(video)) return;
++    if (video.v_baseAddr != ZORN_SCANOUT_FRONT || video.v_rowBytes != ZORN_SCANOUT_STRIDE) {
++        out[ZornScanoutAlias345::Status] = ZornScanoutKernelGeometryMismatch;
++        return;
++    }
++    ZornScanoutAlias345::observe(out);
++}
++
+ extern "C" void zorn26_run_display_cadence344(
+     IOService *platform, const uint32_t (&held)[ZornDisplayHeldTiming335::Words],
+     uint32_t (&out)[ZornRuntimeDisplayCadence344::Words], uint64_t deadline, const uint32_t &publication)
+@@ -446,6 +459,7 @@
+     if(!zorn26_ui_menu_done313())return false;
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     zorn26_display_cadence_snapshot344(out + ZornManualWire313::TeStart);
++    zorn26_scanout_reservation_snapshot345(out + ZornManualWire313::ScanoutStart);
+     zorn26_display_held_timing335(out + ZornManualWire313::HeldTimingStart);
+     zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
+     zorn26_display_lease325(out + ZornManualWire313::LeaseStart);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26F9C8D25E22F9"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C1B3270B1DE5"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -206,6 +206,7 @@
+ 
+     zorn26_capture_display_clocks334(state.platform, displayClockWords334);
+     zorn26_capture_held_dpu335(state.platform, displayHeldTimingWords335);
++    zorn26_observe_scanout_alias345(state.platform, displayScanoutWords345);
+     const auto &held = displayHeldTimingWords335;
+     if (held[H::GopAddress] == 0xfc400000 && held[H::GopStride] == 5760) {
+         clock_interval_to_deadline(R::OwnerWindowMs, NSEC_PER_MSEC, &displayRuntimeDeadline341);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xf9,0xc8,0xd2,0x5e,0x22,0xf9,0x40,0x78,0xbc,0x5e,0xb3,0x8f,0xc9,0xbc,0x93,0xd6};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc1,0xb3,0x27,0x0b,0x1d,0xe5,0x48,0x26,0xa6,0x02,0x07,0xfa,0xca,0xfd,0x5f,0x79};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xf9,0xc8,0xd2,0x5e,0x22,0xf9,0x40,0x78,0xbc,0x5e,0xb3,0x8f,0xc9,0xbc,0x93,0xd6};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc1,0xb3,0x27,0x0b,0x1d,0xe5,0x48,0x26,0xa6,0x02,0x07,0xfa,0xca,0xfd,0x5f,0x79};

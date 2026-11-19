@@ -1,0 +1,194 @@
+diff -ruN a/ZornGen7HostRing26.cpp b/ZornGen7HostRing26.cpp
+--- a/ZornGen7HostRing26.cpp	2026-11-18 07:32:03
++++ b/ZornGen7HostRing26.cpp	2026-11-18 12:36:06
+@@ -3,6 +3,7 @@
+ extern "C" volatile uint32_t native_adreno_trace_stage;
+ /* SPDX-License-Identifier: BSD-2-Clause-Patent */
+ #include "ZornGen7HostRing26.h"
++#include "ZornWaitFenceScope299.h"
+ #include "ZornApplicationObservation26.h"
+ #include "ZornGen7AppExecution26.h"
+ #include "ZornGen7Present26.h"
+@@ -2290,6 +2291,52 @@
+     if(presentationIssuerHeld){presentationIssuerHeld=false;presentationOwner->storage_->unlockIssuer();}
+     IOLockUnlock(__atomic_load_n(&presentationRegistry,__ATOMIC_ACQUIRE));
+ }
++
++uint64_t ZornGen7HostRing26::awaitApplicationFenceIrq299(uint64_t fence,uint64_t timeoutNs)
++{
++    if(!storage_ || !normal())return timeoutNs;
++    auto &s=*storage_;
++    if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || s.appSerialHeld())return timeoutNs;
++    void *fenceLine=nullptr;
++    auto preflight=[&](uint32_t target)->ZornWaitPreflight299{
++        if(__atomic_load_n(&s.phase,__ATOMIC_ACQUIRE)<6 ||
++           !__atomic_load_n(&s.runtimeReady,__ATOMIC_ACQUIRE) ||
++           __atomic_load_n(&s.stopped,__ATOMIC_ACQUIRE))return ZornWaitPreflight299::Passthrough;
++        s.lockIssuer();
++        const bool valid=s.runtimeReady && bootstrapHealthy() && !s.native.poisoned() &&
++            target>0 && target<=s.native.lastSubmitted();
++        const bool done=valid && s.native.completedFence()>=target;
++        if(valid && !done){
++            uint8_t *base=static_cast<uint8_t *>(s.memory.bo(FHG_GPU_POOL_SLOT).mapping());
++            if(base)fenceLine=base+0xc8100;
++        }
++        s.unlockIssuer();
++        if(!valid)return ZornWaitPreflight299::Passthrough;
++        if(done || !fenceLine)return ZornWaitPreflight299::AlreadyComplete;
++        return ZornWaitPreflight299::WaitIrq;
++    };
++    auto readHwFence=[&]()->uint32_t{
++        __asm__ volatile("dc civac, %0\n\tdsb sy" : : "r"(fenceLine) : "memory");
++        const auto *words=static_cast<const uint32_t *>(fenceLine);
++        return __atomic_load_n(&words[1],__ATOMIC_ACQUIRE);
++    };
++    auto isStopped=[&]()->bool{
++        return __atomic_load_n(&s.stopped,__ATOMIC_ACQUIRE)!=0 || s.irq.halted() || s.gmu.halted() || s.domain.faulted();
++    };
++    auto nowNs=[]()->uint64_t{
++        uint64_t abs=0,ns=0;clock_get_uptime(&abs);absolutetime_to_nanoseconds(abs,&ns);return ns;
++    };
++    const uint32_t target32=static_cast<uint32_t>(fence);
++    auto sleepIrqNs=[&](uint64_t stepNs){
++        uint64_t deadline=0;clock_interval_to_deadline(stepNs,1,&deadline);
++        IOLockLock(s.waitGate);
++        if(!__atomic_load_n(&s.stopped,__ATOMIC_ACQUIRE) && readHwFence()<target32)
++            (void)IOLockSleepDeadline(s.waitGate,&s.irqCandidates,deadline,THREAD_UNINT);
++        IOLockUnlock(s.waitGate);
++    };
++    return zorn26_await_fence_unlocked299(fence,timeoutNs,preflight,readHwFence,isStopped,nowNs,sleepIrqNs);
++}
++
+ extern "C" uint32_t zorn_gen7_present_capture_fence26(void){return ZornGen7HostRing26::capturePresentationFence();}
+ extern "C" int zorn_gen7_present_begin_frame26(uint32_t fence){return ZornGen7HostRing26::beginPresentation(fence);}
+ extern "C" void zorn_gen7_present_end26(void){ZornGen7HostRing26::endPresentation();}
+diff -ruN a/ZornGen7HostRing26.h b/ZornGen7HostRing26.h
+--- a/ZornGen7HostRing26.h	2026-11-18 07:27:38
++++ b/ZornGen7HostRing26.h	2026-11-18 12:36:06
+@@ -51,6 +51,7 @@
+     bool processExecutionHealthy() const;
+     bool processConnectionHeld(class IOUserClient &) const;
+     IOReturn openApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 *&);
++    uint64_t awaitApplicationFenceIrq299(uint64_t,uint64_t);
+     IOReturn dispatchApplicationProcess(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+         uint32_t,const void *,size_t,void *,size_t);
+     IOReturn applicationIoLeases(class IOUserClient &,class ZornGen7AppExecution26 &,ZornGen7ProcessTables26 &,
+diff -ruN a/ZornUfsOwner26.cpp b/ZornUfsOwner26.cpp
+--- a/ZornUfsOwner26.cpp	2026-11-18 12:09:44
++++ b/ZornUfsOwner26.cpp	2026-11-18 12:36:06
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 5968f06ef28b4046b0ba8c9e4c49056c %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC db9363f8a0ac496c807f98f3282cf597 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"5968f06ef28b4046b0ba8c9e4c49056c",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"db9363f8a0ac496c807f98f3282cf597",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+diff -ruN a/ZornUsbCdc26.c b/ZornUsbCdc26.c
+--- a/ZornUsbCdc26.c	2026-11-18 12:09:44
++++ b/ZornUsbCdc26.c	2026-11-18 12:36:06
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN265968F06EF28B"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26DB9363F8A0AC"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+diff -ruN a/ZornWaitFenceScope299.h b/ZornWaitFenceScope299.h
+--- a/ZornWaitFenceScope299.h	1970-01-01 08:00:00
++++ b/ZornWaitFenceScope299.h	2026-11-18 12:36:06
+@@ -0,0 +1,43 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include <stdint.h>
++
++enum class ZornWaitPreflight299 : unsigned {
++    Passthrough = 0,
++    AlreadyComplete = 1,
++    WaitIrq = 2,
++};
++
++// Wait for the hardware ring fence outside per-client serial_, appSerial and
++// issuer locks so concurrent BoImport/BoMap/BoFree/GetStatus/SubmitBatch and
++// presenter lease calls proceed without blocking on GPU execution time.
++// The subsequent normal locked WaitFence call performs actual job retirement.
++template <typename PreflightFn, typename ReadHwFenceFn, typename StoppedFn,
++          typename NowNsFn, typename SleepIrqFn>
++inline uint64_t zorn26_await_fence_unlocked299(
++    uint64_t fence,
++    uint64_t timeoutNs,
++    PreflightFn &&preflight,
++    ReadHwFenceFn &&readHwFence,
++    StoppedFn &&isStopped,
++    NowNsFn &&nowNs,
++    SleepIrqFn &&sleepIrqNs)
++{
++    if (!fence || fence > 0xffffffffULL || !timeoutNs) return timeoutNs;
++    const uint32_t target = static_cast<uint32_t>(fence);
++    const ZornWaitPreflight299 state = preflight(target);
++    if (state == ZornWaitPreflight299::Passthrough) return timeoutNs;
++    if (state == ZornWaitPreflight299::AlreadyComplete) return 0;
++
++    const uint64_t start = nowNs();
++    for (;;) {
++        if (isStopped()) return timeoutNs;
++        if (readHwFence() >= target) return 0;
++        const uint64_t now = nowNs();
++        const uint64_t elapsed = now >= start ? (now - start) : timeoutNs;
++        if (elapsed >= timeoutNs) return 0;
++        const uint64_t remaining = timeoutNs - elapsed;
++        const uint64_t step = remaining < 200000ULL ? remaining : 200000ULL;
++        sleepIrqNs(step);
++    }
++}
+diff -ruN a/direct-runtime/ZornGen7AppIo26.cpp b/direct-runtime/ZornGen7AppIo26.cpp
+--- a/direct-runtime/ZornGen7AppIo26.cpp	2026-11-17 08:37:56
++++ b/direct-runtime/ZornGen7AppIo26.cpp	2026-11-18 12:36:06
+@@ -218,7 +218,16 @@
+ IOReturn ZornGen7AppIoClient26::run(uint32_t method,const void *input,size_t inputBytes,void *output,size_t outputBytes)
+ {
+     zorn26_client_event240(17);
+-    if(!serial_)return kIOReturnNotReady;IOLockLock(serial_);bool tracing261=false;
++    if(!serial_)return kIOReturnNotReady;
++    NativeAdrenoAbiWaitFence adjustedWait299{};
++    if(method==NativeAdrenoMethodWaitFence && input && inputBytes==sizeof(NativeAdrenoAbiWaitFence) &&
++       !outputBytes && owner_){
++        memcpy(&adjustedWait299,input,sizeof(adjustedWait299));
++        if(adjustedWait299.timeout_ns)
++            adjustedWait299.timeout_ns=owner_->awaitApplicationFenceIrq299(adjustedWait299.fence,adjustedWait299.timeout_ns);
++        input=&adjustedWait299;
++    }
++    IOLockLock(serial_);bool tracing261=false;
+     auto done=[&](IOReturn raw){
+         if(tracing261){if(raw)zorn_failure_note261(ZornFailureRun261,uint32_t(raw),
+             raw==kIOReturnBusy||raw==kIOReturnTimeout?ZornFailurePending261:
+diff -ruN a/record-identity/ZornPlatformRecordIdentity26.h b/record-identity/ZornPlatformRecordIdentity26.h
+--- a/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 12:09:44
++++ b/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 12:36:06
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x59,0x68,0xf0,0x6e,0xf2,0x8b,0x40,0x46,0xb0,0xba,0x8c,0x9e,0x4c,0x49,0x05,0x6c};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xdb,0x93,0x63,0xf8,0xa0,0xac,0x49,0x6c,0x80,0x7f,0x98,0xf3,0x28,0x2c,0xf5,0x97};
+diff -ruN a/record-identity/ZornPlatformTrialIdentity26.h b/record-identity/ZornPlatformTrialIdentity26.h
+--- a/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 12:09:44
++++ b/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 12:36:06
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x59,0x68,0xf0,0x6e,0xf2,0x8b,0x40,0x46,0xb0,0xba,0x8c,0x9e,0x4c,0x49,0x05,0x6c};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xdb,0x93,0x63,0xf8,0xa0,0xac,0x49,0x6c,0x80,0x7f,0x98,0xf3,0x28,0x2c,0xf5,0x97};

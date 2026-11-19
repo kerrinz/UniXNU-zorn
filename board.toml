@@ -186,10 +186,40 @@ artwork-display-gamut = "sRGB"
 [adt.defaults.u32]
 sleep-disabled = 1
 
-# Official fixed packaging entry. Default17 baseline remains selected;the26
-# source archive is not advertised as a generic release profile.
+# The catalog default remains the historical profile consumed by the public
+# upstream checkout. Select 23G90 by full name after staging its OS layer.
 [package]
 unixnu = "../UniXNU"
 
 [package.defconfig]
 "ipados-17.7.11-21H461" = "zorn_union_defconfig"
+"ios-26.6.2-23G90" = "zorn_ios26_defconfig"
+
+[os_overrides."ios-26.6.2-23G90"]
+# The archived iPadOS prelink, payload and storage policy do not describe
+# the 23G90 native K80 kernel or the installed iOS 26 root.
+remove = ["ipsw.sha256", "kernel.prelink", "payload", "userdata", "adt"]
+
+[os_overrides."ios-26.6.2-23G90".ipsw]
+url = "https://updates.cdn-apple.com/2026SummerFCS/f768ecdf-e037-44e6-bfa6-949b6d127c4f/iPhone18,1_26.6.2_23G90_Restore.ipsw"
+product = "iPhone18,1"
+version = "26.6.2"
+build = "23G90"
+device_class = "v53ap"
+chip_id = 0x8150
+board_id = 12
+fetch = ["KernelCache", "DeviceTree", "StaticTrustCache"]
+
+[os_overrides."ios-26.6.2-23G90".kernel]
+defconfig = "zorn_ios26_defconfig"
+config_fragments = []
+# The arm64e replay owns its source changes and object list. The generic
+# 4 KiB build and Darwin 23 patch series are not inputs to that replay.
+patch_series = []
+archives = []
+
+[os_overrides."ios-26.6.2-23G90".components]
+include = []
+
+[os_overrides."ios-26.6.2-23G90".package]
+release_backend = "scripts/build-ios26-release.py"

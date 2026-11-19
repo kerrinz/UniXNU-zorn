@@ -1,0 +1,41 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC dc48e662130d4dc28186229f33c6aa7e %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC df2c09e8c23f42cba9b0a3e6e2e78ae9 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -949,6 +949,7 @@
+     (void)thread_terminate(current_thread());panic("K80 GPU progress worker returned");
+ }
+ extern "C" void zorn26_vm_completed_totals264(uint64_t *);
++#include "ZornKnownTask266.h"
+ static unsigned zorn_gpu_progress_next201(void *cookie,char *line,unsigned cap,unsigned completedFrames){
+     auto *p=static_cast<ZornGpuProgress201 *>(cookie);
+     // Callback receives only actual complete transfers. Never acknowledge a
+@@ -976,7 +977,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"dc48e662130d4dc28186229f33c6aa7e",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"df2c09e8c23f42cba9b0a3e6e2e78ae9",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1032,6 +1033,12 @@
+         (unsigned long long)vm264[0],(unsigned long long)vm264[1],(unsigned long long)vm264[2],(unsigned long long)vm264[3]);
+     if(vmBytes264<0 || unsigned(vmBytes264)>=cap-(size-2))return 0;
+     size+=unsigned(vmBytes264)-2;
++    // The retained worker publishes all original task-result stores before
++    // state3. Until then zero means unavailable,never successful hardware.
++    uint32_t known266[32]{};const unsigned knownAvailable266=state==3?1u:0u;
++    if(knownAvailable266)zorn26_native_known_image_observation(known266);
++    size=zorn_known_task_append266(line,cap,size,knownAvailable266,known266);
++    if(!size)return 0;
+     static uint32_t journalCursor248=0;
+     size=zorn_journal_append248(line,cap,size,journalCursor248,zorn26_journal_snapshot248,zorn26_base64_encode);
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}

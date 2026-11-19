@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""Actual new capture deadline plus unchanged269 service/creator failure controls."""
+import argparse,hashlib,importlib.util,json,os,subprocess
+from pathlib import Path
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source',type=Path,required=True);p.add_argument('--touch-common',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--sanitizer',choices=['address-undefined','thread'],required=True);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=False)
+    original=Path(__file__).with_name('check-ios26-ui-service269.py');spec=importlib.util.spec_from_file_location('service269',original);base=importlib.util.module_from_spec(spec);spec.loader.exec_module(base)
+    prefix=base.PREFIX+'\n#define NSEC_PER_SEC 1000000000ULL\nvoid clock_interval_to_deadline(unsigned n,uint64_t scale,uint64_t *out){assert(n==30&&scale==NSEC_PER_SEC);*out=mach_absolute_time()+uint64_t(n)*scale;}\n'
+    source=a.source/'ZornUiSceneService269.cpp';text=source.read_text();actual=text[text.index('class ZornUiSceneService269 final'):]
+    test=base.MAIN.replace('scheduled269=done269=schedulingReturned269=0;','scheduled269=done269=schedulingReturned269=0;captureDeadline270=0;')
+    before='assert(zorn26_ui_scene_done269()&&zorn26_ui_scene_snapshot269(out));';after=before+'assert(!zorn26_ui_scene_capture_ready270());nowTick+=29999;assert(!zorn26_ui_scene_capture_ready270());++nowTick;assert(zorn26_ui_scene_capture_ready270());';assert test.count(before)==1;test=test.replace(before,after)
+    f=a.out/'actual-capture.cpp';f.write_text(prefix+actual+test);exe=a.out/'actual-capture';san='address,undefined' if a.sanitizer=='address-undefined' else 'thread';args=['xcrun','clang++','-std=c++17','-O1','-g','-pthread','-fno-omit-frame-pointer','-fsanitize='+san,'-I'+str(a.source),'-I'+str(a.touch_common),str(f),'-o',str(exe)]
+    env=os.environ|dict(ASAN_OPTIONS='symbolize=0',UBSAN_OPTIONS='symbolize=0:print_stacktrace=0',TSAN_OPTIONS='symbolize=0:halt_on_error=1');r=subprocess.run(args,capture_output=True,env=env,timeout=120);(a.out/'compile.stderr').write_bytes(r.stderr);assert not r.returncode,r.stderr.decode();r=subprocess.run([str(exe)],capture_output=True,env=env,timeout=120);(a.out/'run.stdout').write_bytes(r.stdout);(a.out/'run.stderr').write_bytes(r.stderr);assert not r.returncode,r.stderr.decode();pin=lambda f:dict(path=str(f.resolve()),sha256=hashlib.sha256(f.read_bytes()).hexdigest());result=dict(passed=True,sanitizer=a.sanitizer,source=pin(source),retained_test_base=pin(original),actual_method_bodies_extracted=True,deadline_boundaries_ms=[0,29999,30000],test=pin(f),executable=pin(exe),arguments=args,stdout=r.stdout.decode(),IOKit_and_clock_boundaries_stubbed=True,phone_access=False,settled_UI_image_proven=False);(a.out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print('PASS270 actual capture30sdeadline and retained creator/worker/lifetime failures;',a.sanitizer)
+if __name__=='__main__':main()

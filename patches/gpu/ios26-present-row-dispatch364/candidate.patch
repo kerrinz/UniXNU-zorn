@@ -1,0 +1,41 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -1470,7 +1470,9 @@
+         Live348::seed(target, seedFrom);
+         ++fZornLiveScanout348->out[Trace348::SeededCopies];
+     }
+-    if (auto *live = fZornLiveScanout348; live && !fDiff && fThreads > 1) {
++    // A runnable helper can take rows, but a helper that has not been
++    // scheduled must not hold up a frame. Wait only for claimed stores.
++    if (!fDiff && fThreads > 1) {
+         job.dynamicRows = true;
+         IOLockLock(fHelperLock);
+         fZornRowClaims355 = {cy0, cy1};
+@@ -1481,17 +1483,20 @@
+         IOLockWakeup(fHelperLock, &fHelperGeneration, false);
+         drawClaimedRows355(job, fBlendRow);
+         fHelperJob = nullptr;
+-        const uint64_t joinStart = mach_absolute_time();
++        auto *live = fZornLiveScanout348;
++        const uint64_t joinStart = live ? mach_absolute_time() : 0;
+         while (fHelpersBusy)
+             IOLockSleep(fHelperLock, &fHelpersBusy, THREAD_UNINT);
+         const unsigned joins = fZornHelperJoins355;
+         IOLockUnlock(fHelperLock);
+-        namespace Phase = ZornScanoutPhase349;
+-        ++live->phase[Phase::DynamicRowLayers];
+-        live->phase[Phase::DynamicRowHelperJoins] += joins;
+-        const uint64_t elapsed = zornDisplayUptimeUs348(mach_absolute_time() - joinStart);
+-        if (elapsed > live->phase[Phase::DynamicRowMaxJoinUs])
+-            live->phase[Phase::DynamicRowMaxJoinUs] = uint32_t(elapsed);
++        if (live) {
++            namespace Phase = ZornScanoutPhase349;
++            ++live->phase[Phase::DynamicRowLayers];
++            live->phase[Phase::DynamicRowHelperJoins] += joins;
++            const uint64_t elapsed = zornDisplayUptimeUs348(mach_absolute_time() - joinStart);
++            if (elapsed > live->phase[Phase::DynamicRowMaxJoinUs])
++                live->phase[Phase::DynamicRowMaxJoinUs] = uint32_t(elapsed);
++        }
+         return true;
+     }
+ #endif

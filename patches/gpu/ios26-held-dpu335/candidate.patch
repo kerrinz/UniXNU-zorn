@@ -1,0 +1,452 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -63,7 +63,6 @@
+ #include "ZornPresenterScope298.h"
+ static ZornSerialMenu297 zornSerialShot265;
+ extern "C" bool zorn26_ui_menu_capture_ready313();
+-extern "C" void zorn26_panel_handoff321(IOService *, uint64_t, uint64_t);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+ 
+@@ -2807,7 +2806,6 @@
+         if(kvtophys(live.v_baseaddr+offset)!=live.v_physaddr+offset)return kIOReturnNotReady;
+     if(kvtophys(live.v_baseaddr+full-1)!=live.v_physaddr+full-1)return kIOReturnNotReady;
+     if(!zornOriginalDisplayPath26())return kIOReturnExclusiveAccess;
+-    zorn26_panel_handoff321(&provider, live.v_physaddr, live.v_rowbytes);
+     auto *fb=OSTypeAlloc(IOMobileFramebuffer);if(!fb)return kIOReturnNoMemory;
+     if(!fb->init()){fb->release();return kIOReturnError;}
+     fb->fZornCheckedExtent265=size_t(full); // Source factory already checked every CPU alias page.
+--- /dev/null
++++ b/ZornDisplayHeldTiming335.h
+@@ -0,0 +1,160 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornDisplayClockRead334.h"
++#include "ZornDpuHandoff321.h"
++
++namespace ZornDisplayHeldTiming335 {
++
++enum class Result : uint32_t {
++    NotRun, ClockStateUnavailable, FabricClockInactive, DomainInactive,
++    DisplayBranchInactive, ResetActive, InterfaceUnavailable,
++    ClockChangedDuringRead, WindowExpired, Observed,
++};
++
++enum Field : unsigned {
++    FirstStatus, SecondStatus, FirstMs, SecondMs,
++    FirstIntfFrames, FirstMdpFrames, FirstTearCount, FirstLineCount,
++    SecondIntfFrames, SecondMdpFrames, SecondTearCount, SecondLineCount,
++    RouteStatus, GopAddress, GopStride, ActiveCtl, ActiveFetch, CtlStart,
++    PipeStart = CtlStart + ZornDpuHandoff321::CtlCount * ZornDpuHandoff321::CtlWords,
++    Used = PipeStart + ZornDpuHandoff321::PipeCount * 2,
++    Words = ZornDpuHandoff321::Words,
++};
++static_assert(Used <= Words);
++
++inline constexpr uint32_t kWindowMs = 120;
++inline constexpr uint32_t kMaxWindowMs = 750;
++
++inline Result classify(const uint32_t (&snapshot)[ZornDisplayClockRead334::Words])
++{
++    using namespace ZornDisplayClockRead334;
++    using ZornDisplayTiming318::clockRunning;
++    if (snapshot[Status] != Sampled || !interfaceVoted(snapshot[GccAhbBefore]) ||
++        !interfaceVoted(snapshot[GccAhbAfter])) return Result::ClockStateUnavailable;
++    if (!clockRunning(snapshot[GccAxi])) return Result::FabricClockInactive;
++    constexpr uint32_t powerOn = 1u << 31;
++    constexpr uint32_t controlOrCollapse = 7u;
++    constexpr uint32_t completedPowerEvents = (1u << 16) | (1u << 15);
++    if ((snapshot[Domain] & (powerOn | controlOrCollapse)) != powerOn ||
++        (snapshot[DomainConfig] & completedPowerEvents) != (1u << 16)) {
++        return Result::DomainInactive;
++    }
++    if (!clockRunning(snapshot[Ahb]) || !clockRunning(snapshot[Mdp]) ||
++        !clockRunning(snapshot[Vsync])) return Result::DisplayBranchInactive;
++    return Result::Observed;
++}
++
++template <typename ReadClock>
++Result checkedClock(ReadClock &clock, uint32_t (&state)[ZornDisplayClockRead334::Words])
++{
++    using namespace ZornDisplayClockRead334;
++    sampleUnderLease(clock, state);
++    const auto status = classify(state);
++    if (status != Result::Observed) return status;
++    uint32_t reset = 0;
++    if (!clock(Bank::DispCc, 0, reset)) return Result::ClockStateUnavailable;
++    return (reset & 1) ? Result::ResetActive : Result::Observed;
++}
++
++struct Counters {
++    uint32_t intfFrames;
++    uint32_t mdpFrames;
++    uint32_t tearCount;
++    uint32_t lineCount;
++};
++
++template <typename ReadClock, typename ReadInterface>
++Result sample(ReadClock &clock, ReadInterface &interface, Counters &result)
++{
++    using namespace ZornDisplayClockRead334;
++    result = {};
++    uint32_t state[ZornDisplayClockRead334::Words]{};
++    const auto readiness = checkedClock(clock, state);
++    if (readiness != Result::Observed) return readiness;
++
++    Counters counters{};
++    if (!interface(0xac, counters.intfFrames) ||
++        !interface(0xa4, counters.mdpFrames) ||
++        !interface(0x298, counters.tearCount) ||
++        !interface(0xb0, counters.lineCount)) return Result::InterfaceUnavailable;
++
++    if (checkedClock(clock, state) != Result::Observed) return Result::ClockChangedDuringRead;
++    result = counters;
++    return Result::Observed;
++}
++
++// Run only from the actual board owner after successful lease acquisition.
++// Read two counter sets and then resolve the active K80 CTL and fetch routes.
++template <typename ReadClock, typename ReadInterface, typename ReadMdp, typename Now, typename Delay>
++void observe(ReadClock &clock, ReadInterface &interface, ReadMdp &mdp,
++             Now now, Delay delay, uint32_t gop, uint32_t stride, uint32_t (&out)[Words])
++{
++    using DpuResult = ZornDisplayTiming318::Result;
++    for (auto &value : out) value = 0;
++    Counters first{}, second{};
++    const uint32_t firstStart = now();
++    const auto firstResult = sample(clock, interface, first);
++    out[FirstStatus] = uint32_t(firstResult);
++    if (firstResult != Result::Observed) return;
++
++    const uint32_t start = now();
++    out[FirstMs] = start;
++    out[FirstIntfFrames] = first.intfFrames;
++    out[FirstMdpFrames] = first.mdpFrames;
++    out[FirstTearCount] = first.tearCount;
++    out[FirstLineCount] = first.lineCount;
++
++    delay(kWindowMs);
++    const uint32_t secondStart = now();
++    if (secondStart - firstStart > kMaxWindowMs) {
++        out[SecondStatus] = uint32_t(Result::WindowExpired);
++        return;
++    }
++    const auto secondResult = sample(clock, interface, second);
++    out[SecondStatus] = uint32_t(secondResult);
++    if (secondResult != Result::Observed) return;
++
++    const uint32_t finish = now();
++    if (finish < start || finish - start < kWindowMs || finish - start > kMaxWindowMs) {
++        out[SecondStatus] = uint32_t(Result::WindowExpired);
++        return;
++    }
++    out[SecondMs] = finish;
++    out[SecondIntfFrames] = second.intfFrames;
++    out[SecondMdpFrames] = second.mdpFrames;
++    out[SecondTearCount] = second.tearCount;
++    out[SecondLineCount] = second.lineCount;
++
++    auto checkRouteClock = [&](uint32_t (&state)[ZornDisplayTiming318::Words]) {
++        using namespace ZornDisplayClockRead334;
++        uint32_t raw[ZornDisplayClockRead334::Words]{};
++        if (checkedClock(clock, raw) != Result::Observed) return DpuResult::UnstablePower;
++        state[ZornDisplayTiming318::GccAhb] = raw[GccAhbAfter];
++        state[ZornDisplayTiming318::CoreDomain] = raw[Domain];
++        state[ZornDisplayTiming318::CoreDomainConfig] = raw[DomainConfig];
++        state[ZornDisplayTiming318::AhbClock] = raw[Ahb];
++        state[ZornDisplayTiming318::MdpClock] = raw[Mdp];
++        state[ZornDisplayTiming318::VsyncClock] = raw[Vsync];
++        return DpuResult::Observed;
++    };
++    namespace Handoff = ZornDpuHandoff321;
++    uint32_t route[Handoff::Words]{};
++    Handoff::sampleChecked(checkRouteClock, mdp, finish, gop, stride, route);
++    out[RouteStatus] = route[Handoff::Status];
++    out[GopAddress] = gop;
++    out[GopStride] = stride;
++    if (route[Handoff::Status] != uint32_t(DpuResult::Observed)) return;
++    out[ActiveCtl] = route[Handoff::DisplayCtlMask];
++    out[ActiveFetch] = route[Handoff::ActiveFetchMask];
++    for (unsigned i = 0; i < Handoff::CtlCount * Handoff::CtlWords; ++i) {
++        out[CtlStart + i] = route[Handoff::CtlStart + i];
++    }
++    for (unsigned i = 0; i < Handoff::PipeCount; ++i) {
++        const unsigned at = Handoff::PipeStart + i * Handoff::PipeWords;
++        out[PipeStart + 2 * i] = route[at];
++        out[PipeStart + 2 * i + 1] = route[at + 2];
++    }
++}
++
++} // namespace ZornDisplayHeldTiming335
+--- a/ZornDpuHandoff321.h
++++ b/ZornDpuHandoff321.h
+@@ -31,9 +31,9 @@
+ // Only the display's active SSPPs are read. No source addresses are changed.
+ // Equal physical and register addresses in this snapshot are correlation
+ // evidence; the display's SMMU translation must be checked independently.
+-template <typename ClockRead, typename MdpRead>
+-void sample(ClockRead &clock, MdpRead &mdp, uint32_t stamp, uint32_t gop, uint32_t stride,
+-            uint32_t (&out)[Words])
++template <typename CheckClock, typename MdpRead>
++void sampleChecked(CheckClock &check, MdpRead &mdp, uint32_t stamp, uint32_t gop, uint32_t stride,
++                   uint32_t (&out)[Words])
+ {
+     using namespace ZornDisplayTiming318;
+     for (auto &word : out) word = 0;
+@@ -41,7 +41,7 @@
+     out[GopAddress] = gop;
+     out[GopStride] = stride;
+     uint32_t state[ZornDisplayTiming318::Words]{};
+-    auto result = checkClockState(clock, state);
++    auto result = check(state);
+     for (unsigned i = GccAhb; i <= VsyncClock; ++i)
+         out[i] = state[ZornDisplayTiming318::GccAhb + i - GccAhb];
+     out[Status] = uint32_t(result);
+@@ -77,7 +77,7 @@
+             }
+         }
+     }
+-    if (checkClockState(clock, state) != Result::Observed) {
++    if (check(state) != Result::Observed) {
+         out[Status] = uint32_t(Result::UnstablePower);
+         return;
+     }
+@@ -92,7 +92,7 @@
+             return;
+         }
+     }
+-    if (checkClockState(clock, state) != Result::Observed) {
++    if (check(state) != Result::Observed) {
+         out[Status] = uint32_t(Result::UnstablePower);
+         return;
+     }
+@@ -104,4 +104,14 @@
+         for (unsigned reg = 0; reg < PipeWords; ++reg) out[PipeStart + i * PipeWords + reg] = pipe[i][reg];
+ }
+ 
++template <typename ClockRead, typename MdpRead>
++void sample(ClockRead &clock, MdpRead &mdp, uint32_t stamp, uint32_t gop, uint32_t stride,
++            uint32_t (&out)[Words])
++{
++    auto check = [&](uint32_t (&state)[ZornDisplayTiming318::Words]) {
++        return ZornDisplayTiming318::checkClockState(clock, state);
++    };
++    sampleChecked(check, mdp, stamp, gop, stride, out);
++}
++
+ } // namespace ZornDpuHandoff321
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -51,6 +51,7 @@
+ #include "ZornDisplayResources322.h"
+ #include "ZornDisplayLeaseProbe325.h"
+ #include "ZornDisplayClockRead334.h"
++#include "ZornDisplayHeldTiming335.h"
+ #include "ZornGen7OwnedArcVoltage.h"
+ 
+ namespace {
+@@ -59,6 +60,7 @@
+ uint32_t displayLeaseWords325[ZornDisplayLeaseProbe325::Words]{};
+ uint32_t displayLeasePhase325 = 0;
+ uint32_t displayClockWords334[ZornDisplayClockRead334::Words]{};
++uint32_t displayHeldTimingWords335[ZornDisplayHeldTiming335::Words]{};
+ }
+ 
+ extern "C" void zorn26_display_resources322(uint32_t *out)
+@@ -77,6 +79,13 @@
+     for (unsigned i = 0; i < ZornDisplayClockRead334::Words; ++i) out[i] = displayClockWords334[i];
+ }
+ 
++extern "C" void zorn26_display_held_timing335(uint32_t *out)
++{
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornDisplayHeldTiming335::Words; ++i) out[i] = displayHeldTimingWords335[i];
++}
++
++extern "C" void zorn26_capture_held_dpu335(IOService *, uint32_t (&)[ZornDisplayHeldTiming335::Words]);
+ extern "C" bool zorn26_read_display_gcc325(IOService *, uint32_t &);
+ extern "C" void zorn26_capture_display_clocks334(IOService *, uint32_t (&)[ZornDisplayClockRead334::Words]);
+ 
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -8,6 +8,7 @@
+ #include "ZornDisplayResourceWire322.h"
+ #include "ZornDisplayLeaseProbe325.h"
+ #include "ZornDisplayClockRead334.h"
++#include "ZornDisplayHeldTiming335.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -18,8 +19,8 @@
+ constexpr unsigned TimingStart = TouchEnd + Samples * (1 + CostWords);
+ constexpr unsigned TimingWords = ZornDisplayTiming318::Words;
+ constexpr unsigned TeStart = TimingStart + Samples * TimingWords;
+-constexpr unsigned HandoffStart = TeStart + ZornPanelTe320::Words;
+-constexpr unsigned ResourcesStart = HandoffStart + ZornDpuHandoff321::Words;
++constexpr unsigned HeldTimingStart = TeStart + ZornPanelTe320::Words;
++constexpr unsigned ResourcesStart = HeldTimingStart + ZornDisplayHeldTiming335::Words;
+ constexpr unsigned LeaseStart = ResourcesStart + ZornDisplayResources322::Words;
+ constexpr unsigned ClockStart = LeaseStart + ZornDisplayLeaseProbe325::Words;
+ constexpr unsigned Words = ClockStart + ZornDisplayClockRead334::Words;
+@@ -31,11 +32,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT334", 8);
++    memcpy(p, "K80FT335", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 334);
++    zorn_panic_le236(p, Bytes - 4, 335);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -552,7 +552,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 329948d2e033443eaada873146857dc2 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3d121da95ebf47fd8e870dc8e013f0ad %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1035,7 +1035,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"329948d2e033443eaada873146857dc2",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"3d121da95ebf47fd8e870dc8e013f0ad",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -15,6 +15,7 @@
+ extern "C" void zorn26_display_resources322(uint32_t *);
+ extern "C" void zorn26_display_lease325(uint32_t *);
+ extern "C" void zorn26_display_clock_state334(uint32_t *);
++extern "C" void zorn26_display_held_timing335(uint32_t *);
+ extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+@@ -22,7 +23,6 @@
+ namespace {
+ uint32_t scheduled269=0,done269=0,schedulingReturned269=0;
+ uint32_t status269[ZornManualWire313::Words]{};
+-uint32_t handoff321[ZornDpuHandoff321::Words]{}, handoffReady321 = 0;
+ uint64_t captureDeadline270=0;
+ void store(unsigned i,uint32_t value){__atomic_store_n(status269+i,value,__ATOMIC_RELAXED);}
+ void addFlags(uint32_t flags){__atomic_fetch_or(status269+2,flags,__ATOMIC_RELAXED);}
+@@ -107,9 +107,8 @@
+     }
+ };
+ 
+-bool inheritedGop318()
+-{
+-    PE_Video boot{};
++bool inheritedGop318(PE_Video &boot)
++{
+     constexpr uint64_t first = 0xfc400000;
+     constexpr uint64_t end = first + 0x02b00000;
+     if (PE_current_console(&boot) || boot.v_width != 1440 || boot.v_height != 3200 ||
+@@ -119,6 +118,12 @@
+     }
+     const uint64_t bytes = end - boot.v_baseAddr;
+     return boot.v_rowBytes <= bytes / boot.v_height;
++}
++
++bool inheritedGop318()
++{
++    PE_Video boot{};
++    return inheritedGop318(boot);
+ }
+ 
+ void worker(void *context,wait_result_t) {
+@@ -192,14 +197,25 @@
+     return window(ZornDisplayTiming318::Window::Gcc, 0, value);
+ }
+ 
+-extern "C" void zorn26_panel_handoff321(IOService *provider, uint64_t physical, uint64_t stride)
+-{
+-    if (!normal() || !nativeK80(provider) || !inheritedGop318() || physical > UINT32_MAX ||
+-        stride > UINT32_MAX) return;
+-    DisplayRead318 read;
+-    auto mdp = [&](uint32_t offset, uint32_t &value) { return read.readDpu(offset, value); };
+-    ZornDpuHandoff321::sample(read, mdp, uptimeMs(), uint32_t(physical), uint32_t(stride), handoff321);
+-    __atomic_store_n(&handoffReady321, 1u, __ATOMIC_RELEASE);
++extern "C" void zorn26_capture_held_dpu335(
++    IOService *platform, uint32_t (&out)[ZornDisplayHeldTiming335::Words])
++{
++    PE_Video video{};
++    if (!normal() || !nativeK80(platform) || !inheritedGop318(video) ||
++        video.v_baseAddr > UINT32_MAX || video.v_rowBytes > UINT32_MAX) return;
++
++    using ZornDisplayClockRead334::Bank;
++    DisplayRead318 mmio;
++    auto clock = [&](Bank bank, uint32_t offset, uint32_t &value) {
++        return bank == Bank::Gcc ? mmio.readGccDisplay(offset, value) :
++            mmio(ZornDisplayTiming318::Window::DisplayClock, offset, value);
++    };
++    auto intf = [&](uint32_t offset, uint32_t &value) {
++        return mmio(ZornDisplayTiming318::Window::Interface, offset, value);
++    };
++    auto mdp = [&](uint32_t offset, uint32_t &value) { return mmio.readDpu(offset, value); };
++    ZornDisplayHeldTiming335::observe(clock, intf, mdp, uptimeMs,
++        [](uint32_t ms) { IOSleep(ms); }, uint32_t(video.v_baseAddr), uint32_t(video.v_rowBytes), out);
+ }
+ 
+ extern "C" void zorn26_capture_display_clocks334(
+@@ -220,11 +236,7 @@
+ extern "C" bool zorn26_ui_menu_snapshot313(uint32_t (&out)[ZornManualWire313::Words]) {
+     if(!zorn26_ui_menu_done313())return false;
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+-    if (__atomic_load_n(&handoffReady321, __ATOMIC_ACQUIRE)) {
+-        for (unsigned i = 0; i < ZornDpuHandoff321::Words; ++i) {
+-            out[ZornManualWire313::HandoffStart + i] = handoff321[i];
+-        }
+-    }
++    zorn26_display_held_timing335(out + ZornManualWire313::HeldTimingStart);
+     zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
+     zorn26_display_lease325(out + ZornManualWire313::LeaseStart);
+     zorn26_display_clock_state334(out + ZornManualWire313::ClockStart);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26329948D2E033"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN263D121DA95EBF"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -189,6 +189,7 @@
+         const auto result = setDisplayRegisterResources(hold);
+         if (hold && result == kIOReturnSuccess) {
+             zorn26_capture_display_clocks334(state.platform, displayClockWords334);
++            zorn26_capture_held_dpu335(state.platform, displayHeldTimingWords335);
+         }
+         return uint32_t(result);
+     };
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x32,0x99,0x48,0xd2,0xe0,0x33,0x44,0x3e,0xaa,0xda,0x87,0x31,0x46,0x85,0x7d,0xc2};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x3d,0x12,0x1d,0xa9,0x5e,0xbf,0x47,0xfd,0x8e,0x87,0x0d,0xc8,0xe0,0x13,0xf0,0xad};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x32,0x99,0x48,0xd2,0xe0,0x33,0x44,0x3e,0xaa,0xda,0x87,0x31,0x46,0x85,0x7d,0xc2};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x3d,0x12,0x1d,0xa9,0x5e,0xbf,0x47,0xfd,0x8e,0x87,0x0d,0xc8,0xe0,0x13,0xf0,0xad};

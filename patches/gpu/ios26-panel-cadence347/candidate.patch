@@ -1,0 +1,417 @@
+--- /dev/null
++++ b/ZornK80AutorefreshPeriod347.h
+@@ -0,0 +1,90 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornDpuAutoRefreshTransfer340.h"
++#include "ZornScanoutHandoff345.h"
++
++namespace ZornK80AutorefreshPeriod347 {
++
++namespace Auto = ZornDpuAutoRefreshTransfer340;
++namespace Cmd = Auto::Cmd;
++constexpr uint32_t Enabled = 1u << 31, ExternalTe = 1u << 20;
++constexpr uint32_t TearSyncVsync = 0x288;
++constexpr uint32_t Inherited = Enabled | 60, Comparison = Enabled | 4;
++constexpr unsigned DrainPolls = 25, DrainPollMs = 2;
++
++enum class State { NotQualified, StartChanged, TeDetached, Disabled, Drained, TeRestored, Applied };
++struct Report {
++    State state = State::NotQualified;
++    uint32_t savedVsync = 0, lastBusy = 0, lastLine = 0, lastCounter = 0;
++    unsigned polls = 0;
++    bool keepResources = false;
++};
++
++// The actual present owner must have made BOTH buffers immutable and checked
++// that both VIG pipes address the active buffer. Port writes are restricted to
++// INTF1 TE config and autorefresh, with the live display lease held.
++template<class Port>
++Report change(Port &port, uint32_t from, uint32_t to)
++{
++    Report out;
++    uint32_t config = 0, dsi = 0, te = 0;
++    const bool legal = (from == Inherited && to == Comparison) ||
++                       (from == Comparison && to == Inherited);
++    if (!legal || !port.lease() || !port.readIntf(TearSyncVsync, out.savedVsync) ||
++        !(out.savedVsync & ExternalTe) || !port.readIntf(Cmd::AutoRefreshConfig, config) ||
++        config != from || !port.readTear(Auto::TearEnable, te) || (te & Auto::TearDoneMask) ||
++        !port.readDsi(Cmd::DsiInterrupt, dsi) || (dsi & (Cmd::DsiDoneEnabled | Cmd::DsiError))) return out;
++
++    auto writeVerify = [&](uint32_t off, uint32_t value) {
++        uint32_t readback = 0;
++        return port.lease() && port.writeIntf(off, value) && port.readIntf(off, readback) && readback == value;
++    };
++    const uint32_t detached = out.savedVsync & ~ExternalTe;
++    out.keepResources = true;
++    out.state = State::StartChanged;
++    if (!writeVerify(TearSyncVsync, detached)) return out;
++    out.state = State::TeDetached;
++    if (!writeVerify(Cmd::AutoRefreshConfig, from & ~Enabled)) return out;
++    out.state = State::Disabled;
++
++    // The vendor command encoder detaches external TE before disabling auto
++    // refresh. Treat its active write-line interval as busy as well as INTF's
++    // own auto status. Require two consecutive quiet, identical counters
++    // before the next input is armed. Never touch the debug-bus or write ptr.
++    bool previousQuiet = false;
++    const uint64_t start = port.nowUs();
++    uint64_t last = start;
++    while (out.polls < DrainPolls) {
++        port.delayMs(DrainPollMs);
++        ++out.polls;
++        const uint64_t now = port.nowUs();
++        uint32_t verifyTe = 0;
++        const uint32_t previous = out.lastCounter;
++        if (now <= last || now - start > 50000 || !port.lease() ||
++            !port.readIntf(TearSyncVsync, verifyTe) || verifyTe != detached ||
++            !port.readIntf(Cmd::AutoRefreshConfig, config) || config != (from & ~Enabled) ||
++            !port.readIntf(Cmd::AutoRefreshStatus, out.lastBusy) ||
++            !port.readIntf(Auto::WriteLine, out.lastLine) ||
++            !port.readIntf(Cmd::InterfaceFrames, out.lastCounter) ||
++            !port.readDsi(Cmd::DsiInterrupt, dsi) || (dsi & (Cmd::DsiDoneEnabled | Cmd::DsiError))) return out;
++        last = now;
++        const bool quiet = !out.lastBusy && (!out.lastLine || out.lastLine >= ZORN_SCANOUT_HEIGHT);
++        if (quiet && previousQuiet && previous == out.lastCounter) {
++            out.state = State::Drained;
++            break;
++        }
++        previousQuiet = quiet;
++    }
++    if (out.state != State::Drained) return out;
++    if (!writeVerify(TearSyncVsync, out.savedVsync)) return out;
++    out.state = State::TeRestored;
++    if (!writeVerify(Cmd::AutoRefreshConfig, to)) return out;
++    out.state = State::Applied;
++    // This completed MMIO step alone cannot authorize dropping the owner.
++    // A caller must observe fresh DSI completion and eventually restore the
++    // retained mode or intentionally keep owning the live scanout.
++    return out;
++}
++
++} // namespace ZornK80AutorefreshPeriod347
+--- a/ZornK80PassiveDsi343.h
++++ b/ZornK80PassiveDsi343.h
+@@ -23,13 +23,15 @@
+ // The board owner has already verified CTL0/VIG0/VIG1, the live Apps SMMU
+ // route, and the DSI0 controller. This observer never starts a transfer.
+ template<class Port, class Source, class Note>
+-Report observe(Port &port, const Source &source, uint64_t intervalUs, Note note)
++Report observe(Port &port, const Source &source, uint64_t intervalUs, Note note,
++               uint32_t expectedConfig = Auto::InheritedAutoConfig)
+ {
+     constexpr uint64_t pollLimit = 3500;
+     Report out;
+     uint32_t tearEn = 0, dsi = 0, config = 0, underruns = 0;
+-    if (!intervalUs || intervalUs > 8000000 || !port.lease() ||
+-        !port.readIntf(Cmd::AutoRefreshConfig, config) || config != Auto::InheritedAutoConfig ||
++    if (!intervalUs || intervalUs > 8000000 ||
++        (expectedConfig != Auto::InheritedAutoConfig && expectedConfig != 0x80000004) || !port.lease() ||
++        !port.readIntf(Cmd::AutoRefreshConfig, config) || config != expectedConfig ||
+         !port.readIntf(Cmd::UnderrunCount, underruns) ||
+         !port.readTear(Auto::TearEnable, tearEn) || (tearEn & Auto::TearDoneMask) ||
+         !port.readDsi(Cmd::DsiInterrupt, dsi) || (dsi & (Cmd::DsiError | Cmd::DsiDoneEnabled))) return out;
+@@ -44,7 +46,7 @@
+         poll.before = epoch(source.poll());
+         uint32_t latestEn = 0, latestUnderruns = 0;
+         if (!port.lease() || !port.readTear(Auto::TearEnable, latestEn) || latestEn != tearEn ||
+-            !port.readIntf(Cmd::AutoRefreshConfig, config) || config != Auto::InheritedAutoConfig ||
++            !port.readIntf(Cmd::AutoRefreshConfig, config) || config != expectedConfig ||
+             !port.readIntf(Cmd::UnderrunCount, latestUnderruns) || latestUnderruns != underruns ||
+             !port.readTear(Auto::TearStatus, foundTear) ||
+             !port.readIntf(Auto::WriteLine, poll.writeLine) ||
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -40,11 +40,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT346", 8);
++    memcpy(p, "K80FT347", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 346);
++    zorn_panic_le236(p, Bytes - 4, 347);
+     return Bytes;
+ }
+ }
+--- /dev/null
++++ b/ZornPanelCadenceWire347.h
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++#include "ZornRuntimeDisplayCadence344.h"
++
++namespace ZornPanelCadenceWire347 {
++enum Field : unsigned { Status, Retain, StartedMs, ReadinessChecks, EntryState, EntryPolls,
++    SampleState, ElapsedUs, InterfaceAdvances, FreshDsi, PollingGaps, FirstDsiUs, LastDsiUs,
++    RevertState, RevertPolls, SavedVsync, MeasuredProfile, FinalProfile, Words };
++enum State : unsigned { NotRun, RouteUnavailable, PublicationClosed, ProducerDeadline, AwaitingFlip,
++    EntryRefused, EntryUncertain, ObservationUncertain, RevertUncertain, Compared };
++static_assert(Retain == unsigned(ZornRuntimeDisplayCadence344::Retain));
++static_assert(Words <= unsigned(ZornRuntimeDisplayCadence344::Words));
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC be1d2a4481a54c529f9eca320751a1fd %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3aecbf7c94704dd382d39c8147699ddc %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"be1d2a4481a54c529f9eca320751a1fd",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"3aecbf7c94704dd382d39c8147699ddc",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -2,6 +2,8 @@
+ #include "ZornManualWire313.h"
+ #include "ZornScanoutAlias345.h"
+ #include "ZornScanoutRoundTrip346.h"
++#include "ZornK80AutorefreshPeriod347.h"
++#include "ZornPanelCadenceWire347.h"
+ #include "ZornK80PassiveDsi343.h"
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IODeviceTreeSupport.h>
+@@ -68,12 +70,29 @@
+     static constexpr unsigned kTearIrqWindow = 7;
+     static constexpr unsigned kVigSourcePage = 8;
+     static constexpr unsigned kCtlFlushPage = 9;
+-    IOMemoryMap *maps[10]{};
++    static constexpr unsigned kIntfCadenceWindow = 10;
++    IOMemoryMap *maps[11]{};
+     bool writable_, bufferSwitch_;
+ 
+ public:
+     explicit DisplayRead318(bool writable = false, bool bufferSwitch = false)
+         : writable_(writable), bufferSwitch_(bufferSwitch) {}
++    bool writeIntfForCadence(uint32_t offset, uint32_t value)
++    {
++        namespace P = ZornK80AutorefreshPeriod347;
++        if (!bufferSwitch_ || (offset != P::TearSyncVsync && offset != P::Cmd::AutoRefreshConfig)) return false;
++        uint32_t previous = 0;
++        using namespace ZornDisplayTiming318;
++        if (!read(kIntfCadenceWindow, Windows[unsigned(Window::Interface)], offset, previous)) return false;
++        if (offset == P::TearSyncVsync) {
++            if ((previous ^ value) != P::ExternalTe) return false;
++        } else if (value != P::Inherited && value != P::Comparison &&
++                   value != (P::Inherited & ~P::Enabled) && value != (P::Comparison & ~P::Enabled)) {
++            return false;
++        }
++        return storeWord(kIntfCadenceWindow, offset, value);
++    }
++
+     bool writeDpuForFlip(uint32_t offset, uint32_t value)
+     {
+         using namespace ZornDpuCommandTransfer339;
+@@ -117,7 +136,7 @@
+ 
+     void retainControllerMappings()
+     {
+-        const unsigned windows[] = {kMdpWindow, kDsiWindow, kTearIrqWindow, kVigSourcePage, kCtlFlushPage};
++        const unsigned windows[] = {kMdpWindow, kDsiWindow, kTearIrqWindow, kVigSourcePage, kCtlFlushPage, kIntfCadenceWindow};
+         for (unsigned index : windows) {
+             if (maps[index]) maps[index]->retain();
+         }
+@@ -169,7 +188,7 @@
+             IODeviceMemory *memory = IODeviceMemory::withRange(range.address, range.bytes);
+             if (!memory) return false;
+             const bool writes = writable_ && (index == kDsiWindow || index == kTearIrqWindow ||
+-                                                (bufferSwitch_ && (index == kVigSourcePage || index == kCtlFlushPage)));
++                                                (bufferSwitch_ && (index == kVigSourcePage || index == kCtlFlushPage || index == kIntfCadenceWindow)));
+             auto *map = memory->map(kIOMapAnywhere | kIOMapInhibitCache | (writes ? 0 : kIOMapReadOnly));
+             memory->release();
+             if (!map) return false;
+@@ -314,7 +333,7 @@
+     namespace H = ZornDisplayHeldTiming335;
+     namespace S = ZornDisplaySmmu336;
+     namespace T = ZornK80PassiveDsi343;
+-    namespace R = ZornRuntimeDisplayCadence344;
++    namespace R = ZornPanelCadenceWire347;
+     const auto *smmu = held + H::Used;
+     out[R::Status] = R::RouteUnavailable;
+     const uint32_t address = held[H::GopAddress], stride = held[H::GopStride];
+@@ -327,7 +346,7 @@
+     }
+ 
+     uint64_t reserve = 0;
+-    nanoseconds_to_absolutetime(uint64_t(R::SampleWindowUs + 5000000) * 1000, &reserve);
++    nanoseconds_to_absolutetime(uint64_t(7000000) * 1000, &reserve);
+     out[R::Status] = R::ProducerDeadline;
+     bool live = false;
+     while (out[R::ReadinessChecks] < 350) {
+@@ -370,6 +389,9 @@
+         bool writeMdp(uint32_t off, uint32_t value) { return lease() && mmio.writeDpuForFlip(off, value); }
+         bool readIntf(uint32_t off, uint32_t &value) {
+             return mmio(ZornDisplayTiming318::Window::Interface, off, value);
++        }
++        bool writeIntf(uint32_t off, uint32_t value) {
++            return lease() && mmio.writeIntfForCadence(off, value);
+         }
+         bool readTear(uint32_t off, uint32_t &value) { return mmio.readTear(off, value); }
+         bool writeTear(uint32_t off, uint32_t value) { return lease() && mmio.writeTear(off, value); }
+@@ -408,11 +430,13 @@
+         }
+     }
+     namespace F = ZornScanoutFlipWire346;
++    out[R::Status] = R::AwaitingFlip;
+     flip[F::Status] = F::WriterUnavailable;
+     struct FlipContext {
+         Port &port;
+         uint32_t (&out)[F::Words];
+-    } context{port, flip};
++        uint32_t *cadence;
++    } context{port, flip, out};
+     zorn26_with_gop_writer339(address, stride, [](void *cookie) {
+         namespace A = ZornScanoutAlias345;
+         namespace D = ZornDpuAutoRefreshTransfer340;
+@@ -452,9 +476,40 @@
+         }
+ 
+         const auto report = ZornScanoutRoundTrip346::flipAndRestore(p, [&] {
++            namespace P = ZornK80AutorefreshPeriod347;
++            auto *rows = ctx.cadence;
+             f[F::HoldStartedMs] = uptimeMs();
+-            IOSleep(750);
+-            return p.lease();
++            const auto entry = P::change(p, P::Inherited, P::Comparison);
++            rows[R::EntryState] = uint32_t(entry.state);
++            rows[R::EntryPolls] = entry.polls;
++            rows[R::SavedVsync] = entry.savedVsync;
++            if (entry.state != P::State::Applied) {
++                rows[R::Status] = entry.keepResources ? R::EntryUncertain : R::EntryRefused;
++                return !entry.keepResources;
++            }
++            rows[R::Status] = R::ObservationUncertain;
++            rows[R::MeasuredProfile] = P::Comparison;
++            rows[R::StartedMs] = uptimeMs();
++            struct StaticSource { T::Stamp::Frame poll() const { return {}; } } still;
++            const auto sample = T::observe(p, still, 1500000,
++                [&](const auto &edge, auto) {
++                    if (!rows[R::FirstDsiUs]) rows[R::FirstDsiUs] = uint32_t(edge.endUs);
++                    rows[R::LastDsiUs] = uint32_t(edge.endUs);
++                }, P::Comparison);
++            rows[R::SampleState] = uint32_t(sample.state) + 1u;
++            rows[R::ElapsedUs] = uint32_t(sample.elapsedUs);
++            rows[R::InterfaceAdvances] = sample.interfaceAdvances;
++            rows[R::FreshDsi] = sample.freshDsi;
++            rows[R::PollingGaps] = sample.pollingGaps;
++            if (sample.state != T::State::Complete || sample.retain) return false;
++            rows[R::Status] = R::RevertUncertain;
++            const auto revert = P::change(p, P::Comparison, P::Inherited);
++            rows[R::RevertState] = uint32_t(revert.state);
++            rows[R::RevertPolls] = revert.polls;
++            if (revert.state != P::State::Applied) return false;
++            rows[R::FinalProfile] = P::Inherited;
++            rows[R::Status] = R::Compared;
++            return true;
+         });
+         f[F::Forward] = report.forward[D::Status];
+         f[F::Restore] = report.restore[D::Status];
+@@ -472,67 +527,7 @@
+         }
+         return retain;
+     }, &context);
+-    if (flip[F::Retain]) {
+-        out[R::Status] = R::ArmUnavailable;
+-        out[R::Retain] = 1;
+-        out[R::StartedMs] = uptimeMs();
+-        return;
+-    }
+-
+-    struct Source {
+-        mutable T::Stamp::Frame latest;
+-        T::Stamp::Frame poll() const {
+-            zorn26_visible_gop_epoch343(latest);
+-            return latest;
+-        }
+-    } owner;
+-    struct EnableVisibility {
+-        EnableVisibility() { zorn26_enable_gop_epoch343(true); }
+-        ~EnableVisibility() { zorn26_enable_gop_epoch343(false); }
+-    } enabled;
+-    // Hardware observations can proceed before a compositor epoch is
+-    // available. The observer counts such completed transfers as unbound.
+-    if (port.lease())
+-        port.readIntf(T::Cmd::AutoRefreshConfig, out[R::AutoRefreshConfig]);
+-    out[R::StartedMs] = uptimeMs();
+-    R::CopyToDsi copyToDsi;
+-    const auto report = T::observe(port, owner, R::SampleWindowUs,
+-        [&](const auto &p, T::Ownership::Result status) {
+-            const auto seen = uint32_t(p.endUs);
+-            if (!out[R::FirstDsiUs]) out[R::FirstDsiUs] = seen;
+-            out[R::LastDsiUs] = seen;
+-            if (status == T::Ownership::Result::CompleteFirst || status == T::Ownership::Result::CompleteChanged ||
+-                status == T::Ownership::Result::CompleteRepeated) {
+-                const auto &stamp = owner.latest;
+-                if (stamp.qualified() && stamp.epoch == p.after.sequence) {
+-                    out[R::LastKnownSwap] = stamp.swap;
+-                    out[R::LastKnownFence] = stamp.producerFence;
+-                    copyToDsi.add(stamp.copiedUs, p.endUs);
+-                }
+-            }
+-        });
+-    switch (report.state) {
+-        case T::State::ConfigUnavailable: out[R::Status] = R::ConfigUnavailable; break;
+-        case T::State::CannotArm: out[R::Status] = R::ArmUnavailable; break;
+-        case T::State::Interrupted: out[R::Status] = R::Interrupted; break;
+-        case T::State::Complete: out[R::Status] = R::Completed; break;
+-    }
+-    out[R::Retain] = report.retain;
+-    out[R::ElapsedUs] = uint32_t(report.elapsedUs);
+-    out[R::InterfaceAdvances] = report.interfaceAdvances;
+-    out[R::FreshDsi] = report.freshDsi;
+-    out[R::UnknownContent] = report.unbound;
+-    out[R::ChangedContent] = report.changed;
+-    out[R::RepeatedContent] = report.repeated;
+-    out[R::FirstContent] = report.first;
+-    out[R::PollingGaps] = report.pollingGaps;
+-    copyToDsi.record(out);
+-    zorn26_enable_gop_epoch343(false);
+-    zorn26_gop_diagnostics344(out);
+-    if (report.retain) {
+-        port.mmio.retainControllerMappings();
+-        zorn26_retain_gop_on_transfer_uncertainty343();
+-    }
++    out[R::Retain] = flip[F::Retain];
+ }
+ 
+ extern "C" void zorn26_capture_display_clocks334(
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BE1D2A4481A5"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN263AECBF7C9470"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbe,0x1d,0x2a,0x44,0x81,0xa5,0x4c,0x52,0x9f,0x9e,0xca,0x32,0x07,0x51,0xa1,0xfd};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x3a,0xec,0xbf,0x7c,0x94,0x70,0x4d,0xd3,0x82,0xd3,0x9c,0x81,0x47,0x69,0x9d,0xdc};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbe,0x1d,0x2a,0x44,0x81,0xa5,0x4c,0x52,0x9f,0x9e,0xca,0x32,0x07,0x51,0xa1,0xfd};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x3a,0xec,0xbf,0x7c,0x94,0x70,0x4d,0xd3,0x82,0xd3,0x9c,0x81,0x47,0x69,0x9d,0xdc};

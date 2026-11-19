@@ -1,0 +1,46 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -1949,7 +1949,7 @@
+     if(!raw && (actual!=p || s.processSelected!=p || p->state_.detached))raw=kIOReturnNotReady;
+     s.unlockIssuer();return raw;
+ }
+-IOReturn ZornGen7HostRing26::leaveApplicationContext(ZornGen7AppExecution26 &execution,bool waitExpired)
++IOReturn ZornGen7HostRing26::leaveApplicationContext(ZornGen7AppExecution26 &execution,bool keepPending)
+ {
+     auto &s=*storage_;s.lockIssuer();auto done=[&](IOReturn raw){s.unlockIssuer();return raw;};
+     if(s.hfi || s.appExecution!=&execution || !applicationOperationHeld() || !bootstrapHealthy() ||
+@@ -1962,7 +1962,7 @@
+     if(p!=s.appOperationProcess || p->ringOwner_!=this || p->domain_!=&s.domain ||
+        p->clientOwner_!=execution.client_ || p->clientTask_!=execution.task_ || !p->clientOpen_ ||
+        p->clientClosed_ || !p->vmAttached_ || p->vmDetached_ || p->state_.poisoned)return done(kIOReturnNotReady);
+-    if(waitExpired && (s.native.outstanding() || s.runtimeSubmit.outstanding() ||
++    if(keepPending && (s.native.outstanding() || s.runtimeSubmit.outstanding() ||
+        p->vm_.hasPendingSubmissionResources() ||
+        (p->clientState_ && p->clientState_->submit.outstanding())))return done(kIOReturnSuccess);
+     // Existing transition drains real fences and observes hardware idle,then
+@@ -2026,17 +2026,23 @@
+     // A wrong/foreign scope cannot clear or unlock the legitimate owner.
+     if(!matches){s.unlockIssuer();return kIOReturnNotReady;}
+     const bool reportedExpiry=raw==kIOReturnTimeout && s.appFenceWaitExpired;
++    // Native submission has published a real pending fence/queue/resource set.
++    // Returning the actual success does not require completion. Leave keeps
++    // the selected owner only while those actual pending predicates hold;
++    // foreign handover,normal release and all failure paths still drain/refuse.
++    const bool submitted=!raw && s.appOperationKind==ZornGen7AppOperation26::Submit &&
++        applicationOperationHeld() && bootstrapHealthy();
+     bool waitExpired=reportedExpiry && applicationOperationHeld() && bootstrapHealthy();
+     if((!raw && !bootstrapHealthy()) || (reportedExpiry && !waitExpired))raw=kIOReturnNotReady;
+     const bool fatal=(raw==kIOReturnTimeout && !waitExpired) || raw==kIOReturnIOError ||
+         raw==kIOReturnNotReady || raw==kIOReturnNotPermitted;
+     s.unlockIssuer();
+     if(!fatal && !s.hfi){
+-        const auto contextRaw=leaveApplicationContext(execution,waitExpired);
++        const auto contextRaw=leaveApplicationContext(execution,waitExpired || submitted);
+         if(contextRaw){raw=contextRaw;waitExpired=false;}
+     }
+     s.lockIssuer();
+-    if(waitExpired && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
++    if((waitExpired || submitted) && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
+     if(!raw && !bootstrapHealthy())raw=kIOReturnNotReady;
+     s.appOperationThread=THREAD_NULL;s.appOperationPending=false;s.appFenceWaitExpired=false;
+     s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appOperationProcess=nullptr;s.appExecution=nullptr;

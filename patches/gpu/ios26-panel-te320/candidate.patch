@@ -1,0 +1,238 @@
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -3,6 +3,7 @@
+ 
+ #include "ZornUiSceneWire269.h"
+ #include "ZornDisplayTiming318.h"
++#include "ZornPanelTe320.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -12,7 +13,8 @@
+ constexpr unsigned CostWords = 16;
+ constexpr unsigned TimingStart = TouchEnd + Samples * (1 + CostWords);
+ constexpr unsigned TimingWords = ZornDisplayTiming318::Words;
+-constexpr unsigned Words = TimingStart + Samples * TimingWords;
++constexpr unsigned TeStart = TimingStart + Samples * TimingWords;
++constexpr unsigned Words = TeStart + ZornPanelTe320::Words;
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+@@ -21,11 +23,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT318", 8);
++    memcpy(p, "K80FT320", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 318);
++    zorn_panic_le236(p, Bytes - 4, 320);
+     return Bytes;
+ }
+ }
+--- /dev/null
++++ b/ZornPanelTe320.h
+@@ -0,0 +1,98 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornPanelTe320 {
++
++// Live zorn FDT: primary DSI TE at TLMM GPIO86. Pineapple pinctrl:
++// TLMM + 0x100000 + 0x1000 * 86, mux selector 1 = mdp_vsync.
++inline constexpr uint64_t Address = 0x0f156000;
++inline constexpr unsigned RegisterBytes = 8;
++inline constexpr unsigned SampleUs = 160000;
++inline constexpr unsigned PollUs = 10;
++inline constexpr unsigned PollLimit = SampleUs / PollUs + 1;
++inline constexpr unsigned EdgeLimit = 32;
++
++enum Index : unsigned {
++    Status, StartUptimeMs, InitialCtl, FinalCtl, ElapsedUs, Polls, MaxGapUs,
++    FallingEdges, FirstEdgeUs, Words = FirstEdgeUs + EdgeLimit
++};
++
++enum class Outcome : uint32_t {
++    NotRun, NoPresentation, ReadUnavailable, UnexpectedPad, PadChanged,
++    Incomplete, Observed
++};
++
++inline bool isTearingInput(uint32_t ctl)
++{
++    constexpr unsigned muxMask = 0xf << 2;
++    constexpr unsigned mdpVsync = 1 << 2;
++    constexpr unsigned outputEnable = 1 << 9;
++    constexpr unsigned egpioPresent = 1 << 11;
++    constexpr unsigned localEnable = 1 << 12;
++    return (ctl & (muxMask | outputEnable)) == mdpVsync &&
++           (!(ctl & egpioPresent) || (ctl & localEnable));
++}
++
++// The caller owns a preemptible worker and read-only mapping. Hold the
++// existing mux stable and record the raw falling edges seen by the vendor
++// TE interrupt. A missed short pulse is possible between reads.
++template <typename Read, typename Time, typename Delay>
++void sample(Read &read, Time &nowUs, Delay &delay, bool presented, uint32_t (&out)[Words])
++{
++    for (auto &word : out) word = 0;
++    out[Status] = uint32_t(Outcome::NoPresentation);
++    if (!presented) return;
++
++    out[Status] = uint32_t(Outcome::ReadUnavailable);
++    if (!read(0, out[InitialCtl])) return;
++    if (!isTearingInput(out[InitialCtl])) {
++        out[Status] = uint32_t(Outcome::UnexpectedPad);
++        return;
++    }
++
++    const uint64_t start = nowUs();
++    out[StartUptimeMs] = uint32_t(start / 1000);
++    uint32_t last = 0;
++    uint32_t prev = 0;
++    unsigned polls = 0;
++    unsigned edges = 0;
++    auto outcome = Outcome::Incomplete;
++    for (; polls < PollLimit; ++polls) {
++        uint32_t io = 0;
++        if (!read(4, io)) {
++            outcome = Outcome::ReadUnavailable;
++            break;
++        }
++        const uint64_t when = nowUs();
++        if (when < start || when - start < last || when - start > UINT32_MAX) break;
++        const uint32_t elapsed = uint32_t(when - start);
++        const uint32_t gap = elapsed - last;
++        if (gap > out[MaxGapUs]) out[MaxGapUs] = gap;
++        last = elapsed;
++        if (polls && (prev & 1) && !(io & 1)) {
++            if (edges == EdgeLimit) break;
++            out[FirstEdgeUs + edges++] = elapsed;
++        }
++        prev = io;
++        if (elapsed >= SampleUs) {
++            ++polls;
++            outcome = Outcome::Observed;
++            break;
++        }
++        delay(PollUs);
++    }
++
++    out[ElapsedUs] = last;
++    out[Polls] = polls;
++    out[FallingEdges] = edges;
++    if (!read(0, out[FinalCtl])) {
++        outcome = Outcome::ReadUnavailable;
++    } else if (out[FinalCtl] != out[InitialCtl]) {
++        outcome = Outcome::PadChanged;
++    }
++    out[Status] = uint32_t(outcome);
++}
++
++} // namespace ZornPanelTe320
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 40e40ca097bf4cfa85552460cadb77b7 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC b3739708067149e8a8f948641148f4cc %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"40e40ca097bf4cfa85552460cadb77b7",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"b3739708067149e8a8f948641148f4cc",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -44,7 +44,8 @@
+ }
+ // Access only the fixed K80 read-only windows, on the existing bounded observer thread.
+ class DisplayRead318 {
+-    IOMemoryMap *maps[3]{};
++    static constexpr unsigned kTeWindow = 3;
++    IOMemoryMap *maps[4]{};
+ 
+ public:
+     ~DisplayRead318()
+@@ -57,8 +58,18 @@
+     bool operator()(ZornDisplayTiming318::Window window, uint32_t offset, uint32_t &value)
+     {
+         const unsigned index = unsigned(window);
+-        if (index >= sizeof(maps) / sizeof(maps[0])) return false;
+-        const auto &range = ZornDisplayTiming318::Windows[index];
++        if (index >= kTeWindow) return false;
++        return read(index, ZornDisplayTiming318::Windows[index], offset, value);
++    }
++
++    bool readTe(uint32_t offset, uint32_t &value)
++    {
++        return read(kTeWindow, {ZornPanelTe320::Address, ZornPanelTe320::RegisterBytes}, offset, value);
++    }
++
++private:
++    bool read(unsigned index, const ZornDisplayTiming318::Range &range, uint32_t offset, uint32_t &value)
++    {
+         if ((offset & 3) || offset > range.bytes - sizeof(uint32_t)) return false;
+         if (!maps[index]) {
+             IODeviceMemory *memory = IODeviceMemory::withRange(range.address, range.bytes);
+@@ -131,6 +142,22 @@
+             ZornDisplayTiming318::sample(readPanel, displayed, uptimeMs(), timing, stopPanelRead);
+             const unsigned timingAt = ZornManualWire313::TimingStart + n * ZornManualWire313::TimingWords;
+             for (unsigned i = 0; i < ZornManualWire313::TimingWords; ++i) store(timingAt + i, timing[i]);
++            // Read TLMM once at the end of the existing cost windows. The
++            // sampling never changes mux, IRQ routing, or any display clock.
++            if (n + 1 == ZornManualWire313::Samples) {
++                uint32_t te[ZornPanelTe320::Words]{};
++                auto read = [&](uint32_t offset, uint32_t &value) { return readPanel.readTe(offset, value); };
++                auto nowUs = [] {
++                    uint64_t ns = 0;
++                    absolutetime_to_nanoseconds(mach_absolute_time(), &ns);
++                    return ns / 1000;
++                };
++                auto delay = [](unsigned microseconds) { IODelay(microseconds); };
++                ZornPanelTe320::sample(read, nowUs, delay, displayed && normal(), te);
++                for (unsigned i = 0; i < ZornPanelTe320::Words; ++i) {
++                    store(ZornManualWire313::TeStart + i, te[i]);
++                }
++            }
+             store(3,n+1);
+             if(n+1<ZornManualWire313::Samples)IOSleep(10000);
+         }
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2640E40CA097BF"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B37397080671"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x40,0xe4,0x0c,0xa0,0x97,0xbf,0x4c,0xfa,0x85,0x55,0x24,0x60,0xca,0xdb,0x77,0xb7};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb3,0x73,0x97,0x08,0x06,0x71,0x49,0xe8,0xa8,0xf9,0x48,0x64,0x11,0x48,0xf4,0xcc};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x40,0xe4,0x0c,0xa0,0x97,0xbf,0x4c,0xfa,0x85,0x55,0x24,0x60,0xca,0xdb,0x77,0xb7};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb3,0x73,0x97,0x08,0x06,0x71,0x49,0xe8,0xa8,0xf9,0x48,0x64,0x11,0x48,0xf4,0xcc};

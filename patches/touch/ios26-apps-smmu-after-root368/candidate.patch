@@ -1,0 +1,37 @@
+--- a/GenericARMPE.cpp
++++ b/GenericARMPE.cpp
+@@ -344,7 +344,9 @@
+     zorn26_cpu_presenter_start(this);
+     // Independent, explicit K80 FT3683 creator. The selector's absence leaves
+     // the original platform/presenter path without touch bus or HID startup.
+-    zorn26_touch_platform_start(this);
++    unsigned nativeRoot26 = 0;
++    if (!PE_parse_boot_argn("zorn26_root", &nativeRoot26, sizeof(nativeRoot26)))
++        zorn26_touch_platform_start(this);
+ 
+     // First K80 platform trial stops at CPU/GIC/PSCI+registered expert.
+     // No houji display/backlight,CPU DVFS,GPU/battery or desktop stand-ins.
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -35,6 +35,7 @@
+ #include "ZornPresenterStartup26.h"
+ #include "ZornFramebufferProgress26.h"
+ #include "ZornTouchTrialSnapshot26.h"
++#include "ZornTouchPlatformStart26.h"
+ #include "ZornGen7PlatformBoardStart26.h"
+ #include "ZornGen7RegistryStartup26.h"
+ extern "C" bool zorn26_gpu_platform_startup_result26(ZornGen7RegistryStartupResult26 &);
+@@ -113,7 +114,12 @@
+     zorn26_boot_stage328(0xb8);
+     // Repeated IOFindBSDRoot calls cannot repeat initialization or binding.
+     // Every real partial/failure stays in the original owner's status.
+-    (void)owner->bindRoot(index, start, bytes);
++    const auto root = owner->bindRoot(index, start, bytes);
++    // UFS has finished its APPs SMMU publication attempt and has
++    // registered the original root successfully.
++    // Touch creates its own worker and still checks the live mapping.
++    if (root.rootBindReturned && root.phase == ZornUfsOwner26::Phase::RootRegistered)
++        zorn26_touch_platform_start(IOService::getPlatform());
+ }
+ 
+ ZornUfsOwner26::Status ZornUfsOwner26::prepare() {

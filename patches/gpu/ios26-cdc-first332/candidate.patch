@@ -1,0 +1,194 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -184,13 +184,7 @@
+         ? Phase::RootRegistered : Phase::RootRefused;
+     const Status result = status_;
+     IOLockUnlock(gate_);
+-    if (result.phase == Phase::RootRegistered) {
+-        zorn26_boot_stage328(0xa3);
+-        // Only this successful registration path can dispatch the existing
+-        // GPU owner. No UFS lock is held while acquiring its separate gate.
+-        if (!zorn26_gpu_board_platform_start(IOService::getPlatform()))
+-            zorn26_boot_stage328(0xb6);
+-    }
++    if (result.phase == Phase::RootRegistered) zorn26_boot_stage328(0xa3);
+     return result;
+ }
+ 
+@@ -558,7 +552,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 925cc8e2acfd412da5d837362b701948 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 2478447336e64832ba3daa2286739b46 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -981,18 +975,36 @@
+         [](){return mach_absolute_time();},[](){IOSleep(10);});
+ }
+ 
+-static void zorn_gpu_deferred_worker201(void *cookie,wait_result_t){
+-    auto *p=static_cast<ZornGpuProgress201 *>(cookie);
+-    __atomic_store_n(&p->worker,current_thread(),__ATOMIC_RELEASE);
+-    __atomic_store_n(&p->state,2,__ATOMIC_RELEASE);
+-    if(zorn26_gpu_diagnostic_gate203(1)){
+-        const unsigned actual=zorn26_gmu_validate_smr_after_checkpoint();
+-        __atomic_store_n(&p->result,actual,__ATOMIC_RELAXED);
+-        __atomic_store_n(&p->state,3,__ATOMIC_RELEASE);
+-    }else __atomic_store_n(&p->state,5,__ATOMIC_RELEASE); // Explicit diagnostic abort; GPU not called.
+-    __atomic_store_n(&p->worker,THREAD_NULL,__ATOMIC_RELEASE);
++extern "C" bool zorn26_gmu_deferred_ready252();
++
++static void zorn_gpu_deferred_worker201(void *cookie, wait_result_t)
++{
++    auto *p = static_cast<ZornGpuProgress201 *>(cookie);
++    __atomic_store_n(&p->worker, current_thread(), __ATOMIC_RELEASE);
++    bool completed = false;
++    // The CDC callback schedules this worker only after three complete
++    // transfers. Do not launch the board from the UFS or USB owner context.
++    if (zorn26_gpu_board_platform_start(IOService::getPlatform())) {
++        uint64_t deadline = 0;
++        clock_interval_to_deadline(30, NSEC_PER_SEC, &deadline);
++        const bool ready = zorn_gpu_early_wait252(deadline, zorn26_gmu_deferred_ready252,
++            []() { return mach_absolute_time(); }, []() { IOSleep(10); });
++        if (ready) {
++            __atomic_fetch_or(&zornEarlyFlags252, 4u, __ATOMIC_RELEASE);
++            __atomic_store_n(&p->state, 2, __ATOMIC_RELEASE);
++            if (zorn26_gpu_diagnostic_gate203(1)) {
++                const unsigned actual = zorn26_gmu_validate_smr_after_checkpoint();
++                __atomic_store_n(&p->result, actual, __ATOMIC_RELAXED);
++                __atomic_store_n(&p->state, 3, __ATOMIC_RELEASE);
++                completed = true;
++            }
++        } else zorn26_boot_stage328(0xbd);
++    } else zorn26_boot_stage328(0xb6);
++    if (!completed) __atomic_store_n(&p->state, 5, __ATOMIC_RELEASE);
++    __atomic_store_n(&p->worker, THREAD_NULL, __ATOMIC_RELEASE);
+     p->owner->release();
+-    (void)thread_terminate(current_thread());panic("K80 GPU progress worker returned");
++    (void)thread_terminate(current_thread());
++    panic("K80 GPU progress worker returned");
+ }
+ extern "C" void zorn26_vm_completed_totals264(uint64_t *);
+ #include "ZornKnownTask266.h"
+@@ -1023,7 +1035,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"925cc8e2acfd412da5d837362b701948",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"2478447336e64832ba3daa2286739b46",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1122,44 +1134,34 @@
+ }
+ 
+ 
+-extern "C" bool zorn26_gmu_deferred_ready252();
+-static void zorn_gpu_early_worker252(void *context,wait_result_t) {
+- auto *owner=static_cast<ZornUfsOwner26 *>(context);
+- bool entered=false;
+- if(zorn_early_mode252()==1 && preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled()){
+-  zorn26_boot_stage328(0xa5);
+-  uint64_t deadline=0;clock_interval_to_deadline(30,NSEC_PER_SEC,&deadline);
+-  const bool ready=zorn_gpu_early_wait252(deadline,zorn26_gmu_deferred_ready252,
+-      [](){return mach_absolute_time();},[](){IOSleep(10);});
+-  if(owner->readStatus().phase==ZornUfsOwner26::Phase::RootRegistered){
+-   __atomic_store_n(&zornEarlyTicks252,mach_absolute_time(),__ATOMIC_RELEASE);
+-   if(ready)__atomic_fetch_or(&zornEarlyFlags252,4u,__ATOMIC_RELEASE);
+-   Hjt26Reason milestone={};
+-   char text[sizeof(milestone.record.text)]{};
+-   const unsigned online=__atomic_load_n(&processor_avail_count,__ATOMIC_RELAXED);
+-   const int n=snprintf(text,sizeof(text),
+-       "K80 GPU early252: root=1; deferred=%s; cpu_online=%u; cpu_samples=pending",
+-       ready ? "1" : "timeout",online);
+-   if(n>0 && size_t(n)<sizeof(text)){
+-    hjt26_capture(&milestone,text,kZornPlatformRecordTrial);
+-    ZornUfsCore26::PlatformRecordObservation observed{};
+-    const auto raw=ZornUfsCore26::persistPlatformRecordOnce(milestone.record,observed);
+-    if(!raw && observed.writeReturned && observed.readbackReturned && observed.readbackMatched){
+-     __atomic_fetch_or(&zornEarlyFlags252,8u|16u,__ATOMIC_RELEASE);
+-     // Original physical CDC identity/route check and three actually completed
+-     // frames still precede the original worker and every diagnostic handshake.
+-     zorn26_boot_stage328(ready ? 0xa6 : 0xaf);
+-     if(ready){
+-      entered=true;__atomic_fetch_or(&zornEarlyFlags252,32u,__ATOMIC_RELEASE);
+-      zorn_gpu_progress_cdc201(owner);
+-     }
+-    }else zorn26_boot_stage328(0xae);
+-   }
+-  }
+- }
+- if(!entered)__atomic_fetch_or(&zornEarlyFlags252,0x80000000u,__ATOMIC_RELEASE);
+- owner->release();
+- (void)thread_terminate(current_thread());panic("K80 early GPU worker termination returned");
++static void zorn_gpu_early_worker252(void *context, wait_result_t)
++{
++    auto *owner = static_cast<ZornUfsOwner26 *>(context);
++    bool entered = false;
++    if (zorn_early_mode252() == 1 && preemption_enabled() && !ml_at_interrupt_context() &&
++        ml_get_interrupts_enabled() && owner->readStatus().phase == ZornUfsOwner26::Phase::RootRegistered) {
++        zorn26_boot_stage328(0xa5);
++        Hjt26Reason milestone{};
++        char text[96]{};
++        const unsigned online = __atomic_load_n(&processor_avail_count, __ATOMIC_RELAXED);
++        const int bytes = snprintf(text, sizeof(text), "K80 GPU early332: root=1; cpu_online=%u; gpu=pending", online);
++        if (bytes > 0 && size_t(bytes) < sizeof(text)) {
++            hjt26_capture(&milestone, text, kZornPlatformRecordTrial);
++            ZornUfsCore26::PlatformRecordObservation observed{};
++            const auto raw = ZornUfsCore26::persistPlatformRecordOnce(milestone.record, observed);
++            if (!raw && observed.writeReturned && observed.readbackReturned && observed.readbackMatched) {
++                __atomic_store_n(&zornEarlyTicks252, mach_absolute_time(), __ATOMIC_RELEASE);
++                __atomic_fetch_or(&zornEarlyFlags252, 8u | 16u | 32u | 64u, __ATOMIC_RELEASE);
++                zorn26_boot_stage328(0xa6);
++                entered = true;
++                zorn_gpu_progress_cdc201(owner);
++            } else zorn26_boot_stage328(0xae);
++        }
++    }
++    if (!entered) __atomic_fetch_or(&zornEarlyFlags252, 0x80000000u, __ATOMIC_RELEASE);
++    owner->release();
++    (void)thread_terminate(current_thread());
++    panic("K80 early GPU worker termination returned");
+ }
+ static void zorn_gpu_early_schedule252(ZornUfsOwner26 *owner){
+  unsigned empty=0;
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26925CC8E2ACFD"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN262478447336E6"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/houji_recovery26.c
++++ b/houji_recovery26.c
+@@ -160,7 +160,7 @@
+ void zorn26_boot_stage328(unsigned stage);
+ void zorn26_boot_stage328(unsigned stage)
+ {
+-    if(stage>=0xa0 && stage<=0xba)draw_stage(stage);
++    if(stage>=0xa0 && stage<=0xbd)draw_stage(stage);
+ }
+ 
+ // The panic formatter already owns the first message. Use its published
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x92,0x5c,0xc8,0xe2,0xac,0xfd,0x41,0x2d,0xa5,0xd8,0x37,0x36,0x2b,0x70,0x19,0x48};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x24,0x78,0x44,0x73,0x36,0xe6,0x48,0x32,0xba,0x3d,0xaa,0x22,0x86,0x73,0x9b,0x46};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x92,0x5c,0xc8,0xe2,0xac,0xfd,0x41,0x2d,0xa5,0xd8,0x37,0x36,0x2b,0x70,0x19,0x48};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x24,0x78,0x44,0x73,0x36,0xe6,0x48,0x32,0xba,0x3d,0xaa,0x22,0x86,0x73,0x9b,0x46};

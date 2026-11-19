@@ -1,0 +1,50 @@
+--- a/NativeBridgeMetalFrontend.mm
++++ b/NativeBridgeMetalFrontend.mm
+@@ -42,6 +42,7 @@
+ #include <unistd.h>
+ #include <sys/time.h>
+ #include <sys/uio.h>
++#include "ZornDarwinCallCost287.h"
+ #include <sys/sysctl.h>
+ #include <signal.h>
+ #include <stdlib.h>
+@@ -146,7 +147,7 @@
+   sleep(delays[sample]);
+   const size_t length=native_bridge_metal_telemetry(table,sizeof table);
+   char title[160];
+-  const int n=snprintf(title,sizeof title,"ZORN286COUNTERS run=%s sample=%u uptime_us=%llu bytes=%zu\n",
++  const int n=snprintf(title,sizeof title,"ZORN287COUNTERS run=%s sample=%u uptime_us=%llu bytes=%zu\n",
+    getenv("NATIVE_METAL_BOOT_SESSION")?:"unbound",sample,
+    (unsigned long long)(clock_gettime_nsec_np(CLOCK_UPTIME_RAW)/1000),length);
+   if(n<=0 || (size_t)n>=sizeof title || length>=sizeof table)break;
+@@ -5559,10 +5560,12 @@
+  // Turnip's own counters, once the runtime has loaded it.
+  static void *turnip;
+  static void (*cacheStats)(uint64_t *),(*modeStats)(uint64_t *),(*sideStats)(uint64_t *);
++ static bool (*callCost287)(uint64_t *,uint32_t);
+  if(!turnip && !gLoaderPath.empty() && (turnip=dlopen(gLoaderPath.c_str(),RTLD_NOW|RTLD_NOLOAD))) {
+   cacheStats=(void (*)(uint64_t *))dlsym(turnip,"tu_darwin_bo_cache_stats");
+   modeStats=(void (*)(uint64_t *))dlsym(turnip,"tu_render_mode_stats");
+   sideStats=(void (*)(uint64_t *))dlsym(turnip,"tu_gmem_side_stats");
++  callCost287=(bool (*)(uint64_t *,uint32_t))dlsym(turnip,"tu_darwin_call_cost287");
+  }
+  // ---- where this process's GPU memory is ----
+  if(gDevice) {
+@@ -5787,6 +5790,17 @@
+  row("J surface cache n=%llu bytes=%llu dup=%llu us=%llu max=%llu",(ull)gTimeSurfaceFlush.count.load(),
+   (ull)gSurfaceFlushBytes.load(),(ull)gSurfaceFlushDuplicates.load(),
+   (ull)gTimeSurfaceFlush.total.load(),(ull)gTimeSurfaceFlush.slowest.load());
++ {
++  uint64_t nc[ZornDarwinCallCost287::Words]={};
++  if(callCost287 && callCost287(nc,ZornDarwinCallCost287::Words)) {
++   row("NC meta %llu %llu %llu %llu %llu",(ull)nc[0],(ull)nc[1],(ull)nc[2],(ull)nc[3],(ull)nc[4]);
++   for(unsigned i=0;i<ZornDarwinCallCost287::Methods;++i) {
++    const unsigned at=6+5*i;
++    row("NC %u %llu %llu %llu %llu %llu",i,(ull)nc[at],(ull)(nc[at+1]/1000),
++     (ull)(nc[at+2]/1000),(ull)nc[at+3],(ull)nc[at+4]);
++   }
++  } else row("%s","NC unavailable 287");
++ }
+  row("N no-copy %llu dealloc %llu/%llu surface %llu/%llu",(ull)gNoCopyAll.load(),(ull)gNoCopyReleased.load(),
+   (ull)gNoCopyMade.load(),
+   (ull)gSurfaceImportsReleased.load(),(ull)gSurfaceImportsMade.load());

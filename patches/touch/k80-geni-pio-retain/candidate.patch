@@ -1,0 +1,93 @@
+--- a/GeniSpi.c
++++ b/GeniSpi.c
+@@ -72,8 +72,14 @@
+ }
+ 
+ int geni_spi_init(struct geni_spi *s) {
++    if (s && s->pio_failure_retained) return GENI_ERR_IO;
++    if (s && s->retain_pio_on_failure && (s->use_dma || s->allow_fifo_disabled)) return GENI_ERR_PARAM;
+     int r = geni_spi_read_info(s);
+     if (r) return r;
++    if (s->retain_pio_on_failure && (s->info.geni_status & GENI_STATUS_M_ACTIVE)) {
++        s->pio_failure_retained = 1;
++        return GENI_ERR_IO;
++    }
+     if (s->info.protocol != GENI_PROTO_SPI) return GENI_ERR_PROTO;
+     if (s->use_dma && (!s->dma.tx_virt || !s->dma.rx_virt || !s->dma.tx_phys || !s->dma.rx_phys || !s->dma.size))
+         return GENI_ERR_PARAM;
+@@ -121,6 +127,7 @@
+ }
+ 
+ int geni_spi_setup(struct geni_spi *s, unsigned mode, unsigned chip_select) {
++    if (s && s->pio_failure_retained) return GENI_ERR_IO;
+     if (chip_select > 15) return GENI_ERR_PARAM;
+     unsigned changed = s->last_mode ^ mode;
+     int cs_changed = ((unsigned)s->last_cs != chip_select);
+@@ -137,6 +144,7 @@
+ }
+ 
+ int geni_spi_set_clock(struct geni_spi *s, unsigned speed_hz, unsigned sclk_hz, unsigned clk_sel) {
++    if (s && s->pio_failure_retained) return GENI_ERR_IO;
+     if (!speed_hz || !sclk_hz || clk_sel > 7 || !s->oversampling) return GENI_ERR_PARAM;
+     unsigned long long denom = (unsigned long long)s->oversampling * speed_hz;
+     unsigned long long div = (sclk_hz + denom - 1) / denom;
+@@ -293,7 +301,13 @@
+ }
+ 
+ int geni_spi_transfer(struct geni_spi *s, const uint8_t *tx, uint8_t *rx, size_t len, int keep_cs) {
++    if (s && s->pio_failure_retained) return GENI_ERR_IO;
++    if (s && s->retain_pio_on_failure && (s->use_dma || s->allow_fifo_disabled)) return GENI_ERR_PARAM;
+     if (!s || !len || len > GENI_TRANS_LEN_MASK || (!tx && !rx) || !s->cur_speed_hz) return GENI_ERR_PARAM;
++    if (s->retain_pio_on_failure && (rd(s, SE_GENI_STATUS) & GENI_STATUS_M_ACTIVE)) {
++        s->pio_failure_retained = 1;
++        return GENI_ERR_IO;
++    }
+     if (s->cur_bpw != 8) {
+         set_word_len(s, 8, !(s->last_mode & GENI_SPI_LSB_FIRST));
+         s->cur_bpw = 8;
+@@ -320,6 +334,10 @@
+             if (s->se.delay_us) s->se.delay_us(s->se.ctx, 1);
+             continue;
+         }
++        if (s->retain_pio_on_failure && (st & GENI_M_ERRORS)) {
++            status = GENI_ERR_IO;
++            break;
++        }
+         wr(s, SE_GENI_M_IRQ_CLEAR, st);
+         if (st & GENI_M_ERRORS) {
+             status = GENI_ERR_IO;
+@@ -330,6 +348,10 @@
+         if (st & GENI_M_CMD_DONE) {
+             if (rx && x.rx_rem) handle_rx(s, &x);
+             status = (x.tx_rem || x.rx_rem) ? GENI_ERR_IO : 0;
++            if (s->retain_pio_on_failure && (status || (rd(s, SE_GENI_STATUS) & GENI_STATUS_M_ACTIVE))) {
++                status = GENI_ERR_IO;
++                break;
++            }
+             if (x.tx_rem) wr(s, SE_GENI_TX_WATERMARK_REG, 0);
+             return status;
+         }
+@@ -343,6 +365,9 @@
+     s->snap_txfs = rd(s, SE_GENI_TX_FIFO_STATUS);
+     s->snap_rxfs = rd(s, SE_GENI_RX_FIFO_STATUS);
+     s->snap_valid = 1;
+-    recover(s);
++    if (s->retain_pio_on_failure)
++        s->pio_failure_retained = 1;
++    else
++        recover(s);
+     return status;
+ }
+--- a/GeniSpi.h
++++ b/GeniSpi.h
+@@ -206,6 +206,10 @@
+         size_t size;
+     } dma;
+     int allow_fifo_disabled;            // try FIFO mode even when FIFO_IF_DISABLE is set (the Linux fallback when no GPI channel exists)
++    // Optional PIO owner policy. On unknown completion preserve the engine
++    // and reject subsequent writes; this instance must stay owned.
++    int retain_pio_on_failure;
++    int pio_failure_retained;
+ };
+ 
+ // Read-only: protocol, FIFO geometry, FIFO-disable flag, version. Safe to run before any register write; only valid when

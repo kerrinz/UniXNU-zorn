@@ -1,0 +1,64 @@
+{
+  "version": 337,
+  "boot_tag": "f7fda793ad694c57be740bb78a1cd6ce",
+  "base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124",
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-smmu-transport337/candidate.patch",
+    "bytes": 8072,
+    "sha256": "2c477a30eae0e8b1189fbe2180a75ccb1caa62c9dff40cb4ffcf555d5717c69c"
+  },
+  "replay": "Apply patch -F0 -p1 to the v336 build source",
+  "source_bases": {
+    "ZornManualWire313.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124/ZornManualWire313.h",
+      "bytes": 1941,
+      "sha256": "192636991f6be8008f88d2491750751110c124cbdb14e221db6063cc714e2509"
+    },
+    "ZornUfsCore26.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124/ZornUfsCore26.cpp",
+      "bytes": 15184,
+      "sha256": "83373d117882b1760db5d9101ab6e624d6216d324c64816647ecec56add4f5a5"
+    },
+    "ZornUfsOwner26.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124/ZornUfsOwner26.cpp",
+      "bytes": 95922,
+      "sha256": "bca24edfa697353b76103aefd3143189f4ff7979d12af7af97109703cdb5d55b"
+    },
+    "ZornUsbCdc26.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124/ZornUsbCdc26.c",
+      "bytes": 27186,
+      "sha256": "cdadd263d9232a1f7bed142027b247ab870c214bd9b997f6ce664fbd842b10a5"
+    },
+    "record-identity/ZornPlatformRecordIdentity26.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124/record-identity/ZornPlatformRecordIdentity26.h",
+      "bytes": 320,
+      "sha256": "f3ebc1931b9fe465dd8f7968e389ceb39b00b1dfae180b0db9c6262f43cc1366"
+    },
+    "record-identity/ZornPlatformTrialIdentity26.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v336-display-smmu-79358e64c84e458e8e31428b69abe124/record-identity/ZornPlatformTrialIdentity26.h",
+      "bytes": 308,
+      "sha256": "f4c3e647d62753169086fa84d7fd5212efd30daca09c7b40da21cdfafd9c32a7"
+    }
+  },
+  "candidate_files": {
+    "ZornDisplaySmmuHost337.h": "abbea24bf5a599040a656ac8ba5c6575bd80e2459ba8003f7f2a4486a35ed44a",
+    "ZornManualWire313.h": "c2c6db27869c68f232019cb1de9b578dcf3d51b7600c07dbac518c2c3872c062",
+    "ZornUfsCore26.cpp": "ee2fe67a9103ec00df4d21aad038374467c5ad0e32d7901817af65c15826298c",
+    "ZornUfsOwner26.cpp": "01dd88fca0f2b023167f36d5023a1a31c4c0d5c5bf59018086a86ce2b603d671",
+    "ZornUsbCdc26.c": "e474d754d195b2edefb91087ee7696b3e3c036ef0e375b6cab9d4fdfd804406e",
+    "record-identity/ZornPlatformRecordIdentity26.h": "b4cdc3aeef84377a0064dd9d98a4266b46db9bcd50684abce132f6cded5c7215",
+    "record-identity/ZornPlatformTrialIdentity26.h": "af02a02a0209473a1f6ab8a8a51408ffb3ef18a3f3b33b75b714819e150a4c55"
+  },
+  "board_sources": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/display-smmu-board-inputs.json",
+    "bytes": 1813,
+    "sha256": "d8f382a5a1d8b61237f9fd3290129fc1e29116e1bfcdbac3426445685a1a5db1"
+  },
+  "actual_compiler_dependency_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/ufs-dependency-review.json",
+    "bytes": 247,
+    "sha256": "041c846241b1490bec3313d7f8b2490b532319f4b16ca97f20175690ae35acee"
+  },
+  "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+  "hardware_qualification": false
+}

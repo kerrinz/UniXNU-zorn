@@ -1,0 +1,72 @@
+// SPDX-License-Identifier: MIT
+// SHOT/BGRX framing and nearest sampled rows follow UniXNU-sheng BootDiagExport.c,
+// commit6a3d35c02504b712897799c5481952a61761325d. No sheng address/storage/export
+// backend is reused. The K80 presenter must supply its retained,checked CPU alias
+// after its genuine acquire/copy and helper completion;this header grants none.
+#pragma once
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+#include "ZornPanicPacket236.h" // Reuse existing checked LE/CRC primitives.
+#include "ZornCdcStream201.h"
+struct ZornSerialShot265 {
+    enum { Width=48,Height=104,Stride=Width*4,Pixels=Stride*Height,
+           ShotBytes=16+Pixels,Bytes=ShotBytes+16*4,PacketHeader=48 };
+    unsigned state=0; // 0 unrequested,1 requested,2 sole writer,3 immutable published
+    uint32_t crc=0;
+    uint8_t bytes[Bytes]{};
+    bool request(){unsigned zero=0;return __atomic_compare_exchange_n(&state,&zero,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE);}
+    bool ready()const{return __atomic_load_n(&state,__ATOMIC_ACQUIRE)==3;}
+    bool capture(const volatile uint32_t *base,uint32_t w,uint32_t h,uint32_t stride,
+                 size_t available,const uint32_t (&record)[16]){
+        const uintptr_t address=reinterpret_cast<uintptr_t>(base);
+        const uint64_t extent=uint64_t(stride)*h;
+        if(!base || (address&3u) || w<Width || h<Height || w>16384 || h>16384 ||
+           (stride&3u) || uint64_t(stride)<uint64_t(w)*4 || !extent || extent>available ||
+           extent-1>UINTPTR_MAX-address || record[0]!=2 || !record[1] ||
+           (record[3]!=1 && record[3]!=2) || record[9]!=1)return false;
+        unsigned pending=1;
+        if(!__atomic_compare_exchange_n(&state,&pending,2u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return false;
+        memcpy(bytes,"SHOT",4);zorn_panic_le236(bytes,4,Width);
+        zorn_panic_le236(bytes,8,Height);zorn_panic_le236(bytes,12,Stride);
+        // Aligned scalar reads from the actual presenter's alias,not a guessed
+        // scanout address. No cache/MMIO/DMA operation or source surface lease.
+        for(unsigned y=0;y<Height;++y){
+            const auto *row=reinterpret_cast<const volatile uint32_t *>(
+                reinterpret_cast<const volatile uint8_t *>(base)+size_t(uint64_t(y)*h/Height)*stride);
+            for(unsigned x=0;x<Width;++x)
+                zorn_panic_le236(bytes,16+y*Stride+x*4,row[uint64_t(x)*w/Width]);
+        }
+        for(unsigned i=0;i<16;++i)zorn_panic_le236(bytes,ShotBytes+i*4,record[i]);
+        crc=zorn_panic_crc236(bytes,Bytes);
+        __atomic_store_n(&state,3u,__ATOMIC_RELEASE);return true;
+    }
+    // Called only by the existing sole CDC producer after actual prior bulk-IN
+    // completion. Its original3072byte buffer/frame/terminal budgets still apply.
+    unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{
+        if(!out || cap>3072 || cap<=PacketHeader || offset>=Bytes || !ready())return 0;
+        const unsigned n=Bytes-offset<cap-PacketHeader?Bytes-offset:cap-PacketHeader;
+        auto *p=reinterpret_cast<uint8_t *>(out);memcpy(p,"K80SH265",8);memcpy(p+8,tag,16);
+        zorn_panic_le236(p,24,offset);zorn_panic_le236(p,28,n);zorn_panic_le236(p,32,Bytes);
+        zorn_panic_le236(p,36,zorn_panic_crc236(bytes+offset,n));zorn_panic_le236(p,40,crc);
+        zorn_panic_le236(p,44,265);memcpy(p+PacketHeader,bytes+offset,n);return PacketHeader+n;
+    }
+};
+struct ZornSerialMux265 {
+    unsigned wire=0,normal=0,offset=0;
+    bool previousShot=false;
+    template<class Snapshot>
+    unsigned next(void *context,char *out,unsigned cap,unsigned completed,
+                  ZornCdcNext201 normalNext,const Snapshot &shot,
+                  const uint8_t (&tag)[16],bool idleWithoutPendingGates){
+        if(!normalNext || completed!=wire || wire>=38)return 0;
+        if(idleWithoutPendingGates && !previousShot && shot.ready() && offset<shot.Bytes){
+            const unsigned n=shot.packet(out,cap,offset,tag);
+            if(n){offset+=n-shot.PacketHeader;previousShot=true;++wire;return n;}
+        }
+        // Only real normal frame completions advance the original sequence.
+        // A screenshot must never acknowledge a newly sampled GPU callback point.
+        const unsigned n=normalNext(context,out,cap,normal);
+        if(n){++normal;++wire;previousShot=false;}return n;
+    }
+};

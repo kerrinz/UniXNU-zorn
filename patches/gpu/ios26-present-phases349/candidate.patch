@@ -1,0 +1,452 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -399,6 +399,7 @@
+ /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ 
+ struct RowJob;
++struct ZornSwapPhases349;
+ 
+ class IOMobileFramebuffer : public IOService
+ {
+@@ -497,7 +498,7 @@
+ 	void publishModes(void);
+ 	MiniIOSurface * defaultSurface(void);
+ 	IOReturn present(const uint8_t * swap);
+-	bool show(const uint8_t * swap, MiniIOSurface ** surfaces, uint64_t queuedAt = 0);
++	bool show(const uint8_t *swap, MiniIOSurface **surfaces, const ZornSwapPhases349 *phase = nullptr);
+ 	void presenter(void);
+ 	uint64_t paceSwap(uint64_t ready);
+ 	static void presenterMain(void * self, wait_result_t result);
+@@ -1553,6 +1554,7 @@
+ #if defined(ZORN_IOS26)
+     ZornPresentCost278 cost278;ZornPresentClock278 clock278;
+     uint64_t leaseObserved278=0;
++    ZornSwapPhases349 phase349;
+ #endif
+ 
+ #endif
+@@ -1577,12 +1579,14 @@
+ 		if (!paced) {
+ #if defined(ZORN_IOS26)
+             const uint64_t began278=clock278.now();
++            phase349={queuedAt278,began278};
+             cost278.frame=swapWord(swap,SWAP_ID);cost278.producer=producerFence;
+             cost278.measure(ZornPresentCost278::Queue,queuedAt278,began278,clock278);
+ #endif
+ 			paceSwap(mach_absolute_time());
+ #if defined(ZORN_IOS26)
+             leaseObserved278=clock278.now();
++            phase349.paced=leaseObserved278;
+             cost278.measure(ZornPresentCost278::Beat,began278,leaseObserved278,clock278);
+ #endif
+ 			paced = true;
+@@ -1599,7 +1603,7 @@
+             [](uint32_t *t, uint32_t *r) { return zorn_gen7_present_ledger245(t, r) != 0; },
+             [](uint32_t sid) { return zorn_surface_fence246(sid); },
+             []() { return __atomic_load_n(&houji26Presents, __ATOMIC_ACQUIRE); },
+-            [&]() { stopped339 = !show(swap, surfaces, queuedAt278); });
++            [&]() { stopped339 = !show(swap, surfaces, &phase349); }, &phase349);
+         completed = outcome298.completed && !stopped339;
+         terminal = outcome298.terminal || stopped339;
+         copied278 = outcome298.copied;
+@@ -1727,7 +1731,7 @@
+ 
+ /* A swap's surfaces onto the panel, once the GPU is done with them. */
+ bool
+-IOMobileFramebuffer::show(const uint8_t *swap, MiniIOSurface **surfaces, uint64_t queuedAt __unused)
++IOMobileFramebuffer::show(const uint8_t *swap, MiniIOSurface **surfaces, const ZornSwapPhases349 *phase __unused)
+ {
+ 	uint32_t set = swapWord(swap, SWAP_LAYERS_SET);
+ 	uint64_t began = mach_absolute_time(), nanos, ready, shown, drawn;
+@@ -1800,6 +1804,7 @@
+         return false;
+     }
+     auto *live = fZornLiveScanout348;
++    const uint64_t drawStarted = live ? mach_absolute_time() : 0;
+     uint32_t targetAddress = 0;
+     const uint8_t *previousPixels = nullptr;
+     if (live) {
+@@ -1957,8 +1962,14 @@
+             IOLockUnlock(fLock);
+             return true;
+         }
+-        wrotePixels = live->transfer(*live, swapWord(swap, SWAP_ID), targetAddress,
+-            zornDisplayUptimeUs348(queuedAt), zornDisplayUptimeUs348(drawn));
++        const unsigned index = live->out[Trace348::Attempts];
++        const uint32_t swapId = swapWord(swap, SWAP_ID);
++        uint32_t guard = 0;
++        wrotePixels = live->transfer(*live, swapId, targetAddress,
++            phase ? zornDisplayUptimeUs348(phase->queued) : 0, zornDisplayUptimeUs348(drawn), guard);
++        ZornScanoutPhase349::pack(live->phase + index * ZornScanoutPhase349::RecordWords, swapId,
++            phase ? *phase : ZornSwapPhases349{}, drawStarted, drawn,
++            live->out[Trace348::LastTransfer], guard, wrotePixels, zornDisplayUptimeUs348);
+         if (live->buffers.uncertain()) {
+             __atomic_store_n(&zornGopTransferUncertain339, 1u, __ATOMIC_RELEASE);
+             IOLockWakeup(fLock, &fZornLiveScanout348, false);
+--- a/ZornDpuAutoRefreshTransfer340.h
++++ b/ZornDpuAutoRefreshTransfer340.h
+@@ -29,9 +29,13 @@
+ inline constexpr uint32_t DeadlineUs = 1350000;
+ inline constexpr uint32_t MaxPolls = 1350;
+ enum class Mode : uint32_t { Inherited = InheritedAutoConfig, FourTe = 0x80000004 };
++enum Refusal : uint32_t {
++    CtlBusy = 1, AutoBusy = 2, TearOwned = 4, DsiOwnedOrError = 8,
++    ArmLease = 16, ArmAck = 32, ArmRead = 64, ArmDirty = 128, ArmDeadline = 256,
++};
+ struct Timing {
+     uint64_t programmed = 0, completed = 0;
+-    uint32_t source0 = 0, source1 = 0;
++    uint32_t source0 = 0, source1 = 0, guard = 0;
+ };
+ inline constexpr uint32_t ObservationGapUs = 50000;
+ 
+@@ -84,6 +88,10 @@
+     if (start || flush || out[InitialAutoStatus] || (out[InitialTearEnable] & TearDoneMask) ||
+         (out[InitialDsi] & (Cmd::DsiDoneEnabled | Cmd::DsiError))) {
+         out[Status] = ExistingActivity;
++        if (timing) timing->guard = (start || flush ? CtlBusy : 0u) |
++            (out[InitialAutoStatus] ? AutoBusy : 0u) |
++            ((out[InitialTearEnable] & TearDoneMask) ? TearOwned : 0u) |
++            ((out[InitialDsi] & (Cmd::DsiDoneEnabled | Cmd::DsiError)) ? DsiOwnedOrError : 0u);
+         return;
+     }
+ 
+@@ -115,11 +123,19 @@
+     out[Status] = ArmFailed;
+     out[LastTear] = out[InitialTear];
+     out[LastDsi] = out[InitialDsi];
+-    if (!port.lease() || !acknowledge() || !sample() || flush || !clean()) return;
++    const uint32_t refusal = !port.lease() ? ArmLease : !acknowledge() ? ArmAck :
++        !sample() ? ArmRead : (flush || !clean()) ? ArmDirty : 0u;
++    if (refusal) {
++        if (timing) timing->guard = refusal;
++        return;
++    }
+     out[InitialWriteLine] = out[LastWriteLine];
+ 
+     const uint64_t began = port.nowUs();
+-    if (deadline && began >= deadline) return;
++    if (deadline && began >= deadline) {
++        if (timing) timing->guard = ArmDeadline;
++        return;
++    }
+     out[Status] = ProgramUncertain;
+     out[Sequence] = out[Retain] = 1;
+     if (timing) timing->programmed = began;
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -55,6 +55,7 @@
+ #include "ZornRuntimeDisplayCadence344.h"
+ #include "ZornScanoutHandoff345.h"
+ #include "ZornScanoutTrace348.h"
++#include "ZornScanoutPhase349.h"
+ #include "touch-source313/ZornTouchThread26.h"
+ #include "ZornGen7OwnedArcVoltage.h"
+ 
+@@ -66,6 +67,7 @@
+ uint32_t displayClockWords334[ZornDisplayClockRead334::Words]{};
+ uint32_t displayHeldTimingWords335[ZornDisplayHeldTiming335::Words]{};
+ uint32_t displayLiveTrace348[ZornScanoutTrace348::Words]{};
++uint32_t displayLivePhase349[ZornScanoutPhase349::Words]{};
+ uint32_t displayRuntimePublication341 = 0;
+ uint32_t displayScanoutWords345[ZornScanoutAlias345::Words]{};
+ uint64_t displayRuntimeDeadline341 = 0;
+@@ -99,6 +101,11 @@
+     if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
+     for (unsigned i = 0; i < ZornScanoutTrace348::Words; ++i) out[i] = displayLiveTrace348[i];
+ }
++extern "C" void zorn26_display_live_phase349(uint32_t *out)
++{
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornScanoutPhase349::Words; ++i) out[i] = displayLivePhase349[i];
++}
+ extern "C" void zorn26_scanout_reservation_snapshot345(uint32_t *out)
+ {
+     if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
+@@ -107,7 +114,7 @@
+ extern "C" void zorn26_observe_scanout_alias345(IOService *, uint32_t (&)[ZornScanoutAlias345::Words]);
+ extern "C" void zorn26_run_live_scanout348(
+     IOService *, const uint32_t (&)[ZornDisplayHeldTiming335::Words], uint32_t (&)[ZornScanoutTrace348::Words],
+-    uint64_t, const uint32_t &);
++    uint64_t, const uint32_t &, uint32_t (&)[ZornScanoutPhase349::Words]);
+ extern "C" bool zorn26_read_display_gcc325(IOService *, uint32_t &);
+ extern "C" void zorn26_capture_display_clocks334(IOService *, uint32_t (&)[ZornDisplayClockRead334::Words]);
+ 
+--- a/ZornGopLiveSession348.h
++++ b/ZornGopLiveSession348.h
+@@ -3,15 +3,18 @@
+ 
+ #include "ZornScanoutFlipOwnership348.h"
+ #include "ZornScanoutTrace348.h"
++#include "ZornScanoutPhase349.h"
+ 
+ namespace ZornGopLiveSession348 {
+ namespace T = ZornScanoutTrace348;
+ 
+ struct Session {
+     uint32_t (&out)[T::Words];
++    uint32_t (&phase)[ZornScanoutPhase349::Words];
+     void *context;
+     bool (*enter)(Session &);
+-    bool (*transfer)(Session &, uint32_t swap, uint32_t target, uint64_t queued, uint64_t ready);
++    bool (*transfer)(Session &, uint32_t swap, uint32_t target, uint64_t queued, uint64_t ready,
++                     uint32_t &guard);
+     void (*restore)(Session &, uint8_t *original);
+     uint8_t *back = nullptr;
+     uint64_t deadline = 0, deadlineUs = 0;
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -13,6 +13,7 @@
+ #include "ZornRuntimeDisplayCadence344.h"
+ #include "ZornScanoutHandoff345.h"
+ #include "ZornScanoutTrace348.h"
++#include "ZornScanoutPhase349.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -21,6 +22,7 @@
+ constexpr unsigned TouchEnd = PresentWords + Samples * (1 + TouchWords);
+ constexpr unsigned CostWords = 16;
+ constexpr unsigned TimingStart = TouchEnd + Samples * (1 + CostWords);
++static_assert(TouchEnd + ZornScanoutPhase349::Words <= TimingStart);
+ constexpr unsigned TimingWords = ZornDisplayTiming318::Words;
+ constexpr unsigned TeStart = TimingStart + Samples * TimingWords;
+ constexpr unsigned HeldTimingStart = TeStart + ZornPanelTe320::Words;
+@@ -40,11 +42,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT348", 8);
++    memcpy(p, "K80FT349", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 348);
++    zorn_panic_le236(p, Bytes - 4, 349);
+     return Bytes;
+ }
+ }
+--- a/ZornPresenterScope298.h
++++ b/ZornPresenterScope298.h
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #pragma once
+ #include <stdint.h>
++#include "ZornScanoutPhase349.h"
+ 
+ struct ZornPresenterOutcome298 {
+     bool completed = false;
+@@ -30,7 +31,8 @@
+     LedgerFn &&readLedger,
+     SurfaceFenceFn &&readSurfaceFence,
+     CounterFn &&readPresentCounter,
+-    ShowFn &&runShow)
++    ShowFn &&runShow,
++    ZornSwapPhases349 *phase = nullptr)
+ {
+     ZornPresenterOutcome298 out{};
+     bool leaseGpu = false;
+@@ -58,7 +60,13 @@
+                 }
+             }
+         }
+-        cost.measure(Cost::Acquire, acquireBegan, clock.now(), clock);
++        const uint64_t acquireEnded = clock.now();
++        cost.measure(Cost::Acquire, acquireBegan, acquireEnded, clock);
++        if (phase && out.readable) {
++            phase->cacheStart = acquireBegan;
++            phase->cacheEnd = acquireEnded;
++            phase->gpu = leaseGpu;
++        }
+         if (out.readable) {
+             ledger = leaseGpu && readLedger(&tail, &retired);
+             for (unsigned i = 0; i < Layers; ++i) {
+--- a/ZornScanoutLive348.h
++++ b/ZornScanoutLive348.h
+@@ -13,13 +13,15 @@
+ // registers, full-frame advance, a fresh DSI completion and its acknowledgement.
+ template<class Port>
+ bool present(Port &port, Ownership &buffers, uint64_t seq, uint32_t swap,
+-             uint32_t target, uint64_t queued, uint64_t ready, uint32_t (&report)[Dpu::Words], uint64_t deadline = 0)
++             uint32_t target, uint64_t queued, uint64_t ready, uint32_t (&report)[Dpu::Words], uint64_t deadline = 0, uint32_t *guard = nullptr)
+ {
++    if (guard) *guard = 0;
+     for (auto &word : report) word = 0;
+     if (!buffers.stage(seq, swap, target, queued, ready)) return false;
+     const uint32_t current = target == ZORN_SCANOUT_BACK ? ZORN_SCANOUT_FRONT : ZORN_SCANOUT_BACK;
+     Dpu::Timing times{};
+     Dpu::run(port, current, ZORN_SCANOUT_STRIDE, report, target, Dpu::Mode::FourTe, &times, deadline);
++    if (guard) *guard = times.guard;
+     if (!report[Dpu::Sequence]) {
+         buffers.rejectBeforeProgram(seq);
+         return false;
+--- /dev/null
++++ b/ZornScanoutPhase349.h
+@@ -0,0 +1,43 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include "ZornScanoutTrace348.h"
++
++// All timestamps use mach_absolute_time. Reset only when starting a new swap,
++// so fence and issuer readiness includes sleeps across the real pending retries.
++struct ZornSwapPhases349 {
++    uint64_t queued = 0, selected = 0, paced = 0, cacheStart = 0, cacheEnd = 0;
++    bool gpu = false;
++};
++
++namespace ZornScanoutPhase349 {
++constexpr unsigned RecordWords = 4;
++constexpr unsigned Words = ZornScanoutTrace348::MaxFlips * RecordWords;
++constexpr unsigned QuantumUs = 64;
++constexpr uint32_t StatusMask = 0xf, Gpu = 1u << 4, Valid = 1u << 5, GuardShift = 6, Transferred = 1u << 15;
++
++template<class Micros>
++void pack(uint32_t *row, uint32_t swap, const ZornSwapPhases349 &phase,
++          uint64_t drawStart, uint64_t drawEnd, uint32_t status, uint32_t guard, bool transferred, Micros micros)
++{
++    row[0] = swap;
++    const uint32_t flags = (phase.gpu ? Gpu : 0) | (status & StatusMask) | ((guard & 0x1ff) << GuardShift) | (transferred ? Transferred : 0);
++    row[3] = flags << 16;
++    if (!phase.queued || phase.selected < phase.queued || phase.paced < phase.selected ||
++        phase.cacheStart < phase.paced || phase.cacheEnd < phase.cacheStart ||
++        drawStart < phase.cacheEnd || drawEnd < drawStart) return;
++    const uint64_t spans[] = {
++        phase.selected - phase.queued, phase.paced - phase.selected, phase.cacheStart - phase.paced,
++        phase.cacheEnd - phase.cacheStart, drawEnd - drawStart,
++    };
++    uint32_t duration[sizeof(spans) / sizeof(spans[0])]{};
++    for (unsigned i = 0; i < sizeof(duration) / sizeof(duration[0]); ++i) {
++        const auto value = micros(spans[i]) / QuantumUs;
++        if (value > UINT16_MAX) return;
++        duration[i] = uint32_t(value);
++    }
++    row[1] = duration[0] | (duration[1] << 16);
++    row[2] = duration[2] | (duration[3] << 16);
++    row[3] = duration[4] | ((flags | Valid) << 16);
++}
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 74b96780ad354951806edd8e717a3339 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC bcb7637f93f646749ac79398fa7214ef %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"74b96780ad354951806edd8e717a3339",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"bcb7637f93f646749ac79398fa7214ef",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -30,7 +30,7 @@
+ extern "C" void zorn26_gop_diagnostics344(uint32_t *);
+ extern "C" void zorn26_visible_gop_epoch343(ZornGopWriterEpoch343::Frame &);
+ extern "C" void zorn26_retain_gop_on_transfer_uncertainty343();
+-extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
++extern "C" void zorn26_display_live_phase349(uint32_t *);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+ // opens no touch provider and never submits a contact. GPU collectors are CPU-only.
+@@ -249,13 +249,7 @@
+             const unsigned begin=ZornManualWire313::PresentWords+n*(1+ZornManualWire313::TouchWords);
+             store(begin,zorn26_ft3683_trace313(touch));
+             for(unsigned i=0;i<ZornManualWire313::TouchWords;++i)store(begin+1+i,touch[i]);
+-            // The cost collector has its own snapshot timestamp and frame ID.
+-            // It can advance independently of the present/FT3683 samples above.
+-            uint32_t cost[ZornManualWire313::CostWords]{};
+-            const unsigned costAt=ZornManualWire313::TouchEnd+n*(1+ZornManualWire313::CostWords);
+-            const bool haveCost=zorn26_present_cost_snapshot278(cost)!=0;
+-            store(costAt,haveCost);
+-            if(haveCost)for(unsigned i=0;i<ZornManualWire313::CostWords;++i)store(costAt+1+i,cost[i]);
++
+             uint32_t timing[ZornManualWire313::TimingWords]{};
+             const bool displayed = (values[0] & 1) && values[1] && inheritedGop318();
+             ZornDisplayTiming318::sample(readPanel, displayed, uptimeMs(), timing, stopPanelRead);
+@@ -326,7 +320,7 @@
+ 
+ extern "C" void zorn26_run_live_scanout348(
+     IOService *platform, const uint32_t (&held)[ZornDisplayHeldTiming335::Words],
+-    uint32_t (&out)[ZornScanoutTrace348::Words], uint64_t deadline, const uint32_t &publication)
++    uint32_t (&out)[ZornScanoutTrace348::Words], uint64_t deadline, const uint32_t &publication, uint32_t (&phase)[ZornScanoutPhase349::Words])
+ {
+     namespace H = ZornDisplayHeldTiming335;
+     namespace S = ZornDisplaySmmu336;
+@@ -437,7 +431,7 @@
+ 
+     out[R::Status] = R::WriterUnavailable;
+     Live::Session session{
+-        out, &context,
++        out, phase, &context,
+         [](Live::Session &s) {
+             auto &c = *static_cast<Context *>(s.context);
+             auto &p = c.port;
+@@ -458,11 +452,11 @@
+             s.back = reinterpret_cast<uint8_t *>(c.mapping->getVirtualAddress());
+             return true;
+         },
+-        [](Live::Session &s, uint32_t swap, uint32_t target, uint64_t queued, uint64_t ready) {
++        [](Live::Session &s, uint32_t swap, uint32_t target, uint64_t queued, uint64_t ready, uint32_t &guard) {
+             auto &p = static_cast<Context *>(s.context)->port;
+             const uint32_t seq = ++s.out[R::Attempts];
+             uint32_t result[D::Words]{};
+-            const bool transferred = ZornScanoutLive348::present(p, s.buffers, seq, swap, target, queued, ready, result, s.deadlineUs);
++            const bool transferred = ZornScanoutLive348::present(p, s.buffers, seq, swap, target, queued, ready, result, s.deadlineUs, &guard);
+             s.out[R::LastTransfer] = result[D::Status];
+             if (transferred) {
+                 Live::record(s.out, s.buffers.shown());
+@@ -523,6 +517,7 @@
+     if(!zorn26_ui_menu_done313())return false;
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     zorn26_display_live_trace348(out + ZornManualWire313::LiveTraceStart);
++    zorn26_display_live_phase349(out + ZornManualWire313::TouchEnd);
+     zorn26_scanout_reservation_snapshot345(out + ZornManualWire313::ScanoutStart);
+     zorn26_display_held_timing335(out + ZornManualWire313::HeldTimingStart);
+     zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2674B96780AD35"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26BCB7637F93F6"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -215,7 +215,7 @@
+             auto *owner = static_cast<ZornGen7DarwinBoardOwner *>(context);
+             auto &state = *owner->storage_;
+             zorn26_run_live_scanout348(state.platform, displayHeldTimingWords335, displayLiveTrace348,
+-                displayRuntimeDeadline341, displayRuntimePublication341);
++                displayRuntimeDeadline341, displayRuntimePublication341, displayLivePhase349);
+             auto &record = displayLeaseWords325;
+             const auto raw = displayLiveTrace348[ZornScanoutTrace348::Retain] ? kIOReturnNotReady :
+                 owner->setDisplayRegisterResources(false);
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x74,0xb9,0x67,0x80,0xad,0x35,0x49,0x51,0x80,0x6e,0xdd,0x8e,0x71,0x7a,0x33,0x39};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xbc,0xb7,0x63,0x7f,0x93,0xf6,0x46,0x74,0x9a,0xc7,0x93,0x98,0xfa,0x72,0x14,0xef};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x74,0xb9,0x67,0x80,0xad,0x35,0x49,0x51,0x80,0x6e,0xdd,0x8e,0x71,0x7a,0x33,0x39};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xbc,0xb7,0x63,0x7f,0x93,0xf6,0x46,0x74,0x9a,0xc7,0x93,0x98,0xfa,0x72,0x14,0xef};

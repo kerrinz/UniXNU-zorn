@@ -1,0 +1,50 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -59,6 +59,12 @@
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
++#include "ZornSerialShot265.h"
++static ZornSerialShot265 zornSerialShot265;
++extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
++extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
++extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
++
+ static ZornKnownPresent247 zornKnownPresent247;
+ extern "C" int zorn26_known_present_snapshot247(uint32_t (&out)[16]) {return zornKnownPresent247.trace.snapshot(out)?1:0;}
+ #include "ZornSurfaceBacking246.h"
+@@ -387,6 +393,10 @@
+ public:
+ 	IOLock *        fLock;
+ 	uint8_t *       fBase;                  /* the boot framebuffer: the panel */
++#if defined(ZORN_IOS26)
++    size_t fZornCheckedExtent265=0; // Actual factory-checked retained alias size.
++#endif
++
+ 	uint32_t        fPanelWidth, fPanelHeight, fRowBytes;
+ 	uint32_t        fWidth, fHeight;        /* the display as user space sees it */
+ 	MiniIOSurface * fDefaultSurface;
+@@ -1427,6 +1437,15 @@
+                     uint32_t(before),uint32_t(after),fWidth,fHeight,count && lease.gpu()?zorn_surface_fence246(firstSid):0};
+                 zornPresentTrace245.publish(record);
+                 zornKnownPresent247.complete(record);
++                // One thumbnail after real CPU copies/helpers and a mature
++                // compositor frame. The same retained issuer lease is held.
++                if(record[1]>=64 && record[9] && __atomic_load_n(&zornSerialShot265.state,__ATOMIC_ACQUIRE)==1){
++                    IOLockLock(fLock);
++                    (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
++                        fPanelWidth,fPanelHeight,fRowBytes,fZornCheckedExtent265,record);
++                    IOLockUnlock(fLock);
++                }
++
+ #endif
+             }
+         } /* Drop the issuer gate before sleeping, surface destruction or allocator work. */
+@@ -2735,6 +2754,7 @@
+     if(!zornOriginalDisplayPath26())return kIOReturnExclusiveAccess;
+     auto *fb=OSTypeAlloc(IOMobileFramebuffer);if(!fb)return kIOReturnNoMemory;
+     if(!fb->init()){fb->release();return kIOReturnError;}
++    fb->fZornCheckedExtent265=size_t(full); // Source factory already checked every CPU alias page.
+     fb->retain();partial=fb;provider.retain();
+     if(!fb->attach(&provider))return kIOReturnNotAttached;
+     if(PE_initialize_console(nullptr,kPEDisableScreen))return kIOReturnIOError;

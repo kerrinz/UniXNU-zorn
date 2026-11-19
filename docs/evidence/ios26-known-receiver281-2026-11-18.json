@@ -1,0 +1,57 @@
+{
+  "version": 281,
+  "date": "2026-11-18",
+  "status": "source-and-host-tested-receiver-library;system-entry-and-admission-pending",
+  "source": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_known281_capture.py",
+      "sha256": "bce6d1d83fa08aa0f308ac554f135e2199603b310b0f8c1df869570402b823c7"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_known281_receiver.py",
+      "sha256": "0eafd7f63ae32425a9622ffd7157f95331a625eb5c54bc9f078f58ac1e74d173"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-known-capture281.py",
+      "sha256": "695dd32cc9b894582c6ee9fc2ba227bb9d3b50ecea51ccbf7c43e97efe5332c5"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-ios26-known-receiver281.py",
+      "sha256": "4bf963a6ceb1699b4966f28a3335e983b04e83bb712eb73ba5a15cc2e868b69b"
+    }
+  ],
+  "host_tests": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v281-upstream-known-image-36e4614944b04a64bee5499cb2e8338f/known-capture-current-host281/result.json",
+      "sha256": "f73dd982e6bc497a64991fa58e54bbbff14eb0cde514ee634212552a913b824f"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v281-upstream-known-image-36e4614944b04a64bee5499cb2e8338f/known-receiver-current-host281/result.json",
+      "sha256": "14d52ac9786343f7ab064f172e215c5d2d42c8cf5ae51351cb9ebb1ac6431fef"
+    }
+  ],
+  "reuse": "Actual268 CDC exclusive-open bounded reader and identity matching;actual268 census,267 Metal,266 kernel-task,265 SHOT and early252 record decoders unchanged",
+  "root_cause": "Reading run.json before decoding CDC discarded parsed diagnostics when the runner failed before writing its receipt.",
+  "fix": "Decode/save CDC screenshot/journal/panic first;require fresh record,one actual boot,exact scope,fastboot success,known Recovery and runner success for associated grades. Preserve all original raw bytes and exclusive receipts.",
+  "risk": "Host-only receiver/result path. Registry/serial/runner/thread boundaries mocked;this does not validate native execution,root installation,full bundle,USB or scanout.",
+  "native_kernel_or_root_changed": false,
+  "tests": {
+    "capture_cases": 16,
+    "actual_receiver_controls": 7,
+    "old_boot_rejected": true,
+    "boot_vs_program_identity_distinct": true,
+    "failed_runner_diagnostics_retained": true,
+    "existing_claim_and_failed_validation_refuse_before_registry": true
+  },
+  "pending": [
+    "Wire fixed281 system entry and complete current bundle validation",
+    "Bind camera,actual root-install evidence,fresh owner/ready/admission/claim",
+    "One bounded real new-stack known-image/lifecycle trial after all runtime gates",
+    "Full Metal/display/touch qualification and FPS investigation"
+  ],
+  "phone_access": false,
+  "boot_attempts": 0,
+  "full_GPU_qualification": false,
+  "no_disassembly_or_reverse_engineering": true,
+  "no_commit_or_push": true
+}

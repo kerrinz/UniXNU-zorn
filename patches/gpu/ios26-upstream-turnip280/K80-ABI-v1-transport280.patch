@@ -1,0 +1,207 @@
+--- a/src/freedreno/vulkan/tu_knl_darwin.cc
++++ b/src/freedreno/vulkan/tu_knl_darwin.cc
+@@ -152,8 +152,7 @@
+ }
+ 
+ /* The priority the driver was last given for this process (NativeAdrenoMethodSetPriority). */
+-static NativeAdrenoAbiPriority dw_priority;
+-static bool dw_priority_known;
++#include "ZornAdrenoAbiV1Selection279.h"
+ 
+ static kern_return_t
+ dw_call(uint32_t method, const void *in, size_t in_size, void *out,
+@@ -163,8 +162,8 @@
+    if (!dw.tunnel)
+       return IOConnectCallStructMethod(dw.conn, method, in, in_size, out_size ? out : NULL,
+                                        out_size ? &out_bytes : NULL);
+-   uint8_t buffer[8 + sizeof(NativeAdrenoAbiSubmit)];
+-   if (in_size > sizeof(NativeAdrenoAbiSubmit))
++   uint8_t buffer[8 + sizeof(NativeAdrenoAbiSubmitBatch)];
++   if (in_size > sizeof(NativeAdrenoAbiSubmitBatch))
+       return kIOReturnBadArgument;
+    const uint32_t header[2] = {DW_TUNNEL_MAGIC, method};
+    memcpy(buffer, header, sizeof(header));
+@@ -198,11 +197,39 @@
+       service_name = "IOAcceleratorES";
+    const char *type_text = getenv("TU_DARWIN_OPEN_TYPE");
+    uint32_t open_type = type_text && *type_text ? (uint32_t)strtoul(type_text, NULL, 0) : 0x4147u;
+-   const bool direct = !strcmp(service_name, "NativeAdrenoGpuPublished");
+-   if (direct && !(type_text && *type_text))
++   // K80's distinct application service has the actual ABI-v1 fixed selector
++   // dispatcher,not an AGX tunnel. Match its real C++ IOService class;the
++   // IORegistry display name is not an IOServiceMatching class name.
++   // This explicit transport selection does not bypass normal XNU admission.
++   const bool published_direct = !strcmp(service_name, "NativeAdrenoGpuPublished");
++   const bool k80_application = !strcmp(service_name, "ZornGen7AppIoService26");
++   const bool direct = published_direct || k80_application;
++   if (published_direct && !(type_text && *type_text))
+       open_type = 0;
+-   io_service_t service = IOServiceGetMatchingService(
+-      kIOMainPortDefault, IOServiceMatching(service_name));
++   io_service_t service = IO_OBJECT_NULL;
++   const char *registry_text = k80_application ? getenv("TU_DARWIN_REGISTRY_ID") : NULL;
++   if (registry_text) {
++      // The plugin passes its actual IOKit discovery port's entry ID. Failure
++      // must not silently choose a different same-class service or peer.
++      if (*registry_text < '0' || *registry_text > '9')
++         return VK_ERROR_INCOMPATIBLE_DRIVER;
++      char *end = NULL;
++      errno = 0;
++      const unsigned long long registry_id = strtoull(registry_text, &end, 0);
++      if (errno || !registry_id || !end || *end)
++         return VK_ERROR_INCOMPATIBLE_DRIVER;
++      auto matching = IORegistryEntryIDMatching(registry_id);
++      if (!matching)
++         return VK_ERROR_INCOMPATIBLE_DRIVER;
++      service = IOServiceGetMatchingService(kIOMainPortDefault, matching);
++      if (service && !IOObjectConformsTo(service, service_name)) {
++         IOObjectRelease(service);
++         service = IO_OBJECT_NULL;
++      }
++   } else {
++      service = IOServiceGetMatchingService(kIOMainPortDefault,
++                                            IOServiceMatching(service_name));
++   }
+    if (!service)
+       return VK_ERROR_INCOMPATIBLE_DRIVER;
+ 
+@@ -234,21 +261,8 @@
+    dw.inflight_count = 0;
+    dw.last_fence = 0;
+ 
+-   /* Normal until Metal queues publish their current requests. An explicit environment override is also accepted. */
+-   {
+-      const char *want = getenv("METAL2VULKAN_QUEUE_PRIORITY");
+-      NativeAdrenoAbiPriority priority = {.foreground = 1, .background = 3};
+-      if (want && !strcmp(want, "high")) {
+-         priority.foreground = 0;
+-         priority.background = 2;
+-      } else if (want && !strcmp(want, "low")) {
+-         priority.foreground = 2;
+-         priority.background = 2;
+-      }
+-      dw_priority = priority;
+-      dw_priority_known = true;
+-      (void)dw_call(NativeAdrenoMethodSetPriority, &priority, sizeof(priority), NULL, 0);
+-   }
++   // ABI v1 exposes no per-process priority method. The board's queue policy
++   // remains authoritative; publishing an unsupported priority returns false.
+    return VK_SUCCESS;
+ }
+ 
+@@ -260,22 +274,8 @@
+ extern "C" __attribute__((visibility("default"))) bool
+ tu_darwin_set_priority(uint32_t foreground, uint32_t background)
+ {
+-   if ((foreground != UINT32_MAX && (foreground > 5 || foreground == 3)) ||
+-       (background != UINT32_MAX && background > 5))
+-      return false;
+-   pthread_mutex_lock(&dw.lock);
+-   bool accepted = false;
+-   if (dw_priority_known && dw.open) {
+-      NativeAdrenoAbiPriority priority = dw_priority;
+-      if (foreground != UINT32_MAX) priority.foreground = foreground;
+-      if (background != UINT32_MAX) priority.background = background;
+-      /* The frontend aggregates current live queues; lowering releases an old boost. */
+-      accepted = (priority.foreground == dw_priority.foreground && priority.background == dw_priority.background) ||
+-         dw_call(NativeAdrenoMethodSetPriority, &priority, sizeof(priority), NULL, 0) == KERN_SUCCESS;
+-      if (accepted) dw_priority = priority;
+-   }
+-   pthread_mutex_unlock(&dw.lock);
+-   return accepted;
++   (void)foreground; (void)background;
++   return false;
+ }
+ 
+ /* A note for the kernel's log (NativeAdrenoMethodNote), from the host frontend: kind 1 a render pass, 2 a pipeline made or refused. The
+@@ -285,13 +285,8 @@
+ extern "C" __attribute__((visibility("default"))) bool
+ tu_darwin_note(uint32_t kind, const uint32_t *words, uint32_t count)
+ {
+-   if (!dw.open || count > NativeAdrenoNoteWords)
+-      return false;
+-   NativeAdrenoAbiNote note = {};
+-   note.kind = kind;
+-   note.count = count;
+-   memcpy(note.words, words, count * sizeof(uint32_t));
+-   return dw_call(NativeAdrenoMethodNote, &note, sizeof(note), NULL, 0) == KERN_SUCCESS;
++   (void)kind; (void)words; (void)count;
++   return false; // ABI v1 has no Note method.
+ }
+ 
+ extern "C" __attribute__((visibility("default"))) const char *tu_darwin_frame_build_id(void);
+@@ -306,8 +301,8 @@
+ extern "C" __attribute__((visibility("default"))) bool
+ tu_darwin_frame_diagnostic(uint32_t method,const void *data,uint32_t bytes)
+ {
+-   if(!dw.open || !data || method!=0x7102 ||
+-      bytes!=120)return false;
++   if(!dw.open || !data || (method!=0x7102 && method!=0x7103) ||
++      (method==0x7102 && bytes!=120) || (method==0x7103 && bytes!=1144))return false;
+    return dw_call(method,data,bytes,NULL,0)==KERN_SUCCESS;
+ }
+ 
+@@ -1071,7 +1066,7 @@
+    /* With IO-coherent BOs (the kernel reports NativeAdrenoParamsOwnedCoherent) the GPU maps the pages write-back inner-shareable, so the CPU
+     * view is a write-back one too: a write-combined view of a page the GPU snoops and the kernel's cacheable alias would disagree. */
+    uint32_t options = (placed_addr ? 0 : kIOMapAnywhere) |
+-                      ((dw.params.flags & NativeAdrenoParamsOwnedCoherent) ? kIOMapCopybackCache : kIOMapWriteCombineCache);
++                      kIOMapWriteCombineCache /* ABI-v1 bit 1 means SubmitBatch */;
+    kr = IOConnectMapMemory64(dw.conn, reply.token, mach_task_self(), &address, &length, options);
+    if (kr != KERN_SUCCESS || !address || length < bo->size) {
+       NativeAdrenoAbiBoCpuUnmap undo = {.handle = bo->darwin_handle, .token = reply.token};
+@@ -1492,7 +1487,10 @@
+                     unsigned count, uint32_t *fence, struct tu_darwin_submit_rec *rec)
+ {
+    struct tu_device *dev = queue->device;
+-   NativeAdrenoAbiSubmit req = {};
++   const bool batch = (dw.params.flags & NativeAdrenoParamsSubmitBatch) != 0;
++   NativeAdrenoAbiSubmitBatch req = {};
++   if (!count || count > (batch ? NativeAdrenoAbiMaxBatchBuffers : NativeAdrenoAbiMaxBuffers))
++      return vk_device_set_lost(&dev->vk, "invalid v1 submission length");
+    req.buffer_count = count;
+    req.queue = 0;
+    for (unsigned i = 0; i < count; i++)
+@@ -1501,7 +1499,9 @@
+    for (;;) {
+       NativeAdrenoAbiSubmitReply reply = {};
+       const uint64_t began = tu_trace_clock_ns();
+-      kern_return_t kr = dw_call(NativeAdrenoMethodSubmit, &req, sizeof(req), &reply, sizeof(reply));
++      kern_return_t kr = dw_call(batch ? NativeAdrenoMethodSubmitBatch : NativeAdrenoMethodSubmit,
++                                 &req, batch ? sizeof(req) : sizeof(NativeAdrenoAbiSubmit),
++                                 &reply, sizeof(reply));
+       rec->call_us += (uint32_t)MIN2((tu_trace_clock_ns() - began) / 1000, 0xffffffffull - rec->call_us);
+       if (kr == KERN_SUCCESS) {
+          *fence = (uint32_t)reply.fence;
+@@ -1555,10 +1555,12 @@
+       bool inside = false;
+       if (total > darwin_split_counts[3])
+          p_atomic_set(&darwin_split_counts[3], total);
+-      if (total > NativeAdrenoAbiMaxBuffers)
++      const unsigned limit = (dw.params.flags & NativeAdrenoParamsSubmitBatch) ?
++         NativeAdrenoAbiMaxBatchBuffers : NativeAdrenoAbiMaxBuffers;
++      if (total > limit)
+          p_atomic_inc(&darwin_split_counts[0]);
+       for (unsigned at = 0, count = 0; at < total; at += count) {
+-         count = MIN2(total - at, (unsigned)NativeAdrenoAbiMaxBuffers);
++         count = MIN2(total - at, limit);
+          if (at + count < total) {
+             /* The kernel ends every submission with both threads selected and concurrent binning on, and starts the next one with a
+              * thread synchronization (NativeAdrenoRing's a7xx_submit framing). A command stream cut in two would run its second
+@@ -1713,13 +1715,11 @@
+    if (kr != KERN_SUCCESS)
+       return vk_device_set_lost(&device->vk, "error getting GPU status: 0x%x", kr);
+    if (reply.faults != device->fault_count) {
+-      /* The kernel ended a submission of this device (a hang or a fault): it retired that submission, restarted the GPU and
+-       * replayed every other one. The device's memory, pipelines and queues are as they were, so the device is not lost: a
+-       * Metal device keeps its resources across a GPU restart and only the command buffer in flight ends with an error, and a
+-       * render server cannot make its resources again. The count is kept for the frontend's telemetry (tu_darwin_restarts).
+-       */
++      /* K80 ABI-v1 has no qualified restart/replay contract. Count the observed
++       * fault and lose this device; retain uncertain native resources. */
+       p_atomic_add(&darwin_restarts, (uint32_t)(reply.faults - device->fault_count));
+       device->fault_count = reply.faults;
++      return vk_device_set_lost(&device->vk, "GPU faulted or hung");
+    }
+    return VK_SUCCESS;
+ }

@@ -1,0 +1,368 @@
+{
+  "version": 338,
+  "boot_tag": "b4bff8cd10764bbbb448d01c47ddf552",
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/full-link/kernel.ZORN26-APPS-SMMU-APERTURE338.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/boot-package/inputs/kernel.macho",
+    "sha256": "55f3780bcbcff8d8dda51b4dd020a1393616efbd5207a80d0c4ffdc82faa5d2a",
+    "bytes": 31115648
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/boot-package/boot.ZORN26-GPU-V338-SERIAL-UNSELECTED.img",
+    "sha256": "16f09ad50f0e1a83eae514d59236dfd6d8db39437372a203538a989e32990c70",
+    "bytes": 11886592
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "date": "2026-11-19",
+  "device": "92988a43/zorn/slot-a",
+  "scope": "single-K80-ios26-v338-apps-smmu-aperture-be0be2129a07",
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/boot-package/verified.json",
+    "bytes": 13480,
+    "sha256": "d0f883d967babc73eb883ba401283ecbf3d9c9c21eda0e9b19cc8ec2d41cae56"
+  },
+  "offline": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v338-apps-smmu-aperture-offline-2026-11-19.json",
+    "bytes": 8816,
+    "sha256": "30fabe242bd435529a2f0be4958cd76ffce1710a9dd407c3c4476ab5cf55f97d"
+  },
+  "boot_attempts": 1,
+  "retries": 0,
+  "native_root_writes": 0,
+  "watchdog_seconds": 300,
+  "recovery_timeout_seconds": 600,
+  "CDC": {
+    "frames": 30,
+    "physical_samples": 9,
+    "verified": true,
+    "capture": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/passive-panel-trial-be0be2129a07/trial/cdc.raw",
+      "bytes": 78606,
+      "sha256": "15b09f12bf567132466fbb2fff7f144e1f56c2f5b0a18244f552c43bcc6202bb"
+    },
+    "terminal_panic_observed": false,
+    "errors": {}
+  },
+  "recovery": {
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "identities": {
+      "before": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      },
+      "after": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      }
+    },
+    "duration_seconds": 334.1262599170004,
+    "protected_pairs": 7,
+    "adb_server_port": 5039,
+    "protected_GPT_and_root_manifest": true,
+    "BCB_before_boot_checked": true
+  },
+  "prerender_checkpoint": {
+    "run_id": "b4bff8cd10764bbbb448d01c47ddf552",
+    "text": "K80 GPU early332: root=1; cpu_online=8; gpu=pending",
+    "freshness": "before and after differ; tag absent before",
+    "status": "fresh-root-EL0-before-GPU",
+    "cpu_online": 8,
+    "deferred_CPU_owner_published": null,
+    "GPU_board_scheduled_at_checkpoint": false,
+    "GPU_firmware_or_rendering_proven": false
+  },
+  "GPU_startup": {
+    "deferred_call_returned": true,
+    "native_known_task": {
+      "raw": 0,
+      "phase": 6,
+      "flags": 63,
+      "grant_raw": 0,
+      "ring_read": 101,
+      "ring_write": 101,
+      "fence": 2,
+      "completed_fence": 2,
+      "native_outstanding": 0,
+      "submit_outstanding": 0,
+      "VM_poisoned": 0,
+      "submit_poisoned": 0,
+      "device_references": 0,
+      "output_crc": 3896750698,
+      "first_bad": 4294967295,
+      "expected_bad_byte": 0,
+      "actual_bad_byte": 0,
+      "table_acquires": 2,
+      "table_releases": 2,
+      "ring_busy": 1895825408,
+      "ring_status": 1,
+      "io_raw": 0,
+      "task_OOB_flags": 127,
+      "task_OOB_raw": 0,
+      "available": true,
+      "task_complete": true,
+      "checks": {
+        "completed_worker": true,
+        "actual_snapshot": true,
+        "original_task_completed": true,
+        "grant_returned_success": true,
+        "ring_idle_record": true,
+        "real_fence_completed": true,
+        "no_task_outstanding": true,
+        "not_poisoned": true,
+        "unmapped_no_device_references": true,
+        "actual_RGBA_readback": true,
+        "table_lease_balance": true,
+        "native_IO_success": true,
+        "actual_task_OOB_release": true
+      },
+      "scope": "Initial retained native kernel known-image task only;not a Metal frontend/ordinary surface/physical scanout or long-term stability oracle"
+    }
+  },
+  "display": {
+    "lease": {
+      "status": 6,
+      "uptime_ms": 72335,
+      "acquire_raw": 0,
+      "release_raw": 0,
+      "gcc_before": 2147483651,
+      "gcc_held": 2147483651,
+      "gcc_after": 2147483651,
+      "acquire_steps": 127,
+      "release_steps": 253,
+      "result": "returned",
+      "gcc_ahb_running": {
+        "gcc_before": false,
+        "gcc_held": false,
+        "gcc_after": false
+      }
+    },
+    "held_state": {
+      "status": 5,
+      "gcc_ahb_before": 2147483651,
+      "gcc_axi": 2097153,
+      "core_domain": 4163041280,
+      "core_domain_config": 67567616,
+      "ahb_clock": 1,
+      "mdp_clock": 1,
+      "vsync_clock": 1,
+      "gcc_ahb_after": 2147483651,
+      "result": "sampled",
+      "gcc_ahb_running_before": false,
+      "gcc_ahb_running_after": false
+    },
+    "held_DPU": {
+      "first_status": 9,
+      "second_status": 9,
+      "first_uptime_ms": 72336,
+      "second_uptime_ms": 72457,
+      "first_intf_frames": 139,
+      "first_mdp_frames": 139,
+      "first_tear_count": 659358,
+      "first_line_count": 1,
+      "second_intf_frames": 139,
+      "second_mdp_frames": 139,
+      "second_tear_count": 1578710,
+      "second_line_count": 1,
+      "route_status": 7,
+      "GOP_physical": 4232052736,
+      "GOP_stride": 5760,
+      "active_ctl_mask": 1,
+      "active_fetch_mask": 196608,
+      "first_result": "observed",
+      "second_result": "observed",
+      "elapsed_ms": 121,
+      "raw_frame_deltas": {
+        "intf": 0,
+        "mdp": 0,
+        "tear_read": 14
+      },
+      "controllers": [
+        {
+          "interface_active": 2,
+          "fetch_active": 196608,
+          "top": 4026662912,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        }
+      ],
+      "active_pipes": {
+        "0": {
+          "address": 4232052736,
+          "stride": 5760
+        },
+        "1": {
+          "address": 4232052736,
+          "stride": 5760
+        }
+      },
+      "equal_numeric_GOP_addresses": [
+        "0",
+        "1"
+      ],
+      "display_Apps_SMMU": {
+        "status": 5,
+        "control": 3081222,
+        "id0": 1275166315,
+        "id1": 1610612807,
+        "result": "observed",
+        "streams": [
+          {
+            "mode": 5,
+            "slot": 3,
+            "smr": 2147621888,
+            "s2cr": 3,
+            "cbar": 126976,
+            "cba2r": 1,
+            "sctlr": 224,
+            "ttbr0_low": 0,
+            "ttbr0_high": 0,
+            "tcr": 0,
+            "sid": 7168,
+            "interpretation": "context_bypass"
+          },
+          {
+            "mode": 5,
+            "slot": 3,
+            "smr": 2147621888,
+            "s2cr": 3,
+            "cbar": 126976,
+            "cba2r": 1,
+            "sctlr": 224,
+            "ttbr0_low": 0,
+            "ttbr0_high": 0,
+            "tcr": 0,
+            "sid": 7170,
+            "interpretation": "context_bypass"
+          }
+        ]
+      }
+    },
+    "Apps_SMMU": {
+      "status": 5,
+      "control": 3081222,
+      "id0": 1275166315,
+      "id1": 1610612807,
+      "result": "observed",
+      "streams": [
+        {
+          "mode": 5,
+          "slot": 3,
+          "smr": 2147621888,
+          "s2cr": 3,
+          "cbar": 126976,
+          "cba2r": 1,
+          "sctlr": 224,
+          "ttbr0_low": 0,
+          "ttbr0_high": 0,
+          "tcr": 0,
+          "sid": 7168,
+          "interpretation": "context_bypass"
+        },
+        {
+          "mode": 5,
+          "slot": 3,
+          "smr": 2147621888,
+          "s2cr": 3,
+          "cbar": 126976,
+          "cba2r": 1,
+          "sctlr": 224,
+          "ttbr0_low": 0,
+          "ttbr0_high": 0,
+          "tcr": 0,
+          "sid": 7170,
+          "interpretation": "context_bypass"
+        }
+      ]
+    },
+    "raw_GOP_copy": {
+      "windows": 8,
+      "missing_windows": 0,
+      "measured_seconds": 79.527,
+      "copied_frames": 2360,
+      "copies_per_second": 29.675456134394608,
+      "window_copies_per_second_min": 25.712856428214106,
+      "window_copies_per_second_max": 36.50860260176248,
+      "show_mean_ms": 19.914770762711864
+    },
+    "new_panel_frame_rate": null,
+    "display_latency_ms": null,
+    "interpretation": "Both K80 nonsecure display streams match slot 3 and resolve to stage-1 context bank 3 with stage 1 disabled and stage 2 bypass. The inherited 32-bit display fetch is the existing GOP physical address. This does not qualify a new mapping, latch, or DSI transfer."
+  },
+  "exact_vendor_DSI_completion_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/next-dsi-completion-sources/exact-inputs.json",
+    "bytes": 2969,
+    "sha256": "1fc3ce6f1734e95dabfd375194843f9eaf7dfd1646882bc39906205884dbf55e"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/passive-panel-trial-be0be2129a07/trial/run.json",
+    "bytes": 1650,
+    "sha256": "f77e5b0681341d76c89c7edf7754120094d675f79f5d2bae01a38c6af09120d4"
+  },
+  "analysis": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/passive-panel-trial-be0be2129a07/analysis/analysis.json",
+    "bytes": 265478,
+    "sha256": "a2225d8fb925c448105f01054d1a056a95d2c4f9da92edb1a788678a56fade05"
+  },
+  "fps_report": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/fps-report338.json",
+    "bytes": 1875,
+    "sha256": "19e1b550b9af16c6e89cc0b5028bf531ee8ff486235f66a8eaae094cf7f6de53"
+  },
+  "next_DSI0_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/next-dsi-completion-sources/board-inputs.json",
+    "bytes": 1821,
+    "sha256": "0d74ce55e22b6933b476aabbe6a4679093f0544af9254516da2ce70db918e2cc"
+  },
+  "verified_host_archive_replay": {
+    "byte_identical": true,
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v338-apps-smmu-aperture-b4bff8cd10764bbbb448d01c47ddf552/actual-v338-replay/analysis.json"
+  }
+}

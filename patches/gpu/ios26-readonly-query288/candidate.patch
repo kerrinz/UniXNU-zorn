@@ -1,0 +1,134 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -46,6 +46,14 @@
+ extern "C" void zorn26_native_known_image_observation(unsigned (&out)[32])
+ {for(unsigned i=0;i<32;++i)out[i]=nativeKnownImageObservation[i];}
+ namespace {
++// These native methods read their own client metadata/status,or the already
++// bound global CP always-on timer. None translates an application GPU VA.
++// Native result and all operation/task/provider/MMIO checks remain in force.
++static bool nativeReadOnlyQuery288(uint32_t method)
++{
++    return method==NativeAdrenoMethodQuery || method==NativeAdrenoMethodGetDeviceInfo ||
++        method==NativeAdrenoMethodGetStatus || method==NativeAdrenoMethodGetTimestamp;
++}
+ // This root lives for the actual initialized GPU's lifetime,not a connection.
+ // Registry lock precedes issuer;native operations never acquire the registry
+ // while holding issuer. It also covers CPU frames BEFORE the first binding,
+@@ -1314,10 +1322,11 @@
+         p.clientTask_==s.kernelTaskOwner && !s.kernelProcessClosing && kernelClientExecutionHealthy();
+     const bool app=applicationOperationHeld() && s.appExecution->client_==&connection &&
+         p.clientTask_==s.appExecution->task_;
+-    if(!callingTask || (!kernel && !app) || !processConnectionHeld(connection) || s.processSelected!=&p || p.ringOwner_!=this ||
++    const bool readOnly=app && !s.hfi && nativeReadOnlyQuery288(method);
++    if(!callingTask || (!kernel && !app) || !processConnectionHeld(connection) || (!readOnly && s.processSelected!=&p) || p.ringOwner_!=this ||
+        p.domain_!=&s.domain || p.clientOwner_!=&connection || !p.clientOpen_ || p.clientClosed_ ||
+-       !p.vmAttached_ || p.vmDetached_ || p.state_.detached || p.state_.poisoned ||
+-       !p.submitAttached_ || p.clientState_->submit.poisoned())return done(kIOReturnNotReady);
++       !p.vmAttached_ || p.vmDetached_ || (!readOnly && p.state_.detached) || p.state_.poisoned ||
++       !p.submitAttached_ || !p.clientState_ || p.clientState_->submit.poisoned())return done(kIOReturnNotReady);
+     clock_interval_to_deadline(1000,NSEC_PER_MSEC,&s.deadline);
+     alignas(8) uint8_t reply[sizeof(NativeAdrenoAbiMetadata)]{};
+     NativeAdrenoRingClock clock{this,nativeNow,nativeIdle};
+@@ -1963,10 +1972,11 @@
+ }
+ 
+ IOReturn ZornGen7HostRing26::beginApplicationOperation(IOUserClient &client,
+-    ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope,bool *pendingFence)
++    ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope,bool *pendingFence,bool selectContext)
+ {
+     if(pendingFence)*pendingFence=false;
+-    if(scope || !storage_ || !normal())return kIOReturnBadArgument;auto &s=*storage_;
++    if(scope || !storage_ || !normal() || (!selectContext &&
++       operation!=ZornGen7AppOperation26::CpuView && operation!=ZornGen7AppOperation26::Timestamp))return kIOReturnBadArgument;auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || !s.appSerial ||
+        __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread())return kIOReturnNotReady;
+     // Sleepable PI mutex:wait for the complete current operation,including
+@@ -1989,7 +1999,7 @@
+         s.appOperationThread=current_thread();scope=execution;s.unlockIssuer();
+         // Prepare creates its process in the original body;every retained
+         // ordinary/Close process uses the real existing Select operation.
+-        if(!s.hfi && operation!=ZornGen7AppOperation26::PrepareTables){
++        if(selectContext && !s.hfi && operation!=ZornGen7AppOperation26::PrepareTables){
+             bool pending=false;raw=enterApplicationContext(client,*execution,&pending);
+             if(raw){scope=nullptr;const auto result=finishApplicationOperation(*execution,raw);
+                 // Only real pre-body pending state may resume. A failure in
+@@ -2069,7 +2079,8 @@
+     else if(method==NativeAdrenoMethodSubmit || method==NativeAdrenoMethodSubmitBatch)operation=ZornGen7AppOperation26::Submit;
+     else if(method==NativeAdrenoMethodWaitFence)operation=ZornGen7AppOperation26::Wait;
+     else if(method==NativeAdrenoMethodGetTimestamp)operation=ZornGen7AppOperation26::Timestamp;
+-    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,operation,scope);if(raw)return raw;
++    const bool selectContext=storage_->hfi || !nativeReadOnlyQuery288(method);
++    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,operation,scope,nullptr,selectContext);if(raw)return raw;
+     if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     alignas(8) uint8_t reply[sizeof(NativeAdrenoAbiMetadata)]{};
+     raw=dispatchProcessClient(client,process,caller.task,method,input,inputBytes,reply,outputBytes);
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -42,7 +42,7 @@
+     IOReturn checkApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 &,
+         ZornGen7AppOperation26);
+     IOReturn closeApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr);
+-    IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr);
++    IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr,bool selectContext=true);
+     IOReturn finishApplicationOperation(class ZornGen7AppExecution26 &,IOReturn);
+     bool applicationOperationHeld() const;
+     IOReturn enterApplicationContext(class IOUserClient &,class ZornGen7AppExecution26 &,bool *pendingFence=nullptr);
+--- a/ZornRootWindow26.h
++++ b/ZornRootWindow26.h
+@@ -17,7 +17,7 @@
+ static_assert(RelativeByteStart<=PartitionBytes && Bytes<=PartitionBytes-RelativeByteStart);
+ static_assert(!(AbsoluteByteStart&4095) && !(Bytes&4095));
+ static_assert((AbsoluteByteStart>>12)+((Bytes>>12)-1)<=0xffffffffULL);
+-static constexpr uint8_t ImageSha256[] = {0x3,0x59,0x3e,0xbb,0xc6,0x19,0x61,0xb2,0x2a,0x75,0xf5,0x72,0xa7,0xd3,0x49,0x6f,0x1,0x67,0xcc,0xc,0xd3,0x32,0x26,0x2b,0xd5,0xf6,0x45,0xb0,0xd0,0xa9,0x22,0x6a};
++static constexpr uint8_t ImageSha256[] = {0xc3,0x3f,0x8f,0x56,0xa6,0xd8,0x2b,0xdb,0xa6,0xa,0xf3,0x81,0x74,0x79,0x50,0xe3,0x8b,0xa3,0x12,0xf,0x8a,0x3f,0x5f,0xa2,0x47,0xbd,0xfe,0x83,0x72,0x3c,0x1b,0xa7};
+ static constexpr uint8_t WindowBytes[] = {0x0,0x0,0x0,0x15,0x33,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+ static constexpr uint8_t NativeCompatible[] = {0x56,0x35,0x33,0x41,0x50,0x0,0x69,0x50,0x68,0x6f,0x6e,0x65,0x31,0x38,0x2c,0x31,0x0,0x41,0x70,0x70,0x6c,0x65,0x41,0x52,0x4d,0x0,0x78,0x69,0x61,0x6f,0x6d,0x69,0x2c,0x7a,0x6f,0x72,0x6e,0x0,0x71,0x63,0x6f,0x6d,0x2c,0x73,0x6d,0x38,0x36,0x35,0x30,0x0};
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC b6847f4ed03640479d36d04e18f44160 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 9f68f2c1c07d4071b74bdd47199865f4 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"b6847f4ed03640479d36d04e18f44160",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"9f68f2c1c07d4071b74bdd47199865f4",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B6847F4ED036"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN269F68F2C1C07D"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb6,0x84,0x7f,0x4e,0xd0,0x36,0x40,0x47,0x9d,0x36,0xd0,0x4e,0x18,0xf4,0x41,0x60};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x9f,0x68,0xf2,0xc1,0xc0,0x7d,0x40,0x71,0xb7,0x4b,0xdd,0x47,0x19,0x98,0x65,0xf4};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb6,0x84,0x7f,0x4e,0xd0,0x36,0x40,0x47,0x9d,0x36,0xd0,0x4e,0x18,0xf4,0x41,0x60};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x9f,0x68,0xf2,0xc1,0xc0,0x7d,0x40,0x71,0xb7,0x4b,0xdd,0x47,0x19,0x98,0x65,0xf4};

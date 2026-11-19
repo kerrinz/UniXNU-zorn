@@ -1,0 +1,117 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 334,
+  "boot_tag": "329948d2e033443eaada873146857dc2",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/boot-package/boot.ZORN26-GPU-V334-SERIAL-UNSELECTED.img",
+    "sha256": "e21a99eefc88c921431b7cf2bbbfffca76aa703ba52985ea6240ee885e8cfe12",
+    "bytes": 11882496
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/full-link/kernel.ZORN26-DISPCLK334.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/boot-package/inputs/kernel.macho",
+    "sha256": "9b1fd47859dc52eed4543cfa7cbe4d579cf0172b9b269b74d4d938d32fc930ee",
+    "bytes": 31097288
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/boot-package/verified.json",
+    "bytes": 13386,
+    "sha256": "c0dbfa6978649dacb895e75ccffbaa8418051910ff1044dace74ccc970e252f5"
+  },
+  "link": {
+    "passed": true,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/full-link/kernel.ZORN26-DISPCLK334.UNSELECTED.macho",
+      "sha256": "9b1fd47859dc52eed4543cfa7cbe4d579cf0172b9b269b74d4d938d32fc930ee"
+    },
+    "bytes": 31097288,
+    "inputs": 1399,
+    "replaced": 41,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/full-link/exact-inputs.json",
+      "sha256": "1205a3813658391b2422749c83596c1b26ff3ab9da54c0850d748a8c7ffd2c68"
+    },
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "hardware_qualified": false,
+    "device_access": false,
+    "sha256": "9b1fd47859dc52eed4543cfa7cbe4d579cf0172b9b269b74d4d938d32fc930ee",
+    "undefined_symbols": 0
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-display-clock334/source-manifest.json",
+    "bytes": 2185,
+    "sha256": "6e9496a52b259bd1001b208394b332fb71f4be7b14c9240ed33f46cb8bc9564a"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v333-arc-supply-device-2026-11-19.json",
+    "bytes": 12793,
+    "sha256": "68c7095089dfc96a9a8549a6f747a7020812bbe5296f6ec96716e2c99310b20e"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/host-clock-state/result.json",
+      "bytes": 3528,
+      "sha256": "06dd0de433ccbdb97f0d6e844375f11d6b61674bbf45c073776e43658d9fc710"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/patch-replay.json",
+      "bytes": 795,
+      "sha256": "88eb514a79f51e6022b96933bb3fcb6364526249d7a6c1a222e3a287eadf3d7b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/early-console-archive-host/result.json",
+      "bytes": 4242,
+      "sha256": "273209809f435f8fa7465ead877f4cd84fcdd44db151384a5efe351c927ed5b9"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v334-display-clock-state-329948d2e033443eaada873146857dc2/retained-v333-archive-regression/result.json",
+      "bytes": 4182,
+      "sha256": "5e0f4afcf8b6346069a5119b95ba23dd147199235fe20f70fac13cebe44bc0e0"
+    }
+  ],
+  "enabled_path": "Observe native K80 clock-controller status only while the existing display regulator and bandwidth resources are held. Keep all actual DPU counter gates unchanged.",
+  "expected_markers": {
+    "A5": "started early worker checking native root before record",
+    "A6": "the v332 pre-GPU record write and readback matched; CDC call follows",
+    "AE": "record write/readback refused",
+    "B5": "native GPU board worker created after initial CDC transfers",
+    "B6": "board scheduling refused",
+    "BD": "deferred CPU GPU owner did not appear by the 30 second deadline"
+  },
+  "device_only_questions": [
+    "Does DISP_CC respond to bounded reads under the held resources and existing GCC software vote?",
+    "If readable, which GCC bus, domain and clock states block the DPU counter path?",
+    "Do GPU bring-up and automatic return to verified Recovery remain intact?"
+  ],
+  "watchdog_seconds": 300,
+  "recovery_timeout_seconds": 600,
+  "retries": 0,
+  "root_installation_required": false,
+  "device_ready": false,
+  "phone_access": false
+}

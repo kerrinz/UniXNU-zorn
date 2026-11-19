@@ -1,4 +1,14 @@
+2026-11-17最新280：新Metal／runtime与公共Turnip完成整栈配套，独立根／完整K80内核／启动包及主机检查通过；保留真实ABI-v1，未安装或上机，GMEM／性能仍待实测。[280交接](handoff-2026-11-17-k80-ios26-gpu-v280-upstream-stack.md)。
+
+2026-11-17最新279：配套上游8c7f9502／46e7cc96＋0063源码已构建为独立、完整链接签名的iOS26 Metal用户态bundle；实际Mach权限／安全读取和有界no-copy适配通过。原v1 Turnip保持，公共Mesa／新root／kernel／boot及硬件帧率仍待推进。[279交接](handoff-2026-11-17-k80-ios26-gpu-v279-upstream-runtime.md)。
+
+2026-11-17上游更新：官方630b85a3已建立逐文件／Git树核验的独立参考仓库，并同步原origin/main；旧main、本地改动及所有K80基线保留。主机测试41通过／1缺工具跳过，新版官方记录检查通过。GPU组件仅核对新钉点，尚未集成或上机。[更新来源、回归和性能候选](upstream-refresh-2026-11-17.md)。
+
+2026-11-17最新离线278：真实presenter的排队／pace／lease／acquire／show计时已接通并完成完整内核／启动包。固定入口因私有ADB5039不可达在claim前拒绝，未启动手机、无新耗时结果；不自行bootstrap或重试。设置交互独立待修，低帧率仍待测量。[278精确交接](handoff-2026-11-17-k80-ios26-gpu-v278-present-cost.md)。
+
 Current hardware update: v256 kernel0f1840cb/boot79249c64 reuses installed252 root859c7eba and completed one protected ordinary-system trial. AutomaticTWRP333.724595s,first native close0/reopen,second last call3293/method13/raw0;surface151/SID183 accessfence154 matches producer/tail/completed/acquire/copy ledger.39frames58147B,intact9170B/60record observed stderr prefix,gaps0,actual8CPU samples and seven protection/fullBCB checks pass. Camera150/225s shows physical lockscreen4:02→4:03. No new root install or retries. Logical admission remains exclusive;independent per-switch MMIO/per-frame GPU-write,daemon exit/fullGPU desktop andFT3683 gestures remain unqualified. [256 handoff](handoff-2026-11-16-k80-ios26-gpu-v256-operation-context.md),[observed evidence](evidence/k80-gpu-v256-operation-context-observed-2026-11-16.json). The earlier offline creation summaries below keep their original chronology.
+
+2026-11-17最新277手动验收：解锁、长按菜单出现／收起、Home手势有响应；设置列表无法滑动但可以回桌面，不是系统整体卡死。按机主指示设置单列待修，GPU主线优先定位低帧率。真实fence72..90／ROI93，无采样后端错误、compact丢失1；333.48秒回核验TWRP，完整验收未完成。[精确交接与机主更正](handoff-2026-11-17-k80-ios26-gpu-v277-manual-acceptance.md)。
 
 2026-11-17 v261实机更新：一次启动约333.63秒自动回TWRP，串口／相机成功，用户确认iOS桌面及滑动／点按／长按／解锁响应，最终长按设置卡死。两条渲染路径均低帧率，不比较帧率高低；GPU稳定性未解决。首个记录后端错误BoMap NoResources，仍待内部容量／映射分支及更晚生命周期日志定位。[本次记录](handoff-2026-11-17-k80-ios26-gpu-v261-client-failure.md)。
 

@@ -1,0 +1,252 @@
+{
+  "version": 315,
+  "boot_tag": "1aca8228542b4b3bad2fb1e5f4dbce9e",
+  "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e",
+  "build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e",
+  "parent_exact_build": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a",
+  "parent_source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a",
+  "actual_previous_worker_object": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-passive26-cc9fbb3b86364db19e8f2ec90256040b/full-link/inputs/1328-ZornFt3683Worker26.cpo",
+    "sha256": "12a3d0f23e3ab4b5ae64ac746c71aba9a82b64b336f8ca0619578ea66faa3d5d",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-passive26-cc9fbb3b86364db19e8f2ec90256040b/full-link/inputs/1328-ZornFt3683Worker26.cpo",
+    "replaced": false
+  },
+  "actual_previous_worker_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-worker-reference-candidate/ZornFt3683Worker26.cpp",
+    "sha256": "c4a376cc28b2991fb1c2515ee5f1ba43cabfce90b3beef241ea3d3e18b304d14"
+  },
+  "actual_selected_worker_object": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/native-compile/ZornFt3683Worker26.cpo",
+    "sha256": "9e639bc45bfbc7f24c6580a7e25c730dea4c9dc86f972914bf49ba7d19b80031",
+    "prior_input": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-passive26-cc9fbb3b86364db19e8f2ec90256040b/full-link/inputs/1328-ZornFt3683Worker26.cpo",
+    "replaced": true
+  },
+  "replay_base": "Clone the exact v314 source and seed the previously linked reference worker at touch-source313/ZornFt3683Worker26.cpp before applying the patch.",
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-ft-dispatch315/candidate.patch",
+    "sha256": "cefc1c3c6faf68bb9d967e124a8583fda48bae30aadfe930b60a6a407aa330d2"
+  },
+  "zero_fuzz_patch_replayed": true,
+  "patch_command": [
+    "/usr/bin/patch",
+    "--batch",
+    "--forward",
+    "--fuzz=0",
+    "-p1",
+    "-i",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-ft-dispatch315/candidate.patch"
+  ],
+  "patch_stdout": "patching file ZornUfsOwner26.cpp\npatching file ZornUsbCdc26.c\npatching file 'record-identity/ZornPlatformRecordIdentity26.h'\npatching file 'record-identity/ZornPlatformTrialIdentity26.h'\npatching file 'touch-source313/ZornFt3683Worker26.cpp'\n",
+  "source_inputs": {
+    "ZornUfsOwner26.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/ZornUfsOwner26.cpp",
+      "sha256": "d8af8637bf30a35e0c247649cc6e02d6312c49d698162dc193740d4e6e6fcd67"
+    },
+    "ZornUsbCdc26.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/ZornUsbCdc26.c",
+      "sha256": "f43523619daa7349a1cd5401243772e44a636f8ebc6dec513d900f9b90187bc2"
+    },
+    "record-identity/ZornPlatformRecordIdentity26.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/record-identity/ZornPlatformRecordIdentity26.h",
+      "sha256": "04474c9652e09d84e76778e88ab968b1b6a24cfbced05108974bb8a14db101cf"
+    },
+    "record-identity/ZornPlatformTrialIdentity26.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/record-identity/ZornPlatformTrialIdentity26.h",
+      "sha256": "de1d576755c2af74ff2a1a4afd693aca7070cb88977c087026b028abbd8d8381"
+    },
+    "touch-source313/ZornFt3683Worker26.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/touch-worker-reference-candidate/ZornFt3683Worker26.cpp",
+      "sha256": "c4a376cc28b2991fb1c2515ee5f1ba43cabfce90b3beef241ea3d3e18b304d14"
+    }
+  },
+  "changed_files": [
+    {
+      "file": "ZornUfsOwner26.cpp",
+      "parent": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/ZornUfsOwner26.cpp",
+        "sha256": "d8af8637bf30a35e0c247649cc6e02d6312c49d698162dc193740d4e6e6fcd67"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/ZornUfsOwner26.cpp",
+        "sha256": "f749bf0387c300712b1dbe88732d935c88a5ac7070404d28d9a321ae86f67108"
+      }
+    },
+    {
+      "file": "ZornUsbCdc26.c",
+      "parent": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/ZornUsbCdc26.c",
+        "sha256": "f43523619daa7349a1cd5401243772e44a636f8ebc6dec513d900f9b90187bc2"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/ZornUsbCdc26.c",
+        "sha256": "bb4670cdff9903dbf9876f64c43ed5e143af465a9489dd44d1c0677f0af84b20"
+      }
+    },
+    {
+      "file": "record-identity/ZornPlatformRecordIdentity26.h",
+      "parent": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/record-identity/ZornPlatformRecordIdentity26.h",
+        "sha256": "04474c9652e09d84e76778e88ab968b1b6a24cfbced05108974bb8a14db101cf"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/record-identity/ZornPlatformRecordIdentity26.h",
+        "sha256": "7c0a1bd3e74b7592b4e127f329140b4fade6aa5c46ec347310645a5cbf9a860f"
+      }
+    },
+    {
+      "file": "record-identity/ZornPlatformTrialIdentity26.h",
+      "parent": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/record-identity/ZornPlatformTrialIdentity26.h",
+        "sha256": "de1d576755c2af74ff2a1a4afd693aca7070cb88977c087026b028abbd8d8381"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/record-identity/ZornPlatformTrialIdentity26.h",
+        "sha256": "0cb13fbb2ccf6b9581b8338dfe9b30c64bb642dda129e4892d74be201c48e676"
+      }
+    },
+    {
+      "file": "touch-source313/ZornFt3683Worker26.cpp",
+      "parent": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/touch-source313/ZornFt3683Worker26.cpp",
+        "sha256": "56dfe2c22fe9584796ba7db76b78975baf2aad0d8535303983c524fc37d7f289"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/touch-source313/ZornFt3683Worker26.cpp",
+        "sha256": "4784f0f790a1687a0f04ff82c5bf81cf28f9c33537a2bc1fbe4c14e2243d3e79"
+      }
+    }
+  ],
+  "recipes": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/prepare315.py",
+      "sha256": "7bbb87e096c1011e0dc8ada1f0380c7065924a965027260614a159efc7a8f8e4"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/build315.py",
+      "sha256": "7c29dcb0ee56a99030c232ad0f5637a860b307917b6d187ea8aca70f0976fff4"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/make-package315.py",
+      "sha256": "0f681fac224a775d5f4362df7f44dc8443ea23f4f76c27a820667af8057f1ba7"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/package-wrapper315.py",
+      "sha256": "36f348da6ef8605c6db80c5c5e53015d3c8be7e5160218bc1e40857ece2749cf"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/package-ft-dispatch315.py",
+      "sha256": "ce6d1295b29df773d0b0f901977147733c6da8a3795496c437e2bfa14bf15e3e"
+    }
+  ],
+  "build_records": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/candidate.json",
+      "sha256": "2354ebf561c3d657fec322fc1e1582543371eb971c65eb94ff798807de9609af"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/artifact-identity.json",
+      "sha256": "ff40c9bc568b91d40016fd8fc8c80f3420e6751d387c0e43c29413bda345c57c"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/source-stage.json",
+      "sha256": "6f4a81f3fccd9140ee9cbe0260bded3287199d2f013373eb60ca6944ec9c7350"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/source-delta-review.json",
+      "sha256": "47ab218088b3a7ec65a44a790f3b97d0b5149d03168fb5ead8b1d3c12879a1d1"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/compile-result.json",
+      "sha256": "140de1d76778cdfa7c0d3e99e414697240fdb682f8d73a0f8b37c02c1d515412"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/native315-commands.json",
+      "sha256": "335ffc718532172c18809a06efc0f57593925a108d3b85b0938e5e028591248b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/native-vfs.json",
+      "sha256": "6a598781c85a410fd140a95ace037c37d7c4452255cd3b85383c8c44690116ae"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/worker315-inputs.json",
+      "sha256": "0bff66e72997d6fc09eba995ca084026329a6601b8d21d140cd905bfcc5c56aa"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/worker315-native-recipe.json",
+      "sha256": "07a9f101a12d945bc3daaab54d0414cf83b9d26557590afcb294258c6126e137"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/full-build-review.json",
+      "sha256": "0f140e7fb08846118f6d24922c9067de5a5ff41f37777b8f37262016e9e497e2"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/full-link/link.command.json",
+      "sha256": "9cf58e4cd01942fc8a12d2631d682f280788e758231184a35644a2e23bc3766b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/full-link/link-result.json",
+      "sha256": "bfa8f32bea606850dc3278443e680f3c898b1ee9edfd9a864027ba8eb8804221"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/full-link/exact-inputs.json",
+      "sha256": "9d751a180b15d745cc1cef30525611e7084f58d063e41b6be024d4e2d85f788b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/native-platform-config.json",
+      "sha256": "1a580938653079026f1c902e73e810a98be1cc665cb6640fa14f35a1778e3909"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/firmware-input-closure315.json",
+      "sha256": "2a3972f5ecfb835a7fab9d5401a79c8bf1b825185532bf95b7cb687370143573"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/boot-package/commands.json",
+      "sha256": "3a64e9d76038a5ec5ffe427ef12048000b77327d15c7ac260767171158876323"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/boot-package/verified.json",
+      "sha256": "83a85c02ad8d5980df3333699e93006fa5c64aadebb7437f266c8061a383ec18"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/boot-package/unixnu.toml",
+      "sha256": "9193063b9cbcd8aaf414439683d92a4ba9709926d9b809e0b68d027858302216"
+    }
+  ],
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/ft-worker315-asan/result.json",
+      "sha256": "bd85690e0f014d3c390b3a6078496d591f4264dabd300ca2219b5e398d46935d"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/ft-worker315-tsan/result.json",
+      "sha256": "7f617927c5ac967dd21a7be879b6714d007c1359fd25730f8f314de1e4e4f9eb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/ft313-observer-host/result.json",
+      "sha256": "060d9ed174ad4f10b9fa01391687c3f729f6ca8e7bc5c51ae2be5332f65140ee"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/native-identity-current-host/result.json",
+      "sha256": "a5459edb7dc7f2426e16ce54cb18cbbc5929b95ce6351a55171b6316c0a9964b"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/physical-archive-host/result.json",
+      "sha256": "0d748078b80a7bc8178e816262b79330a11f7e730ec8c0817d5e5ac644f59997"
+    }
+  ],
+  "negative_old_worker_control": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v315-ft-dispatch-1aca8228542b4b3bad2fb1e5f4dbce9e/expected-old-worker-failure.log",
+    "sha256": "09a9b4798fc570443e343fb0f15ced5a6ef506a890fa04a889e1874e5d143a62"
+  },
+  "prior_v314_analyzer_frozen": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/physical-archive-verified-host/analyze-ios26-ft-capture.py",
+      "sha256": "ba072ee87aa1480f2dc7a99553723eac20ef87d00a108ee502c5201fbb5cf0d8"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v314-submit-rollback-47bfe9bd7337476d83b113716083b03a/physical-archive-verified-host/check-ios26-ft-capture-archive.py",
+      "sha256": "f6550d2c01fb0b133adb8446aba1d354e160f98f176dd2bcae1bc21e47ca90a8"
+    }
+  ],
+  "phone_access": false
+}

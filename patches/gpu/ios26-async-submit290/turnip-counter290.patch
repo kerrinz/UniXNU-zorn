@@ -1,0 +1,85 @@
+--- a/k80-abi280/ZornDarwinCallCost287.h
++++ b/k80-abi280/ZornDarwinCallCost287.h
+@@ -3,25 +3,26 @@
+ #define ZORN_DARWIN_CALL_COST287_H
+ #include <stdint.h>
+ #include <stddef.h>
++#include <pthread.h>
+ 
+-/* Diagnostic counters around the real ABI1 IOKit call. No object, fence,
+- * permission, result or resource lifetime is supplied by this observer.
+- * Its nonblocking gate never spans an IOKit call. Contention is visible loss.
+- * Times are monotonic CPU wall nanoseconds, not GPU timestamps. */
++/* Private userland observation;the96-word287 wire contract is unchanged.
++ * Serialize only counter updates/snapshots,never an IOKit call. Unlike the
++ * old trylock update gate,ordinary counter contention loses no RPC records.
++ * A real mutex failure still invalidates observation;backend results remain
++ * unchanged. The actual exporter samples its clock AFTER acquiring the lock.
++ */
+ struct ZornDarwinCallCost287 {
+     enum { Schema=287, Methods=18, Words=96 };
+     enum Fault { Clock=1, Saturated=2, Lost=4, UnknownMethod=8 };
+     struct Row { uint64_t count=0,total=0,maximum=0,errors=0,timeouts=0; };
+-    uint32_t gate=0,flags=0;
++    pthread_mutex_t gate=PTHREAD_MUTEX_INITIALIZER;
++    uint32_t flags=0;
+     uint64_t dropped=0;
+     Row rows[Methods]{};
+ 
+     void fault(uint32_t bits) { __atomic_fetch_or(&flags,bits,__ATOMIC_RELAXED); }
+-    bool take() {
+-        uint32_t free=0;
+-        return __atomic_compare_exchange_n(&gate,&free,1,false,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED);
+-    }
+-    void unlock() { __atomic_store_n(&gate,0,__ATOMIC_RELEASE); }
++    bool take() { return pthread_mutex_lock(&gate)==0; }
++    bool unlock() { return pthread_mutex_unlock(&gate)==0; }
+     void lost() {
+         uint64_t before=__atomic_load_n(&dropped,__ATOMIC_RELAXED);
+         while(before<UINT32_MAX && !__atomic_compare_exchange_n(&dropped,&before,before+1,false,__ATOMIC_RELAXED,__ATOMIC_RELAXED)) {}
+@@ -43,10 +44,9 @@
+         }
+         if(error)add(r.errors,1,UINT32_MAX);
+         if(timeout)add(r.timeouts,1,UINT32_MAX);
+-        unlock();
++        if(!unlock())lost();
+     }
+-    bool snapshot(uint64_t *out,uint32_t words,int64_t now) {
+-        if(!out || words!=Words || now<0 || !take())return false;
++    void copyLocked(uint64_t *out,int64_t now) {
+         out[0]=Schema;out[1]=Methods;
+         out[2]=__atomic_load_n(&flags,__ATOMIC_RELAXED);
+         out[3]=__atomic_load_n(&dropped,__ATOMIC_RELAXED);
+@@ -56,7 +56,20 @@
+             out[at]=r.count;out[at+1]=r.total;out[at+2]=r.maximum;
+             out[at+3]=r.errors;out[at+4]=r.timeouts;
+         }
+-        unlock();return true;
++    }
++    bool finishSnapshot() {
++        if(unlock())return true;
++        lost();return false;
++    }
++    bool snapshot(uint64_t *out,uint32_t words,int64_t now) {
++        if(!out || words!=Words || now<0 || !take())return false;
++        copyLocked(out,now);return finishSnapshot();
++    }
++    bool snapshotWithClock(uint64_t *out,uint32_t words,int64_t (*clock)()) {
++        if(!out || words!=Words || !clock || !take())return false;
++        const int64_t now=clock();
++        if(now<0) { if(!unlock())lost();return false; }
++        copyLocked(out,now);return finishSnapshot();
+     }
+ };
+ static_assert(ZornDarwinCallCost287::Words==6+5*ZornDarwinCallCost287::Methods,"fixed private scalar snapshot");
+--- a/src/freedreno/vulkan/tu_knl_darwin.cc
++++ b/src/freedreno/vulkan/tu_knl_darwin.cc
+@@ -160,7 +160,7 @@
+ extern "C" __attribute__((visibility("default"))) bool
+  tu_darwin_call_cost287(uint64_t *out,uint32_t words)
+ {
+-   return darwin_call_cost287.snapshot(out,words,os_time_get_nano());
++   return darwin_call_cost287.snapshotWithClock(out,words,os_time_get_nano);
+ }
+ 
+ static kern_return_t

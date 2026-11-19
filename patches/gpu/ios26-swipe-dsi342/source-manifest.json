@@ -1,0 +1,82 @@
+{
+  "version": 342,
+  "boot_tag": "29ea4b69ae9e411f846be8f431920c17",
+  "base": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97",
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-swipe-dsi342/candidate.patch",
+    "bytes": 22240,
+    "sha256": "eeb48ce2b56e54c1218fd0cfa34a569d5d485e93c7069bafcd875c14a4cd69a9"
+  },
+  "replay": "Apply patch -F0 -p1 to the v341 build source",
+  "source_bases": {
+    "MiniIOMobileFramebuffer.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/MiniIOMobileFramebuffer.cpp",
+      "bytes": 121691,
+      "sha256": "e91aa9bcf18a2ed3fcc192b10b369e1735cb1b9232a8cca5f0498b26318991f8"
+    },
+    "ZornGen7DarwinBoardOwner.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/ZornGen7DarwinBoardOwner.cpp",
+      "bytes": 366880,
+      "sha256": "08d9ef612a6fade51ef5195519679d0cdde72b9dd7a1eac02f2f7b6cbdf3d4a7"
+    },
+    "ZornManualWire313.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/ZornManualWire313.h",
+      "bytes": 2190,
+      "sha256": "1ed1cf96114566a316c1ddd069b63218cec71a6a2a04ebee348b5f1750767ce7"
+    },
+    "ZornUfsOwner26.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/ZornUfsOwner26.cpp",
+      "bytes": 96043,
+      "sha256": "07e15dd07eb563f6df6dd853e83dbeedb87d38ee8186ae717d972452921d3632"
+    },
+    "ZornUiSceneService269.cpp": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/ZornUiSceneService269.cpp",
+      "bytes": 19326,
+      "sha256": "8857525fb5b0f143741eb044b61aa43f4729fb8a9603d5416fe13c2c19a44462"
+    },
+    "ZornUsbCdc26.c": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/ZornUsbCdc26.c",
+      "bytes": 27186,
+      "sha256": "639cb3e4c475f98689a9c7c3c698bd575f67394c621c3474f6ca80810e8e1559"
+    },
+    "arc-runtime/ZornDisplayRegisterResources324.inc": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/arc-runtime/ZornDisplayRegisterResources324.inc",
+      "bytes": 12820,
+      "sha256": "56f798d123639179a64523b894518c880e8f5d332f04650e416ddb31b5977dc2"
+    },
+    "record-identity/ZornPlatformRecordIdentity26.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/record-identity/ZornPlatformRecordIdentity26.h",
+      "bytes": 320,
+      "sha256": "044b76f62c776bffb227cf748d386075277fd4faf937d7b5f203a2bdbdf22006"
+    },
+    "record-identity/ZornPlatformTrialIdentity26.h": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v341-runtime-dsi-243f850e8a814f828b735dc75f05cf97/record-identity/ZornPlatformTrialIdentity26.h",
+      "bytes": 308,
+      "sha256": "41a2e0358e93aaf76daed27d50f2fc57c898cb0a679fa5aaed51f8770f19b169"
+    }
+  },
+  "candidate_files": {
+    "MiniIOMobileFramebuffer.cpp": "1e025c8a6d488a54b2a09bb6f3f06d03acdb6107471fbedb40109e8457e9d467",
+    "ZornGen7DarwinBoardOwner.cpp": "8df6c777eb7dbc88b8bfa7959b8e73a5a0ac7135945f5e40214f76a081da899b",
+    "ZornManualWire313.h": "0df98553fbb14667b88d5c71780907e6df962cdb0339c9283b2246bd7e473a78",
+    "ZornRuntimeDisplayScene342.h": "fd2efc59d90a67df5ecabd807386a1757c922a052a6defbb0486a739a392951e",
+    "ZornUfsOwner26.cpp": "6a3221d7a3148f6a10bfd462f356fd8a10134963fd857d0887833433a07cc1cc",
+    "ZornUiSceneService269.cpp": "e12b7923218cdd78e43d901fbabb130ccbf172e7515e1614c322dcc58cde86db",
+    "ZornUsbCdc26.c": "2420b514092e20a2c9efcb1f02fec239ad3a4c0c4bd80834b654e3c0fa6abb5e",
+    "arc-runtime/ZornDisplayRegisterResources324.inc": "1c4293384f4be401b381563adee12d105df8168a806ddd08df0c93ab70e6479b",
+    "record-identity/ZornPlatformRecordIdentity26.h": "66d46ded699632e0886399f880cf7f6442371fca8786a0fd1d54e7349c5ade5f",
+    "record-identity/ZornPlatformTrialIdentity26.h": "0ba80e4ef02526ec856a50c5c8b6df9dfd8e0f5377e3fed5c570e808834c00cb"
+  },
+  "board_sources": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v342-swipe-dsi-29ea4b69ae9e411f846be8f431920c17/scene-inputs342.json",
+    "bytes": 2296,
+    "sha256": "61d830fd2b9ee9b5456d2c554b70afc3669b63c4628c8210cfcd5e53c82240a8"
+  },
+  "actual_compiler_dependency_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v342-swipe-dsi-29ea4b69ae9e411f846be8f431920c17/full-build-review.json",
+    "bytes": 82635,
+    "sha256": "9237e286b370329e4ca10fd4ef1882e8fd7b0cf0b32648438e71d6bab2e8874c"
+  },
+  "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+  "hardware_qualification": false
+}

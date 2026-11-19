@@ -1,0 +1,39 @@
+{
+  "scope": "K80 FT3683 prospective polling transport, suppress transient interrupt forwarding during initialization",
+  "upstream_source": "UniXNU/QcomGeniSpi @ eac47baefe6a5d2368a70351e6ad1b6361bedbe2",
+  "parent_patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/touch/k80-geni-pio-retain/candidate.patch",
+    "bytes": 3784,
+    "sha256": "0b2ae6807ef68f0483b610d3d795d6dc776203467ade753dbeff577411ced141"
+  },
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/touch/k80-geni-poll-only/candidate.patch",
+    "bytes": 1966,
+    "sha256": "0c73225ad523447827494ad84a94a78e5cb03d501bcf843613e69253c5b05a9e"
+  },
+  "model_source": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/next-geni-poll-only/Test/k80-geni-spi.c",
+    "bytes": 19453,
+    "sha256": "9397d4d38cdfdf9edc27cb96db626ec112cfa2be1cde157dae563536e5db8e70"
+  },
+  "model_before": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/next-geni-poll-only/check-parent.stdout",
+    "bytes": 218,
+    "sha256": "b60bbbdfbfd31cebfab3db1c8b322a9d8b8771eab246e3c125e0fba2bb8c8290"
+  },
+  "model_after": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/next-geni-poll-only/check.stdout",
+    "bytes": 187,
+    "sha256": "aa6bf9dae9d67eea0873fb28c5f9b812c2b5cb0afab6c17b27e78233e1caffe2"
+  },
+  "ASan_UBSan": true,
+  "zero_fuzz_replay": true,
+  "freestanding_arm64e_host_recipe_object": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v360-touch-geni-inventory-3347de2837fb462f9ea02a89a684c397/next-geni-poll-only/GeniSpi-arm64e.o",
+    "bytes": 9384,
+    "sha256": "814dafbabc7f97eeaa858d3ae077ea331b6c1111a9d6cd9a765ad2d7473be4b8"
+  },
+  "selected_in_device_build": false,
+  "native_kernel_link": false,
+  "hardware_qualified": false
+}

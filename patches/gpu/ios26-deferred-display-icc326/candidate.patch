@@ -1,0 +1,311 @@
+--- a/ZornGen7IccHlosSource26.inc
++++ b/ZornGen7IccHlosSource26.inc
+@@ -183,4 +183,5 @@
+ constexpr uint32_t bcm_provider_masks[]={1u,1u,2u,2u,12u,8u};
+ constexpr size_t provider_count=4,node_count=78,bcm_count=6,max_bcm_members=54,path_count=4;
+ constexpr size_t display_path_count=6,gpu_startup_bcm_count=4;
++constexpr size_t gpu_startup_provider_count=2,gpu_startup_node_count=19;
+ }
+--- a/ZornGen7IccInputs26.cpp
++++ b/ZornGen7IccInputs26.cpp
+@@ -426,6 +426,13 @@
+     s.tbuReleaseAttempted=true;const auto raw=s.voter->setTbuPowerBandwidth(s.startupGate,false);
+     if(raw!=kIOReturnSuccess)return raw;s.tbuHeld=false;return kIOReturnSuccess;
+ }
++IOReturn ZornGen7IccInputs26::prepareDisplayRegisterBandwidth()
++{
++    if (!normal() || !voterReady() || !storage_->startupGate ||
++        !IORecursiveLockHaveLock(storage_->startupGate) || !storage_->qosReady) return kIOReturnNotReady;
++    return storage_->voter->prepareDisplayRegisterBandwidth(storage_->startupGate);
++}
++
+ IOReturn ZornGen7IccInputs26::setDisplayRegisterBandwidth(uint32_t peakKbps)
+ {
+     if (!normal() || !voterReady() || !storage_->startupGate ||
+--- a/ZornGen7IccInputs26.h
++++ b/ZornGen7IccInputs26.h
+@@ -39,6 +39,7 @@
+         ZornGen7Rpmh::NativeReservation &,const ZornGen7Rpmh::ActualXoCommandDbSnapshot &,OSObject &);
+     bool voterReady() const;
+     IOReturn initializeInitialVotes();
++    IOReturn prepareDisplayRegisterBandwidth();
+     IOReturn setDisplayRegisterBandwidth(uint32_t peakKbps);
+     IOReturn applyBootstrapBandwidth();
+     IOReturn finishHostBootstrap();
+--- a/ZornGen7IccVoter26.cpp
++++ b/ZornGen7IccVoter26.cpp
+@@ -102,7 +102,7 @@
+     ZornGen7Icc::NativeConstraintApplication::Owner *tbuBandwidth=nullptr;
+     NativeRequest *displayRequests[Source::display_path_count]{};
+     NativeConstraintApplication::Owner *displayBandwidth=nullptr;
+-    bool displayHeld=false,displayRetained=false;
++    bool displayHeld=false,displayRetained=false,displayGraphAttempted=false;
+     bool tbuRaiseAttempted=false,tbuRaised=false,tbuLowerAttempted=false,tbuLowered=false;
+     IccApplyResult tbuRaiseResult{},tbuLowerResult{};
+     bool attempted=false,ready=false,graphAttempted=false,graphReady=false;
+@@ -119,6 +119,8 @@
+         ZornGen7Rpmh::NativeCommandCache &c,ZornGen7Rpmh::NativeReservation &q,ZornGen7Rpmh::NativeCommandDbResourceReader &reader,
+         OSObject &sourceOwner,NativeIccClock &clock,OSObject &clockOwner):
+         root(root),treeOwner(tree),snapshotOwner(sourceOwner),clockOwner(clockOwner),rsc(r),cache(c),reservation(q),input(reader),resourceRoute(true),ubwcClock(clock){}
++    NativeConstraintApplication::Owner *bindPath(const uint32_t *ids, size_t count,
++        NativeRequest **requests, NativePath *&pathOut);
+     OSObject *copy(const char *key){
+         if(propertyCount==16)return nullptr;OSObject *p=node->copyProperty(key);if(p)properties[propertyCount++]=p;return p;
+     }
+@@ -197,14 +199,13 @@
+     // Canonical CPU graph and qualified address/aux bindings are prepared.
+     // No full-provider publication, init vote, QoS, bandwidth or native IO is issued here.
+ }
+-bool ZornGen7IccVoter26::prepareGraph()
+-{
+-    if(!storage_ || !normal())return false;auto &s=*storage_;
+-    if(s.graphAttempted || !s.domain || !s.voter || !s.batch || !s.rsc.forwardAllowed())return false;
+-    s.graphAttempted=true;
++bool ZornGen7IccVoter26::prepareGraphSlice(size_t firstProvider, size_t lastProvider,
++    size_t firstNode, size_t lastNode, size_t firstBcm, size_t lastBcm)
++{
++    auto &s = *storage_;
+     // Bind all required resources uniquely from THIS already decoded and
+     // version-qualified snapshot before publishing any native BCM command row.
+-    for(size_t i=0;i<Source::bcm_count;++i) {
++    for(size_t i=firstBcm;i<lastBcm;++i) {
+         const auto &src=Source::bcms[i];const size_t len=strlen(src.name);
+         if(!len || len>8 || !src.count || src.count>Source::max_bcm_members || src.provider>=Source::provider_count)return false;
+         uint32_t address=0;uint8_t copiedAux[8]{};const uint8_t *actualAux=nullptr;
+@@ -231,23 +232,22 @@
+         s.bcms[i]=new(memory)BcmRecord(*s.voter,src,address,actualAux);
+         s.commands[i]={&s.bcms[i]->bcm,&s.bcms[i]->address,&s.bcms[i]->vcd};
+     }
+-    s.transport={&s.crmPresent,&s.hasAmc,&s.tcsWait,s.commands,Source::bcm_count,Source::bcm_count};
+-    for(size_t i=0;i<Source::provider_count;++i) {
++    for(size_t i=firstProvider;i<lastProvider;++i) {
+         void *memory=IOMallocZero(sizeof(ProviderRecord));if(!memory)return false;
+         s.providers[i]=new(memory)ProviderRecord(*s.domain,s.voter,*s.batch,s.transport);
+         if(!s.domain->bind(s.providers[i]->provider))return false;
+     }
+-    for(size_t i=0;i<Source::node_count;++i) {
+-        const auto &src=Source::nodes[i];if(src.provider>=Source::provider_count || !src.buswidth || !src.channels)return false;
++    for(size_t i=firstNode;i<lastNode;++i) {
++        const auto &src=Source::nodes[i];if(src.provider>=Source::provider_count || !s.providers[src.provider] || !src.buswidth || !src.channels)return false;
+         for(size_t j=0;j<i;++j)if(Source::nodes[j].id==src.id)return false;
+         void *memory=IOMallocZero(sizeof(NodeRecord));if(!memory)return false;
+         s.nodes[i]=new(memory)NodeRecord(*s.domain,s.providers[src.provider]->provider,src,s.ubwcClock);
+         if(!s.domain->bind(s.nodes[i]->node))return false;
+     }
+-    for(size_t i=0;i<Source::bcm_count;++i) {
++    for(size_t i=firstBcm;i<lastBcm;++i) {
+         auto &b=*s.bcms[i];
+         for(size_t j=0;j<b.count;++j) {
+-            const size_t index=b.source.nodes[j];if(index>=Source::node_count)return false;
++            const size_t index=b.source.nodes[j];if(index<firstNode || index>=lastNode || !s.nodes[index])return false;
+             auto &n=*s.nodes[index];if(!(Source::bcm_provider_masks[i] & (1u << n.source.provider)) || n.bcmCount>=3)return false;
+             for(size_t k=0;k<j;++k)if(b.source.nodes[k]==index)return false;
+             b.nodes[j]=&n.node;n.bcms[n.bcmCount++]=&b.bcm; // Same canonical objects in both source membership directions.
+@@ -255,50 +255,77 @@
+         void *memory=IOMallocZero(sizeof(NativeBcmVoterOperation::Owner));if(!memory)return false;
+         b.operation=::new(memory)NativeBcmVoterOperation::Owner(b.bcm,*s.batch,s.transport,&b.keepalive,&b.qosProxy);
+     }
+-    auto bindPath = [&](const uint32_t *ids, size_t count, NativeRequest **requests,
+-                        NativePath *&pathOut) -> NativeConstraintApplication::Owner * {
+-        for (size_t i = 0; i < count; ++i) {
+-            NodeRecord *node = nullptr;
+-            for (auto *candidate : s.nodes) {
+-                if (candidate->source.id == ids[i]) {
+-                    node = candidate;
+-                    break;
+-                }
++    return true;
++}
++
++NativeConstraintApplication::Owner *ZornGen7IccVoter26::Storage::bindPath(const uint32_t *ids, size_t count,
++    NativeRequest **requests, NativePath *&pathOut)
++{
++    auto &s = *this;
++    for (size_t i = 0; i < count; ++i) {
++        NodeRecord *node = nullptr;
++        for (auto *candidate : s.nodes) {
++            if (candidate && candidate->source.id == ids[i]) {
++                node = candidate;
++                break;
+             }
+-            if (!node) return nullptr;
+-            if (i + 1 < count) {
+-                bool linked = false;
+-                for (size_t link = 0; link < node->source.linkCount; ++link) {
+-                    if (node->source.links[link] == ids[i + 1]) linked = true;
+-                }
+-                if (!linked) return nullptr;
++        }
++        if (!node) return nullptr;
++        if (i + 1 < count) {
++            bool linked = false;
++            for (size_t link = 0; link < node->source.linkCount; ++link) {
++                if (node->source.links[link] == ids[i + 1]) linked = true;
+             }
+-            void *memory = IOMallocZero(sizeof(NativeRequest));
+-            if (!memory) return nullptr;
+-            requests[i] = ::new(memory) NativeRequest(node->node);
++            if (!linked) return nullptr;
+         }
+-        void *pathMemory = IOMallocZero(sizeof(NativePath));
+-        if (!pathMemory) return nullptr;
+-        pathOut = ::new(pathMemory) NativePath(*s.domain, requests, count, count);
+-        if (!s.domain->bind(*pathOut)) return nullptr;
+-        void *owner = IOMallocZero(sizeof(NativeConstraintApplication::Owner));
+-        return owner ? ::new(owner) NativeConstraintApplication::Owner(*pathOut) : nullptr;
+-    };
+-    // Each path owns distinct requests against the same domain, voter and
+-    // canonical nodes. Removing a display request preserves GPU/TBU demand.
+-    s.bandwidth = bindPath(Source::gpu_path, Source::path_count, s.requests, s.path);
++        void *memory = IOMallocZero(sizeof(NativeRequest));
++        if (!memory) return nullptr;
++        requests[i] = ::new(memory) NativeRequest(node->node);
++    }
++    void *pathMemory = IOMallocZero(sizeof(NativePath));
++    if (!pathMemory) return nullptr;
++    pathOut = ::new(pathMemory) NativePath(*s.domain, requests, count, count);
++    if (!s.domain->bind(*pathOut)) return nullptr;
++    void *owner = IOMallocZero(sizeof(NativeConstraintApplication::Owner));
++    return owner ? ::new(owner) NativeConstraintApplication::Owner(*pathOut) : nullptr;
++}
++
++bool ZornGen7IccVoter26::prepareGraph()
++{
++    if (!storage_ || !normal()) return false;
++    auto &s = *storage_;
++    if (s.graphAttempted || !s.domain || !s.voter || !s.batch || !s.rsc.forwardAllowed()) return false;
++    s.graphAttempted = true;
++    s.transport = {&s.crmPresent, &s.hasAmc, &s.tcsWait, s.commands, Source::gpu_startup_bcm_count, Source::bcm_count};
++    if (!prepareGraphSlice(0, Source::gpu_startup_provider_count, 0, Source::gpu_startup_node_count,
++                           0, Source::gpu_startup_bcm_count)) return false;
++    s.bandwidth = s.bindPath(Source::gpu_path, Source::path_count, s.requests, s.path);
+     if (!s.bandwidth) return false;
+-    s.tbuBandwidth = bindPath(Source::tbu_path, Source::tbu_path_count, s.tbuRequests, s.tbuPath);
+-    if (!s.tbuBandwidth) return false;
+-    NativePath *displayPath = nullptr;
+-    s.displayBandwidth = bindPath(Source::display_path, Source::display_path_count,
+-                                  s.displayRequests, displayPath);
+-    if (!s.displayBandwidth) return false;
+-    s.graphReady=true;return true;
+-    // Private HLOS GPU bootstrap namespace only. Other OEM source voters are
+-    // neither emulated nor claimed disabled. No init/QoS/bandwidth operation,
+-    // full-provider publication, physical ownership or source sync is inferred.
+-}
++    s.tbuBandwidth = s.bindPath(Source::tbu_path, Source::tbu_path_count, s.tbuRequests, s.tbuPath);
++    s.graphReady = s.tbuBandwidth != nullptr;
++    return s.graphReady;
++}
++
++IOReturn ZornGen7IccVoter26::prepareDisplayRegisterBandwidth(IORecursiveLock *startup)
++{
++    if (!sourceReady() || !normal() || !startup || !IORecursiveLockHaveLock(startup)) return kIOReturnNotReady;
++    auto &s = *storage_;
++    if (!s.recommitReady || s.displayGraphAttempted || !s.rsc.forwardAllowed()) return kIOReturnNotReady;
++    s.displayGraphAttempted = true;
++    IORecursiveLockLock(s.domainGate);
++    auto finish = [&](IOReturn result) { IORecursiveLockUnlock(s.domainGate); return result; };
++    // No BCM sends occur in this graph construction. The live voter sees
++    // only its four existing bindings until every display object is attached.
++    if (!prepareGraphSlice(Source::gpu_startup_provider_count, Source::provider_count,
++                           Source::gpu_startup_node_count, Source::node_count,
++                           Source::gpu_startup_bcm_count, Source::bcm_count)) return finish(kIOReturnNotReady);
++    NativePath *path = nullptr;
++    s.displayBandwidth = s.bindPath(Source::display_path, Source::display_path_count, s.displayRequests, path);
++    if (!s.displayBandwidth || !s.rsc.forwardAllowed()) return finish(kIOReturnNotReady);
++    s.transport.binding_count = Source::bcm_count;
++    return finish(kIOReturnSuccess);
++}
++
+ // Source bcm_init initial-vote branches only. Explicitly distinct from CPU
+ // graph preparation: this method contains real RPMh calls and requires the
+ // owning board's held startup gate and same actual live RSC transport.
+@@ -328,7 +355,7 @@
+ {
+     if(!sourceReady() || !normal() || !startup || !IORecursiveLockHaveLock(startup))return kIOReturnNotReady;
+     auto &s=*storage_;if(!s.initialReady || s.proxyAttempted)return kIOReturnNotReady;s.proxyAttempted=true;
+-    for(size_t i=0;i<Source::bcm_count;++i) {
++    for(size_t i=0;i<Source::gpu_startup_bcm_count;++i) {
+         auto *b=s.bcms[i];if(!b || !b->operation || !s.rsc.forwardAllowed())return kIOReturnNotReady;
+         if(!b->source.qosProxy)continue;
+         b->proxyResult=b->operation->acquireQosProxy();b->proxyReturned=true;
+@@ -343,7 +370,7 @@
+ {
+     if(!sourceReady() || !normal() || !startup || !IORecursiveLockHaveLock(startup))return kIOReturnNotReady;
+     auto &s=*storage_;if(!s.proxyReady || s.recommitAttempted)return kIOReturnNotReady;s.recommitAttempted=true;
+-    for(size_t i=0;i<Source::bcm_count;++i) {
++    for(size_t i=0;i<Source::gpu_startup_bcm_count;++i) {
+         auto *b=s.bcms[i];if(!b || !b->operation || !s.rsc.forwardAllowed())return kIOReturnNotReady;
+         if(!b->source.qosProxy)continue;
+         b->recommitResult=b->operation->recommitAfterNormalQosUse();b->recommitReturned=true;
+--- a/ZornGen7IccVoter26.h
++++ b/ZornGen7IccVoter26.h
+@@ -26,6 +26,9 @@
+         const ZornGen7Rpmh::ActualXoCommandDbSnapshot *,ZornGen7Rpmh::NativeCommandDbResourceReader *,OSObject &,
+         ZornGen7Icc::NativeIccClock &,OSObject &,ZornGen7IccVoter26 *&);
+     bool prepare();bool prepareGraph();bool sourceReady() const;
++    bool prepareGraphSlice(size_t firstProvider, size_t lastProvider, size_t firstNode, size_t lastNode,
++                           size_t firstBcm, size_t lastBcm);
++    IOReturn prepareDisplayRegisterBandwidth(IORecursiveLock *actualStartupGate);
+     IOReturn initializeInitialVotes(IORecursiveLock *actualStartupGate);
+     IOReturn acquireQosProxy(IORecursiveLock *actualStartupGate);
+     IOReturn recommitNormalQos(IORecursiveLock *actualStartupGate);
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 029545879d9c4d6dbec700a4c5948f8e %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 6bbd84b8357a4507a80f49e1c87b1841 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"029545879d9c4d6dbec700a4c5948f8e",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"6bbd84b8357a4507a80f49e1c87b1841",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26029545879D9C"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN266BBD84B8357A"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -66,6 +66,10 @@
+         return finish(kIOReturnNotReady);
+     }
+     steps |= CheckedExistingProxies;
++    if (hold) {
++        const auto raw = s.gpu_icc_inputs->prepareDisplayRegisterBandwidth();
++        if (raw != kIOReturnSuccess) return finish(raw);
++    }
+     display.phase = Phase::Transition;
+     auto retainFailure = [&](IOReturn result) {
+         display.phase = Phase::Retained;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x02,0x95,0x45,0x87,0x9d,0x9c,0x4d,0x6d,0xbe,0xc7,0x00,0xa4,0xc5,0x94,0x8f,0x8e};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x6b,0xbd,0x84,0xb8,0x35,0x7a,0x45,0x07,0xa8,0x0f,0x49,0xe1,0xc8,0x7b,0x18,0x41};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x02,0x95,0x45,0x87,0x9d,0x9c,0x4d,0x6d,0xbe,0xc7,0x00,0xa4,0xc5,0x94,0x8f,0x8e};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x6b,0xbd,0x84,0xb8,0x35,0x7a,0x45,0x07,0xa8,0x0f,0x49,0xe1,0xc8,0x7b,0x18,0x41};

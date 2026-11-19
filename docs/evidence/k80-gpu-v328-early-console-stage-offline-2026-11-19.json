@@ -1,0 +1,115 @@
+{
+  "display_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-timing-board-inputs-2026-11-18.json",
+    "bytes": 3634,
+    "sha256": "0c5353d184f73076ff64f0ef738fe4439d4658a44a9d03192f53114486d0c29a"
+  },
+  "panel_te_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-panel-te-board-inputs-2026-11-18.json",
+    "bytes": 3414,
+    "sha256": "9901632bd377569a13fc25c59055cfa2a84555a7c7bd97cc216b2e61f79a0211"
+  },
+  "scanout_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-dpu-handoff-board-inputs-2026-11-18.json",
+    "bytes": 4346,
+    "sha256": "69688447f5d9599b5df7cbf6f267c3892b8e4e0c4c94f01a10ce79cd30c4e30d"
+  },
+  "display_power_board_inputs": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-display-power-board-inputs-2026-11-18.json",
+    "bytes": 3976,
+    "sha256": "44b51759e171eaf774e20e7a0a9f6844557d3aee93a2760c183f563fc8923ca3"
+  },
+  "version": 328,
+  "boot_tag": "47abb87a7be149e0b3eb69b471045c92",
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/boot-package/boot.ZORN26-GPU-V328-STAGE-UNSELECTED.img",
+    "sha256": "28b2dd579a0f2d0ebfd786bcc51176c1a0b36ef7272f409af8e06a759bd9f709",
+    "bytes": 11878400
+  },
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/full-link/kernel.ZORN26-STAGE328.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/boot-package/inputs/kernel.macho",
+    "sha256": "c8381eb58bf25e9be0d6abe3d282d30485e988125b17d88c93cddfa4361b7bad",
+    "bytes": 31096856
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "boot_args": "rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_cpu_presenter=1 zorn26_software_accelerator=2 sample=0 sb_wallpaper=0 zorn26_touch=1 zorn26_touch_pacing=1 zorn26_touch_continuous=1 zorn26_touch_record=1 zorn26_gpu_board_stage=1 zorn26_owned_clocks=1 zorn26_gpu_provider_claim=1 zorn26_commanddb_resources=1 zorn26_commanddb_resources_only=1 zorn26_rsc_managed=1 zorn26_clock_prefix=1 zorn26_domain_prefix=1 zorn26_register_maps=1 zorn26_gpu_guarded_maps=1 zorn26_gpu_guarded_smmu_id=1 zorn26_gpu_guarded_smmu_reserve=1 zorn26_gpu_smmu_context_read=1 zorn26_gpu_guarded_gmu_clocks=1 zorn26_gpu_guarded_cx_timer=1 zorn26_gpu_cdc=1 zorn26_gpu_cpu_memory_prep=1 zorn26_gpu_gmu_context_image=1 zorn26_gpu_gmu_direct_seed=1 zorn26_gpu_masked_global_irq=1 zorn26_smmu_active_faults=1 zorn26_gmu_context_irq=1 zorn26_gmu_blocked_stream=1 zorn26_gmu_program_bank=1 zorn26_gmu_observe_reset=1 zorn26_gmu_deferred_valid=21 -g0",
+  "exact_package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/boot-package/verified.json",
+    "bytes": 13228,
+    "sha256": "bd8e889ecd78bef6d297d6e2f06858d2c65aad301f7793ef7e3ab55f7dd7dd92"
+  },
+  "link": {
+    "passed": true,
+    "kernel": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/full-link/kernel.ZORN26-STAGE328.UNSELECTED.macho",
+      "sha256": "c8381eb58bf25e9be0d6abe3d282d30485e988125b17d88c93cddfa4361b7bad"
+    },
+    "bytes": 31096856,
+    "inputs": 1399,
+    "replaced": 40,
+    "exact_inputs": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/full-link/exact-inputs.json",
+      "sha256": "54e24d79c7575418637d6f655a5a28b374e76a59979bd61f562c7da95e917d70"
+    },
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "hardware_qualified": false,
+    "device_access": false,
+    "sha256": "c8381eb58bf25e9be0d6abe3d282d30485e988125b17d88c93cddfa4361b7bad",
+    "undefined_symbols": 0
+  },
+  "source_manifest": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-early-console-stage328/source-manifest.json",
+    "bytes": 4830,
+    "sha256": "90243542fc9dd5ff4e5048f85272981cbcac2846cc967feeb7266f22b8786442"
+  },
+  "previous_trial": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v327-deferred-owner-checkpoint-device-2026-11-18.json",
+    "bytes": 8577,
+    "sha256": "c049a534cac5d3b6134164e0444b6d1607e3847e72a4955ac88a1bc3584812c0"
+  },
+  "host_checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/host-stage-raster/result.json",
+      "bytes": 2016,
+      "sha256": "76acd2ad9e98cd96aaccc6be44b17041c2771c0dfdb949f869bbed5772ac1542"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/patch-replay.json",
+      "bytes": 503,
+      "sha256": "7de48dc0183b40b3d941cff12ee1fa1fa822f6b17161b0265da10e42f7c9fd3e"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v328-early-console-stage-47abb87a7be149e0b3eb69b471045c92/early-console-archive-host/result.json",
+      "bytes": 4219,
+      "sha256": "e5f8ca2d721b0421b26cbd21257b5ecc789addf574bf594720aec4f6be983606"
+    }
+  ],
+  "enabled_path": "Reuse the checked early native console surface for an optical checkpoint before and after watchdog takeover and before the CDC gating path. Scope includes host USB camera only, with no audio.",
+  "markers": {
+    "A0": "PE_init_iokit entered after PE_init_printf",
+    "A1": "kernel watchdog start about to run",
+    "A2": "kernel watchdog start returned with worker created",
+    "A3": "native root registration returned",
+    "A4": "exact PID1 EL0 and root checks passed, early worker about to schedule",
+    "A5": "early worker entered, before deferred owner wait",
+    "A6": "ready record persisted and matched; CDC call next",
+    "AE": "one-page write or readback contract failed",
+    "AF": "owner timeout page persisted and matched"
+  },
+  "device_only_questions": [
+    "First and last visible checkpoint on hardware",
+    "Current CDC, persistent page and protected TWRP return",
+    "Whether the screen console accepts markers before UFS and root setup"
+  ],
+  "watchdog_seconds": 300,
+  "recovery_timeout_seconds": 600,
+  "retries": 0,
+  "root_installation_required": false,
+  "device_ready": false,
+  "phone_access": false
+}

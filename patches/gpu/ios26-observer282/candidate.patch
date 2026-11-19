@@ -1,0 +1,96 @@
+--- a/ZornApplicationObservation26.inc
++++ b/ZornApplicationObservation26.inc
+@@ -3,6 +3,9 @@
+ #include "ZornMapGate222.h"
+ static unsigned appObservationGate,appObservationDropped;
+ static uintptr_t appObservationClient;
++// Filter unrelated clients before the shared diagnostic lock. This is only a
++// published observation identity; it never supplies native GPU authority.
++static uintptr_t appObservationActiveClient;
+ static ZornApplicationObservation26 appObservation;
+ static bool appObservationLock(){unsigned zero=0;return __atomic_compare_exchange_n(&appObservationGate,&zero,1,false,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED);}
+ static void appObservationUnlock(){__atomic_store_n(&appObservationGate,0,__ATOMIC_RELEASE);}
+@@ -30,6 +33,7 @@
+  appObservation.closeReturned=0;appObservation.closeRaw=0;appObservation.prepareMask=0;
+  appObservation.prepareStage=0;appObservation.prepareRaw=0;appObservation.prepareDetail=0;
+  appObservation.prepareEvents=0;appObservation.prepareFailed=0;
++ __atomic_store_n(&appObservationActiveClient,client,__ATOMIC_RELEASE);
+  appObservationRemember();appObservationUnlock();
+ }
+ static void appObservationRemember(){
+@@ -41,16 +45,19 @@
+  h.prepareDetail=appObservation.prepareDetail;h.prepareEvents=appObservation.prepareEvents;h.prepareFailed=appObservation.prepareFailed;
+ }
+ static void appObservationEvent(uintptr_t client,uint32_t flags,uint32_t method,uint32_t raw,bool closed=false){
++ if(!client || client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
+  if(!appObservationLock()){appObservationDrop();return;}
+  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned){appObservation.flags|=flags;appObservation.method=method;appObservation.raw=raw;
+   if(appObservation.calls<65535)++appObservation.calls;else appObservationDrop();
+-  if(closed){appObservation.closeReturned=1;appObservation.closeRaw=raw;}appObservationRemember();}
++  if(closed){appObservation.closeReturned=1;appObservation.closeRaw=raw;
++   __atomic_store_n(&appObservationActiveClient,uintptr_t(0),__ATOMIC_RELEASE);}appObservationRemember();}
+  appObservationUnlock();
+ }
+ // Bounded software-only observation of actual preparation calls. Latch the
+ // first nonzero native result; later wrapper/close errors cannot replace it.
+ extern "C" void zorn26_application_prepare_event(uintptr_t client,uint32_t stage,uint32_t raw,uint32_t detail){
+  if(!client || !stage || stage>=64)return;
++ if(client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
+  if(!appObservationLock()){appObservationDrop();return;}
+  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned){
+   if(appObservation.prepareEvents<128){
+@@ -120,6 +127,7 @@
+ 
+ extern "C" void zorn26_application_native_return225(uintptr_t client,uintptr_t request,uint32_t method,uint32_t stage,uint32_t raw){
+  if(!client || !request)return;
++ if(client!=__atomic_load_n(&appObservationActiveClient,__ATOMIC_ACQUIRE))return;
+  if(!appObservationLock()){appObservationDrop();return;}
+  if(client==appObservationClient && appObservation.sessions && !appObservation.closeReturned)
+   if(stage==1 || appObservation.nativeReturn225.sequence)(void)zorn_native_return225_event(appObservation.nativeReturn225,request,method,stage,raw);
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 36e4614944b04a64bee5499cb2e8338f %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC b631a4ee28874ebfaa9c4bfdcf2fc3c4 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -977,7 +977,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"36e4614944b04a64bee5499cb2e8338f",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"b631a4ee28874ebfaa9c4bfdcf2fc3c4",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2636E4614944B0"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B631A4EE2887"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x36,0xe4,0x61,0x49,0x44,0xb0,0x4a,0x64,0xbe,0xe5,0x49,0x9c,0xb2,0xe8,0x33,0x8f};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb6,0x31,0xa4,0xee,0x28,0x87,0x4e,0xbf,0xaa,0x9c,0x4b,0xfd,0xcf,0x2f,0xc3,0xc4};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x36,0xe4,0x61,0x49,0x44,0xb0,0x4a,0x64,0xbe,0xe5,0x49,0x9c,0xb2,0xe8,0x33,0x8f};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb6,0x31,0xa4,0xee,0x28,0x87,0x4e,0xbf,0xaa,0x9c,0x4b,0xfd,0xcf,0x2f,0xc3,0xc4};

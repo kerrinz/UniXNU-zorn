@@ -1,0 +1,81 @@
+--- a/userland/ZornMetalProbe193.mm
++++ b/userland/ZornMetalProbe193.mm
+@@ -17,7 +17,7 @@
+ #include <time.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-static constexpr char tag[]="f80eb1403d7e4f958b5eddacb49d98d0";
++static constexpr char tag[]="ddb9c8640ab544cd85cae684e0fb8f66";
+ static uint32_t stages,actualCRC,firstBad=UINT32_MAX;
+ static uint64_t serviceID,deviceID;
+ static uint32_t crc32(const uint8_t *p,size_t n){uint32_t c=~0u;for(size_t i=0;i<n;i++){c^=p[i];for(unsigned j=0;j<8;j++)c=(c>>1)^((0u-(c&1u))&0xedb88320u);}return ~c;}
+@@ -104,34 +104,45 @@
+  if(n>0 && size_t(n)<sizeof(line))(void)write(2,line,size_t(n));
+  return submitted==120 && completed==120 && closed==KERN_SUCCESS;
+ }
+-// Exercise real independent IOKit metadata connections while the Metal
+-// backend owns its existing native session. No second hardware acquisition,
+-// fallback,automatic retry or synthetic native completion is accepted.
+-static bool metadataWhileNative251(){
++// Exercise the actual257+ shared-member implementation. Query invokes a real
++// native session;unused IOServiceOpen handles alone are not native acceptance.
++static bool sharedQueries267(){
+  io_service_t service=IOServiceGetMatchingService(kIOMainPortDefault,IOServiceMatching("ZornGen7AppIoService26"));
+  if(service==IO_OBJECT_NULL)return false;
+- uint64_t identity=0;const kern_return_t identityRaw=IORegistryEntryGetRegistryEntryID(service,&identity);
++ uint64_t identity=0;const auto identityRaw=IORegistryEntryGetRegistryEntryID(service,&identity);
+  if(identityRaw!=KERN_SUCCESS || identity!=serviceID){IOObjectRelease(service);return false;}
+  io_connect_t connections[2]={IO_OBJECT_NULL,IO_OBJECT_NULL};
+  kern_return_t opened[2]={kIOReturnNotReady,kIOReturnNotReady};
++ kern_return_t queried[2]={kIOReturnNotReady,kIOReturnNotReady};
+  kern_return_t closed[2]={kIOReturnNotReady,kIOReturnNotReady};
++ NativeAdrenoAbiParams replies[2]{};size_t sizes[2]={sizeof(replies[0]),sizeof(replies[1])};
++ bool valid[2]={false,false};
+  for(unsigned i=0;i<2;++i){
+   opened[i]=IOServiceOpen(service,mach_task_self(),0x4147,&connections[i]);
+   if(opened[i]!=KERN_SUCCESS)break;
+  }
+  IOObjectRelease(service);
+- NativeAdrenoAbiParams reply{};size_t bytes=sizeof(reply);kern_return_t busy=kIOReturnNotReady;
+- if(opened[0]==KERN_SUCCESS && opened[1]==KERN_SUCCESS)
+-  busy=IOConnectCallStructMethod(connections[0],NativeAdrenoMethodQuery,nullptr,0,&reply,&bytes);
+- // Close each actually successful metadata connection once. Failed opens are
+- // never treated as owned handles;busy refusal must leave both closeable.
++ for(unsigned i=0;i<2;++i){
++  if(opened[i]!=KERN_SUCCESS)continue;
++  queried[i]=IOConnectCallStructMethod(connections[i],NativeAdrenoMethodQuery,nullptr,0,&replies[i],&sizes[i]);
++  const auto &r=replies[i];
++  valid[i]=queried[i]==KERN_SUCCESS && sizes[i]==sizeof(r) &&
++   r.abi_version==NativeAdrenoAbiVersion && r.input_bits>=12 && r.input_bits<=63 &&
++   r.output_bits>=12 && r.output_bits<=52 &&
++   r.flags==(NativeAdrenoParamsHostImport|NativeAdrenoParamsSubmitBatch) &&
++   r.max_bo_bytes==(UINT64_C(1)<<NativeAdrenoAbiMaxBoBytesShift);
++ }
++ // Exactly one close for each successful open. The kernel's actual Close
++ // owns drain/unmap/OOB checks and retains uncertain native resources.
+  for(unsigned i=0;i<2;++i)if(opened[i]==KERN_SUCCESS)closed[i]=IOServiceClose(connections[i]);
+- char line[256];const int n=snprintf(line,sizeof(line),
+-  "ZORN251META run=%s open0=%x open1=%x busy=%x close0=%x close1=%x identity=%u\n",
+-  tag,unsigned(opened[0]),unsigned(opened[1]),unsigned(busy),unsigned(closed[0]),unsigned(closed[1]),identity==serviceID?1u:0u);
++ const bool equal=valid[0] && valid[1] && memcmp(&replies[0],&replies[1],sizeof(replies[0]))==0;
++ char line[320];const int n=snprintf(line,sizeof(line),
++  "ZORN267SHARED run=%s open0=%x open1=%x query0=%x query1=%x close0=%x close1=%x valid0=%u valid1=%u equal=%u identity=%u\n",
++  tag,unsigned(opened[0]),unsigned(opened[1]),unsigned(queried[0]),unsigned(queried[1]),
++  unsigned(closed[0]),unsigned(closed[1]),valid[0]?1u:0u,valid[1]?1u:0u,equal?1u:0u,identity==serviceID?1u:0u);
+  if(n>0 && size_t(n)<sizeof(line))(void)write(2,line,size_t(n));
+- return opened[0]==KERN_SUCCESS && opened[1]==KERN_SUCCESS && busy==kIOReturnExclusiveAccess &&
+-        closed[0]==KERN_SUCCESS && closed[1]==KERN_SUCCESS;
++ return opened[0]==KERN_SUCCESS && opened[1]==KERN_SUCCESS && equal &&
++  closed[0]==KERN_SUCCESS && closed[1]==KERN_SUCCESS;
+ }
+ static int probe(){
+  report(1,0);
+@@ -243,7 +254,7 @@
+  }
+  if(firstBad!=UINT32_MAX){report(10,(long)status,1);return 10;}
+  stages|=256;report(10,(long)status);
+- if(!metadataWhileNative251()){report(10,(long)status,9);return 10;}
++ if(!sharedQueries267()){report(10,(long)status,9);retainUntilWatchdog();}
+  // Keep texture and its real IOSurface alive until actual acquire/show acknowledgement.
+  if(!presentKnown249(surface.value)){report(10,(long)status,8);return 10;}
+  // Completion is established before releasing GPU resources. Process teardown is observed separately in kernel logs.

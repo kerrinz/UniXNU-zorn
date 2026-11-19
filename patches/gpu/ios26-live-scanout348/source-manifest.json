@@ -1,0 +1,93 @@
+{
+  "stage": "presenter-backend-only",
+  "version": 348,
+  "source_parent": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/candidate.json",
+    "bytes": 6963,
+    "sha256": "1c3c39799a26c56a8627e10c4dda6eb0e74acdf4e0e4e58c32779d324accedb8"
+  },
+  "parent_device_evidence": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v347-panel-cadence-device-2026-11-19.json",
+    "bytes": 14398,
+    "sha256": "4b4810c7d2c5ad1be41235a9801a7d6c647767bc8db277c6cc01952c029b4766"
+  },
+  "patch": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-live-scanout348/present-transfer.patch",
+    "bytes": 8781,
+    "sha256": "f625cee87a78c4a8b5ce940b99e6fcb6f1d4e20e4489310e87253212d60e04c2"
+  },
+  "changed": [
+    {
+      "file": "ZornDpuAutoRefreshTransfer340.h",
+      "parent": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/ZornDpuAutoRefreshTransfer340.h",
+        "bytes": 8498,
+        "sha256": "656b028ac1b496583f0abb47c3be9a2a273266f511ea11b8e933ed32521b2465"
+      },
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/next-scanout/ZornDpuAutoRefreshTransfer340.h",
+        "bytes": 9391,
+        "sha256": "994248f02f061f49f4171a06d21908472cbc634b62583a5e3a268b359b7c3469"
+      }
+    },
+    {
+      "file": "ZornScanoutFlipOwnership348.h",
+      "parent": null,
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/next-scanout/ZornScanoutFlipOwnership348.h",
+        "bytes": 2950,
+        "sha256": "0073baf3fff81d12ca3ae6ebb63eea41253cb07774ebf0ace72f49a0f5d3b88f"
+      }
+    },
+    {
+      "file": "ZornScanoutLive348.h",
+      "parent": null,
+      "candidate": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/next-scanout/ZornScanoutLive348.h",
+        "bytes": 1520,
+        "sha256": "2a88db299d65a2a7b9dc2ebbb0432e0fbde98be8b3f3c75e564bf2deabcb2556"
+      }
+    }
+  ],
+  "retained_includes": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/ZornScanoutHandoff345.h",
+      "bytes": 3568,
+      "sha256": "ef5f061729a6b252ab47e0f214ede9299a7c4ea41214cc78524c9ec485090edb"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/gpu-v347-panel-cadence-3aecbf7c94704dd382d39c8147699ddc/ZornDpuCommandTransfer339.h",
+      "bytes": 6725,
+      "sha256": "f2708e1047434a601a90cb6e79b915e0dfa06bea81554f49e49eeea57f459744"
+    }
+  ],
+  "host_checks": {
+    "zero_fuzz_replay": true,
+    "sanitizers": [
+      "address",
+      "undefined"
+    ],
+    "tests": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-live-scanout348/ownership-test.cpp",
+        "bytes": 2100,
+        "sha256": "88f3dc12a0563ff5dcc6039f9bb6d9b7c6409e6e8e035f0b826fead579d31ff1"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/gpu/ios26-live-scanout348/live-test.cpp",
+        "bytes": 4962,
+        "sha256": "2ab3e2b8ea18386fe438b0d4fc302022d65f68fec89603e5ab5e1cbb8917b74e"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v340-autorefresh-transfer-d64d373cf87d499e9d56a62bc15a582f/host-autorefresh/probe.cpp",
+        "bytes": 4840,
+        "sha256": "737d547290cb126995fe912dd39422b26e8caf105fb7142ddd0654db76878429"
+      }
+    ],
+    "passed": true
+  },
+  "integrated_native_presenter": false,
+  "kernel_built": false,
+  "hardware_qualified": false,
+  "note": "Kernel-side two-slot owner and 4-TE transfer reuse. Tests exercise the real checked transfer helper using host MMIO simulation."
+}

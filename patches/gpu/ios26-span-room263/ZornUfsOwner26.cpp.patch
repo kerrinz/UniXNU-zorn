@@ -1,0 +1,35 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3df21cbd4e974475befb85cebe382928 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 5870a69eaaaa48439f94d86d2736dba7 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -964,7 +964,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"3df21cbd4e974475befb85cebe382928",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"5870a69eaaaa48439f94d86d2736dba7",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1005,6 +1005,14 @@
+     ZornClientFailure261 failure261{};
+     const unsigned haveFailure261=zorn_failure_snapshot261(completedFrames,&failure261)?1u:0u;
+     size=zorn_failure_append261(line,cap,size,haveFailure261,failure261);
++    // Completed startup publishes the actual Domain runtime-capacity observation.
++    // Read only after the worker's release/acquire completion;no hardware access.
++    unsigned runtime263[24]{};
++    if(state==3 && result==88)zorn26_native_runtime_observation(runtime263);
++    if(size<2 || size>=cap)return 0;
++    const int capacityBytes263=snprintf(line+size-2,cap-(size-2),",rc=%08x\r\n",runtime263[11]);
++    if(capacityBytes263<0 || unsigned(capacityBytes263)>=cap-(size-2))return 0;
++    size+=unsigned(capacityBytes263)-2;
+     static uint32_t journalCursor248=0;
+     size=zorn_journal_append248(line,cap,size,journalCursor248,zorn26_journal_snapshot248,zorn26_base64_encode);
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}

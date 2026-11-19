@@ -1,0 +1,127 @@
+{
+  "checks": {
+    "fat_marker_sectors": 2,
+    "fat_member_readback": 5,
+    "independent_embedded_payload_and_fd": true,
+    "ios26_generic_patch_count": 0,
+    "legacy_ipados17_check": 157,
+    "original_v371_kernel_fat_boot_verified_record_and_1400_objects_match": true,
+    "upstream_release_verify": true
+  },
+  "configuration": "zorn_ios26_defconfig",
+  "cpu_architecture": "arm64e.kernel",
+  "cpu_page_bytes": 16384,
+  "device_ready": false,
+  "donor": "iPhone18,1/v53ap",
+  "github_actions_run": false,
+  "kernel_base_objects": 1194,
+  "kernel_command_line_bytes": 994,
+  "notes": [
+    "The profile uses a private prepared source tree and archived EFI/ADT/firmware inputs.",
+    "During prototype compilation duplicate dependency-output flags rewrote 14 historical compiler dependency reports. All were regenerated with their original commands and historical target paths. Their prior byte hashes were unavailable. The v371 kernel, boot image, FAT, verification manifest and all 1400 original object hashes were checked against the archived manifest."
+  ],
+  "object_count": 1400,
+  "outputs": {
+    "boot.img": {
+      "bytes": 11907072,
+      "sha256": "e112b54b9c7f9e79fdadedf70b808fe1a15a8358804d6587356fe163a83fef06"
+    },
+    "kernel.macho": {
+      "bytes": 31154624,
+      "sha256": "3e71fc6ea5532e7805800e27a28be0eadffb2236b1abbd6d25f1f59a74a78d48"
+    },
+    "payload.img": {
+      "bytes": 201326592,
+      "sha256": "ddbfb6d4df69d720b792490e4964a02b3983f7a0cc7c59d8e0c077c10f5b0c59"
+    }
+  },
+  "phone_access": false,
+  "profile": "ios-26.6.2-23G90",
+  "rebuilt_board_components": 206,
+  "records": [
+    {
+      "bytes": 2427,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/package.manifest.json",
+      "sha256": "ea165dce9bd8e3784ad8a42d4bd52acf1d98b6a468e22594ba69adfa5715d4b2"
+    },
+    {
+      "bytes": 187477,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/kernel/native-inputs.json",
+      "sha256": "965ece9398b2bb6abec316f9522ca67be2d642d778f9c91e2f7e42df595f19bb"
+    },
+    {
+      "bytes": 1946,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/payload/payload.json",
+      "sha256": "8ce0cf557379bbe71717225c4321021b88787de03590f3a5b8941e825742102a"
+    },
+    {
+      "bytes": 1759,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/release.log",
+      "sha256": "59b483da23c0c3eaf7288ee3004554c5b503b636d7fd53640f522817ec38c797"
+    },
+    {
+      "bytes": 421,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/host-verify.log",
+      "sha256": "b8ea3f13cefbaa88b0482260d94f76f28f39556805ec9bd9db60669a978778fc"
+    },
+    {
+      "bytes": 425245,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/UniXNU-zorn-index.txt",
+      "sha256": "7672f810c9940c27e7de9a11ce78b6f25b4f178980a981fc8b154598704b84b0"
+    },
+    {
+      "bytes": 82101,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/uefi-zorn-index.txt",
+      "sha256": "82032df0d38bd59653e08e218f74b6c40a015fc77d49b59e309d6629762e2017"
+    }
+  ],
+  "release_command": [
+    "/private/tmp/zorn23g90-clean.3KjG6a/checkout-final/UniXNU-zorn/scripts/package.sh",
+    "--os",
+    "ios-26.6.2-23G90",
+    "--no-deps",
+    "--release-inputs",
+    "/Volumes/macData/projects/ios-zorn",
+    "--uefi",
+    "/private/tmp/zorn23g90-clean.3KjG6a/checkout-final/uefi-zorn",
+    "--out",
+    "/Volumes/macData/projects/ios-zorn/out/zorn/release-23g90-verified",
+    "--jobs",
+    "5"
+  ],
+  "retained_inputs": {
+    "fd_sha256": "1bf94507996700b508474956f5d7f96fa7df764201951b0ce8e5ce8b592a11ab",
+    "parent_manifest_sha256": "4395c4c639db529b95133b0279d5d621edfc7a65c8770a85dba3e6da7fc1ffc5",
+    "root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301"
+  },
+  "source_workspace": "Clean exports of the two zorn Git indices plus a fresh detached upstream checkout. No previous objects or kernel were linked.",
+  "sources": {
+    "build_script_sha256": "ebc196ca03ad53b57c045054760390e6c21bf69faed381ef88c4f06ce052973c",
+    "pinned_trees": {
+      "out/zorn/ios26-feasibility-20261107/source/kernel/zorn26-platform-build-candidate": "cc523a24252bf1c2285e0cd624bd3d5a845cd5b49294e49e964d6cb0e913c0d4",
+      "references/ios26-build-inputs-20261107/kernel-support-locked/libdispatch": "4c72217096e09f728ea52ca394151bbd68dad076261c81f49be12c575b1aca9e",
+      "references/ios26-build-inputs-20261107/kernel-support-locked/libpthread": "81b2c99f318fac812432860d8148db8e501fecc9a01dc70b6487c6fda5bca018"
+    },
+    "plan_sha256": "7f0349e98d49453a2167d1a481a8a8d80eafbb6e2636e7043900a336e1e1c893",
+    "private_file_pins": 2546
+  },
+  "support_archives": [
+    {
+      "bytes": 5832,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/kernel/native-build/kernel-support/libfirehose_kernel.a",
+      "sha256": "ea4f2bd7a00596198bf3c69e9c9b7bcd9c9700a5f96ac69bf7bf5b8c74bc7285"
+    },
+    {
+      "bytes": 46768,
+      "path": "out/zorn/release-23g90-verified/zorn/ios-26.6.2-23G90/zorn_ios26/kernel/native-build/kernel-support/libpthread_kext.a",
+      "sha256": "023b7deb5e3efafedb1f13ab2aed0b57f34aa2b7ce08f3be01eb51aa3436e396"
+    }
+  ],
+  "undefined_symbols": 0,
+  "upstream_changes": {
+    "scripts/unixnu/cli.py": "e255f8d6a17bd0904ab4cd9d290b38727e6bc59115356653621efd2228a058de",
+    "scripts/unixnu/pipeline.py": "090f807629827efb14e324eb69f00b819abce0838e1287675084ef8dc4ad2d2b"
+  },
+  "upstream_revision": "630b85a307f19c8d8a4699d5bfc12f6796b874aa",
+  "xcode": "27.0 (27A266a)"
+}

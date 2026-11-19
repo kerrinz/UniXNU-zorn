@@ -1,0 +1,104 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -1949,7 +1949,7 @@
+     if(!raw && (actual!=p || s.processSelected!=p || p->state_.detached))raw=kIOReturnNotReady;
+     s.unlockIssuer();return raw;
+ }
+-IOReturn ZornGen7HostRing26::leaveApplicationContext(ZornGen7AppExecution26 &execution,bool waitExpired)
++IOReturn ZornGen7HostRing26::leaveApplicationContext(ZornGen7AppExecution26 &execution,bool keepPending)
+ {
+     auto &s=*storage_;s.lockIssuer();auto done=[&](IOReturn raw){s.unlockIssuer();return raw;};
+     if(s.hfi || s.appExecution!=&execution || !applicationOperationHeld() || !bootstrapHealthy() ||
+@@ -1962,7 +1962,7 @@
+     if(p!=s.appOperationProcess || p->ringOwner_!=this || p->domain_!=&s.domain ||
+        p->clientOwner_!=execution.client_ || p->clientTask_!=execution.task_ || !p->clientOpen_ ||
+        p->clientClosed_ || !p->vmAttached_ || p->vmDetached_ || p->state_.poisoned)return done(kIOReturnNotReady);
+-    if(waitExpired && (s.native.outstanding() || s.runtimeSubmit.outstanding() ||
++    if(keepPending && (s.native.outstanding() || s.runtimeSubmit.outstanding() ||
+        p->vm_.hasPendingSubmissionResources() ||
+        (p->clientState_ && p->clientState_->submit.outstanding())))return done(kIOReturnSuccess);
+     // Existing transition drains real fences and observes hardware idle,then
+@@ -2026,17 +2026,23 @@
+     // A wrong/foreign scope cannot clear or unlock the legitimate owner.
+     if(!matches){s.unlockIssuer();return kIOReturnNotReady;}
+     const bool reportedExpiry=raw==kIOReturnTimeout && s.appFenceWaitExpired;
++    // Native submission has published a real pending fence/queue/resource set.
++    // Returning the actual success does not require completion. Leave keeps
++    // the selected owner only while those actual pending predicates hold;
++    // foreign handover,normal release and all failure paths still drain/refuse.
++    const bool submitted=!raw && s.appOperationKind==ZornGen7AppOperation26::Submit &&
++        applicationOperationHeld() && bootstrapHealthy();
+     bool waitExpired=reportedExpiry && applicationOperationHeld() && bootstrapHealthy();
+     if((!raw && !bootstrapHealthy()) || (reportedExpiry && !waitExpired))raw=kIOReturnNotReady;
+     const bool fatal=(raw==kIOReturnTimeout && !waitExpired) || raw==kIOReturnIOError ||
+         raw==kIOReturnNotReady || raw==kIOReturnNotPermitted;
+     s.unlockIssuer();
+     if(!fatal && !s.hfi){
+-        const auto contextRaw=leaveApplicationContext(execution,waitExpired);
++        const auto contextRaw=leaveApplicationContext(execution,waitExpired || submitted);
+         if(contextRaw){raw=contextRaw;waitExpired=false;}
+     }
+     s.lockIssuer();
+-    if(waitExpired && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
++    if((waitExpired || submitted) && (!applicationOperationHeld() || !bootstrapHealthy())){raw=kIOReturnNotReady;waitExpired=false;}
+     if(!raw && !bootstrapHealthy())raw=kIOReturnNotReady;
+     s.appOperationThread=THREAD_NULL;s.appOperationPending=false;s.appFenceWaitExpired=false;
+     s.appOperationKind=ZornGen7AppOperation26::PrepareTables;s.appOperationProcess=nullptr;s.appExecution=nullptr;
+--- a/ZornRootWindow26.h
++++ b/ZornRootWindow26.h
+@@ -17,7 +17,7 @@
+ static_assert(RelativeByteStart<=PartitionBytes && Bytes<=PartitionBytes-RelativeByteStart);
+ static_assert(!(AbsoluteByteStart&4095) && !(Bytes&4095));
+ static_assert((AbsoluteByteStart>>12)+((Bytes>>12)-1)<=0xffffffffULL);
+-static constexpr uint8_t ImageSha256[] = {0x3d,0x59,0xc4,0x47,0x91,0x8a,0xb8,0x62,0xdd,0x51,0xb1,0x56,0x5b,0x39,0xa6,0x51,0x92,0x0,0xfa,0x12,0xe9,0xf3,0x77,0x94,0xa7,0xc0,0x46,0x24,0x24,0xc2,0xb8,0x53};
++static constexpr uint8_t ImageSha256[] = {0x44,0x9c,0xe7,0x9a,0x68,0xcd,0x7f,0x3c,0xb5,0xc3,0x6c,0xbf,0xc2,0xd2,0x5e,0x27,0x71,0x8,0x69,0xc,0x38,0x9c,0xdf,0x6,0x7f,0xec,0xa4,0xb9,0x12,0xad,0xed,0x62};
+ static constexpr uint8_t WindowBytes[] = {0x0,0x0,0x0,0x15,0x33,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+ static constexpr uint8_t NativeCompatible[] = {0x56,0x35,0x33,0x41,0x50,0x0,0x69,0x50,0x68,0x6f,0x6e,0x65,0x31,0x38,0x2c,0x31,0x0,0x41,0x70,0x70,0x6c,0x65,0x41,0x52,0x4d,0x0,0x78,0x69,0x61,0x6f,0x6d,0x69,0x2c,0x7a,0x6f,0x72,0x6e,0x0,0x71,0x63,0x6f,0x6d,0x2c,0x73,0x6d,0x38,0x36,0x35,0x30,0x0};
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC b584642f88624bc7be45526207021576 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 71e1465877624de2aaac70d24739bf6f %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"b584642f88624bc7be45526207021576",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"71e1465877624de2aaac70d24739bf6f",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B584642F8862"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2671E146587762"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb5,0x84,0x64,0x2f,0x88,0x62,0x4b,0xc7,0xbe,0x45,0x52,0x62,0x07,0x02,0x15,0x76};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x71,0xe1,0x46,0x58,0x77,0x62,0x4d,0xe2,0xaa,0xac,0x70,0xd2,0x47,0x39,0xbf,0x6f};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb5,0x84,0x64,0x2f,0x88,0x62,0x4b,0xc7,0xbe,0x45,0x52,0x62,0x07,0x02,0x15,0x76};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x71,0xe1,0x46,0x58,0x77,0x62,0x4d,0xe2,0xaa,0xac,0x70,0xd2,0x47,0x39,0xbf,0x6f};

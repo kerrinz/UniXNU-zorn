@@ -1,0 +1,252 @@
+--- /dev/null
++++ b/ZornDisplaySmmu336.h
+@@ -0,0 +1,102 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornDisplaySmmu336 {
++
++// Pineapple Apps SMMU qcom,handoff-smrs = <0x1c00 0x2> and the display's
++// non-secure IOMMU specifier. This is the Apps SMMU retained by the UFS
++// owner, separate from the GPU's privately managed SMMU.
++inline constexpr uint32_t Sid[] = {0x1c00, 0x1c02};
++inline constexpr uint32_t NoSlot = UINT32_MAX;
++enum Status : uint32_t { NotRun, HostUnavailable, ReadFailed, Unsupported, Changed, Observed };
++enum Mode : uint32_t { UnmatchedBypass = 1, UnmatchedFault, StreamBypass, StreamFault,
++                       ContextBypass, Stage1Enabled, OtherContext };
++enum Entry : unsigned { Route, Slot, Smr, S2cr, Cbar, Cba2r, Sctlr, Ttbr0Low, Ttbr0High, Tcr, EntryWords };
++enum Field : unsigned { State, GlobalControl, Id0, Id1, Streams, Words = Streams + 2 * EntryWords };
++
++template <typename Read>
++Status scan(Read &read, uint32_t aperture, uint32_t (&out)[Words])
++{
++    if (!read(0, out[GlobalControl]) || !read(0x20, out[Id0]) || !read(0x24, out[Id1])) {
++        return ReadFailed;
++    }
++    const uint32_t control = out[GlobalControl], id0 = out[Id0], id1 = out[Id1];
++    const bool extended = control & (1u << 3);
++    const unsigned count = id0 & 255u, banks = id1 & 255u;
++    const unsigned pages = 1u << (((id1 >> 28) & 7u) + 1);
++    const unsigned sidWidth = (id0 >> 9) & 15u;
++    // Match the inherited K80 UFS owner's 4 KiB register frame layout and
++    // retained aperture. Never visit a register bank outside that mapping.
++    if ((control & 1u) || !(id0 & (1u << 27)) || !count || !banks ||
++        (id1 & (1u << 31)) || pages < 2 || (pages + banks) * 4096u > aperture ||
++        ((id1 >> 16) & 255u) > banks ||
++        (!(id0 & (1u << 8)) && (extended || sidWidth < 13))) {
++        return Unsupported;
++    }
++    for (unsigned n = 0; n < 2; ++n) out[Streams + n * EntryWords + Slot] = NoSlot;
++    const uint32_t matchMask = extended ? 0xffffu : 0x7fffu;
++    for (unsigned slot = 0; slot < count; ++slot) {
++        uint32_t smr = 0, s2cr = 0;
++        if (!read(0x800 + 4 * slot, smr) || !read(0xc00 + 4 * slot, s2cr)) return ReadFailed;
++        if (!(extended ? s2cr & (1u << 10) : smr & (1u << 31))) continue;
++        for (unsigned n = 0; n < 2; ++n) {
++            if ((Sid[n] ^ smr) & 0xffffu & ~((smr >> 16) & matchMask)) continue;
++            auto *entry = out + Streams + n * EntryWords;
++            if (entry[Slot] != NoSlot) return Unsupported;
++            entry[Slot] = slot;
++            entry[Smr] = smr;
++            entry[S2cr] = s2cr;
++        }
++    }
++    for (unsigned n = 0; n < 2; ++n) {
++        auto *entry = out + Streams + n * EntryWords;
++        if (entry[Slot] == NoSlot) {
++            entry[Route] = control & (1u << 10) ? UnmatchedFault : UnmatchedBypass;
++            continue;
++        }
++        const unsigned type = (entry[S2cr] >> 16) & 3u;
++        if (type == 1 || type == 2) {
++            entry[Route] = type == 1 ? StreamBypass : StreamFault;
++            continue;
++        }
++        const unsigned bank = entry[S2cr] & 255u;
++        if (type || bank >= banks) return Unsupported;
++        const uint32_t offset = (pages + bank) * 4096u;
++        if (!read(0x1000 + 4 * bank, entry[Cbar]) || !read(0x1800 + 4 * bank, entry[Cba2r]) ||
++            !read(offset, entry[Sctlr]) || !read(offset + 0x20, entry[Ttbr0Low]) ||
++            !read(offset + 0x24, entry[Ttbr0High]) || !read(offset + 0x30, entry[Tcr])) return ReadFailed;
++        const unsigned context = (entry[Cbar] >> 16) & 3u;
++        if (context == 1 && bank >= ((id1 >> 16) & 255u) && (id0 & (1u << 30))) {
++            entry[Route] = entry[Sctlr] & 1u ? Stage1Enabled : ContextBypass;
++        } else {
++            entry[Route] = OtherContext;
++        }
++    }
++    return Observed;
++}
++
++// Publish only a stable complete pair. This observes translation controls;
++// it does not walk a page table or assert an IOVA resolves to the GOP PA.
++template <typename Read>
++void sample(Read &read, uint32_t aperture, uint32_t (&out)[Words])
++{
++    for (auto &word : out) word = 0;
++    uint32_t first[Words]{}, second[Words]{};
++    Status status = scan(read, aperture, first);
++    if (status == Observed) status = scan(read, aperture, second);
++    if (status == Observed) {
++        for (unsigned i = 1; i < Words; ++i) {
++            if (first[i] != second[i]) {
++                status = Changed;
++                break;
++            }
++        }
++    }
++    out[State] = status;
++    if (status == Observed)
++        for (unsigned i = 1; i < Words; ++i) out[i] = second[i];
++}
++
++} // namespace ZornDisplaySmmu336
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -9,6 +9,7 @@
+ #include "ZornDisplayLeaseProbe325.h"
+ #include "ZornDisplayClockRead334.h"
+ #include "ZornDisplayHeldTiming335.h"
++#include "ZornDisplaySmmu336.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -25,6 +26,7 @@
+ constexpr unsigned ClockStart = LeaseStart + ZornDisplayLeaseProbe325::Words;
+ constexpr unsigned Words = ClockStart + ZornDisplayClockRead334::Words;
+ constexpr unsigned Bytes = 32 + 4 * Words;
++static_assert(ZornDisplayHeldTiming335::Used + ZornDisplaySmmu336::Words <= ZornDisplayHeldTiming335::Words);
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+ inline unsigned packet(char *out, unsigned cap, const uint32_t (&values)[Words],
+@@ -32,11 +34,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT335", 8);
++    memcpy(p, "K80FT336", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 335);
++    zorn_panic_le236(p, Bytes - 4, 336);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsCore26.cpp
++++ b/ZornUfsCore26.cpp
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornUfsCore26.h"
++#include "ZornDisplaySmmu336.h"
+ #include <kern/clock.h>
+ #include "TransferPoll.h"
+ #include "ZornDataStorePolicy.h"
+@@ -350,4 +351,27 @@
+ 
+ #include "ZornPlatformRecordIo26.inc"
+ 
+-}
++extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&out)[ZornDisplaySmmu336::Words])
++{
++    namespace Probe = ZornDisplaySmmu336;
++    for (auto &word : out) word = 0;
++    out[Probe::State] = Probe::HostUnavailable;
++    if (!preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled() ||
++        !gHost.lock || !IOLockTryLock(gHost.lock)) return;
++    constexpr uint32_t aperture = 0xd0000;
++    auto *const map = gHost.smmuMap.get();
++    if (gHost.ready && !gHost.poisoned && map && gHost.smmu &&
++        map->getPhysicalAddress() == 0x15000000 && map->getVirtualAddress() == gHost.smmu &&
++        map->getLength() >= aperture) {
++        auto read = [](uint32_t offset, uint32_t &value) {
++            if ((offset & 3u) || offset > aperture - sizeof(uint32_t)) return false;
++            value = read32(gHost.smmu, offset);
++            __asm__ volatile("dmb oshld" ::: "memory");
++            return true;
++        };
++        Probe::sample(read, aperture, out);
++    }
++    IOLockUnlock(gHost.lock);
++}
++
++}
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -552,7 +552,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3d121da95ebf47fd8e870dc8e013f0ad %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 79358e64c84e458e8e31428b69abe124 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1035,7 +1035,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"3d121da95ebf47fd8e870dc8e013f0ad",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"79358e64c84e458e8e31428b69abe124",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -16,6 +16,7 @@
+ extern "C" void zorn26_display_lease325(uint32_t *);
+ extern "C" void zorn26_display_clock_state334(uint32_t *);
+ extern "C" void zorn26_display_held_timing335(uint32_t *);
++extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&)[ZornDisplaySmmu336::Words]);
+ extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+@@ -216,6 +217,19 @@
+     auto mdp = [&](uint32_t offset, uint32_t &value) { return mmio.readDpu(offset, value); };
+     ZornDisplayHeldTiming335::observe(clock, intf, mdp, uptimeMs,
+         [](uint32_t ms) { IOSleep(ms); }, uint32_t(video.v_baseAddr), uint32_t(video.v_rowBytes), out);
++    using namespace ZornDisplayHeldTiming335;
++    namespace Smmu = ZornDisplaySmmu336;
++    const auto observed = uint32_t(ZornDisplayTiming318::Result::Observed);
++    if (out[RouteStatus] != observed || !out[ActiveCtl] || !out[ActiveFetch]) return;
++    uint32_t smmu[Smmu::Words]{};
++    uint32_t lease[ZornDisplayClockRead334::Words]{};
++    if (checkedClock(clock, lease) != Result::Observed) return;
++    zorn26_sample_apps_display_smmu336(smmu);
++    if (checkedClock(clock, lease) != Result::Observed) {
++        out[Used] = Smmu::Changed;
++        return;
++    }
++    for (unsigned i = 0; i < Smmu::Words; ++i) out[Used + i] = smmu[i];
+ }
+ 
+ extern "C" void zorn26_capture_display_clocks334(
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN263D121DA95EBF"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2679358E64C84E"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x3d,0x12,0x1d,0xa9,0x5e,0xbf,0x47,0xfd,0x8e,0x87,0x0d,0xc8,0xe0,0x13,0xf0,0xad};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x79,0x35,0x8e,0x64,0xc8,0x4e,0x45,0x8e,0x8e,0x31,0x42,0x8b,0x69,0xab,0xe1,0x24};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x3d,0x12,0x1d,0xa9,0x5e,0xbf,0x47,0xfd,0x8e,0x87,0x0d,0xc8,0xe0,0x13,0xf0,0xad};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x79,0x35,0x8e,0x64,0xc8,0x4e,0x45,0x8e,0x8e,0x31,0x42,0x8b,0x69,0xab,0xe1,0x24};

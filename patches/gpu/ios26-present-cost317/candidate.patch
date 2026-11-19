@@ -1,0 +1,99 @@
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -7,19 +7,22 @@
+ constexpr unsigned Samples = 9;
+ constexpr unsigned PresentWords = 160;
+ constexpr unsigned TouchWords = 12;
+-constexpr unsigned Words = PresentWords + Samples * (1 + TouchWords);
++constexpr unsigned TouchEnd = PresentWords + Samples * (1 + TouchWords);
++constexpr unsigned CostWords = 16;
++constexpr unsigned Words = TouchEnd + Samples * (1 + CostWords);
+ constexpr unsigned Bytes = 32 + 4 * Words;
++static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+ inline unsigned packet(char *out, unsigned cap, const uint32_t (&values)[Words],
+                        const uint8_t (&tag)[16])
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT313", 8);
++    memcpy(p, "K80FT317", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 313);
++    zorn_panic_le236(p, Bytes - 4, 317);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 39a0aa1b81e548e593f7831bf8eaf017 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 210509d2579b4ee8b4b05196397565e3 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1009,7 +1009,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"39a0aa1b81e548e593f7831bf8eaf017",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"210509d2579b4ee8b4b05196397565e3",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -10,6 +10,7 @@
+ #include <machine/machine_routines.h>
+ extern "C" bool zorn26_ft3683_trace313(uint32_t (&)[ZornManualWire313::TouchWords]);
+ extern "C" void zorn26_ui_menu_progress274(uint32_t (&)[16]);
++extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+ // opens no touch provider and never submits a contact. GPU collectors are CPU-only.
+@@ -62,6 +63,13 @@
+             const unsigned begin=ZornManualWire313::PresentWords+n*(1+ZornManualWire313::TouchWords);
+             store(begin,zorn26_ft3683_trace313(touch));
+             for(unsigned i=0;i<ZornManualWire313::TouchWords;++i)store(begin+1+i,touch[i]);
++            // The cost collector has its own snapshot timestamp and frame ID.
++            // It can advance independently of the present/FT3683 samples above.
++            uint32_t cost[ZornManualWire313::CostWords]{};
++            const unsigned costAt=ZornManualWire313::TouchEnd+n*(1+ZornManualWire313::CostWords);
++            const bool haveCost=zorn26_present_cost_snapshot278(cost)!=0;
++            store(costAt,haveCost);
++            if(haveCost)for(unsigned i=0;i<ZornManualWire313::CostWords;++i)store(costAt+1+i,cost[i]);
+             store(3,n+1);
+             if(n+1<ZornManualWire313::Samples)IOSleep(10000);
+         }
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN2639A0AA1B81E5"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26210509D2579B"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x39,0xa0,0xaa,0x1b,0x81,0xe5,0x48,0xe5,0x93,0xf7,0x83,0x1b,0xf8,0xea,0xf0,0x17};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x21,0x05,0x09,0xd2,0x57,0x9b,0x4e,0xe8,0xb4,0xb0,0x51,0x96,0x39,0x75,0x65,0xe3};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x39,0xa0,0xaa,0x1b,0x81,0xe5,0x48,0xe5,0x93,0xf7,0x83,0x1b,0xf8,0xea,0xf0,0x17};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x21,0x05,0x09,0xd2,0x57,0x9b,0x4e,0xe8,0xb4,0xb0,0x51,0x96,0x39,0x75,0x65,0xe3};

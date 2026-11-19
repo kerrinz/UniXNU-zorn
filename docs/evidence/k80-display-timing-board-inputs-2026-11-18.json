@@ -1,0 +1,121 @@
+{
+  "device": "92988a43/zorn",
+  "scope": "Archived live FDT resource matched to stock FDT catalogue and fixed MiCode register definitions",
+  "live_summary": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/brightness/live-panel-summary.json",
+    "bytes": 11601,
+    "sha256": "e2495c1fabe9c285f60ac35cb16002c1904f5c41b9748e0364ebd7941f117fc9"
+  },
+  "stock_FDT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/dtbo/fdt-00000040.dtb",
+    "bytes": 415429,
+    "sha256": "7e22223883f1a318806920a5fdaeddf1276d58fcb4a7f02e276c40c10fd4f459"
+  },
+  "stock_FDT_extraction": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-stock-dt-source-20261102/dtbo/extraction.json",
+    "bytes": 798,
+    "sha256": "674d5c6f5539572aa26616a2c98106917a33345b7e7e648700a6768c34c61975"
+  },
+  "stock_panels": [
+    "qcom,mdss_dsi_o11_42_02_0a_dsc_cmd"
+  ],
+  "panel_modes": [
+    {
+      "width": 1440,
+      "height": 3200,
+      "nominal_Hz": 60
+    },
+    {
+      "width": 1440,
+      "height": 3200,
+      "nominal_Hz": 120
+    },
+    {
+      "width": 1440,
+      "height": 3200,
+      "nominal_Hz": 90
+    }
+  ],
+  "registered_resources": {
+    "dsi_ctrl": {
+      "base": 183058432,
+      "bytes": 4096
+    },
+    "disp_cc_base": {
+      "base": 183562240,
+      "bytes": 4
+    },
+    "mdp_intf_base": {
+      "base": 182673408,
+      "bytes": 768
+    }
+  },
+  "mdp_catalog": {
+    "base": 182452224,
+    "interface_size": 768,
+    "interfaces": [
+      {
+        "offset": 217088,
+        "type": "dp",
+        "irq_offset": 0
+      },
+      {
+        "offset": 221184,
+        "type": "dsi",
+        "irq_offset": 223232
+      },
+      {
+        "offset": 225280,
+        "type": "dsi",
+        "irq_offset": 227328
+      },
+      {
+        "offset": 229376,
+        "type": "dp",
+        "irq_offset": 0
+      }
+    ]
+  },
+  "controller_revision": "2.8",
+  "mdp_interface_index": 1,
+  "register_definitions": {
+    "INTF_TIMING_ENGINE_EN": 0,
+    "INTF_STATUS": 620,
+    "INTF_CONFIG": 4,
+    "INTF_FRAME_COUNT": 172,
+    "INTF_LINE_COUNT": 176,
+    "INTF_MDP_FRAME_COUNT": 164,
+    "INTF_TEAR_TEAR_CHECK_EN": 644,
+    "INTF_TEAR_INT_COUNT_VAL": 664,
+    "INTF_TEAR_LINE_COUNT": 688,
+    "INTF_TEAR_AUTOREFRESH_CONFIG": 692
+  },
+  "vendor": {
+    "commit": "3f527f3e55ef27f240507ace3181d13900c3ed7f",
+    "git_blob": "9a884d55f438fbc26038e05214fe65f86434d9cd",
+    "tree": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/brightness/display-tree.json",
+      "bytes": 123875,
+      "sha256": "30f285f8be4aeadd9c901832656756e17375cfba2c2f8cc70d216998258f640e"
+    },
+    "file": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v317-present-cost-210509d2579b4ee8b4b05196397565e3/display-timing-reference/sde_hw_intf.c",
+      "bytes": 32537,
+      "sha256": "3cb0c3e17614e071d066dc530933c17b76f3689e5692f654dd1f3cad24672d4b"
+    },
+    "URL": "https://github.com/MiCode/vendor_opensource_display-drivers/blob/3f527f3e55ef27f240507ace3181d13900c3ed7f/msm/sde/sde_hw_intf.c"
+  },
+  "reference_houji": {
+    "commit": "98bc0960f96076de8e8d16efcfb0c0603b166b85",
+    "header": {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-houji/kernel/overlay/iokit/Kernel/arm/HoujiDisplayTiming.h",
+      "bytes": 3108,
+      "sha256": "2a4bc397d3458e3048251f31f1dccedd31f8e975508923775861d225d689a055"
+    }
+  },
+  "target_access": false,
+  "reads_or_writes": false,
+  "active_iOS26_scanout_mode_and_clock_verified": false,
+  "hardware_scan_timing_verified": false,
+  "release_or_flip_verified": false
+}

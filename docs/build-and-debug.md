@@ -1,128 +1,71 @@
-# K80 构建、测试与日志
+# K80 iOS 26 构建与证据入口
 
-> 当前设备已改为slotA + Android +独立unixnu64。先阅读[新存储布局](storage-unixnu64.md)。下文slotB/userdata/192GiB命令属于历史配置；不可用于当前设备，尤其不可执行generic输出的flash userdata。历史兼容board及资格清单原样保留。
+当前候选是 iOS 26.6.2（23G90）。完整隔离源码、内核和启动包采用每轮清单里的固定输入。最新候选 v371 的清单给出 boot ID、内核、原根、启动参数、完整链接输入和源码重放。 [主线与最新结果](ios26-mainline.md) · [v371 构建清单](evidence/k80-ft3683-v371-early-smmu-cdc-offline-2026-11-19.json)
 
-本文保留已有格式 1 调试入口；2026-10-30 根配置已迁移格式 2，调试构建器显式选择固定兼容配置，见 [迁移范围](repository-format.md)。它记录已准备工作区的使用方式，不是全新克隆的一键安装说明。后续上游构建验证见 [构建回归记录](progress-2026-10-29-repro-build.md)，与已验收桌面基线分开记录。
+## 主机工作区
 
-## 基线与前置输入
+在共同父目录维护 `UniXNU/`、`UniXNU-houji/`、`UniXNU-zorn/`、`uefi-zorn/`、K80 小米内核与设备树参考。匹配候选记录中的 XNU、工具链、IPSW、依赖组件和原厂固件。Wi-Fi、摄像头等未验收组件的历史资料见对应阶段记录。
 
-- 主 UniXNU 基线：`16e592abee8a550dec8154ed1f38b5ebc4f16213`；本仓库 `patches/core/` 保存本地 CLI overlay。
-- XNU：`d8b80295118ef25ac3a784134bcf95cd8e88109f`，Darwin 23.6 / XNU 10063.141.1；其余已解析源码见根目录 `unixnu.lock`。
-- 本机共同父目录内已有 `UniXNU/`、`UniXNU-zorn/`、`uefi-zorn/`；Mu-Silicium 路径单独传入。上游依赖按主仓库说明准备，不必 fork 成额外仓库。
-- 工具链、SDK、编译记录、匹配的 IPSW、原版 trust cache、签名/区块策略、ADT 与 Data 种子必须事先准备。
-- IPSW 为 `iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw`（iPad7,1 / j120ap）。公开来源与成员哈希见 `board.toml`；本地文件可用 `--ipsw` 或 `UNIXNU_IPSW` 指定。
-- Mu-Silicium 中的厂商 DXE、Apple 二进制和私钥不随两仓库分发；私钥仅保存在忽略的本机 `out/` 内。
+隔离 iOS 26 产物放在 `out/zorn/ios26-feasibility-20261107/`。复核新候选时查看同一轮的源码清单、实际编译配方、完整链接输入和 `boot-package/verified.json`。从新目录构建，保留已有归档及精确 SHA-256。准备工作区和证据中的本地输入路径均归属具体候选。 [主线验证记录](progress-2026-11-18-ios26-upstream-gpu.md)
 
-当前成功结果依赖本机已打补丁的 XNU 工作树和此前预链接候选。**后续已修正陈旧上下文，157 个补丁的干净重放及独立新对象编译通过，但新候选未验收桌面；另已固化实际工作树的 97 文件过渡源码快照，提供隔离工作区入口。PMGR 等配方仍显式使用此前 ABI 候选。** 旧锁、pmap、MAC / exec 的部分实验修改仍须复核，不因本轮桌面成功而视为全部合格。
+## 格式 2 配置预检
 
-## 已准备工作区的入口
-
-以下准备步骤按实际缺失输入使用，不要覆盖已有 Data 或签名身份。在专用于 zorn 的主 UniXNU 检出中安装 overlay 并选择设备：
+在独立父目录准备 `UniXNU-zorn` 及同级 `UniXNU`，后者固定到 `630b85a307f19c8d8a4699d5bfc12f6796b874aa`。用 Python 3.11 或以上版本运行。
 
 ```sh
-../UniXNU-zorn/scripts/install-zorn-patches.sh . --core
-python3 ../UniXNU-zorn/scripts/prepare-zorn-legacy-view.py
-./unixnu defconfig zorn_defconfig -D ../out/zorn/legacy-device
+git -C UniXNU submodule update --init kits/XnuPrelink
+bash UniXNU-zorn/scripts/check-package-profiles.sh "$PWD/out/profile-check"
 ```
 
-安装器仅为旧调试路径向基础补丁集追加 `patches/zorn`。根目录新的 `patches/xnu/series` 属于格式 2 路径；兼容视图刻意不暴露它，避免替换旧基础补丁模块。公共 IOStorageFamily feed 固定为 `e45fbe30a7879e0b16e26dddb78538f1b00e0bff`，用于 ABI 参考，不将参考对象链接为替代的原版存储栈。
+脚本把 `profiles/os/ios-26.6.2-23G90/profile.toml` 安装到独立的上游检出，再用原版 `scripts/package.sh --check` 对两个明确的 profile 预检。23G90 解析为 iPhone18,1／v53ap、arm64e、16 KiB CPU 页和 `zorn_ios26_defconfig`。使用完整的 `--os ios-26.6.2-23G90`。上游数字别名 `--os 26` 解析为 iPadOS 26.5.2（23F84）。[官方打包流程](https://unixnu.com/zh/porting/packaging)
 
-在共同父目录准备原版 trust cache：
+## 23G90 原生 release
+
+在独立父目录准备 `UniXNU-zorn`、`uefi-zorn` 和固定提交的 `UniXNU`。主机需要 Xcode 27.0（27A266a）、Python 3.11 以上、mtools、LLVM 的 `clang`、`llvm-objcopy`、`llvm-nm`。`inputs` 指向保留 `out/zorn/ios26-feasibility-20261107/` 和 `references/ios26-build-inputs-20261107/` 的本地输入树。
 
 ```sh
-python3 UniXNU-zorn/scripts/prepare-zorn-trustcache.py \
-  --ipsw iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw
+inputs=/path/to/pinned-23g90-inputs
+bash UniXNU-zorn/scripts/prepare-ios26-release.sh
+UniXNU-zorn/scripts/package.sh --os ios-26.6.2-23G90 --no-deps \
+  --release-inputs "$inputs" --uefi "$PWD/uefi-zorn" \
+  --out "$PWD/out/zorn-release-23g90" --jobs 5
 ```
 
-owner 验证输入的准备依赖既有只读镜像及 OpenSSL，使用 `prepare-zorn-verified-root.py` 和主仓库 `kits/VerifiedRoot/tests/check.py`。Data 种子与持久窗口的前像、容量、UUID 和已安装状态分别由既有 Data 清单维护；**本次不重新初始化或安装这些输入**。来源与验证过程见 [Data / 八核记录](progress-2026-10-28-data-smp-touch.md)。
+准备脚本只在独立的上游检出应用板级构建钩子，`scripts/package.sh` 沿用官方模板。通用 `release` 负责配置、步骤编排和最终 `verify`。23G90 的板级钩子从固定源码重建 XNU 和支持库，再编译板级对象，按记录顺序链接 arm64e 内核。生成的 `assym.s` 验证 CPU 页移位为 14。构建清单固定了已准备的 XNU 源码树、私有源文件和编译配方。[原生构建输入](../profiles/os/ios-26.6.2-23G90/native-release.json)
 
-固件由 [uefi-zorn](https://github.com/kerrinz/uefi-zorn) 的 `stage-into-mu.sh` / `build-zorn-firmware.py` 构建；统一构建器支持 `--fd /path/to/SILICIUM_UEFI.fd`，需使用包含对应触控供电和提前 watchdog 的已核验固件。
+打包阶段新建 512 字节簇的 FAT32，写入新内核、固定加载器、ADT 和看门狗／触控交接标记，再把 FAT 与固定 FD 封装为启动镜像。最终在 `zorn/ios-26.6.2-23G90/zorn_ios26/` 生成 `boot/boot.img`、`payload/payload.img`、`kernel/kernel.macho`、`package.manifest.json`。`kernel/native-inputs.json` 和 `payload/payload.json` 记录本次链接与封装输入。FD、加载器、ADT 和安装根采用精确的 v371 归档，本流程重建内核和载体。重试请选择新的输出目录。
 
-## 基本桌面触控配置
+独立暂存快照上的正式运行编译了 1194 个基础对象和 206 个板级对象，两个支持库均从源码重建。链接无未定义符号。通用校验通过后，另行回读了内嵌 FD、FAT、五个 FAT 文件和两个标记扇区。[本地 release 构建证据](evidence/k80-ios26-native-release-2026-11-19.json)
 
-以下在共同父目录执行，只生成新镜像，不隐式启动，也不重建 Data：
+## 固定输入的离线打包
+
+准备原 v371 `boot-package` 归档、Python 3.11 以上、mtools 和 LLVM 的 `clang`、`llvm-objcopy`、`llvm-nm`。以下命令从归档重封装 FAT 和 boot，回读菜单与所有固定 FAT 成员，生成 `boot/boot.img`、`payload/payload.img`、`kernel/kernel.macho` 及 `package.manifest.json`，再运行 UniXNU 的标准产物校验。
 
 ```sh
-python3 UniXNU-zorn/scripts/build-zorn-debug.py \
-  --incremental-patched-tree --defconfig zorn_union_defconfig --data-profile 8g \
-  --source-pins UniXNU-zorn/source-pins.json \
-  --smp-preflight 8 --smp-continue --smp-root-publication 1 --display-mode 3 --brightness-mode 3 \
-  --touch-handoff --touch-runtime --touch-edges --touch-kernel-parser --touch-trace \
-  --gui-watch --development-wifi-identity --data-permissions --keystore-state \
-  --shared-data-volume --data-store-mode 2 --retained-data --quiet-gui --hid-family \
-  --minimal-services --skip-setup --lite-services --gui-hold-seconds 300 \
-  --memory-mib 8192 --early-watchdog 1 --recovery-timeout 600 --touch-fast-poll
+verified=/path/to/v371/boot-package/verified.json
+python3 -B UniXNU-zorn/scripts/package-ios26-v371-offline.py \
+  --verified "$verified" --upstream UniXNU --uefi uefi-zorn \
+  --out "$PWD/out/zorn/v371-budget-package"
 ```
 
-这是 `42f3d518` 所属的已验收配置组合，重建结果须以新的清单和 SHA256 为准，不保证逐字节相同。`--development-wifi-identity` 仅提供系统身份属性，不是 Wi-Fi 驱动；`--retained-data` 保留已有 Data 初始化成果；不要随意追加首次初始化或重置参数。
+整理版只移除旧菜单中的 `zorn26_gpu_provider_claim=1`。当前源码中实际读取的同类参数是 `zorn26_gpu_provider_claims_prep`。命令行由 1022 降至 994 字节，保留看门狗、Recovery 回收和触控选项。原 v371 归档和已安装根保持原身份。mtools 写入新 FAT 目录时间，因此每次重封装使用本次生成的 SHA-256。整理版的输出标记为离线验证，真机验收仍以原候选和对应审批记录为准。
 
-快采样模式将合作让出间隔从每 8 字节调整为每 32 字节、帧间等待从 100 ms 调整为 20 ms。真实日志约每 140 ms 一点，最大采样间隔 148 ms；这不是 60 / 120 Hz 的硬件 SPI / IRQ 驱动。
+当前构建验证通过上述本地命令执行。启动镜像和专有输入留在本机。
 
-输出包括 `out/zorn/boot.img`、`boot.inputs.json` 和 `out/zorn/builds/<哈希前缀>/` 的完整归档。格式 1 的 XNU 工作树仍为 `UniXNU/out/zorn/tree`。输入审计或构建失败时停止，不沿用旧镜像宣称新版本成功。
+## 目录记录与日志
 
-## 临时启动与回收
-
-仅在设备已连接、需要新测试且准备好自动回收时使用。当前已验收归档可按下面的命令启动；自行重建后替换为新归档路径：
+在共同父目录可离线检查格式 2 目录记录和查看 CDC 归档分析入口。
 
 ```sh
-python3 UniXNU-zorn/scripts/run-zorn-debug.py \
-  --image out/zorn/builds/42f3d518/boot.img --timeout 600 --arm-recovery-bcb
+python3 UniXNU-zorn/scripts/check-catalog-record.py --upstream UniXNU
+python3 UniXNU-zorn/scripts/analyze-ios26-ft-capture.py --help
+python3 UniXNU-zorn/scripts/prepare-ios26-physical-review.py --help
 ```
 
-脚本只针对 `92988a43` / `zorn` / `b`，核对 ready 清单及镜像身份，执行临时 `fastboot boot`，等待有界自动回 recovery。归档缺失时不能用这个短哈希替代真实镜像和清单。不要同时运行多个启动或回收任务。
+格式 2 元数据、旧兼容 profile 和实际 iOS 26 构建各自有固定输入。 [格式 2 记录](repository-format.md) · [历史 OS](archived-os.md)
 
-该配置使用 300 秒 GUI 观察和独立 watchdog；600 秒是主机回收预算，不是系统永久驻留时间。成功回收后手机留在 recovery，运行结果在 `out/zorn/debug/<时间>-<镜像前缀>/run.json`。只有 `status=recovered`、`kernel_log_changed=true` 且 boot / kernel / 归档身份匹配，才能把对应日志归为这次启动。
+## 设备验收
 
-## 存储与回收边界
+启动前核对精确内核、FD、加载器、ADT、菜单、固件、根和配置。当前目标为 `92988a43`／`zorn`／slot A。固定 runner 核验 Recovery、GPT、各保护范围和 BCB 整页及尾部，再以一轮 scope／ready／claim 执行。300 秒看门狗和 600 秒主机回收预算以对应清单为准。
 
-- SHNGROOT 系统镜像：9382658048 字节，SHA256 `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。OS 位于镜像内 `0x100000`，SystemOS 位于 `0x16a600000`，运行时由真实 GPT 定位 userdata，两者保持只读。
-- 当前 8 GiB Data 使用 UFS 持久后端（RamBlock 的 DirectDisk 路径），不是分配等量 RAM 的 8 GiB 内存盘；不可变压缩种子提供尚未写入的页。独立窗口从 userdata 相对 192 GiB 开始，共 2097217 个 4096 字节块，包含其格式元数据，并非另改 GPT 分区。APFS UUID 为 `C7D77FF3-6437-4C4A-8E05-E8E239AC1641`。
-- 原 userdata 相对 10 GiB 的 512 MiB Data 窗口保留；不是当前活跃的 8 GiB Data。禁止因种子或校验不匹配而隐式清空旧窗口。
-- 日志位于 userdata 内第 `2291712` 个 4096 字节块，始终只用既有单页。
-- recovery BCB 仅更新 GPT 选定 misc 页的前 864 字节，保留尾部并读回验证，不使用 wipe 参数。
-
-不 flash / erase、不改槽位、不写 boot、super、vbmeta、vendor_boot 或 GPT。当前 userdata 已用于 iPadOS，不能启动 Android；这里不是双系统配置或安装教程。板级 first / last LBA 的历史值仅复现容量，不是真实 GPT 起始地址。
-
-## 日志与身份
-
-读取目标 K80 recovery 的既有日志，或离线解析本地副本：
-
-```sh
-python3 UniXNU-zorn/scripts/read-zorn-log.py --save out/zorn/last-log.bin --tail 100
-python3 UniXNU-zorn/scripts/read-zorn-log.py --block out/zorn/last-log.bin --tail 100
-```
-
-触控轨迹与 GUI 快照复用既有 4 KiB 页；`zorn_log_only=1` 后屏幕旧词不表示最终执行位置。用户栈、内核等待栈与真实读取错误分开记录，不凭一次采样认定死锁，也不将包含锁等待和抢占的读盘计时相加当墙钟占比。
-
-当前基本触控验收身份：
-
-```text
-boot    42f3d5183b67bd42b2e02ec1d193ba888d0e6c2dc4cd50dafab2211ce589583e
-kernel  824f882cf22cab37a0f6e2c83478eb30f5147a3127bdc79d0321e73227816b0f
-log     3c5015fc70dbbd510459cc6a73bfc14167b02a6ba5811a9cd0f978ef72e9c508
-```
-
-证据、主机检查及未解决的 CPU1 早退见 [触控阶段记录](progress-2026-10-29-touch-events.md) 与 [验收摘要](evidence/touch-desktop-fast-qualified.json)。诊断私钥、IPSW、完整系统副本、生成内核及手机镜像不提交到 Git。
-
-## 2026-10-30 当前结果
-
-两次3a桌面、CPU1窄发布对照、两布局及c50最终观察见 [非GPU最新摘要](progress-2026-10-30-non-gpu.md)。上文带日期的“待验收”保留原构建背景；当前 CPU1 有有界窄修正证据，偶发苹果标志原因仍未定。本文命令是已有调试配置入口，不授权在暂停期间构建或启动；旧c50唯一观察轮已消耗，不重复执行。
-## Dedicated resource-observation diagnostic
-
-The fixed offline `--gpu-resource-observation-image --os 17` entry packages the
-source-bound selected diagnostic FD and exact retained unixnu64 kernel/FAT.
-It has no automatic boot option. The dedicated diagnostic terminates before
-payload; it is not a CPU/GUI trial or GPU activation.
-
-`run-zorn-debug.py --gpu-resource-observation-trial` requires a new exact-image
-admission and explicit execution decision. It refuses the pending admission,
-old media scopes and consumed claims before USB. Its one-shot claim precedes
-any device query. The original independent watchdog1/fresh full-page recovery
-BCB and600-second Recovery budget remain required, with no bootstrap or retry.
-
-The observation only locates Clock/RPMh/CommandDB and queries resource IDs/GCD
-metadata. Providers may allocate bookkeeping or block. The policy backend
-remains unavailable; this is not permission for clock/power/SCM/PAS/MMIO or GPU
-execution. See the [source evidence](evidence/gpu-resource-observation-candidate-2026-11-01.json)
-for the full candidate, exact scope, offline checks and concrete execution
-proposal. No additional phone execution is authorized by this documentation.
+恢复后核对原生日志启动 ID、串口完成状态和保护区回读。当前设备停止原因见主线状态及取证记录。 [存储保护](storage-unixnu64.md) · [当前验收边界](ios26-mainline.md)

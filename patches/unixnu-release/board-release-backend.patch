@@ -1,0 +1,79 @@
+--- a/scripts/unixnu/cli.py
++++ b/scripts/unixnu/cli.py
+@@ -84,8 +84,9 @@
+     status = sub.add_parser('status', parents=[c], help='show the device, configuration and where each module comes from')
+     status.add_argument('--json', action='store_true', help='print resolved configuration as JSON without fetching sources')
+     sub.add_parser('clean', parents=[c], help='remove the build output of the device (keeps fetched sources)')
+     k = sub.add_parser('release', parents=[c], help='dependencies, patches, build steps and boot image of the device in one run, with a manifest')
++    k.add_argument('--release-inputs', metavar='DIR', help='private source and firmware inputs for the board release backend')
+     k.add_argument('--no-deps', action='store_true', help='skip fetching sources and the IPSW members')
+     k.add_argument('--check', action='store_true', help='fetch, resolve and list the patch series, then stop before any build step')
+     return top
+
+@@ -327,15 +328,22 @@
+         log(f'patch {number:02} {path}')
+     if args.check:
+         log(f'check done: {len(order)} patches, configuration {ctx.config_name}, OS {ctx.work.parent.name}')
+         return
++    backend = ctx.board.get('package', {}).get('release_backend')
+     log('step build')
+-    args.steps = list(STEPS)
+-    cmd_build(ctx)
++    if backend:
++        pipeline.run_board_backend(ctx, backend, 'build')
++    else:
++        args.steps = list(STEPS)
++        cmd_build(ctx)
+     log('step pack')
+-    args.fd = args.ramdisk = args.output = None
+-    args.dtb = None
+-    cmd_bootimg(ctx)
++    if backend:
++        pipeline.run_board_backend(ctx, backend, 'pack')
++    else:
++        args.fd = args.ramdisk = args.output = None
++        args.dtb = None
++        cmd_bootimg(ctx)
+     log('step verify')
+     files = pipeline.outputs(ctx)
+     manifest = pipeline.write_manifest(ctx, modules, order, files)
+     pipeline.verify(ctx, files, manifest)
+--- a/scripts/unixnu/pipeline.py
++++ b/scripts/unixnu/pipeline.py
+@@ -2,18 +2,35 @@
+
+ Every value comes from the device repository's board.toml ([package] and the sections the build steps
+ already read), the profiles and the local build inputs. Nothing here names a device.
+ """
+ import json
++import sys
+ from pathlib import Path
+
+ from . import payload
+-from .util import Error, git, log, sha256_file
++from .util import Error, git, log, run, sha256_file
+
+ MAX_COMMAND_LINE = 1000
+
+
++def run_board_backend(ctx, backend, stage):
++    """Run an opt-in device recipe and keep the generic package verification."""
++    if not isinstance(backend, str) or not backend:
++        raise Error('[package] release_backend must name a device script')
++    device = ctx.device.resolve()
++    entry = (device / backend).resolve()
++    if Path(backend).is_absolute() or not entry.is_relative_to(device) or not entry.is_file():
++        raise Error(f'invalid device release backend: {backend}')
++    inputs = ctx.option('release_inputs')
++    uefi = ctx.option('uefi', 'UNIXNU_UEFI')
++    if not inputs or not inputs.is_dir() or not uefi or not uefi.is_dir():
++        raise Error('the board release backend requires --release-inputs DIR and --uefi DIR')
++    run([sys.executable, '-B', str(entry), stage, '--work', str(ctx.work),
++         '--inputs', str(inputs), '--uefi', str(uefi), '--jobs', str(ctx.jobs)])
++
++
+ def outputs(ctx):
+     return {'boot.img': ctx.work / 'boot/boot.img', 'payload.img': payload.paths(ctx)[1], 'kernel.macho': ctx.work / 'kernel/kernel.macho'}
+
+
+ def command_line(ctx):

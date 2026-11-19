@@ -1,0 +1,43 @@
+--- a/crates/metal2vulkan-runtime/src/copied.rs
++++ b/crates/metal2vulkan-runtime/src/copied.rs
+@@ -2640,12 +2640,13 @@
+     true
+ }
+ 
+-/// [`read_pages`] on macOS.
+-#[cfg(target_os = "macos")]
++/// [`read_pages`] on macOS and iOS;both use the current task's Mach API.
++#[cfg(any(target_os = "macos", target_os = "ios"))]
+ pub(crate) fn read_pages(pages: NonNull<u8>, into: &mut [u8]) -> bool {
+     unsafe extern "C" {
+         /// `<mach/mach_init.h>`: the port of this process's task.
+         static mach_task_self_: libc::mach_port_t;
++        #[cfg_attr(target_os = "ios", link_name = "vm_read_overwrite")]
+         fn mach_vm_read_overwrite(
+             target_task: libc::vm_map_t,
+             address: libc::mach_vm_address_t,
+--- a/crates/metal2vulkan-runtime/src/host_memory.rs
++++ b/crates/metal2vulkan-runtime/src/host_memory.rs
+@@ -917,11 +917,12 @@
+ /// [`mapped_writable`] on macOS: the regions of this task over `[start, end)`, without a gap,
+ /// each with write protection now (`mach_vm_region`, `VM_REGION_BASIC_INFO_64`); `false` where the
+ /// kernel answers no region.
+-#[cfg(target_os = "macos")]
++#[cfg(any(target_os = "macos", target_os = "ios"))]
+ pub(super) fn mapped_writable(start: u64, end: u64) -> bool {
+     unsafe extern "C" {
+         /// `<mach/mach_init.h>`: the port of this process's task.
+         static mach_task_self_: libc::mach_port_t;
++        #[cfg_attr(target_os = "ios", link_name = "vm_region_64")]
+         fn mach_vm_region(
+             target_task: libc::vm_map_t,
+             address: *mut libc::mach_vm_address_t,
+@@ -1042,7 +1043,7 @@
+ 
+ /// [`mapped_writable`] where the runtime does not ask the system for its mappings: `false` (and no
+ /// copy is made here: the runtime reads no caller's page, [`mapped_readable`]).
+-#[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
++#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "ios", windows)))]
+ pub(super) fn mapped_writable(_start: u64, _end: u64) -> bool {
+     false
+ }

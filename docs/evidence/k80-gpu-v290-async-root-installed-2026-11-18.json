@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "version": 290,
+  "date": "2026-11-18",
+  "scope": "actual dedicated iOS26 root installation only;subsequent boot requires separate receipt",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a"
+  },
+  "old_root_sha256": "3d59c447918ab862dd51b1565b39a6519200fa12e9f37794a7c0462424c2b853",
+  "new_root_sha256": "449ce79a68cd7f3cb5c36cbfc2d25e277108690c389cdf067feca4b912aded62",
+  "kernel_sha256": "6b9db0da836a57ab1f8dcff4d236fe61b1392ba2d3e77df5fb55a130d1fe9a0a",
+  "boot_sha256": "32c71ce7062a6e0b3d4944b5786b61bbd9a4c3e572d2700ae72539968ffd63a9",
+  "changed_files": [
+    {
+      "path": "/System/Library/Extensions/NativeAdrenoMetal.bundle/NativeAdrenoMetal",
+      "sha256": "b7cc95d4d213254a754afeef16981297e065f56fc7c3d2da18a889459622c8af",
+      "attributes": {
+        "inode": 487813,
+        "uid": 0,
+        "gid": 0,
+        "mode": 493,
+        "nlink": 1,
+        "flags": 0
+      }
+    },
+    {
+      "path": "/System/Library/Extensions/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib",
+      "sha256": "ef70374430bb7ac884033d1d30a1768cdca35ed96f4c2a1341dc97abaa06f57b",
+      "attributes": {
+        "inode": 487814,
+        "uid": 0,
+        "gid": 0,
+        "mode": 493,
+        "nlink": 1,
+        "flags": 0
+      }
+    },
+    {
+      "path": "/System/Library/Extensions/NativeAdrenoMetal.bundle/_CodeSignature/CodeResources",
+      "sha256": "eebb5172b7d1129787ce56200b2e833257eb6e7229daf5b872a26e9be608c0a3",
+      "attributes": {
+        "inode": 487812,
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "nlink": 1,
+        "flags": 0
+      }
+    },
+    {
+      "path": "/System/Library/LaunchDaemons/com.apple.backboardd.plist",
+      "sha256": "9d57036fad91301500874ab8809791723f73cb669af3211f91ff4ca658ac0ec7",
+      "attributes": {
+        "inode": 487830,
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "nlink": 1,
+        "flags": 0
+      }
+    }
+  ],
+  "changed_pages": 4292,
+  "changed_bytes": 17580032,
+  "write_groups": 129,
+  "retained_actual_parent_pages_verified": 13754,
+  "layout_change": false,
+  "readback": {
+    "scope": "written4KiB-root-pages-only",
+    "blocks": 4292,
+    "bytes": 17580032,
+    "sha256": "d67f49ec7f2e89a80ba64b1742069b023d54764b354747c30cf10926802e9cbf"
+  },
+  "protected_metadata_and_fences_unchanged": true,
+  "BCB_full_page_and_tail_verified": true,
+  "recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "automatic_boot_by_install": false,
+  "retries": 0,
+  "timeout_seconds": 600,
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/review-inputs.json",
+    "sha256": "7a2a696c8cc345defad04b406850f9d59ec56cf882e9e137b50dbe2e4313fe68"
+  },
+  "actual_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/admission/run/result.json",
+    "sha256": "98b1e22e99a9e9163c47b0fb51963d6a2a11e225ee5be677baf29d87b578e736"
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/admission/admission.json",
+    "sha256": "08921d016436a3b94e2a054212129a7c9c7dd073a6cfeaf1de15d0227d395a0c"
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/admission/run/one-shot.claim.json",
+    "sha256": "370707fe5f1547af53086b7558ec7ab1a22d39e64ba3ee0306ba6b423ac9de80"
+  },
+  "source_plan": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/metal_root_delta_plan.py",
+    "sha256": "29dd6e9cddec3bffe6472ce33401315c3a82a7c5a9a5c5e978ff2a754730aaa2"
+  },
+  "actual_installer_entry": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/installer-root-entry.py",
+    "sha256": "50fa095d7819e9398ee93fa453ded4115c4fbeb63a3324eca6e5fb3369635c2c"
+  },
+  "actual_installer_runner": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-async290-root-delta-review-71e14658/installer-run-zorn-debug.py",
+    "sha256": "9ff3975c846d14b98621aa0ea03917c6c9cadf49ae9880be69752e0305b22fc5"
+  },
+  "offline_replay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v290-async-submit-71e1465877624de2aaac70d24739bf6f/root-candidate/layout-and-replay-result.json",
+    "sha256": "a9a77fb445c619261b0a172adad5b1cb219f73e64afbaeab45150b4d6405f469"
+  },
+  "host_adapter": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v290-async-submit-71e1465877624de2aaac70d24739bf6f/root-adapter-current-host/result.json",
+    "sha256": "8fa1f2efe7e955cdc2830b6441a00ca9801d060a1442486132c95a37f5892a75"
+  },
+  "recompiled_frontend": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v290-async-submit-71e1465877624de2aaac70d24739bf6f/metal-plugin/build-result290.json",
+    "sha256": "5188dfa03f6c2eb28535478f1715ee01460a4dd1d976dab328055f1ba7bb48b6"
+  },
+  "new_userland_closure": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v290-async-submit-71e1465877624de2aaac70d24739bf6f/frontend-source-closure290.json",
+    "sha256": "df5c6af7deedcc5b1fa12215795c059b06614b410a4fae84504efbc41202c732"
+  },
+  "native_Rust_archive": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v279-upstream-runtime-c06c80df1b754ba1aef8c3ec6b050ca9/rust-build/target/arm64e-apple-ios-pauth/release/libzorn_metal_bridge279.a",
+    "sha256": "83705f5f82273c927277227bc6c06105fd5eedac499f96e58ee1a20f1714c506"
+  },
+  "no_disassembly_reverse_engineering_or_instruction_rewrite": true,
+  "full_GPU_qualification": false
+}

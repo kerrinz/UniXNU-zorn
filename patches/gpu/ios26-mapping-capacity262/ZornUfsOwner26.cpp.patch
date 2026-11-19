@@ -1,0 +1,42 @@
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC 186b81acea5f4a5b8424a1d8fded3eae %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 3df21cbd4e974475befb85cebe382928 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -860,6 +860,21 @@
+ static thread_t zornCallbackThread222;
+ static ZornProgressGate203 zornCallbackGate222{};
+ static uint64_t zornCallbackResult222,zornCallbackViewState222,zornCallbackMapState222;
++// The existing retained progress owner supplies cadence metadata only.
++// Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
++extern "C" unsigned zorn26_cdc_interval262(void *context){
++    if(context!=&zornProgress201)return 3;
++    const auto &p=zornProgress201;
++    return __atomic_load_n(&p.state,__ATOMIC_ACQUIRE)==3 &&
++        __atomic_load_n(&p.result,__ATOMIC_ACQUIRE)==88 &&
++        __atomic_load_n(&p.gate.requested,__ATOMIC_ACQUIRE)==6 &&
++        __atomic_load_n(&p.gate.acknowledged,__ATOMIC_ACQUIRE)==6 &&
++        !__atomic_load_n(&p.gate.failed,__ATOMIC_ACQUIRE) &&
++        __atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE)==
++            __atomic_load_n(&zornCallbackGate222.acknowledged,__ATOMIC_ACQUIRE) &&
++        !__atomic_load_n(&zornCallbackGate222.failed,__ATOMIC_ACQUIRE)?9:3;
++}
++
+ static unsigned zornCallbackEmitted222; // Sole USB consumer owns this field.
+ extern "C" int zorn26_gpu_map_gate222(uintptr_t client,unsigned token,unsigned point,uint32_t actualRaw,unsigned resultKnown,unsigned descriptorPresent,unsigned mapState){
+  if(!token || token>4096 || point<1 || point>4 || resultKnown>1 || descriptorPresent>1 ||
+@@ -949,7 +964,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"186b81acea5f4a5b8424a1d8fded3eae",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"3df21cbd4e974475befb85cebe382928",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,

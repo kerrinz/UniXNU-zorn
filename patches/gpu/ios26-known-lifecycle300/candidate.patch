@@ -1,0 +1,336 @@
+diff -ruN a/MiniIOMobileFramebuffer.cpp b/MiniIOMobileFramebuffer.cpp
+--- a/MiniIOMobileFramebuffer.cpp	2026-11-18 12:09:44
++++ b/MiniIOMobileFramebuffer.cpp	2026-11-18 13:01:35
+@@ -59,10 +59,9 @@
+ #include "ZornGen7Present26.h"
+ #include "ZornPresentTrace245.h"
+ #include "ZornKnownPresent247.h"
+-#include "ZornSerialMenu297.h"
++#include "ZornSerialShot265.h"
+ #include "ZornPresenterScope298.h"
+-static ZornSerialMenu297 zornSerialShot265;
+-extern "C" bool zorn26_ui_menu_capture_ready297();
++static ZornSerialShot265 zornSerialShot265;
+ extern "C" void zorn26_serial_shot_request265(void){(void)zornSerialShot265.request();}
+ extern "C" unsigned zorn26_serial_shot_packet265(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16]){return zornSerialShot265.packet(out,cap,offset,tag);}
+ extern "C" bool zorn26_serial_shot_ready265(void){return zornSerialShot265.ready();}
+@@ -1443,11 +1442,10 @@
+         copied278 = outcome298.copied;
+         if (outcome298.readable) {
+             zornPresentTrace245.publish(outcome298.record);
+-            zornKnownPresent247.complete(outcome298.record);
+-            if (zorn26_ui_menu_capture_ready297() && outcome298.record[1] >= 64 && outcome298.record[9] && zornSerialShot265.pending()) {
++            const bool knownComplete281 = zornKnownPresent247.complete(outcome298.record);
++            if (knownComplete281 && outcome298.record[1] >= 64 && outcome298.record[9] && __atomic_load_n(&zornSerialShot265.state, __ATOMIC_ACQUIRE) == 1) {
+                 IOLockLock(fLock);
+-                if (zorn26_ui_menu_capture_ready297())
+-                    (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
++                (void)zornSerialShot265.capture(reinterpret_cast<const volatile uint32_t *>(fBase),
+                     fPanelWidth, fPanelHeight, fRowBytes, fZornCheckedExtent265, outcome298.record);
+                 IOLockUnlock(fLock);
+             }
+diff -ruN a/ZornApplicationStderr26.inc b/ZornApplicationStderr26.inc
+--- a/ZornApplicationStderr26.inc	2026-11-18 09:01:08
++++ b/ZornApplicationStderr26.inc	2026-11-18 13:01:35
+@@ -6,7 +6,7 @@
+  // Actual kernel process identity; this name filter selects diagnostics only.
+  // It never grants IOKit/GPU admission or changes a syscall result.
+  const char *name=proc_best_name(process);
+- static const char expected[]="backboardd";
++ static const char expected[]="zorn-metal-probe193";
+  if(!name || strncmp(name,expected,sizeof(expected)))return;
+  const uint64_t unique=proc_uniqueid(process);const uint32_t pid=(uint32_t)proc_pid(process);
+  if(!zorn26_application_stderr_reserve(unique,pid))return;
+diff -ruN a/ZornJournalCapture248.inc b/ZornJournalCapture248.inc
+--- a/ZornJournalCapture248.inc	2026-11-18 09:01:08
++++ b/ZornJournalCapture248.inc	2026-11-18 13:01:35
+@@ -3,7 +3,7 @@
+ static int zorn26_journal_process248(proc_t p,int fd){
+  if(!p || fd!=2)return 0;
+  const char *name=proc_best_name(p);
+- static const char expected[]="backboardd";
++ static const char expected[]="zorn-metal-probe193";
+  return name && !strncmp(name,expected,sizeof(expected));
+ }
+ // Observe the actually returned prefix after the original write. User memory
+diff -ruN a/ZornRootWindow26.h b/ZornRootWindow26.h
+--- a/ZornRootWindow26.h	2026-11-18 11:09:23
++++ b/ZornRootWindow26.h	2026-11-18 13:01:35
+@@ -17,7 +17,7 @@
+ static_assert(RelativeByteStart<=PartitionBytes && Bytes<=PartitionBytes-RelativeByteStart);
+ static_assert(!(AbsoluteByteStart&4095) && !(Bytes&4095));
+ static_assert((AbsoluteByteStart>>12)+((Bytes>>12)-1)<=0xffffffffULL);
+-static constexpr uint8_t ImageSha256[] = {0x95,0x1d,0x3d,0xe6,0x36,0xfb,0x50,0xa2,0x68,0x86,0xac,0x6b,0x7,0xe2,0x4d,0xb5,0xbf,0x3d,0xa6,0xa0,0xb5,0x8b,0xe2,0x70,0x65,0x42,0xf2,0x83,0x39,0xfc,0xa3,0x1};
++static constexpr uint8_t ImageSha256[] = {0x93,0x34,0x76,0x9,0x4a,0x89,0xd0,0xe3,0x73,0x39,0x2e,0xc1,0x44,0xb4,0x8b,0xab,0x1c,0xbe,0x53,0x7e,0x3e,0xee,0xf4,0x46,0x35,0xd7,0x69,0x38,0x73,0x57,0xd,0xe5};
+ static constexpr uint8_t WindowBytes[] = {0x0,0x0,0x0,0x15,0x33,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x0,0x0};
+ static constexpr uint8_t NativeCompatible[] = {0x56,0x35,0x33,0x41,0x50,0x0,0x69,0x50,0x68,0x6f,0x6e,0x65,0x31,0x38,0x2c,0x31,0x0,0x41,0x70,0x70,0x6c,0x65,0x41,0x52,0x4d,0x0,0x78,0x69,0x61,0x6f,0x6d,0x69,0x2c,0x7a,0x6f,0x72,0x6e,0x0,0x71,0x63,0x6f,0x6d,0x2c,0x73,0x6d,0x38,0x36,0x35,0x30,0x0};
+ }
+diff -ruN a/ZornUfsOwner26.cpp b/ZornUfsOwner26.cpp
+--- a/ZornUfsOwner26.cpp	2026-11-18 12:36:06
++++ b/ZornUfsOwner26.cpp	2026-11-18 13:01:35
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC db9363f8a0ac496c807f98f3282cf597 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 434b97f5baea4ec3aae2a0a28b79c1b7 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -862,22 +862,22 @@
+ static uint64_t zornCallbackResult222,zornCallbackViewState222,zornCallbackMapState222;
+ // The existing retained progress owner supplies cadence metadata only.
+ // Keep both-transfer diagnostic acknowledgements fast before/while a gate waits.
+-#include "ZornSerialMenu297.h"
++#include "ZornSerialShot265.h"
+ extern "C" void zorn26_serial_shot_request265(void);
+ extern "C" unsigned zorn26_serial_shot_packet265(char *,unsigned,unsigned,const uint8_t (&)[16]);
+ extern "C" bool zorn26_serial_shot_ready265(void);
+-#include "ZornUiMenuWire274.h"
+-extern "C" bool zorn26_ui_menu_done274();
+-extern "C" bool zorn26_ui_menu_snapshot274(uint32_t (&)[64]);
+-extern "C" void zorn26_ui_menu_schedule274(IOService *);
++#include "ZornUiMenuWire278.h"
++extern "C" bool zorn26_ui_menu_done278();
++extern "C" bool zorn26_ui_menu_snapshot278(uint32_t (&)[304]);
++extern "C" void zorn26_ui_menu_schedule278(IOService *);
+ struct ZornUiSceneProvider269 {
+-    bool ready()const{return zorn26_ui_menu_done274();}
++    bool ready()const{return zorn26_ui_menu_done278();}
+     unsigned packet(char *out,unsigned cap,const uint8_t (&tag)[16])const{
+-        uint32_t snapshot[64]{};
+-        return zorn26_ui_menu_snapshot274(snapshot)?ZornUiMenuWire274::packet(out,cap,snapshot,tag):0;
++        uint32_t snapshot[304]{};
++        return zorn26_ui_menu_snapshot278(snapshot)?ZornUiMenuWire278::packet(out,cap,snapshot,tag):0;
+     }
+ };
+-static ZornSerialMux270 zornSerialMux265;
++static ZornSerialMux265 zornSerialMux265;
+ static bool zorn_serial_idle265(void *context){
+     if(context!=&zornProgress201)return false;
+     const auto &p=zornProgress201;
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"db9363f8a0ac496c807f98f3282cf597",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"434b97f5baea4ec3aae2a0a28b79c1b7",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+@@ -1056,7 +1056,7 @@
+     return size;
+ }
+ struct ZornSerialProvider265 {
+-    enum {Bytes=ZornSerialMenu297::Bytes,PacketHeader=ZornSerialMenu297::PacketHeader};
++    enum {Bytes=ZornSerialShot265::Bytes,PacketHeader=ZornSerialShot265::PacketHeader};
+     bool ready()const{return zorn26_serial_shot_ready265();}
+     unsigned packet(char *out,unsigned cap,unsigned offset,const uint8_t (&tag)[16])const{return zorn26_serial_shot_packet265(out,cap,offset,tag);}
+ };
+@@ -1067,7 +1067,7 @@
+     if(idle)zorn26_serial_shot_request265();
+     const ZornSerialProvider265 actual{};
+     return zornSerialMux265.next(cookie,line,cap,completed,zorn_gpu_progress_next201,
+-        actual,ZornUiSceneProvider269{},kZornPlatformRecordTrial,idle);
++        actual,kZornPlatformRecordTrial,idle);
+ }
+ static void zorn_gpu_progress_cdc201(ZornUfsOwner26 *owner){
+     unsigned enabled=0;
+@@ -1301,7 +1301,7 @@
+             // Actual root device/PID1 EL0/preemption checks above still apply.
+             // This prospective profile selects one source-bounded synthetic
+             // scene;the normal FT3683 platform owner remains independent.
+-            zorn26_ui_menu_schedule274(IOService::getPlatform());
++            // This controlled known-image phase starts no desktop observation worker.
+         }
+         owner->retain();thread_t worker=THREAD_NULL;
+         const auto raw=kernel_thread_start(zorn_touch_checkpoint_worker26,owner,&worker);
+diff -ruN a/ZornUiSceneService269.cpp b/ZornUiSceneService269.cpp
+--- a/ZornUiSceneService269.cpp	2026-11-18 11:02:38
++++ b/ZornUiSceneService269.cpp	2026-11-18 13:01:35
+@@ -1,6 +1,5 @@
+ // SPDX-License-Identifier: BSD-2-Clause-Patent
+ #include "ZornTouchEventService26.h"
+-#include "ZornUiMenuPlan274.h"
+ #include <IOKit/IOPlatformExpert.h>
+ #include <IOKit/IODeviceTreeSupport.h>
+ #include <IOKit/IOLib.h>
+@@ -13,32 +12,18 @@
+ extern "C" bool zorn26_ui_desktop_ready272();
+ extern "C" uint32_t zorn26_ui_compact_loss272();
+ extern "C" void zorn26_ui_menu_progress274(uint32_t (&)[16]);
++extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[16]);
+ 
+-// A separate normal HID service. No FT3683 provider open, GPIO, bus, IRQ,
+-// physical frame state, touchscreen identity or sampled contact is borrowed.
+-class ZornUiSceneService269 final : public ZornTouchEventService26 {
+-    OSDeclareDefaultStructors(ZornUiSceneService269);
+-public:
+-    bool hasSubscriber() {
+-        if(!_clientLock || !_clients || !acceptingFrames())return false;
+-        // The selected lifetime-fixed base keeps closed tombstones in _clients.
+-        // Its actual predicate skips them; array length is not an open client.
+-        IOLockLock(_clientLock);const bool present=handleIsOpenLocked(nullptr);
+-        IOLockUnlock(_clientLock);return present;
+-    }
+-protected:
+-    OSString *getTransport() override {return OSString::withCString("Virtual");}
+-    OSString *getProduct() override {return OSString::withCString("K80 GPU UI scene (synthetic)");}
+-};
+-OSDefineMetaClassAndStructors(ZornUiSceneService269,ZornTouchEventService26);
+-
++// This candidate observes physical/user input only. It creates no HID service,
++// opens no touch provider and never submits a contact. GPU collectors are CPU-only.
+ namespace {
+ uint32_t scheduled269=0,done269=0,schedulingReturned269=0;
+-uint32_t status269[64]{};
++uint32_t status269[304]{};
+ uint64_t captureDeadline270=0;
+ void store(unsigned i,uint32_t value){__atomic_store_n(status269+i,value,__ATOMIC_RELAXED);}
+ void addFlags(uint32_t flags){__atomic_fetch_or(status269+2,flags,__ATOMIC_RELAXED);}
+ void finish(uint32_t phase){uint64_t deadline=0;clock_interval_to_deadline(5,NSEC_PER_SEC,&deadline);__atomic_store_n(&captureDeadline270,deadline,__ATOMIC_RELEASE);store(0,phase);__atomic_store_n(&done269,1u,__ATOMIC_RELEASE);}
++uint32_t uptimeMs(){uint64_t ns=0;absolutetime_to_nanoseconds(mach_absolute_time(),&ns);return uint32_t(ns/1000000);}
+ bool normal(){return preemption_enabled() && !ml_at_interrupt_context() && ml_get_interrupts_enabled();}
+ bool nativeK80(IOService *platform) {
+     if(!OSDynamicCast(IODTPlatformExpert,platform))return false;
+@@ -57,82 +42,43 @@
+     }
+     OSSafeReleaseNULL(property);return valid&&found;
+ }
+-struct Backend {
+-    ZornUiSceneService269 &service;
+-    uint64_t nowMs() {uint64_t ns=0;absolutetime_to_nanoseconds(mach_absolute_time(),&ns);return ns/1000000;}
+-    bool ready(){return service.hasSubscriber() && zorn26_ui_desktop_ready272();}
+-    uint32_t send(const ZornContacts::Frame &frame){return uint32_t(service.submitFrame(frame));}
+-    void sleepMs(uint32_t ms){IOSleep(ms);}
+-    void beforeMenu(){store(30,uint32_t(nowMs()));uint32_t values[16]{};zorn26_ui_menu_progress274(values);for(unsigned i=0;i<16;++i)store(32+i,values[i]);}
+-};
+ void worker(void *context,wait_result_t) {
+     auto *platform=static_cast<IOService *>(context);
+-    // Fixed prospective candidate:one scene after real PID1 EL0,well before
+-    // the independent300s WDT. No boot-argument extension of the1022byte line.
+-    IOSleep(120000);
+-    // Bounded CPU-snapshot wait before any virtual service/input. Not GPU or boot retry.
+-    for(unsigned i=0;i<120 && normal() && nativeK80(platform) && !zorn26_ui_desktop_ready272();++i)IOSleep(250);
+-    if(!__atomic_load_n(&schedulingReturned269,__ATOMIC_ACQUIRE)) {
+-        store(7,uint32_t(kIOReturnNotReady));finish(7);
+-    } else if(!normal() || !nativeK80(platform)) {
+-        store(7,uint32_t(kIOReturnUnsupported));finish(7);
+-    } else if(!zorn26_ui_desktop_ready272()) {
+-        // No new service/input without actual live backboardd and completed
+-        // GPU-surface evidence. No DMA-stop or resource-release authority.
+-        store(7,uint32_t(kIOReturnNotReady));finish(7);
+-    } else {
+-        addFlags(512);
+-        store(0,2);
+-        auto *service=new ZornUiSceneService269;
+-        bool initialized=false,attached=false,started=false;
+-        if(service)initialized=service->init();
+-        if(initialized){addFlags(4);attached=service->attach(platform);}
+-        if(attached){addFlags(8);started=service->start(platform);}
+-        if(started) {
+-            addFlags(16);service->registerService();addFlags(32);store(0,3);
+-            Backend io{*service};const auto scene=ZornUiMenu274::run(io);const auto &r=scene.swipe;
+-            const auto &press=scene.press;
+-            IOSleep(2000);uint32_t progress[16]{};zorn26_ui_menu_progress274(progress);
+-            for(unsigned i=0;i<16;++i)store(48+i,progress[i]);store(31,uint32_t(io.nowMs()));
+-            store(16,uint32_t(press.outcome));store(17,press.attempted);store(18,press.returned);
+-            store(19,press.firstRaw);store(20,press.liftAttempted);store(21,press.liftRaw);
+-            store(22,press.elapsedMs);store(23,ZornUiMenu274::X);store(24,ZornUiMenu274::Y);
+-            store(25,ZornUiMenu274::Reports);store(26,ZornUiMenu274::IntervalMs);
+-            store(27,ZornUiMenu274::SettleMs);store(28,ZornUiMenu274::BudgetMs);
+-            store(29,zorn26_ui_compact_loss272());
+-            store(3,r.polls);store(4,uint32_t(service->hasSubscriber()));
+-            store(5,r.attempted);store(6,r.returned);store(7,r.firstRaw);
+-            store(8,r.liftRaw);store(9,r.elapsedMs);
+-            store(10,ZornUiScene269::X);store(11,ZornUiScene269::StartY);
+-            store(12,ZornUiScene269::EndY);store(13,ZornUiScene269::Steps);
+-            store(14,ZornUiScene269::Identity);store(15,uint32_t(r.outcome));
+-            if(r.attempted)addFlags(64);
+-            if(r.liftAttempted && !r.liftRaw)addFlags(128);
+-            // Drop only the producer's creation reference. The live registered
+-            // service remains held by its service-plane attachment/subscribers;
+-            // normal IOKit termination owns stop/detach/free. No force-close of
+-            // user clients, guessed callback drain or physical driver teardown.
+-            service->release();service=nullptr;addFlags(256);
+-            finish(r.outcome==ZornUiScene269::Outcome::Complete && press.outcome==ZornUiScene269::Outcome::Complete?6u:7u);
+-        } else {
+-            store(7,uint32_t(kIOReturnNotReady));
+-            // Not published,no worker/client callback can borrow this object.
+-            if(attached)service->detach(platform);
+-            OSSafeReleaseNULL(service);finish(7);
++    IOSleep(90000);
++    if(!__atomic_load_n(&schedulingReturned269,__ATOMIC_ACQUIRE)){
++        finish(7);
++    }else if(!normal() || !nativeK80(platform)){
++        finish(7);
++    }else{
++        addFlags(4|8|16);store(0,2);store(4,10000);store(5,uptimeMs());
++        // Nine actual snapshots;flat/missing fences and missing readiness remain
++        // observations,never converted into a successful hardware/UI verdict.
++        bool interrupted=false;
++        for(unsigned n=0;n<9;++n){
++            if(!normal() || !nativeK80(platform)){interrupted=true;break;}
++            uint32_t values[16]{};zorn26_ui_menu_progress274(values);
++            const unsigned at=7+33*n;store(at,uptimeMs());
++            for(unsigned i=0;i<16;++i)store(at+1+i,values[i]);
++            uint32_t costs[16]{};if(zorn26_present_cost_snapshot278(costs))
++                for(unsigned i=0;i<16;++i)store(at+17+i,costs[i]);
++            store(3,n+1);
++            if(n!=8)IOSleep(10000);
+         }
++        store(6,uptimeMs());
++        if(interrupted)finish(7);else{addFlags(32);finish(6);}
+     }
+     platform->release();
+-    (void)thread_terminate(current_thread());panic("K80 synthetic UI worker termination returned");
++    (void)thread_terminate(current_thread());panic("K80 manual observation worker termination returned");
+ }
+ }
+-extern "C" bool zorn26_ui_menu_done274() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
+-extern "C" bool zorn26_ui_menu_capture_ready297(){return zorn26_ui_menu_done274() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
+-extern "C" bool zorn26_ui_menu_snapshot274(uint32_t (&out)[64]) {
+-    if(!zorn26_ui_menu_done274())return false;
+-    for(unsigned i=0;i<64;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
++extern "C" bool zorn26_ui_menu_done278() {return __atomic_load_n(&done269,__ATOMIC_ACQUIRE)!=0;}
++extern "C" bool zorn26_ui_menu_capture_ready278(){return zorn26_ui_menu_done278() && mach_absolute_time()>=__atomic_load_n(&captureDeadline270,__ATOMIC_ACQUIRE);}
++extern "C" bool zorn26_ui_menu_snapshot278(uint32_t (&out)[304]) {
++    if(!zorn26_ui_menu_done278())return false;
++    for(unsigned i=0;i<304;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
+     return true;
+ }
+-extern "C" void zorn26_ui_menu_schedule274(IOService *platform) {
++extern "C" void zorn26_ui_menu_schedule278(IOService *platform) {
+     if(!normal() || !nativeK80(platform))return;
+     uint32_t zero=0;
+     if(!__atomic_compare_exchange_n(&scheduled269,&zero,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return;
+diff -ruN a/ZornUsbCdc26.c b/ZornUsbCdc26.c
+--- a/ZornUsbCdc26.c	2026-11-18 12:36:06
++++ b/ZornUsbCdc26.c	2026-11-18 13:01:35
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26DB9363F8A0AC"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26434B97F5BAEA"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+diff -ruN a/record-identity/ZornPlatformRecordIdentity26.h b/record-identity/ZornPlatformRecordIdentity26.h
+--- a/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 12:36:06
++++ b/record-identity/ZornPlatformRecordIdentity26.h	2026-11-18 13:01:35
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xdb,0x93,0x63,0xf8,0xa0,0xac,0x49,0x6c,0x80,0x7f,0x98,0xf3,0x28,0x2c,0xf5,0x97};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x43,0x4b,0x97,0xf5,0xba,0xea,0x4e,0xc3,0xaa,0xe2,0xa0,0xa2,0x8b,0x79,0xc1,0xb7};
+diff -ruN a/record-identity/ZornPlatformTrialIdentity26.h b/record-identity/ZornPlatformTrialIdentity26.h
+--- a/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 12:36:06
++++ b/record-identity/ZornPlatformTrialIdentity26.h	2026-11-18 13:01:35
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xdb,0x93,0x63,0xf8,0xa0,0xac,0x49,0x6c,0x80,0x7f,0x98,0xf3,0x28,0x2c,0xf5,0x97};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x43,0x4b,0x97,0xf5,0xba,0xea,0x4e,0xc3,0xaa,0xe2,0xa0,0xa2,0x8b,0x79,0xc1,0xb7};

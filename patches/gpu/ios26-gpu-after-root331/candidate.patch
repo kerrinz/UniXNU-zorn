@@ -1,0 +1,145 @@
+--- a/GenericARMPE.cpp
++++ b/GenericARMPE.cpp
+@@ -329,9 +329,9 @@
+     // no UFS owner,thread,storage read or write is attempted. The frozen
+     // platform packet has no selector and is not rebuilt here.
+     zorn26_platform_record_start(this);
+-    // Existing root platform owner holds the real preparation inputs/locks.
+-    if(!zorn26_gpu_board_platform_start(this))return true;
+-    zorn26_boot_stage328(0xb5);
++    // The root owner schedules the GPU after actual UFS root registration.
++    // CPU presentation and the touch service remain independent of GPU startup.
++    zorn26_boot_stage328(0xba);
+     // Use the reference platform ordering for the software display path.
+     unsigned cpuPresenter=0;
+     if(PE_parse_boot_argn("zorn26_cpu_presenter",&cpuPresenter,sizeof(cpuPresenter)) && cpuPresenter==1){
+--- a/ZornRootPlatform26.cpp
++++ b/ZornRootPlatform26.cpp
+@@ -15,6 +15,8 @@
+ #include <kern/sched_prim.h>
+ #include <machine/machine_routines.h>
+ #include "ZornGen7InactiveOwner26.h"
++extern "C" void zorn26_boot_stage328(unsigned stage);
++
+ class ZornRootPlatform26 final : public OSObject {
+     OSDeclareDefaultStructors(ZornRootPlatform26);
+ public:
+@@ -179,7 +181,11 @@
+     gpuStatus_.threadHandleReturned=thread!=THREAD_NULL;
+     gpuStatus_.setupRaw=raw!=KERN_SUCCESS?kIOReturnNoResources:thread==THREAD_NULL?kIOReturnNotReady:kIOReturnSuccess;
+     gpuStatus_.setupReturned=true;const bool returned=gpuStatus_.setupRaw==kIOReturnSuccess;IOLockUnlock(gpuGate_);
+-    if(raw==KERN_SUCCESS && thread!=THREAD_NULL)thread_deallocate(thread);return returned;
++    if(returned) {
++        thread_deallocate(thread);
++        zorn26_boot_stage328(0xb5);
++    }
++    return returned;
+ }
+ void ZornRootPlatform26::gpuBoardWorker(void *context,wait_result_t)
+ {
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -92,6 +92,8 @@
+     return true;
+ }
+ 
++extern "C" void zorn26_boot_stage328(unsigned stage);
++
+ extern "C" void zorn_ufs_root_attach26(int index) {
+     auto *owner = __atomic_load_n(&rootLookupOwner, __ATOMIC_ACQUIRE);
+     if (!owner) return;
+@@ -101,8 +103,13 @@
+     }
+     const uint64_t start = owner->stagedStart_, bytes = owner->stagedBytes_;
+     IOLockUnlock(owner->gate_);
++    zorn26_boot_stage328(0xb7);
+     const auto preparation = owner->prepare();
+-    if (preparation.phase != ZornUfsOwner26::Phase::Prepared) return;
++    if (preparation.phase != ZornUfsOwner26::Phase::Prepared) {
++        if (preparation.initializerReturned) zorn26_boot_stage328(0xb9);
++        return;
++    }
++    zorn26_boot_stage328(0xb8);
+     // Repeated IOFindBSDRoot calls cannot repeat initialization or binding.
+     // Every real partial/failure stays in the original owner's status.
+     (void)owner->bindRoot(index, start, bytes);
+@@ -146,8 +153,6 @@
+     return result;
+ }
+ 
+-extern "C" void zorn26_boot_stage328(unsigned stage);
+-
+ ZornUfsOwner26::Status ZornUfsOwner26::bindRoot(int index,
+                                             uint64_t start, uint64_t bytes) {
+     if (!gate_) return readStatus();
+@@ -179,7 +184,13 @@
+         ? Phase::RootRegistered : Phase::RootRefused;
+     const Status result = status_;
+     IOLockUnlock(gate_);
+-    if(result.phase==Phase::RootRegistered)zorn26_boot_stage328(0xa3);
++    if (result.phase == Phase::RootRegistered) {
++        zorn26_boot_stage328(0xa3);
++        // Only this successful registration path can dispatch the existing
++        // GPU owner. No UFS lock is held while acquiring its separate gate.
++        if (!zorn26_gpu_board_platform_start(IOService::getPlatform()))
++            zorn26_boot_stage328(0xb6);
++    }
+     return result;
+ }
+ 
+@@ -547,7 +558,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC c14a643a7a2a4afc8104a19a16e75bc0 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 925cc8e2acfd412da5d837362b701948 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1012,7 +1023,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"c14a643a7a2a4afc8104a19a16e75bc0",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"925cc8e2acfd412da5d837362b701948",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26C14A643A7A2A"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26925CC8E2ACFD"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/houji_recovery26.c
++++ b/houji_recovery26.c
+@@ -160,7 +160,7 @@
+ void zorn26_boot_stage328(unsigned stage);
+ void zorn26_boot_stage328(unsigned stage)
+ {
+-    if(stage>=0xa0 && stage<=0xb5)draw_stage(stage);
++    if(stage>=0xa0 && stage<=0xba)draw_stage(stage);
+ }
+ 
+ // The panic formatter already owns the first message. Use its published
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xc1,0x4a,0x64,0x3a,0x7a,0x2a,0x4a,0xfc,0x81,0x04,0xa1,0x9a,0x16,0xe7,0x5b,0xc0};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x92,0x5c,0xc8,0xe2,0xac,0xfd,0x41,0x2d,0xa5,0xd8,0x37,0x36,0x2b,0x70,0x19,0x48};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xc1,0x4a,0x64,0x3a,0x7a,0x2a,0x4a,0xfc,0x81,0x04,0xa1,0x9a,0x16,0xe7,0x5b,0xc0};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x92,0x5c,0xc8,0xe2,0xac,0xfd,0x41,0x2d,0xa5,0xd8,0x37,0x36,0x2b,0x70,0x19,0x48};

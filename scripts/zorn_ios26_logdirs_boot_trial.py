@@ -18,6 +18,8 @@ import struct
 import subprocess
 import time
 
+from zorn_adb_endpoint import LEGACY_ARCHIVE_PORT, LOOPBACK, bundle_port, device_arguments, port_number
+
 ROOT = Path(__file__).resolve().parents[2]
 STAGE = ROOT/'out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90'
 ARGS = 'rd=md0 -v keepsyms=1 houji_native_root=1 zorn26_root=1 zorn26_installed_root_trial=1 zorn_wdt=1 zorn26_prearmed_recovery=1 zorn26_trial_seconds=300 zorn26_userland_progress=1'
@@ -85,17 +87,17 @@ def protected_recovery(io, pins, accepted_recovery):
     return state
 
 
-def probe_existing_adb_listener():
+def probe_existing_adb_listener(port=LEGACY_ARCHIVE_PORT):
     # TCP only. This does not send an ADB protocol request or contact a device.
     try:
-        with socket.create_connection(('127.0.0.1', 5039), timeout=0.2):
+        with socket.create_connection((LOOPBACK, port_number(port)), timeout=0.2):
             pass
     except OSError as error:
         raise RuntimeError('existing private ADB listener unreachable') from error
 
 
 def require_existing_adb(io):
-    probe_existing_adb_listener()
+    probe_existing_adb_listener(io.adb_server_port)
     server = io.adb_call('server-status')
     if io.adb not in server or 'usb_backend: NATIVE' not in server:
         raise RuntimeError('exact existing private native SDK37 server required')
@@ -251,11 +253,13 @@ def validate_admission(path, bundle_path):
 
 def run(bundle, claim, *, record_result=None):
     out, pins = claim.parent, bundle['pins']
+    port = bundle_port(bundle)
     current = load(CURRENT)
     if any(current.get(k) for k in ['active_run','active_build','runner_session','stop_device_operations']) or current.get('gpu_discovery',{}).get('current_mode') == 'unattended-offline-no-phone':
         raise ValueError('current mode/run changed;no claim or USB')
     save(claim, {'scope': bundle['scope'], 'status': 'consumed-no-repeat',
-                 'boot_sha256': pins['boot']['sha256'], 'before_first_USB': True}, True)
+                 'boot_sha256': pins['boot']['sha256'], 'before_first_USB': True,
+                 'adb_server_port': port}, True)
     current = load(CURRENT)
     current['active_run'] = str(out)
     temporary = CURRENT.with_name('current.installed-root-boot.tmp')
@@ -265,6 +269,7 @@ def run(bundle, claim, *, record_result=None):
 
     class Capture(Transport):
         def __init__(self):
+            super().__init__(adb_server_port=port)
             self.adb, self.fastboot = pins['adb_binary']['path'], pins['fastboot_binary']['path']
             # The bundle field already existed; it used to be ignored in favour of a
             # fixed 600s. 1500s is the one reviewed longer value, for the 1080s trial.
@@ -301,22 +306,18 @@ def run(bundle, claim, *, record_result=None):
             p.check_returncode()
             return p.stdout if binary else (p.stdout + p.stderr).decode().strip()
 
-        def adb_call(self, *args, **kw):
-            return self.call(self.adb, '-H', '127.0.0.1', '-P', '5039', '-s', SERIAL, *args, **kw)
-
         def probe_recovery(self):
             from zorn_recovery_identity import PROPERTIES, inspect_recovery
 
             properties = {}
             for key in PROPERTIES:
-                result = self.execute((self.adb, '-H', '127.0.0.1', '-P', '5039', '-s', SERIAL,
-                                       'shell', 'getprop', key), 3)
+                result = self.execute(device_arguments(self.adb, port, SERIAL, 'shell', 'getprop', key), 3)
                 result.check_returncode()
                 properties[key] = (result.stdout + result.stderr).decode().strip()
             return inspect_recovery(properties)
 
     io = Capture()
-    status = {'scope': bundle['scope'], 'status': 'claimed', 'GPU_started': False,
+    status = {'scope': bundle['scope'], 'status': 'claimed', 'adb_server_port': port, 'GPU_started': False,
               'root_mount_proven': False, 'desktop_proven': False, 'boot_attempts': 0}
     def record():
         pending = out / 'run.json.pending'
@@ -455,11 +456,13 @@ def finish_recovery():
     claim_path = trial / 'one-shot.claim.json'
     claim = load(claim_path)
     pins = bundle['pins']
+    port = bundle_port(bundle)
     if (claim['scope'] != incident['scope'] or claim['scope'] != bundle['scope']
             or claim['status'] != 'consumed-no-repeat' or claim['before_first_USB'] is not True
             or claim['boot_sha256'] != pins['boot']['sha256']
+            or ('adb_server_port' in claim and port_number(claim['adb_server_port']) != port)
             or any(bundle.get(k) != v for k, v in dict(serial=SERIAL, product='zorn', slot='a',
-                       accepted_recovery='twrp-or-orangefox', adb_server_port=5039).items())
+                       accepted_recovery='twrp-or-orangefox').items())
             or any(sha(path) != digest for path, digest in incident['files'].items())):
         raise ValueError('interrupted trial evidence changed')
     for role in PROTECTION_ROLES | {'adb_binary', 'host_adb_proof', 'device_helpers', 'recovery_identity',
@@ -477,10 +480,10 @@ def finish_recovery():
 
     save(out / 'one-shot.claim.json', dict(scope=ready['scope'], ready_sha256=sha(ready_path),
                                          consumed_before_first_USB=True, reusable=False), True)
-    io = Transport(adb_server_port=5039)
+    io = Transport(adb_server_port=port)
     io.adb = pins['adb_binary']['path']
     io.deadline = time.monotonic() + ready['timeout_seconds']
-    result = dict(scope=ready['scope'], device_writes=False, boots=False)
+    result = dict(scope=ready['scope'], adb_server_port=port, device_writes=False, boots=False)
     try:
         require_existing_adb(io)
         protected = protected_recovery(io, pins, bundle['accepted_recovery'])

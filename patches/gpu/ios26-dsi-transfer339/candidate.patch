@@ -1,0 +1,551 @@
+--- a/MiniIOMobileFramebuffer.cpp
++++ b/MiniIOMobileFramebuffer.cpp
+@@ -489,7 +489,7 @@
+ 	void publishModes(void);
+ 	MiniIOSurface * defaultSurface(void);
+ 	IOReturn present(const uint8_t * swap);
+-	void show(const uint8_t * swap, MiniIOSurface ** surfaces);
++	bool show(const uint8_t * swap, MiniIOSurface ** surfaces);
+ 	void presenter(void);
+ 	uint64_t paceSwap(uint64_t ready);
+ 	static void presenterMain(void * self, wait_result_t result);
+@@ -531,6 +531,37 @@
+     return expected==1;
+ }
+ static IOMobileFramebuffer * gFramebuffer;      /* (for MiniIOMobileFramebufferEnd) */
++#if defined(ZORN_IOS26)
++static uint32_t zornGopTransferUncertain339;
++
++extern "C" bool zorn26_with_gop_writer339(uint32_t address, uint32_t stride,
++    bool (*body)(void *), void *cookie)
++{
++    if (!body || !preemption_enabled() || ml_at_interrupt_context() || !ml_get_interrupts_enabled() ||
++        !__atomic_load_n(&houji26FBPublished, __ATOMIC_ACQUIRE)) return false;
++    auto *fb = gFramebuffer;
++    if (!fb) return false;
++    uint64_t deadline = 0;
++    clock_interval_to_deadline(25, NSEC_PER_MSEC, &deadline);
++    bool held = false;
++    for (unsigned i = 0; i < 16 && mach_absolute_time() < deadline; ++i) {
++        if (IOLockTryLock(fb->fLock)) {
++            held = true;
++            break;
++        }
++        IOSleep(1);
++    }
++    if (!held) return false;
++    const bool checked = !__atomic_load_n(&zornGopTransferUncertain339, __ATOMIC_ACQUIRE) &&
++        vinfo.v_physaddr == address && vinfo.v_rowbytes == stride && vinfo.v_depth == 32 &&
++        vinfo.v_width == 1440 && vinfo.v_height == 3200 &&
++        fb->fBase == reinterpret_cast<uint8_t *>(vinfo.v_baseaddr) && fb->fRowBytes == stride &&
++        fb->fZornCheckedExtent265 == uint64_t(stride) * vinfo.v_height;
++    if (checked && body(cookie)) __atomic_store_n(&zornGopTransferUncertain339, 1u, __ATOMIC_RELEASE);
++    IOLockUnlock(fb->fLock);
++    return checked;
++}
++#endif
+ 
+ #if defined(ZORN_IOS26)
+ void IOMobileFramebuffer::captureSerialFrame310()
+@@ -1457,6 +1488,7 @@
+ #if defined(ZORN_IOS26)
+         bool terminal = false;
+         bool copied278 = false;
++        bool stopped339 = false;
+         const ZornPresenterOutcome298 outcome298 = zorn26_present_frame298<SWAP_LAYERS, ZornGen7PresentLease26>(
+             swapWord(swap, SWAP_ID), producerFence, fWidth, fHeight, surfaces,
+             leaseObserved278, clock278, cost278,
+@@ -1464,11 +1496,11 @@
+             [](uint32_t *t, uint32_t *r) { return zorn_gen7_present_ledger245(t, r) != 0; },
+             [](uint32_t sid) { return zorn_surface_fence246(sid); },
+             []() { return __atomic_load_n(&houji26Presents, __ATOMIC_ACQUIRE); },
+-            [&]() { show(swap, surfaces); });
+-        completed = outcome298.completed;
+-        terminal = outcome298.terminal;
++            [&]() { stopped339 = !show(swap, surfaces); });
++        completed = outcome298.completed && !stopped339;
++        terminal = outcome298.terminal || stopped339;
+         copied278 = outcome298.copied;
+-        if (outcome298.readable) {
++        if (outcome298.readable && !stopped339) {
+             zornPresentTrace245.publish(outcome298.record);
+             zornKnownPresent247.complete(outcome298.record);
+             if (outcome298.copied) {
+@@ -1562,7 +1594,7 @@
+ #endif
+ 
+ /* A swap's surfaces onto the panel, once the GPU is done with them. */
+-void
++bool
+ IOMobileFramebuffer::show(const uint8_t * swap, MiniIOSurface ** surfaces)
+ {
+ 	uint32_t set = swapWord(swap, SWAP_LAYERS_SET);
+@@ -1630,6 +1662,10 @@
+ 	IOLockUnlock(fSwapLock);
+ 	IOLockLock(fLock);
+ #if defined(ZORN_IOS26)
++    if (__atomic_load_n(&zornGopTransferUncertain339, __ATOMIC_ACQUIRE)) {
++        IOLockUnlock(fLock);
++        return false;
++    }
+     // Invalidate the ledger before touching destination pixels.
+     fZornLastShownRecord310[9] = 0;
+ #endif
+@@ -1867,6 +1903,7 @@
+ 		fStatSince = 0;
+ 	}
+ 	IOLockUnlock(fLock);
++	return true;
+ }
+ 
+ uint64_t
+@@ -2591,6 +2628,9 @@
+ extern "C" void
+ MiniIOMobileFramebufferShow(const uint8_t * pixels, uint32_t width, uint32_t height, uint32_t rowBytes)
+ {
++#if defined(ZORN_IOS26)
++    if (__atomic_load_n(&zornGopTransferUncertain339, __ATOMIC_ACQUIRE)) return;
++#endif
+ 	if(!zornOriginalDisplayPath26())return;
+ 	uint32_t columns = width < vinfo.v_width ? width : (uint32_t) vinfo.v_width;
+ 	uint32_t rows = height < vinfo.v_height ? height : (uint32_t) vinfo.v_height;
+--- /dev/null
++++ b/ZornDpuCommandTransfer339.h
+@@ -0,0 +1,123 @@
++// SPDX-License-Identifier: BSD-2-Clause-Patent
++#pragma once
++
++#include <stdint.h>
++
++namespace ZornDpuCommandTransfer339 {
++
++// Recovery FDT and MiCode display 3f527f3e: sde_hw_ctl.c, sde_hwio.h,
++// sde_hw_intf.c, dsi_ctrl_reg.h and dsi_ctrl_hw_cmn.c.
++enum : uint32_t {
++    Interrupt2Enable = 0x1008, Interrupt2Status = 0x100c, Interrupt2Clear = 0x102c,
++    CtlTop = 0x16014, CtlFlush = 0x16018, CtlStart = 0x1601c,
++    CtlIntfActive = 0x160f4, CtlFetchActive = 0x160fc,
++    Vig0Source = 0x5014, Vig1Source = 0x7014, Vig0Stride = 0x5024, Vig1Stride = 0x7024,
++    AutoRefreshConfig = 0x2b4, AutoRefreshStatus = 0x2c0, UnderrunCount = 0x268, InterfaceFrames = 0xac,
++    DsiInterrupt = 0x110, DsiDone = 1u << 8, DsiDoneEnabled = 1u << 9, DsiError = 1u << 24,
++    DsiEnableMask = 0xa222aa02, CtlDone = 1, VigFlush = 3,
++};
++enum Result : uint32_t {
++    NotRun, RouteUnavailable, GopBusy, LeaseUnavailable, ReadUnavailable,
++    ExistingActivity, WrongTopology, AutoRefreshActive, ArmFailed,
++    ProgramUncertain, ObservationLost, Timeout, TransferObserved,
++};
++enum Field : unsigned {
++    Status, Sequence, Retain, StartMs, LatchUs, CtlUs, DsiUs, Polls, FrameDelta,
++    InitialAutoConfig, InitialAutoStatus, InitialCtlEnable, InitialCtlStatus,
++    InitialDsi, LastDsi, DpuVersion, DsiVersion, PixelClock, ByteClock, ByteIntfClock,
++    EscapeClock, InitialCtlStart, InitialCtlFlush, DsiControl, DsiClockControl, Words,
++};
++
++inline constexpr uint32_t DeadlineUs = 50000;
++
++// The caller holds the checked display lease and the framebuffer writer
++// lock. Same-address programming leaves the inherited DMA route intact. Clear
++// only the two owned completion bits, and keep resources on ambiguous return.
++template <typename Port>
++void run(Port &port, uint32_t address, uint32_t stride, uint32_t (&out)[Words])
++{
++    out[Status] = LeaseUnavailable;
++    if (!port.lease()) return;
++    uint32_t ctl = 0, active = 0, fetch = 0, addr0 = 0, addr1 = 0, stride0 = 0, stride1 = 0;
++    uint32_t underruns = 0, frames = 0;
++    out[Status] = ReadUnavailable;
++    if (!port.readMdp(0, out[DpuVersion]) || !port.readMdp(CtlTop, ctl) ||
++        !port.readMdp(CtlIntfActive, active) || !port.readMdp(CtlFetchActive, fetch) ||
++        !port.readMdp(CtlFlush, out[InitialCtlFlush]) || !port.readMdp(CtlStart, out[InitialCtlStart]) ||
++        !port.readMdp(Vig0Source, addr0) || !port.readMdp(Vig1Source, addr1) ||
++        !port.readMdp(Vig0Stride, stride0) || !port.readMdp(Vig1Stride, stride1) ||
++        !port.readMdp(Interrupt2Enable, out[InitialCtlEnable]) || !port.readMdp(Interrupt2Status, out[InitialCtlStatus]) ||
++        !port.readIntf(AutoRefreshConfig, out[InitialAutoConfig]) || !port.readIntf(AutoRefreshStatus, out[InitialAutoStatus]) ||
++        !port.readIntf(UnderrunCount, underruns) || !port.readIntf(InterfaceFrames, frames) ||
++        !port.readDsi(0, out[DsiVersion]) || !port.readDsi(4, out[DsiControl]) ||
++        !port.readDsi(0xa8, out[DsiClockControl]) || !port.readDsi(DsiInterrupt, out[InitialDsi])) return;
++    if (out[DpuVersion] >> 16 != 0xa000 || !(ctl & (1u << 17)) || active != 2 || fetch != 0x30000 ||
++        address != 0xfc400000 || stride != 5760 || addr0 != address || addr1 != address ||
++        (stride0 & 0xffff) != stride || (stride1 & 0xffff) != stride || out[DsiVersion] != 0x20080000 ||
++        out[DsiControl] != 0x1f5 || (out[DsiClockControl] & 0x1f1f) != 0x1f1f) {
++        out[Status] = WrongTopology;
++        return;
++    }
++    if (out[InitialCtlStart] || out[InitialCtlFlush] || (out[InitialCtlEnable] & CtlDone) ||
++        (out[InitialDsi] & (DsiDoneEnabled | DsiError))) {
++        out[Status] = ExistingActivity;
++        return;
++    }
++    if ((out[InitialAutoConfig] >> 31) || out[InitialAutoStatus]) {
++        out[Status] = AutoRefreshActive;
++        return;
++    }
++
++    out[Status] = ArmFailed;
++    uint32_t ctlStatus = 0, start = 0, flush = 0, currentFrames = 0;
++    const auto dsiEnables = out[InitialDsi] & DsiEnableMask;
++    if (!port.lease() ||
++        ((out[InitialCtlStatus] & CtlDone) && !port.writeMdp(Interrupt2Clear, CtlDone)) ||
++        ((out[InitialDsi] & DsiDone) && !port.writeDsi(DsiInterrupt, dsiEnables | DsiDone)) ||
++        !port.readMdp(Interrupt2Status, ctlStatus) || (ctlStatus & CtlDone) ||
++        !port.readMdp(CtlStart, start) || start || !port.readMdp(CtlFlush, flush) || flush ||
++        !port.readIntf(InterfaceFrames, currentFrames) || currentFrames != frames ||
++        !port.readDsi(DsiInterrupt, out[LastDsi]) || (out[LastDsi] & (DsiDone | DsiError)) ||
++        (out[LastDsi] & DsiEnableMask) != dsiEnables || !port.lease()) return;
++
++    out[Status] = ProgramUncertain;
++    out[Sequence] = out[Retain] = 1;
++    const uint64_t startUs = port.nowUs();
++    out[StartMs] = uint32_t(startUs / 1000);
++    if (!port.writeMdp(Vig0Source, addr0) || !port.writeMdp(Vig1Source, addr1) ||
++        !port.writeMdp(CtlFlush, VigFlush) || !port.writeMdp(CtlStart, 1)) return;
++
++    out[Status] = Timeout;
++    while (out[Polls] < 50 && port.nowUs() - startUs < DeadlineUs) {
++        ++out[Polls];
++        uint32_t currentUnderruns = 0;
++        if (!port.lease() || !port.readMdp(CtlFlush, flush) || !port.readMdp(Interrupt2Status, ctlStatus) ||
++            !port.readIntf(UnderrunCount, currentUnderruns) || currentUnderruns != underruns ||
++            !port.readDsi(DsiInterrupt, out[LastDsi]) || (out[LastDsi] & DsiError) ||
++            (out[LastDsi] & DsiEnableMask) != dsiEnables) {
++            out[Status] = ObservationLost;
++            return;
++        }
++        const uint64_t elapsed = port.nowUs() - startUs;
++        if (elapsed >= DeadlineUs) return;
++        // One-based elapsed encoding reserves zero for an unobserved event.
++        if (!flush && !out[LatchUs]) out[LatchUs] = uint32_t(elapsed + 1);
++        if ((ctlStatus & CtlDone) && !out[CtlUs]) out[CtlUs] = uint32_t(elapsed + 1);
++        if ((out[LastDsi] & DsiDone) && !out[DsiUs]) out[DsiUs] = uint32_t(elapsed + 1);
++        if (!flush && (ctlStatus & CtlDone) && (out[LastDsi] & DsiDone)) {
++            uint32_t config = 0, autoStatus = 0;
++            out[Status] = ObservationLost;
++            if (!port.readMdp(CtlStart, start) || start || !port.readIntf(AutoRefreshConfig, config) ||
++                (config >> 31) || !port.readIntf(AutoRefreshStatus, autoStatus) || autoStatus ||
++                !port.readIntf(InterfaceFrames, currentFrames) || !port.lease() ||
++                !port.writeMdp(Interrupt2Clear, CtlDone) || !port.writeDsi(DsiInterrupt, dsiEnables | DsiDone)) return;
++            out[FrameDelta] = currentFrames - frames;
++            out[Retain] = 0;
++            out[Status] = TransferObserved;
++            return;
++        }
++        port.delayMs(1);
++    }
++}
++
++} // namespace ZornDpuCommandTransfer339
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -52,6 +52,7 @@
+ #include "ZornDisplayLeaseProbe325.h"
+ #include "ZornDisplayClockRead334.h"
+ #include "ZornDisplayHeldTiming335.h"
++#include "ZornDpuCommandTransfer339.h"
+ #include "ZornGen7OwnedArcVoltage.h"
+ 
+ namespace {
+@@ -61,6 +62,7 @@
+ uint32_t displayLeasePhase325 = 0;
+ uint32_t displayClockWords334[ZornDisplayClockRead334::Words]{};
+ uint32_t displayHeldTimingWords335[ZornDisplayHeldTiming335::Words]{};
++uint32_t displayTransferWords339[ZornDpuCommandTransfer339::Words]{};
+ }
+ 
+ extern "C" void zorn26_display_resources322(uint32_t *out)
+@@ -86,6 +88,14 @@
+ }
+ 
+ extern "C" void zorn26_capture_held_dpu335(IOService *, uint32_t (&)[ZornDisplayHeldTiming335::Words]);
++extern "C" void zorn26_display_transfer339(uint32_t *out)
++{
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
++    for (unsigned i = 0; i < ZornDpuCommandTransfer339::Words; ++i) out[i] = displayTransferWords339[i];
++}
++extern "C" void zorn26_run_display_transfer339(
++    IOService *, const uint32_t (&)[ZornDisplayHeldTiming335::Words],
++    uint32_t (&)[ZornDpuCommandTransfer339::Words]);
+ extern "C" bool zorn26_read_display_gcc325(IOService *, uint32_t &);
+ extern "C" void zorn26_capture_display_clocks334(IOService *, uint32_t (&)[ZornDisplayClockRead334::Words]);
+ 
+--- a/ZornManualWire313.h
++++ b/ZornManualWire313.h
+@@ -10,6 +10,7 @@
+ #include "ZornDisplayClockRead334.h"
+ #include "ZornDisplayHeldTiming335.h"
+ #include "ZornDisplaySmmu336.h"
++#include "ZornDpuCommandTransfer339.h"
+ 
+ namespace ZornManualWire313 {
+ constexpr unsigned Samples = 9;
+@@ -27,6 +28,7 @@
+ constexpr unsigned Words = ClockStart + ZornDisplayClockRead334::Words;
+ constexpr unsigned Bytes = 32 + 4 * Words;
+ static_assert(ZornDisplayHeldTiming335::Used + ZornDisplaySmmu336::Words <= ZornDisplayHeldTiming335::Words);
++static_assert(unsigned(ZornDpuCommandTransfer339::Words) <= unsigned(ZornPanelTe320::Words));
+ static_assert(Bytes <= 3072, "Physical timing packet must fit one existing CDC frame");
+ 
+ inline unsigned packet(char *out, unsigned cap, const uint32_t (&values)[Words],
+@@ -34,11 +36,11 @@
+ {
+     if (!out || cap < Bytes) return 0;
+     auto *p = reinterpret_cast<uint8_t *>(out);
+-    memcpy(p, "K80FT338", 8);
++    memcpy(p, "K80FT339", 8);
+     memcpy(p + 8, tag, 16);
+     for (unsigned i = 0; i < Words; ++i) zorn_panic_le236(p, 24 + 4 * i, values[i]);
+     zorn_panic_le236(p, Bytes - 8, zorn_panic_crc236(p, Bytes - 8));
+-    zorn_panic_le236(p, Bytes - 4, 338);
++    zorn_panic_le236(p, Bytes - 4, 339);
+     return Bytes;
+ }
+ }
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -554,7 +554,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC b4bff8cd10764bbbb448d01c47ddf552 %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC a69cb2e808d4431592d01875b6af8d5d %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -1037,7 +1037,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"b4bff8cd10764bbbb448d01c47ddf552",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"a69cb2e808d4431592d01875b6af8d5d",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUiSceneService269.cpp
++++ b/ZornUiSceneService269.cpp
+@@ -17,6 +17,8 @@
+ extern "C" void zorn26_display_clock_state334(uint32_t *);
+ extern "C" void zorn26_display_held_timing335(uint32_t *);
+ extern "C" void zorn26_sample_apps_display_smmu336(uint32_t (&)[ZornDisplaySmmu336::Words]);
++extern "C" void zorn26_display_transfer339(uint32_t *);
++extern "C" bool zorn26_with_gop_writer339(uint32_t, uint32_t, bool (*)(void *), void *);
+ extern "C" int zorn26_present_cost_snapshot278(uint32_t (&)[ZornManualWire313::CostWords]);
+ 
+ // This candidate observes physical/user input only. It creates no HID service,
+@@ -52,9 +54,45 @@
+     static constexpr unsigned kTeWindow = 3;
+     static constexpr unsigned kMdpWindow = 4;
+     static constexpr unsigned kGccDisplayWindow = 5;
+-    IOMemoryMap *maps[6]{};
++    static constexpr unsigned kDsiWindow = 6;
++    IOMemoryMap *maps[7]{};
++    bool writable_;
+ 
+ public:
++    explicit DisplayRead318(bool writable = false) : writable_(writable) {}
++    bool readDsi(uint32_t offset, uint32_t &value)
++    {
++        return read(kDsiWindow, {0x0ae94000, 0x1000}, offset, value);
++    }
++
++    bool writeMdp(uint32_t offset, uint32_t value)
++    {
++        using namespace ZornDpuCommandTransfer339;
++        switch (offset) {
++            case Interrupt2Clear: if (value != CtlDone) return false; break;
++            case Vig0Source: case Vig1Source: if (value != 0xfc400000) return false; break;
++            case CtlFlush: if (value != VigFlush) return false; break;
++            case CtlStart: if (value != 1) return false; break;
++            default: return false;
++        }
++        return storeWord(kMdpWindow, offset, value);
++    }
++
++    bool writeDsi(uint32_t offset, uint32_t value)
++    {
++        using namespace ZornDpuCommandTransfer339;
++        if (offset != DsiInterrupt || !(value & DsiDone) || (value & DsiDoneEnabled) ||
++            (value & ~(DsiEnableMask | DsiDone))) return false;
++        return storeWord(kDsiWindow, offset, value);
++    }
++
++    void retainControllerMappings()
++    {
++        const unsigned windows[] = {kMdpWindow, kDsiWindow};
++        for (unsigned index : windows) {
++            if (maps[index]) maps[index]->retain();
++        }
++    }
+     ~DisplayRead318()
+     {
+         for (auto *mapping : maps) {
+@@ -85,13 +123,24 @@
+     }
+ 
+ private:
++    bool storeWord(unsigned index, uint32_t offset, uint32_t value)
++    {
++        auto *map = maps[index];
++        if (!writable_ || !map || (offset & 3u) || offset + sizeof(uint32_t) > map->getLength()) return false;
++        auto *regs = reinterpret_cast<volatile uint32_t *>(map->getVirtualAddress());
++        regs[offset / sizeof(uint32_t)] = value;
++        __asm__ volatile("dsb oshst" ::: "memory");
++        return true;
++    }
++
+     bool read(unsigned index, const ZornDisplayTiming318::Range &range, uint32_t offset, uint32_t &value)
+     {
+         if ((offset & 3) || offset > range.bytes - sizeof(uint32_t)) return false;
+         if (!maps[index]) {
+             IODeviceMemory *memory = IODeviceMemory::withRange(range.address, range.bytes);
+             if (!memory) return false;
+-            auto *map = memory->map(kIOMapAnywhere | kIOMapInhibitCache | kIOMapReadOnly);
++            const bool writes = writable_ && (index == kMdpWindow || index == kDsiWindow);
++            auto *map = memory->map(kIOMapAnywhere | kIOMapInhibitCache | (writes ? 0 : kIOMapReadOnly));
+             memory->release();
+             if (!map) return false;
+             if (!map->getVirtualAddress() || (map->getVirtualAddress() & 3) ||
+@@ -164,22 +213,6 @@
+             ZornDisplayTiming318::sample(readPanel, displayed, uptimeMs(), timing, stopPanelRead);
+             const unsigned timingAt = ZornManualWire313::TimingStart + n * ZornManualWire313::TimingWords;
+             for (unsigned i = 0; i < ZornManualWire313::TimingWords; ++i) store(timingAt + i, timing[i]);
+-            // Read TLMM once at the end of the existing cost windows. The
+-            // sampling never changes mux, IRQ routing, or any display clock.
+-            if (n + 1 == ZornManualWire313::Samples) {
+-                uint32_t te[ZornPanelTe320::Words]{};
+-                auto read = [&](uint32_t offset, uint32_t &value) { return readPanel.readTe(offset, value); };
+-                auto nowUs = [] {
+-                    uint64_t ns = 0;
+-                    absolutetime_to_nanoseconds(mach_absolute_time(), &ns);
+-                    return ns / 1000;
+-                };
+-                auto delay = [](unsigned microseconds) { IODelay(microseconds); };
+-                ZornPanelTe320::sample(read, nowUs, delay, displayed && normal(), te);
+-                for (unsigned i = 0; i < ZornPanelTe320::Words; ++i) {
+-                    store(ZornManualWire313::TeStart + i, te[i]);
+-                }
+-            }
+             store(3,n+1);
+             if(n+1<ZornManualWire313::Samples)IOSleep(10000);
+         }
+@@ -232,6 +265,70 @@
+     for (unsigned i = 0; i < Smmu::Words; ++i) out[Used + i] = smmu[i];
+ }
+ 
++extern "C" void zorn26_run_display_transfer339(
++    IOService *platform, const uint32_t (&held)[ZornDisplayHeldTiming335::Words],
++    uint32_t (&out)[ZornDpuCommandTransfer339::Words])
++{
++    namespace H = ZornDisplayHeldTiming335;
++    namespace S = ZornDisplaySmmu336;
++    namespace T = ZornDpuCommandTransfer339;
++    const auto *smmu = held + H::Used;
++    out[T::Status] = T::RouteUnavailable;
++    const uint32_t address = held[H::GopAddress], stride = held[H::GopStride];
++    if (!normal() || !nativeK80(platform) || held[H::ActiveCtl] != 1 || held[H::ActiveFetch] != 0x30000 ||
++        smmu[S::State] != S::Observed || address != 0xfc400000 || stride != 5760) return;
++    for (unsigned i = 0; i < 2; ++i) {
++        const auto *route = smmu + S::Streams + i * S::EntryWords;
++        if (route[S::Route] != S::ContextBypass || route[S::Smr] != 0x80021c00 ||
++            route[S::S2cr] != 3 || route[S::Slot] != 3) return;
++    }
++
++    struct Port {
++        DisplayRead318 mmio{true};
++        uint32_t (&out)[T::Words];
++        uint32_t address, stride;
++        bool lease() {
++            using ZornDisplayClockRead334::Bank;
++            using ZornDisplayTiming318::Window;
++            auto read = [&](Bank bank, uint32_t off, uint32_t &value) {
++                return bank == Bank::Gcc ? mmio.readGccDisplay(off, value) : mmio(Window::DisplayClock, off, value);
++            };
++            uint32_t raw[ZornDisplayClockRead334::Words]{};
++            if (H::checkedClock(read, raw) != H::Result::Observed) return false;
++            const uint32_t offsets[] = {0x04, 0x28, 0x2c, 0x38};
++            bool ready = true;
++            for (unsigned i = 0; i < 4; ++i) {
++                auto &value = out[T::PixelClock + i];
++                if (!mmio(Window::DisplayClock, offsets[i], value)) return false;
++                ready &= ZornDisplayTiming318::clockRunning(value);
++            }
++            return ready;
++        }
++        bool readMdp(uint32_t off, uint32_t &value) { return mmio.readDpu(off, value); }
++        bool readIntf(uint32_t off, uint32_t &value) {
++            return mmio(ZornDisplayTiming318::Window::Interface, off, value);
++        }
++        bool readDsi(uint32_t off, uint32_t &value) { return mmio.readDsi(off, value); }
++        bool writeMdp(uint32_t off, uint32_t value) { return lease() && mmio.writeMdp(off, value); }
++        bool writeDsi(uint32_t off, uint32_t value) { return lease() && mmio.writeDsi(off, value); }
++        uint64_t nowUs() {
++            uint64_t ns = 0;
++            absolutetime_to_nanoseconds(mach_absolute_time(), &ns);
++            return ns / 1000;
++        }
++        void delayMs(unsigned ms) { IOSleep(ms); }
++    } port{DisplayRead318(true), out, address, stride};
++    out[T::Status] = T::GopBusy;
++    zorn26_with_gop_writer339(address, stride, [](void *cookie) {
++        auto &port = *static_cast<Port *>(cookie);
++        __asm__ volatile("dsb oshst" ::: "memory");
++        T::run(port, port.address, port.stride, port.out);
++        if (!port.out[T::Retain]) return false;
++        port.mmio.retainControllerMappings();
++        return true;
++    }, &port);
++}
++
+ extern "C" void zorn26_capture_display_clocks334(
+     IOService *platform, uint32_t (&out)[ZornDisplayClockRead334::Words])
+ {
+@@ -250,6 +347,7 @@
+ extern "C" bool zorn26_ui_menu_snapshot313(uint32_t (&out)[ZornManualWire313::Words]) {
+     if(!zorn26_ui_menu_done313())return false;
+     for(unsigned i=0;i<ZornManualWire313::Words;++i)out[i]=__atomic_load_n(status269+i,__ATOMIC_RELAXED);
++    zorn26_display_transfer339(out + ZornManualWire313::TeStart);
+     zorn26_display_held_timing335(out + ZornManualWire313::HeldTimingStart);
+     zorn26_display_resources322(out + ZornManualWire313::ResourcesStart);
+     zorn26_display_lease325(out + ZornManualWire313::LeaseStart);
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26B4BFF8CD1076"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26A69CB2E808D4"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/arc-runtime/ZornDisplayRegisterResources324.inc
++++ b/arc-runtime/ZornDisplayRegisterResources324.inc
+@@ -186,10 +186,13 @@
+     auto &state = *storage_;
+     auto readClock = [&](uint32_t &value) { return zorn26_read_display_gcc325(state.platform, value); };
+     auto setLease = [&](bool hold) {
++        if (!hold && displayTransferWords339[ZornDpuCommandTransfer339::Retain])
++            return uint32_t(kIOReturnNotReady);
+         const auto result = setDisplayRegisterResources(hold);
+         if (hold && result == kIOReturnSuccess) {
+             zorn26_capture_display_clocks334(state.platform, displayClockWords334);
+             zorn26_capture_held_dpu335(state.platform, displayHeldTimingWords335);
++            zorn26_run_display_transfer339(state.platform, displayHeldTimingWords335, displayTransferWords339);
+         }
+         return uint32_t(result);
+     };
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xb4,0xbf,0xf8,0xcd,0x10,0x76,0x4b,0xbb,0xb4,0x48,0xd0,0x1c,0x47,0xdd,0xf5,0x52};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xa6,0x9c,0xb2,0xe8,0x08,0xd4,0x43,0x15,0x92,0xd0,0x18,0x75,0xb6,0xaf,0x8d,0x5d};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xb4,0xbf,0xf8,0xcd,0x10,0x76,0x4b,0xbb,0xb4,0x48,0xd0,0x1c,0x47,0xdd,0xf5,0x52};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xa6,0x9c,0xb2,0xe8,0x08,0xd4,0x43,0x15,0x92,0xd0,0x18,0x75,0xb6,0xaf,0x8d,0x5d};

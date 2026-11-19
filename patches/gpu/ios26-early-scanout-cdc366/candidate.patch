@@ -1,0 +1,73 @@
+--- a/ZornGen7DarwinBoardOwner.cpp
++++ b/ZornGen7DarwinBoardOwner.cpp
+@@ -101,6 +101,28 @@
+     if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
+     for (unsigned i = 0; i < ZornScanoutTrace348::Words; ++i) out[i] = displayLiveTrace348[i];
+ }
++extern "C" bool zorn26_display_live_summary366(uint32_t (&out)[11])
++{
++    namespace Trace = ZornScanoutTrace348;
++    namespace Phase = ZornScanoutPhase349;
++    if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return false;
++    const auto &trace = displayLiveTrace348;
++    const auto &phase = displayLivePhase349;
++    if (!trace[Trace::Status] || trace[Trace::Completed] > Trace::MaxFlips) return false;
++    const unsigned fields[] = {Trace::Status, Trace::Retain, Trace::StartUs, Trace::StopUs,
++                               Trace::Attempts, Trace::Completed, Trace::Refused};
++    for (unsigned i = 0; i < sizeof(fields) / sizeof(fields[0]); ++i) out[i] = trace[fields[i]];
++    out[7] = 0;
++    for (unsigned i = 0; i < trace[Trace::Completed]; ++i) {
++        const auto done = trace[Trace::Frames + i * Trace::FrameWords + 2];
++        if (done > trace[Trace::StartUs] && done <= trace[Trace::StopUs]) ++out[7];
++    }
++    out[8] = phase[Phase::PriorDsiWaitAttempts];
++    out[9] = phase[Phase::PriorDsiWaitIdle];
++    out[10] = phase[Phase::PriorDsiWaitMaxUs];
++    return true;
++}
++
+ extern "C" void zorn26_display_live_phase349(uint32_t *out)
+ {
+     if (__atomic_load_n(&displayLeasePhase325, __ATOMIC_ACQUIRE) != 2) return;
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -1010,6 +1010,7 @@
+ }
+ extern "C" void zorn26_vm_completed_totals264(uint64_t *);
+ #include "ZornKnownTask266.h"
++extern "C" bool zorn26_display_live_summary366(uint32_t (&)[11]);
+ static unsigned zorn_gpu_progress_next201(void *cookie,char *line,unsigned cap,unsigned completedFrames){
+     auto *p=static_cast<ZornGpuProgress201 *>(cookie);
+     // Callback receives only actual complete transfers. Never acknowledge a
+@@ -1100,7 +1101,30 @@
+     size=zorn_known_task_append266(line,cap,size,knownAvailable266,known266);
+     if(!size)return 0;
+     static uint32_t journalCursor248=0;
+-    size=zorn_journal_append248(line,cap,size,journalCursor248,zorn26_journal_snapshot248,zorn26_base64_encode);
++    uint32_t display[11]{};
++    char summary[108]{};
++    unsigned summaryBytes = 0;
++    if (zorn26_display_live_summary366(display)) {
++        const int count = snprintf(summary, sizeof(summary),
++            ",ds366=%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x/%08x",
++            display[0], display[1], display[2], display[3], display[4], display[5],
++            display[6], display[7], display[8], display[9], display[10]);
++        if (count > 0 && unsigned(count) < sizeof(summary)) summaryBytes = unsigned(count);
++    }
++    // Reserve a small part of this existing frame for the immutable display
++    // record. On tight input, emit the original journal frame unchanged.
++    unsigned formatted = 0;
++    if (summaryBytes && size + summaryBytes < cap) {
++        formatted = zorn_journal_append248(line,cap-summaryBytes,size,journalCursor248,
++                                          zorn26_journal_snapshot248,zorn26_base64_encode);
++        if (formatted) {
++            memcpy(line + formatted - 2, summary, summaryBytes);
++            formatted += summaryBytes;
++            memcpy(line + formatted - 2, "\r\n", 3);
++        }
++    }
++    size = formatted ? formatted : zorn_journal_append248(line,cap,size,journalCursor248,
++                                                          zorn26_journal_snapshot248,zorn26_base64_encode);
+     if(size){p->emittedPoint=point;zornCallbackEmitted222=callbackPoint;}
+     return size;
+ }

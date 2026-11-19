@@ -1,0 +1,38 @@
+--- a/GeniSpi.c
++++ b/GeniSpi.c
+@@ -11,7 +11,7 @@
+     wr(s, SE_GENI_S_IRQ_CLEAR, 0xffffffffu);
+     wr(s, SE_DMA_TX_IRQ_CLR, 0xffffffffu);
+     wr(s, SE_DMA_RX_IRQ_CLR, 0xffffffffu);
+-    wr(s, SE_IRQ_EN, 0xffffffffu);
++    if (s->poll_only != 1) wr(s, SE_IRQ_EN, 0xffffffffu);
+ }
+ 
+ // FIFO words hold fifo_width_bits/8 packed bytes at 8 bits per word.
+@@ -85,13 +85,17 @@
+         return GENI_ERR_PARAM;
+     if (s->info.fifo_disabled && !s->allow_fifo_disabled && !s->use_dma) return GENI_ERR_NOTSUP;   // GPI DMA path not implemented
+     if (s->info.tx_fifo_depth < 4 || s->info.fifo_width_bits != 32) return GENI_ERR_NODEV;
++    // Polling needs local status, but has no GIC handler. Mask the
++    // summary outputs before clearing or configuring any local sources.
++    if (s->poll_only == 1) wr(s, SE_IRQ_EN, 0);
+     // geni_se_init
+     irq_clear(s);
+     rmw_set(s, SE_GENI_CGC_CTRL, GENI_DEFAULT_CGC_EN);
+     rmw_set(s, SE_DMA_GENERAL_CFG, GENI_AHB_SEC_SLV_CGC_ON | GENI_DMA_AHB_SLV_CGC_ON | GENI_DMA_TX_CGC_ON | GENI_DMA_RX_CGC_ON);
+     wr(s, GENI_OUTPUT_CTRL, GENI_DEFAULT_IO_OUTPUT_CTRL);
+     wr(s, GENI_FORCE_DEFAULT_REG, GENI_FORCE_DEFAULT);
+-    rmw_set(s, SE_IRQ_EN, GENI_IRQ_M | GENI_IRQ_S | GENI_IRQ_DMA_TX | GENI_IRQ_DMA_RX);
++    if (s->poll_only != 1)
++        rmw_set(s, SE_IRQ_EN, GENI_IRQ_M | GENI_IRQ_S | GENI_IRQ_DMA_TX | GENI_IRQ_DMA_RX);
+     wr(s, SE_GENI_DMA_MODE_EN, rd(s, SE_GENI_DMA_MODE_EN) & ~GENI_DMA_MODE_EN);
+     wr(s, SE_GSI_EVENT_EN, 0);
+     wr(s, SE_GENI_RX_WATERMARK_REG, s->info.tx_fifo_depth - 3);
+@@ -122,7 +126,6 @@
+         wr(s, SE_GENI_M_IRQ_EN, rd(s, SE_GENI_M_IRQ_EN) & ~(GENI_M_CMD_DONE | GENI_M_TX_FIFO_WATERMARK | GENI_M_RX_FIFO_WATERMARK | GENI_M_RX_FIFO_LAST));
+         wr(s, SE_GENI_DMA_MODE_EN, rd(s, SE_GENI_DMA_MODE_EN) | GENI_DMA_MODE_EN);
+     }
+-    if (s->poll_only == 1) wr(s, SE_IRQ_EN, 0);     // status registers stay pollable; no unhandled interrupt reaches the GIC
+     return 0;
+ }
+ 

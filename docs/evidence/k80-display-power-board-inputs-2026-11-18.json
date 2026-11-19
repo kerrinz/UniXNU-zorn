@@ -1,0 +1,88 @@
+{
+  "device": "92988a43/zorn",
+  "existing_register_bus_route": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v321-dpu-handoff-1d4ad7f909c74a07aaf378ba1762b770/display-register-interconnect-route.json",
+    "bytes": 3695,
+    "sha256": "bbbc4ef6cbcd9e3b3f7e5b3cb98df913a641af5456db2ffd5f25a0a0e9074e04"
+  },
+  "names": {
+    "bcm": [
+      "SH1",
+      "CN0",
+      "CN1"
+    ],
+    "arc": {
+      "CX_parent": "cx.lvl",
+      "VDD_MM": "mmcx.lvl",
+      "VDD_MXA": "mx.lvl"
+    }
+  },
+  "linux": {
+    "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+    "files": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/regulator/rpmh-regulator.c",
+        "bytes": 64580,
+        "sha256": "58e23b60eaf05dd3fa581e9639e8c15b306371899dbe4435b039744b3f1acb8e"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/clk/qcom/dispcc-pineapple.c",
+        "bytes": 59563,
+        "sha256": "f5c7958776fbe9eb52722c37965836c7b6b16a7548d7da7b7d6dc6a0306993c3"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/interconnect/qcom/pineapple.c",
+        "bytes": 80284,
+        "sha256": "5ffe4e07d87407b97325e967c6b151b0857fc4f82f394aa8aeb3ee8c907887b2"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/interconnect/qcom/icc-rpmh.c",
+        "bytes": 14669,
+        "sha256": "1a16bee228a7c98df6358e57a9f9df056075f59fe79a7ab9270217ce72878320"
+      }
+    ]
+  },
+  "device_tree": {
+    "commit": "25446a168427695fed4adecb61fd63926f12bc17",
+    "files": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/pineapple-regulators.dtsi",
+        "bytes": 39691,
+        "sha256": "ea6bf3205ca744f2b0bb0116a8fc6fff90f3abdb493526ecea31c286d6faed3d"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/pineapple.dtsi",
+        "bytes": 91063,
+        "sha256": "60cabffe3e606f8216066aca9ba1ee35ea428b4169d3f7b02bfeee980bc4b2eb"
+      }
+    ]
+  },
+  "shared_owners": {
+    "icc_object": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-cpu-posterboard-passive26-cc9fbb3b86364db19e8f2ec90256040b/full-link/inputs/1274-ZornGen7IccVoter26.cpo",
+      "bytes": 328560,
+      "sha256": "e0e4017a55682f33a72dfce10449671f90796552ff6bad2327838a1cfdfd3ed2"
+    },
+    "icc": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515/ZornGen7IccVoter26.cpp",
+      "bytes": 26573,
+      "sha256": "db4bf3db919fddf934cec2ff6d7da977763340230130157e644446393b536492"
+    },
+    "graph": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515/ZornGen7IccHlosSource26.inc",
+      "bytes": 3253,
+      "sha256": "52a239f34594a598c29fc391c3a61b8b23ab3d8df8a3f73c47b6561d31d2af6d"
+    },
+    "command_db": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/board/zorn/firmware/gpu-native-qtb-power-resume-f05e722179f1481f8dd3ba3673690515/ZornGen7CommandDbResources26.cpp",
+      "bytes": 11484,
+      "sha256": "22836bb55fb9992394dda68bd819e04b44d1e08aadf42e80087f85db08baf8f3"
+    },
+    "reader": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/shared/cxo-parentless-poll-46ac957736a647b19cfc4425b89722f3/k80/runtime/startup/ZornGen7CommandDbResourceReader.h",
+      "bytes": 1173,
+      "sha256": "1958f91f8c74d72a737d9a79f6f00501bb05c2d1f14de5427f89fac0f7c981f8"
+    }
+  },
+  "scope": "Resolve attached CommandDB resource records; HLOS SH1 remains shared with GPU, and resolved records grant no ownership or voltage authority."
+}

@@ -1,0 +1,52 @@
+{
+  "base_boot_tag": "563a3c360ee24e19a3f910d47c5f3640",
+  "base_bundle_sha256": "ed78ed3ea0ffbd1a098268ab023d42d6e85a59f13f6abe1efb2830ff104cdd81",
+  "candidate_boot_tag": "0b1d9fe655b34f3cbcf0aa993fe6430b",
+  "source_delta": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/touch/ios26-apps-smmu-after-root368/candidate.patch",
+    "bytes": 1725,
+    "sha256": "b70f8f827163c4fd7029613f83215d6702da451146060ecfaeea4e2d0e2acdba"
+  },
+  "functional_deltas": [
+    {
+      "file": "GenericARMPE.cpp",
+      "base": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/ft3683-v367-smmu-gate-563a3c360ee24e19a3f910d47c5f3640/GenericARMPE.cpp",
+        "bytes": 15750,
+        "sha256": "ced43b24f9d1f72b2d93f55528ca7c98338ef2a40fae39a7e43a1d74a2c22076"
+      },
+      "functional_delta": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/ft3683-v368-after-root-0b1d9fe655b34f3cbcf0aa993fe6430b/GenericARMPE.cpp",
+        "bytes": 15866,
+        "sha256": "15ff4f77c573a8b5b1ed9c8ac04bd54b6299a2979845a04d8de286368293d0fd"
+      },
+      "patch_replay": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ft3683-v368-after-root-0b1d9fe655b34f3cbcf0aa993fe6430b/patch-replay/GenericARMPE.cpp",
+        "sha256": "15ff4f77c573a8b5b1ed9c8ac04bd54b6299a2979845a04d8de286368293d0fd"
+      }
+    },
+    {
+      "file": "ZornUfsOwner26.cpp",
+      "base": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/ft3683-v367-smmu-gate-563a3c360ee24e19a3f910d47c5f3640/ZornUfsOwner26.cpp",
+        "bytes": 96043,
+        "sha256": "ed3c22302554c7f64b0c5f4041d20cba36f530757f8162e45214dac26abe31ed"
+      },
+      "functional_delta": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/source/os/ios26/ft3683-v368-after-root-0b1d9fe655b34f3cbcf0aa993fe6430b/ZornUfsOwner26.cpp",
+        "bytes": 96429,
+        "sha256": "cd6eee9a5504244e9623114e39cb314fb369947d42d7cce1ac778ea7663711f6"
+      },
+      "patch_replay": {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-ft3683-v368-after-root-0b1d9fe655b34f3cbcf0aa993fe6430b/patch-replay/ZornUfsOwner26.cpp",
+        "sha256": "cd6eee9a5504244e9623114e39cb314fb369947d42d7cce1ac778ea7663711f6"
+      }
+    }
+  ],
+  "patch_check_command": [
+    "git",
+    "apply",
+    "--check",
+    "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/patches/touch/ios26-apps-smmu-after-root368/candidate.patch"
+  ]
+}

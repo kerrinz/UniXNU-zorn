@@ -1,0 +1,76 @@
+--- a/ZornGen7HostRing26.cpp
++++ b/ZornGen7HostRing26.cpp
+@@ -46,6 +46,14 @@
+ extern "C" void zorn26_native_known_image_observation(unsigned (&out)[32])
+ {for(unsigned i=0;i<32;++i)out[i]=nativeKnownImageObservation[i];}
+ namespace {
++// These native methods read their own client metadata/status,or the already
++// bound global CP always-on timer. None translates an application GPU VA.
++// Native result and all operation/task/provider/MMIO checks remain in force.
++static bool nativeReadOnlyQuery288(uint32_t method)
++{
++    return method==NativeAdrenoMethodQuery || method==NativeAdrenoMethodGetDeviceInfo ||
++        method==NativeAdrenoMethodGetStatus || method==NativeAdrenoMethodGetTimestamp;
++}
+ // This root lives for the actual initialized GPU's lifetime,not a connection.
+ // Registry lock precedes issuer;native operations never acquire the registry
+ // while holding issuer. It also covers CPU frames BEFORE the first binding,
+@@ -1314,10 +1322,11 @@
+         p.clientTask_==s.kernelTaskOwner && !s.kernelProcessClosing && kernelClientExecutionHealthy();
+     const bool app=applicationOperationHeld() && s.appExecution->client_==&connection &&
+         p.clientTask_==s.appExecution->task_;
+-    if(!callingTask || (!kernel && !app) || !processConnectionHeld(connection) || s.processSelected!=&p || p.ringOwner_!=this ||
++    const bool readOnly=app && !s.hfi && nativeReadOnlyQuery288(method);
++    if(!callingTask || (!kernel && !app) || !processConnectionHeld(connection) || (!readOnly && s.processSelected!=&p) || p.ringOwner_!=this ||
+        p.domain_!=&s.domain || p.clientOwner_!=&connection || !p.clientOpen_ || p.clientClosed_ ||
+-       !p.vmAttached_ || p.vmDetached_ || p.state_.detached || p.state_.poisoned ||
+-       !p.submitAttached_ || p.clientState_->submit.poisoned())return done(kIOReturnNotReady);
++       !p.vmAttached_ || p.vmDetached_ || (!readOnly && p.state_.detached) || p.state_.poisoned ||
++       !p.submitAttached_ || !p.clientState_ || p.clientState_->submit.poisoned())return done(kIOReturnNotReady);
+     clock_interval_to_deadline(1000,NSEC_PER_MSEC,&s.deadline);
+     alignas(8) uint8_t reply[sizeof(NativeAdrenoAbiMetadata)]{};
+     NativeAdrenoRingClock clock{this,nativeNow,nativeIdle};
+@@ -1963,10 +1972,11 @@
+ }
+ 
+ IOReturn ZornGen7HostRing26::beginApplicationOperation(IOUserClient &client,
+-    ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope,bool *pendingFence)
++    ZornGen7AppOperation26 operation,ZornGen7AppExecution26 *&scope,bool *pendingFence,bool selectContext)
+ {
+     if(pendingFence)*pendingFence=false;
+-    if(scope || !storage_ || !normal())return kIOReturnBadArgument;auto &s=*storage_;
++    if(scope || !storage_ || !normal() || (!selectContext &&
++       operation!=ZornGen7AppOperation26::CpuView && operation!=ZornGen7AppOperation26::Timestamp))return kIOReturnBadArgument;auto &s=*storage_;
+     if(IORecursiveLockHaveLock(&s.gate) || s.issuerHeld() || !s.appSerial ||
+        __atomic_load_n(&s.appSerialThread,__ATOMIC_ACQUIRE)==current_thread())return kIOReturnNotReady;
+     // Sleepable PI mutex:wait for the complete current operation,including
+@@ -1989,7 +1999,7 @@
+         s.appOperationThread=current_thread();scope=execution;s.unlockIssuer();
+         // Prepare creates its process in the original body;every retained
+         // ordinary/Close process uses the real existing Select operation.
+-        if(!s.hfi && operation!=ZornGen7AppOperation26::PrepareTables){
++        if(selectContext && !s.hfi && operation!=ZornGen7AppOperation26::PrepareTables){
+             bool pending=false;raw=enterApplicationContext(client,*execution,&pending);
+             if(raw){scope=nullptr;const auto result=finishApplicationOperation(*execution,raw);
+                 // Only real pre-body pending state may resume. A failure in
+@@ -2069,7 +2079,8 @@
+     else if(method==NativeAdrenoMethodSubmit || method==NativeAdrenoMethodSubmitBatch)operation=ZornGen7AppOperation26::Submit;
+     else if(method==NativeAdrenoMethodWaitFence)operation=ZornGen7AppOperation26::Wait;
+     else if(method==NativeAdrenoMethodGetTimestamp)operation=ZornGen7AppOperation26::Timestamp;
+-    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,operation,scope);if(raw)return raw;
++    const bool selectContext=storage_->hfi || !nativeReadOnlyQuery288(method);
++    ZornGen7AppExecution26 *scope=nullptr;auto raw=beginApplicationOperation(client,operation,scope,nullptr,selectContext);if(raw)return raw;
+     if(scope!=&execution)return finishApplicationOperation(*scope,kIOReturnNotReady);
+     alignas(8) uint8_t reply[sizeof(NativeAdrenoAbiMetadata)]{};
+     raw=dispatchProcessClient(client,process,caller.task,method,input,inputBytes,reply,outputBytes);
+--- a/ZornGen7HostRing26.h
++++ b/ZornGen7HostRing26.h
+@@ -42,7 +42,7 @@
+     IOReturn checkApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 &,
+         ZornGen7AppOperation26);
+     IOReturn closeApplicationExecution(class IOUserClient &,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr);
+-    IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr);
++    IOReturn beginApplicationOperation(class IOUserClient &,ZornGen7AppOperation26,class ZornGen7AppExecution26 *&,bool *pendingFence=nullptr,bool selectContext=true);
+     IOReturn finishApplicationOperation(class ZornGen7AppExecution26 &,IOReturn);
+     bool applicationOperationHeld() const;
+     IOReturn enterApplicationContext(class IOUserClient &,class ZornGen7AppExecution26 &,bool *pendingFence=nullptr);

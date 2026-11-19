@@ -1,0 +1,69 @@
+--- a/ZornApplicationStderr26.inc
++++ b/ZornApplicationStderr26.inc
+@@ -6,7 +6,7 @@
+  // Actual kernel process identity; this name filter selects diagnostics only.
+  // It never grants IOKit/GPU admission or changes a syscall result.
+  const char *name=proc_best_name(process);
+- static const char expected[]="backboardd";
++ static const char expected[]="zorn-metal-probe193";
+  if(!name || strncmp(name,expected,sizeof(expected)))return;
+  const uint64_t unique=proc_uniqueid(process);const uint32_t pid=(uint32_t)proc_pid(process);
+  if(!zorn26_application_stderr_reserve(unique,pid))return;
+--- a/ZornJournalCapture248.inc
++++ b/ZornJournalCapture248.inc
+@@ -3,7 +3,7 @@
+ static int zorn26_journal_process248(proc_t p,int fd){
+  if(!p || fd!=2)return 0;
+  const char *name=proc_best_name(p);
+- static const char expected[]="backboardd";
++ static const char expected[]="zorn-metal-probe193";
+  return name && !strncmp(name,expected,sizeof(expected));
+ }
+ // Observe the actually returned prefix after the original write. User memory
+--- a/ZornUfsOwner26.cpp
++++ b/ZornUfsOwner26.cpp
+@@ -544,7 +544,7 @@
+         (void)zorn26_application_snapshot(&application);
+     }
+     char line[4096];
+-    int length = snprintf(line, sizeof(line), "K80 GPU CDC ea69910e02e94ccda7b6fd7b3e8a9aac %s,m=%u\r\n", gpu + 2, smr);
++    int length = snprintf(line, sizeof(line), "K80 GPU CDC 9a0a80f5874448e281789c9cfb9db089 %s,m=%u\r\n", gpu + 2, smr);
+     if (length <= 0 || size_t(length) >= sizeof(line)) return;
+     uint64_t scmStatus=0;
+     if(zorn26_cx_scm_read_status(&scmStatus)){
+@@ -988,7 +988,7 @@
+     const unsigned ack=__atomic_load_n(&p->gate.acknowledged,__ATOMIC_ACQUIRE);
+     const unsigned failed=__atomic_load_n(&p->gate.failed,__ATOMIC_ACQUIRE);
+     const unsigned callbackPoint=__atomic_load_n(&zornCallbackGate222.requested,__ATOMIC_ACQUIRE);
+-    unsigned size=zorn_progress_format202(line,cap,"ea69910e02e94ccda7b6fd7b3e8a9aac",completedFrames,state,result,
++    unsigned size=zorn_progress_format202(line,cap,"9a0a80f5874448e281789c9cfb9db089",completedFrames,state,result,
+         __atomic_load_n(&p->spawnRaw,__ATOMIC_ACQUIRE),got,zorn26_native_application_publication(),observation,
+         point,ack,failed,
+         callbackPoint,
+--- a/ZornUsbCdc26.c
++++ b/ZornUsbCdc26.c
+@@ -84,7 +84,7 @@
+ _Static_assert(TX+TX_SIZE<=RX,"USB RX/TX overlap");
+ _Static_assert((RX&63)==0,"USB RX cache alignment");
+ static const unsigned trb_off[6]={0x1000,0x1040,0x1080,0x10c0,0x1100,0x1140};
+-static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN26EA69910E02E9"};
++static const char *const usb_strings[]={NULL,"UniXNU","Redmi K80 XNU CDC","ZORN269A0A80F58744"};
+ // Every steady-state mutation and normal cleanup shares this nonblocking owner.
+ // A terminal caller never waits for it and never recycles an active DMA buffer.
+ static unsigned cdcOwner230,cdcReady230,cdcTerminal230;
+--- a/record-identity/ZornPlatformRecordIdentity26.h
++++ b/record-identity/ZornPlatformRecordIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // New offline artifact tag only; no owner,ready,claim or execution permission.
+-static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0xea,0x69,0x91,0x0e,0x02,0xe9,0x4c,0xcd,0xa7,0xb6,0xfd,0x7b,0x3e,0x8a,0x9a,0xac};
++static constexpr uint8_t __attribute__((used)) kZornPlatformRecordTrial[16]={0x9a,0x0a,0x80,0xf5,0x87,0x44,0x48,0xe2,0x81,0x78,0x9c,0x9c,0xfb,0x9d,0xb0,0x89};
+--- a/record-identity/ZornPlatformTrialIdentity26.h
++++ b/record-identity/ZornPlatformTrialIdentity26.h
+@@ -2,4 +2,4 @@
+ #pragma once
+ #include <stdint.h>
+ // Offline artifact identity only;not hardware/phone execution authorization.
+-static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0xea,0x69,0x91,0x0e,0x02,0xe9,0x4c,0xcd,0xa7,0xb6,0xfd,0x7b,0x3e,0x8a,0x9a,0xac};
++static const uint8_t __attribute__((used)) kZornPlatformTrial[16]={0x9a,0x0a,0x80,0xf5,0x87,0x44,0x48,0xe2,0x81,0x78,0x9c,0x9c,0xfb,0x9d,0xb0,0x89};

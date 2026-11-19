@@ -1,0 +1,299 @@
+{
+  "version": 337,
+  "boot_tag": "f7fda793ad694c57be740bb78a1cd6ce",
+  "kernel": {
+    "source": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/full-link/kernel.ZORN26-SMMU-TRANSPORT337.UNSELECTED.macho",
+    "archive": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/boot-package/inputs/kernel.macho",
+    "sha256": "95af4ff74808a2ad70c61e8097b5553793c2531ad6edd89bffba4e90b1bf8f55",
+    "bytes": 31115136
+  },
+  "boot": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/boot-package/boot.ZORN26-GPU-V337-SERIAL-UNSELECTED.img",
+    "sha256": "b48bde790cd96d56b2a7d9c927cf59d84b83d88d60dc3cacdade978cbc3dfe4c",
+    "bytes": 11886592
+  },
+  "root": {
+    "image": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/ios26-root-glass-material297.UNSELECTED.hfsx",
+    "sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+    "bytes": 34359738368
+  },
+  "date": "2026-11-19",
+  "device": "92988a43/zorn/slot-a",
+  "scope": "single-K80-ios26-v337-smmu-transport-c691cfa545ab",
+  "package": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/boot-package/verified.json",
+    "bytes": 13392,
+    "sha256": "70cd0d4ace8f7534ca69be20354f8953e773c5b0f62b5acd26ed5a310a1fa81f"
+  },
+  "offline": {
+    "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/docs/evidence/k80-gpu-v337-smmu-transport-offline-2026-11-19.json",
+    "bytes": 8475,
+    "sha256": "718fe085081f3e786d700c76670a9f4587afd585465597e5376b2f53761694f7"
+  },
+  "boot_attempts": 1,
+  "retries": 0,
+  "native_root_writes": 0,
+  "watchdog_seconds": 300,
+  "recovery_timeout_seconds": 600,
+  "CDC": {
+    "frames": 30,
+    "physical_samples": 9,
+    "verified": true,
+    "capture": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/passive-panel-trial-c691cfa545ab/trial/cdc.raw",
+      "bytes": 78569,
+      "sha256": "ed79b31c74c5db439f393a4dcab6a5a8cd65267cabe9342c61a6bd4ddeaa3160"
+    },
+    "terminal_panic_observed": false,
+    "errors": {}
+  },
+  "recovery": {
+    "BCB": {
+      "tail_preserved": true,
+      "full_page_readback": true,
+      "before": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "prepared": "8a7ad840906c3a1bfda429292e597ad7e66989a0bf92959fbbd22ef92c64c03a"
+    },
+    "identities": {
+      "before": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      },
+      "after": {
+        "family": "TWRP",
+        "properties": {
+          "ro.orangefox.boot": "",
+          "ro.twrp.boot": "1",
+          "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+        },
+        "identity_scope": "property identity only;not hardware or storage authority"
+      }
+    },
+    "duration_seconds": 334.2393732500059,
+    "protected_pairs": 7,
+    "adb_server_port": 5039,
+    "protected_GPT_and_root_manifest": true,
+    "BCB_before_boot_checked": true
+  },
+  "prerender_checkpoint": {
+    "run_id": "f7fda793ad694c57be740bb78a1cd6ce",
+    "text": "K80 GPU early332: root=1; cpu_online=8; gpu=pending",
+    "freshness": "before and after differ; tag absent before",
+    "status": "fresh-root-EL0-before-GPU",
+    "cpu_online": 8,
+    "deferred_CPU_owner_published": null,
+    "GPU_board_scheduled_at_checkpoint": false,
+    "GPU_firmware_or_rendering_proven": false
+  },
+  "GPU_startup": {
+    "deferred_call_returned": true,
+    "native_known_task": {
+      "raw": 0,
+      "phase": 6,
+      "flags": 63,
+      "grant_raw": 0,
+      "ring_read": 101,
+      "ring_write": 101,
+      "fence": 2,
+      "completed_fence": 2,
+      "native_outstanding": 0,
+      "submit_outstanding": 0,
+      "VM_poisoned": 0,
+      "submit_poisoned": 0,
+      "device_references": 0,
+      "output_crc": 3896750698,
+      "first_bad": 4294967295,
+      "expected_bad_byte": 0,
+      "actual_bad_byte": 0,
+      "table_acquires": 2,
+      "table_releases": 2,
+      "ring_busy": 1895825408,
+      "ring_status": 1,
+      "io_raw": 0,
+      "task_OOB_flags": 127,
+      "task_OOB_raw": 0,
+      "available": true,
+      "task_complete": true,
+      "checks": {
+        "completed_worker": true,
+        "actual_snapshot": true,
+        "original_task_completed": true,
+        "grant_returned_success": true,
+        "ring_idle_record": true,
+        "real_fence_completed": true,
+        "no_task_outstanding": true,
+        "not_poisoned": true,
+        "unmapped_no_device_references": true,
+        "actual_RGBA_readback": true,
+        "table_lease_balance": true,
+        "native_IO_success": true,
+        "actual_task_OOB_release": true
+      },
+      "scope": "Initial retained native kernel known-image task only;not a Metal frontend/ordinary surface/physical scanout or long-term stability oracle"
+    }
+  },
+  "display": {
+    "lease": {
+      "status": 6,
+      "uptime_ms": 72377,
+      "acquire_raw": 0,
+      "release_raw": 0,
+      "gcc_before": 2147483651,
+      "gcc_held": 2147483651,
+      "gcc_after": 2147483651,
+      "acquire_steps": 127,
+      "release_steps": 253,
+      "result": "returned",
+      "gcc_ahb_running": {
+        "gcc_before": false,
+        "gcc_held": false,
+        "gcc_after": false
+      }
+    },
+    "held_state": {
+      "status": 5,
+      "gcc_ahb_before": 2147483651,
+      "gcc_axi": 2097153,
+      "core_domain": 4163041280,
+      "core_domain_config": 67567616,
+      "ahb_clock": 1,
+      "mdp_clock": 1,
+      "vsync_clock": 1,
+      "gcc_ahb_after": 2147483651,
+      "result": "sampled",
+      "gcc_ahb_running_before": false,
+      "gcc_ahb_running_after": false
+    },
+    "held_DPU": {
+      "first_status": 9,
+      "second_status": 9,
+      "first_uptime_ms": 72378,
+      "second_uptime_ms": 72498,
+      "first_intf_frames": 139,
+      "first_mdp_frames": 139,
+      "first_tear_count": 857789,
+      "first_line_count": 1,
+      "second_intf_frames": 139,
+      "second_mdp_frames": 139,
+      "second_tear_count": 1839272,
+      "second_line_count": 1,
+      "route_status": 7,
+      "GOP_physical": 4232052736,
+      "GOP_stride": 5760,
+      "active_ctl_mask": 1,
+      "active_fetch_mask": 196608,
+      "first_result": "observed",
+      "second_result": "observed",
+      "elapsed_ms": 120,
+      "raw_frame_deltas": {
+        "intf": 0,
+        "mdp": 0,
+        "tear_read": 15
+      },
+      "controllers": [
+        {
+          "interface_active": 2,
+          "fetch_active": 196608,
+          "top": 4026662912,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        },
+        {
+          "interface_active": 0,
+          "fetch_active": 0,
+          "top": 0,
+          "flush": 0
+        }
+      ],
+      "active_pipes": {
+        "0": {
+          "address": 4232052736,
+          "stride": 5760
+        },
+        "1": {
+          "address": 4232052736,
+          "stride": 5760
+        }
+      },
+      "equal_numeric_GOP_addresses": [
+        "0",
+        "1"
+      ],
+      "display_Apps_SMMU": {
+        "status": 8,
+        "control": 0,
+        "id0": 0,
+        "id1": 0,
+        "result": "lock_deadline"
+      }
+    },
+    "Apps_SMMU": {
+      "status": 8,
+      "control": 0,
+      "id0": 0,
+      "id1": 0,
+      "result": "lock_deadline"
+    },
+    "raw_GOP_copy": {
+      "windows": 8,
+      "missing_windows": 0,
+      "measured_seconds": 79.983,
+      "copied_frames": 2386,
+      "copies_per_second": 29.83133915957141,
+      "window_copies_per_second_min": 25.02753028331164,
+      "window_copies_per_second_max": 37.17201166180758,
+      "show_mean_ms": 20.092988264878457
+    },
+    "new_panel_frame_rate": null,
+    "display_latency_ms": null,
+    "interpretation": "The transport lock wait expired at the display read. Current reference root startup and its active UFS I/O share this lock. No MMIO route evidence was published. The observer needs an independently published aperture."
+  },
+  "future_ctl_unit_fixture": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/next-command-kickoff-host/result.json",
+    "bytes": 765,
+    "sha256": "065672331c1eb918d4591253c308afd99a8de0780bfd8e6a450884fb1daa94d4"
+  },
+  "run": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/passive-panel-trial-c691cfa545ab/trial/run.json",
+    "bytes": 1646,
+    "sha256": "711e27de365f2c8814d9a4fd7c7afb2b5caad2bfeb1402f867ada1689443c2f9"
+  },
+  "analysis": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/passive-panel-trial-c691cfa545ab/analysis/analysis.json",
+    "bytes": 263580,
+    "sha256": "c1b06237222629004d00c5ee4249f25bb4033d67459bd3eb433e9633f1cf1293"
+  },
+  "fps_report": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v337-smmu-transport-f7fda793ad694c57be740bb78a1cd6ce/fps-report337.json",
+    "bytes": 1227,
+    "sha256": "35c6cd0946385775407e054fe5da5467002d5b31d05eff1934299686b2b14680"
+  }
+}

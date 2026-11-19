@@ -1,5 +1,7 @@
 # K80 device work
 
+iOS 26.6.2 (23G90) is the active driver and validation line. The iPadOS 17 GPU port is retired. Keep its compatibility profiles, protected storage and recorded baselines available for historical reference.
+
 Read [README.md](README.md), the [official record guide](https://unixnu.com/zh/porting/records), [device repository guide](https://unixnu.com/zh/porting/device-repository), [component catalog](https://unixnu.com/zh/reference/components), and the authoritative UniXNU-zorn/porting.toml before implementation. For firmware read [UEFI integration](https://unixnu.com/zh/porting/uefi-firmware); for kernel/config changes read [migration](https://unixnu.com/zh/porting/migration), the selected OS profile and component source/README/recipe.
 
 Only UniXNU-zorn and uefi-zorn are maintained here. Do not modify either `_副本` repository. Preserve unrelated working-tree changes, old manifests and all baselines. Do not commit/push Git unless expressly instructed. Root device metadata is format2; the existing debug entry uses the exact compatibility board. Never mechanically change its pinned SHA or bypass an input/object/link/ready check. Update affected record areas with concrete findings and evidence; do not give historical runs the current HEAD or invent verification levels.

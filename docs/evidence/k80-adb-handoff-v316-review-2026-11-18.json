@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "scope": "K80 host ADB transport and offline v316 review",
+  "target": "92988a43/zorn/slot A",
+  "competing_host_process_terminated": {
+    "pid": 91506,
+    "previous_port": 5037,
+    "sdk": "35.0.2",
+    "signal": "SIGTERM"
+  },
+  "reviewed_existing_daemon": {
+    "pid": 93135,
+    "observed_port": 5039,
+    "sdk": "37.0.1",
+    "target_listed": true,
+    "transport_state": "recovery"
+  },
+  "before_host_ownership": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/recovery-preflight-zJbti/host-ownership.json",
+    "sha256": "38fc68cee46d3cd195cf090dc064b05b351319aacc7843e7a00b2959ba581938"
+  },
+  "after_host_ownership": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/adb-host-handoff-rniuY/host-ownership.json",
+    "sha256": "82f08f141b943eccaac3797bbd47dad6b4ebc660855fc2980139d6c591834e73"
+  },
+  "host_inventory": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/adb-host-handoff-rniuY/host-inventory.json",
+    "sha256": "3e24c8e41cbc9af7a60638fea31207a4c7c734b7aa9d8a4f025a63b5016077b0"
+  },
+  "camera_attempt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/recovery-preflight-zJbti/passive-observation.json",
+    "sha256": "438ad41c38a078c1e90f8a87746c24bdca926149650a40f0957517848ff21f9a"
+  },
+  "independent_v316_review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/physical-trial-review-selectable-final/offline-review.json",
+    "sha256": "050c4a2377fd44d384b550b11f71050453151bddee0c4fa6f9546de1609a7e02"
+  },
+  "v316_root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+  "independent_input_count": 56,
+  "checks": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/adb-endpoint-host-final/result.json",
+      "sha256": "2c97d3b318179dc64ace7cda14d178915d6aa94d3b85c6b1f4ac5a2f80dd43b4"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/adb-owner-selectable-host-final.json",
+      "sha256": "59d325a14eed2d47471ba3cb70ceb0b1fbad40bfdb56b75808485bb11b605b53"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v316-fence-progress-39a0aa1b81e548e593f7831bf8eaf017/physical-alternate-adb-archive-final-host/result.json",
+      "sha256": "ada6d4a9c6616f453840952a912eafb005c801a264511ee2c7516315a253ce41"
+    }
+  ],
+  "input_sources": [
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_adb_endpoint.py",
+      "sha256": "5464f23b209271cfb1714b145df29fdd94781a195a7886f8aeab9e93a97bea07"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/check-zorn-usb-adb-owner.py",
+      "sha256": "081070f6a625c808bf94c749ce7d0d4e2d0f176709bcc5746ff986ff5e3da6bc"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/prepare-ios26-physical-review.py",
+      "sha256": "906dae932c51a7760f9f93785041adaacbc2a1adc714cb4749645a83599ec59d"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_gpu_resource_trial.py",
+      "sha256": "52e243429badd18ab6f75b0cc433a0d9b98f19da84db5a48c3c5975118e63b36"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/zorn_ios26_logdirs_boot_trial.py",
+      "sha256": "10d488416af7a236ca71341f1c1ae34f94a6a2092d119c44f34204eca0022ea0"
+    },
+    {
+      "path": "/Volumes/macData/projects/ios-zorn/UniXNU-zorn/scripts/analyze-ios26-ft-capture.py",
+      "sha256": "9c962b90b8881f561100b2977a0e4d242bb9a39d3d15715a81bf893d9f3b74ad"
+    }
+  ],
+  "selected_loopback_port_can_vary": true,
+  "tools_remain_fixed_per_admitted_bundle": true,
+  "host_inventory_is_only_cached_transport_state": true,
+  "current_recovery_properties_verified": false,
+  "phone_command_sent": false,
+  "phone_booted": false,
+  "device_stop_preserved": true,
+  "new_scope_ready_or_claim_created": false,
+  "physical_FT3683_qualified": false,
+  "full_GPU_qualification": false
+}

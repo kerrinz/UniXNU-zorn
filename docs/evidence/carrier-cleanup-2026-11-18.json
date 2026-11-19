@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-18",
+  "scope": "Only verified FAT carriers of old iOS26 GPU v100..260. Retain every compressed boot, kernel, root, source, receipt and all v261+ / iOS17 / Data.",
+  "completed": true,
+  "removed_FAT_carriers": 159,
+  "logical_bytes_removed": 32010928128,
+  "free_before_bytes": 1835008000,
+  "free_after_bytes": 10977280000,
+  "observed_free_space_increase_bytes": 9142272000,
+  "space_note": "Logical bytes differ from APFS freed blocks. Host space observations may include concurrent activity.",
+  "verification": {
+    "each_full_FAT_decompressed_and_byte_compared_before_removal": true,
+    "all_retained_boots_and_original_receipts_rehashed_after_cleanup": true,
+    "lsof_no_open_build_files": true,
+    "no_mounted_removed_FAT": true,
+    "current281_kernel_boot_hashes_unchanged": true,
+    "current281_primary_root_retained": true
+  },
+  "ledger": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/carrier-cleanup-20261118/ledger.json",
+    "sha256": "b8e0f5841d116d6c416b599f3300749c236c7312f4aa1f2348c7deddaf8814bb"
+  },
+  "recovery": "Read Android v4 compressed kernel_size uint32le at offset8; gzip payload starts4096. Last FAT bytes in decompressed payload recover exact old path; check saved SHA256 before using historical receipts.",
+  "recovery_notes": "/Volumes/macData/projects/ios-zorn/out/zorn/carrier-cleanup-20261118/RECOVERY.md",
+  "protected_artifact_check": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/carrier-cleanup-20261118/current-protected-artifacts.json",
+    "sha256": "2fce5f68fdef58fed005dd2d4b22283dced6cb05028937cf1d01ec2d578ce279"
+  },
+  "iOS17_Data_Android_untouched": true,
+  "no_phone_operations": true,
+  "no_commit": true,
+  "goal_status": "active;owner asked original agent to continue,not handed off"
+}

@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "version": 297,
+  "date": "2026-11-18",
+  "scope": "actual dedicated iOS26 root installation only;boot requires separate receipt",
+  "device": {
+    "serial": "92988a43",
+    "product": "zorn",
+    "slot": "a"
+  },
+  "old_root_sha256": "181e7fc6f85c73bfe7155baf3cc25260ce9107b9c4efbef28d7075767955e03a",
+  "new_root_sha256": "951d3de636fb50a26886ac6b07e24db5bf3da6a0b58be2706542f28339fca301",
+  "kernel_sha256": "a2a68439ff9089e471dc6888446df1439d2c002c805787898d9961596e66f5ce",
+  "boot_sha256": "e942787753046aef8168425fe6c83eef79666c5f73b296e0ef970785c2a3aa69",
+  "changed_files": [
+    {
+      "path": "/System/Library/LaunchDaemons/com.apple.backboardd.plist",
+      "sha256": "e08808b6f3d47d073ae2e4636b779cb503303146dbde81ea64c9c4332f745679",
+      "attributes": {
+        "inode": 487830,
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "nlink": 1,
+        "flags": 0
+      }
+    }
+  ],
+  "changed_pages": 21,
+  "changed_bytes": 86016,
+  "write_groups": 11,
+  "retained_actual_parent_pages_verified": 13755,
+  "layout_change": false,
+  "readback": {
+    "scope": "written4KiB-root-pages-only",
+    "blocks": 21,
+    "bytes": 86016,
+    "sha256": "410ef10bd287234a2c40b6e8f5279c4677506b2fb1d2742fa895345008a107ec"
+  },
+  "protected_metadata_and_fences_unchanged": true,
+  "BCB_full_page_and_tail_verified": true,
+  "recovery_before": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "recovery_after": {
+    "family": "TWRP",
+    "properties": {
+      "ro.orangefox.boot": "",
+      "ro.twrp.boot": "1",
+      "ro.twrp.version": "3.7.1_16-POCO_F7_Pro-By_Mr3333_droid"
+    },
+    "identity_scope": "property identity only;not hardware or storage authority"
+  },
+  "automatic_boot_by_install": false,
+  "retries": 0,
+  "timeout_seconds": 600,
+  "review": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/review-inputs.json",
+    "sha256": "1bc9c826900924d4e48c4ad58cbd3d26c1ca1c75f0046746e0c8e5d395e70ae6",
+    "bytes": 48352
+  },
+  "actual_receipt": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/admission/run/result.json",
+    "sha256": "5752c0bf33fff6c4dcea2de79d724227295d4bfad636952cdf0befa2dbaf32e2",
+    "bytes": 1226
+  },
+  "admission": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/admission/admission.json",
+    "sha256": "7b2db5e3b144b9469b373fc753694e68cae62356680fe975c04a27a8b4b609e3",
+    "bytes": 1369
+  },
+  "claim": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/admission/run/one-shot.claim.json",
+    "sha256": "2fa5bdb78645504eeba0878f350ff1179c20efecb5f4913f1fc19ff0682ccf7c",
+    "bytes": 204
+  },
+  "source_plan": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/metal_root_delta_plan.py",
+    "sha256": "d896898db46d07b2f14a43c18eaf2370d22e3f5308bb6e46a47a2f14cc17116f",
+    "bytes": 13575
+  },
+  "actual_installer_entry": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/installer-root-entry.py",
+    "sha256": "1ab4db7682c3b151665b1023e0aa16f15627528b7262b13bbf3892eedda5a9b3",
+    "bytes": 28856
+  },
+  "actual_installer_runner": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-glass297-root-delta-review-9c373859/installer-run-zorn-debug.py",
+    "sha256": "2af0263cc2364f3b0d3bc0ec7eeedc4c46500cff66c30c0b8cee990f53834696",
+    "bytes": 38978
+  },
+  "offline_replay": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-candidate/layout-and-replay-result.json",
+    "sha256": "a402fd999a810932090f7eb137d498438ac457c0e0e8056153e52afa260f0f5c",
+    "bytes": 4049
+  },
+  "host_adapter": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/root-adapter-current-host/result.json",
+    "sha256": "9635498139cbd8d262dad6c17417ee9c2a28d8494fb99b2edc57d260bd3a886a",
+    "bytes": 2476
+  },
+  "retained_actual290_userland": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v297-glass-material-9c37385967304b6fae92874309c81104/retained-userland297.json",
+    "sha256": "fff0a33ea42794eed14dbff53dc730e4751ead0e353bb4dd622fc4524382f5e3",
+    "bytes": 2618
+  },
+  "no_disassembly_reverse_engineering_or_instruction_rewrite": true,
+  "full_GPU_qualification": false
+}

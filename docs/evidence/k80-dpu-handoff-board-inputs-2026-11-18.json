@@ -1,0 +1,113 @@
+{
+  "device": "92988a43/zorn",
+  "recovery_FDT": {
+    "path": "/Volumes/macData/projects/ios-zorn/out/zorn/gpu-recovery-resume-20261031/current-recovery-fdt.dtb",
+    "bytes": 900407,
+    "sha256": "dfafb7be0363b11538f6ccd0d1aa19c6f88b7bf365b1935d9264f9e8c4d214cf"
+  },
+  "MDP": {
+    "physical": "0x0ae00000",
+    "resource_bytes": 540672,
+    "mapped_bytes": 196608,
+    "active_controller_input": "K80 DSI0 is INTF1",
+    "ctl_offsets": [
+      90112,
+      94208,
+      98304,
+      102400,
+      106496,
+      110592
+    ],
+    "pipe_offsets": [
+      20480,
+      28672,
+      36864,
+      45056,
+      151552,
+      159744,
+      167936,
+      176128,
+      184320,
+      192512
+    ],
+    "only_qualified_paths_read": true
+  },
+  "linux": {
+    "commit": "d9e81e6bcc4ac43c247dcbd382d1d8ff1e5f22d9",
+    "sources": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/clk/qcom/common.c",
+        "bytes": 16015,
+        "sha256": "e6d56c307b26cc49566bdc9864276b2bfaf1183c6d27e5752125c104283bbee6"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/clk/qcom/gcc-pineapple.c",
+        "bytes": 120443,
+        "sha256": "5f52b2c960a94a1385c571748ab54eb83aac079038850c5ffdbe44ec937efb59"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/drivers/clk/qcom/dispcc-pineapple.c",
+        "bytes": 59563,
+        "sha256": "f5c7958776fbe9eb52722c37965836c7b6b16a7548d7da7b7d6dc6a0306993c3"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-kernel/include/dt-bindings/clock/qcom,gcc-pineapple.h",
+        "bytes": 9199,
+        "sha256": "f7bd81588277aa98730c37f4d77ed6abd9067580c740b5635fe1294a0d179a58"
+      }
+    ],
+    "power_order": "qcom_cc_runtime_resume applies VDD, then ICC, then the interface-clock PM resume"
+  },
+  "device_tree": {
+    "commit": "25446a168427695fed4adecb61fd63926f12bc17",
+    "files": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/pineapple.dtsi",
+        "bytes": 91063,
+        "sha256": "60cabffe3e606f8216066aca9ba1ee35ea428b4169d3f7b02bfeee980bc4b2eb"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/zorn-devicetree/qcom/display/display/pineapple-sde.dtsi",
+        "bytes": 8925,
+        "sha256": "477b40fe1f0d195a36788bb528666a997dfcf60dd2bc9f0def235f99503cc20f"
+      }
+    ]
+  },
+  "vendor": {
+    "commit": "3f527f3e55ef27f240507ace3181d13900c3ed7f",
+    "tree": {
+      "path": "/Volumes/macData/projects/ios-zorn/out/zorn/brightness/display-tree.json",
+      "bytes": 123875,
+      "sha256": "30f285f8be4aeadd9c901832656756e17375cfba2c2f8cc70d216998258f640e"
+    },
+    "sources": [
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v318-panel-timing-40e40ca097bf4cfa85552460cadb77b7/scanout-source-reference/sde_hw_ctl.c",
+        "bytes": 40200,
+        "sha256": "5a821b52cc82404687cbc7b05e14dba65e4867a7dc3cae584f53aa1752a9340f",
+        "git_blob": "a7a667ee62080f124b237c48685e043d1915fd93"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v318-panel-timing-40e40ca097bf4cfa85552460cadb77b7/scanout-source-reference/sde_hw_sspp.c",
+        "bytes": 50503,
+        "sha256": "8ee4ee37be36c1e60120913549d43d37bdecb170be7ee050664e33e83c238a69",
+        "git_blob": "5c6db8a70679e8b910145d33d69cb474153b8b3e"
+      },
+      {
+        "path": "/Volumes/macData/projects/ios-zorn/out/zorn/ios26-feasibility-20261107/build/ios-26.6.2-23G90/k80-gpu-v318-panel-timing-40e40ca097bf4cfa85552460cadb77b7/scanout-source-reference/sde_encoder_phys_cmd.c",
+        "bytes": 86928,
+        "sha256": "13e5709b4fd0e7e4b9f61138cd9f31d3383666d285f1618e8edb9e02e964e571",
+        "git_blob": "c34b390858568ae2cf119365f8c20a6c0da45458"
+      }
+    ]
+  },
+  "GOP": {
+    "reserve_start": "0xfc400000",
+    "reserve_end_exclusive": "0xfef00000",
+    "overlapping_ramdump_end_exclusive": "0xfd800000",
+    "stride_and_extent_validated": true
+  },
+  "ownership_not_inferred_from_address_equality": true,
+  "frame_transfer_known_source": "MiCode command-mode encoder uses CTL done/PP TX done with an actual pending kickoff.",
+  "physical_fps_and_latency_qualification": false
+}
